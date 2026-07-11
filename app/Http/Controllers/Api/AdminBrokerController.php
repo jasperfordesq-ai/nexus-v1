@@ -28,6 +28,13 @@ class AdminBrokerController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /** @var list<string> */
+    private const RETIRED_VETTING_CONFIG_KEYS = [
+        'vetting_enabled',
+        'enforce_vetting_on_exchanges',
+        'vetting_expiry_warning_days',
+    ];
+
     public function __construct(
         private readonly BrokerControlConfigService $brokerControlConfigService,
         private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
@@ -35,6 +42,12 @@ class AdminBrokerController extends BaseApiController
         private readonly NotificationDispatcher $notificationDispatcher,
         private readonly AuditLogService $auditLogService,
     ) {}
+
+    /** @param array<string, mixed> $config @return array<string, mixed> */
+    private function withoutRetiredVettingConfig(array $config): array
+    {
+        return array_diff_key($config, array_flip(self::RETIRED_VETTING_CONFIG_KEYS));
+    }
 
     // ============================================
     // HELPERS
@@ -223,22 +236,18 @@ class AdminBrokerController extends BaseApiController
             \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard monitored_users failed: ' . $e->getMessage());
         }
 
-        $vettingPending = 0;
-        $vettingExpiring = 0;
+        $vettingReviewRequests = 0;
         try {
             $row = DB::selectOne(
-                "SELECT
-                    SUM(CASE WHEN status IN ('pending', 'submitted') THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN status = 'verified' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring
-                 FROM vetting_records WHERE {$tenantWhere}",
+                "SELECT COUNT(*) as cnt
+                 FROM safeguarding_vetting_review_requests
+                 WHERE {$tenantWhere} AND status = 'pending'",
                 $tenantParams
             );
-            $vettingPending = (int) ($row->pending ?? 0);
-            $vettingExpiring = (int) ($row->expiring ?? 0);
+            $vettingReviewRequests = (int) ($row->cnt ?? 0);
         } catch (\Exception $e) {
-            $failedMetrics[] = 'vetting_pending';
-            $failedMetrics[] = 'vetting_expiring';
-            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard vetting failed: ' . $e->getMessage());
+            $failedMetrics[] = 'vetting_review_requests';
+            \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard vetting review queue failed: ' . $e->getMessage());
         }
 
         $safeguardingAlerts = 0;
@@ -301,13 +310,10 @@ class AdminBrokerController extends BaseApiController
         $recentActivity = [];
         try {
             // Activity feed reads from BOTH activity_log and org_audit_log,
-            // because broker actions are split between them by historical
-            // accident: AdminVettingController logs via ActivityLog::log →
-            // activity_log; AdminBrokerController + the R6 audit additions
-            // log via AuditLogService::log → org_audit_log. UNIONing the two
-            // with the actual action keys those controllers write keeps the
-            // dashboard panel populated regardless of which table a given
-            // mutation hits.
+            // because insurance and broker actions are split between them.
+            // Safeguarding contact decisions have their own append-only event
+            // table and are deliberately not represented as legacy vetting
+            // record or document actions here.
             //
             // Each branch returns a literal `source` column ('activity' /
             // 'audit') so the frontend can build a stable composite React
@@ -344,10 +350,6 @@ class AdminBrokerController extends BaseApiController
                   LEFT JOIN users u ON u.id = al.user_id
                   LEFT JOIN tenants t ON al.tenant_id = t.id
                   WHERE {$actWhere} AND al.action IN (
-                      'vetting_record_verified', 'vetting_record_rejected',
-                      'vetting_record_created', 'vetting_record_updated',
-                      'vetting_record_deleted', 'vetting_document_uploaded',
-                      'vetting_bulk_verify', 'vetting_bulk_reject', 'vetting_bulk_delete',
                       'insurance_cert_created', 'insurance_cert_updated',
                       'insurance_cert_verified', 'insurance_cert_rejected',
                       'insurance_cert_deleted'
@@ -386,8 +388,7 @@ class AdminBrokerController extends BaseApiController
             'unreviewed_messages' => in_array('unreviewed_messages', $failedMetrics, true) ? null : $unreviewedMessages,
             'high_risk_listings' => in_array('high_risk_listings', $failedMetrics, true) ? null : $highRiskListings,
             'monitored_users' => in_array('monitored_users', $failedMetrics, true) ? null : $monitoredUsers,
-            'vetting_pending' => in_array('vetting_pending', $failedMetrics, true) ? null : $vettingPending,
-            'vetting_expiring' => in_array('vetting_expiring', $failedMetrics, true) ? null : $vettingExpiring,
+            'vetting_review_requests' => in_array('vetting_review_requests', $failedMetrics, true) ? null : $vettingReviewRequests,
             'safeguarding_alerts' => in_array('safeguarding_alerts', $failedMetrics, true) ? null : $safeguardingAlerts,
             'onboarding_safeguarding_flags' => in_array('onboarding_safeguarding_flags', $failedMetrics, true) ? null : $onboardingSafeguardingFlags,
             'recent_activity' => $recentActivity,
@@ -709,7 +710,16 @@ class AdminBrokerController extends BaseApiController
         $memberVisibleNotes = trim($this->input('member_visible_notes', ''));
         $requiresApproval = (bool) $this->input('requires_approval', false);
         $insuranceRequired = (bool) $this->input('insurance_required', false);
-        $dbsRequired = (bool) $this->input('dbs_required', false);
+        $hasRoleVettingInput = request()->has('dbs_required');
+        $dbsRequired = $hasRoleVettingInput ? (bool) $this->input('dbs_required', false) : null;
+        if ($dbsRequired === true) {
+            return $this->respondWithError(
+                'ROLE_VETTING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.listing_role_feature_unavailable'),
+                'dbs_required',
+                409,
+            );
+        }
 
         $allowedLevels = ['low', 'medium', 'high', 'critical'];
         if (!in_array($riskLevel, $allowedLevels)) {
@@ -745,15 +755,16 @@ class AdminBrokerController extends BaseApiController
             $listingTenantId = (int) $listing->tenant_id;
 
             $existing = DB::selectOne(
-                "SELECT id, risk_level FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
+                "SELECT id, risk_level, dbs_required FROM listing_risk_tags WHERE listing_id = ? AND tenant_id = ?",
                 [$listingId, $listingTenantId]
             );
 
             if ($existing) {
                 $oldRiskLevel = $existing->risk_level;
+                $effectiveDbsRequired = $dbsRequired ?? (bool) $existing->dbs_required;
                 DB::update(
                     "UPDATE listing_risk_tags SET risk_level = ?, risk_category = ?, risk_notes = ?, member_visible_notes = ?, requires_approval = ?, insurance_required = ?, dbs_required = ?, tagged_by = ?, updated_at = NOW() WHERE listing_id = ? AND tenant_id = ?",
-                    [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
+                    [$riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $effectiveDbsRequired ? 1 : 0, $adminId, $listingId, $listingTenantId]
                 );
                 $tagId = $existing->id;
                 $this->auditLogService->log('listing_risk_tag_updated', null, $adminId, ['listing_id' => $listingId, 'old_risk_level' => $oldRiskLevel, 'new_risk_level' => $riskLevel, 'actor_role' => $this->resolveActorRole()]);
@@ -765,7 +776,7 @@ class AdminBrokerController extends BaseApiController
             } else {
                 DB::insert(
                     "INSERT INTO listing_risk_tags (listing_id, tenant_id, risk_level, risk_category, risk_notes, member_visible_notes, requires_approval, insurance_required, dbs_required, tagged_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-                    [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, $dbsRequired ? 1 : 0, $adminId]
+                    [$listingId, $listingTenantId, $riskLevel, $riskCategory, $riskNotes, $memberVisibleNotes, $requiresApproval ? 1 : 0, $insuranceRequired ? 1 : 0, 0, $adminId]
                 );
                 $tagId = (int) DB::getPdo()->lastInsertId();
                 $this->auditLogService->log('listing_risk_tag_created', null, $adminId, ['listing_id' => $listingId, 'tag_id' => $tagId, 'risk_level' => $riskLevel, 'actor_role' => $this->resolveActorRole()]);
@@ -1435,9 +1446,9 @@ class AdminBrokerController extends BaseApiController
             'show_broker_name' => false, 'broker_contact_email' => '',
             'copy_first_contact' => true, 'copy_new_member_messages' => true,
             'copy_high_risk_listing_messages' => true, 'random_sample_percentage' => 0,
-            'retention_days' => 90, 'vetting_enabled' => false,
-            'insurance_enabled' => false, 'enforce_vetting_on_exchanges' => false,
-            'enforce_insurance_on_exchanges' => false, 'vetting_expiry_warning_days' => 30,
+            'retention_days' => 90,
+            'insurance_enabled' => false,
+            'enforce_insurance_on_exchanges' => false,
             'insurance_expiry_warning_days' => 30,
         ];
 
@@ -1462,7 +1473,9 @@ class AdminBrokerController extends BaseApiController
                     $allConfigs[] = [
                         'tenant_id' => (int) $r->tenant_id,
                         'tenant_name' => $r->tenant_name ?? 'Unknown',
-                        'config' => array_merge($defaults, $runtimeConfig, $saved),
+                        'config' => $this->withoutRetiredVettingConfig(
+                            array_merge($defaults, $runtimeConfig, $saved),
+                        ),
                     ];
                 }
                 return $this->respondWithData($allConfigs);
@@ -1483,6 +1496,8 @@ class AdminBrokerController extends BaseApiController
                 $saved = json_decode($row->setting_value, true) ?? [];
                 $config = array_merge($config, $saved);
             }
+
+            $config = $this->withoutRetiredVettingConfig($config);
 
             return $this->respondWithData($config);
         } catch (\Exception $e) {
@@ -1521,15 +1536,14 @@ class AdminBrokerController extends BaseApiController
             'broker_visible_to_members', 'show_broker_name', 'broker_contact_email',
             'copy_first_contact', 'copy_new_member_messages', 'copy_high_risk_listing_messages',
             'random_sample_percentage', 'retention_days',
-            'vetting_enabled', 'insurance_enabled',
-            'enforce_vetting_on_exchanges', 'enforce_insurance_on_exchanges',
-            'vetting_expiry_warning_days', 'insurance_expiry_warning_days',
+            'insurance_enabled', 'enforce_insurance_on_exchanges',
+            'insurance_expiry_warning_days',
         ];
 
         // Privilege boundary: brokers/coordinators tune their day-to-day
         // operating thresholds (e.g. monitoring days, retention, copy
-        // criteria), but tenant-wide enforcement toggles — vetting/insurance
-        // gating, approval requirements, blanket message copying — are
+        // criteria), but tenant-wide enforcement toggles — insurance gating,
+        // approval requirements, blanket message copying — are
         // policy decisions reserved for admins. Without this gate a broker
         // could disable platform-wide vetting enforcement for their tenant.
         $adminOnlyKeys = [
@@ -1539,8 +1553,7 @@ class AdminBrokerController extends BaseApiController
             'exchange_workflow_enabled', 'require_broker_approval_new_members',
             'require_broker_approval_high_risk', 'require_broker_approval_over_hours',
             'auto_approve_low_risk', 'max_hours_without_approval',
-            'vetting_enabled', 'insurance_enabled',
-            'enforce_vetting_on_exchanges', 'enforce_insurance_on_exchanges',
+            'insurance_enabled', 'enforce_insurance_on_exchanges',
             'require_exchange_for_listings',
         ];
         $callerUser = $this->resolveUserObject();
@@ -1587,7 +1600,7 @@ class AdminBrokerController extends BaseApiController
             // Partial updates must preserve previously saved policy keys.
             // Otherwise a broker saving an allowed threshold can wipe
             // admin-owned controls from tenant_settings.broker_config.
-            $mergedConfig = array_merge($savedConfig, $config);
+            $mergedConfig = $this->withoutRetiredVettingConfig(array_merge($savedConfig, $config));
             $json = json_encode($mergedConfig);
             if ($existing) {
                 DB::update(

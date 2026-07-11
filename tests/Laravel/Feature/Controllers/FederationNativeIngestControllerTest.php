@@ -7,9 +7,13 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\FederationApiMiddleware;
+use App\Models\User;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
@@ -149,6 +153,50 @@ class FederationNativeIngestControllerTest extends TestCase
     {
         $response = $this->apiPost('/v2/federation/ingest/reviews', ['garbage' => str_repeat('x', 200)]);
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_native_review_policy_unavailable_returns_retryable_503_without_write(): void
+    {
+        $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+        $apiKey = $this->createFederationApiKey(['*'], (int) $externalPartner->id);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $externalId = 'native-review-policy-unavailable-' . uniqid();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateExternalContact')
+            ->once()
+            ->with(
+                (int) $receiver->id,
+                $this->testTenantId,
+                "partner:{$externalPartner->id}:sender:701",
+                'external_federated_review',
+            )
+            ->andReturn(new SafeguardingInteractionDecision(
+                status: SafeguardingInteractionDecision::UNAVAILABLE,
+                code: 'SAFEGUARDING_POLICY_UNAVAILABLE',
+                recipientTenantId: $this->testTenantId,
+                purposeCode: 'safeguarded_member_contact',
+                scopeType: 'tenant',
+                scopeIdentifier: '',
+                canRequestCoordinator: true,
+            ));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $response = $this->apiPost('/v2/federation/ingest/reviews', [
+            'external_id' => $externalId,
+            'rating' => 5,
+            'receiver_id' => $receiver->id,
+            'reviewer_external_id' => 701,
+            'reviewer_tenant_id' => 999,
+        ], $this->nativeAuthHeaders($apiKey));
+
+        $response->assertStatus(503);
+        $response->assertJsonPath('errors.0.code', 'SAFEGUARDING_POLICY_UNAVAILABLE');
+        $this->assertDatabaseMissing('reviews', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $externalPartner->id,
+            'external_id' => $externalId,
+        ]);
     }
 
     // ============================================================

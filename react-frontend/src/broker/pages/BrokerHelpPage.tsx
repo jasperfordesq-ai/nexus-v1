@@ -67,6 +67,8 @@ type HelpBlock =
 
 interface HelpSectionDef {
   key: string;
+  titleKey?: string;
+  ariaKey?: string;
   icon: LucideIcon;
   tone: BrokerStatColor;
   blocks: ReadonlyArray<HelpBlock>;
@@ -86,7 +88,7 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
           { key: 'help.overview.bullet_risk_tags', rich: true },
           { key: 'help.overview.bullet_message_review', rich: true },
           { key: 'help.overview.bullet_user_monitoring', rich: true },
-          { key: 'help.overview.bullet_vetting', rich: true },
+          { key: 'help.overview.bullet_attestations', rich: true },
           { key: 'help.overview.bullet_configuration', rich: true },
         ],
       },
@@ -106,7 +108,7 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
           { key: 'help.workflow.step_unreviewed', rich: true },
           { key: 'help.workflow.step_pending', rich: true },
           { key: 'help.workflow.step_alerts', rich: true },
-          { key: 'help.workflow.step_vetting', rich: true },
+          { key: 'help.workflow.step_vetting_reviews', rich: true },
           { key: 'help.workflow.step_activity', rich: true },
         ],
       },
@@ -161,34 +163,32 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
   },
   {
     key: 'vetting',
+    titleKey: 'help.vetting.metadata_title',
+    ariaKey: 'help.vetting.metadata_aria',
     icon: ShieldCheck,
     tone: 'success',
     blocks: [
       { type: 'p', key: 'help.vetting.intro' },
+      { type: 'heading', key: 'help.vetting.jurisdiction_heading' },
       {
         type: 'list',
         items: [
-          { key: 'help.vetting.type_garda', rich: true },
-          { key: 'help.vetting.type_dbs', rich: true },
-          { key: 'help.vetting.type_pvg', rich: true },
-          { key: 'help.vetting.type_access_ni', rich: true },
-          { key: 'help.vetting.type_international', rich: true },
-          { key: 'help.vetting.type_other', rich: true },
+          { key: 'help.vetting.jurisdiction_england_wales', rich: true },
+          { key: 'help.vetting.jurisdiction_elsewhere', rich: true },
         ],
       },
-      { type: 'heading', key: 'help.vetting.lifecycle_heading' },
+      { type: 'heading', key: 'help.vetting.workflow_heading' },
       {
         type: 'list',
         ordered: true,
         items: [
-          { key: 'help.vetting.lifecycle_pending', rich: true },
-          { key: 'help.vetting.lifecycle_verified', rich: true },
-          { key: 'help.vetting.lifecycle_reminder', rich: true },
-          { key: 'help.vetting.lifecycle_expired', rich: true },
-          { key: 'help.vetting.lifecycle_rejected', rich: true },
+          { key: 'help.vetting.workflow_review', rich: true },
+          { key: 'help.vetting.workflow_confirm', rich: true },
+          { key: 'help.vetting.workflow_revoke', rich: true },
         ],
       },
-      { type: 'p', key: 'help.vetting.match_note', rich: true, italic: true },
+      { type: 'p', key: 'help.vetting.privacy', rich: true },
+      { type: 'p', key: 'help.vetting.messaging', rich: true, italic: true },
     ],
   },
   {
@@ -207,7 +207,7 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
         items: [
           { key: 'help.alerts.escalate_abuse', rich: true },
           { key: 'help.alerts.escalate_child', rich: true },
-          { key: 'help.alerts.escalate_vetting', rich: true },
+          { key: 'help.alerts.escalate_attestation', rich: true },
         ],
       },
     ],
@@ -217,16 +217,13 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
     icon: Scale,
     tone: 'neutral',
     blocks: [
-      { type: 'p', key: 'help.legal.disclaimer' },
+      { type: 'p', key: 'help.legal.scope_disclaimer' },
       {
         type: 'list',
         items: [
-          { key: 'help.legal.law_nvb', rich: true },
-          { key: 'help.legal.law_children_first', rich: true },
-          { key: 'help.legal.law_svga', rich: true },
-          { key: 'help.legal.law_pvg', rich: true },
-          { key: 'help.legal.law_svgni', rich: true },
-          { key: 'help.legal.law_gdpr', rich: true },
+          { key: 'help.legal.current_scope', rich: true },
+          { key: 'help.legal.jurisdiction_limits', rich: true },
+          { key: 'help.legal.data_minimisation', rich: true },
         ],
       },
     ],
@@ -241,10 +238,11 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
         items: [
           { key: 'help.data.monitoring_status', rich: true },
           { key: 'help.data.message_copies', rich: true },
-          { key: 'help.data.vetting_records', rich: true },
+          { key: 'help.data.vetting_confirmations', rich: true },
+          { key: 'help.data.vetting_review_requests', rich: true },
           { key: 'help.data.user_prefs', rich: true },
           { key: 'help.data.guardian_assignments', rich: true },
-          { key: 'help.data.audit_trail', rich: true },
+          { key: 'help.data.attestation_audit', rich: true },
         ],
       },
     ],
@@ -260,7 +258,7 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
           { key: 'help.contacts.technical', rich: true },
           { key: 'help.contacts.safeguarding', rich: true },
           { key: 'help.contacts.criminality', rich: true },
-          { key: 'help.contacts.policy', rich: true },
+          { key: 'help.contacts.policy_scope', rich: true },
         ],
       },
     ],
@@ -273,9 +271,9 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
       {
         type: 'list',
         items: [
-          { key: 'help.troubleshooting.cant_message', rich: true },
+          { key: 'help.troubleshooting.cant_message_attestation', rich: true },
           { key: 'help.troubleshooting.wrong_member', rich: true },
-          { key: 'help.troubleshooting.vetting_stuck', rich: true },
+          { key: 'help.troubleshooting.vetting_review', rich: true },
           { key: 'help.troubleshooting.no_copies', rich: true },
         ],
       },
@@ -285,7 +283,10 @@ const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
 
 /** i18n keys whose translated text makes up a section's search haystack. */
 function sectionSearchKeys(section: HelpSectionDef): string[] {
-  const keys = [`help.${section.key}.title`, `help.${section.key}.aria`];
+  const keys = [
+    section.titleKey ?? `help.${section.key}.title`,
+    section.ariaKey ?? `help.${section.key}.aria`,
+  ];
   for (const block of section.blocks) {
     if (block.type === 'list') {
       keys.push(...block.items.map((item) => item.key));
@@ -358,7 +359,7 @@ function HelpAccordion({ sections }: { sections: ReadonlyArray<HelpSectionDef> }
           <AccordionItem
             key={section.key}
             id={section.key}
-            aria-label={t(`help.${section.key}.aria`)}
+            aria-label={t(section.ariaKey ?? `help.${section.key}.aria`)}
             startContent={
               <span
                 aria-hidden="true"
@@ -367,7 +368,7 @@ function HelpAccordion({ sections }: { sections: ReadonlyArray<HelpSectionDef> }
                 <Icon size={15} />
               </span>
             }
-            title={<span className="font-medium text-foreground">{t(`help.${section.key}.title`)}</span>}
+            title={<span className="font-medium text-foreground">{t(section.titleKey ?? `help.${section.key}.title`)}</span>}
           >
             <HelpBlocks blocks={section.blocks} />
           </AccordionItem>

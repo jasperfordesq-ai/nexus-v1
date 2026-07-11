@@ -7,6 +7,8 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
+use App\Services\LegacyVettingEvidenceManager;
 use App\Services\SafeguardingService;
 use App\Services\VolunteerService;
 use App\Services\VolunteerEmergencyAlertService;
@@ -15,7 +17,9 @@ use App\Services\VolunteerMatchingService;
 use App\Services\VolunteerDonationService;
 use App\Services\VolunteerExpenseService;
 use App\Services\VolOrgWalletService;
+use App\Services\VolunteerCredentialPolicy;
 use App\Services\ShiftGroupReservationService;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -600,6 +604,13 @@ trait VolunteeringParity
         $ok = false;
         try {
             $ok = VolunteerEmergencyAlertService::respond($id, $userId, $response);
+        } catch (SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.volunteering.emergency-alerts', [
+                'tenantSlug' => $tenantSlug,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'alert-safeguarding-unavailable'
+                    : 'alert-safeguarding-restricted',
+            ])->with('emergency_alert_safeguarding_error', $e->getMessage());
         } catch (\Throwable $e) {
             report($e);
         }
@@ -630,20 +641,63 @@ trait VolunteeringParity
         $tenantId = TenantContext::getId();
         $credentials = [];
         try {
-            // Same SELECT shape as VolunteerCertificateController::myCredentials.
-            $rows = DB::select(
-                'SELECT id, credential_type, file_name, status, expires_at, created_at
-                 FROM vol_credentials WHERE user_id = ? AND tenant_id = ? ORDER BY created_at DESC',
-                [$userId, $tenantId]
-            );
-            $credentials = array_map(static fn (object $r): array => [
+            $normalisedType = DB::raw('LOWER(TRIM(credential_type))');
+            $allowedRows = DB::table('vol_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn($normalisedType, VolunteerCredentialPolicy::ALLOWED_TYPES)
+                ->where(function (Builder $query): void {
+                    $query->whereNull('notes')
+                        ->orWhere('notes', '!=', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+                })
+                ->select(['id', 'credential_type', 'status', 'expires_at', 'created_at'])
+                ->get();
+            $legacyRows = DB::table('vol_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where(function (Builder $query) use ($normalisedType): void {
+                    $query->whereIn($normalisedType, VolunteerCredentialPolicy::PROHIBITED_VETTING_TYPES)
+                        ->orWhere('notes', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+                })
+                ->select(['id', 'credential_type', 'created_at'])
+                ->get();
+            $manualReviewRows = DB::table('vol_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->whereNotIn($normalisedType, VolunteerCredentialPolicy::ALLOWED_TYPES)
+                ->whereNotIn($normalisedType, VolunteerCredentialPolicy::PROHIBITED_VETTING_TYPES)
+                ->where(function (Builder $query): void {
+                    $query->whereNull('notes')
+                        ->orWhere('notes', '!=', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+                })
+                ->select(['id', 'credential_type', 'status', 'created_at'])
+                ->get();
+
+            $credentials = $allowedRows->map(static fn (object $r): array => [
                 'id' => (int) $r->id,
                 'credential_type' => (string) ($r->credential_type ?? ''),
-                'file_name' => $r->file_name,
                 'status' => (string) ($r->status ?? 'pending'),
                 'expires_at' => $r->expires_at,
                 'created_at' => $r->created_at,
-            ], $rows);
+                'legacy_vetting_evidence' => false,
+                'manual_review_required' => false,
+            ])->concat($legacyRows->map(static fn (object $r): array => [
+                'id' => (int) $r->id,
+                'credential_type' => (string) ($r->credential_type ?? ''),
+                'status' => 'retired',
+                'expires_at' => null,
+                'created_at' => $r->created_at,
+                'legacy_vetting_evidence' => true,
+                'manual_review_required' => false,
+            ]))->concat($manualReviewRows->map(static fn (object $r): array => [
+                'id' => (int) $r->id,
+                'credential_type' => (string) ($r->credential_type ?? ''),
+                'status' => (string) ($r->status ?? 'pending'),
+                'expires_at' => null,
+                'created_at' => $r->created_at,
+                'legacy_vetting_evidence' => false,
+                'manual_review_required' => true,
+            ]))->sortByDesc('created_at')->values()->all();
         } catch (\Throwable $e) {
             report($e);
         }
@@ -668,12 +722,23 @@ trait VolunteeringParity
         }
 
         $tenantId = TenantContext::getId();
-        $type = trim(self::asStr($request->input('credential_type')));
+        $type = VolunteerCredentialPolicy::normaliseType(self::asStr($request->input('credential_type')));
         $expiresAt = self::asStr($request->input('expiry_date')) ?: null;
 
         if ($type === '') {
             return redirect()->route('govuk-alpha.volunteering.credentials', [
                 'tenantSlug' => $tenantSlug, 'status' => 'credential-type-required',
+            ]);
+        }
+
+        if (VolunteerCredentialPolicy::isProhibitedVetting($type)) {
+            return redirect()->route('govuk-alpha.volunteering.credentials', [
+                'tenantSlug' => $tenantSlug, 'status' => 'credential-vetting-prohibited',
+            ]);
+        }
+        if (! VolunteerCredentialPolicy::isAllowed($type)) {
+            return redirect()->route('govuk-alpha.volunteering.credentials', [
+                'tenantSlug' => $tenantSlug, 'status' => 'credential-upload-failed',
             ]);
         }
 
@@ -740,21 +805,37 @@ trait VolunteeringParity
             // Ownership-scoped delete (user_id + tenant_id) — never another
             // user's credential. Mirrors deleteCredential including file cleanup.
             $credential = DB::selectOne(
-                'SELECT file_url FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?',
+                'SELECT id, file_url FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?',
                 [$id, $userId, $tenantId]
             );
-            $affected = DB::delete(
-                'DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?',
-                [$id, $userId, $tenantId]
-            );
-            $ok = $affected > 0;
+            if ($credential !== null) {
+                $deleteStatus = app(LegacyVettingEvidenceManager::class)
+                    ->deletePrivateCredentialPointer((string) ($credential->file_url ?? ''), $tenantId);
+                if (! in_array($deleteStatus, ['deleted', 'missing'], true)) {
+                    DB::table('vol_credentials')
+                        ->where('id', (int) $credential->id)
+                        ->where('user_id', $userId)
+                        ->where('tenant_id', $tenantId)
+                        ->update([
+                            'file_name' => null,
+                            'status' => 'rejected',
+                            'verified_by' => null,
+                            'verified_at' => null,
+                            'expires_at' => null,
+                            'notes' => LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER,
+                            'updated_at' => now(),
+                        ]);
 
-            if ($ok && $credential !== null && str_starts_with((string) $credential->file_url, 'private:')) {
-                $path = substr((string) $credential->file_url, strlen('private:'));
-                $expectedPrefix = 'volunteer-credentials/' . $tenantId . '/';
-                if (str_starts_with($path, $expectedPrefix) && !str_contains($path, '..')) {
-                    Storage::disk('local')->delete($path);
+                    return redirect()->route('govuk-alpha.volunteering.credentials', [
+                        'tenantSlug' => $tenantSlug,
+                        'status' => 'credential-delete-failed',
+                    ]);
                 }
+
+                $ok = DB::delete(
+                    'DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?',
+                    [$id, $userId, $tenantId]
+                ) > 0;
             }
         } catch (\Throwable $e) {
             report($e);
@@ -1158,13 +1239,17 @@ trait VolunteeringParity
             // The service enforces leadership, capacity and the active-reservation
             // check, running the slot increment inside a locked transaction.
             $ok = ShiftGroupReservationService::addMember($id, $memberUserId, $userId);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'member-safeguarding-unavailable'
+                : 'member-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
         return redirect()->route('govuk-alpha.volunteering.group-signups', [
             'tenantSlug' => $tenantSlug,
-            'status' => $ok ? 'member-added' : 'member-add-failed',
+            'status' => $ok ? 'member-added' : ($safeguardingStatus ?? 'member-add-failed'),
         ]);
     }
 

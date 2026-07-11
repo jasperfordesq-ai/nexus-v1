@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
@@ -166,6 +167,8 @@ class ReviewsController extends BaseApiController
 
         try {
             $review = $this->reviewService->create($userId, $this->getAllInput());
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (ValidationException $e) {
             $errors = collect($e->errors())->flatMap(function (array $messages, string $field) {
                 return array_map(fn (string $msg) => [

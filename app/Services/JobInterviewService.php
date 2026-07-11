@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobInterview;
@@ -65,6 +66,13 @@ class JobInterviewService
                 return false;
             }
 
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $proposedByUserId,
+                (int) $application->user_id,
+                $tenantId,
+                'job_interview_proposal',
+            );
+
             $interview = JobInterview::create([
                 'tenant_id'      => $tenantId,
                 'vacancy_id'     => (int) $application->vacancy_id,
@@ -116,6 +124,8 @@ class JobInterviewService
             }
 
             return $interview->toArray();
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('JobInterviewService::propose failed', ['error' => $e->getMessage()]);
             return false;
@@ -149,6 +159,25 @@ class JobInterviewService
             if ($interview->status !== 'proposed') {
                 return false;
             }
+
+            $posterId = (int) ($interview->application->vacancy->user_id ?? 0);
+            if ($posterId <= 0) {
+                return false;
+            }
+
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $posterId,
+                $userId,
+                $tenantId,
+                'job_interview_accept',
+            );
+            $policy->assertLocalContactAllowed(
+                $userId,
+                $posterId,
+                $tenantId,
+                'job_interview_accept',
+            );
 
             $interview->update([
                 'status'          => 'accepted',
@@ -196,6 +225,8 @@ class JobInterviewService
             }
 
             return true;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('JobInterviewService::accept failed', ['error' => $e->getMessage()]);
             return false;
@@ -228,6 +259,19 @@ class JobInterviewService
 
             if ($interview->status !== 'proposed') {
                 return false;
+            }
+
+            $posterId = (int) ($interview->application->vacancy->user_id ?? 0);
+            if ($notes !== null && trim($notes) !== '' && $posterId > 0) {
+                $decision = app(SafeguardingInteractionPolicy::class)->evaluateLocalContact(
+                    $userId,
+                    $posterId,
+                    $tenantId,
+                    'job_interview_decline_note',
+                );
+                if (! $decision->isAllowed()) {
+                    $notes = null;
+                }
             }
 
             $interview->update([

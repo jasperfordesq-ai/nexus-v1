@@ -294,9 +294,29 @@
     "revoke_confirm_no": "Mantenerla",
     "revoked_toast": "Preferencia revocada.",
     "revoke_error_toast": "Algo salió mal. Por favor inténtalo de nuevo.",
+    "policy_review_title": "Revise sus preferencias de protección",
+    "policy_review_body": "Su comunidad cambió su jurisdicción de protección. Sus protecciones siguen activas. Revise el texto actualizado y confirme que aún refleja lo que desea.",
+    "policy_review_confirm": "Confirmar mis preferencias",
+    "policy_review_confirmed": "Preferencias de protección confirmadas.",
+    "policy_review_error": "No se pudo confirmar la revisión. Inténtelo de nuevo.",
     "chip_broker_review": "Revisión de intermediario",
     "chip_match_approval": "Aprobación de coincidencia",
-    "chip_vetted_only": "Solo contactos verificados"
+    "chip_vetted_only": "Solo contactos verificados",
+    "vetting": {
+      "title": "Su estado de investigación de comunidad privada",
+      "status_not_confirmed": "No confirmado",
+      "status_review_requested": "Revisión solicitada",
+      "status_unavailable": "No se pudo cargar su estado de investigación.",
+      "confirmed_on": "Su comunidad confirmó que cumple con este requisito de contacto de protección en {{date}}.",
+      "review_pending_body": "Se le ha pedido a su corredor que revise la confirmación de su comunidad.",
+      "not_confirmed_body": "Su comunidad no ha confirmado que cumpla con este requisito de contacto de protección.",
+      "policy_unavailable_body": "Esta comunidad no ha configurado una política de contacto de protección compatible para su jurisdicción.",
+      "no_documents": "No cargue ni envíe un documento DBS, control policial, investigación de Garda, AccessNI o PVG a través de NEXUS. Su comunidad se encargará de cualquier control legal fuera de la plataforma.",
+      "request_review_button": "Solicitar revisión del corredor",
+      "review_requested_button": "Revisión solicitada",
+      "review_requested_toast": "Se solicita revisión del agente inmobiliario.",
+      "review_error": "No se pudo solicitar la revisión del corredor. Por favor inténtalo de nuevo."
+    }
   },
   "header": {
     "title": "Configuración",
@@ -591,9 +611,9 @@
     "unblock_error": "Error al desbloquear al usuario",
     "blocked_on": "Bloqueado en {{date}}",
     "link": "Usuarios bloqueados",
-    "count_many": "{{count}} bloqueados",
     "count_one": "{{count}} bloqueados",
-    "count_other": "{{count}} bloqueados"
+    "count_other": "{{count}} bloqueados",
+    "count_many": "{{count}} bloqueados"
   },
   "block_user": {
     "title": "¿Bloquear {{name}}?",
@@ -621,13 +641,13 @@
   "push_campaign_opt_in_description": "Permite que empresas y organizaciones locales te envíen notificaciones push dirigidas. Puedes darte de baja en cualquier momento.",
   "tabs_aria": "Secciones de configuración",
   "twofa_loading_setup": "Cargando configuración de dos factores...",
-  "biometric_all_removed_many": "Se eliminaron las claves de acceso {{count}}.",
   "biometric_all_removed_one": "Se eliminaron las claves de acceso {{count}}.",
   "biometric_all_removed_other": "Se eliminaron las claves de acceso {{count}}.",
-  "biometric_enabled_many": "Claves de acceso {{count}} registradas",
   "biometric_enabled_one": "Claves de acceso {{count}} registradas",
   "biometric_enabled_other": "Claves de acceso {{count}} registradas",
-  "twofa_backup_remaining_many": "{{count}} códigos de respaldo restantes",
   "twofa_backup_remaining_one": "{{count}} códigos de respaldo restantes",
-  "twofa_backup_remaining_other": "{{count}} códigos de respaldo restantes"
+  "twofa_backup_remaining_other": "{{count}} códigos de respaldo restantes",
+  "biometric_all_removed_many": "Se eliminaron las claves de acceso {{count}}.",
+  "biometric_enabled_many": "Claves de acceso {{count}} registradas",
+  "twofa_backup_remaining_many": "{{count}} códigos de respaldo restantes"
 }

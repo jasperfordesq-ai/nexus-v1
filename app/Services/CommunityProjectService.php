@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -471,6 +472,46 @@ class CommunityProjectService
 
         if (! $exists) {
             return false;
+        }
+
+        // Existing support is an idempotent no-op. Keep it policy-free so a
+        // member can always reach the separate unsupport exit path.
+        $alreadySupporting = DB::table('vol_community_project_supporters')
+            ->where('tenant_id', $tenantId)
+            ->where('project_id', $proposalId)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($alreadySupporting) {
+            return true;
+        }
+
+        $proposerId = DB::table('vol_community_projects')
+            ->where('id', $proposalId)
+            ->where('tenant_id', $tenantId)
+            ->value('proposed_by');
+
+        if (! is_numeric($proposerId)) {
+            Log::error('Safeguarding recipient lookup failed.', [
+                'tenant_id' => $tenantId,
+                'channel' => 'community_project_support',
+                'project_id' => $proposalId,
+            ]);
+
+            throw new SafeguardingPolicyException(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+            );
+        }
+
+        $proposerId = (int) $proposerId;
+        if ($proposerId !== $userId) {
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $userId,
+                $proposerId,
+                $tenantId,
+                'community_project_support',
+            );
         }
 
         // INSERT IGNORE handles the unique constraint on (project_id, user_id).

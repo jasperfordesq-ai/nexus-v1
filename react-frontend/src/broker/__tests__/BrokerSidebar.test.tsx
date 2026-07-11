@@ -77,7 +77,7 @@ import { BrokerSidebar, type BrokerBadgeCounts } from '../components/BrokerSideb
 const EMPTY_BADGES: BrokerBadgeCounts = {
   pending_members: 0,
   safeguarding_alerts: 0,
-  vetting_expiring: 0,
+  vetting_review_requests: 0,
   pending_exchanges: 0,
   unreviewed_messages: 0,
   monitored_users: 0,

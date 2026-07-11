@@ -294,9 +294,31 @@
     "revoke_confirm_no": "Keep it",
     "revoked_toast": "Preference revoked.",
     "revoke_error_toast": "Something went wrong. Please try again.",
+    "policy_review_title": "Review your safeguarding preferences",
+    "policy_review_body": "Your community changed its safeguarding jurisdiction. Your protections remain active. Check the updated wording below, then confirm it still reflects what you want.",
+    "policy_review_confirm": "Confirm my preferences",
+    "policy_review_confirmed": "Safeguarding preferences confirmed.",
+    "policy_review_error": "The review could not be confirmed. Please try again.",
     "chip_broker_review": "Broker review",
     "chip_match_approval": "Match approval",
-    "chip_vetted_only": "Vetted contacts only"
+    "chip_vetted_only": "Vetted contacts only",
+    "vetting": {
+      "title": "Your private community vetting status",
+      "status_confirmed": "Confirmed",
+      "status_revoked": "Revoked",
+      "status_not_confirmed": "Not confirmed",
+      "status_review_requested": "Review requested",
+      "status_unavailable": "Your vetting status could not be loaded.",
+      "confirmed_on": "Your community confirmed that you meet this safeguarding contact requirement on {{date}}.",
+      "review_pending_body": "Your broker has been asked to review your community confirmation.",
+      "not_confirmed_body": "Your community has not confirmed that you meet this safeguarding contact requirement.",
+      "policy_unavailable_body": "This community has not configured a supported safeguarding contact policy for its jurisdiction.",
+      "no_documents": "Do not upload or send a DBS, police-check, Garda vetting, AccessNI, or PVG document through NEXUS. Your community will arrange any lawful checking outside the platform.",
+      "request_review_button": "Request broker review",
+      "review_requested_button": "Review requested",
+      "review_requested_toast": "Broker review requested.",
+      "review_error": "The broker review could not be requested. Please try again."
+    }
   },
   "header": {
     "title": "Settings",

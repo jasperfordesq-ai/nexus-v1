@@ -116,7 +116,7 @@
       "who_can_see_heading": "誰がこれを見られるか",
       "who_can_see_body": "これらの設定を閲覧できるのはコミュニティコーディネーターと管理者のみです。他のメンバーは閲覧できません。すべてのアクセスは記録されます。",
       "what_activates_heading": "その結果何が有効になるか",
-      "activation_broker_review": "コーディネーターが送受信するメッセージを確認します。",
+      "activation_broker_review": "選択した設定で必要な場合、コーディネーターが保護対象のマッチングや交換を確認して承認します。メッセージ本文へのアクセス権は与えられません。",
       "activation_match_approval": "コーディネーターがあなたに関するマッチングを承認してから、相手のメンバーに提案します。",
       "activation_discovery_hidden": "必要な審査を完了していないメンバーの検索結果には表示されません。",
       "activation_notification": "コーディネーターに通知が送られ、サポート方法についてご連絡いたします。",

@@ -156,4 +156,17 @@ describe('MessageInputArea', () => {
     const imgs = screen.getAllByRole('img');
     expect(imgs.length).toBeGreaterThan(0);
   });
+
+  it('replaces text, attachment, and voice controls when safeguarding denies contact', () => {
+    render(<MessageInputArea {...defaultProps} safeguardingPolicyStatus="deny" />);
+    expect(screen.getByText('composer_blocked_safeguarding')).toBeDefined();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByLabelText('aria_record_voice')).toBeNull();
+  });
+
+  it('fails closed with distinct copy when the safeguarding policy is unavailable', () => {
+    render(<MessageInputArea {...defaultProps} safeguardingPolicyStatus="unavailable" />);
+    expect(screen.getByText('composer_blocked_safeguarding_unavailable')).toBeDefined();
+    expect(screen.queryByRole('textbox')).toBeNull();
+  });
 });

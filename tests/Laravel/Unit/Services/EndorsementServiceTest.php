@@ -6,14 +6,20 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use Tests\Laravel\TestCase;
 use App\Services\EndorsementService;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Models\SkillEndorsement;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Mockery;
 
 class EndorsementServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     // =========================================================================
     // endorse()
     // =========================================================================
@@ -50,6 +56,40 @@ class EndorsementServiceTest extends TestCase
 
         // Since endorse uses User::where directly, we need integration test for full flow
         $this->markTestIncomplete('Requires model mocking or integration test');
+    }
+
+    public function test_endorse_denial_writes_no_endorsement(): void
+    {
+        $endorser = User::factory()->forTenant($this->testTenantId)->create();
+        $endorsed = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with((int) $endorser->id, (int) $endorsed->id, $this->testTenantId, 'skill_endorsement')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            EndorsementService::endorse(
+                (int) $endorser->id,
+                (int) $endorsed->id,
+                'Safeguarding test skill',
+                null,
+                'Must not persist',
+            );
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('skill_endorsements', [
+            'tenant_id' => $this->testTenantId,
+            'endorser_id' => $endorser->id,
+            'endorsed_id' => $endorsed->id,
+            'skill_name' => 'Safeguarding test skill',
+        ]);
     }
 
     // =========================================================================

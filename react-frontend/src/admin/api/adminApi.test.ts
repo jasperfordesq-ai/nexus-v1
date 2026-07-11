@@ -1944,22 +1944,41 @@ describe('adminVetting', () => {
     expect(mockGet).toHaveBeenCalledWith('/v2/admin/vetting/stats');
   });
 
-  it('verify posts to /verify', async () => {
-    mockPost.mockResolvedValueOnce({ success: true, data: {} });
-    await adminVetting.verify(5);
-    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/5/verify');
+  it('loads the controlled safeguarding policy', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: {} });
+    await adminVetting.policy();
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/vetting/policy');
   });
 
-  it('reject posts reason', async () => {
-    mockPost.mockResolvedValueOnce({ success: true, data: {} });
-    await adminVetting.reject(5, 'expired');
-    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/5/reject', { reason: 'expired' });
+  it('updates only the jurisdiction', async () => {
+    mockPut.mockResolvedValueOnce({ success: true, data: {} });
+    await adminVetting.updatePolicy('england_wales');
+    expect(mockPut).toHaveBeenCalledWith('/v2/admin/vetting/policy', { jurisdiction: 'england_wales' });
   });
 
-  it('destroy calls DELETE', async () => {
-    mockDelete.mockResolvedValueOnce({ success: true, data: {} });
-    await adminVetting.destroy(5);
-    expect(mockDelete).toHaveBeenCalledWith('/v2/admin/vetting/5');
+  it('confirms with acknowledgement and optional review request only', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminVetting.confirm(5, 12);
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/user/5/confirm', {
+      acknowledgement: true,
+      review_request_id: 12,
+    });
+  });
+
+  it('revokes with a controlled reason code', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminVetting.revoke(5, 'recorded_in_error');
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/user/5/revoke', {
+      reason_code: 'recorded_in_error',
+    });
+  });
+
+  it('resolves a review with a controlled outcome', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminVetting.resolveReview(7, 'member_contacted');
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/reviews/7/resolve', {
+      resolution_code: 'member_contacted',
+    });
   });
 
   it('getUserRecords fetches by user', async () => {
@@ -1968,22 +1987,6 @@ describe('adminVetting', () => {
     expect(mockGet).toHaveBeenCalledWith('/v2/admin/vetting/user/10');
   });
 
-  it('bulk posts ids, action, reason', async () => {
-    mockPost.mockResolvedValueOnce({ success: true, data: {} });
-    await adminVetting.bulk([1, 2, 3], 'verify', 'ok');
-    expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/bulk', {
-      ids: [1, 2, 3],
-      action: 'verify',
-      reason: 'ok',
-    });
-  });
-
-  it('uploadDocument calls upload', async () => {
-    mockUpload.mockResolvedValueOnce({ success: true, data: {} });
-    const file = new File(['doc'], 'doc.pdf', { type: 'application/pdf' });
-    await adminVetting.uploadDocument(5, file);
-    expect(mockUpload).toHaveBeenCalledWith('/v2/admin/vetting/5/upload', file);
-  });
 });
 
 // ─── Insurance ────────────────────────────────────────────────────────────────

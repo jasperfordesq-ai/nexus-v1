@@ -60,6 +60,7 @@ const LOCALE_IDENTITY_VALUES = new Map([
     '{{count}} articles',
   ])],
   ['it', new Set(['{{count}} post'])],
+  ['ga', new Set(['{{count}} post'])],
   ['nl', new Set(['{{count}} check-ins'])],
   ['pt', new Set(['Total: {{count}}', '{{count}} total', '{{count}} check-ins'])],
 ]);

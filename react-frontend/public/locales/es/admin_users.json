@@ -361,6 +361,7 @@
       "safeguarding": "Salvaguardia",
       "super_admin_access": "Acceso de superadministrador",
       "time_credits": "Créditos de tiempo",
+      "contact_attestation": "Atestación de contacto de protección",
       "vetting_status": "Estado de investigación"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Activado el {{date}}",
       "more_certificates": "Más certificados",
+      "more_attestations": "Más testimonios",
       "more_records": "Más registros"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- Caduca",
       "no_reference": "Sin referencia",
-      "unknown_provider": "Proveedor desconocido"
+      "unknown_provider": "Proveedor desconocido",
+      "attestation_dbs_enhanced": "DBS mejorado (Inglaterra y Gales)",
+      "attestation_pvg_scotland": "esquema PVG",
+      "attestation_access_ni": "AccessNI (Irlanda del Norte)",
+      "attestation_garda_vetting": "investigación de antecedentes de la garda",
+      "safeguarding_confirmation": "Confirmación de salvaguardia",
+      "confirmed_on": "Atestación comunitaria confirmada el {{date}}",
+      "not_confirmed": "No se confirma ningún atestado comunitario",
+      "decision_confirmed": "Atestación confirmada",
+      "decision_revoked": "Atestación revocada",
+      "decision_not_confirmed": "Atestación no confirmada"
     }
   },
   "aria": {

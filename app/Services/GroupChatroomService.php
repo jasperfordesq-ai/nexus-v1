@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -140,6 +141,27 @@ class GroupChatroomService
             return null;
         }
 
+        // Name and description are immediately visible directed content for
+        // every active group member, so chatroom creation is also a protected
+        // group contact write.
+        $recipientIds = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('status', 'active')
+            ->where('user_id', '!=', $userId)
+            ->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateManyLocalContacts(
+            $userId,
+            $recipientIds,
+            $tenantId,
+            'group_chatroom_create',
+        );
+        if (! $decision->isAllowed()) {
+            $this->setSafeguardingError($decision);
+            return null;
+        }
+
         $category = isset($data['category']) ? trim($data['category']) : null;
         if ($category !== null && mb_strlen($category) > 100) {
             $category = mb_substr($category, 0, 100);
@@ -162,6 +184,17 @@ class GroupChatroomService
         ]);
 
         return (int) $id;
+    }
+
+    private function setSafeguardingError(SafeguardingInteractionDecision $decision): void
+    {
+        $this->errors = [MessageService::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ])];
     }
 
     /**
@@ -345,6 +378,28 @@ class GroupChatroomService
 
         if (! $isMember) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_member_only_post')];
+            return null;
+        }
+
+        // A group chatroom post is delivered to every other active group
+        // member. Evaluate the indivisible send before storing or broadcasting
+        // it so this parallel chat implementation cannot bypass the central DM
+        // safeguarding boundary.
+        $recipientIds = DB::table('group_members')
+            ->where('group_id', $chatroom->group_id)
+            ->where('status', 'active')
+            ->where('user_id', '!=', $userId)
+            ->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateManyLocalContacts(
+            $userId,
+            $recipientIds,
+            $tenantId,
+            'group_chatroom_message',
+        );
+        if (! $decision->isAllowed()) {
+            $this->setSafeguardingError($decision);
             return null;
         }
 

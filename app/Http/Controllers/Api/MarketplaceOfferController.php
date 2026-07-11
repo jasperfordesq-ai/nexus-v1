@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Services\MarketplaceOfferService;
@@ -80,6 +81,8 @@ class MarketplaceOfferController extends BaseApiController
             $offer = MarketplaceOfferService::create($userId, $listingId, $validated);
 
             return $this->respondWithData($offer->toArray(), null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
@@ -194,6 +197,8 @@ class MarketplaceOfferController extends BaseApiController
             $offer = MarketplaceOfferService::counter($offer, $userId, $validated);
 
             return $this->respondWithData($offer->toArray());
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }

@@ -100,13 +100,12 @@ describe('VerificationBadgeIcon', () => {
     expect(icon).toBeInTheDocument();
   });
 
-  it('renders for unknown badge type using fallback', async () => {
+  it('does not render an unknown badge type outside the public allow-list', async () => {
     const { VerificationBadgeIcon } = await import('./VerificationBadge');
     const unknown: VerificationBadgeData = { type: 'unknown_type', label: 'Custom Badge' };
     render(<VerificationBadgeIcon badge={unknown} />);
 
-    const icon = screen.getByRole('img');
-    expect(icon).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });
 
@@ -150,9 +149,20 @@ describe('VerificationBadgeRow — with prop badges', () => {
     render(<VerificationBadgeRow badges={[emailBadge, idBadge, dbsBadge]} />);
 
     await waitFor(() => {
-      // Email and DBS visible; id_verified suppresses the "not verified" sentinel
+      // Private safeguarding status is never rendered as a public profile badge.
       expect(screen.getAllByText(/email verified/i).length).toBeGreaterThan(0);
+      expect(screen.queryByText(/dbs checked/i)).not.toBeInTheDocument();
       expect(screen.queryByText(/not id verified/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('suppresses any unknown legacy badge alias by default', async () => {
+    const { VerificationBadgeRow } = await import('./VerificationBadge');
+    render(<VerificationBadgeRow badges={[{ type: 'police_clearance', label: 'Police clearance' }]} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/police clearance/i)).not.toBeInTheDocument();
+      expect(screen.getByText(/not id verified/i)).toBeInTheDocument();
     });
   });
 

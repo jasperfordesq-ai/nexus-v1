@@ -7,16 +7,20 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\JobAlert;
 use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\SavedJob;
 use App\Services\JobVacancyService;
+use App\Services\JobOfferService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -383,6 +387,60 @@ class JobVacancyServiceTest extends TestCase
         $this->assertNotNull($row);
         $this->assertSame((string) $vacId, (string) $row->vacancy_id);
         $this->assertSame((string) $applicantId, (string) $row->user_id);
+    }
+
+    public function test_apply_safeguarding_denial_writes_no_application(): void
+    {
+        $ownerId = $this->insertUser();
+        $applicantId = $this->insertUser();
+        $vacancyId = $this->insertVacancy($ownerId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($applicantId, $ownerId, self::TENANT_ID, 'job_application')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            $this->svc->apply($vacancyId, $applicantId, ['cover_letter' => 'Must not persist']);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('job_vacancy_applications', [
+            'tenant_id' => self::TENANT_ID,
+            'vacancy_id' => $vacancyId,
+            'user_id' => $applicantId,
+        ]);
+    }
+
+    public function test_job_offer_safeguarding_denial_writes_no_offer(): void
+    {
+        $ownerId = $this->insertUser();
+        $applicantId = $this->insertUser();
+        $vacancyId = $this->insertVacancy($ownerId);
+        $applicationId = (int) $this->svc->apply($vacancyId, $applicantId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($ownerId, $applicantId, self::TENANT_ID, 'job_offer')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            JobOfferService::create($applicationId, $ownerId, ['message' => 'Must not persist']);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('job_offers', [
+            'tenant_id' => self::TENANT_ID,
+            'application_id' => $applicationId,
+        ]);
     }
 
     public function test_apply_returns_null_when_vacancy_does_not_exist(): void

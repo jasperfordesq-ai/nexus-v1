@@ -45,6 +45,13 @@ class MarketplaceOfferService
                 throw new \InvalidArgumentException('Cannot make an offer on your own listing.');
             }
 
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $buyerId,
+                (int) $listing->user_id,
+                $tenantId,
+                'marketplace_offer',
+            );
+
             // Check for existing active offer
             $existingOffer = MarketplaceOffer::withoutGlobalScopes()
                 ->where('tenant_id', $tenantId)
@@ -223,6 +230,13 @@ class MarketplaceOfferService
             self::assertOfferActionable($offer);
 
             $tenantId = (int) $offer->tenant_id;
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $sellerId,
+                (int) $offer->buyer_id,
+                $tenantId,
+                'marketplace_counter_offer',
+            );
+
             $offer->status = 'countered';
             $offer->counter_amount = $data['amount'];
             $offer->counter_message = $data['message'] ?? null;

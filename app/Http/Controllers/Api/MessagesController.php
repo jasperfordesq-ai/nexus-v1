@@ -118,8 +118,18 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_recipient_required'), 'recipient_id', 422);
         }
 
+        $recipientId = (int) $data['recipient_id'];
+        $preflightError = $this->messageService->preflightWrite($userId, $recipientId);
+        if ($preflightError !== null) {
+            return $this->respondWithErrors([$preflightError], $this->preflightErrorStatus($preflightError));
+        }
+
         $body = trim($data['body'] ?? '');
         $voiceUrl = $data['voice_url'] ?? null;
+
+        if (mb_strlen($body) > 10000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_too_long'), 'body', 400);
+        }
 
         // File/image attachments (multipart). Store each up front so a failure is
         // reported before the message is created; pass metadata to the service.
@@ -131,6 +141,7 @@ class MessagesController extends BaseApiController
         $attachments = [];
         foreach ($files as $file) {
             if (!$file || !$file->isValid()) {
+                $this->deleteStagedAttachments($attachments);
                 return $this->respondWithError('VALIDATION_ERROR', __('api.message_attachment_upload_error'), 'attachments', 422);
             }
             try {
@@ -142,8 +153,10 @@ class MessagesController extends BaseApiController
                     'size'     => $file->getSize(),
                 ]);
             } catch (\InvalidArgumentException $e) {
+                $this->deleteStagedAttachments($attachments);
                 return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'attachments', 422);
             } catch (\Throwable $e) {
+                $this->deleteStagedAttachments($attachments);
                 Log::error('Message attachment upload failed', ['error' => $e->getMessage()]);
                 return $this->respondWithError('UPLOAD_FAILED', __('api.message_attachment_upload_error'), 'attachments', 400);
             }
@@ -153,18 +166,19 @@ class MessagesController extends BaseApiController
         }
 
         if (empty($body) && empty($voiceUrl) && empty($attachments)) {
+            $this->deleteStagedAttachments($attachments);
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_body_or_voice_required'), 'body', 422);
-        }
-
-        if (mb_strlen($body) > 10000) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.message_too_long'), 'body', 400);
         }
 
         $message = $this->messageService->send($userId, $data);
 
         if (!$message) {
+            $this->deleteStagedAttachments($attachments);
             $errors = $this->messageService->getErrors();
-            return $this->respondWithErrors($errors, 422);
+            $status = isset($errors[0]) && is_array($errors[0])
+                ? $this->preflightErrorStatus($errors[0])
+                : 422;
+            return $this->respondWithErrors($errors, $status);
         }
 
         // Award XP for sending a message
@@ -345,7 +359,10 @@ class MessagesController extends BaseApiController
         if ($result === null) {
             $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
-                return $this->respondWithErrors($errors, 403);
+                $status = isset($errors[0]) && is_array($errors[0])
+                    ? $this->preflightErrorStatus($errors[0])
+                    : 403;
+                return $this->respondWithErrors($errors, $status);
             }
             return $this->respondWithError('NOT_FOUND', __('api.message_not_found'), null, 404);
         }
@@ -410,7 +427,10 @@ class MessagesController extends BaseApiController
         if ($result === null) {
             $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
-                return $this->respondWithErrors($errors, 404);
+                $status = isset($errors[0]) && is_array($errors[0])
+                    ? $this->preflightErrorStatus($errors[0])
+                    : 404;
+                return $this->respondWithErrors($errors, $status);
             }
             return $this->respondWithError('NOT_FOUND', __('api.message_not_found'), null, 404);
         }
@@ -493,6 +513,11 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_recipient_id_required'), 'recipient_id', 400);
         }
 
+        $preflightError = $this->messageService->preflightWrite($userId, $recipientId);
+        if ($preflightError !== null) {
+            return $this->respondWithErrors([$preflightError], $this->preflightErrorStatus($preflightError));
+        }
+
         $this->messageService->setTypingIndicator($recipientId, $userId, $isTyping);
 
         return $this->respondWithData(['sent' => true]);
@@ -564,6 +589,11 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_recipient_id_required'), 'recipient_id', 400);
         }
 
+        $preflightError = $this->messageService->preflightWrite($userId, $recipientId);
+        if ($preflightError !== null) {
+            return $this->respondWithErrors([$preflightError], $this->preflightErrorStatus($preflightError));
+        }
+
         $file = request()->file('voice_message');
         if (!$file || !$file->isValid()) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_voice_file_required'), 'voice_message', 400);
@@ -591,8 +621,12 @@ class MessagesController extends BaseApiController
             ]);
 
             if (!$message) {
+                AudioUploader::delete((string) $audioResult['url']);
                 $errors = $this->messageService->getErrors();
-                return $this->respondWithErrors($errors, 422);
+                $status = isset($errors[0]) && is_array($errors[0])
+                    ? $this->preflightErrorStatus($errors[0])
+                    : 422;
+                return $this->respondWithErrors($errors, $status);
             }
 
             // Transcribe the audio (non-blocking — failures are logged, not thrown)
@@ -625,6 +659,29 @@ class MessagesController extends BaseApiController
         } catch (\Exception $e) {
             Log::error('Voice message send failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return $this->respondWithError('UPLOAD_FAILED', __('api.message_voice_send_failed'), 'voice_message', 400);
+        }
+    }
+
+    /** @param array<string, mixed> $error */
+    private function preflightErrorStatus(array $error): int
+    {
+        return match ($error['code'] ?? null) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 503,
+            'VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED', 'BLOCKED',
+            'MESSAGING_DISABLED', 'FORBIDDEN' => 403,
+            'NOT_FOUND' => 404,
+            default => 422,
+        };
+    }
+
+    /** @param list<array<string, mixed>> $attachments */
+    private function deleteStagedAttachments(array $attachments): void
+    {
+        foreach ($attachments as $attachment) {
+            $url = $attachment['url'] ?? null;
+            if (is_string($url) && $url !== '') {
+                MessageAttachmentUploader::delete($url);
+            }
         }
     }
 

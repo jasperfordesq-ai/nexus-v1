@@ -376,7 +376,6 @@ class TenantBootstrapController extends BaseApiController
         $data['settings']['onboarding_mandatory'] = filter_var($this->getOnboardingSetting((int) $tenant['id'], 'onboarding.mandatory', '1'), FILTER_VALIDATE_BOOLEAN);
 
         $data['compliance'] = [
-            'vetting_enabled' => $this->brokerControlConfigService->isVettingEnabled(),
             'insurance_enabled' => $this->brokerControlConfigService->isInsuranceEnabled(),
         ];
 

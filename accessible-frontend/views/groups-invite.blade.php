@@ -14,6 +14,7 @@
         $errorStates = [
             'invite-link-failed', 'invite-emails-required', 'invite-emails-too-many',
             'invite-email-failed', 'invite-revoke-failed', 'invite-forbidden',
+            'invite-safeguarding-restricted', 'invite-safeguarding-unavailable',
         ];
         $formatDate = fn ($value): ?string => $value
             ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y')
@@ -34,7 +35,11 @@
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_groups.common.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha_groups.states.' . $status) }}</p></div>
+                <div class="govuk-error-summary__body"><p class="govuk-body">{{ match ($status) {
+                    'invite-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'invite-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha_groups.states.' . $status),
+                } }}</p></div>
             </div>
         </div>
     @endif

@@ -9,7 +9,7 @@
         $gId = (int) ($group['id'] ?? 0);
         $gName = trim((string) ($group['name'] ?? ''));
         $successStates = ['member-promoted', 'member-demoted', 'member-removed', 'request-approved', 'request-rejected'];
-        $failStates = ['member-failed', 'request-failed'];
+        $failStates = ['member-failed', 'request-failed', 'request-safeguarding-restricted', 'request-safeguarding-unavailable'];
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.back_to_group') }}</a>
@@ -26,7 +26,11 @@
     @elseif (in_array($status, $failStates, true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div></div>
+                <div class="govuk-error-summary__body"><p class="govuk-body">{{ match ($status) {
+                    'request-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'request-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha.groups.states.' . $status),
+                } }}</p></div></div>
         </div>
     @endif
 

@@ -13,7 +13,7 @@
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
         $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $successStates = ['application-approved', 'application-declined', 'hours-approved', 'hours-declined'];
-        $failStates = ['application-failed', 'hours-verify-failed'];
+        $failStates = ['application-failed', 'application-safeguarding-restricted', 'application-safeguarding-unavailable', 'hours-verify-failed'];
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'organisations']) }}">{{ __('govuk_alpha.vol_org.back_to_organisations') }}</a>
@@ -30,7 +30,11 @@
     @elseif (in_array($status, $failStates, true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.vol_org.states.' . $status) }}</p></div></div>
+                <div class="govuk-error-summary__body"><p class="govuk-body">{{ match ($status) {
+                    'application-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'application-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha.vol_org.states.' . $status),
+                } }}</p></div></div>
         </div>
     @endif
 

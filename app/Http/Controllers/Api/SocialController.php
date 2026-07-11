@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\CommentService;
 use App\Services\FeedActivityService;
 use App\Services\FeedRankingService;
@@ -438,6 +439,17 @@ class SocialController extends BaseApiController
 
         $data = $this->getAllInput();
 
+        try {
+            FeedService::assertMentionContactsAllowed(
+                (string) ($data['content'] ?? $data['body'] ?? ''),
+                $userId,
+                $this->getTenantId(),
+                'feed_post_create',
+            );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
+
         // Handle image upload if present (multipart/form-data)
         $imageUrl = $this->handleImageUpload();
         if ($imageUrl) {
@@ -448,6 +460,8 @@ class SocialController extends BaseApiController
             $postObj = $this->feedService->createPost($userId, $data);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         }
 
         if (is_array($postObj) && isset($postObj['error'])) {
@@ -623,7 +637,11 @@ class SocialController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $result = $this->feedService->updatePost($id, $userId, $data);
+        try {
+            $result = $this->feedService->updatePost($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$result['success']) {
             $status = str_contains($result['error'] ?? '', 'not found') ? 404 : 422;
@@ -876,7 +894,11 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.social_option_id_required'), 'option_id', 400);
         }
 
-        $success = $this->pollService->vote((int) $id, $optionId, $userId);
+        try {
+            $success = $this->pollService->vote((int) $id, $optionId, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (! $success) {
             $errors = $this->pollService->getErrors();
@@ -1241,6 +1263,8 @@ class SocialController extends BaseApiController
             }
 
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Submit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_comment_post_failed'), null, 500);
@@ -1439,6 +1463,8 @@ class SocialController extends BaseApiController
         try {
             $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Reaction Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reaction_failed'), null, 500);
@@ -1469,6 +1495,8 @@ class SocialController extends BaseApiController
             }
 
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Reply Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_reply_failed'), null, 500);
@@ -1491,6 +1519,8 @@ class SocialController extends BaseApiController
         try {
             $result = $this->commentService->editComment($commentId, $userId, $content);
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Edit Comment Error: " . $e->getMessage());
             return $this->respondWithError('OPERATION_FAILED', __('api.social_edit_failed'), null, 500);

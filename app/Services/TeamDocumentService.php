@@ -166,6 +166,15 @@ class TeamDocumentService
             'text/csv' => 'csv',
         ];
         $ext = $extMap[$mimeType] ?? 'bin';
+        $displayTitle = $title ?: ($fileData['name'] ?? 'document.' . $ext);
+
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $userId,
+            (int) $tenantId,
+            'team_document_upload',
+            (string) $displayTitle,
+        );
 
         // Store file — anchored to httpdocs/ to ensure consistent path resolution
         $uploadDir = base_path("httpdocs/uploads/team_documents/{$tenantId}/{$groupId}");
@@ -184,8 +193,22 @@ class TeamDocumentService
             return null;
         }
 
-        $displayTitle = $title ?: ($fileData['name'] ?? $filename);
         $publicPath = "/uploads/team_documents/{$tenantId}/{$groupId}/{$filename}";
+
+        try {
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                (int) $tenantId,
+                'team_document_upload',
+                (string) $displayTitle,
+            );
+        } catch (\Throwable $e) {
+            if (is_file($destPath)) {
+                @unlink($destPath);
+            }
+            throw $e;
+        }
 
         $id = DB::table('team_documents')->insertGetId([
             'group_id' => $groupId,

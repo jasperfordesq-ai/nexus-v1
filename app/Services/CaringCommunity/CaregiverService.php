@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\CaringCommunity;
 
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
@@ -608,10 +609,34 @@ class CaregiverService
     {
         $this->ensureCoverRequestsAvailable();
 
+        $request = DB::table('caring_cover_requests')
+            ->where('id', $coverRequestId)
+            ->where('tenant_id', $tenantId)
+            ->where('caregiver_id', $caregiverId)
+            ->first(['cared_for_id']);
+        if ($request === null) {
+            throw new \RuntimeException(__('api.caring_cover_not_found'));
+        }
+
         $candidateIds = array_column($this->suggestCoverCandidates($coverRequestId, $caregiverId, $tenantId), 'id');
         if (! in_array($supporterId, $candidateIds, true)) {
             throw new InvalidArgumentException(__('api.caring_cover_candidate_invalid'));
         }
+
+        $caredForId = (int) $request->cared_for_id;
+        $interactionPolicy = app(SafeguardingInteractionPolicy::class);
+        $interactionPolicy->assertLocalContactAllowed(
+            $supporterId,
+            $caredForId,
+            $tenantId,
+            'caring_cover_assignment',
+        );
+        $interactionPolicy->assertLocalContactAllowed(
+            $caredForId,
+            $supporterId,
+            $tenantId,
+            'caring_cover_assignment',
+        );
 
         DB::table('caring_cover_requests')
             ->where('id', $coverRequestId)

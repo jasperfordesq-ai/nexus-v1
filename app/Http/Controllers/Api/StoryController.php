@@ -6,8 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\I18n\LocaleContext;
+use App\Services\MessageService;
 use App\Services\StoryService;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
@@ -292,6 +294,8 @@ class StoryController extends BaseApiController
             }
 
             return $this->respondWithData(['reacted' => true]);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('REACT_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
@@ -334,6 +338,8 @@ class StoryController extends BaseApiController
         try {
             $results = $this->storyService->votePoll($id, $userId, (int) $optionIndex);
             return $this->respondWithData($results);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('VOTE_FAILED', $e->getMessage());
         } catch (\Throwable $e) {
@@ -464,6 +470,18 @@ class StoryController extends BaseApiController
         try {
             $result = $this->storyService->replyToStory($id, $userId, $body);
 
+            // MessageService is the authoritative write boundary. A safeguarding
+            // denial returns an empty result plus a structured error; propagate it
+            // before creating the story-reply notification.
+            if ($result === []) {
+                $errors = MessageService::getErrors();
+                if ($errors === []) {
+                    return $this->respondWithError('REPLY_FAILED', __('api.story_reply_failed'));
+                }
+
+                return $this->respondWithErrors($errors, $this->replyFailureStatus($errors));
+            }
+
             // Notify story creator about the reply (skip self-replies)
             try {
                 $tenantId = $this->getTenantId();
@@ -511,6 +529,17 @@ class StoryController extends BaseApiController
             Log::error('StoryController::reply failed', ['error' => $e->getMessage()]);
             return $this->respondWithError('REPLY_FAILED', __('api.story_reply_failed'), null, 500);
         }
+    }
+
+    /** @param array<int, array<string, mixed>> $errors */
+    private function replyFailureStatus(array $errors): int
+    {
+        return match ($errors[0]['code'] ?? null) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 503,
+            'VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED', 'FORBIDDEN', 'BLOCKED' => 403,
+            'NOT_FOUND' => 404,
+            default => 400,
+        };
     }
 
     /**

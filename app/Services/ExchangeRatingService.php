@@ -70,6 +70,13 @@ class ExchangeRatingService
             return ['success' => false, 'error' => 'You are not a participant in this exchange'];
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $userId,
+            $ratedId,
+            (int) $tenantId,
+            'exchange_rating',
+        );
+
         // Check if already rated (unique constraint: exchange_id + rater_id)
         $existing = DB::selectOne(
             "SELECT id FROM exchange_ratings WHERE exchange_id = ? AND rater_id = ?",

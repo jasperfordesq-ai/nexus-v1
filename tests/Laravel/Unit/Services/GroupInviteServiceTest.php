@@ -7,10 +7,13 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
 use App\Services\GroupInviteService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -170,6 +173,34 @@ class GroupInviteServiceTest extends TestCase
         $errors = $this->service->getErrors();
         $this->assertCount(1, $errors);
         $this->assertEquals('FORBIDDEN', $errors[0]['code']);
+    }
+
+    public function test_email_invite_safeguarding_denial_writes_no_invite(): void
+    {
+        $ownerId = $this->seedUser();
+        $recipientId = $this->seedUser();
+        $groupId = $this->seedGroup($ownerId);
+        $recipientEmail = (string) DB::table('users')->where('id', $recipientId)->value('email');
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($ownerId, $recipientId, $this->testTenantId, 'group_email_invitation')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            $this->service->sendEmailInvites($groupId, $ownerId, [$recipientEmail], 'Must not persist');
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('group_invites', [
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'email' => $recipientEmail,
+        ]);
     }
 
     public function test_status_constants_are_defined(): void

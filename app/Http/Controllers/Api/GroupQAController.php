@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupQAService;
 
@@ -69,7 +70,11 @@ class GroupQAController extends BaseApiController
             return $this->errorResponse(__('api_controllers_3.group_qa.body_required'), 422);
         }
 
-        $result = $this->qaService->askQuestion($id, $userId, $title, $body);
+        try {
+            $result = $this->qaService->askQuestion($id, $userId, $title, $body);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             return $this->qaErrorResponse(__('api_controllers_3.group_qa.failed_create_question'));
@@ -117,7 +122,11 @@ class GroupQAController extends BaseApiController
             return $this->errorResponse(__('api_controllers_3.group_qa.body_required'), 422);
         }
 
-        $result = $this->qaService->postAnswer($id, $questionId, $userId, $body);
+        try {
+            $result = $this->qaService->postAnswer($id, $questionId, $userId, $body);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             return $this->qaErrorResponse(__('api_controllers_3.group_qa.failed_post_answer'));
@@ -138,7 +147,11 @@ class GroupQAController extends BaseApiController
             return $userId;
         }
 
-        $success = $this->qaService->acceptAnswer($id, $answerId, $userId);
+        try {
+            $success = $this->qaService->acceptAnswer($id, $answerId, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->qaErrorResponse(__('api_controllers_3.group_qa.failed_accept_answer'));
@@ -180,7 +193,11 @@ class GroupQAController extends BaseApiController
             return $this->errorResponse(__('api_controllers_3.group_qa.vote_must_be_up_down'), 422);
         }
 
-        $success = $this->qaService->vote($id, $userId, $type, $targetId, $voteValue);
+        try {
+            $success = $this->qaService->vote($id, $userId, $type, $targetId, $voteValue);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->qaErrorResponse(__('api_controllers_3.group_qa.failed_record_vote'));

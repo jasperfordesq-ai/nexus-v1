@@ -14,7 +14,6 @@ import { useState, useEffect } from 'react';import ShieldCheck from 'lucide-reac
 import ShieldOff from 'lucide-react/icons/shield-off';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
-import FileCheck from 'lucide-react/icons/file-check';
 import UserCheck from 'lucide-react/icons/user-check';
 import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
@@ -73,13 +72,6 @@ function getBadgeConfig(t: (key: string) => string): Record<string, BadgeConfigE
       bgColor: 'bg-emerald-500/15 dark:bg-emerald-500/20',
       label: t('verification.badge.id_verified'),
     },
-    dbs_checked: {
-      icon: <FileCheck className="w-3.5 h-3.5" />,
-      iconSm: <FileCheck className="w-3 h-3" />,
-      color: 'text-amber-600 dark:text-amber-400',
-      bgColor: 'bg-amber-500/10',
-      label: t('verification.badge.dbs_checked'),
-    },
     admin_verified: {
       icon: <UserCheck className="w-3.5 h-3.5" />,
       iconSm: <UserCheck className="w-3 h-3" />,
@@ -94,12 +86,24 @@ function getBadgeConfig(t: (key: string) => string): Record<string, BadgeConfigE
 // Helpers — normalize API response
 // ─────────────────────────────────────────────────────────────────────────────
 
+const PUBLIC_VERIFICATION_BADGE_TYPES = new Set([
+  'email_verified',
+  'phone_verified',
+  'id_verified',
+  'address_verified',
+  'admin_verified',
+  'organization_vouched',
+  'peer_endorsed',
+]);
+
 function normalizeBadges(data: VerificationBadgeData[]): VerificationBadgeData[] {
-  return data.map((b) => ({
-    ...b,
-    type: b.type || b.badge_type || '',
-    verified_at: b.verified_at || b.granted_at,
-  }));
+  return data
+    .map((b) => ({
+      ...b,
+      type: b.type || b.badge_type || '',
+      verified_at: b.verified_at || b.granted_at,
+    }))
+    .filter((badge) => PUBLIC_VERIFICATION_BADGE_TYPES.has(badge.type));
 }
 
 const sizeClasses = {
@@ -120,6 +124,9 @@ export function VerificationBadgeIcon({
   size?: 'sm' | 'md' | 'lg';
 }) {
   const { t } = useTranslation('common');
+  if (!PUBLIC_VERIFICATION_BADGE_TYPES.has(badge.type || badge.badge_type || '')) {
+    return null;
+  }
   const badgeConfig = getBadgeConfig(t);
   const config = badgeConfig[badge.type] || {
     icon: <ShieldCheck className="w-3.5 h-3.5" />,
@@ -156,12 +163,12 @@ export function VerificationBadgeRow({
 }) {
   const { t } = useTranslation('common');
   const badgeConfig = getBadgeConfig(t);
-  const [badges, setBadges] = useState<VerificationBadgeData[]>(propBadges || []);
+  const [badges, setBadges] = useState<VerificationBadgeData[]>(normalizeBadges(propBadges || []));
   const [isLoaded, setIsLoaded] = useState(!!propBadges);
 
   useEffect(() => {
     if (propBadges) {
-      setBadges(propBadges);
+      setBadges(normalizeBadges(propBadges));
       setIsLoaded(true);
       return;
     }

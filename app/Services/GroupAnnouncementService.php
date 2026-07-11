@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -162,19 +163,40 @@ class GroupAnnouncementService
         $expiresAt = !empty($data['expires_at']) ? date('Y-m-d H:i:s', strtotime($data['expires_at'])) : null;
 
         try {
-            $id = DB::table('group_announcements')->insertGetId([
-                'group_id'   => $groupId,
-                'tenant_id'  => $tenantId,
-                'title'      => $title,
-                'content'    => $content,
-                'is_pinned'  => $isPinned ? 1 : 0,
-                'priority'   => $priority,
-                'created_by' => $userId,
-                'created_at' => now(),
-                'expires_at' => $expiresAt,
-            ]);
+            $id = DB::transaction(function () use (
+                $groupId,
+                $userId,
+                $tenantId,
+                $title,
+                $content,
+                $isPinned,
+                $priority,
+                $expiresAt,
+            ): int {
+                GroupService::assertSafeguardingBroadcastAllowed(
+                    $groupId,
+                    $userId,
+                    $tenantId,
+                    'group_announcement_create',
+                    $title . ' ' . $content,
+                );
+
+                return DB::table('group_announcements')->insertGetId([
+                    'group_id'   => $groupId,
+                    'tenant_id'  => $tenantId,
+                    'title'      => $title,
+                    'content'    => $content,
+                    'is_pinned'  => $isPinned ? 1 : 0,
+                    'priority'   => $priority,
+                    'created_by' => $userId,
+                    'created_at' => now(),
+                    'expires_at' => $expiresAt,
+                ]);
+            });
 
             return $this->getById($groupId, $id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.group_announcement_create_failed')];
             return null;
@@ -238,12 +260,24 @@ class GroupAnnouncementService
         }
 
         if (!empty($updates)) {
-            $updates['updated_at'] = now();
-            DB::table('group_announcements')
-                ->where('id', $announcementId)
-                ->where('group_id', $groupId)
-                ->where('tenant_id', $tenantId)
-                ->update($updates);
+            DB::transaction(function () use ($groupId, $announcementId, $userId, $tenantId, &$updates): void {
+                if (array_key_exists('title', $updates) || array_key_exists('content', $updates)) {
+                    GroupService::assertSafeguardingBroadcastAllowed(
+                        $groupId,
+                        $userId,
+                        $tenantId,
+                        'group_announcement_update',
+                        trim((string) ($updates['title'] ?? '') . ' ' . (string) ($updates['content'] ?? '')),
+                    );
+                }
+
+                $updates['updated_at'] = now();
+                DB::table('group_announcements')
+                    ->where('id', $announcementId)
+                    ->where('group_id', $groupId)
+                    ->where('tenant_id', $tenantId)
+                    ->update($updates);
+            });
         }
 
         return $this->getById($groupId, $announcementId, $userId);

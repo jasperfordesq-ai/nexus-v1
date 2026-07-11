@@ -74,6 +74,12 @@ const dataCollectionKeys = [
     basisKey: 'privacy.data_profile_basis',
   },
   {
+    typeKey: 'privacy.data_safeguarding_type',
+    collectedKey: 'privacy.data_safeguarding_collected',
+    whyKey: 'privacy.data_safeguarding_why',
+    basisKey: 'privacy.data_safeguarding_basis',
+  },
+  {
     typeKey: 'privacy.data_activity_type',
     collectedKey: 'privacy.data_activity_collected',
     whyKey: 'privacy.data_activity_why',
@@ -202,7 +208,7 @@ export function PrivacyPage() {
         </p>
         <div className="flex items-center justify-center gap-2 mt-3 text-sm text-theme-subtle">
           <CalendarDays className="w-4 h-4" aria-hidden="true" />
-          <span>{t('privacy.last_updated')}</span>
+          <span>{t('privacy.last_updated_safeguarding')}</span>
         </div>
       </motion.div>
 
@@ -275,6 +281,20 @@ export function PrivacyPage() {
                 <p className="text-xs text-theme-subtle">{t(row.whyKey)}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <h3 className="font-semibold text-theme-primary">
+              {t('privacy.safeguarding_data_title')}
+            </h3>
+            <p className="mt-2 text-sm text-theme-muted">
+              {t('privacy.safeguarding_data_body')}
+            </p>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-theme-muted">
+              <li>{t('privacy.safeguarding_data_access')}</li>
+              <li>{t('privacy.safeguarding_data_retention')}</li>
+              <li>{t('privacy.safeguarding_data_correction')}</li>
+            </ul>
           </div>
         </GlassCard>
       </motion.div>

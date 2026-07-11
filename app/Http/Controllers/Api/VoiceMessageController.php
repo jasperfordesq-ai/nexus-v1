@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use App\Core\AudioUploader;
 use App\Core\TenantContext;
+use App\Services\MessageService;
 use App\Services\TranscriptionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -45,6 +46,12 @@ class VoiceMessageController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'receiver_id']), 'receiver_id', 400);
         }
 
+        $preflightError = MessageService::preflightWrite($senderId, $receiverId);
+        if ($preflightError !== null) {
+            $status = ($preflightError['code'] ?? null) === 'SAFEGUARDING_POLICY_UNAVAILABLE' ? 503 : 403;
+            return $this->respondWithErrors([$preflightError], $status);
+        }
+
         try {
             $audioResult = null;
 
@@ -79,8 +86,10 @@ class VoiceMessageController extends BaseApiController
             ]);
 
             if (empty($messageData)) {
+                AudioUploader::delete((string) $audioResult['url']);
                 $errors = \App\Services\MessageService::getErrors();
-                return $this->respondWithErrors($errors, 422);
+                $status = (($errors[0]['code'] ?? null) === 'SAFEGUARDING_POLICY_UNAVAILABLE') ? 503 : 403;
+                return $this->respondWithErrors($errors, $status);
             }
 
             $messageId = $messageData['id'] ?? null;

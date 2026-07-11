@@ -186,6 +186,9 @@ class UserModelTest extends TestCase
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'password_hash' => 'secret-hash-value',
+            'vetting_status' => 'verified',
+            'safeguarding_notes' => 'private safeguarding note',
+            'works_with_children' => 1,
         ]);
 
         $array = $user->toArray();
@@ -193,6 +196,19 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('password_hash', $array, 'password_hash should be hidden');
         $this->assertArrayNotHasKey('totp_secret', $array, 'totp_secret should be hidden');
         $this->assertArrayNotHasKey('totp_backup_codes', $array, 'totp_backup_codes should be hidden');
+        foreach ([
+            'vetting_status',
+            'vetting_expires_at',
+            'works_with_children',
+            'works_with_vulnerable_adults',
+            'no_home_visits',
+            'requires_home_visits',
+            'safeguarding_notes',
+            'safeguarding_reviewed_by',
+            'safeguarding_reviewed_at',
+        ] as $privateSafeguardingField) {
+            $this->assertArrayNotHasKey($privateSafeguardingField, $array);
+        }
     }
 
     /**

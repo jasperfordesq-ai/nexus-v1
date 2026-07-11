@@ -7,8 +7,11 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Services\MatchApprovalWorkflowService;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -30,6 +33,32 @@ use Tests\Laravel\TestCase;
  */
 class MatchApprovalWorkflowServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->bindPolicy(SafeguardingInteractionDecision::ALLOW);
+    }
+
+    private function bindPolicy(string $status): void
+    {
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateLocalContact')->zeroOrMoreTimes()->andReturn(
+            new SafeguardingInteractionDecision(
+                status: $status,
+                code: $status === SafeguardingInteractionDecision::ALLOW
+                    ? 'SAFEGUARDING_ALLOWED'
+                    : ($status === SafeguardingInteractionDecision::UNAVAILABLE
+                        ? 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                        : 'VETTING_REQUIRED'),
+                recipientTenantId: 1,
+                purposeCode: 'safeguarded_member_contact',
+                scopeType: 'tenant',
+                scopeIdentifier: '',
+            )
+        );
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+    }
+
     public function test_submitForApproval_returns_id_on_success(): void
     {
         DB::shouldReceive('table')->andReturnSelf();
@@ -63,6 +92,23 @@ class MatchApprovalWorkflowServiceTest extends TestCase
 
         $result = MatchApprovalWorkflowService::submitForApproval(10, 1, []);
         $this->assertNull($result);
+    }
+
+    public function test_submitForApproval_writes_nothing_when_contact_policy_denies(): void
+    {
+        $this->bindPolicy(SafeguardingInteractionDecision::DENY);
+        DB::shouldReceive('table')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('orWhere')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('first')->andReturn((object) ['user_id' => 20]);
+        DB::shouldReceive('exists')->andReturn(false);
+        DB::shouldReceive('insertGetId')->never();
+        Log::shouldReceive('info')->once();
+
+        $this->assertNull(MatchApprovalWorkflowService::submitForApproval(10, 1, []));
     }
 
     public function test_submitForApproval_returns_null_when_listing_not_found(): void
@@ -102,7 +148,7 @@ class MatchApprovalWorkflowServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         // Row lookup before update
         DB::shouldReceive('first')->andReturn((object) [
-            'id' => 1, 'user_id' => 20, 'listing_id' => 5, 'match_score' => 80,
+            'id' => 1, 'user_id' => 20, 'listing_owner_id' => 30, 'listing_id' => 5, 'match_score' => 80,
         ]);
         DB::shouldReceive('update')->andReturn(1);
         // Listing title lookup for the approval notification
@@ -124,6 +170,24 @@ class MatchApprovalWorkflowServiceTest extends TestCase
         DB::shouldReceive('first')->andReturn(null);
 
         $this->assertFalse(MatchApprovalWorkflowService::approveMatch(999, 5));
+    }
+
+    public function test_approveMatch_does_not_update_when_policy_is_unavailable(): void
+    {
+        $this->bindPolicy(SafeguardingInteractionDecision::UNAVAILABLE);
+        DB::shouldReceive('table')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('first')->andReturn((object) [
+            'id' => 1,
+            'user_id' => 20,
+            'listing_owner_id' => 30,
+            'listing_id' => 5,
+            'match_score' => 80,
+        ]);
+        DB::shouldReceive('update')->never();
+        Log::shouldReceive('info')->once();
+
+        $this->assertFalse(MatchApprovalWorkflowService::approveMatch(1, 5));
     }
 
     public function test_rejectMatch_returns_true_on_success(): void

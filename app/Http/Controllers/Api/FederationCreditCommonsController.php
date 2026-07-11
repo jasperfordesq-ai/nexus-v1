@@ -10,7 +10,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\CreditCommonsNodeService;
+use App\Services\MessageService;
 use App\Services\Protocols\CreditCommonsAdapter;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Support\SecurityBounds;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -278,6 +280,15 @@ class FederationCreditCommonsController extends BaseApiController
         }
         if (!$payeeId) {
             return $this->ccError('UnresolvedAccountnameViolation', "Payee account not found", 400);
+        }
+
+        if ($blocked = $this->creditCommonsSafeguardingBlock(
+            (string) $payerPath,
+            (string) $payeePath,
+            $tenantId,
+            'credit_commons_create',
+        )) {
+            return $blocked;
         }
 
         // Idempotency: honour a caller-supplied transaction UUID so a retried
@@ -845,6 +856,15 @@ class FederationCreditCommonsController extends BaseApiController
                     'Payee does not accept federated transactions', 403);
             }
 
+            if ($blocked = $this->creditCommonsSafeguardingBlock(
+                (string) $payerPath,
+                (string) $payeePath,
+                $tenantId,
+                'credit_commons_relay',
+            )) {
+                return $blocked;
+            }
+
             // Idempotency: a relayed transaction carries the originating node's
             // UUID. A repeat delivery of the same UUID must NOT credit the payee
             // again — return the previously recorded result instead of re-applying.
@@ -1028,6 +1048,15 @@ class FederationCreditCommonsController extends BaseApiController
 
         if (!SecurityBounds::isAcceptableHourAmount($quant)) {
             return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
+        }
+
+        if ($blocked = $this->creditCommonsSafeguardingBlock(
+            (string) $payerPath,
+            (string) $payeePath,
+            $tenantId,
+            'credit_commons_propose',
+        )) {
+            return $blocked;
         }
 
         // Honour a caller-supplied UUID (like createTransaction and relay do)
@@ -1278,6 +1307,60 @@ class FederationCreditCommonsController extends BaseApiController
     }
 
     /**
+     * Apply the local recipient's safeguarding policy before any Credit
+     * Commons description, proposal, ledger entry, or balance movement lands.
+     */
+    private function creditCommonsSafeguardingBlock(
+        string $payerPath,
+        string $payeePath,
+        int $tenantId,
+        string $channel,
+    ): ?JsonResponse {
+        if (! CreditCommonsNodeService::isLocalAccount($payeePath, $tenantId)) {
+            return null;
+        }
+
+        $payeeId = $this->resolveAccountId($payeePath, $tenantId);
+        if ($payeeId === null) {
+            return null;
+        }
+
+        $policy = app(SafeguardingInteractionPolicy::class);
+        if (CreditCommonsNodeService::isLocalAccount($payerPath, $tenantId)) {
+            $payerId = $this->resolveAccountId($payerPath, $tenantId);
+            if ($payerId === null) {
+                return null;
+            }
+            $decision = $policy->evaluateLocalContact($payerId, $payeeId, $tenantId, $channel);
+        } else {
+            $decision = $policy->evaluateExternalContact(
+                $payeeId,
+                $tenantId,
+                'credit-commons:' . hash('sha256', $payerPath),
+                $channel,
+            );
+        }
+
+        if ($decision->isAllowed()) {
+            return null;
+        }
+
+        $error = MessageService::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ]);
+
+        return $this->ccError(
+            $decision->code,
+            (string) $error['message'],
+            $decision->isUnavailable() ? 503 : 403,
+        );
+    }
+
+    /**
      * Resolve a CC account path or ID to a NEXUS user ID.
      *
      * Accepts: "node-slug/username", "username", or numeric user ID.
@@ -1332,6 +1415,15 @@ class FederationCreditCommonsController extends BaseApiController
         if ($payeeId && !$this->localAccountCanTransact($payeeId, $tenantId)) {
             return $this->ccError('PermissionViolation',
                 'Payee does not accept federated transactions', 403);
+        }
+
+        if ($blocked = $this->creditCommonsSafeguardingBlock(
+            (string) $entry->payer,
+            (string) $entry->payee,
+            $tenantId,
+            'credit_commons_complete',
+        )) {
+            return $blocked;
         }
 
         DB::beginTransaction();

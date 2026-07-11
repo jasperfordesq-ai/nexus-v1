@@ -9,6 +9,8 @@
   "send": "Wyślij",
   "you": "Ty",
   "unread": "{{count}} nieprzeczytane",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Twoje rozmowy z członkami społeczności",
   "disabled_title": "Wiadomości bezpośrednie wyłączone",
   "disabled_subtitle": "Wiadomości bezpośrednie nie są włączone w tej społeczności. Aby zorganizować usługi, proszę skorzystać z systemu zgłoszeń wymiany.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Ładowanie starszych wiadomości",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Wymagana kontrola ochronna",
     "body": "Ta rozmowa jest wstrzymana, poniewaz zasada ochrony spolecznosci wymaga potwierdzonej weryfikacji, zanim mozesz napisac do tego czlonka.",
@@ -226,6 +226,13 @@
     "action": "Otworz pomoc",
     "dismiss": "Zamknij powiadomienie o ochronie"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Kontrola zabezpieczająca chwilowo niedostępna",
+    "body": "Wysyłanie wiadomości bezpośrednich zostało wstrzymane, ponieważ nie można było bezpiecznie sprawdzić zasad bezpieczeństwa społeczności.",
+    "contact_broker": "Sprawdź ponownie wkrótce. Jeśli problem będzie się powtarzał, poproś o pomoc koordynatora społeczności.",
+    "action": "Sprawdź ponownie",
+    "dismiss": "Odrzuć powiadomienie zabezpieczające"
+  },
   "coordinator_request": {
     "button": "Poproś koordynatora o pomoc",
     "aria_button": "Poproś koordynatora o pomoc w nawiązaniu kontaktu",
@@ -234,13 +241,28 @@
     "sent": "Koordynator został powiadomiony — skontaktuje się z Tobą, aby pomóc w nawiązaniu kontaktu.",
     "error": "Nie udało się wysłać Twojej prośby. Spróbuj ponownie za chwilę."
   },
+  "vetting_review_request": {
+    "button": "Poproś o weryfikację",
+    "success_title": "Zażądano przeglądu",
+    "success_body": "Twój broker społeczny został poproszony o sprawdzenie Twojego potwierdzenia dotyczącego ochrony prywatnej.",
+    "sent": "Zażądano przeglądu weryfikacyjnego. Twoja społeczność skontaktuje się z Tobą w sprawie procesu.",
+    "error": "Nie mogliśmy teraz poprosić o weryfikację. Spróbuj ponownie wkrótce."
+  },
+  "safeguarding_check_again": "Sprawdź ponownie",
+  "safeguarding_checks": {
+    "dbs_enhanced": "Ulepszony DBS (Anglia i Walia)",
+    "pvg_scotland": "Schemat PVG",
+    "access_ni": "AccessNI (Irlandia Północna)",
+    "garda_vetting": "Kontrola Gardy"
+  },
   "composer_blocked_safeguarding": "Bezpośrednia wiadomość do tego członka nie jest dostępna. Skorzystaj z opcji powyżej, aby poprosić koordynatora o pomoc w nawiązaniu kontaktu.",
-  "aria_conversation_unread_few": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
-  "aria_conversation_unread_many": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "composer_blocked_safeguarding_unavailable": "Wiadomości bezpośrednie zostaną wstrzymane na czas sprawdzania zasad zabezpieczeń. Użyj opcji Sprawdź ponownie powyżej.",
   "aria_conversation_unread_one": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
   "aria_conversation_unread_other": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
-  "selected_members_few": "Wybrani ({{count}})",
-  "selected_members_many": "Wybrani ({{count}})",
   "selected_members_one": "Wybrani ({{count}})",
-  "selected_members_other": "Wybrani ({{count}})"
+  "selected_members_other": "Wybrani ({{count}})",
+  "aria_conversation_unread_few": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "aria_conversation_unread_many": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "selected_members_few": "Wybrani ({{count}})",
+  "selected_members_many": "Wybrani ({{count}})"
 }

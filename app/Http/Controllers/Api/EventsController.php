@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\EventService;
 use App\Services\EventNotificationService;
 use App\Http\Resources\PublicEventResource;
@@ -387,7 +388,11 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.event_rsvp_status_required'), 'status', 400);
         }
 
-        $success = $this->eventService->rsvp($id, $userId, $status);
+        try {
+            $success = $this->eventService->rsvp($id, $userId, $status);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             $errors = $this->eventService->getErrors();
@@ -721,7 +726,11 @@ class EventsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
-        $success = $this->eventService->addToWaitlist($id, $userId);
+        try {
+            $success = $this->eventService->addToWaitlist($id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithError('WAITLIST_FAILED', __('api.event_waitlist_failed'), null, 400);

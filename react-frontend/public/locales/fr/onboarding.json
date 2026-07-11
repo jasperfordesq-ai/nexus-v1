@@ -116,7 +116,7 @@
       "who_can_see_heading": "Qui peut voir ça",
       "who_can_see_body": "Seuls les coordinateurs et administrateurs de communauté peuvent voir ces préférences. Les autres membres ne le peuvent pas. Tous les accès sont enregistrés.",
       "what_activates_heading": "Ce qui s'active en conséquence",
-      "activation_broker_review": "Un coordinateur examinera les messages que vous envoyez et recevez.",
+      "activation_broker_review": "Une personne coordinatrice examinera et approuvera les mises en relation ou échanges protégés lorsque votre choix l’exige. Cela ne lui donne pas accès au contenu des messages.",
       "activation_match_approval": "Un coordinateur approuvera les matchs vous impliquant avant qu’ils ne soient suggérés à l’autre membre.",
       "activation_discovery_hidden": "Vous ne serez pas découvert par les membres qui n'ont pas effectué la vérification requise.",
       "activation_notification": "Un coordinateur a été informé et vous contactera pour discuter de la manière dont nous pouvons vous aider.",

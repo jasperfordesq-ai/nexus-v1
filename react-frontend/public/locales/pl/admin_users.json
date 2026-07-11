@@ -361,6 +361,7 @@
       "safeguarding": "Ochrona",
       "super_admin_access": "Dostęp superadministratora",
       "time_credits": "Kredyty czasowe",
+      "contact_attestation": "Zabezpieczenie poświadczenia kontaktu",
       "vetting_status": "Stan weryfikacji"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Aktywowano {{date}}",
       "more_certificates": "Więcej certyfikatów",
+      "more_attestations": "Więcej atestów",
       "more_records": "Więcej rekordów"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- Wygasa",
       "no_reference": "Brak odniesienia",
-      "unknown_provider": "Nieznany dostawca"
+      "unknown_provider": "Nieznany dostawca",
+      "attestation_dbs_enhanced": "Ulepszony DBS (Anglia i Walia)",
+      "attestation_pvg_scotland": "Schemat PVG",
+      "attestation_access_ni": "AccessNI (Irlandia Północna)",
+      "attestation_garda_vetting": "Kontrola Gardy",
+      "safeguarding_confirmation": "Potwierdzenie zabezpieczające",
+      "confirmed_on": "Zaświadczenie społeczności potwierdzone na {{date}}",
+      "not_confirmed": "Żadne zaświadczenie społeczności nie zostało potwierdzone",
+      "decision_confirmed": "Zaświadczenie potwierdzone",
+      "decision_revoked": "Zaświadczenie cofnięte",
+      "decision_not_confirmed": "Zaświadczenie niepotwierdzone"
     }
   },
   "aria": {

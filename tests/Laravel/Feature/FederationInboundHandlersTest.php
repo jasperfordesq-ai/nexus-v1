@@ -19,10 +19,13 @@ use App\Events\FederatedVolunteeringReceived;
 use App\Listeners\HandleFederatedReviewReceived;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -195,6 +198,81 @@ class FederationInboundHandlersTest extends TestCase
             ->where('external_id', $payload['external_id'])
             ->count());
         Event::assertDispatchedTimes(FederatedReviewReceived::class, 1);
+    }
+
+    public function test_review_created_safeguarding_denial_returns_403_without_write_or_event(): void
+    {
+        Event::fake([FederatedReviewReceived::class]);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateExternalContact')
+            ->once()
+            ->with(
+                (int) $receiver->id,
+                $this->testTenantId,
+                "partner:{$this->partnerId}:sender:501",
+                'external_federated_review',
+            )
+            ->andReturn($this->safeguardingDenied());
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $externalId = 'ext-review-safeguarding-denied-' . uniqid();
+        $response = $this->postWebhook('review.created', [
+            'external_id' => $externalId,
+            'rating' => 5,
+            'receiver_id' => $receiver->id,
+            'reviewer_external_id' => 501,
+            'reviewer_tenant_id' => 999,
+            'comment' => 'Must not persist',
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $this->assertDatabaseMissing('reviews', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $this->partnerId,
+            'external_id' => $externalId,
+        ]);
+        Event::assertNotDispatched(FederatedReviewReceived::class);
+    }
+
+    public function test_review_created_policy_unavailable_returns_retryable_503_without_write(): void
+    {
+        Event::fake([FederatedReviewReceived::class]);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateExternalContact')
+            ->once()
+            ->with(
+                (int) $receiver->id,
+                $this->testTenantId,
+                "partner:{$this->partnerId}:sender:502",
+                'external_federated_review',
+            )
+            ->andReturn($this->safeguardingUnavailable());
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $externalId = 'ext-review-policy-unavailable-' . uniqid();
+        $response = $this->postWebhook('review.created', [
+            'external_id' => $externalId,
+            'rating' => 4,
+            'receiver_id' => $receiver->id,
+            'reviewer_external_id' => 502,
+            'reviewer_tenant_id' => 999,
+        ]);
+
+        $response->assertStatus(503);
+        $response->assertJsonPath('errors.0.code', 'SAFEGUARDING_POLICY_UNAVAILABLE');
+        $this->assertDatabaseMissing('reviews', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $this->partnerId,
+            'external_id' => $externalId,
+        ]);
+        Event::assertNotDispatched(FederatedReviewReceived::class);
     }
 
     public function test_federated_review_listener_is_idempotent_for_bell_and_email_skip(): void
@@ -1022,5 +1100,34 @@ class FederationInboundHandlersTest extends TestCase
         app()->instance(EmailDispatchService::class, $mailer);
 
         return $mailer;
+    }
+
+    private function safeguardingDenied(): SafeguardingInteractionDecision
+    {
+        return new SafeguardingInteractionDecision(
+            status: SafeguardingInteractionDecision::DENY,
+            code: 'VETTING_REQUIRED',
+            recipientTenantId: $this->testTenantId,
+            purposeCode: 'safeguarded_member_contact',
+            scopeType: 'tenant',
+            scopeIdentifier: '',
+            policyVersion: 'test-v1',
+            requiredAttestationCodes: ['dbs_enhanced'],
+            requiredAttestationLabels: ['Enhanced DBS'],
+            canRequestCoordinator: true,
+        );
+    }
+
+    private function safeguardingUnavailable(): SafeguardingInteractionDecision
+    {
+        return new SafeguardingInteractionDecision(
+            status: SafeguardingInteractionDecision::UNAVAILABLE,
+            code: 'SAFEGUARDING_POLICY_UNAVAILABLE',
+            recipientTenantId: $this->testTenantId,
+            purposeCode: 'safeguarded_member_contact',
+            scopeType: 'tenant',
+            scopeIdentifier: '',
+            canRequestCoordinator: true,
+        );
     }
 }

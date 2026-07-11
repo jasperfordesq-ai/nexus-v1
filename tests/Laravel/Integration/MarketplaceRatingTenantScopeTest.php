@@ -7,12 +7,15 @@
 namespace Tests\Laravel\Integration;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\MarketplaceRatingService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 class MarketplaceRatingTenantScopeTest extends TestCase
@@ -65,6 +68,37 @@ class MarketplaceRatingTenantScopeTest extends TestCase
         $this->assertNull($rating->notification_email_last_error);
         $this->assertSame('marketplace_rating', $mailer->calls[0]['options']['category']);
         $this->assertSame($this->testTenantId, (int) $mailer->calls[0]['options']['tenant_id']);
+    }
+
+    public function test_safeguarding_denial_writes_no_marketplace_rating(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $orderId = $this->createOrder($this->testTenantId, (int) $buyer->id, (int) $seller->id, 'completed');
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with((int) $buyer->id, (int) $seller->id, $this->testTenantId, 'marketplace_order_rating')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            MarketplaceRatingService::rateOrder($orderId, (int) $buyer->id, 'buyer', [
+                'rating' => 5,
+                'comment' => 'Must not persist',
+            ], $this->testTenantId);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('marketplace_seller_ratings', [
+            'tenant_id' => $this->testTenantId,
+            'order_id' => $orderId,
+            'rater_id' => $buyer->id,
+        ]);
     }
 
     public function test_dispute_email_failure_is_persisted_and_open_uses_lock(): void

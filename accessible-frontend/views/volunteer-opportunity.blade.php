@@ -27,12 +27,16 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.volunteering.apply_created') }}</p>
             </div>
         </div>
-    @elseif ($status === 'apply-failed')
+    @elseif (in_array($status, ['apply-failed', 'apply-safeguarding-restricted', 'apply-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ __('govuk_alpha.volunteering.apply_failed') }}</p>
+                    <p>{{ match ($status) {
+                        'apply-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                        'apply-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                        default => __('govuk_alpha.volunteering.apply_failed'),
+                    } }}</p>
                 </div>
             </div>
         </div>
@@ -45,12 +49,17 @@
                 <p class="govuk-notification-banner__heading">{{ $status === 'shift-signed-up' ? __('govuk_alpha.volunteering.shift_signed_up_detail') : __('govuk_alpha.volunteering.shift_cancelled_detail') }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['shift-signup-failed', 'shift-cancel-failed'], true))
+    @elseif (in_array($status, ['shift-signup-failed', 'shift-cancel-failed', 'shift-safeguarding-restricted', 'shift-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ $status === 'shift-signup-failed' ? __('govuk_alpha.volunteering.shift_signup_failed') : __('govuk_alpha.volunteering.shift_cancel_failed') }}</p>
+                    <p>{{ match ($status) {
+                        'shift-signup-failed' => __('govuk_alpha.volunteering.shift_signup_failed'),
+                        'shift-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                        'shift-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                        default => __('govuk_alpha.volunteering.shift_cancel_failed'),
+                    } }}</p>
                 </div>
             </div>
         </div>

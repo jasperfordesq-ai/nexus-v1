@@ -97,6 +97,16 @@
     "privacy_policy_link": "Privacy Policy"
   },
   "privacy": {
+    "last_updated_safeguarding": "Last updated: July 2026",
+    "data_safeguarding_type": "Private safeguarding vetting confirmation",
+    "data_safeguarding_collected": "Community, member, controlled scheme, purpose and scope, confirmed or revoked decision, authorised decision-maker, timestamps, controlled reason code and policy version. We do not ask for or store the certificate, reference number, dates, result, criminal-record details, free-text notes or identity documents.",
+    "data_safeguarding_why": "To enforce a member's private contact preference and provide an auditable correction and review process.",
+    "data_safeguarding_basis": "Controller-documented legal basis",
+    "safeguarding_data_title": "Safeguarding confirmation metadata",
+    "safeguarding_data_body": "Where a community lawfully requires an Enhanced DBS confirmation for safeguarded member contact, the community completes its own checks outside Project NEXUS. An authorised broker records only the resulting community decision. This is not a claim that a member is safe, has no criminal record or is cleared for every role.",
+    "safeguarding_data_access": "Access is limited to authorised brokers and administrators in the member's community and is not shown on public profiles, badges, search results or ordinary analytics.",
+    "safeguarding_data_retention": "The Community Operator must publish and apply a documented retention schedule and remove metadata when it is no longer necessary, subject to any properly documented legal obligation.",
+    "safeguarding_data_correction": "Members can view their private status, request a broker review without sending evidence, and ask the Community Operator to correct or challenge an inaccurate decision.",
     "meta_description": "How we collect, use, and protect your personal data on our community platform.",
     "page_title": "Privacy Policy",
     "heading": "Privacy Policy",
@@ -717,6 +727,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Where a community policy requires vetted contact, the community carries out its lawful checking outside Project NEXUS. An authorised broker can record a private, metadata-only community confirmation for the specific contact policy. Project NEXUS does not ask for or retain DBS, Garda Vetting, AccessNI, PVG or equivalent certificates, reference numbers, results or criminal-record details. A confirmation does not mean a person is universally safe or cleared for every role.",
+    "what_we_dont_vetting_item": "We do not independently inspect or store criminal-record certificates, certify a member for a profession, or turn a contact-policy confirmation into universal role clearance.",
+    "precautions_vetting_item": "For activities involving children or vulnerable adults, contact your community coordinator about the rules that apply. Do not ask another member to send a DBS, Garda Vetting, AccessNI, PVG or equivalent certificate through Project NEXUS.",
     "page_title": "Trust & Safety",
     "meta_description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding.",
     "heading": "Trust & Safety",

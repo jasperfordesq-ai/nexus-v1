@@ -6,10 +6,14 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use Tests\Laravel\TestCase;
 use App\Services\ExchangeRatingService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 
 class ExchangeRatingServiceTest extends TestCase
 {
@@ -19,6 +23,10 @@ class ExchangeRatingServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new ExchangeRatingService();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')->zeroOrMoreTimes();
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
     }
 
     // =========================================================================
@@ -104,6 +112,23 @@ class ExchangeRatingServiceTest extends TestCase
 
         $result = $this->service->submitRating(1, 1, 4);
         $this->assertFalse($result['success']);
+    }
+
+    public function test_submitRating_denial_writes_no_rating(): void
+    {
+        $exchange = (object) ['id' => 1, 'requester_id' => 1, 'provider_id' => 2, 'status' => 'completed'];
+        DB::shouldReceive('selectOne')->once()->andReturn($exchange);
+        DB::shouldReceive('insert')->never();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with(1, 2, (int) TenantContext::getId(), 'exchange_rating')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $this->expectException(SafeguardingPolicyException::class);
+        $this->service->submitRating(1, 1, 5, 'Must not persist');
     }
 
     // =========================================================================

@@ -294,9 +294,29 @@
     "revoke_confirm_no": "Conserver",
     "revoked_toast": "Préférence révoquée.",
     "revoke_error_toast": "Une erreur est survenue. Veuillez réessayer.",
+    "policy_review_title": "Vérifiez vos préférences de protection",
+    "policy_review_body": "Votre communauté a changé de juridiction de protection. Vos protections restent actives. Vérifiez le texte mis à jour ci-dessous, puis confirmez votre choix.",
+    "policy_review_confirm": "Confirmer mes préférences",
+    "policy_review_confirmed": "Préférences de protection confirmées.",
+    "policy_review_error": "La vérification n’a pas pu être confirmée. Veuillez réessayer.",
     "chip_broker_review": "Révision par courtier",
     "chip_match_approval": "Approbation de correspondance",
-    "chip_vetted_only": "Contacts vérifiés uniquement"
+    "chip_vetted_only": "Contacts vérifiés uniquement",
+    "vetting": {
+      "title": "Votre statut de contrôle communautaire privé",
+      "status_not_confirmed": "Non confirmé",
+      "status_review_requested": "Révision demandée",
+      "status_unavailable": "Votre statut de vérification n'a pas pu être chargé.",
+      "confirmed_on": "Votre communauté a confirmé que vous répondez à cette exigence de contact de protection sur {{date}}.",
+      "review_pending_body": "Votre courtier a été invité à examiner votre confirmation de communauté.",
+      "not_confirmed_body": "Votre communauté n’a pas confirmé que vous répondez à cette exigence de contact de sauvegarde.",
+      "policy_unavailable_body": "Cette communauté n'a pas configuré de stratégie de contact de protection prise en charge pour sa juridiction.",
+      "no_documents": "Ne téléchargez pas et n'envoyez pas de document DBS, contrôle de police, contrôle Garda, AccessNI ou PVG via NEXUS. Votre communauté organisera toute vérification légale en dehors de la plateforme.",
+      "request_review_button": "Demander un examen au courtier",
+      "review_requested_button": "Révision demandée",
+      "review_requested_toast": "Examen du courtier demandé.",
+      "review_error": "L'examen du courtier n'a pas pu être demandé. Veuillez réessayer."
+    }
   },
   "header": {
     "title": "Paramètres",
@@ -591,9 +611,9 @@
     "unblock_error": "Échec du déblocage de l'utilisateur",
     "blocked_on": "Bloqué sur {{date}}",
     "link": "Utilisateurs bloqués",
-    "count_many": "{{count}} bloqué(s)",
     "count_one": "{{count}} bloqué(s)",
-    "count_other": "{{count}} bloqué(s)"
+    "count_other": "{{count}} bloqué(s)",
+    "count_many": "{{count}} bloqué(s)"
   },
   "block_user": {
     "title": "Bloquer {{name}} ?",
@@ -621,13 +641,13 @@
   "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment.",
   "tabs_aria": "Sections de paramètres",
   "twofa_loading_setup": "Chargement de la configuration à deux facteurs...",
-  "biometric_all_removed_many": "Suppression des clés d'accès {{count}}.",
   "biometric_all_removed_one": "Suppression des clés d'accès {{count}}.",
   "biometric_all_removed_other": "Suppression des clés d'accès {{count}}.",
-  "biometric_enabled_many": "{{count}} mot(s) d'accès enregistré(s)",
   "biometric_enabled_one": "{{count}} mot(s) d'accès enregistré(s)",
   "biometric_enabled_other": "{{count}} mot(s) d'accès enregistré(s)",
-  "twofa_backup_remaining_many": "{{count}} codes de secours restants",
   "twofa_backup_remaining_one": "{{count}} codes de secours restants",
-  "twofa_backup_remaining_other": "{{count}} codes de secours restants"
+  "twofa_backup_remaining_other": "{{count}} codes de secours restants",
+  "biometric_all_removed_many": "Suppression des clés d'accès {{count}}.",
+  "biometric_enabled_many": "{{count}} mot(s) d'accès enregistré(s)",
+  "twofa_backup_remaining_many": "{{count}} codes de secours restants"
 }

@@ -9,6 +9,8 @@
   "send": "Senden",
   "you": "Sie",
   "unread": "{{count}} ungelesen",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Ihre Gespräche mit Gemeinschaftsmitgliedern",
   "disabled_title": "Direktnachrichten deaktiviert",
   "disabled_subtitle": "Direktnachrichten sind für diese Gemeinschaft nicht aktiviert. Um Dienstleistungen zu vereinbaren, verwenden Sie bitte das Austauschanfragesystem.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Ältere Nachrichten werden geladen",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Schutzpruefung erforderlich",
     "body": "Dieses Gespraech wurde pausiert, weil eine Schutzregel der Community eine bestaetigte Ueberpruefung verlangt, bevor du diesem Mitglied schreiben kannst.",
@@ -226,6 +226,13 @@
     "action": "Hilfe oeffnen",
     "dismiss": "Schutzhinweis schliessen"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Sicherungsscheck vorübergehend nicht verfügbar",
+    "body": "Direktnachrichten wurden pausiert, da die Community-Schutzrichtlinie nicht sicher überprüft werden konnte.",
+    "contact_broker": "Schauen Sie in Kürze noch einmal vorbei. Wenn dies weiterhin der Fall ist, bitten Sie einen Community-Koordinator um Hilfe.",
+    "action": "Überprüfen Sie es noch einmal",
+    "dismiss": "Schutzbescheid ablehnen"
+  },
   "coordinator_request": {
     "button": "Koordinatorhilfe anfordern",
     "aria_button": "Koordinatorhilfe anfordern, um Kontakt zu vermitteln",
@@ -234,7 +241,22 @@
     "sent": "Koordinator benachrichtigt — er wird sich melden, um den Kontakt zu vermitteln.",
     "error": "Ihre Anfrage konnte gerade nicht gesendet werden. Bitte versuchen Sie es in Kürze erneut."
   },
+  "vetting_review_request": {
+    "button": "Fordern Sie eine Überprüfung an",
+    "success_title": "Rezension angefordert",
+    "success_body": "Ihr Community-Broker wurde gebeten, Ihre private Sicherungsbestätigung zu überprüfen.",
+    "sent": "Überprüfung angefordert. Ihre Community wird Sie bezüglich des Prozesses kontaktieren.",
+    "error": "Wir konnten im Moment keine Sicherheitsüberprüfung anfordern. Bitte versuchen Sie es in Kürze noch einmal."
+  },
+  "safeguarding_check_again": "Überprüfen Sie es noch einmal",
+  "safeguarding_checks": {
+    "dbs_enhanced": "Erweitertes DBS (England und Wales)",
+    "pvg_scotland": "PVG-Schema",
+    "access_ni": "AccessNI (Nordirland)",
+    "garda_vetting": "Garda-Überprüfung"
+  },
   "composer_blocked_safeguarding": "Direktnachrichten sind mit diesem Mitglied nicht verfügbar. Nutzen Sie die obige Option, um einen Koordinator um Hilfe bei der Kontaktvermittlung zu bitten.",
+  "composer_blocked_safeguarding_unavailable": "Direktnachrichten werden angehalten, während die Schutzrichtlinie überprüft wird. Verwenden Sie oben erneut „Überprüfen“.",
   "aria_conversation_unread_one": "Gespräch mit {{name}}, {{count}} ungelesen",
   "aria_conversation_unread_other": "Gespräch mit {{name}}, {{count}} ungelesen",
   "selected_members_one": "Ausgewählt ({{count}})",

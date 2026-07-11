@@ -116,7 +116,7 @@
       "who_can_see_heading": "Kto może to zobaczyć",
       "who_can_see_body": "Tylko koordynatorzy i administratorzy społeczności mogą zobaczyć te preferencje. Inni członkowie nie mogą. Cały dostęp jest rejestrowany.",
       "what_activates_heading": "Co w wyniku tego zostaje aktywowane",
-      "activation_broker_review": "Koordynator przejrzy wiadomości, które wysyłasz i otrzymujesz.",
+      "activation_broker_review": "Koordynator sprawdzi i zatwierdzi chronione dopasowania lub wymiany, gdy wymaga tego wybrana preferencja. Nie daje to dostępu do treści wiadomości.",
       "activation_match_approval": "Koordynator zatwierdzi dopasowania z Twoim udziałem przed zaproponowaniem ich drugiemu członkowi.",
       "activation_discovery_hidden": "Będziesz ukryty w wynikach wyszukiwania dla członków, którzy nie ukończyli wymaganej weryfikacji.",
       "activation_notification": "Koordynator został powiadomiony i skontaktuje się z Tobą, aby omówić, jak możemy pomóc.",

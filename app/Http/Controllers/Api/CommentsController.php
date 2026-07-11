@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Comment;
 use App\Models\Notification;
@@ -105,6 +106,8 @@ class CommentsController extends BaseApiController
             $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         }
 
         $comment->load('user:id,first_name,last_name,avatar_url');
@@ -142,7 +145,11 @@ class CommentsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.comment_text_required'), 'content', 400);
         }
 
-        $updatedContent = $this->commentService->update($id, $userId, $content);
+        try {
+            $updatedContent = $this->commentService->update($id, $userId, $content);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($updatedContent === null) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.cannot_edit_comment'), null, 403);
@@ -201,7 +208,11 @@ class CommentsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reaction_type'), 'emoji', 400);
         }
 
-        $result = $this->commentService->toggleReaction($userId, $tenantId, $id, $actualEmoji);
+        try {
+            $result = $this->commentService->toggleReaction($userId, $tenantId, $id, $actualEmoji);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         // Notify comment author on reaction add (not on remove/update)
         if ($result['action'] === 'added') {

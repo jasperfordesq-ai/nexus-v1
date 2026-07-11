@@ -294,9 +294,29 @@
     "revoke_confirm_no": "Zachowaj",
     "revoked_toast": "Preferencja cofnięta.",
     "revoke_error_toast": "Coś poszło nie tak. Spróbuj ponownie.",
+    "policy_review_title": "Sprawdź preferencje ochrony",
+    "policy_review_body": "Twoja społeczność zmieniła jurysdykcję ochrony. Ochrona pozostaje aktywna. Sprawdź zaktualizowane brzmienie i potwierdź swój wybór.",
+    "policy_review_confirm": "Potwierdź moje preferencje",
+    "policy_review_confirmed": "Preferencje ochrony potwierdzone.",
+    "policy_review_error": "Nie udało się potwierdzić przeglądu. Spróbuj ponownie.",
     "chip_broker_review": "Przegląd brokera",
     "chip_match_approval": "Zatwierdzenie dopasowania",
-    "chip_vetted_only": "Tylko zweryfikowane kontakty"
+    "chip_vetted_only": "Tylko zweryfikowane kontakty",
+    "vetting": {
+      "title": "Twój status weryfikacji społeczności prywatnej",
+      "status_not_confirmed": "Nie potwierdzone",
+      "status_review_requested": "Zażądano przeglądu",
+      "status_unavailable": "Nie można wczytać Twojego statusu weryfikacji.",
+      "confirmed_on": "Twoja społeczność potwierdziła, że ​​spełniasz wymagania dotyczące kontaktu zabezpieczającego w witrynie {{date}}.",
+      "review_pending_body": "Twój broker został poproszony o sprawdzenie potwierdzenia Twojej społeczności.",
+      "not_confirmed_body": "Twoja społeczność nie potwierdziła, że ​​spełniasz ten wymóg kontaktu zabezpieczającego.",
+      "policy_unavailable_body": "Ta społeczność nie skonfigurowała obsługiwanej polityki kontaktów ochronnych dla swojej jurysdykcji.",
+      "no_documents": "Nie przesyłaj ani nie wysyłaj dokumentów DBS, kontroli policyjnej, weryfikacji Garda, AccessNI lub PVG za pośrednictwem NEXUS. Twoja społeczność zorganizuje wszelkie zgodne z prawem sprawdzenie poza platformą.",
+      "request_review_button": "Poproś o recenzję brokera",
+      "review_requested_button": "Zażądano przeglądu",
+      "review_requested_toast": "Poproszono o opinię brokera.",
+      "review_error": "Nie można było poprosić o recenzję brokera. Spróbuj ponownie."
+    }
   },
   "header": {
     "title": "Ustawienia",
@@ -591,10 +611,10 @@
     "unblock_error": "Nie udało się odblokować użytkownika",
     "blocked_on": "Zablokowany na {{date}}",
     "link": "Zablokowani użytkownicy",
-    "count_few": "{{count}} zablokowanych",
-    "count_many": "{{count}} zablokowanych",
     "count_one": "{{count}} zablokowanych",
-    "count_other": "{{count}} zablokowanych"
+    "count_other": "{{count}} zablokowanych",
+    "count_few": "{{count}} zablokowanych",
+    "count_many": "{{count}} zablokowanych"
   },
   "block_user": {
     "title": "Zablokować {{name}}?",
@@ -622,16 +642,16 @@
   "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
   "tabs_aria": "Sekcje ustawień",
   "twofa_loading_setup": "Ładowanie konfiguracji dwuskładnikowej...",
-  "biometric_all_removed_few": "Usunięto klucze {{count}}.",
-  "biometric_all_removed_many": "Usunięto klucze {{count}}.",
   "biometric_all_removed_one": "Usunięto klucze {{count}}.",
   "biometric_all_removed_other": "Usunięto klucze {{count}}.",
-  "biometric_enabled_few": "Zarejestrowano klucz(e) {{count}}",
-  "biometric_enabled_many": "Zarejestrowano klucz(e) {{count}}",
   "biometric_enabled_one": "Zarejestrowano klucz(e) {{count}}",
   "biometric_enabled_other": "Zarejestrowano klucz(e) {{count}}",
-  "twofa_backup_remaining_few": "{{count}} kody zapasowe pozostałe",
-  "twofa_backup_remaining_many": "{{count}} kody zapasowe pozostałe",
   "twofa_backup_remaining_one": "{{count}} kody zapasowe pozostałe",
-  "twofa_backup_remaining_other": "{{count}} kody zapasowe pozostałe"
+  "twofa_backup_remaining_other": "{{count}} kody zapasowe pozostałe",
+  "biometric_all_removed_few": "Usunięto klucze {{count}}.",
+  "biometric_all_removed_many": "Usunięto klucze {{count}}.",
+  "biometric_enabled_few": "Zarejestrowano klucz(e) {{count}}",
+  "biometric_enabled_many": "Zarejestrowano klucz(e) {{count}}",
+  "twofa_backup_remaining_few": "{{count}} kody zapasowe pozostałe",
+  "twofa_backup_remaining_many": "{{count}} kody zapasowe pozostałe"
 }

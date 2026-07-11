@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MarketplaceOrder;
 use App\Services\MarketplaceOrderService;
 use App\Services\MarketplaceRatingService;
@@ -62,6 +63,8 @@ class MarketplaceOrderController extends BaseApiController
             }
 
             return $this->respondWithData(MarketplaceOrderService::formatOrder($order), null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
@@ -241,6 +244,8 @@ class MarketplaceOrderController extends BaseApiController
         try {
             $rating = MarketplaceRatingService::rateOrder($id, $userId, $role, $data, TenantContext::getId());
             return $this->respondWithData($rating->toArray(), null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }

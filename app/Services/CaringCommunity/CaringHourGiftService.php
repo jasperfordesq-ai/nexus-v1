@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services\CaringCommunity;
 
 use App\Core\TenantContext;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
@@ -85,6 +86,13 @@ class CaringHourGiftService
             if (!$recipient) {
                 throw new RuntimeException('Recipient not found.');
             }
+
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $senderId,
+                $recipientId,
+                $tenantId,
+                'caring_hour_gift',
+            );
 
             // Debit sender immediately — hours are held in pending state until
             // the recipient accepts (or sender reverts / recipient declines).

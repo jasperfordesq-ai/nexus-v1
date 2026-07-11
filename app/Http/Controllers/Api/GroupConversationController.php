@@ -48,7 +48,7 @@ class GroupConversationController extends BaseApiController
 
         if ($result === null) {
             $errors = GroupConversationService::getErrors();
-            return $this->respondWithErrors($errors, 422);
+            return $this->respondWithErrors($errors, $this->failureStatus($errors, 422));
         }
 
         return $this->respondWithData($result, null, 201);
@@ -109,11 +109,7 @@ class GroupConversationController extends BaseApiController
 
         if ($result === null) {
             $errors = GroupConversationService::getErrors();
-            $status = 422;
-            if (!empty($errors[0]['code']) && $errors[0]['code'] === 'FORBIDDEN') {
-                $status = 403;
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->respondWithErrors($errors, $this->failureStatus($errors, 422));
         }
 
         return $this->respondWithData($result);
@@ -195,6 +191,7 @@ class GroupConversationController extends BaseApiController
             'cursor' => $result['cursor'],
             'per_page' => $filters['limit'],
             'has_more' => $result['has_more'],
+            'safeguarding' => $result['safeguarding'] ?? null,
         ]);
     }
 
@@ -223,9 +220,25 @@ class GroupConversationController extends BaseApiController
 
         if ($result === null) {
             $errors = GroupConversationService::getErrors();
-            return $this->respondWithErrors($errors, 403);
+            return $this->respondWithErrors($errors, $this->failureStatus($errors, 403));
         }
 
         return $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * Keep safeguarding policy outages distinct from an ordinary permission
+     * denial. Clients may retry a 503, while a 403 requires a policy/attestation
+     * change or coordinator assistance.
+     *
+     * @param array<int, array<string, mixed>> $errors
+     */
+    private function failureStatus(array $errors, int $default): int
+    {
+        return match ($errors[0]['code'] ?? null) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 503,
+            'VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED', 'FORBIDDEN' => 403,
+            default => $default,
+        };
     }
 }

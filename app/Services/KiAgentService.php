@@ -373,6 +373,20 @@ class KiAgentService
                         ->where('recipient_id', $recipientId)
                         ->exists();
                     if (!$existing) {
+                        $interactionPolicy = app(SafeguardingInteractionPolicy::class);
+                        $interactionPolicy->assertLocalContactAllowed(
+                            $supporterId,
+                            $recipientId,
+                            $tenantId,
+                            'ki_agent_tandem_approval',
+                        );
+                        $interactionPolicy->assertLocalContactAllowed(
+                            $recipientId,
+                            $supporterId,
+                            $tenantId,
+                            'ki_agent_tandem_approval',
+                        );
+
                         // `caring_support_relationships` requires NOT NULL `title`
                         // and `start_date` (neither has a DB default). Omitting them
                         // either rejected the row (strict mode) or wrote an empty

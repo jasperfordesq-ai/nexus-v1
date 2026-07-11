@@ -35,17 +35,54 @@ class MatchingService
     {
         try {
             $tenantId = \App\Core\TenantContext::getId();
+            $userId = (int) $userId;
+            $limit = max(1, min(100, (int) $limit));
+            $candidateLimit = min(500, max($limit, $limit * 5));
 
-            return DB::select(
+            $candidates = DB::select(
                 "SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.location, u.skills
                  FROM users u
                  WHERE u.tenant_id = ? AND u.id != ? AND u.status = 'active' AND u.is_approved = 1
                  ORDER BY RAND()
                  LIMIT ?",
-                [$tenantId, $userId, $limit]
+                [$tenantId, $userId, $candidateLimit]
             );
+
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $suggestions = [];
+            foreach ($candidates as $candidate) {
+                $candidateId = (int) ($candidate->id ?? 0);
+                if ($candidateId <= 0) {
+                    continue;
+                }
+
+                $requesterToCandidate = $policy->evaluateLocalContact(
+                    $userId,
+                    $candidateId,
+                    $tenantId,
+                    'legacy_match_suggestion',
+                );
+                $candidateToRequester = $policy->evaluateLocalContact(
+                    $candidateId,
+                    $userId,
+                    $tenantId,
+                    'legacy_match_suggestion',
+                );
+                if (! $requesterToCandidate->isAllowed() || ! $candidateToRequester->isAllowed()) {
+                    continue;
+                }
+
+                $suggestions[] = $candidate;
+                if (count($suggestions) >= $limit) {
+                    break;
+                }
+            }
+
+            return $suggestions;
         } catch (\Throwable $e) {
-            Log::debug('[MatchingService] getSuggestionsForUser failed: ' . $e->getMessage());
+            Log::debug('[MatchingService] getSuggestionsForUser failed closed', [
+                'exception' => $e::class,
+            ]);
             return [];
         }
     }

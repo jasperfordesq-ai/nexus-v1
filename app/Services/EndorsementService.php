@@ -57,6 +57,13 @@ class EndorsementService
             return null;
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $endorserId,
+            $endorsedId,
+            (int) TenantContext::getId(),
+            'skill_endorsement',
+        );
+
         // Check for existing endorsement
         $existing = SkillEndorsement::query()
             ->where('endorser_id', $endorserId)

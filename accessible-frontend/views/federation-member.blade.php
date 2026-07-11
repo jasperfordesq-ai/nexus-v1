@@ -52,6 +52,8 @@
         $bannerMap = [
             'connect-sent' => ['success', __('govuk_alpha.fed2.member_actions.connect_pending')],
             'connect-failed' => ['error', __('govuk_alpha.fed2.connections.status.connection-action-failed')],
+            'connect-safeguarding-restricted' => ['error', __('safeguarding.errors.interaction_not_allowed')],
+            'connect-safeguarding-unavailable' => ['error', __('safeguarding.errors.policy_unavailable')],
             'message-sent' => ['success', __('govuk_alpha.fed2.messages.status.message-sent')],
             'message-empty' => ['error', __('govuk_alpha.fed2.messages.status.message-empty')],
             'message-too-long' => ['error', __('govuk_alpha.fed2.messages.status.message-too-long')],

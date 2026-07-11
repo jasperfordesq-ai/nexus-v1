@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\MessageService;
 use App\Services\Protocols\KomunitinAdapter;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -690,6 +692,29 @@ class FederationKomunitinController extends BaseApiController
         if (!$this->localAccountCanTransact((int) $payeeId, $tenantId)) {
             return $this->jsonApiError('Forbidden', 'Forbidden',
                 'Payee does not accept federated transactions', 403);
+        }
+
+        $safeguardingDecision = app(SafeguardingInteractionPolicy::class)->evaluateLocalContact(
+            (int) $payerId,
+            (int) $payeeId,
+            $tenantId,
+            'komunitin_transfer',
+        );
+        if (! $safeguardingDecision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'status' => $safeguardingDecision->status,
+                'code' => $safeguardingDecision->code,
+                'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+                'can_request_coordinator' => $safeguardingDecision->canRequestCoordinator,
+            ]);
+
+            return $this->jsonApiError(
+                $safeguardingDecision->code,
+                (string) ($error['title'] ?? $error['message']),
+                (string) $error['message'],
+                $safeguardingDecision->isUnavailable() ? 503 : 403,
+            );
         }
 
         // Execute transfer — only settle balances when the requested state

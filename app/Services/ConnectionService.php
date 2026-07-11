@@ -119,6 +119,13 @@ class ConnectionService
             throw new \RuntimeException('User not found');
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $requesterId,
+            $receiverId,
+            (int) $requesterTenantId,
+            'connection_request',
+        );
+
         $connection = DB::transaction(function () use ($requesterId, $receiverId) {
             // Lock both user rows (in consistent order to prevent deadlocks) to serialize
             // concurrent connection requests between the same pair of users
@@ -195,6 +202,13 @@ class ConnectionService
             if ($connection->status !== 'pending') {
                 throw new \RuntimeException(__('api.connection_not_pending'));
             }
+
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                (int) $connection->requester_id,
+                (int) $connection->receiver_id,
+                (int) TenantContext::getId(),
+                'connection_accept',
+            );
 
             $connection->status = 'accepted';
             $connection->save();

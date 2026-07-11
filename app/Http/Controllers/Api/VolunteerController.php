@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Volunteering\ApplyOpportunityRequest;
 use App\Http\Requests\Volunteering\CreateOpportunityRequest;
@@ -219,6 +220,8 @@ class VolunteerController extends BaseApiController
 
         try {
             $application = $this->volunteerService->apply($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             $status = (int) $e->getCode();
             if (!in_array($status, [400, 403, 404, 409, 422], true)) {
@@ -313,7 +316,11 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.action_must_be_approve_or_decline'), 'action', 400);
         }
 
-        $success = $this->volunteerService->handleApplication((int) $id, $userId, $action, $orgNote);
+        try {
+            $success = $this->volunteerService->handleApplication((int) $id, $userId, $action, $orgNote);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -422,7 +429,11 @@ class VolunteerController extends BaseApiController
             }
         }
 
-        $success = $this->volunteerService->signUpForShift((int) $id, $userId);
+        try {
+            $success = $this->volunteerService->signUpForShift((int) $id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -675,7 +686,11 @@ class VolunteerController extends BaseApiController
         $rating = $this->inputInt('rating');
         $comment = trim($this->input('comment', ''));
 
-        $reviewId = $this->volunteerService->createReview($userId, $targetType, $targetId, $rating, $comment);
+        try {
+            $reviewId = $this->volunteerService->createReview($userId, $targetType, $targetId, $rating, $comment);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if ($reviewId === null) {
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));

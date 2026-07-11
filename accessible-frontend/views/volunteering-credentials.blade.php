@@ -9,13 +9,14 @@
         $credentials = $credentials ?? [];
         $status = $status ?? null;
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
-        $typeOptions = ['police_check', 'first_aid', 'safeguarding', 'dbs', 'driving_licence', 'other'];
+        $typeOptions = ['first_aid', 'safeguarding', 'manual_handling', 'food_hygiene', 'driving_licence', 'professional_registration', 'other'];
         $typeLabelKeys = [
-            'police_check' => 'govuk_alpha_volunteering.credentials.type_police_check',
             'first_aid' => 'govuk_alpha_volunteering.credentials.type_first_aid',
             'safeguarding' => 'govuk_alpha_volunteering.credentials.type_safeguarding',
-            'dbs' => 'govuk_alpha_volunteering.credentials.type_dbs',
+            'manual_handling' => 'govuk_alpha_volunteering.credentials.type_manual_handling',
+            'food_hygiene' => 'govuk_alpha_volunteering.credentials.type_food_hygiene',
             'driving_licence' => 'govuk_alpha_volunteering.credentials.type_driving_licence',
+            'professional_registration' => 'govuk_alpha_volunteering.credentials.type_professional_registration',
             'other' => 'govuk_alpha_volunteering.credentials.type_other',
         ];
         $typeLabel = function (string $value) use ($typeLabelKeys): string {
@@ -26,16 +27,19 @@
             'verified' => 'govuk-tag--green',
             'rejected' => 'govuk-tag--red',
             'expired' => 'govuk-tag--grey',
+            'retired' => 'govuk-tag--red',
         ];
         $statusLabel = [
             'pending' => 'govuk_alpha_volunteering.credentials.status_pending',
             'verified' => 'govuk_alpha_volunteering.credentials.status_verified',
             'rejected' => 'govuk_alpha_volunteering.credentials.status_rejected',
             'expired' => 'govuk_alpha_volunteering.credentials.status_expired',
+            'retired' => 'govuk_alpha_volunteering.credentials.status_retired',
         ];
-        $fileErrors = ['credential-type-required', 'credential-file-required', 'credential-file-type', 'credential-file-size', 'credential-upload-failed', 'credential-delete-failed'];
+        $fileErrors = ['credential-type-required', 'credential-vetting-prohibited', 'credential-file-required', 'credential-file-type', 'credential-file-size', 'credential-upload-failed', 'credential-delete-failed'];
         $errorMsg = [
             'credential-type-required' => 'govuk_alpha_volunteering.credentials.type_required',
+            'credential-vetting-prohibited' => 'govuk_alpha_volunteering.credentials.vetting_prohibited',
             'credential-file-required' => 'govuk_alpha_volunteering.credentials.file_required',
             'credential-file-type' => 'govuk_alpha_volunteering.credentials.file_type',
             'credential-file-size' => 'govuk_alpha_volunteering.credentials.file_size',
@@ -79,6 +83,14 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.volunteering.title') }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha_volunteering.credentials.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha_volunteering.credentials.description') }}</p>
+
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">{{ __('govuk_alpha_volunteering.shared.warning') }}:</span>
+            {{ __('govuk_alpha_volunteering.credentials.vetting_documents_notice') }}
+        </strong>
+    </div>
 
     {{-- Upload form --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha_volunteering.credentials.upload_title') }}</h2>
@@ -138,21 +150,32 @@
                     @php
                         $credId = (int) ($credential['id'] ?? 0);
                         $credType = (string) ($credential['credential_type'] ?? '');
+                        $isLegacyVettingEvidence = (bool) ($credential['legacy_vetting_evidence'] ?? false);
+                        $manualReviewRequired = (bool) ($credential['manual_review_required'] ?? false);
                         $statusValue = (string) ($credential['status'] ?? 'pending');
-                        $sTag = $statusTag[$statusValue] ?? 'govuk-tag--grey';
-                        $sLabelKey = $statusLabel[$statusValue] ?? 'govuk_alpha_volunteering.credentials.status_pending';
+                        $sTag = $manualReviewRequired ? 'govuk-tag--yellow' : ($statusTag[$statusValue] ?? 'govuk-tag--grey');
+                        $sLabelKey = $manualReviewRequired
+                            ? 'govuk_alpha_volunteering.credentials.status_manual_review'
+                            : ($statusLabel[$statusValue] ?? 'govuk_alpha_volunteering.credentials.status_pending');
                     @endphp
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">{{ $typeLabel($credType) }}</td>
+                        <td class="govuk-table__cell">
+                            {{ $isLegacyVettingEvidence ? __('govuk_alpha_volunteering.credentials.retired_vetting_label') : $typeLabel($credType) }}
+                            @if ($isLegacyVettingEvidence)
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">{{ __('govuk_alpha_volunteering.credentials.retired_vetting_warning') }}</p>
+                            @elseif ($manualReviewRequired)
+                                <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">{{ __('govuk_alpha_volunteering.credentials.manual_review_warning') }}</p>
+                            @endif
+                        </td>
                         <td class="govuk-table__cell"><strong class="govuk-tag {{ $sTag }}">{{ __($sLabelKey) }}</strong></td>
-                        <td class="govuk-table__cell">{{ $formatDate($credential['expires_at'] ?? null) ?? __('govuk_alpha_volunteering.credentials.no_expiry') }}</td>
+                        <td class="govuk-table__cell">{{ ($isLegacyVettingEvidence || $manualReviewRequired) ? __('govuk_alpha_volunteering.credentials.not_applicable') : ($formatDate($credential['expires_at'] ?? null) ?? __('govuk_alpha_volunteering.credentials.no_expiry')) }}</td>
                         <td class="govuk-table__cell">{{ $formatDate($credential['created_at'] ?? null) ?? '—' }}</td>
                         <td class="govuk-table__cell">
                             @if ($credId > 0)
                                 <form method="post" action="{{ route('govuk-alpha.volunteering.credentials.delete', ['tenantSlug' => $tenantSlug, 'id' => $credId]) }}">
                                     @csrf
                                     <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">
-                                        {{ __('govuk_alpha_volunteering.credentials.delete_button') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha_volunteering.credentials.delete_for', ['type' => $typeLabel($credType)]) }}</span>
+                                        {{ $isLegacyVettingEvidence ? __('govuk_alpha_volunteering.credentials.delete_vetting_evidence_button') : __('govuk_alpha_volunteering.credentials.delete_button') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha_volunteering.credentials.delete_for', ['type' => $isLegacyVettingEvidence ? __('govuk_alpha_volunteering.credentials.retired_vetting_label') : $typeLabel($credType)]) }}</span>
                                     </button>
                                 </form>
                             @endif

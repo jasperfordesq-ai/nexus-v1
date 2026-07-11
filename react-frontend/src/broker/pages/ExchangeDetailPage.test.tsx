@@ -230,7 +230,7 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
       risk_notes: 'Requires PPE',
       requires_approval: true,
       insurance_required: false,
-      dbs_required: false,
+      dbs_required: true,
       created_at: '2026-01-10T00:00:00Z',
     };
     mockAdminBroker.showExchange.mockResolvedValue({
@@ -242,6 +242,7 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     await waitFor(() => {
       expect(screen.getByText('Requires PPE')).toBeInTheDocument();
       expect(screen.getByText('Broker approval required')).toBeInTheDocument();
+      expect(screen.getByText('Legacy role-vetting requirement unavailable — access remains blocked')).toBeInTheDocument();
     });
   });
 

@@ -9,6 +9,8 @@
   "send": "送信",
   "you": "あなた",
   "unread": "{{count}} 未読",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "コミュニティメンバーとの会話",
   "disabled_title": "ダイレクトメッセージが無効です",
   "disabled_subtitle": "このコミュニティではダイレクトメッセージが有効ではありません。サービスを手配するには、交換リクエストシステムをご利用ください。",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "古いメッセージを読み込む",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Anzen kakunin ga hitsuyo desu",
     "body": "Kono kaiwa wa, kono menba ni messeji o okuru mae ni kakunin-zumi no shinsa ga hitsuyo na tame, komyuniti no anzen ruuru ni yori ichiji teishi sareteimasu.",
@@ -226,6 +226,13 @@
     "action": "Herupu o hiraku",
     "dismiss": "Anzen oshirase o tojiru"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "保護チェックは一時的に利用できません",
+    "body": "コミュニティ保護ポリシーを安全に確認できなかったため、ダイレクト メッセージングは​​一時停止されています。",
+    "contact_broker": "しばらくしてからもう一度確認してください。これが続く場合は、コミュニティ コーディネーターに助けを求めてください。",
+    "action": "もう一度確認してください",
+    "dismiss": "安全保護通知を却下する"
+  },
   "coordinator_request": {
     "button": "コーディネーターにサポートを依頼する",
     "aria_button": "連絡の調整をコーディネーターに依頼する",
@@ -234,7 +241,23 @@
     "sent": "コーディネーターに通知しました。連絡の調整についてご連絡いたします。",
     "error": "現在、依頼を送信できませんでした。しばらくしてからもう一度お試しください。"
   },
+  "vetting_review_request": {
+    "button": "精査レビューをリクエストする",
+    "success_title": "レビューが要求されました",
+    "success_body": "あなたのコミュニティブローカーは、あなたの個人保護の確認を確認するよう求められています。",
+    "sent": "精査レビューがリクエストされました。コミュニティからプロセスについて連絡があります。",
+    "error": "現時点では精査をリクエストできませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "safeguarding_check_again": "もう一度確認してください",
+  "safeguarding_checks": {
+    "dbs_enhanced": "強化された DBS (イングランドおよびウェールズ)",
+    "pvg_scotland": "PVGスキーム",
+    "access_ni": "アクセスNI (北アイルランド)",
+    "garda_vetting": "ガルダの審査"
+  },
   "composer_blocked_safeguarding": "このメンバーへのダイレクトメッセージはご利用いただけません。上記のオプションを使用して、コーディネーターに連絡の調整をご依頼ください。",
+  "composer_blocked_safeguarding_unavailable": "安全保護ポリシーがチェックされている間、ダイレクト メッセージングは​​一時停止されます。上記でもう一度「チェック」を使用します。",
+  "aria_conversation_unread_one": "{{name}}、{{count}} との会話が未読",
   "aria_conversation_unread_other": "会話 {{name}} と {{count}} は未読です",
   "selected_members_other": "選択済み ({{count}})"
 }

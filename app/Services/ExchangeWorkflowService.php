@@ -27,6 +27,9 @@ use Illuminate\Support\Facades\Log;
  */
 class ExchangeWorkflowService
 {
+    private const PURPOSE_LISTING_ROLE = 'listing_role';
+    private const SCOPE_LISTING = 'listing';
+
     // Status constants
     public const STATUS_PENDING_PROVIDER = 'pending_provider';
     public const STATUS_PENDING_BROKER = 'pending_broker';
@@ -113,6 +116,15 @@ class ExchangeWorkflowService
             return null;
         }
 
+        if (! self::contactPolicyAllowsBoth(
+            $requesterId,
+            $providerId,
+            $tenantId,
+            'exchange_request',
+        )) {
+            return null;
+        }
+
         $proposedHours = max(0.25, min(24, (float) ($data['proposed_hours'] ?? $listing->hours ?? 1)));
         $initialStatus = self::STATUS_PENDING_PROVIDER;
 
@@ -154,6 +166,15 @@ class ExchangeWorkflowService
             return false;
         }
         if ($exchange->status !== self::STATUS_PENDING_PROVIDER) {
+            return false;
+        }
+
+        if (! self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_accept',
+        )) {
             return false;
         }
 
@@ -208,14 +229,22 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $reason ?: 'Provider declined');
+        $canIncludeMemberReason = self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_decline',
+        );
+        $safeReason = $canIncludeMemberReason ? $reason : '';
+
+        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $safeReason ?: 'Provider declined');
 
         if ($result) {
             try {
                 NotificationDispatcher::send((int) $exchange->requester_id, 'exchange_request_declined', [
                     'exchange_id' => $exchangeId,
                     'listing_title' => $exchange->listing->title ?? '',
-                    'reason' => $reason,
+                    'reason' => $safeReason,
                 ]);
             } catch (\Throwable $e) {
                 Log::warning("Exchange #{$exchangeId}: notification failed after declineRequest", [
@@ -234,6 +263,15 @@ class ExchangeWorkflowService
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || $exchange->status !== self::STATUS_PENDING_BROKER) {
+            return false;
+        }
+
+        if (! self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_broker_approval',
+        )) {
             return false;
         }
 
@@ -310,6 +348,15 @@ class ExchangeWorkflowService
             return false;
         }
 
+        if (! self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_start',
+        )) {
+            return false;
+        }
+
         $result = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, 'provider', 'Work started');
 
         if ($result) {
@@ -347,6 +394,15 @@ class ExchangeWorkflowService
         // Only the provider may mark work ready for confirmation (matches the
         // React product rule and closes the direct-call IDOR).
         if ((int) $exchange->provider_id !== $userId) {
+            return false;
+        }
+
+        if (! self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_ready_confirmation',
+        )) {
             return false;
         }
 
@@ -397,6 +453,19 @@ class ExchangeWorkflowService
             $isProvider = (int) $exchange->provider_id === $userId;
 
             if (!$isRequester && !$isProvider) {
+                return false;
+            }
+
+            // Re-evaluate at the irreversible confirmation boundary. A member
+            // may have revoked a preference or a broker may have revoked an
+            // attestation after work started; no confirmation or credit movement
+            // may proceed under stale eligibility.
+            if (! self::contactPolicyAllowsBoth(
+                (int) $exchange->requester_id,
+                (int) $exchange->provider_id,
+                TenantContext::getId(),
+                'exchange_confirm_completion',
+            )) {
                 return false;
             }
 
@@ -475,14 +544,22 @@ class ExchangeWorkflowService
             $role = $isRequester ? 'requester' : 'provider';
         }
 
-        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
+        $canIncludeMemberReason = self::contactPolicyAllowsBoth(
+            (int) $exchange->requester_id,
+            (int) $exchange->provider_id,
+            TenantContext::getId(),
+            'exchange_cancel',
+        );
+        $safeReason = $canIncludeMemberReason ? $reason : '';
+
+        $result = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $safeReason ?: 'Cancelled');
 
         if ($result) {
             try {
                 $notificationData = [
                     'exchange_id' => $exchangeId,
                     'listing_title' => $exchange->listing->title ?? '',
-                    'reason' => $reason,
+                    'reason' => $safeReason,
                 ];
                 // Notify the other party (not the one who cancelled)
                 $otherPartyId = $isRequester
@@ -723,6 +800,14 @@ class ExchangeWorkflowService
         $tenantId = TenantContext::getId();
 
         try {
+            $listingProviderId = (int) DB::table('listings')
+                ->where('id', $listingId)
+                ->where('tenant_id', $tenantId)
+                ->value('user_id');
+            if ($listingProviderId > 0) {
+                $providerId = $listingProviderId;
+            }
+
             $riskTag = DB::table('listing_risk_tags')
                 ->where('listing_id', $listingId)
                 ->where('tenant_id', $tenantId)
@@ -733,17 +818,28 @@ class ExchangeWorkflowService
             }
 
             if (!empty($riskTag->dbs_required)) {
-                $hasVetting = DB::table('vetting_records')
-                    ->where('user_id', $providerId)
-                    ->where('tenant_id', $tenantId)
-                    ->where('status', 'verified')
-                    ->where(function ($q) {
-                        $q->whereNull('expiry_date')->orWhere('expiry_date', '>', now());
-                    })
-                    ->exists();
+                $policy = app(SafeguardingJurisdictionService::class)->getPolicy($tenantId);
+                if (! $policy['configured']
+                    || ! $policy['contact_policy_available']
+                    || $policy['scheme_code'] === null
+                    || $policy['attestation_code'] === null
+                    || $policy['policy_version'] === null) {
+                    $violations[] = __('safeguarding.errors.compliance_policy_unavailable');
+                } else {
+                    $hasVetting = app(MemberVettingAttestationService::class)->hasConfirmedAttestation(
+                        tenantId: $tenantId,
+                        memberId: $providerId,
+                        schemeCode: $policy['scheme_code'],
+                        attestationCode: $policy['attestation_code'],
+                        purposeCode: self::PURPOSE_LISTING_ROLE,
+                        scopeType: self::SCOPE_LISTING,
+                        scopeIdentifier: (string) $listingId,
+                        policyVersion: $policy['policy_version'],
+                    );
 
-                if (!$hasVetting) {
-                    $violations[] = 'Provider requires valid DBS/vetting check for this listing.';
+                    if (! $hasVetting) {
+                        $violations[] = __('safeguarding.errors.listing_role_confirmation_required');
+                    }
                 }
             }
 
@@ -761,16 +857,47 @@ class ExchangeWorkflowService
                     $violations[] = 'Provider requires valid insurance certificate for this listing.';
                 }
             }
-        } catch (\Exception $e) {
-            // Tables may not exist — fail open
+        } catch (\Throwable $e) {
+            Log::error('[ExchangeWorkflow] compliance policy unavailable', [
+                'tenant_id' => $tenantId,
+                'listing_id' => $listingId,
+                'provider_id' => $providerId,
+                'error' => $e->getMessage(),
+            ]);
+            $violations[] = __('safeguarding.errors.compliance_policy_unavailable');
         }
 
-        return $violations;
+        return array_values(array_unique($violations));
     }
 
     // =========================================================================
     // PRIVATE HELPERS
     // =========================================================================
+
+    private static function contactPolicyAllowsBoth(
+        int $firstUserId,
+        int $secondUserId,
+        int $tenantId,
+        string $channel,
+    ): bool {
+        $policy = app(SafeguardingInteractionPolicy::class);
+        foreach ([[$firstUserId, $secondUserId], [$secondUserId, $firstUserId]] as [$senderId, $recipientId]) {
+            $decision = $policy->evaluateLocalContact($senderId, $recipientId, $tenantId, $channel);
+            if (! $decision->isAllowed()) {
+                Log::info('[ExchangeWorkflow] Blocked by safeguarding contact policy', [
+                    'tenant_id' => $tenantId,
+                    'sender_id' => $senderId,
+                    'recipient_id' => $recipientId,
+                    'reason_code' => $decision->code,
+                    'channel' => $channel,
+                ]);
+
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private static function processConfirmations(int $exchangeId, ExchangeRequest $exchange): bool
     {
@@ -1157,8 +1284,8 @@ class ExchangeWorkflowService
      * Check if an exchange needs broker approval (static).
      *
      * Checks TWO layers:
-     * 1. User-level safeguarding: either party has requires_broker_approval in user_messaging_restrictions
-     *    (set when a vulnerable person ticks safeguarding checkboxes during onboarding)
+     * 1. User-level safeguarding: either party's active preference requires
+     *    broker approval, evaluated separately from message monitoring
      * 2. Listing-level risk: listing risk tags, hours threshold, or global broker approval config
      */
     private static function needsBrokerApproval(int $listingId, float $proposedHours, ?int $requesterId = null, ?int $providerId = null): bool
@@ -1168,22 +1295,15 @@ class ExchangeWorkflowService
         // LAYER 1: User-level safeguarding flags (always checked, even if exchange workflow is "off")
         // A vulnerable person's exchanges MUST go through broker regardless of tenant config
         try {
-            $userIds = array_filter([$requesterId, $providerId]);
-            if (!empty($userIds)) {
-                $placeholders = implode(',', array_fill(0, count($userIds), '?'));
-                $hasSafeguardingFlag = DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM user_messaging_restrictions
-                     WHERE tenant_id = ? AND user_id IN ({$placeholders})
-                     AND requires_broker_approval = 1
-                     AND (monitoring_expires_at IS NULL OR monitoring_expires_at > NOW())",
-                    array_merge([$tenantId], $userIds)
-                );
-                if ($hasSafeguardingFlag && (int) $hasSafeguardingFlag->cnt > 0) {
+            $userIds = array_values(array_unique(array_filter([$requesterId, $providerId])));
+            foreach ($userIds as $userId) {
+                if (SafeguardingTriggerService::requiresBrokerApproval((int) $userId, $tenantId)) {
                     return true;
                 }
             }
-        } catch (\Exception $e) {
-            // Table may not exist — fail open for this check only
+        } catch (\Throwable $e) {
+            return true;
+            // A safety-preference lookup failure requires broker review.
         }
 
         // LAYER 2: Listing-level and tenant-level config checks

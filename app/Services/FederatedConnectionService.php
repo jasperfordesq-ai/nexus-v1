@@ -62,6 +62,29 @@ class FederatedConnectionService
             return ['success' => false, 'error' => __('api.cannot_send_request_to_user')];
         }
 
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+            $requesterId,
+            $requesterTenantId,
+            $receiverId,
+            $receiverTenantId,
+            'federated_connection_request',
+        );
+        if (! $decision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'status' => $decision->status,
+                'code' => $decision->code,
+                'required_vetting_types' => $decision->requiredAttestationCodes,
+                'required_vetting_labels' => $decision->requiredAttestationLabels,
+                'can_request_coordinator' => $decision->canRequestCoordinator,
+            ]);
+            return [
+                'success' => false,
+                'error_code' => $decision->code,
+                'retryable' => $decision->isUnavailable(),
+                'error' => (string) $error['message'],
+            ];
+        }
+
         // Check if connection already exists (in either direction)
         $existing = DB::selectOne(
             "SELECT id, status FROM federation_connections
@@ -181,6 +204,30 @@ class FederatedConnectionService
 
         if (!$connection) {
             return ['success' => false, 'error' => __('api.connection_request_not_found_or_processed')];
+        }
+
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+            (int) $connection->requester_user_id,
+            (int) $connection->requester_tenant_id,
+            $userId,
+            (int) $tenantId,
+            'federated_connection_accept',
+        );
+        if (! $decision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'status' => $decision->status,
+                'code' => $decision->code,
+                'required_vetting_types' => $decision->requiredAttestationCodes,
+                'required_vetting_labels' => $decision->requiredAttestationLabels,
+                'can_request_coordinator' => $decision->canRequestCoordinator,
+            ]);
+
+            return [
+                'success' => false,
+                'error_code' => $decision->code,
+                'retryable' => $decision->isUnavailable(),
+                'error' => (string) $error['message'],
+            ];
         }
 
         try {

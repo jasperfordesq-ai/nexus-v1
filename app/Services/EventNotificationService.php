@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +71,20 @@ class EventNotificationService
                 return 0;
             }
 
+            $recipientIds = $attendees
+                ->pluck('user_id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->filter(static fn (int $id): bool => $id > 0 && $id !== $organizerId)
+                ->unique()
+                ->values()
+                ->all();
+            app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+                $organizerId,
+                $recipientIds,
+                $tenantId,
+                'event_broadcast',
+            );
+
             $path = '/events/' . $eventId;
             $count = 0;
             $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
@@ -111,6 +126,8 @@ class EventNotificationService
             }
 
             return $count;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyAttendees error: " . $e->getMessage());
             return 0;
@@ -492,6 +509,9 @@ class EventNotificationService
             $userName = $user->name ?? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
             $eventTitle = $event->title;
             $organizerId = (int) $event->user_id;
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed($userId, $organizerId, $tenantId, 'event_rsvp');
+            $policy->assertLocalContactAllowed($organizerId, $userId, $tenantId, 'event_rsvp');
             $path = '/events/' . $eventId;
 
             // Fetch organizer up-front so we have preferred_language available for
@@ -560,6 +580,8 @@ class EventNotificationService
             } catch (\Throwable $e) {
                 Log::warning("[EventNotificationService] RSVP self-confirmation bell failed for user {$userId}: " . $e->getMessage());
             }
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyRsvp error: " . $e->getMessage());
         }

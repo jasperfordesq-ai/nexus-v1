@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\EndorsementService;
 
@@ -43,7 +44,11 @@ class EndorsementController extends BaseApiController
         $skillId = $this->input('skill_id') ? (int) $this->input('skill_id') : null;
         $comment = $this->input('comment');
 
-        $endorsementId = $this->endorsementService->endorse($userId, $id, $skillName, $skillId, $comment);
+        try {
+            $endorsementId = $this->endorsementService->endorse($userId, $id, $skillName, $skillId, $comment);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($endorsementId === null) {
             $errors = $this->endorsementService->getErrors();

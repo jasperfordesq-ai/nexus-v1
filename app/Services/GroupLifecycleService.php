@@ -197,6 +197,13 @@ class GroupLifecycleService
                     ->exists();
 
                 if (!$exists) {
+                    GroupService::assertSafeguardingCohortAllowed(
+                        $targetGroupId,
+                        (int) $member->user_id,
+                        (int) $tenantId,
+                        'group_merge_member_activation',
+                    );
+
                     DB::table('group_members')->insert([
                         'tenant_id' => $tenantId,
                         'group_id' => $targetGroupId,
@@ -275,6 +282,32 @@ class GroupLifecycleService
             return null;
         }
 
+        $cloneMemberIds = [];
+        if ($cloneMembers) {
+            $cloneMemberIds = DB::table('group_members')
+                ->where('group_id', $sourceGroupId)
+                ->where('status', 'active')
+                ->where('user_id', '!=', $ownerId)
+                ->pluck('user_id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->all();
+
+            $cohort = array_values(array_unique(array_merge([$ownerId], $cloneMemberIds)));
+            $policy = app(SafeguardingInteractionPolicy::class);
+            foreach ($cohort as $senderId) {
+                $recipientIds = array_values(array_filter(
+                    $cohort,
+                    static fn (int $recipientId): bool => $recipientId !== $senderId,
+                ));
+                $policy->assertManyLocalContactsAllowed(
+                    $senderId,
+                    $recipientIds,
+                    (int) $tenantId,
+                    'group_clone_member_activation',
+                );
+            }
+        }
+
         $newGroupId = DB::table('groups')->insertGetId([
             'tenant_id' => $tenantId,
             'owner_id' => $ownerId,
@@ -304,17 +337,11 @@ class GroupLifecycleService
 
         // Clone members if requested
         if ($cloneMembers) {
-            $members = DB::table('group_members')
-                ->where('group_id', $sourceGroupId)
-                ->where('status', 'active')
-                ->where('user_id', '!=', $ownerId)
-                ->get();
-
-            foreach ($members as $member) {
+            foreach ($cloneMemberIds as $memberId) {
                 DB::table('group_members')->insert([
                     'tenant_id' => $tenantId,
                     'group_id' => $newGroupId,
-                    'user_id' => $member->user_id,
+                    'user_id' => $memberId,
                     'role' => 'member',
                     'status' => 'active',
                     'created_at' => now(),

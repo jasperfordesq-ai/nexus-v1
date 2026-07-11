@@ -38,6 +38,8 @@ class UserSafeguardingPreference extends Model
         'consent_given_at',
         'consent_ip',
         'revoked_at',
+        'policy_review_required_at',
+        'policy_review_reason_code',
     ];
 
     protected $casts = [
@@ -45,6 +47,7 @@ class UserSafeguardingPreference extends Model
         'option_id' => 'integer',
         'consent_given_at' => 'datetime',
         'revoked_at' => 'datetime',
+        'policy_review_required_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

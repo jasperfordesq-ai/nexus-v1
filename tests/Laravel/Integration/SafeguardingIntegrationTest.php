@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Integration;
 
 use App\Models\User;
+use App\Services\SafeguardingTriggerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -16,7 +17,7 @@ use Tests\Laravel\TestCase;
  * Integration tests for the safeguarding preference -> trigger -> restriction flow.
  *
  * Verifies that saving safeguarding preferences during onboarding correctly:
- * - Activates messaging restrictions via SafeguardingTriggerService
+ * - Activates policy gates via SafeguardingTriggerService without enabling message monitoring
  * - Records GDPR consent (timestamp + IP)
  * - Creates audit log entries
  * - Strips internal trigger data from member-facing API responses
@@ -65,10 +66,10 @@ class SafeguardingIntegrationTest extends TestCase
     }
 
     // =========================================================================
-    // Test 1: Preference save activates messaging restriction
+    // Test 1: Preference save activates policy gates without message monitoring
     // =========================================================================
 
-    public function test_preference_save_activates_messaging_restriction(): void
+    public function test_preference_save_activates_policy_gates_without_message_monitoring(): void
     {
         $user = $this->authenticatedMember();
 
@@ -86,15 +87,52 @@ class SafeguardingIntegrationTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonPath('data.message', 'Safeguarding preferences saved');
 
-        // Verify user_messaging_restrictions row was created
+        // A self-selected preference must never create the administrative row
+        // that grants brokers visibility of message bodies.
         $restriction = DB::table('user_messaging_restrictions')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $user->id)
             ->first();
 
-        $this->assertNotNull($restriction, 'Messaging restriction row should be created');
-        $this->assertEquals(1, (int) $restriction->under_monitoring, 'under_monitoring should be 1');
-        $this->assertEquals(1, (int) $restriction->requires_broker_approval, 'requires_broker_approval should be 1');
+        $this->assertNull($restriction, 'Member preferences must not create a message-monitoring row');
+        $this->assertTrue(SafeguardingTriggerService::requiresBrokerApproval($user->id, $this->testTenantId));
+        $this->assertTrue(SafeguardingTriggerService::isMessagingRestricted($user->id, $this->testTenantId));
+    }
+
+    public function test_preference_save_does_not_overwrite_a_separately_authorised_monitoring_decision(): void
+    {
+        $user = $this->authenticatedMember();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+        DB::table('user_messaging_restrictions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 1,
+            'requires_broker_approval' => 0,
+            'monitoring_reason' => 'Manual safeguarding case decision',
+            'monitoring_started_at' => now(),
+            'restricted_by' => $admin->id,
+            'restricted_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $optionId = $this->createSafeguardingOption([
+            'requires_broker_approval' => true,
+            'restricts_messaging' => true,
+        ]);
+
+        $this->apiPost('/v2/onboarding/safeguarding', [
+            'preferences' => [['option_id' => $optionId, 'value' => '1']],
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('user_messaging_restrictions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 1,
+            'requires_broker_approval' => 0,
+            'monitoring_reason' => 'Manual safeguarding case decision',
+            'restricted_by' => $admin->id,
+        ]);
+        $this->assertTrue(SafeguardingTriggerService::requiresBrokerApproval($user->id, $this->testTenantId));
     }
 
     // =========================================================================
@@ -118,30 +156,27 @@ class SafeguardingIntegrationTest extends TestCase
         ]);
         $response->assertStatus(200);
 
-        // Verify restriction exists
+        // Verify the broker-approval policy is active without creating a
+        // message-content monitoring record.
         $restriction = DB::table('user_messaging_restrictions')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $user->id)
             ->first();
-        $this->assertNotNull($restriction, 'Restriction should exist after saving preferences');
-        $this->assertEquals(1, (int) $restriction->under_monitoring);
+        $this->assertNull($restriction, 'Member preferences must not create a message-monitoring row');
+        $this->assertTrue(SafeguardingTriggerService::requiresBrokerApproval($user->id, $this->testTenantId));
 
         // Revoke the preference via the service directly
         // (The revoke endpoint calls SafeguardingPreferenceService::revokePreference)
         \App\Services\SafeguardingPreferenceService::revokePreference($user->id, $optionId);
 
-        // Verify restrictions are cleared
+        // Verify policy gates are cleared.
         $restriction = DB::table('user_messaging_restrictions')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $user->id)
             ->first();
 
-        // Restrictions should be cleared (under_monitoring=0) since the only triggering preference was revoked
-        if ($restriction) {
-            $this->assertEquals(0, (int) $restriction->under_monitoring, 'under_monitoring should be cleared after revocation');
-            $this->assertEquals(0, (int) $restriction->requires_broker_approval, 'requires_broker_approval should be cleared after revocation');
-        }
-        // If no row exists at all, that's also acceptable (restriction fully removed)
+        $this->assertNull($restriction, 'Revocation must not create a message-monitoring row');
+        $this->assertFalse(SafeguardingTriggerService::requiresBrokerApproval($user->id, $this->testTenantId));
     }
 
     // =========================================================================

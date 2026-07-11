@@ -29,10 +29,15 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ap-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.status-updated') }}</p></div>
         </div>
-    @elseif (in_array(($status ?? null), ['status-failed', 'export-failed'], true))
+    @elseif (in_array(($status ?? null), ['status-failed', 'status-safeguarding-restricted', 'status-safeguarding-unavailable', 'export-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ $status === 'export-failed' ? __('govuk_alpha.jobs_t3.states.export-failed') : __('govuk_alpha.jobs_t3.states.status-failed') }}</li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ match ($status) {
+                    'export-failed' => __('govuk_alpha.jobs_t3.states.export-failed'),
+                    'status-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'status-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha.jobs_t3.states.status-failed'),
+                } }}</li></ul></div></div>
         </div>
     @endif
 

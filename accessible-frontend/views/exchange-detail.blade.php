@@ -50,14 +50,22 @@
                 <p class="govuk-notification-banner__heading">{{ $status === 'exchange-created' ? __('govuk_alpha.exchanges.created') : ($status === 'rating-submitted' ? __('govuk_alpha.exchanges.rating_submitted') : __('govuk_alpha.exchanges.updated')) }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['exchange-action-failed', 'rating-failed', 'rating-invalid'], true))
+    @elseif (in_array($status, ['exchange-action-failed', 'rating-failed', 'rating-invalid', 'rating-safeguarding-restricted', 'rating-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
                         <li>
-                            <a href="{{ in_array($status, ['rating-invalid', 'rating-failed'], true) ? '#rating' : '#main-content' }}">{{ $status === 'rating-invalid' ? __('govuk_alpha.exchanges.rating_invalid') : ($status === 'rating-failed' ? __('govuk_alpha.exchanges.rating_failed') : __('govuk_alpha.exchanges.failed')) }}</a>
+                            <a href="{{ in_array($status, ['rating-invalid', 'rating-failed', 'rating-safeguarding-restricted', 'rating-safeguarding-unavailable'], true) ? '#rating' : '#main-content' }}">
+                                {{ match ($status) {
+                                    'rating-invalid' => __('govuk_alpha.exchanges.rating_invalid'),
+                                    'rating-failed' => __('govuk_alpha.exchanges.rating_failed'),
+                                    'rating-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                                    'rating-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                                    default => __('govuk_alpha.exchanges.failed'),
+                                } }}
+                            </a>
                         </li>
                     </ul>
                 </div>

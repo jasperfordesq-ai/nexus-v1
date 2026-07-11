@@ -97,6 +97,16 @@
     "privacy_policy_link": "Polasai Priobhaideachta"
   },
   "privacy": {
+    "last_updated_safeguarding": "Nuashonraithe den uair dheireanach: Iúil 2026",
+    "data_safeguarding_type": "Deimhniú príobháideach grinnfhiosrúcháin cosanta",
+    "data_safeguarding_collected": "An pobal, an comhalta, an scéim ghrinnfhiosrúcháin shainithe, an cuspóir agus an raon feidhme, an cinneadh deimhnithe nó cúlghairthe, an cinnteoir údaraithe, stampaí ama, cód cúise sainithe agus leagan an bheartais. Ní iarraimid ná ní stórálaimid an deimhniú, an uimhir thagartha, dátaí, toradh, sonraí taifid choiriúil, nótaí saorthéacs ná doiciméid aitheantais.",
+    "data_safeguarding_why": "Chun rogha phríobháideach teagmhála comhalta a chur i bhfeidhm agus próiseas in-iniúchta ceartúcháin agus athbhreithnithe a chur ar fáil.",
+    "data_safeguarding_basis": "Bunús dlí arna dhoiciméadú ag an rialaitheoir sonraí",
+    "safeguarding_data_title": "Meiteashonraí deimhnithe cosanta",
+    "safeguarding_data_body": "Nuair a éilíonn pobal go dleathach deimhniú DBS Feabhsaithe le haghaidh teagmhála cosanta idir comhaltaí, déanann an pobal a sheiceálacha féin lasmuigh de Project NEXUS. Ní thaifeadann bróicéir údaraithe ach cinneadh an phobail a eascraíonn astu. Ní mhaíonn sé seo go bhfuil comhalta sábháilte, nach bhfuil taifead coiriúil ag an gcomhalta, ná go bhfuil an comhalta ceadaithe do gach ról.",
+    "safeguarding_data_access": "Tá rochtain teoranta do bhróicéirí agus riarthóirí údaraithe i bpobal an chomhalta, agus ní thaispeántar na sonraí ar phróifílí poiblí, ar shuaitheantais, i dtorthaí cuardaigh ná i ngnáthanailísíocht.",
+    "safeguarding_data_retention": "Ní mór d’Oibreoir an Phobail sceideal coinneála doiciméadaithe a fhoilsiú agus a chur i bhfeidhm, agus na meiteashonraí a bhaint nuair nach bhfuil gá leo a thuilleadh, faoi réir aon oibleagáide dlíthiúla a bhfuil doiciméadú cuí déanta uirthi.",
+    "safeguarding_data_correction": "Is féidir le comhaltaí a stádas príobháideach a fheiceáil, athbhreithniú bróicéara a iarraidh gan fianaise a sheoladh, agus iarraidh ar Oibreoir an Phobail cinneadh míchruinn a cheartú nó a cheistiú.",
     "meta_description": "Conas a bhailímid, a úsáidimid agus a chosnaíonn tú do shonraí pearsanta ar ár n-ardán pobail.",
     "page_title": "Polasai Priobhaideachta",
     "heading": "Polasai Priobhaideachta",
@@ -723,6 +733,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Nuair a éilíonn beartas pobail teagmháil idir daoine a ndearnadh grinnfhiosrúchán orthu, déanann an pobal an tseiceáil dhleathach lasmuigh de Project NEXUS. Is féidir le bróicéir údaraithe deimhniú príobháideach pobail, nach bhfuil ann ach meiteashonraí, a thaifeadadh don bheartas teagmhála ar leith. Ní iarrann ná ní choinníonn Project NEXUS deimhnithe DBS, Grinnfhiosrúcháin an Gharda Síochána, AccessNI, PVG ná a gcomhionann, uimhreacha tagartha, torthaí nó sonraí taifid choiriúil. Ní chiallaíonn deimhniú go bhfuil duine sábháilte i ngach cás nó ceadaithe do gach ról.",
+    "what_we_dont_vetting_item": "Ní dhéanaimid iniúchadh neamhspleách ar dheimhnithe taifid choiriúil ná ní stórálaimid iad, ní dheimhnímid comhalta do ghairm, agus ní dhéanaimid cead uilíoch do róil de dheimhniú beartais teagmhála.",
+    "precautions_vetting_item": "I gcás gníomhaíochtaí a bhaineann le leanaí nó daoine fásta leochaileacha, déan teagmháil le comhordaitheoir do phobail faoi na rialacha is infheidhme. Ná hiarr ar chomhalta eile deimhniú DBS, Grinnfhiosrúcháin an Gharda Síochána, AccessNI, PVG nó a chomhionann a sheoladh trí Project NEXUS.",
     "page_title": "Iontaobhas & Sábháilteacht",
     "meta_description": "Conas a oibríonn malartuithe ar {{name}}, cad a dhéanaimid chun an pobal a choinneáil sábháilte, cad nach ndéanaimid, agus conas ábhar imní a thuairisciú. Iontaobhas agus cosaint Bhéarla shimplí.",
     "heading": "Iontaobhas & Sábháilteacht",

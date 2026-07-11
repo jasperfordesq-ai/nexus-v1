@@ -50,14 +50,29 @@ interface ListSection {
   introKey?: string;
   itemsKey: string;
   count: number;
+  itemKeyOverrides?: Record<number, string>;
 }
 
 const SECTIONS: ListSection[] = [
   { icon: ListChecks, titleKey: 'trust_safety.how_exchanges_title', introKey: 'trust_safety.how_exchanges_intro', itemsKey: 'trust_safety.how_exchanges_steps', count: 5 },
   { icon: ShieldCheck, titleKey: 'trust_safety.what_we_do_title', itemsKey: 'trust_safety.what_we_do_items', count: 6 },
-  { icon: AlertTriangle, titleKey: 'trust_safety.what_we_dont_title', introKey: 'trust_safety.what_we_dont_intro', itemsKey: 'trust_safety.what_we_dont_items', count: 4 },
-  { icon: HeartHandshake, titleKey: 'trust_safety.precautions_title', introKey: 'trust_safety.precautions_intro', itemsKey: 'trust_safety.precautions_items', count: 4 },
-  { icon: UserCheck, titleKey: 'trust_safety.vetting_title', introKey: 'trust_safety.vetting_body', itemsKey: '', count: 0 },
+  {
+    icon: AlertTriangle,
+    titleKey: 'trust_safety.what_we_dont_title',
+    introKey: 'trust_safety.what_we_dont_intro',
+    itemsKey: 'trust_safety.what_we_dont_items',
+    count: 4,
+    itemKeyOverrides: { 0: 'trust_safety.what_we_dont_vetting_item' },
+  },
+  {
+    icon: HeartHandshake,
+    titleKey: 'trust_safety.precautions_title',
+    introKey: 'trust_safety.precautions_intro',
+    itemsKey: 'trust_safety.precautions_items',
+    count: 4,
+    itemKeyOverrides: { 2: 'trust_safety.precautions_vetting_item' },
+  },
+  { icon: UserCheck, titleKey: 'trust_safety.vetting_title', introKey: 'trust_safety.vetting_attestation_body', itemsKey: '', count: 0 },
   { icon: Scale, titleKey: 'trust_safety.insurance_title', itemsKey: 'trust_safety.insurance_items', count: 4 },
   { icon: MessageSquare, titleKey: 'trust_safety.disputes_title', introKey: 'trust_safety.disputes_intro', itemsKey: 'trust_safety.disputes_steps', count: 4 },
   { icon: ShieldCheck, titleKey: 'trust_safety.responsibilities_title', introKey: 'trust_safety.responsibilities_intro', itemsKey: 'trust_safety.responsibilities_items', count: 5 },
@@ -121,7 +136,10 @@ export function TrustSafetyPage() {
       {SECTIONS.map((section) => {
         const Icon = section.icon;
         const items = section.count > 0
-          ? Array.from({ length: section.count }, (_, i) => t(`${section.itemsKey}.${i}`, { name: brandName }))
+          ? Array.from({ length: section.count }, (_, i) => t(
+              section.itemKeyOverrides?.[i] ?? `${section.itemsKey}.${i}`,
+              { name: brandName },
+            ))
           : [];
 
         return (

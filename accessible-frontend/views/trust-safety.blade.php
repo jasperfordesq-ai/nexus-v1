@@ -11,7 +11,7 @@
         $guidelinesHref = route('govuk-alpha.legal.community-guidelines', ['tenantSlug' => $tenantSlug]);
         $sectionKeys = [
             'how_exchanges', 'what_we_do', 'what_we_dont', 'precautions',
-            'vetting', 'insurance', 'disputes', 'responsibilities', 'rights',
+            'vetting_attestation', 'insurance', 'disputes', 'responsibilities', 'rights',
         ];
     @endphp
 

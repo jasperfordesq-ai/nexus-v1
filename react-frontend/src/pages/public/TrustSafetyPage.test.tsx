@@ -40,6 +40,7 @@ vi.mock('@/contexts', () => ({
   usePresence: () => ({ status: 'offline', setStatus: vi.fn(), getPresence: vi.fn(), isOnline: vi.fn(() => false) }),
   usePresenceOptional: () => null,
 }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 import { TrustSafetyPage } from './TrustSafetyPage';
 

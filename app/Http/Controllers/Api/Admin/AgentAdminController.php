@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Services\Agent\AgentExecutor;
@@ -271,6 +272,8 @@ class AgentAdminController extends BaseApiController
                 $userId,
                 $request->input('note'),
             );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Agent proposal approve failed', [
                 'proposal_id' => $proposalId,
@@ -325,6 +328,8 @@ class AgentAdminController extends BaseApiController
                 $payload,
                 $request->input('note'),
             );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Agent proposal edit-approve failed', [
                 'proposal_id' => $proposalId,

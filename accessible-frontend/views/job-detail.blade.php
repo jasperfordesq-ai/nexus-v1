@@ -72,7 +72,7 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.' . $status) }}</p></div>
         </div>
-    @elseif (in_array($status, ['apply-failed', 'save-failed', 'renew-failed', 'cv-invalid', 'cv-too-large', 'cover-required'], true))
+    @elseif (in_array($status, ['apply-failed', 'apply-safeguarding-restricted', 'apply-safeguarding-unavailable', 'save-failed', 'renew-failed', 'cv-invalid', 'cv-too-large', 'cover-required'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>
@@ -81,6 +81,8 @@
                     @elseif ($status === 'cv-invalid'){{ __('govuk_alpha.jobs.states.cv-invalid') }}
                     @elseif ($status === 'cv-too-large'){{ __('govuk_alpha.jobs.states.cv-too-large') }}
                     @elseif ($status === 'cover-required'){{ __('govuk_alpha.jobs.states.cover-required') }}
+                    @elseif ($status === 'apply-safeguarding-restricted'){{ __('safeguarding.errors.interaction_not_allowed') }}
+                    @elseif ($status === 'apply-safeguarding-unavailable'){{ __('safeguarding.errors.policy_unavailable') }}
                     @else{{ __('govuk_alpha.jobs.states.apply-failed') }}@endif
                 </li></ul></div></div>
         </div>

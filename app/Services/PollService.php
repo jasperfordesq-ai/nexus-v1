@@ -301,7 +301,7 @@ class PollService
 
             // C5: Fetch poll with end_date to enforce expiry check
             $poll = DB::selectOne(
-                'SELECT id, end_date FROM polls WHERE id = ? AND tenant_id = ?',
+                'SELECT id, user_id, end_date FROM polls WHERE id = ? AND tenant_id = ?',
                 [$pollId, $tenantId]
             );
             if (!$poll) {
@@ -320,6 +320,23 @@ class PollService
             );
             if (!$option) {
                 throw new \InvalidArgumentException('Invalid poll option');
+            }
+
+            $existingVote = DB::selectOne(
+                'SELECT id FROM poll_votes WHERE tenant_id = ? AND poll_id = ? AND user_id = ?',
+                [$tenantId, $pollId, $userId]
+            );
+            if ($existingVote) {
+                return false;
+            }
+
+            if ((int) $poll->user_id !== $userId) {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $poll->user_id,
+                    (int) $tenantId,
+                    'poll_vote',
+                );
             }
 
             // Use INSERT IGNORE to atomically prevent double-votes.

@@ -17,6 +17,14 @@ class GroupScheduledPostService
     public static function schedule(int $groupId, int $userId, array $data): int
     {
         $tenantId = TenantContext::getId();
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $userId,
+            (int) $tenantId,
+            'group_scheduled_post_create',
+            trim((string) ($data['title'] ?? '') . ' ' . (string) ($data['content'] ?? '')),
+        );
+
         return DB::table('group_scheduled_posts')->insertGetId([
             'tenant_id' => $tenantId,
             'group_id' => $groupId,
@@ -73,6 +81,13 @@ class GroupScheduledPostService
         foreach ($due as $post) {
             try {
                 TenantContext::setById($post->tenant_id);
+                GroupService::assertSafeguardingBroadcastAllowed(
+                    (int) $post->group_id,
+                    (int) $post->user_id,
+                    (int) $post->tenant_id,
+                    'group_scheduled_post_publish',
+                    trim((string) ($post->title ?? '') . ' ' . (string) $post->content),
+                );
 
                 if ($post->post_type === 'announcement') {
                     DB::table('group_announcements')->insert([

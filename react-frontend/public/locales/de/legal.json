@@ -97,6 +97,16 @@
     "privacy_policy_link": "Datenschutzrichtlinie"
   },
   "privacy": {
+    "last_updated_safeguarding": "Zuletzt aktualisiert: Juli 2026",
+    "data_safeguarding_type": "Private Bestätigung einer sicherheitsbezogenen Überprüfung",
+    "data_safeguarding_collected": "Gemeinschaft, Mitglied, festgelegtes Prüfverfahren, Zweck und Geltungsbereich, bestätigte oder widerrufene Entscheidung, befugte entscheidende Person, Zeitstempel, festgelegter Begründungscode und Richtlinienversion. Wir fragen weder nach dem Zertifikat, der Referenznummer, den Daten, dem Ergebnis, Angaben zum Strafregister, Freitextnotizen oder Ausweisdokumenten noch speichern wir diese.",
+    "data_safeguarding_why": "Um die private Kontaktpräferenz eines Mitglieds durchzusetzen und ein prüfbares Berichtigungs- und Überprüfungsverfahren bereitzustellen.",
+    "data_safeguarding_basis": "Vom Verantwortlichen dokumentierte Rechtsgrundlage",
+    "safeguarding_data_title": "Metadaten der Schutzbestätigung",
+    "safeguarding_data_body": "Wenn eine Gemeinschaft für geschützte Kontakte zwischen Mitgliedern rechtmäßig die Bestätigung einer erweiterten DBS-Prüfung verlangt, führt sie ihre eigenen Prüfungen außerhalb von Project NEXUS durch. Eine befugte Vermittlungsperson erfasst ausschließlich die daraus folgende Entscheidung der Gemeinschaft. Dies ist keine Aussage darüber, dass ein Mitglied sicher ist, kein Strafregister hat oder für jede Rolle freigegeben wurde.",
+    "safeguarding_data_access": "Der Zugriff ist auf befugte Vermittlungspersonen und Administratoren in der Gemeinschaft des Mitglieds beschränkt. Die Daten erscheinen weder in öffentlichen Profilen, Abzeichen oder Suchergebnissen noch in allgemeinen Analysen.",
+    "safeguarding_data_retention": "Der Gemeinschaftsbetreiber muss einen dokumentierten Aufbewahrungsplan veröffentlichen und anwenden und die Metadaten löschen, sobald sie nicht mehr erforderlich sind, vorbehaltlich ordnungsgemäß dokumentierter rechtlicher Verpflichtungen.",
+    "safeguarding_data_correction": "Mitglieder können ihren privaten Status einsehen, ohne die Übermittlung von Nachweisen eine Überprüfung durch eine Vermittlungsperson beantragen und den Gemeinschaftsbetreiber auffordern, eine fehlerhafte Entscheidung zu berichtigen oder zu überprüfen.",
     "meta_description": "Wie wir Ihre personenbezogenen Daten auf unserer Community-Plattform erfassen, verwenden und schützen.",
     "page_title": "Datenschutzrichtlinie",
     "heading": "Datenschutzrichtlinie",
@@ -717,6 +727,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Wenn eine Gemeinschaftsrichtlinie überprüfte Kontakte verlangt, führt die Gemeinschaft die rechtmäßige Prüfung außerhalb von Project NEXUS durch. Eine befugte Vermittlungsperson kann für die konkrete Kontaktrichtlinie eine private Bestätigung der Gemeinschaft erfassen, die ausschließlich aus Metadaten besteht. Project NEXUS fragt weder nach DBS-, Garda-Vetting-, AccessNI-, PVG- oder gleichwertigen Zertifikaten noch speichert es diese, ihre Referenznummern, Ergebnisse oder Angaben zum Strafregister. Eine Bestätigung bedeutet nicht, dass eine Person uneingeschränkt sicher oder für jede Rolle freigegeben ist.",
+    "what_we_dont_vetting_item": "Wir prüfen oder speichern Strafregisterbescheinigungen nicht eigenständig, zertifizieren kein Mitglied für einen Beruf und machen aus einer Bestätigung für eine Kontaktrichtlinie keine allgemeine Freigabe für Rollen.",
+    "precautions_vetting_item": "Wenden Sie sich bei Aktivitäten mit Kindern oder schutzbedürftigen Erwachsenen an die Koordination Ihrer Gemeinschaft, um die geltenden Regeln zu klären. Fordern Sie andere Mitglieder nicht auf, ein DBS-, Garda-Vetting-, AccessNI-, PVG- oder gleichwertiges Zertifikat über Project NEXUS zu senden.",
     "page_title": "Vertrauen und Sicherheit",
     "meta_description": "Wie der Austausch auf {{name}} funktioniert, was wir tun, um die Community zu schützen, was wir nicht tun und wie man Bedenken meldet. Klares Vertrauen und Schutz.",
     "heading": "Vertrauen und Sicherheit",

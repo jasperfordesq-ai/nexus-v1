@@ -14,6 +14,7 @@ use App\Events\GroupDeleted;
 use App\Events\GroupMemberJoined;
 use App\Events\GroupMemberLeft;
 use App\Events\GroupUpdated;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Group;
 use App\Models\GroupDiscussion;
@@ -428,6 +429,14 @@ class GroupService
         }
 
         $status = $group->visibility === 'private' ? 'pending' : 'active';
+
+        self::assertSafeguardingCohortAllowed(
+            $groupId,
+            $userId,
+            (int) TenantContext::getId(),
+            $status === 'pending' ? 'group_join_request' : 'group_join',
+            $status === 'pending',
+        );
 
         try {
             $group->attachMember($userId, [
@@ -1180,6 +1189,13 @@ class GroupService
         }
 
         if ($action === 'accept') {
+            self::assertSafeguardingCohortAllowed(
+                $groupId,
+                $requesterId,
+                (int) TenantContext::getId(),
+                'group_join_request_accept',
+            );
+
             DB::table('group_members')
                 ->where('group_id', $groupId)
                 ->where('user_id', $requesterId)
@@ -1205,6 +1221,168 @@ class GroupService
         }
 
         return true;
+    }
+
+    /**
+     * A group membership exposes a member to the active cohort. Check both
+     * directions before activating membership; for a private join request the
+     * initial directed contact is limited to the group's administrators.
+     */
+    public static function assertSafeguardingCohortAllowed(
+        int $groupId,
+        int $joiningUserId,
+        int $tenantId,
+        string $channel,
+        bool $administratorsOnly = false,
+    ): void {
+        if ((int) TenantContext::getId() !== $tenantId) {
+            self::throwGroupPolicyUnavailable($tenantId, $groupId, $channel, 'tenant_context_mismatch');
+        }
+
+        try {
+            $group = DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id', 'owner_id'])
+                ->first();
+            if (! $group) {
+                self::throwGroupPolicyUnavailable($tenantId, $groupId, $channel, 'group_not_found');
+            }
+
+            // Scope through the already tenant-verified group id. Do not filter
+            // on group_members.tenant_id here: historical rows can carry the
+            // old default tenant even though their globally unique group_id is
+            // valid, and omitting them would silently weaken the cohort gate.
+            $members = DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('status', 'active')
+                ->when($administratorsOnly, static function ($query): void {
+                    $query->whereIn('role', ['owner', 'admin']);
+                })
+                ->pluck('user_id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->all();
+
+            // Group ownership is authoritative even if a damaged legacy pivot
+            // row is absent, so never omit the owner from a contact cohort.
+            $members[] = (int) $group->owner_id;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            self::throwGroupPolicyUnavailable(
+                $tenantId,
+                $groupId,
+                $channel,
+                'group_recipient_lookup_failed',
+                $e,
+            );
+        }
+
+        $members = array_values(array_unique(array_filter(
+            $members,
+            static fn (int $memberId): bool => $memberId > 0 && $memberId !== $joiningUserId,
+        )));
+        sort($members, SORT_NUMERIC);
+
+        $policy = app(SafeguardingInteractionPolicy::class);
+        foreach ($members as $memberId) {
+            $policy->assertLocalContactAllowed($joiningUserId, $memberId, $tenantId, $channel);
+            $policy->assertLocalContactAllowed($memberId, $joiningUserId, $tenantId, $channel);
+        }
+    }
+
+    /**
+     * Fail closed before a group content write reaches the current active
+     * cohort or any explicitly mentioned/targeted member.
+     *
+     * @param list<int> $additionalRecipientIds
+     */
+    public static function assertSafeguardingBroadcastAllowed(
+        int $groupId,
+        int $senderId,
+        int $tenantId,
+        string $channel,
+        ?string $content = null,
+        array $additionalRecipientIds = [],
+    ): void {
+        if ((int) TenantContext::getId() !== $tenantId) {
+            self::throwGroupPolicyUnavailable($tenantId, $groupId, $channel, 'tenant_context_mismatch');
+        }
+
+        try {
+            $group = DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id', 'owner_id'])
+                ->first();
+            if (! $group) {
+                self::throwGroupPolicyUnavailable($tenantId, $groupId, $channel, 'group_not_found');
+            }
+
+            $recipientIds = DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('status', 'active')
+                ->pluck('user_id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->all();
+
+            $recipientIds[] = (int) $group->owner_id;
+            $recipientIds = array_merge($recipientIds, $additionalRecipientIds);
+
+            if ($content !== null && $content !== '') {
+                foreach (GroupMentionService::parseMentions($content) as $mention) {
+                    $recipientIds[] = (int) $mention['user_id'];
+                }
+            }
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            self::throwGroupPolicyUnavailable(
+                $tenantId,
+                $groupId,
+                $channel,
+                'group_recipient_lookup_failed',
+                $e,
+            );
+        }
+
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn (mixed $id): int => (int) $id, $recipientIds),
+            static fn (int $id): bool => $id > 0 && $id !== $senderId,
+        )));
+        sort($recipientIds, SORT_NUMERIC);
+
+        if ($recipientIds === []) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+            $senderId,
+            $recipientIds,
+            $tenantId,
+            $channel,
+        );
+    }
+
+    private static function throwGroupPolicyUnavailable(
+        int $tenantId,
+        int $groupId,
+        string $channel,
+        string $reason,
+        ?\Throwable $exception = null,
+    ): never {
+        Log::error('Safeguarding group recipient resolution unavailable', array_filter([
+            'tenant_id' => $tenantId,
+            'group_id' => $groupId,
+            'channel' => $channel,
+            'reason_code' => $reason,
+            'exception_class' => $exception !== null ? $exception::class : null,
+        ], static fn (mixed $value): bool => $value !== null));
+
+        throw new SafeguardingPolicyException(
+            'SAFEGUARDING_POLICY_UNAVAILABLE',
+            __('safeguarding.errors.policy_unavailable'),
+        );
     }
 
     // -----------------------------------------------------------------
@@ -1316,8 +1494,17 @@ class GroupService
         // Sanitize to prevent XSS — strip HTML tags from title, allow basic formatting in content
         $title = strip_tags($title);
         $content = strip_tags($content, '<p><br><b><i><strong><em><ul><ol><li><a><blockquote>');
+        $tenantId = (int) TenantContext::getId();
 
-        return DB::transaction(function () use ($groupId, $userId, $title, $content) {
+        return DB::transaction(function () use ($groupId, $userId, $tenantId, $title, $content) {
+            self::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                $tenantId,
+                'group_discussion_create',
+                $title . ' ' . $content,
+            );
+
             $discussion = GroupDiscussion::create([
                 'group_id' => $groupId,
                 'user_id'  => $userId,
@@ -1498,11 +1685,21 @@ class GroupService
         // Sanitize to prevent XSS — allow basic formatting tags
         $content = strip_tags($content, '<p><br><b><i><strong><em><ul><ol><li><a><blockquote>');
 
-        $post = GroupPost::create([
-            'discussion_id' => $discussionId,
-            'user_id'       => $userId,
-            'content'       => $content,
-        ]);
+        $post = DB::transaction(function () use ($groupId, $discussionId, $userId, $content): GroupPost {
+            self::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                (int) TenantContext::getId(),
+                'group_discussion_post',
+                $content,
+            );
+
+            return GroupPost::create([
+                'discussion_id' => $discussionId,
+                'user_id'       => $userId,
+                'content'       => $content,
+            ]);
+        });
 
         // Fire integrations
         try { GroupWebhookService::fire($groupId, GroupWebhookService::EVENT_POST_CREATED, ['post_id' => $post->id, 'discussion_id' => $discussionId]); } catch (\Throwable $e) { \Log::warning('GroupService: failed to fire post_created webhook', ['group_id' => $groupId, 'post_id' => $post->id, 'error' => $e->getMessage()]); }

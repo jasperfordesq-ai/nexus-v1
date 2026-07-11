@@ -97,6 +97,16 @@
     "privacy_policy_link": "Política de Privacidad"
   },
   "privacy": {
+    "last_updated_safeguarding": "Última actualización: julio de 2026",
+    "data_safeguarding_type": "Confirmación privada de verificación para fines de protección",
+    "data_safeguarding_collected": "Comunidad, miembro, sistema de verificación definido, finalidad y alcance, decisión de confirmación o revocación, responsable autorizado de la decisión, marcas de tiempo, código de motivo definido y versión de la política. No solicitamos ni almacenamos el certificado, el número de referencia, las fechas, el resultado, los datos de antecedentes penales, las notas de texto libre ni los documentos de identidad.",
+    "data_safeguarding_why": "Para aplicar la preferencia privada de contacto de un miembro y ofrecer un proceso auditable de corrección y revisión.",
+    "data_safeguarding_basis": "Base jurídica documentada por el responsable del tratamiento",
+    "safeguarding_data_title": "Metadatos de la confirmación de protección",
+    "safeguarding_data_body": "Cuando una comunidad exige legítimamente la confirmación de una comprobación Enhanced DBS para el contacto protegido entre miembros, realiza sus propias comprobaciones fuera de Project NEXUS. Un intermediario autorizado registra únicamente la decisión resultante de la comunidad. Esto no afirma que un miembro sea seguro, carezca de antecedentes penales o esté habilitado para todas las funciones.",
+    "safeguarding_data_access": "El acceso se limita a intermediarios autorizados y administradores de la comunidad del miembro, y estos datos no aparecen en perfiles públicos, insignias, resultados de búsqueda ni análisis generales.",
+    "safeguarding_data_retention": "El Operador de la Comunidad debe publicar y aplicar un calendario de conservación documentado y eliminar los metadatos cuando dejen de ser necesarios, sujeto a cualquier obligación jurídica debidamente documentada.",
+    "safeguarding_data_correction": "Los miembros pueden consultar su estado privado, solicitar una revisión por parte de un intermediario sin enviar pruebas y pedir al Operador de la Comunidad que corrija o revise una decisión inexacta.",
     "meta_description": "Cómo recopilamos, utilizamos y protegemos sus datos personales en nuestra plataforma comunitaria.",
     "page_title": "Política de Privacidad",
     "heading": "Política de Privacidad",
@@ -719,6 +729,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Cuando una política comunitaria exige el contacto entre personas verificadas, la comunidad realiza la comprobación legítima fuera de Project NEXUS. Un intermediario autorizado puede registrar una confirmación privada de la comunidad, compuesta solo por metadatos, para esa política de contacto concreta. Project NEXUS no solicita ni conserva certificados DBS, Garda Vetting, AccessNI, PVG o equivalentes, sus números de referencia, resultados ni datos de antecedentes penales. Una confirmación no significa que una persona sea segura en cualquier circunstancia o esté habilitada para todas las funciones.",
+    "what_we_dont_vetting_item": "No examinamos ni almacenamos de forma independiente certificados de antecedentes penales, no acreditamos a ningún miembro para ejercer una profesión ni convertimos una confirmación de política de contacto en una habilitación general para desempeñar funciones.",
+    "precautions_vetting_item": "Para actividades con menores o adultos vulnerables, consulta al coordinador de tu comunidad sobre las normas aplicables. No pidas a otro miembro que envíe un certificado DBS, Garda Vetting, AccessNI, PVG o equivalente a través de Project NEXUS.",
     "page_title": "Confianza y seguridad",
     "meta_description": "Cómo funcionan los intercambios en {{name}}, qué hacemos para mantener segura a la comunidad, qué no hacemos y cómo informar una inquietud. Confianza y salvaguardia en inglés sencillo.",
     "heading": "Confianza y seguridad",

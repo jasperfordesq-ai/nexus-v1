@@ -79,6 +79,24 @@ class FederatedMessageService
                 return ['success' => false, 'error' => 'No active federation partnership between tenants'];
             }
 
+            $decision = app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                $senderId,
+                (int) $senderTenantId,
+                $receiverId,
+                $receiverTenantId,
+                'federated_message_service',
+            );
+            if (! $decision->isAllowed()) {
+                return [
+                    'success' => false,
+                    'error_code' => $decision->code,
+                    'retryable' => $decision->isUnavailable(),
+                    'error' => $decision->isUnavailable()
+                        ? __('safeguarding.errors.policy_unavailable')
+                        : __('safeguarding.errors.contact_restricted'),
+                ];
+            }
+
             $messageInsert = self::insertExternalMessage([
                 'sender_user_id'    => $senderId,
                 'sender_tenant_id'  => $sender->tenant_id,
@@ -194,6 +212,24 @@ class FederatedMessageService
                 ->exists();
             if (!$receiverOptIn) {
                 return ['success' => false, 'error' => 'Receiver has not opted into federated messaging'];
+            }
+
+            $decision = app(SafeguardingInteractionPolicy::class)->evaluateExternalContact(
+                $receiverUserId,
+                (int) $receiver->tenant_id,
+                'external-partner:' . $externalPartnerId,
+                'external_federated_message',
+            );
+            if (! $decision->isAllowed()) {
+                return [
+                    'success' => false,
+                    'error_code' => $decision->code,
+                    'status' => 'rejected',
+                    'retryable' => $decision->isUnavailable(),
+                    'error' => $decision->isUnavailable()
+                        ? __('safeguarding.errors.policy_unavailable')
+                        : __('safeguarding.errors.contact_restricted'),
+                ];
             }
 
             // Idempotency: if we already stored this external message for this tenant, return it

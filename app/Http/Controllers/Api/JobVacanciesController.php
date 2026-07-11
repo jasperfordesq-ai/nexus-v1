@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -415,6 +416,25 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_cover_message_required'), 'message', 422);
         }
 
+        // This preflight must run before an uploaded CV is written to disk.
+        // JobVacancyService repeats the assertion immediately before the
+        // application insert for non-HTTP callers and race safety.
+        $jobOwnerId = JobVacancy::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->value('user_id');
+        if ($jobOwnerId !== null && (int) $jobOwnerId !== $userId) {
+            try {
+                app(\App\Services\SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $jobOwnerId,
+                    $tenantId,
+                    'job_application',
+                );
+            } catch (SafeguardingPolicyException $e) {
+                return $this->safeguardingPolicyError($e);
+            }
+        }
+
         $cvPath = null;
         $cvFilename = null;
         $cvSize = null;
@@ -458,12 +478,19 @@ class JobVacanciesController extends BaseApiController
             $cvSize = $file->getSize();
         }
 
-        $applicationId = $this->jobService->apply($id, $userId, [
-            'cover_letter' => $message,
-            'cv_path' => $cvPath,
-            'cv_filename' => $cvFilename,
-            'cv_size' => $cvSize,
-        ]);
+        try {
+            $applicationId = $this->jobService->apply($id, $userId, [
+                'cover_letter' => $message,
+                'cv_path' => $cvPath,
+                'cv_filename' => $cvFilename,
+                'cv_size' => $cvSize,
+            ]);
+        } catch (SafeguardingPolicyException $e) {
+            if ($cvPath !== null) {
+                Storage::disk('local')->delete($cvPath);
+            }
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($applicationId === null) {
             // The application was rejected after the CV was already written to disk
@@ -978,7 +1005,11 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_status_required'), 'status', 400);
         }
 
-        $success = $this->jobService->updateApplicationStatus((int) $id, $userId, $status, $notes);
+        try {
+            $success = $this->jobService->updateApplicationStatus((int) $id, $userId, $status, $notes);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             $errors = $this->jobService->getErrors();
@@ -1166,7 +1197,11 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.job_scheduled_at_required'), 'scheduled_at', 422);
         }
 
-        $interview = JobInterviewService::propose($applicationId, $userId, $data);
+        try {
+            $interview = JobInterviewService::propose($applicationId, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($interview === false) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_propose_failed'), null, 422);
@@ -1187,7 +1222,11 @@ class JobVacanciesController extends BaseApiController
 
         $notes = $this->input('notes');
 
-        $success = JobInterviewService::accept($interviewId, $userId, $notes);
+        try {
+            $success = JobInterviewService::accept($interviewId, $userId, $notes);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_interview_accept_failed'), null, 422);
@@ -1291,7 +1330,11 @@ class JobVacanciesController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $offer = JobOfferService::create($applicationId, $userId, $data);
+        try {
+            $offer = JobOfferService::create($applicationId, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($offer === false) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_create_failed'), null, 422);
@@ -1310,7 +1353,11 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_offer_accept', 10, 60);
 
-        $success = JobOfferService::accept($offerId, $userId);
+        try {
+            $success = JobOfferService::accept($offerId, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_offer_accept_failed'), null, 422);
@@ -1552,12 +1599,16 @@ class JobVacanciesController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $data   = $this->getAllInput();
-        $result = JobTeamService::addMember(
-            $id,
-            $userId,
-            (int) ($data['user_id'] ?? 0),
-            $data['role'] ?? 'reviewer'
-        );
+        try {
+            $result = JobTeamService::addMember(
+                $id,
+                $userId,
+                (int) ($data['user_id'] ?? 0),
+                $data['role'] ?? 'reviewer'
+            );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === false) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_team_add_failed'), null, 422);

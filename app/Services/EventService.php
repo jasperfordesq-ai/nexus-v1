@@ -879,6 +879,15 @@ class EventService
             return false;
         }
 
+        if (in_array($status, ['going', 'interested'], true)) {
+            self::assertEventParticipationAllowed(
+                $userId,
+                (int) ($event->user_id ?? 0),
+                $tenantId,
+                'event_rsvp',
+            );
+        }
+
         // Block RSVP to past events (event has already ended, or started with no end time)
         if ($status === 'going' || $status === 'interested') {
             $eventEnd = $event->end_time ?? $event->start_time ?? null;
@@ -1460,6 +1469,20 @@ class EventService
     {
         $tenantId = \App\Core\TenantContext::getId();
 
+        $event = DB::table('events')
+            ->where('id', $eventId)
+            ->where('tenant_id', $tenantId)
+            ->first(['user_id']);
+        if ($event === null) {
+            return false;
+        }
+        self::assertEventParticipationAllowed(
+            $userId,
+            (int) $event->user_id,
+            $tenantId,
+            'event_waitlist',
+        );
+
         try {
             $exists = DB::selectOne("SELECT id FROM event_waitlist WHERE event_id = ? AND user_id = ? AND tenant_id = ? AND status = 'waiting'", [$eventId, $userId, $tenantId]);
             if ($exists) {
@@ -1480,6 +1503,21 @@ class EventService
             \Illuminate\Support\Facades\Log::error("EventService::addToWaitlist error: " . $e->getMessage());
             return false;
         }
+    }
+
+    private static function assertEventParticipationAllowed(
+        int $memberId,
+        int $organizerId,
+        int $tenantId,
+        string $channel,
+    ): void {
+        if ($memberId <= 0 || $organizerId <= 0 || $memberId === $organizerId) {
+            return;
+        }
+
+        $policy = app(SafeguardingInteractionPolicy::class);
+        $policy->assertLocalContactAllowed($memberId, $organizerId, $tenantId, $channel);
+        $policy->assertLocalContactAllowed($organizerId, $memberId, $tenantId, $channel);
     }
 
     /**

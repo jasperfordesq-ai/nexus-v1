@@ -99,6 +99,31 @@ class GroupInviteService
             ->first();
         $inviterName = $inviter->name ?? __('emails.common.fallback_member_name');
 
+        // Preflight every address that already belongs to a member before
+        // persisting or sending any invite in this batch. This avoids a partial
+        // fan-out where an earlier invite is written before a later protected
+        // recipient denies contact.
+        $normalisedEmails = array_values(array_unique(array_filter(array_map(
+            static fn (mixed $email): string => strtolower(trim((string) $email)),
+            $emails,
+        ), static fn (string $email): bool => filter_var($email, FILTER_VALIDATE_EMAIL) !== false)));
+        if ($normalisedEmails !== []) {
+            $memberRecipients = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('email', $normalisedEmails)
+                ->where('id', '!=', $inviterId)
+                ->pluck('id');
+
+            foreach ($memberRecipients as $recipientId) {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $inviterId,
+                    (int) $recipientId,
+                    $tenantId,
+                    'group_email_invitation',
+                );
+            }
+        }
+
         $results = [];
         foreach ($emails as $email) {
             $email = strtolower(trim($email));
@@ -264,6 +289,30 @@ class GroupInviteService
             $this->errors[] = ['code' => 'ALREADY_MEMBER', 'message' => __('api.group_invite_already_member')];
             return null;
         }
+
+        $inviterId = (int) ($invite->invited_by ?? 0);
+        if ($inviterId > 0 && $inviterId !== $userId) {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $inviterId,
+                $userId,
+                $tenantId,
+                'group_invitation_accept',
+            );
+            $policy->assertLocalContactAllowed(
+                $userId,
+                $inviterId,
+                $tenantId,
+                'group_invitation_accept',
+            );
+        }
+
+        GroupService::assertSafeguardingCohortAllowed(
+            (int) $invite->group_id,
+            $userId,
+            $tenantId,
+            'group_invitation_accept',
+        );
 
         // Add to group
         DB::table('group_members')->updateOrInsert(

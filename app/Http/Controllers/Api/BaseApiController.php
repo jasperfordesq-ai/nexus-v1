@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,25 @@ abstract class BaseApiController extends Controller
 
     /** API version for legacy endpoints */
     protected const API_VERSION_LEGACY = '1.0';
+
+    /**
+     * Map the shared protected-contact exception consistently at every API edge.
+     */
+    protected function safeguardingPolicyError(SafeguardingPolicyException $exception): JsonResponse
+    {
+        $status = match ($exception->reasonCode) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 503,
+            'SAFEGUARDING_JURISDICTION_REQUIRED' => 409,
+            default => 403,
+        };
+
+        return $this->respondWithError(
+            $exception->reasonCode,
+            $exception->getMessage(),
+            null,
+            $status,
+        );
+    }
 
     /**
      * Whether this controller is a v2 API (uses respondWithData format)
@@ -684,6 +704,38 @@ abstract class BaseApiController extends Controller
 
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             $this->error(__('api.admin_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+        );
+    }
+
+    /**
+     * Require authority to make a safeguarding vetting decision.
+     *
+     * Coordinators may share read-only broker-panel workflows, but cannot
+     * confirm or revoke a member's attestation unless a future explicit
+     * tenant-scoped permission is introduced.
+     */
+    protected function requireVettingDecisionMaker(): int
+    {
+        $userId = $this->requireAuth();
+        $user = $this->resolveUser();
+        $role = (string) ($user->role ?? 'member');
+
+        if ($role === 'broker') {
+            return $userId;
+        }
+
+        if ($role !== 'coordinator' && (
+            in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || ($user->is_admin ?? false)
+            || ($user->is_super_admin ?? false)
+            || ($user->is_tenant_super_admin ?? false)
+            || ($user->is_god ?? false)
+        )) {
+            return $userId;
+        }
+
+        throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            $this->error(__('api.vetting_decision_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
         );
     }
 

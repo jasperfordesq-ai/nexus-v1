@@ -361,6 +361,7 @@
       "safeguarding": "الحماية",
       "super_admin_access": "وصول المشرف الفائق",
       "time_credits": "الاعتمادات الزمنية",
+      "contact_attestation": "حماية شهادة الاتصال",
       "vetting_status": "حالة الفحص"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "?? ??????? ?? {{date}}",
       "more_certificates": "المزيد من الشهادات",
+      "more_attestations": "المزيد من الشهادات",
       "more_records": "المزيد من السجلات"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- تنتهي",
       "no_reference": "لا مرجع",
-      "unknown_provider": "مقدم غير معروف"
+      "unknown_provider": "مقدم غير معروف",
+      "attestation_dbs_enhanced": "DBS المحسن (إنجلترا وويلز)",
+      "attestation_pvg_scotland": "مخطط PVG",
+      "attestation_access_ni": "AccessNI (أيرلندا الشمالية)",
+      "attestation_garda_vetting": "فحص جاردا",
+      "safeguarding_confirmation": "تأكيد الحماية",
+      "confirmed_on": "تم تأكيد شهادة المجتمع على {{date}}",
+      "not_confirmed": "لم يتم تأكيد أي شهادة المجتمع",
+      "decision_confirmed": "تم تأكيد الشهادة",
+      "decision_revoked": "تم إبطال الشهادة",
+      "decision_not_confirmed": "لم يتم تأكيد الشهادة"
     }
   },
   "aria": {

@@ -16,10 +16,9 @@ use Illuminate\Support\Facades\DB;
  *      safeguarding step visible in the onboarding wizard so members can
  *      declare vulnerability / vetting needs from day one.
  *
- *   2. For every tenant with zero safeguarding options configured, apply the
- *      country preset that matches the tenant's `country_code` (IE → ireland,
- *      GB/UK → england_wales). Tenants that already have options configured
- *      are left untouched — admin customisations are preserved.
+ *   2. For every tenant with zero safeguarding options configured, leave the
+ *      country preset at `custom`. Country code cannot establish the legally
+ *      relevant safeguarding jurisdiction; an administrator must choose it.
  *
  * Both steps are idempotent: re-running the migration is safe.
  *
@@ -53,7 +52,7 @@ return new class extends Migration
      * Ensure the tenant's safeguarding step is enabled. Uses upsert semantics
      * so we overwrite an existing '0' but don't clobber an admin who has
      * deliberately enabled it ('1' stays '1'). The country_preset column is
-     * seeded so the admin UI shows the matching preset selected.
+     * seeded as custom until an administrator explicitly chooses a regime.
      */
     private function enableSafeguardingStep(int $tenantId): void
     {
@@ -123,10 +122,9 @@ return new class extends Migration
 
     private function mapCountryCodeToPreset(string $countryCode): string
     {
-        return match ($countryCode) {
-            'IE' => 'ireland',
-            'GB', 'UK' => 'england_wales',
-            default => 'custom',
-        };
+        // Intentionally ignore country code. GB cannot distinguish England and
+        // Wales, Scotland, or Northern Ireland, and IE does not establish the
+        // community/engagement scope required for Garda Vetting.
+        return 'custom';
     }
 };

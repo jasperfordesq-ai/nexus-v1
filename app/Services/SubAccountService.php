@@ -174,6 +174,12 @@ class SubAccountService
             }
 
             // If revoked, allow re-request
+            $this->assertRelationshipContactsAllowed(
+                $parentUserId,
+                $childUserId,
+                'sub_account_request',
+            );
+
             $existing->update([
                 'status'            => 'pending',
                 'relationship_type' => $type,
@@ -231,6 +237,16 @@ class SubAccountService
 
         $mergedPermissions = array_merge(self::DEFAULT_PERMISSIONS, $permissions);
 
+        // The pending row exposes the requested permissions and notifies the
+        // child, so the protected-contact decision must happen before either
+        // write. A linked account is inherently two-way even though the parent
+        // initiates it.
+        $this->assertRelationshipContactsAllowed(
+            $parentUserId,
+            $childUserId,
+            'sub_account_request',
+        );
+
         $rel = $this->relationship->newInstance([
             'tenant_id'         => TenantContext::getId(),
             'parent_user_id'    => $parentUserId,
@@ -270,6 +286,29 @@ class SubAccountService
      */
     public function approve(int $relationshipId, int $childUserId): bool
     {
+        $this->errors = [];
+
+        /** @var AccountRelationship|null $pending */
+        $pending = $this->relationship->newQuery()
+            ->where('id', $relationshipId)
+            ->where('child_user_id', $childUserId)
+            ->where('status', 'pending')
+            ->first();
+
+        if (! $pending) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.subaccount_relationship_not_found')];
+            return false;
+        }
+
+        // Re-evaluate the relationship and its already-stored requested
+        // permissions at approval time; a request-time decision may now be
+        // stale. Denial leaves the pending row untouched so it can be revoked.
+        $this->assertRelationshipContactsAllowed(
+            (int) $pending->parent_user_id,
+            $childUserId,
+            'sub_account_approval',
+        );
+
         return $this->relationship->newQuery()
             ->where('id', $relationshipId)
             ->where('child_user_id', $childUserId)
@@ -333,6 +372,17 @@ class SubAccountService
         $currentPermissions = is_array($existing->permissions) ? $existing->permissions : [];
         $mergedPermissions = array_merge($currentPermissions, $permissions);
 
+        // Permission removal remains a safe exit. Any expansion can expose new
+        // activity, message, listing, or transaction capabilities, so re-check
+        // the relationship before writing it.
+        if ($this->permissionsExpand($currentPermissions, $permissions)) {
+            $this->assertRelationshipContactsAllowed(
+                $parentUserId,
+                (int) $existing->child_user_id,
+                'sub_account_permission_expansion',
+            );
+        }
+
         $existing->update(['permissions' => $mergedPermissions]);
 
         return true;
@@ -369,5 +419,44 @@ class SubAccountService
         }
 
         return $this->activityService->getDashboardData($childUserId);
+    }
+
+    /**
+     * A linked-account relationship grants the parent capabilities over the
+     * child while also requiring approval/contact from the child. Evaluate both
+     * directions through the central fail-closed policy.
+     */
+    private function assertRelationshipContactsAllowed(
+        int $parentUserId,
+        int $childUserId,
+        string $channel,
+    ): void {
+        $policy = app(SafeguardingInteractionPolicy::class);
+        $tenantId = TenantContext::getId();
+
+        $policy->assertLocalContactAllowed(
+            $parentUserId,
+            $childUserId,
+            $tenantId,
+            $channel,
+        );
+        $policy->assertLocalContactAllowed(
+            $childUserId,
+            $parentUserId,
+            $tenantId,
+            $channel,
+        );
+    }
+
+    /** @param array<string, mixed> $current @param array<string, mixed> $requested */
+    private function permissionsExpand(array $current, array $requested): bool
+    {
+        foreach ($requested as $permission => $enabled) {
+            if ((bool) $enabled && ! (bool) ($current[$permission] ?? false)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Core\TenantContext;
 use App\Services\KiAgentService;
 use Illuminate\Http\JsonResponse;
@@ -190,6 +191,8 @@ class KiAgentController extends BaseApiController
 
         try {
             $updated = KiAgentService::approveProposal($id, $tenantId, $adminId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             return $this->respondNotFound($e->getMessage());
         } catch (\Throwable $e) {

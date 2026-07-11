@@ -41,6 +41,10 @@
             'swap-respond-failed' => 'govuk_alpha.vol_depth.swap_respond_failed',
             'swap-cancel-failed' => 'govuk_alpha.vol_depth.swap_cancel_failed',
         ];
+        $safeguardingErrors = [
+            'swap-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+            'swap-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+        ];
     @endphp
     @if (isset($successStatuses[$status]))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="swap-success-title">
@@ -51,12 +55,12 @@
                 <p class="govuk-notification-banner__heading">{{ __($successStatuses[$status]) }}</p>
             </div>
         </div>
-    @elseif (isset($errorStatuses[$status]))
+    @elseif (isset($errorStatuses[$status]) || isset($safeguardingErrors[$status]))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ __($errorStatuses[$status]) }}</p>
+                    <p>{{ $safeguardingErrors[$status] ?? __($errorStatuses[$status]) }}</p>
                 </div>
             </div>
         </div>

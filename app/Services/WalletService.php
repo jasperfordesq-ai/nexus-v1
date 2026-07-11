@@ -480,6 +480,13 @@ class WalletService
             throw new \RuntimeException(__('api.wallet_transfer_recipient_inactive'));
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $senderId,
+            (int) $receiver->id,
+            $tenantId,
+            'wallet_transfer',
+        );
+
         // ── Idempotency / anti-double-submit guard ──
         // Re-implements the federation H6 pattern (see
         // FederationV2Controller::sendTransaction). The lockForUpdate below

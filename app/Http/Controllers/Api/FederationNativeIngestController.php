@@ -201,6 +201,29 @@ class FederationNativeIngestController extends BaseApiController
             return $this->respondWithError('PROCESSING_FAILED', __('api.federation.ingest_processing_failed'), null, 500);
         }
 
+        if (($result['success'] ?? true) === false
+            && in_array(($result['error_code'] ?? null), [
+                'VETTING_REQUIRED',
+                'SAFEGUARDING_CONTACT_RESTRICTED',
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+            ], true)) {
+            $code = (string) $result['error_code'];
+            $status = $code === 'SAFEGUARDING_POLICY_UNAVAILABLE' ? 503 : 403;
+            $error = (string) ($result['error'] ?? __('safeguarding.errors.contact_restricted'));
+
+            $this->logNativeIngest(
+                $handlerPartner->id,
+                $eventType,
+                $payload,
+                $status,
+                false,
+                $error,
+                $result,
+            );
+
+            return $this->respondWithError($code, $error, null, $status);
+        }
+
         $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 200, true, null, $result);
 
         Log::info('[FederationNativeIngest] Accepted', [

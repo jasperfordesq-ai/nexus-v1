@@ -9,8 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
-use App\Services\SafeguardingTriggerService;
-use App\Services\VettingService;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -22,6 +21,8 @@ use Illuminate\Support\Facades\Log;
  */
 class GroupExchangeService
 {
+    private ?SafeguardingInteractionDecision $lastContactRestriction = null;
+
     public function __construct()
     {
     }
@@ -31,24 +32,68 @@ class GroupExchangeService
      */
     public function create(int $organizerId, array $data): ?int
     {
+        $this->lastContactRestriction = null;
         $tenantId = TenantContext::getId();
+        $participants = [];
+        foreach (is_array($data['participants'] ?? null) ? $data['participants'] : [] as $participant) {
+            $userId = (int) ($participant['user_id'] ?? 0);
+            $role = trim((string) ($participant['role'] ?? ''));
+            if ($userId <= 0 || $role === '') {
+                continue;
+            }
+            $participants[$userId . ':' . $role] = [
+                'user_id' => $userId,
+                'role' => $role,
+                'hours' => (float) ($participant['hours'] ?? 0),
+                'weight' => (float) ($participant['weight'] ?? 1.0),
+            ];
+        }
 
-        $id = DB::table('group_exchanges')->insertGetId([
-            'tenant_id'    => $tenantId,
-            'title'        => trim($data['title'] ?? ''),
-            'description'  => trim($data['description'] ?? '') ?: null,
-            'organizer_id' => $organizerId,
-            'listing_id'   => $data['listing_id'] ?? null,
-            'status'       => $data['status'] ?? 'draft',
-            'split_type'   => $data['split_type'] ?? 'equal',
-            'total_hours'  => (float) ($data['total_hours'] ?? 0),
-            'broker_id'    => $data['broker_id'] ?? null,
-            'broker_notes' => $data['broker_notes'] ?? null,
-            'created_at'   => now(),
-            'updated_at'   => now(),
-        ]);
+        $contactIds = array_values(array_unique(array_merge(
+            [$organizerId],
+            array_column($participants, 'user_id'),
+        )));
+        $tenantUserCount = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->whereIn('id', $contactIds)
+            ->count();
+        $restriction = $this->firstContactRestriction($contactIds, $tenantId, 'group_exchange_create');
+        if ($tenantUserCount !== count($contactIds) || $restriction !== null) {
+            $this->lastContactRestriction = $restriction;
+            return null;
+        }
 
-        return (int) $id;
+        return DB::transaction(function () use ($tenantId, $organizerId, $data, $participants): int {
+            $id = (int) DB::table('group_exchanges')->insertGetId([
+                'tenant_id'    => $tenantId,
+                'title'        => trim($data['title'] ?? ''),
+                'description'  => trim($data['description'] ?? '') ?: null,
+                'organizer_id' => $organizerId,
+                'listing_id'   => $data['listing_id'] ?? null,
+                'status'       => $data['status'] ?? 'draft',
+                'split_type'   => $data['split_type'] ?? 'equal',
+                'total_hours'  => (float) ($data['total_hours'] ?? 0),
+                'broker_id'    => $data['broker_id'] ?? null,
+                'broker_notes' => $data['broker_notes'] ?? null,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]);
+
+            foreach ($participants as $participant) {
+                DB::table('group_exchange_participants')->insert([
+                    'group_exchange_id' => $id,
+                    'user_id' => $participant['user_id'],
+                    'role' => $participant['role'],
+                    'hours' => $participant['hours'],
+                    'weight' => $participant['weight'],
+                    'confirmed' => 0,
+                    'created_at' => now(),
+                ]);
+            }
+
+            return $id;
+        });
     }
 
     /**
@@ -231,6 +276,25 @@ class GroupExchangeService
      */
     public function addParticipant(int $exchangeId, int $userId, string $role, float $hours = 0, float $weight = 1.0): bool
     {
+        $this->lastContactRestriction = null;
+        $tenantId = TenantContext::getId();
+        $exchange = DB::table('group_exchanges')
+            ->where('id', $exchangeId)
+            ->where('tenant_id', $tenantId)
+            ->first(['organizer_id']);
+        if (! $exchange) {
+            return false;
+        }
+
+        $targetExists = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->exists();
+        if (! $targetExists) {
+            return false;
+        }
+
         // Check if already exists
         $exists = DB::table('group_exchange_participants')
             ->where('group_exchange_id', $exchangeId)
@@ -242,18 +306,9 @@ class GroupExchangeService
             return false;
         }
 
-        // Safeguarding: block adding participants who require broker approval
-        // (set when a vulnerable person ticks safeguarding checkboxes during onboarding)
-        $tenantId = TenantContext::getId();
-        $hasSafeguardingRestriction = DB::table('user_messaging_restrictions')
-            ->where('tenant_id', $tenantId)
-            ->where('user_id', $userId)
-            ->where('requires_broker_approval', 1)
-            ->where(function ($q) {
-                $q->whereNull('monitoring_expires_at')
-                  ->orWhere('monitoring_expires_at', '>', now());
-            })
-            ->exists();
+        // Broker-approval preferences are evaluated directly and remain
+        // separate from administrative message monitoring.
+        $hasSafeguardingRestriction = SafeguardingTriggerService::requiresBrokerApproval($userId, $tenantId);
 
         if ($hasSafeguardingRestriction) {
             Log::info('[GroupExchange] Blocked: participant has safeguarding restrictions', [
@@ -263,53 +318,19 @@ class GroupExchangeService
             return false;
         }
 
-        // Vetting gate — bidirectional. If the organizer or the participant has
-        // safeguarding preferences requiring vetting types, the other party must
-        // hold valid records of all those types. National Vetting Bureau Acts
-        // 2012–2016 / DBS / PVG / AccessNI. Sits alongside the existing monitoring
-        // gate above.
-        try {
-            $organizerId = (int) DB::table('group_exchanges')
-                ->where('id', $exchangeId)
-                ->where('tenant_id', $tenantId)
-                ->value('organizer_id');
-
-            if ($organizerId > 0 && $organizerId !== $userId) {
-                $participantRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($userId, $tenantId);
-                $organizerRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($organizerId, $tenantId);
-
-                if (!empty($participantRequiredTypes) || !empty($organizerRequiredTypes)) {
-                    $vettingService = app(VettingService::class);
-
-                    if (!empty($participantRequiredTypes)
-                        && !$vettingService->userHasAllValidVettings($organizerId, $participantRequiredTypes)) {
-                        Log::info('[GroupExchange] Blocked: organizer lacks required vetting', [
-                            'exchange_id' => $exchangeId,
-                            'user_id' => $userId,
-                            'organizer_id' => $organizerId,
-                            'required_types' => $participantRequiredTypes,
-                        ]);
-                        return false;
-                    }
-                    if (!empty($organizerRequiredTypes)
-                        && !$vettingService->userHasAllValidVettings($userId, $organizerRequiredTypes)) {
-                        Log::info('[GroupExchange] Blocked: participant lacks required vetting', [
-                            'exchange_id' => $exchangeId,
-                            'user_id' => $userId,
-                            'organizer_id' => $organizerId,
-                            'required_types' => $organizerRequiredTypes,
-                        ]);
-                        return false;
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            // Lookup failure is not fatal — the monitoring gate above already ran.
-            Log::warning('[GroupExchange] Vetting lookup failed (continuing)', [
-                'error' => $e->getMessage(),
-                'exchange_id' => $exchangeId,
-                'user_id' => $userId,
-            ]);
+        $existingUserIds = DB::table('group_exchange_participants')
+            ->where('group_exchange_id', $exchangeId)
+            ->pluck('user_id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+        $contactIds = array_values(array_unique(array_merge(
+            [(int) $exchange->organizer_id, $userId],
+            $existingUserIds,
+        )));
+        $restriction = $this->firstContactRestriction($contactIds, $tenantId, 'group_exchange_add_participant');
+        if ($restriction !== null) {
+            $this->lastContactRestriction = $restriction;
+            return false;
         }
 
         DB::table('group_exchange_participants')->insert([
@@ -323,6 +344,11 @@ class GroupExchangeService
         ]);
 
         return true;
+    }
+
+    public function getLastContactRestriction(): ?SafeguardingInteractionDecision
+    {
+        return $this->lastContactRestriction;
     }
 
     /**
@@ -579,6 +605,30 @@ class GroupExchangeService
             return ['success' => false, 'error' => $imbalance];
         }
 
+        $participantIds = DB::table('group_exchange_participants')
+            ->where('group_exchange_id', $exchangeId)
+            ->pluck('user_id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+        $restriction = $this->firstContactRestriction(
+            array_values(array_unique(array_merge([(int) $exchange->organizer_id], $participantIds))),
+            $tenantId,
+            'group_exchange_start',
+        );
+        if ($restriction !== null) {
+            $error = MessageService::buildSafeguardingError([
+                'code' => $restriction->code,
+                'required_vetting_types' => $restriction->requiredAttestationCodes,
+                'required_vetting_labels' => $restriction->requiredAttestationLabels,
+            ]);
+
+            return [
+                'success' => false,
+                'code' => $restriction->code,
+                'error' => (string) $error['message'],
+            ];
+        }
+
         $this->updateStatus($exchangeId, 'pending_confirmation');
 
         // Bell + push + email each participant that the exchange is live and awaiting
@@ -663,11 +713,82 @@ class GroupExchangeService
         }
     }
 
+    /** @param list<int> $userIds */
+    private function firstContactRestriction(
+        array $userIds,
+        int $tenantId,
+        string $channel,
+    ): ?SafeguardingInteractionDecision {
+        $ids = array_values(array_filter(
+            array_unique(array_map('intval', $userIds)),
+            static fn (int $id): bool => $id > 0,
+        ));
+        $firstDenial = null;
+
+        try {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            for ($left = 0, $count = count($ids); $left < $count; $left++) {
+                for ($right = $left + 1; $right < $count; $right++) {
+                    foreach ([[$ids[$left], $ids[$right]], [$ids[$right], $ids[$left]]] as [$senderId, $recipientId]) {
+                        $decision = $policy->evaluateLocalContact($senderId, $recipientId, $tenantId, $channel);
+                        if ($decision->isUnavailable()) {
+                            return $decision;
+                        }
+                        if ($decision->isDenied() && $firstDenial === null) {
+                            $firstDenial = $decision;
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('[GroupExchange] safeguarding contact policy unavailable', [
+                'tenant_id' => $tenantId,
+                'channel' => $channel,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new SafeguardingInteractionDecision(
+                status: SafeguardingInteractionDecision::UNAVAILABLE,
+                code: 'SAFEGUARDING_POLICY_UNAVAILABLE',
+                recipientTenantId: $tenantId,
+                purposeCode: SafeguardingJurisdictionService::PURPOSE_SAFEGUARDED_MEMBER_CONTACT,
+                scopeType: SafeguardingJurisdictionService::SCOPE_TENANT,
+                scopeIdentifier: '',
+                canRequestCoordinator: true,
+            );
+        }
+
+        return $firstDenial;
+    }
+
     /**
      * Confirm a user's participation in an exchange.
      */
     public function confirmParticipation(int $exchangeId, int $userId): bool
     {
+        $this->lastContactRestriction = null;
+        $tenantId = TenantContext::getId();
+        $participantIds = DB::table('group_exchange_participants as gep')
+            ->join('group_exchanges as ge', 'ge.id', '=', 'gep.group_exchange_id')
+            ->where('gep.group_exchange_id', $exchangeId)
+            ->where('ge.tenant_id', $tenantId)
+            ->pluck('gep.user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        if (! in_array($userId, $participantIds, true)) {
+            return false;
+        }
+
+        $decision = $this->firstContactRestriction(
+            $participantIds,
+            $tenantId,
+            'group_exchange_confirm',
+        );
+        if ($decision !== null) {
+            $this->lastContactRestriction = $decision;
+            return false;
+        }
+
         $affected = DB::table('group_exchange_participants')
             ->where('group_exchange_id', $exchangeId)
             ->where('user_id', $userId)
@@ -687,6 +808,7 @@ class GroupExchangeService
      */
     public function complete(int $exchangeId): array
     {
+        $this->lastContactRestriction = null;
         $tenantId = TenantContext::getId();
 
         $exchange = DB::table('group_exchanges')
@@ -714,6 +836,31 @@ class GroupExchangeService
 
         if ($unconfirmed > 0) {
             return ['success' => false, 'error' => __('api.group_exchange_unconfirmed_remaining', ['count' => $unconfirmed])];
+        }
+
+        $participantIds = DB::table('group_exchange_participants')
+            ->where('group_exchange_id', $exchangeId)
+            ->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $decision = $this->firstContactRestriction(
+            $participantIds,
+            $tenantId,
+            'group_exchange_complete',
+        );
+        if ($decision !== null) {
+            $this->lastContactRestriction = $decision;
+            return [
+                'success' => false,
+                'error' => MessageService::buildSafeguardingError([
+                    'status' => $decision->status,
+                    'code' => $decision->code,
+                    'required_vetting_types' => $decision->requiredAttestationCodes,
+                    'required_vetting_labels' => $decision->requiredAttestationLabels,
+                    'can_request_coordinator' => $decision->canRequestCoordinator,
+                ])['message'],
+                'code' => $decision->code,
+            ];
         }
 
         $split = $this->calculateSplit($exchangeId);

@@ -361,6 +361,7 @@
       "safeguarding": "Beveiliging",
       "super_admin_access": "Superbeheerderstoegang",
       "time_credits": "Tijdkredieten",
+      "contact_attestation": "Bescherming van contactattesten",
       "vetting_status": "Controlestatus"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Geactiveerd op {{date}}",
       "more_certificates": "Meer certificaten",
+      "more_attestations": "Meer attesten",
       "more_records": "Meer records"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- Verloopt",
       "no_reference": "Geen referentie",
-      "unknown_provider": "Onbekende aanbieder"
+      "unknown_provider": "Onbekende aanbieder",
+      "attestation_dbs_enhanced": "Verbeterde DBS (Engeland en Wales)",
+      "attestation_pvg_scotland": "PVG-regeling",
+      "attestation_access_ni": "AccessNI (Noord-Ierland)",
+      "attestation_garda_vetting": "Garda-keuring",
+      "safeguarding_confirmation": "Bevestiging veiligstellen",
+      "confirmed_on": "Communityattest bevestigd op {{date}}",
+      "not_confirmed": "Er is geen gemeenschapsattest bevestigd",
+      "decision_confirmed": "Attest bevestigd",
+      "decision_revoked": "Attest ingetrokken",
+      "decision_not_confirmed": "Attest niet bevestigd"
     }
   },
   "aria": {

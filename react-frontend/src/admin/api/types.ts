@@ -213,7 +213,6 @@ export interface AdminUserDetail extends AdminUser {
   badges: AdminBadge[];
   permissions?: string[];
   roles?: string[];
-  vetting_status?: 'none' | 'pending' | 'verified' | 'expired';
   insurance_status?: 'none' | 'pending' | 'verified' | 'expired';
 }
 
@@ -1178,8 +1177,7 @@ export interface BrokerDashboardStats {
   unreviewed_messages: number | null;
   high_risk_listings: number | null;
   monitored_users: number | null;
-  vetting_pending: number | null;
-  vetting_expiring: number | null;
+  vetting_review_requests: number | null;
   safeguarding_alerts: number | null;
   onboarding_safeguarding_flags: number | null;
   recent_activity: BrokerActivityEntry[];
@@ -1362,11 +1360,8 @@ export interface BrokerConfig {
   random_sample_percentage: number;
   retention_days: number;
   // Compliance & Safeguarding
-  vetting_enabled: boolean;
   insurance_enabled: boolean;
-  enforce_vetting_on_exchanges: boolean;
   enforce_insurance_on_exchanges: boolean;
-  vetting_expiry_warning_days: number;
   insurance_expiry_warning_days: number;
 }
 
@@ -1815,52 +1810,81 @@ export interface AdminNavSection {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface VettingRecord {
-  id: number;
   user_id: number;
   first_name: string;
   last_name: string;
   email: string;
-  avatar_url?: string;
-  vetting_type: 'dbs_basic' | 'dbs_standard' | 'dbs_enhanced' | 'garda_vetting' | 'access_ni' | 'pvg_scotland' | 'international' | 'other';
-  status: 'pending' | 'submitted' | 'verified' | 'expired' | 'rejected' | 'revoked';
-  reference_number: string | null;
-  issue_date: string | null;
-  expiry_date: string | null;
-  verified_by: number | null;
-  verifier_first_name: string | null;
-  verifier_last_name: string | null;
-  verified_at: string | null;
-  rejected_by: number | null;
-  rejector_first_name: string | null;
-  rejector_last_name: string | null;
-  rejected_at: string | null;
-  rejection_reason: string | null;
-  document_url: string | null;
-  notes: string | null;
-  works_with_children: boolean;
-  works_with_vulnerable_adults: boolean;
-  requires_enhanced_check: boolean;
-  created_at: string;
-  updated_at: string | null;
+  avatar_url?: string | null;
+  attestation_id: number | null;
+  decision: 'confirmed' | 'revoked' | 'not_confirmed';
+  confirmed_by: number | null;
+  confirmed_at: string | null;
+  revoked_by: number | null;
+  revoked_at: string | null;
+  revocation_reason_code: string | null;
+  policy_version: string | null;
+  review_request_id: number | null;
+  review_status: 'pending' | 'resolved' | null;
+  requested_at: string | null;
+  policy: SafeguardingVettingPolicy;
 }
 
 export interface VettingStats {
-  total: number;
-  /** Records with literal status='pending' (broker hasn't actioned them). */
-  pending: number;
-  /** Records with literal status='submitted' (sent to authority, awaiting confirmation). */
-  submitted?: number;
-  /**
-   * Union of pending+submitted — pre-verification states still owned by
-   * the broker. This is the value the dashboard tile and the "Pending
-   * Review" stat card mean. The legacy `pending` field is the literal
-   * pending count and is kept for backwards compatibility.
-   */
-  pending_review?: number;
-  verified: number;
-  expired: number;
-  expiring_soon: number;
-  rejected?: number;
+  total_members: number;
+  confirmed: number;
+  revoked: number;
+  not_confirmed: number;
+  review_pending?: number;
+  review_requested?: number;
+  policy: SafeguardingVettingPolicy;
+}
+
+export interface SafeguardingVettingPolicy {
+  configured: boolean;
+  contact_policy_available: boolean;
+  jurisdiction: string;
+  scheme_code: string | null;
+  attestation_code: string | null;
+  purpose_code: string;
+  scope_type: string;
+  scope_identifier: string;
+  policy_version: string | null;
+  label: string;
+  attestation_label: string | null;
+  preset: string | null;
+}
+
+export interface SafeguardingJurisdictionOption {
+  code: string;
+  label: string;
+  attestation_code: string | null;
+  attestation_label: string | null;
+  available_for_contact_policy: boolean;
+  contact_policy_available: boolean;
+}
+
+export interface VettingPolicyResponse {
+  policy: SafeguardingVettingPolicy;
+  jurisdictions: SafeguardingJurisdictionOption[];
+  revocation_reason_codes: string[];
+  review_resolution_codes: Array<'no_change' | 'duplicate_request' | 'member_contacted'>;
+}
+
+export interface VettingAttestation {
+  id: number;
+  user_id: number;
+  scheme_code: string;
+  attestation_code: string;
+  purpose_code: string;
+  scope_type: string;
+  scope_identifier: string;
+  decision: 'confirmed' | 'revoked';
+  confirmed_at: string | null;
+  revoked_at: string | null;
+  revocation_reason_code: string | null;
+  policy_version: string;
+  confirmer_first_name?: string | null;
+  confirmer_last_name?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

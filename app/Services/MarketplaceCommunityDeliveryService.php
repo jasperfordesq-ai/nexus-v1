@@ -65,7 +65,7 @@ class MarketplaceCommunityDeliveryService
         }
 
         // Cannot deliver your own order
-        if ($order->buyer_id === $delivererId || $order->seller_id === $delivererId) {
+        if ((int) $order->buyer_id === $delivererId || (int) $order->seller_id === $delivererId) {
             throw new \RuntimeException('Cannot offer to deliver your own order');
         }
 
@@ -95,6 +95,16 @@ class MarketplaceCommunityDeliveryService
         if ($existingOffer) {
             throw new \RuntimeException('You already have an active delivery offer for this order');
         }
+
+        // A delivery offer starts a new working relationship and may carry a
+        // free-text note. Check every participant direction before persisting
+        // either the relationship or its message-like content.
+        self::assertDeliveryContactsAllowed(
+            $order,
+            $delivererId,
+            $tenantId,
+            'marketplace_community_delivery_offer',
+        );
 
         $offerId = DB::table('marketplace_delivery_offers')->insertGetId([
             'tenant_id' => $tenantId,
@@ -129,7 +139,7 @@ class MarketplaceCommunityDeliveryService
     public static function acceptDeliveryOffer(int $orderId, int $delivererId, int $actorId): void
     {
         $tenantId = TenantContext::getId();
-        self::requireOrderParticipant($orderId, $tenantId, $actorId);
+        $order = self::requireOrderParticipant($orderId, $tenantId, $actorId);
 
         $offer = DB::table('marketplace_delivery_offers')
             ->where('order_id', $orderId)
@@ -141,6 +151,16 @@ class MarketplaceCommunityDeliveryService
         if (!$offer) {
             throw new \RuntimeException('Delivery offer not found or already processed');
         }
+
+        // Re-check at acceptance rather than trusting the earlier offer-time
+        // decision: preferences, restrictions, or vetting can change while an
+        // offer is pending. No offer status is changed on denial/unavailability.
+        self::assertDeliveryContactsAllowed(
+            $order,
+            $delivererId,
+            $tenantId,
+            'marketplace_community_delivery_acceptance',
+        );
 
         DB::transaction(function () use ($orderId, $offer, $tenantId) {
             // Accept this offer
@@ -201,6 +221,17 @@ class MarketplaceCommunityDeliveryService
         if (!$offer) {
             throw new \RuntimeException('No accepted delivery offer found');
         }
+
+        // Completion moves credits as well as closing the delivery
+        // relationship. Re-check every direction immediately before the
+        // transaction so a revoked confirmation cannot be bypassed by an old
+        // accepted offer.
+        self::assertDeliveryContactsAllowed(
+            $order,
+            $delivererId,
+            $tenantId,
+            'marketplace_community_delivery_confirmation',
+        );
 
         DB::transaction(function () use ($offer, $order, $tenantId) {
             // Award time credits: buyer pays deliverer
@@ -357,5 +388,39 @@ class MarketplaceCommunityDeliveryService
         }
 
         return $order;
+    }
+
+    /**
+     * A community delivery creates a two-way relationship between the
+     * deliverer and both order participants. The shared policy is directional,
+     * so both sides must be evaluated explicitly.
+     */
+    private static function assertDeliveryContactsAllowed(
+        object $order,
+        int $delivererId,
+        int $tenantId,
+        string $channel,
+    ): void {
+        $participantIds = array_values(array_unique([
+            (int) $order->buyer_id,
+            (int) $order->seller_id,
+        ]));
+
+        $policy = app(SafeguardingInteractionPolicy::class);
+        $policy->assertManyLocalContactsAllowed(
+            $delivererId,
+            $participantIds,
+            $tenantId,
+            $channel,
+        );
+
+        foreach ($participantIds as $participantId) {
+            $policy->assertLocalContactAllowed(
+                $participantId,
+                $delivererId,
+                $tenantId,
+                $channel,
+            );
+        }
     }
 }

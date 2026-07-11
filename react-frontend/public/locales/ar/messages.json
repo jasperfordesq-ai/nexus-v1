@@ -9,6 +9,8 @@
   "send": "إرسال",
   "you": "أنت",
   "unread": "{{count}} غير مقروء",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "محادثاتك مع أعضاء المجتمع",
   "disabled_title": "المراسلة المباشرة معطّلة",
   "disabled_subtitle": "المراسلة المباشرة غير مفعّلة في هذا المجتمع. لترتيب الخدمات، يرجى استخدام نظام طلبات التبادل.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "تحميل الرسائل القديمة",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Yalzam fahs himaya",
     "body": "Tum iyqaf hadhihi almuhadatha muakkatan lianna qaida himaya almujtama tatlub tahqiqan muwathaqan qabla irsal risala ila hadha aludw.",
@@ -226,6 +226,13 @@
     "action": "Iftah almusaada",
     "dismiss": "Aghliq ishara alhimaya"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "التحقق من الحماية غير متاح مؤقتًا",
+    "body": "تم إيقاف المراسلة المباشرة مؤقتًا لأنه لا يمكن التحقق من سياسة حماية المجتمع بشكل آمن.",
+    "contact_broker": "التحقق مرة أخرى قريبا. إذا استمر هذا الأمر، فاطلب من منسق المجتمع المساعدة.",
+    "action": "تحقق مرة أخرى",
+    "dismiss": "رفض إشعار الحماية"
+  },
   "coordinator_request": {
     "button": "طلب مساعدة منسق",
     "aria_button": "طلب مساعدة منسق لترتيب التواصل",
@@ -234,17 +241,32 @@
     "sent": "تم إخطار المنسق — وسيتواصل معك لمساعدتك في ترتيب التواصل.",
     "error": "تعذّر إرسال طلبك في الوقت الحالي. يرجى المحاولة مرة أخرى بعد قليل."
   },
+  "vetting_review_request": {
+    "button": "طلب مراجعة الفحص",
+    "success_title": "المراجعة مطلوبة",
+    "success_body": "لقد طُلب من وسيط مجتمعك مراجعة تأكيد الحماية الخاص بك.",
+    "sent": "طلب مراجعة الفحص. سوف يتصل بك مجتمعك بخصوص العملية.",
+    "error": "لم نتمكن من طلب مراجعة التدقيق الآن. يرجى المحاولة مرة أخرى قريبا."
+  },
+  "safeguarding_check_again": "تحقق مرة أخرى",
+  "safeguarding_checks": {
+    "dbs_enhanced": "DBS المحسن (إنجلترا وويلز)",
+    "pvg_scotland": "مخطط PVG",
+    "access_ni": "AccessNI (أيرلندا الشمالية)",
+    "garda_vetting": "فحص جاردا"
+  },
   "composer_blocked_safeguarding": "المراسلة المباشرة غير متاحة مع هذا العضو. استخدم الخيار أعلاه لطلب مساعدة منسق في ترتيب التواصل.",
-  "aria_conversation_unread_few": "محادثة مع {{name}}، {{count}} غير مقروءة",
-  "aria_conversation_unread_many": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "composer_blocked_safeguarding_unavailable": "يتم إيقاف المراسلة المباشرة مؤقتًا أثناء فحص سياسة الحماية. استخدم التحقق مرة أخرى أعلاه.",
   "aria_conversation_unread_one": "محادثة مع {{name}}، {{count}} غير مقروءة",
   "aria_conversation_unread_other": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "selected_members_one": "المحدد ({{count}})",
+  "selected_members_other": "المحدد ({{count}})",
+  "aria_conversation_unread_few": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_many": "محادثة مع {{name}}، {{count}} غير مقروءة",
   "aria_conversation_unread_two": "محادثة مع {{name}}، {{count}} غير مقروءة",
   "aria_conversation_unread_zero": "محادثة مع {{name}}، {{count}} غير مقروءة",
   "selected_members_few": "المحدد ({{count}})",
   "selected_members_many": "المحدد ({{count}})",
-  "selected_members_one": "المحدد ({{count}})",
-  "selected_members_other": "المحدد ({{count}})",
   "selected_members_two": "المحدد ({{count}})",
   "selected_members_zero": "المحدد ({{count}})"
 }

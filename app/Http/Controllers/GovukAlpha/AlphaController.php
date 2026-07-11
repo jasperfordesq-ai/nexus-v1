@@ -1806,6 +1806,14 @@ class AlphaController extends Controller
 
                 return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
             }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'rsvp-policy-unavailable'
+                    : 'rsvp-vetting-required',
+            ]);
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
@@ -1855,6 +1863,14 @@ class AlphaController extends Controller
         $ok = false;
         try {
             $ok = EventService::addToWaitlist($id, $userId);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'waitlist-policy-unavailable'
+                    : 'waitlist-vetting-required',
+            ]);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -2091,6 +2107,14 @@ class AlphaController extends Controller
                 'message' => trim(self::asStr($request->input('message'))),
                 'shift_id' => $request->input('shift_id') ? (int) $request->input('shift_id') : null,
             ]);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.volunteering.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'apply-safeguarding-unavailable'
+                    : 'apply-safeguarding-restricted',
+            ]);
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-failed']);
@@ -2132,6 +2156,14 @@ class AlphaController extends Controller
         $ok = false;
         try {
             $ok = VolunteerService::signUpForShift($shiftId, $userId);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.volunteering.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'shift-safeguarding-unavailable'
+                    : 'shift-safeguarding-restricted',
+            ]);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -2294,6 +2326,10 @@ class AlphaController extends Controller
         if ($belongs !== null) {
             try {
                 $ok = VolunteerService::handleApplication($appId, $userId, $action, trim(self::asStr($request->input('org_note'))));
+            } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+                $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'application-safeguarding-unavailable'
+                    : 'application-safeguarding-restricted';
             } catch (\Throwable $e) {
                 report($e);
             }
@@ -2339,7 +2375,7 @@ class AlphaController extends Controller
 
         $status = $ok
             ? ($action === 'approve' ? 'application-approved' : 'application-declined')
-            : 'application-failed';
+            : ($safeguardingStatus ?? 'application-failed');
 
         return redirect()->route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
     }
@@ -3875,10 +3911,16 @@ class AlphaController extends Controller
         }
 
         $comment = trim(self::asStr($request->input('comment'))) ?: null;
-        $ok = false;
+        $status = 'rating-failed';
         try {
             $result = app(\App\Services\ExchangeRatingService::class)->submitRating($id, $userId, $rating, $comment);
-            $ok = (bool) ($result['success'] ?? false);
+            if ((bool) ($result['success'] ?? false)) {
+                $status = 'rating-submitted';
+            }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'rating-safeguarding-unavailable'
+                : 'rating-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
@@ -3886,7 +3928,7 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.exchanges.show', [
             'tenantSlug' => $tenantSlug,
             'id' => $id,
-            'status' => $ok ? 'rating-submitted' : 'rating-failed',
+            'status' => $status,
         ]);
     }
 
@@ -4551,6 +4593,10 @@ class AlphaController extends Controller
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             $status = 'review-invalid';
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'review-safeguarding-unavailable'
+                : 'review-safeguarding-restricted';
         } catch (\RuntimeException $e) {
             $status = str_contains($e->getMessage(), 'yourself') ? 'review-invalid' : 'review-duplicate';
         } catch (\Throwable $e) {
@@ -4908,11 +4954,19 @@ class AlphaController extends Controller
         try {
             $res = \App\Services\GroupService::join($id, $userId);
             $ok = (bool) ($res['success'] ?? (is_array($res) ? !isset($res['error']) : (bool) $res));
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'group-safeguarding-unavailable'
+                : 'group-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
-        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'group-joined' : 'group-failed']);
+        return redirect()->route('govuk-alpha.groups.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'group-joined' : ($safeguardingStatus ?? 'group-failed'),
+        ]);
     }
 
     public function leaveGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
@@ -5234,13 +5288,17 @@ class AlphaController extends Controller
         $ok = false;
         try {
             $ok = \App\Services\GroupService::handleJoinRequest($id, $requesterId, $userId, $action);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'request-safeguarding-unavailable'
+                : 'request-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
         $status = $ok
             ? ($action === 'accept' ? 'request-approved' : 'request-rejected')
-            : 'request-failed';
+            : ($safeguardingStatus ?? 'request-failed');
 
         return redirect()->route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
     }
@@ -5774,14 +5832,20 @@ class AlphaController extends Controller
         // offerBuddy() enforces is_public + no-existing-buddy + not-own-goal and
         // returns null when any guard fails, so an IDOR or double-buddy attempt
         // simply reports failure.
-        $ok = false;
+        $status = 'buddy-failed';
         try {
-            $ok = app(\App\Services\GoalService::class)->offerBuddy($id, $userId) !== null;
+            if (app(\App\Services\GoalService::class)->offerBuddy($id, $userId) !== null) {
+                $status = 'buddy-joined';
+            }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'buddy-safeguarding-unavailable'
+                : 'buddy-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
-        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'buddy-joined' : 'buddy-failed']);
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
     }
 
     public function storeGoal(Request $request, string $tenantSlug): RedirectResponse
@@ -6260,6 +6324,29 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'cover-required']);
         }
 
+        $tenantId = TenantContext::getId();
+        $jobOwnerId = \App\Models\JobVacancy::where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->value('user_id');
+        if ($jobOwnerId !== null && (int) $jobOwnerId !== $userId) {
+            try {
+                app(\App\Services\SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $jobOwnerId,
+                    $tenantId,
+                    'job_application',
+                );
+            } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+                return redirect()->route('govuk-alpha.jobs.show', [
+                    'tenantSlug' => $tenantSlug,
+                    'id' => $id,
+                    'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                        ? 'apply-safeguarding-unavailable'
+                        : 'apply-safeguarding-restricted',
+                ]);
+            }
+        }
+
         // Optional CV upload (PDF/DOC/DOCX ≤5MB), validated exactly as the React
         // API path: extension + MIME whitelist, sanitised filename, local disk.
         $cvPath = null;
@@ -6313,6 +6400,10 @@ class AlphaController extends Controller
                 'cv_filename' => $cvFilename,
                 'cv_size' => $cvSize,
             ]) !== null;
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'apply-safeguarding-unavailable'
+                : 'apply-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
@@ -6334,7 +6425,11 @@ class AlphaController extends Controller
             $this->dispatchJobApplicationNotifications($id, $userId);
         }
 
-        return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'applied' : 'apply-failed']);
+        return redirect()->route('govuk-alpha.jobs.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'applied' : ($safeguardingStatus ?? 'apply-failed'),
+        ]);
     }
 
     /**
@@ -9382,6 +9477,10 @@ class AlphaController extends Controller
                 // token so a double-click collapses to one debit server-side.
                 'idempotency_key' => self::asStr($request->input('idempotency_key')),
             ]);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return $fail($e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'safeguarding-unavailable'
+                : 'safeguarding');
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
             return $fail(match (true) {
@@ -9453,6 +9552,18 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-disabled']);
         }
 
+        // Run the authoritative contact checks before accepting any file bytes.
+        // MessageService repeats the check immediately before persistence to
+        // close the race between this preflight and the final write.
+        $preflightError = MessageService::preflightWrite($currentUserId, $userId);
+        if ($preflightError !== null) {
+            return redirect()->route('govuk-alpha.messages.show', [
+                'tenantSlug' => $tenantSlug,
+                'userId' => $userId,
+                'status' => self::accessibleMessageFailureStatus([$preflightError], 'message-failed'),
+            ]);
+        }
+
         // File/image attachments (no-JS multipart). Store each before sending so a
         // bad file is reported rather than silently dropped. Mirrors the React
         // composer + the API MessagesController::send attachment handling.
@@ -9464,6 +9575,7 @@ class AlphaController extends Controller
         $attachments = [];
         foreach ($files as $file) {
             if (!$file || !$file->isValid()) {
+                self::deleteAccessibleMessageAttachments($attachments);
                 return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-failed']);
             }
             try {
@@ -9475,8 +9587,10 @@ class AlphaController extends Controller
                     'size'     => $file->getSize(),
                 ]);
             } catch (\InvalidArgumentException $e) {
+                self::deleteAccessibleMessageAttachments($attachments);
                 return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-invalid']);
             } catch (\Throwable $e) {
+                self::deleteAccessibleMessageAttachments($attachments);
                 report($e);
                 return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-failed']);
             }
@@ -9499,10 +9613,16 @@ class AlphaController extends Controller
 
         $message = MessageService::send($currentUserId, $payload);
 
+        if ($message === []) {
+            self::deleteAccessibleMessageAttachments($attachments);
+        }
+
         return redirect()->route('govuk-alpha.messages.show', [
             'tenantSlug' => $tenantSlug,
             'userId' => $userId,
-            'status' => !empty($message) ? 'message-sent' : 'message-failed',
+            'status' => $message !== []
+                ? 'message-sent'
+                : self::accessibleMessageFailureStatus(MessageService::getErrors(), 'message-failed'),
         ]);
     }
 
@@ -9525,6 +9645,17 @@ class AlphaController extends Controller
 
         if (!BrokerControlConfigService::isDirectMessagingEnabled()) {
             return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-disabled']);
+        }
+
+        // Do not transcribe or store a voice clip until the same direct-message
+        // gate used by MessageService confirms the attempted contact may proceed.
+        $preflightError = MessageService::preflightWrite($currentUserId, $userId);
+        if ($preflightError !== null) {
+            return redirect()->route('govuk-alpha.messages.show', [
+                'tenantSlug' => $tenantSlug,
+                'userId' => $userId,
+                'status' => self::accessibleMessageFailureStatus([$preflightError], 'voice-failed'),
+            ]);
         }
 
         $file = $request->file('voice');
@@ -9572,7 +9703,12 @@ class AlphaController extends Controller
         ]);
 
         if (empty($message)) {
-            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'voice-failed']);
+            \App\Core\AudioUploader::delete((string) ($audioResult['url'] ?? ''));
+            return redirect()->route('govuk-alpha.messages.show', [
+                'tenantSlug' => $tenantSlug,
+                'userId' => $userId,
+                'status' => self::accessibleMessageFailureStatus(MessageService::getErrors(), 'voice-failed'),
+            ]);
         }
 
         if ($transcript !== null && !empty($message['id'])) {
@@ -9587,6 +9723,26 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-sent']);
+    }
+
+    /** @param array<int, array<string, mixed>> $errors */
+    private static function accessibleMessageFailureStatus(array $errors, string $fallback): string
+    {
+        return match ($errors[0]['code'] ?? null) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 'message-policy-unavailable',
+            'VETTING_REQUIRED' => 'message-vetting-required',
+            'SAFEGUARDING_CONTACT_RESTRICTED' => 'message-contact-restricted',
+            'MESSAGING_DISABLED' => 'message-disabled',
+            default => $fallback,
+        };
+    }
+
+    /** @param array<int, array<string, mixed>> $attachments */
+    private static function deleteAccessibleMessageAttachments(array $attachments): void
+    {
+        foreach ($attachments as $attachment) {
+            \App\Core\MessageAttachmentUploader::delete((string) ($attachment['url'] ?? ''));
+        }
     }
 
     public function archiveConversation(string $tenantSlug, int $userId): RedirectResponse
@@ -10076,6 +10232,10 @@ class AlphaController extends Controller
                 $status = \App\Services\EndorsementService::removeEndorsement($viewerId, $id, $skillName)
                     ? 'endorsement-removed' : 'endorsement-failed';
             }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'endorsement-safeguarding-unavailable'
+                : 'endorsement-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
@@ -10148,6 +10308,10 @@ class AlphaController extends Controller
                     }
                     break;
             }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'connection-safeguarding-unavailable'
+                : 'connection-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
             $status = 'connection-failed';
@@ -10214,6 +10378,7 @@ class AlphaController extends Controller
             'mySkills' => $this->alphaUserSkills($userId),
             'sessions' => $this->alphaSessions($userId),
             'safeguarding' => $this->alphaSafeguardingPreferences($userId),
+            'vettingStatus' => $this->alphaVettingStatus($userId),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -10277,7 +10442,16 @@ class AlphaController extends Controller
                 ->where('p.tenant_id', $tenantId)
                 ->where('p.user_id', $userId)
                 ->whereNull('p.revoked_at')
-                ->select(['p.option_id', 'o.label', 'o.description', 'o.triggers'])
+                ->select([
+                    'p.option_id',
+                    'p.policy_review_required_at',
+                    'p.policy_review_reason_code',
+                    'o.option_key',
+                    'o.preset_source',
+                    'o.label',
+                    'o.description',
+                    'o.triggers',
+                ])
                 ->orderBy('o.sort_order')
                 ->get();
 
@@ -10286,18 +10460,43 @@ class AlphaController extends Controller
 
                 return [
                     'option_id' => (int) $row->option_id,
-                    'label' => $row->label,
-                    'description' => $row->description,
+                    'label' => \App\Models\TenantSafeguardingOption::localizeOptionText(
+                        $row->preset_source,
+                        $row->option_key,
+                        'label',
+                        $row->label,
+                    ),
+                    'description' => \App\Models\TenantSafeguardingOption::localizeOptionText(
+                        $row->preset_source,
+                        $row->option_key,
+                        'description',
+                        $row->description,
+                    ),
                     'restricts_messaging' => (bool) ($triggers['restricts_messaging'] ?? false),
                     'restricts_matching' => (bool) ($triggers['restricts_matching'] ?? false),
                     'requires_broker_approval' => (bool) ($triggers['requires_broker_approval'] ?? false),
                     'requires_vetted_interaction' => (bool) ($triggers['requires_vetted_interaction'] ?? false),
+                    'policy_review_required' => $row->policy_review_required_at !== null,
+                    'policy_review_reason_code' => $row->policy_review_reason_code,
                 ];
             })->all();
         } catch (\Throwable $e) {
             report($e);
 
             return [];
+        }
+    }
+
+    /** @return array<string, mixed>|null */
+    private function alphaVettingStatus(int $userId): ?array
+    {
+        try {
+            return app(\App\Services\MemberVettingAttestationService::class)
+                ->getMemberStatus(TenantContext::getId(), $userId);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
         }
     }
 
@@ -10649,6 +10848,121 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('safeguarding');
+    }
+
+    /**
+     * Request a broker review of the member's private contact attestation.
+     *
+     * This is deliberately an empty-body workflow. Certificates, references,
+     * dates, results, notes and every other form of vetting evidence are
+     * prohibited from entering Project NEXUS.
+     */
+    public function requestProfileVettingReview(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if ($request->allFiles() !== [] || $request->except('_token') !== []) {
+            $status = 'vetting-review-evidence-prohibited';
+        } else {
+            try {
+                app(\App\Services\MemberVettingAttestationService::class)
+                    ->requestReview(TenantContext::getId(), $userId);
+                $this->notifyDecisionMakersOfVettingReviewRequest();
+                $status = 'vetting-review-requested';
+            } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+                $status = in_array($e->reasonCode, [
+                    'SAFEGUARDING_JURISDICTION_REQUIRED',
+                    'SAFEGUARDING_POLICY_UNAVAILABLE',
+                ], true) ? 'vetting-review-unavailable' : 'vetting-review-failed';
+            } catch (\Throwable $e) {
+                report($e);
+                $status = 'vetting-review-failed';
+            }
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $status,
+        ])->withFragment('safeguarding');
+    }
+
+    /** Confirm that the member has reviewed updated safeguarding wording. */
+    public function confirmProfileSafeguardingPolicyReview(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if ($request->allFiles() !== [] || $request->except('_token') !== []) {
+            $status = 'safeguarding-policy-review-failed';
+        } else {
+            try {
+                DB::table('user_safeguarding_preferences')
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('user_id', $userId)
+                    ->whereNull('revoked_at')
+                    ->whereNotNull('policy_review_required_at')
+                    ->update([
+                        'policy_review_required_at' => null,
+                        'policy_review_reason_code' => null,
+                        'consent_given_at' => now(),
+                    ]);
+                $status = 'safeguarding-policy-reviewed';
+            } catch (\Throwable $e) {
+                report($e);
+                $status = 'safeguarding-policy-review-failed';
+            }
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $status,
+        ])->withFragment('safeguarding');
+    }
+
+    /** Notify active brokers/admins that a metadata-only review is waiting. */
+    private function notifyDecisionMakersOfVettingReviewRequest(): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $recipients = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($query): void {
+                    $query->where('role', 'broker')
+                        ->orWhereIn('role', ['admin', 'tenant_admin', 'super_admin', 'god'])
+                        ->orWhere('is_admin', 1)
+                        ->orWhere('is_super_admin', 1)
+                        ->orWhere('is_tenant_super_admin', 1)
+                        ->orWhere('is_god', 1);
+                })
+                ->whereNotIn('status', ['deleted', 'deactivated', 'suspended', 'banned'])
+                ->select(['id', 'preferred_language'])
+                ->get();
+
+            foreach ($recipients as $recipient) {
+                \App\I18n\LocaleContext::withLocale(
+                    $recipient->preferred_language ?? null,
+                    static function () use ($recipient, $tenantId): void {
+                        \App\Models\Notification::createNotification(
+                            (int) $recipient->id,
+                            __('svc_notifications.vetting_review_requested'),
+                            '/broker/vetting?status=review_requested',
+                            'safeguarding_review_requested',
+                            false,
+                            $tenantId,
+                        );
+                    },
+                );
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     public function updateProfileEmail(Request $request, string $tenantSlug): RedirectResponse
@@ -12347,13 +12661,17 @@ class AlphaController extends Controller
                 'to_user_id' => $toUserId,
                 'message' => trim(self::asStr($request->input('message'))),
             ]);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'swap-safeguarding-unavailable'
+                : 'swap-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
         return redirect()->route('govuk-alpha.volunteering.swaps', [
             'tenantSlug' => $tenantSlug,
-            'status' => $swapId === null ? 'swap-request-failed' : 'swap-requested',
+            'status' => $swapId === null ? ($safeguardingStatus ?? 'swap-request-failed') : 'swap-requested',
         ]);
     }
 
@@ -12384,11 +12702,15 @@ class AlphaController extends Controller
         $ok = false;
         try {
             $ok = \App\Services\ShiftSwapService::respond($id, $userId, (string) $action);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'swap-safeguarding-unavailable'
+                : 'swap-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
-        $statusCode = 'swap-respond-failed';
+        $statusCode = $safeguardingStatus ?? 'swap-respond-failed';
         if ($ok) {
             $statusCode = $action === 'accept' ? 'swap-accepted' : 'swap-rejected';
         }
@@ -12547,7 +12869,15 @@ class AlphaController extends Controller
             report($e);
         }
 
-        return $backToMember(($result['success'] ?? false) ? 'connect-sent' : 'connect-failed');
+        if ($result['success'] ?? false) {
+            return $backToMember('connect-sent');
+        }
+        $errorCode = (string) ($result['error_code'] ?? '');
+        return $backToMember(match ($errorCode) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 'connect-safeguarding-unavailable',
+            'VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED' => 'connect-safeguarding-restricted',
+            default => 'connect-failed',
+        });
     }
 
     /**
@@ -12999,6 +13329,20 @@ class AlphaController extends Controller
                 return $backToMember('message-recipient-unavailable');
             }
 
+            $safeguardingDecision = app(\App\Services\SafeguardingInteractionPolicy::class)
+                ->evaluateCrossTenantContact(
+                    $userId,
+                    $tenantId,
+                    $receiverId,
+                    $receiverTenantId,
+                    'accessible_federated_message',
+                );
+            if (! $safeguardingDecision->isAllowed()) {
+                return $backToMember($safeguardingDecision->isUnavailable()
+                    ? 'message-safeguarding-unavailable'
+                    : 'message-safeguarding-restricted');
+            }
+
             // ── DUAL-INSERT: outbound (sender copy) + inbound (receiver copy) ──
             DB::insert("
                 INSERT INTO federation_messages
@@ -13249,6 +13593,22 @@ class AlphaController extends Controller
         $partnership = \App\Services\FederationPartnershipService::getPartnership($tenantId, $receiverTenantId);
         if (!$partnership || ($partnership['status'] ?? null) !== 'active' || empty($partnership['transactions_enabled'])) {
             return $backToTransfer('transfer-recipient-unavailable');
+        }
+
+        $safeguardingDecision = app(\App\Services\SafeguardingInteractionPolicy::class)
+            ->evaluateCrossTenantContact(
+                $userId,
+                $tenantId,
+                $receiverId,
+                $receiverTenantId,
+                'accessible_federated_transaction',
+            );
+        if (! $safeguardingDecision->isAllowed()) {
+            return $backToTransfer(
+                $safeguardingDecision->isUnavailable()
+                    ? 'transfer-safeguarding-unavailable'
+                    : 'transfer-safeguarding-restricted'
+            );
         }
 
         $explicitKey = trim(self::asStr($request->input('idempotency_key')));
@@ -13815,12 +14175,18 @@ class AlphaController extends Controller
                 return $fail('not-found');
             }
 
-            $result = $donationService->donateToMember(
-                $userId,
-                $recipientId,
-                $amount,
-                mb_substr($message, 0, 255)
-            );
+            try {
+                $result = $donationService->donateToMember(
+                    $userId,
+                    $recipientId,
+                    $amount,
+                    mb_substr($message, 0, 255)
+                );
+            } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+                return $fail($e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'safeguarding-unavailable'
+                    : 'safeguarding');
+            }
         } else {
             $result = $donationService->donateToCommunityFund(
                 $userId,
@@ -14361,11 +14727,19 @@ class AlphaController extends Controller
         $ok = false;
         try {
             $ok = app(\App\Services\JobVacancyService::class)->updateApplicationStatus($appId, $userId, $newStatus, $notes !== '' ? mb_substr($notes, 0, 2000) : null);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $safeguardingStatus = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'status-safeguarding-unavailable'
+                : 'status-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
 
-        return redirect()->route('govuk-alpha.jobs.applicants', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'status-updated' : 'status-failed']);
+        return redirect()->route('govuk-alpha.jobs.applicants', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'status-updated' : ($safeguardingStatus ?? 'status-failed'),
+        ]);
     }
 
     /** Download the applications for one of the member's own opportunities as CSV. */
@@ -14610,6 +14984,10 @@ class AlphaController extends Controller
             if ($result !== null) {
                 $status = 'buddy-nudge-sent';
             }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'buddy-nudge-safeguarding-unavailable'
+                : 'buddy-nudge-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
@@ -15116,6 +15494,10 @@ class AlphaController extends Controller
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             $status = 'review-invalid';
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'review-safeguarding-unavailable'
+                : 'review-safeguarding-restricted';
         } catch (\RuntimeException $e) {
             $status = str_contains($e->getMessage(), 'yourself') ? 'review-invalid' : 'review-duplicate';
         } catch (\Throwable $e) {
@@ -15175,6 +15557,10 @@ class AlphaController extends Controller
                 // token so a double-click collapses to one debit server-side.
                 'idempotency_key' => self::asStr($request->input('idempotency_key')),
             ]);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return $fail($e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'safeguarding-unavailable'
+                : 'safeguarding');
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
             return $fail(match (true) {

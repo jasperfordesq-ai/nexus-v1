@@ -154,9 +154,8 @@ trait MessagesParity
         $result = GroupConversationService::createGroup($userId, $memberIds, $name);
 
         if ($result === null) {
-            // All createGroup failures (name/min/max/blocked) surface the same
-            // generic, non-enumerating message on the no-JS form.
-            return $backToForm('group-create-failed');
+            $code = GroupConversationService::getErrors()[0]['code'] ?? 'VALIDATION_ERROR';
+            return $backToForm($this->messagesSafeguardingStatus($code) ?? 'group-create-failed');
         }
 
         return redirect()->route('govuk-alpha.messages.groups.show', [
@@ -224,6 +223,7 @@ trait MessagesParity
             'currentUserId' => $userId,
             'directMessagingEnabled' => \App\Services\BrokerControlConfigService::isDirectMessagingEnabled(),
             'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($userId),
+            'safeguarding' => $result['safeguarding'] ?? null,
             'searchQuery' => trim(self::asStr($request->query('q'))),
             'status' => $this->messagesAllowedStatus($request),
         ]);
@@ -262,7 +262,10 @@ trait MessagesParity
 
         if ($result === null) {
             $code = GroupConversationService::getErrors()[0]['code'] ?? 'VALIDATION_ERROR';
-            return $back($code === 'NOT_FOUND' ? 'group-message-failed' : 'group-message-forbidden');
+            return $back(
+                $this->messagesSafeguardingStatus($code)
+                    ?? ($code === 'NOT_FOUND' ? 'group-message-failed' : 'group-message-forbidden')
+            );
         }
 
         return $back('group-message-sent');
@@ -295,6 +298,10 @@ trait MessagesParity
 
         if ($result === null) {
             $code = GroupConversationService::getErrors()[0]['code'] ?? 'VALIDATION_ERROR';
+            $safeguardingStatus = $this->messagesSafeguardingStatus($code);
+            if ($safeguardingStatus !== null) {
+                return $back($safeguardingStatus);
+            }
             return $back(match ($code) {
                 'FORBIDDEN'      => 'group-member-forbidden',
                 'NOT_FOUND'      => 'group-member-not-found',
@@ -476,11 +483,22 @@ trait MessagesParity
             'group-member-added', 'group-member-removed', 'group-member-invalid',
             'group-member-forbidden', 'group-member-not-found', 'group-member-limit',
             'group-member-failed', 'group-left', 'group-leave-failed',
+            'group-vetting-required', 'group-contact-restricted', 'group-policy-unavailable',
             'reaction-added', 'reaction-removed', 'reaction-invalid',
             'reaction-forbidden', 'reaction-failed',
         ];
         $status = self::asStr($request->query('status'));
         return in_array($status, $allowed, true) ? $status : null;
+    }
+
+    private function messagesSafeguardingStatus(string $code): ?string
+    {
+        return match ($code) {
+            'VETTING_REQUIRED' => 'group-vetting-required',
+            'SAFEGUARDING_CONTACT_RESTRICTED' => 'group-contact-restricted',
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 'group-policy-unavailable',
+            default => null,
+        };
     }
 
     /**

@@ -26,7 +26,6 @@ import Eye from 'lucide-react/icons/eye';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import Clock from 'lucide-react/icons/clock';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Activity from 'lucide-react/icons/activity';
 import Settings from 'lucide-react/icons/settings';
@@ -72,8 +71,7 @@ const QUEUES: QueueDef[] = [
   { key: 'unreviewed_messages', labelKey: 'dashboard.unreviewed_messages', icon: MessageSquareWarning, color: 'warning', path: '/broker/messages?status=unreviewed', weight: 4 },
   { key: 'pending_exchanges', labelKey: 'dashboard.pending_exchanges', icon: ArrowLeftRight, color: 'accent', path: '/broker/exchanges?status=pending_broker', weight: 4 },
   { key: 'onboarding_safeguarding_flags', labelKey: 'dashboard.safeguarding_flags', icon: ShieldAlert, color: 'warning', path: '/broker/safeguarding?tab=preferences', weight: 3 },
-  { key: 'vetting_expiring', labelKey: 'dashboard.vetting_expiring', icon: Clock, color: 'warning', path: '/broker/vetting?status=expiring_soon', weight: 3 },
-  { key: 'vetting_pending', labelKey: 'dashboard.vetting_pending', icon: ShieldCheck, color: 'success', path: '/broker/vetting?status=pending_review', weight: 2 },
+  { key: 'vetting_review_requests', labelKey: 'dashboard.vetting_review_requests', icon: ShieldCheck, color: 'warning', path: '/broker/vetting?status=review_requested', weight: 3 },
 ];
 
 const queuePillClass: Record<BrokerStatColor, string> = {
@@ -331,24 +329,12 @@ export function BrokerDashboard() {
               to={tenantPath('/broker/monitoring')}
             />
             <BrokerStatCard
-              label={t('dashboard.vetting_pending')}
-              value={stats?.vetting_pending ?? null}
+              label={t('dashboard.vetting_review_requests')}
+              value={stats?.vetting_review_requests ?? null}
               icon={ShieldCheck}
-              color="success"
-              loading={loading}
-              // Tile counts pending+submitted (pre-verification states); link
-              // must match. ?status=pending alone showed only the literal-
-              // pending subset, hiding submitted records that the user
-              // expected to see when clicking through from the count.
-              to={tenantPath('/broker/vetting?status=pending_review')}
-            />
-            <BrokerStatCard
-              label={t('dashboard.vetting_expiring')}
-              value={stats?.vetting_expiring ?? null}
-              icon={Clock}
               color="warning"
               loading={loading}
-              to={tenantPath('/broker/vetting?status=expiring_soon')}
+              to={tenantPath('/broker/vetting?status=review_requested')}
             />
             <BrokerStatCard
               label={t('dashboard.safeguarding_alerts')}
@@ -492,7 +478,7 @@ const timelineDotClass: Record<ChipColor, string> = {
 // Action keys MUST match the action strings emitted by the backend dashboard
 // query in AdminBrokerController::dashboard (UNION of activity_log +
 // org_audit_log). Any mismatch causes the row to render with a default-grey
-// chip and a snake_case label like "vetting record verified".
+// chip and a readable snake_case fallback label.
 const actionChipColorMap: Record<string, ChipColor> = {
   // org_audit_log entries (broker controller writes via AuditLogService::log)
   exchange_approved: 'success',
@@ -508,16 +494,7 @@ const actionChipColorMap: Record<string, ChipColor> = {
   user_monitoring_added: 'default',
   user_monitoring_removed: 'default',
   broker_config_updated: 'accent',
-  // activity_log entries (vetting/insurance controllers write via ActivityLog::log)
-  vetting_record_verified: 'success',
-  vetting_record_rejected: 'danger',
-  vetting_record_created: 'accent',
-  vetting_record_updated: 'accent',
-  vetting_record_deleted: 'default',
-  vetting_document_uploaded: 'accent',
-  vetting_bulk_verify: 'success',
-  vetting_bulk_reject: 'danger',
-  vetting_bulk_delete: 'default',
+  // activity_log entries (insurance controller writes via ActivityLog::log)
   insurance_cert_created: 'accent',
   insurance_cert_updated: 'accent',
   insurance_cert_verified: 'success',
@@ -543,15 +520,6 @@ const actionI18nKeySuffix: Record<string, string> = {
   user_monitoring_added: 'monitoring_added',
   user_monitoring_removed: 'monitoring_removed',
   broker_config_updated: 'config_updated',
-  vetting_record_verified: 'vetting_verified',
-  vetting_record_rejected: 'vetting_rejected',
-  vetting_record_created: 'vetting_created',
-  vetting_record_updated: 'vetting_updated',
-  vetting_record_deleted: 'vetting_deleted',
-  vetting_document_uploaded: 'vetting_document',
-  vetting_bulk_verify: 'vetting_bulk_verify',
-  vetting_bulk_reject: 'vetting_bulk_reject',
-  vetting_bulk_delete: 'vetting_bulk_delete',
   insurance_cert_created: 'insurance_created',
   insurance_cert_updated: 'insurance_updated',
   insurance_cert_verified: 'insurance_verified',

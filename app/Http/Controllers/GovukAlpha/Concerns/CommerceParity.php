@@ -602,6 +602,10 @@ trait CommerceParity
             }
             // MarketplaceOfferService::create resolves the listing tenant + notifies the seller.
             MarketplaceOfferService::create($userId, $id, $data);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $error = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? __('safeguarding.errors.policy_unavailable')
+                : __('safeguarding.errors.interaction_not_allowed');
         } catch (\InvalidArgumentException $e) {
             $error = e($e->getMessage());
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -954,6 +958,10 @@ trait CommerceParity
             }
             MarketplaceRatingService::rateOrder($id, $userId, $role, $data, TenantContext::getId());
             $status = 'rated';
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'rate-safeguarding-unavailable'
+                : 'rate-safeguarding-restricted';
         } catch (\InvalidArgumentException $e) {
             $status = 'rate-failed';
         } catch (\Throwable $e) {

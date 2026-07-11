@@ -97,6 +97,16 @@
     "privacy_policy_link": "Politique de confidentialite"
   },
   "privacy": {
+    "last_updated_safeguarding": "Dernière mise à jour : juillet 2026",
+    "data_safeguarding_type": "Confirmation privée de vérification à des fins de protection",
+    "data_safeguarding_collected": "Communauté, membre, dispositif de vérification défini, finalité et portée, décision de confirmation ou de révocation, décisionnaire habilité, horodatages, code de motif défini et version de la politique. Nous ne demandons ni ne conservons le certificat, le numéro de référence, les dates, le résultat, les informations relatives au casier judiciaire, les notes en texte libre ou les pièces d’identité.",
+    "data_safeguarding_why": "Pour appliquer la préférence privée de contact d’un membre et fournir un processus vérifiable de rectification et de réexamen.",
+    "data_safeguarding_basis": "Base juridique documentée par le responsable du traitement",
+    "safeguarding_data_title": "Métadonnées de la confirmation de protection",
+    "safeguarding_data_body": "Lorsqu’une communauté exige légitimement la confirmation d’un contrôle Enhanced DBS pour des contacts protégés entre membres, elle effectue ses propres vérifications en dehors de Project NEXUS. Un intermédiaire habilité consigne uniquement la décision qui en résulte pour la communauté. Cela ne revient pas à affirmer qu’un membre est sûr, n’a aucun antécédent pénal ou est habilité pour tous les rôles.",
+    "safeguarding_data_access": "L’accès est limité aux intermédiaires habilités et aux administrateurs de la communauté du membre. Ces données ne figurent ni sur les profils publics, les badges ou les résultats de recherche, ni dans les analyses générales.",
+    "safeguarding_data_retention": "L’Opérateur de la Communauté doit publier et appliquer un calendrier de conservation documenté, puis supprimer les métadonnées lorsqu’elles ne sont plus nécessaires, sous réserve de toute obligation légale dûment documentée.",
+    "safeguarding_data_correction": "Les membres peuvent consulter leur statut privé, demander le réexamen d’un intermédiaire sans envoyer de justificatif et demander à l’Opérateur de la Communauté de rectifier ou de contester une décision inexacte.",
     "meta_description": "Comment nous collectons, utilisons et protégeons vos données personnelles sur notre plateforme communautaire.",
     "page_title": "Politique de confidentialite",
     "heading": "Politique de confidentialite",
@@ -719,6 +729,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Lorsqu’une politique communautaire exige des contacts entre personnes vérifiées, la communauté effectue le contrôle légal en dehors de Project NEXUS. Un intermédiaire habilité peut enregistrer, pour la politique de contact concernée, une confirmation privée de la communauté composée uniquement de métadonnées. Project NEXUS ne demande ni ne conserve les certificats DBS, Garda Vetting, AccessNI, PVG ou équivalents, leurs numéros de référence, leurs résultats ou les informations relatives au casier judiciaire. Une confirmation ne signifie pas qu’une personne est sûre en toutes circonstances ou habilitée pour tous les rôles.",
+    "what_we_dont_vetting_item": "Nous n’examinons ni ne conservons de manière indépendante les certificats de casier judiciaire, nous ne certifions pas un membre pour une profession et nous ne transformons pas la confirmation d’une politique de contact en habilitation générale pour des rôles.",
+    "precautions_vetting_item": "Pour les activités impliquant des enfants ou des adultes vulnérables, renseignez-vous auprès du coordinateur de votre communauté sur les règles applicables. Ne demandez pas à un autre membre d’envoyer un certificat DBS, Garda Vetting, AccessNI, PVG ou équivalent par l’intermédiaire de Project NEXUS.",
     "page_title": "Confiance et sécurité",
     "meta_description": "Comment fonctionnent les échanges sur {{name}}, ce que nous faisons pour assurer la sécurité de la communauté, ce que nous ne faisons pas et comment signaler un problème. Confiance et protection en anglais simple.",
     "heading": "Confiance et sécurité",

@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\TenantSettingsService;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
@@ -153,6 +154,8 @@ class WalletController extends BaseApiController
 
         try {
             $result = $this->walletService->transfer($userId, $input);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 400);
         } catch (\RuntimeException $e) {

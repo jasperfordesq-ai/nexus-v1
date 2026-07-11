@@ -39,7 +39,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 const ZERO_BADGES = {
   pending_members: 0,
   safeguarding_alerts: 0,
-  vetting_expiring: 0,
+  vetting_review_requests: 0,
   pending_exchanges: 0,
   unreviewed_messages: 0,
   monitored_users: 0,
@@ -49,7 +49,7 @@ const ZERO_BADGES = {
 const WITH_BADGES = {
   pending_members: 3,
   safeguarding_alerts: 1,
-  vetting_expiring: 0,
+  vetting_review_requests: 7,
   pending_exchanges: 5,
   unreviewed_messages: 2,
   monitored_users: 0,
@@ -84,7 +84,7 @@ describe('BrokerSidebar — expanded', () => {
     // i18n: broker.nav.exchanges → "Exchanges"
     expect(screen.getByRole('link', { name: /Exchanges/i })).toBeInTheDocument();
     // i18n: broker.nav.safeguarding → "Safeguarding"
-    expect(screen.getByRole('link', { name: /Safeguarding/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Safeguarding$/i })).toBeInTheDocument();
   });
 
   it('renders the Full Admin link for admin users', () => {
@@ -98,6 +98,7 @@ describe('BrokerSidebar — expanded', () => {
     expect(screen.getByText('3')).toBeInTheDocument(); // pending_members
     expect(screen.getByText('5')).toBeInTheDocument(); // pending_exchanges
     expect(screen.getByText('2')).toBeInTheDocument(); // unreviewed_messages
+    expect(screen.getByText('7')).toBeInTheDocument(); // vetting_review_requests
   });
 
   it('does not show badge chips when all badge counts are zero', () => {

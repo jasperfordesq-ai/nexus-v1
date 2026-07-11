@@ -725,6 +725,8 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
         $this->assertArrayHasKey('notifications', $data);
         $this->assertArrayHasKey('connections', $data);
         $this->assertArrayHasKey('login_history', $data);
+        $this->assertArrayHasKey('vetting_attestations', $data);
+        $this->assertArrayNotHasKey('vetting_records', $data);
     }
 
     public function testExportInfoContainsRequiredMetadata(): void

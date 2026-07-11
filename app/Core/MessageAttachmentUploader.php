@@ -43,7 +43,7 @@ class MessageAttachmentUploader
 
     /**
      * @param array{name:string,type?:string,tmp_name:string,error?:int,size?:int} $file
-     * @return array{url:string,name:string,size:int,mime:string}
+     * @return array{url:string,path:string,name:string,size:int,mime:string,type:string}
      *
      * @throws \InvalidArgumentException on validation failure
      * @throws \RuntimeException on storage failure
@@ -112,6 +112,41 @@ class MessageAttachmentUploader
             'mime' => $detectedMime,
             'type' => str_starts_with($detectedMime, 'image/') ? 'image' : 'file',
         ];
+    }
+
+    /**
+     * Remove a staged attachment when validation or message persistence fails.
+     * The resolved path is constrained to the current tenant's attachment root.
+     */
+    public static function delete(string $url): bool
+    {
+        $tenantId = (int) TenantContext::getId();
+        $prefix = '/uploads/' . $tenantId . '/message_attachments/';
+        if (! str_starts_with($url, $prefix)) {
+            return false;
+        }
+
+        $filename = basename($url);
+        if ($filename === '' || $filename !== substr($url, strlen($prefix))) {
+            return false;
+        }
+
+        $baseDir = realpath(__DIR__ . '/../../httpdocs/uploads/' . $tenantId . '/message_attachments');
+        if ($baseDir === false) {
+            return true;
+        }
+
+        $path = $baseDir . DIRECTORY_SEPARATOR . $filename;
+        if (! is_file($path)) {
+            return true;
+        }
+
+        $resolved = realpath($path);
+        if ($resolved === false || ! str_starts_with($resolved, $baseDir . DIRECTORY_SEPARATOR)) {
+            return false;
+        }
+
+        return @unlink($resolved);
     }
 
     private static function detectMime(string $path): string

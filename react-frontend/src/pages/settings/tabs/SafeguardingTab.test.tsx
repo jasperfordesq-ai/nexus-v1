@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
-// ── Stable mock references ──
-const mockToast = {
+const toast = {
   success: vi.fn(),
   error: vi.fn(),
   info: vi.fn(),
@@ -17,32 +16,27 @@ const mockToast = {
 };
 
 vi.mock('@/lib/api', () => ({
-  default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
-  api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+  default: { get: vi.fn(), post: vi.fn() },
+  api: { get: vi.fn(), post: vi.fn() },
 }));
-
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/contexts', () => createMockContexts({ useToast: () => toast }));
 
-vi.mock('@/contexts', () =>
-  createMockContexts({ useToast: () => mockToast })
-);
-
-import { SafeguardingTab } from './SafeguardingTab';
 import { api } from '@/lib/api';
+import { SafeguardingTab, type MemberPreference } from './SafeguardingTab';
 
 const mockedGet = api.get as ReturnType<typeof vi.fn>;
 const mockedPost = api.post as ReturnType<typeof vi.fn>;
 
-// ── Helpers ──
-const PREF_BROKER: import('./SafeguardingTab').MemberPreference = {
+const preference: MemberPreference = {
   preference_id: 1,
   option_id: 10,
   option_key: 'supervised_matching',
   label: 'Supervised matching',
   description: 'Only matched with broker approval',
   selected_value: 'yes',
-  consent_given_at: '2024-01-15T10:00:00Z',
-  created_at: '2024-01-15T10:00:00Z',
+  consent_given_at: '2026-01-15T10:00:00Z',
+  created_at: '2026-01-15T10:00:00Z',
   activations: {
     requires_broker_approval: true,
     restricts_messaging: false,
@@ -52,247 +46,97 @@ const PREF_BROKER: import('./SafeguardingTab').MemberPreference = {
   },
 };
 
-const PREF_DECLINATION: import('./SafeguardingTab').MemberPreference = {
-  preference_id: 2,
-  option_id: 20,
-  option_key: 'none_apply',
-  label: 'None apply to me',
-  description: null,
-  selected_value: 'yes',
-  consent_given_at: null,
-  created_at: null,
-  activations: {
-    requires_broker_approval: false,
-    restricts_messaging: false,
-    restricts_matching: false,
-    requires_vetted_interaction: false,
-    vetting_type_required: null,
+const vettingStatus = {
+  policy: {
+    configured: true,
+    contact_policy_available: true,
+    jurisdiction: 'england_wales',
+    label: 'England and Wales',
+    attestation_code: 'dbs_enhanced',
+    attestation_label: 'Enhanced DBS',
+    purpose_code: 'safeguarded_member_contact',
   },
+  decision: 'not_confirmed',
+  review_status: null,
+  confirmed_at: null,
+  revoked_at: null,
 };
 
-// Type is not exported by SafeguardingTab — declare inline for test convenience
-declare module './SafeguardingTab' {
-  interface MemberPreference {
-    preference_id: number;
-    option_id: number;
-    option_key: string;
-    label: string;
-    description: string | null;
-    selected_value: string;
-    consent_given_at: string | null;
-    created_at: string | null;
-    activations: {
-      requires_broker_approval: boolean;
-      restricts_messaging: boolean;
-      restricts_matching: boolean;
-      requires_vetted_interaction: boolean;
-      vetting_type_required: string | null;
-    };
-  }
+function mockLoads(statusOverrides: Record<string, unknown> = {}, preferences = [preference]) {
+  mockedGet.mockImplementation((url: string) => {
+    if (url === '/v2/safeguarding/my-preferences') {
+      return Promise.resolve({ success: true, data: { preferences, count: preferences.length } });
+    }
+    if (url === '/v2/safeguarding/my-vetting-status') {
+      return Promise.resolve({ success: true, data: { ...vettingStatus, ...statusOverrides } });
+    }
+    return Promise.resolve({ success: false });
+  });
 }
 
 describe('SafeguardingTab', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLoads();
   });
 
-  it('shows loading spinner while preferences load', () => {
-    mockedGet.mockReturnValue(new Promise(() => {}));
+  it('loads private preferences and community vetting status', async () => {
     render(<SafeguardingTab />);
-    // The loading container and the inner Spinner both carry role="status";
-    // the container is the one with aria-busy="true".
-    expect(screen.getAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true')).toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByText('Supervised matching')).toBeInTheDocument());
+    expect(mockedGet).toHaveBeenCalledWith('/v2/safeguarding/my-preferences');
+    expect(mockedGet).toHaveBeenCalledWith('/v2/safeguarding/my-vetting-status');
+    expect(screen.getByText('Enhanced DBS')).toBeInTheDocument();
+    expect(screen.getByText('Not confirmed')).toBeInTheDocument();
   });
 
-  it('shows empty state when no preferences exist', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [], count: 0 },
-    });
+  it('shows a confirmed private community decision', async () => {
+    mockLoads({ decision: 'confirmed', confirmed_at: '2026-07-11T10:00:00Z' }, []);
     render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.queryAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true')).toBeUndefined();
-    });
-    // Empty state is rendered with the Lock icon and no_preferences text
-    expect(document.querySelector('.rounded-lg.bg-theme-elevated')).toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByText('Confirmed')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Request broker review' })).toBeNull();
   });
 
-  it('renders a preference card when preferences are returned', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
+  it('requests broker review with a genuinely empty request body', async () => {
+    mockedPost.mockResolvedValue({ success: true, data: { status: 'pending' } });
     render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Request broker review' })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Request broker review' }));
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledWith('/v2/safeguarding/vetting-review-request'));
+    expect(screen.getByRole('button', { name: 'Review requested' })).toBeDisabled();
   });
 
-  it('renders the preference description when present', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Only matched with broker approval')).toBeInTheDocument();
-    });
+  it('does not offer document, attachment, reference, or notes inputs', async () => {
+    const { container } = render(<SafeguardingTab />);
+    await waitFor(() => expect(screen.getByText('Enhanced DBS')).toBeInTheDocument());
+
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(container.querySelector('textarea')).toBeNull();
+    expect(screen.queryByText(/certificate number/i)).toBeNull();
+    expect(screen.getByText(/Do not upload or send a DBS/i)).toBeInTheDocument();
   });
 
-  it('renders revoke button for each preference', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
+  it('does not offer review when the jurisdiction policy is unavailable', async () => {
+    mockLoads({
+      policy: { ...vettingStatus.policy, configured: false, contact_policy_available: false },
     });
     render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
-    // Revoke button should be present
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBeGreaterThan(0);
+
+    await waitFor(() => expect(screen.getByText(/has not configured a supported safeguarding contact policy/i)).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Request broker review' })).toBeNull();
   });
 
-  it('opens confirmation modal when revoke button is clicked', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
-
-    // Click the Revoke button (danger-soft variant)
-    const buttons = screen.getAllByRole('button');
-    const revokeBtn = buttons[buttons.length - 1]; // Last button is revoke
-    fireEvent.click(revokeBtn);
-
-    // Modal should open — confirmation title or preference label appears in dialog
-    await waitFor(() => {
-      // Modal content contains the preference label
-      expect(screen.getAllByText('Supervised matching').length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  it('calls POST /v2/safeguarding/revoke and removes item on confirmation', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
+  it('preserves member preference revocation', async () => {
     mockedPost.mockResolvedValue({ success: true });
-
     render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Revoke' })).toBeInTheDocument());
 
-    // Click revoke button
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[buttons.length - 1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Revoke' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Yes, revoke' }));
 
-    // Wait for modal to open with confirm button
-    await waitFor(() => {
-      const confirmBtns = screen.getAllByRole('button');
-      // Confirm button should be visible (danger variant)
-      expect(confirmBtns.length).toBeGreaterThan(1);
-    });
-
-    // Click the confirm (danger) button — it's the last button in the modal
-    const allBtns = screen.getAllByRole('button');
-    const confirmBtn = allBtns[allBtns.length - 1];
-    fireEvent.click(confirmBtn);
-
-    await waitFor(() => {
-      expect(mockedPost).toHaveBeenCalledWith('/v2/safeguarding/revoke', {
-        option_id: 10,
-      });
-    });
-  });
-
-  it('shows success toast after successful revocation', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
-    mockedPost.mockResolvedValue({ success: true });
-
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
-
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[buttons.length - 1]);
-
-    await waitFor(() => {
-      expect(screen.getAllByRole('button').length).toBeGreaterThan(1);
-    });
-
-    const allBtns = screen.getAllByRole('button');
-    fireEvent.click(allBtns[allBtns.length - 1]);
-
-    await waitFor(() => {
-      expect(mockToast.success).toHaveBeenCalled();
-    });
-  });
-
-  it('shows error toast when revocation POST fails', async () => {
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_BROKER], count: 1 },
-    });
-    mockedPost.mockResolvedValue({ success: false, error: 'Cannot revoke' });
-
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('Supervised matching')).toBeInTheDocument();
-    });
-
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[buttons.length - 1]);
-
-    await waitFor(() => {
-      expect(screen.getAllByRole('button').length).toBeGreaterThan(1);
-    });
-
-    const allBtns = screen.getAllByRole('button');
-    fireEvent.click(allBtns[allBtns.length - 1]);
-
-    await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
-    });
-  });
-
-  it('does NOT render activation chips for the none_apply declination option', async () => {
-    // PREF_DECLINATION has option_key === 'none_apply' and all activations false
-    mockedGet.mockResolvedValue({
-      success: true,
-      data: { preferences: [PREF_DECLINATION], count: 1 },
-    });
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.getByText('None apply to me')).toBeInTheDocument();
-    });
-    // No activation chips should render for the declination preference
-    expect(screen.queryByText(/broker|vetted|match/i)).not.toBeInTheDocument();
-  });
-
-  it('calls GET /v2/safeguarding/my-preferences on mount', async () => {
-    mockedGet.mockResolvedValue({ success: true, data: { preferences: [], count: 0 } });
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(mockedGet).toHaveBeenCalledWith('/v2/safeguarding/my-preferences');
-    });
-  });
-
-  it('falls back to empty list when API returns success:false', async () => {
-    mockedGet.mockResolvedValue({ success: false, error: 'Unauthorized' });
-    render(<SafeguardingTab />);
-    await waitFor(() => {
-      expect(screen.queryAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true')).toBeUndefined();
-    });
-    // Empty state should show
-    expect(document.querySelector('.rounded-lg.bg-theme-elevated')).toBeInTheDocument();
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledWith('/v2/safeguarding/revoke', { option_id: 10 }));
   });
 });

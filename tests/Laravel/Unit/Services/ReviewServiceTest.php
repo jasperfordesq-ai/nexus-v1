@@ -6,6 +6,11 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
+use App\Models\User;
+use App\Services\SafeguardingInteractionPolicy;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Laravel\TestCase;
 use App\Services\ReviewService;
 use App\Models\Review;
@@ -13,6 +18,8 @@ use Mockery;
 
 class ReviewServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private ReviewService $service;
     private $mockReview;
 
@@ -74,6 +81,43 @@ class ReviewServiceTest extends TestCase
         $this->service->create(5, [
             'receiver_id' => 5,
             'rating' => 5,
+        ]);
+    }
+
+    public function test_create_denial_writes_no_review(): void
+    {
+        $reviewer = User::factory()->forTenant($this->testTenantId)->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with(
+                (int) $reviewer->id,
+                (int) $receiver->id,
+                $this->testTenantId,
+                'local_review',
+            )
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            (new ReviewService(new Review()))->create((int) $reviewer->id, [
+                'receiver_id' => (int) $receiver->id,
+                'rating' => 5,
+                'comment' => 'Must not persist',
+            ]);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('reviews', [
+            'tenant_id' => $this->testTenantId,
+            'reviewer_id' => $reviewer->id,
+            'receiver_id' => $receiver->id,
+            'comment' => 'Must not persist',
         ]);
     }
 

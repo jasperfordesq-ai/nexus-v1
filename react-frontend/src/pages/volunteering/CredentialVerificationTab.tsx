@@ -6,8 +6,8 @@
 /**
  * CredentialVerificationTab - Manage volunteer credentials/certifications (V5)
  *
- * Upload, view, and track status of volunteer credentials such as
- * Police Check, First Aid, Background Check, Safeguarding, etc.
+ * Upload, view, and track non-vetting volunteer credentials. Historical
+ * police-check evidence is rendered as a redacted, removal-only row.
  */
 
 import { formatNumber, getFormattingLocale } from '@/lib/helpers';
@@ -41,7 +41,7 @@ import { useToast } from '@/contexts';
 
 /* ───────────────────────── Types ───────────────────────── */
 
-interface Credential {
+interface StandardCredential {
   id: number;
   type: string;
   type_label: string;
@@ -50,14 +50,30 @@ interface Credential {
   expiry_date: string | null;
   status: 'pending' | 'verified' | 'expired' | 'rejected';
   rejection_reason: string | null;
+  legacy_vetting_evidence?: false;
+  manual_review_required?: false;
 }
+
+interface LegacyVettingEvidenceCredential {
+  id: number;
+  legacy_vetting_evidence: true;
+  manual_review_required?: false;
+}
+
+interface ManualReviewCredential {
+  id: number;
+  type: string;
+  type_label: string;
+  legacy_vetting_evidence?: false;
+  manual_review_required: true;
+}
+
+type Credential = StandardCredential | LegacyVettingEvidenceCredential | ManualReviewCredential;
 
 /* ───────────────────────── Credential Type Options ───────────────────────── */
 
-const CREDENTIAL_TYPE_KEYS = [
-  'police_check',
+export const CREDENTIAL_TYPE_KEYS = [
   'first_aid',
-  'background_check',
   'safeguarding',
   'manual_handling',
   'food_hygiene',
@@ -65,6 +81,18 @@ const CREDENTIAL_TYPE_KEYS = [
   'professional_registration',
   'other',
 ] as const;
+
+const PROHIBITED_VETTING_CREDENTIAL_TYPES = new Set([
+  'police_check',
+  'background_check',
+  'dbs',
+  'dbs_basic',
+  'dbs_standard',
+  'dbs_enhanced',
+  'garda_vetting',
+  'access_ni',
+  'pvg_scotland',
+]);
 
 /* ───────────────────────── Status Helpers ───────────────────────── */
 
@@ -124,6 +152,7 @@ export function CredentialVerificationTab() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingCredentialId, setDeletingCredentialId] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
@@ -193,7 +222,7 @@ export function CredentialVerificationTab() {
   };
 
   const handleUpload = async () => {
-    if (!uploadForm.type || !selectedFile) return;
+    if (!uploadForm.type || !selectedFile || PROHIBITED_VETTING_CREDENTIAL_TYPES.has(uploadForm.type)) return;
 
     try {
       setIsUploading(true);
@@ -238,10 +267,36 @@ export function CredentialVerificationTab() {
     resetUploadForm();
   };
 
+  const handleDeleteRemovalOnlyCredential = async (
+    credential: LegacyVettingEvidenceCredential | ManualReviewCredential,
+    translationPrefix: 'legacy_vetting_evidence' | 'manual_review',
+  ) => {
+    try {
+      setDeletingCredentialId(credential.id);
+      const response = await api.delete(`/v2/volunteering/credentials/${credential.id}`);
+      if (!response.success) {
+        toastRef.current.error(tRef.current(`credentials.${translationPrefix}_delete_failed`));
+        return;
+      }
+
+      setCredentials((current) => current.filter((item) => item.id !== credential.id));
+      toastRef.current.success(tRef.current(`credentials.${translationPrefix}_delete_success`));
+    } catch (err) {
+      logError('Failed to delete removal-only credential', err);
+      toastRef.current.error(tRef.current(`credentials.${translationPrefix}_delete_failed`));
+    } finally {
+      setDeletingCredentialId(null);
+    }
+  };
+
   // Separate credentials by status for summary
-  const verified = credentials.filter((c) => c.status === 'verified');
-  const pending = credentials.filter((c) => c.status === 'pending');
-  const expiring = credentials.filter((c) => {
+  const activeCredentials = credentials.filter(
+    (credential): credential is StandardCredential =>
+      !credential.legacy_vetting_evidence && !credential.manual_review_required,
+  );
+  const verified = activeCredentials.filter((c) => c.status === 'verified');
+  const pending = activeCredentials.filter((c) => c.status === 'pending');
+  const expiring = activeCredentials.filter((c) => {
     if (!c.expiry_date || c.status !== 'verified') return false;
     const expiryDate = new Date(c.expiry_date);
     const now = new Date();
@@ -266,6 +321,16 @@ export function CredentialVerificationTab() {
           {t('credentials.upload_new')}
         </Button>
       </div>
+
+      <GlassCard className="border-l-4 border-amber-500 p-4" role="note">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-semibold text-theme-primary">{t('credentials.vetting_documents_notice_title')}</p>
+            <p className="mt-1 text-sm leading-6 text-theme-muted">{t('credentials.vetting_documents_notice_body')}</p>
+          </div>
+        </div>
+      </GlassCard>
 
       {/* Error */}
       {error && !isLoading && (
@@ -381,6 +446,71 @@ export function CredentialVerificationTab() {
           {/* Credentials List */}
           {credentials.map((credential) => (
             <motion.div key={credential.id} variants={itemVariants}>
+              {credential.legacy_vetting_evidence ? (
+                <GlassCard className="border-l-4 border-rose-500 p-5" role="alert">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-500" aria-hidden="true" />
+                      <div>
+                        <h3 className="font-semibold text-theme-primary">
+                          {t('credentials.legacy_vetting_evidence_title')}
+                        </h3>
+                        <p className="mt-1 text-sm leading-6 text-theme-muted">
+                          {t('credentials.legacy_vetting_evidence_body')}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      variant="secondary"
+                      startContent={deletingCredentialId !== credential.id ? <Trash2 className="h-4 w-4" aria-hidden="true" /> : undefined}
+                      isLoading={deletingCredentialId === credential.id}
+                      isDisabled={deletingCredentialId !== null}
+                      onPress={() => handleDeleteRemovalOnlyCredential(credential, 'legacy_vetting_evidence')}
+                    >
+                      {t('credentials.legacy_vetting_evidence_delete')}
+                    </Button>
+                  </div>
+                </GlassCard>
+              ) : credential.manual_review_required ? (
+                <GlassCard className="border-l-4 border-amber-500 p-5" role="note">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold text-theme-primary">
+                            {credential.type_label || t('credentials.manual_review_title')}
+                          </h3>
+                          <Chip
+                            size="sm"
+                            color="warning"
+                            variant="soft"
+                            startContent={<Hourglass className="h-3 w-3" aria-hidden="true" />}
+                          >
+                            {t('credentials.status_manual_review')}
+                          </Chip>
+                        </div>
+                        <p className="mt-1 text-sm leading-6 text-theme-muted">
+                          {t('credentials.manual_review_body')}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      variant="secondary"
+                      startContent={deletingCredentialId !== credential.id ? <Trash2 className="h-4 w-4" aria-hidden="true" /> : undefined}
+                      isLoading={deletingCredentialId === credential.id}
+                      isDisabled={deletingCredentialId !== null}
+                      onPress={() => handleDeleteRemovalOnlyCredential(credential, 'manual_review')}
+                    >
+                      {t('credentials.manual_review_delete')}
+                    </Button>
+                  </div>
+                </GlassCard>
+              ) : (
               <GlassCard className="p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -425,7 +555,8 @@ export function CredentialVerificationTab() {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 sm:flex-shrink-0">
-                    {(credential.status === 'expired' || credential.status === 'rejected') && (
+                    {(credential.status === 'expired' || credential.status === 'rejected') &&
+                      !PROHIBITED_VETTING_CREDENTIAL_TYPES.has(credential.type) && (
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
@@ -441,6 +572,7 @@ export function CredentialVerificationTab() {
                   </div>
                 </div>
               </GlassCard>
+              )}
             </motion.div>
           ))}
         </motion.div>
@@ -476,7 +608,7 @@ export function CredentialVerificationTab() {
               startContent={<ShieldCheck className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {CREDENTIAL_TYPE_KEYS.map((key) => (
-                <SelectItem key={key} id={key}>{t(`credentials.type_${key}`, key)}</SelectItem>
+                <SelectItem key={key} id={key}>{t(`credentials.type_${key}`)}</SelectItem>
               ))}
             </Select>
 

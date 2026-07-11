@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Mail\VereinCrossInvitationAccepted;
 use App\Mail\VereinCrossInvitationReceived;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use RuntimeException;
@@ -427,6 +428,13 @@ class VereinFederationService
             throw new InvalidArgumentException(__('verein_federation.invitee_not_member'));
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $inviterUserId,
+            $inviteeUserId,
+            $tenantId,
+            'verein_cross_invitation',
+        );
+
         $message = $message !== null ? mb_substr(trim($message), 0, 500) : null;
         $now = now();
         $expiresAt = (clone $now)->addDays(30);
@@ -468,6 +476,22 @@ class VereinFederationService
         }
         if ($invite->status !== 'sent') {
             throw new RuntimeException(__('verein_federation.invitation_not_pending'));
+        }
+
+        if ($action === 'accept') {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                (int) $invite->inviter_user_id,
+                $userId,
+                $tenantId,
+                'verein_cross_invitation_accept',
+            );
+            $policy->assertLocalContactAllowed(
+                $userId,
+                (int) $invite->inviter_user_id,
+                $tenantId,
+                'verein_cross_invitation_accept',
+            );
         }
 
         $newStatus = $action === 'accept' ? 'accepted' : 'declined';

@@ -361,6 +361,7 @@
       "safeguarding": "Cosaint",
       "super_admin_access": "Sár-Rochtain Riaracháin",
       "time_credits": "Creidmheasanna Ama",
+      "contact_attestation": "Fianú teagmhála a chosaint",
       "vetting_status": "Stádas Grinnfhiosrúcháin"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Gn?omhachtaithe ar {{date}}",
       "more_certificates": "Tuilleadh Deimhnithe",
+      "more_attestations": "Tuilleadh fianuithe",
       "more_records": "Tuilleadh Taifead"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- In éag",
       "no_reference": "Gan tagairt",
-      "unknown_provider": "Soláthraí Anaithnid"
+      "unknown_provider": "Soláthraí Anaithnid",
+      "attestation_dbs_enhanced": "DBS feabhsaithe (Sasana agus An Bhreatain Bheag)",
+      "attestation_pvg_scotland": "Scéim PVG",
+      "attestation_access_ni": "AccessNI (Tuaisceart Éireann)",
+      "attestation_garda_vetting": "Grinnfhiosrúchán an Gharda Síochána",
+      "safeguarding_confirmation": "Deimhniú cosanta",
+      "confirmed_on": "Deimhníodh fianú pobail ar {{date}}",
+      "not_confirmed": "Níl aon fhianú pobail deimhnithe",
+      "decision_confirmed": "Fianaise deimhnithe",
+      "decision_revoked": "Fianú cúlghairthe",
+      "decision_not_confirmed": "Ní dheimhnítear an fianú"
     }
   },
   "aria": {

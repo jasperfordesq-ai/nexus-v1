@@ -11,8 +11,6 @@ use App\Services\Matching\CandidateRetriever;
 use App\Services\Matching\KeywordExtractor;
 use App\Services\Matching\MatchScorer;
 use App\Services\Matching\TenantMatchingContext;
-use App\Services\SafeguardingTriggerService;
-use App\Services\VettingService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -74,7 +72,6 @@ class SmartMatchingEngine
 
     public function __construct(
         private readonly EmbeddingService $embeddingService,
-        private readonly VettingService $vettingService,
         private readonly CandidateRetriever $candidateRetriever,
         private readonly MatchLearningService $matchLearningService,
     ) {}
@@ -1286,18 +1283,10 @@ class SmartMatchingEngine
     // =========================================================================
 
     /**
-     * Remove candidates whose owners require safeguarding vetting types the
-     * searcher does not hold. Used by both the main match path and cold-start.
-     *
-     * Staff roles (admin, tenant_admin, broker, super_admin) bypass this —
-     * they need the full pool for coordinator assignments and safeguarding
-     * oversight. Discovery bypass only; the downstream messaging, match
-     * submission and group exchange gates still enforce vetting for staff.
-     *
-     * Fail-open on error: if the filter itself errors, returns the candidate
-     * list unchanged. Downstream gates (MessageService, MatchApprovalWorkflow,
-     * GroupExchangeService) remain fail-closed, so a flagged user still can't
-     * be interacted with even if discovery briefly leaks them during a blip.
+     * Remove candidates the searcher cannot contact under the same central,
+     * recipient-authoritative policy used by messaging. Ordinary discovery has
+     * no role bypass; a policy error returns no candidates rather than exposing
+     * protected members.
      *
      * @param array<int, array> $candidates
      * @param int $searcherId The user ID performing the discovery/match request
@@ -1309,87 +1298,43 @@ class SmartMatchingEngine
             return $candidates;
         }
 
-        // Staff bypass — admins/brokers see the full pool for coordination.
         try {
-            if ($this->vettingService->isSafeguardingStaff($searcherId)) {
-                return $candidates;
-            }
-        } catch (\Throwable $e) {
-            // Staff lookup failure falls through to apply the filter — safer
-            // default (treat as non-staff).
-            Log::debug('[SmartMatchingEngine] staff bypass lookup failed', [
-                'error' => $e->getMessage(),
-                'searcher_id' => $searcherId,
-            ]);
-        }
-
-        try {
-            // Collect unique candidate owner IDs.
-            $ownerIds = [];
-            foreach ($candidates as $cand) {
-                $owner = (int) ($cand['user_id'] ?? 0);
-                if ($owner > 0 && $owner !== $searcherId) {
-                    $ownerIds[$owner] = true;
-                }
-            }
-            if (empty($ownerIds)) {
-                return $candidates;
-            }
-
-            $requiredByUser = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
-                array_keys($ownerIds),
-                TenantContext::getId()
-            );
-
-            // Fast path: if nobody in this batch requires vetting, skip filtering.
-            $anyRequiresVetting = false;
-            foreach ($requiredByUser as $types) {
-                if (!empty($types)) {
-                    $anyRequiresVetting = true;
-                    break;
-                }
-            }
-            if (!$anyRequiresVetting) {
-                return $candidates;
-            }
-
-            // Cache searcher vetting checks by type-set signature so we don't
-            // re-query for each candidate when many share the same requirements.
-            $vettingCheckCache = [];
+            $tenantId = TenantContext::getId();
+            $policy = app(SafeguardingInteractionPolicy::class);
             $filtered = [];
 
             foreach ($candidates as $candidate) {
                 $owner = (int) ($candidate['user_id'] ?? 0);
-                $requiredTypes = $requiredByUser[$owner] ?? [];
-
-                if (empty($requiredTypes)) {
+                if ($owner <= 0 || $owner === $searcherId) {
                     $filtered[] = $candidate;
                     continue;
                 }
 
-                $sortedTypes = $requiredTypes;
-                sort($sortedTypes);
-                $cacheKey = implode('|', $sortedTypes);
-
-                if (!array_key_exists($cacheKey, $vettingCheckCache)) {
-                    $vettingCheckCache[$cacheKey] = $this->vettingService
-                        ->userHasAllValidVettings($searcherId, $sortedTypes);
-                }
-
-                if ($vettingCheckCache[$cacheKey]) {
+                $searcherToOwner = $policy->evaluateLocalContact(
+                    $searcherId,
+                    $owner,
+                    $tenantId,
+                    'match_discovery',
+                );
+                $ownerToSearcher = $policy->evaluateLocalContact(
+                    $owner,
+                    $searcherId,
+                    $tenantId,
+                    'match_discovery',
+                );
+                if ($searcherToOwner->isAllowed() && $ownerToSearcher->isAllowed()) {
                     $filtered[] = $candidate;
                 }
-                // else: silently drop the candidate from the searcher's view
             }
 
             return $filtered;
         } catch (\Throwable $e) {
-            Log::warning('[SmartMatchingEngine] safeguarding filter failed (returning unfiltered)', [
+            Log::error('[SmartMatchingEngine] safeguarding policy unavailable; returning no candidates', [
                 'error' => $e->getMessage(),
                 'searcher_id' => $searcherId,
                 'candidate_count' => count($candidates),
             ]);
-            return $candidates;
+            return [];
         }
     }
 }

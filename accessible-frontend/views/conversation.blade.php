@@ -9,7 +9,10 @@
         $otherUser = $conversation['other_user'] ?? [];
         $otherName = $otherUser['name'] ?? trim(($otherUser['first_name'] ?? '') . ' ' . ($otherUser['last_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
-        $canSend = $directMessagingEnabled && empty($restriction['messaging_disabled']);
+        $safeguarding = $conversation['safeguarding'] ?? null;
+        $canSend = $directMessagingEnabled
+            && empty($restriction['messaging_disabled'])
+            && empty($safeguarding['restricted']);
         $translationEnabled = \App\Core\TenantContext::hasFeature('message_translation');
         $translation = session('messages_translation');
         $translatedMessageId = is_array($translation) ? (int) ($translation['id'] ?? 0) : 0;
@@ -35,7 +38,15 @@
             'attachment-invalid' => 'govuk_alpha_messages.attachments.error_invalid',
             'voice-required' => 'govuk_alpha_messages.voice.error_required',
             'voice-failed' => 'govuk_alpha_messages.voice.error_failed',
+            'message-vetting-required' => 'safeguarding.errors.vetting_required_title',
+            'message-contact-restricted' => 'safeguarding.errors.contact_restricted_title',
+            'message-policy-unavailable' => 'safeguarding.errors.policy_unavailable_title',
         ];
+        $safeguardingStatus = in_array($status, [
+            'message-vetting-required',
+            'message-contact-restricted',
+            'message-policy-unavailable',
+        ], true);
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_messages') }}</a>
@@ -56,7 +67,7 @@
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
                         <li>
-                            <a href="#body">{{ __($errorStatuses[$status]) }}</a>
+                            <a href="{{ $safeguardingStatus ? '#safeguarding-notice' : '#body' }}">{{ __($errorStatuses[$status]) }}</a>
                         </li>
                     </ul>
                 </div>
@@ -89,6 +100,15 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-body">{{ __('govuk_alpha.messages.restricted_detail') }}</p>
+            </div>
+        </div>
+    @elseif (!empty($safeguarding['restricted']))
+        <div id="safeguarding-notice" class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="conversation-safeguarding-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="conversation-safeguarding-title">{{ $safeguarding['title'] ?? __('safeguarding.errors.contact_restricted_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">{{ $safeguarding['detail'] ?? $safeguarding['message'] ?? __('safeguarding.errors.contact_restricted') }}</p>
             </div>
         </div>
     @endif

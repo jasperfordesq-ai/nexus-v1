@@ -307,11 +307,6 @@ class BrokerControlConfigService
         return $default;
     }
 
-    public static function isVettingEnabled(): bool
-    {
-        return (bool) self::getComplianceSetting('vetting_enabled', false);
-    }
-
     public static function isInsuranceEnabled(): bool
     {
         return (bool) self::getComplianceSetting('insurance_enabled', false);

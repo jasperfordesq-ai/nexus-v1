@@ -48,9 +48,13 @@ const sections: PlatformLegalSection[] = [
         <p>
           Your Community Operator (the organisation that runs your timebank or community) maintains
           their own privacy policy, which covers community-level data such as your profile
-          information, messages, exchanges, and other content you create within the community. You
-          should review your Community Operator's privacy policy for details on how they handle your
-          data.
+          information, messages, exchanges, and private safeguarding decisions. Where a community
+          uses the safeguarding vetting-confirmation feature, Project NEXUS processes only the
+          Community Operator's metadata-only decision on its behalf. The feature does not accept or
+          retain DBS, Garda Vetting, AccessNI, PVG, police-check or equivalent certificates,
+          certificate contents, reference numbers, results, dates, identity documents, or free-text
+          evidence. You should review your Community Operator's privacy policy for details on its
+          lawful basis, access controls, retention schedule, and correction process.
         </p>
         <p>
           If you have questions about this Platform Privacy Policy, you can reach us through{' '}
@@ -96,10 +100,12 @@ const sections: PlatformLegalSection[] = [
         </p>
         <p>
           Community Operators are independently responsible for their own GDPR compliance, including
-          maintaining a lawful basis for processing, publishing their own privacy policies, and
+          maintaining a lawful basis for processing, identifying any additional domestic-law
+          condition required for criminal-offence data, completing any required data protection
+          impact assessment and policy documentation, publishing their own privacy policies, and
           responding to data subject requests concerning community-level data. The Platform does not
-          make decisions about how community-level personal data is used — those decisions rest with
-          the Community Operator.
+          make safeguarding decisions or decide how community-level personal data is used — those
+          decisions rest with the Community Operator.
         </p>
       </>
     ),
@@ -145,9 +151,12 @@ const sections: PlatformLegalSection[] = [
         </ul>
         <p>
           <strong>Note:</strong> Member profile data, messages, time credit exchanges, group
-          memberships, event registrations, and other community-level content are processed by the
-          Platform on behalf of your Community Operator. The collection and use of that data is
-          governed by your Community Operator's privacy policy, not this document.
+          memberships, event registrations, metadata-only safeguarding vetting confirmations, and
+          other community-level content are processed by the Platform on behalf of your Community
+          Operator. Safeguarding confirmations contain a controlled decision, purpose, scope,
+          decision-maker, timestamp, reason code and policy version only; they do not contain a
+          criminal-record certificate or its contents. The collection and use of community-level
+          data is governed by your Community Operator's privacy policy, not this document.
         </p>
       </>
     ),
@@ -508,7 +517,7 @@ export function PlatformPrivacyPage() {
         title={t('platform_privacy.title')}
         subtitle={t('platform_privacy.subtitle')}
         icon={Shield}
-        effectiveDate="1 March 2026"
+        effectiveDate="11 July 2026"
         sections={localizedSections}
         crossLinks={[
           { label: t('platform_privacy.link_terms'), to: '/platform/terms' },

@@ -8,12 +8,32 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\FederatedMessageService;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 
 class FederatedMessageServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $allowed = new SafeguardingInteractionDecision(
+            status: SafeguardingInteractionDecision::ALLOW,
+            code: 'SAFEGUARDING_ALLOWED',
+            recipientTenantId: 2,
+            purposeCode: 'safeguarded_member_contact',
+            scopeType: 'tenant',
+            scopeIdentifier: '',
+        );
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateCrossTenantContact')->zeroOrMoreTimes()->andReturn($allowed);
+        $policy->shouldReceive('evaluateExternalContact')->zeroOrMoreTimes()->andReturn($allowed);
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+    }
+
     /**
      * Build a fluent query-builder mock whose chainable methods all return
      * self, and whose terminal methods (first/count/exists/insertGetId/etc.)

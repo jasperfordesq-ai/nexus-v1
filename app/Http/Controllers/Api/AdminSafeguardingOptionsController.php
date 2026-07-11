@@ -7,7 +7,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\TenantSafeguardingOption;
+use App\Services\SafeguardingJurisdictionService;
 use App\Services\SafeguardingPreferenceService;
 use Illuminate\Http\JsonResponse;
 
@@ -27,6 +29,10 @@ use Illuminate\Http\JsonResponse;
 class AdminSafeguardingOptionsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly SafeguardingJurisdictionService $jurisdictions,
+    ) {}
 
     /** GET /v2/admin/safeguarding/options */
     public function index(): JsonResponse
@@ -105,6 +111,12 @@ class AdminSafeguardingOptionsController extends BaseApiController
             }
             // Strip any keys that somehow slipped past (belt and suspenders)
             $data['triggers'] = array_intersect_key($data['triggers'], $allowedTriggerKeys);
+
+            $validatedTriggers = $this->validateTriggers($data['triggers']);
+            if ($validatedTriggers instanceof JsonResponse) {
+                return $validatedTriggers;
+            }
+            $data['triggers'] = $validatedTriggers;
         }
 
         // Validate select_options structure when option_type is 'select'
@@ -205,7 +217,11 @@ class AdminSafeguardingOptionsController extends BaseApiController
             $data['sort_order'] = (int) $data['sort_order'];
         }
 
-        $success = SafeguardingPreferenceService::updateOption($id, $data);
+        try {
+            $success = SafeguardingPreferenceService::updateOption($id, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
@@ -219,7 +235,11 @@ class AdminSafeguardingOptionsController extends BaseApiController
     {
         $this->requireBrokerOrAdmin();
 
-        $success = SafeguardingPreferenceService::deleteOption($id);
+        try {
+            $success = SafeguardingPreferenceService::deleteOption($id);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithError('NOT_FOUND', __('api.safeguarding_option_not_found'), null, 404);
@@ -276,6 +296,40 @@ class AdminSafeguardingOptionsController extends BaseApiController
             }
             if ($expectedType === 'string_or_null' && $value !== null && !is_string($value)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.safeguarding_trigger_type_invalid', ['key' => $key]), 'triggers', 422);
+            }
+        }
+
+        $attestationCode = $triggers['vetting_type_required'] ?? null;
+        if (is_string($attestationCode) && $attestationCode !== ''
+            && ! SafeguardingJurisdictionService::isSupportedAttestationCode($attestationCode)) {
+            return $this->respondWithError(
+                'INVALID_VETTING_REQUIREMENT',
+                __('api.safeguarding_vetting_requirement_invalid'),
+                'triggers.vetting_type_required',
+                422,
+            );
+        }
+
+        if (! empty($triggers['requires_vetted_interaction'])) {
+            if (! is_string($attestationCode) || $attestationCode === '') {
+                return $this->respondWithError(
+                    'VETTING_REQUIREMENT_REQUIRED',
+                    __('api.safeguarding_vetting_requirement_required'),
+                    'triggers.vetting_type_required',
+                    422,
+                );
+            }
+
+            $policy = $this->jurisdictions->getPolicy(TenantContext::getId());
+            if (! $policy['configured']
+                || ! $policy['contact_policy_available']
+                || $policy['attestation_code'] !== $attestationCode) {
+                return $this->respondWithError(
+                    'VETTING_REQUIREMENT_POLICY_MISMATCH',
+                    __('api.safeguarding_vetting_requirement_policy_mismatch'),
+                    'triggers.vetting_type_required',
+                    422,
+                );
             }
         }
 

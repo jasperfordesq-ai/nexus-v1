@@ -11,6 +11,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\Social\Appreciation;
 use App\Models\Social\AppreciationReaction;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -56,6 +57,13 @@ class AppreciationService
         if ($receiverTenantId === null || (int) $receiverTenantId !== $tenantId) {
             throw new \DomainException('receiver_not_found');
         }
+
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $senderId,
+            $receiverId,
+            $tenantId,
+            'appreciation',
+        );
 
         $today = now()->toDateString();
         $rateKey = "appreciation_sent:{$tenantId}:{$senderId}:{$today}";
@@ -153,11 +161,13 @@ class AppreciationService
                         ->decrement('reactions_count');
                     return ['reacted' => false, 'reaction_type' => null];
                 }
+                $this->assertReactionContactAllowed($appreciation, $userId, (int) $tenantId);
                 // swap
                 $existing->reaction_type = $reactionType;
                 $existing->save();
                 return ['reacted' => true, 'reaction_type' => $reactionType];
             }
+            $this->assertReactionContactAllowed($appreciation, $userId, (int) $tenantId);
             AppreciationReaction::create([
                 'appreciation_id' => $appreciation->id,
                 'user_id' => $userId,
@@ -168,6 +178,24 @@ class AppreciationService
             Appreciation::where('id', $appreciation->id)->increment('reactions_count');
             return ['reacted' => true, 'reaction_type' => $reactionType];
         });
+    }
+
+    private function assertReactionContactAllowed(Appreciation $appreciation, int $userId, int $tenantId): void
+    {
+        $recipientIds = array_values(array_unique(array_filter(
+            [(int) $appreciation->sender_id, (int) $appreciation->receiver_id],
+            static fn (int $recipientId): bool => $recipientId > 0 && $recipientId !== $userId,
+        )));
+        if ($recipientIds === []) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+            $userId,
+            $recipientIds,
+            $tenantId,
+            'appreciation_reaction',
+        );
     }
 
     public function removeReaction(int $appreciationId, int $userId): bool

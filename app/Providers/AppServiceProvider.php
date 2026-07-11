@@ -224,7 +224,6 @@ use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 
 use App\Services\UserInsightsService;
-use App\Services\VettingService;
 use App\Services\VolunteerCertificateService;
 use App\Services\VolunteerDonationService;
 use App\Services\VolunteerEmergencyAlertService;
@@ -974,10 +973,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(UserInsightsService::class, function ($app) {
             return new UserInsightsService();
-        });
-
-        $this->app->singleton(VettingService::class, function ($app) {
-            return new VettingService();
         });
 
         $this->app->singleton(VolunteerCertificateService::class, function ($app) {

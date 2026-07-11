@@ -1265,7 +1265,6 @@ export interface TenantConfig {
   };
   settings?: Record<string, unknown>;
   compliance?: {
-    vetting_enabled?: boolean;
     insurance_enabled?: boolean;
   };
   categories?: Category[];

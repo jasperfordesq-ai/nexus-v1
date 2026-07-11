@@ -12,11 +12,14 @@ use App\Events\VolunteerOpportunityCreated;
 use Tests\Laravel\TestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Services\ShiftSwapService;
 use App\Services\ShiftWaitlistService;
 use App\Services\VolunteerCheckInService;
 use App\Services\VolunteerService;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 
 /**
  * VolunteerFlowIntegrationTest
@@ -193,6 +196,123 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
             [$swapId, self::TENANT_ID]
         )->fetchColumn();
         $this->assertSame('cancelled', $status);
+    }
+
+    public function testSwapSafeguardingDenialWritesNoRequest(): void
+    {
+        $this->requireTables(['vol_shift_swap_requests']);
+
+        $ownerId = $this->createUser('swap-guard-owner');
+        $userA = $this->createUser('swap-guard-user-a');
+        $userB = $this->createUser('swap-guard-user-b');
+        [$opportunityId, $shiftA] = $this->createOpportunityAndShift($ownerId);
+
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 5 DAY), INTERVAL 2 HOUR), 5, NOW())',
+            [self::TENANT_ID, $opportunityId]
+        );
+        $shiftB = (int) Database::getInstance()->lastInsertId();
+
+        foreach ([[$userA, $shiftA], [$userB, $shiftB]] as [$userId, $shiftId]) {
+            Database::query(
+                "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, shift_id, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())",
+                [self::TENANT_ID, $opportunityId, $userId, $shiftId]
+            );
+        }
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($userA, $userB, self::TENANT_ID, 'volunteer_shift_swap_request')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            ShiftSwapService::requestSwap($userA, [
+                'from_shift_id' => $shiftA,
+                'to_shift_id' => $shiftB,
+                'to_user_id' => $userB,
+                'message' => 'Must not persist',
+            ]);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $count = (int) Database::query(
+            'SELECT COUNT(*) FROM vol_shift_swap_requests WHERE tenant_id = ? AND from_user_id = ? AND to_user_id = ?',
+            [self::TENANT_ID, $userA, $userB]
+        )->fetchColumn();
+        $this->assertSame(0, $count);
+    }
+
+    public function testSwapAcceptSafeguardingDenialLeavesRequestPending(): void
+    {
+        $this->requireTables(['vol_shift_swap_requests']);
+        $ownerId = $this->createUser('swap-accept-guard-owner');
+        $requesterId = $this->createUser('swap-accept-guard-requester');
+        $recipientId = $this->createUser('swap-accept-guard-recipient');
+        [$opportunityId, $fromShiftId] = $this->createOpportunityAndShift($ownerId);
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 5 DAY), INTERVAL 2 HOUR), 5, NOW())',
+            [self::TENANT_ID, $opportunityId]
+        );
+        $toShiftId = (int) Database::getInstance()->lastInsertId();
+        Database::query(
+            "INSERT INTO vol_shift_swap_requests (tenant_id, from_user_id, to_user_id, from_shift_id, to_shift_id, status, requires_admin_approval, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 0, NOW())",
+            [self::TENANT_ID, $requesterId, $recipientId, $fromShiftId, $toShiftId]
+        );
+        $swapId = (int) Database::getInstance()->lastInsertId();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($requesterId, $recipientId, self::TENANT_ID, 'volunteer_shift_swap_accept')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            ShiftSwapService::respond($swapId, $recipientId, 'accept');
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $status = (string) Database::query(
+            'SELECT status FROM vol_shift_swap_requests WHERE id = ? AND tenant_id = ?',
+            [$swapId, self::TENANT_ID]
+        )->fetchColumn();
+        $this->assertSame('pending', $status);
+    }
+
+    public function testSwapRejectRemainsAvailableWithoutContactPermission(): void
+    {
+        $this->requireTables(['vol_shift_swap_requests']);
+        $ownerId = $this->createUser('swap-reject-owner');
+        $requesterId = $this->createUser('swap-reject-requester');
+        $recipientId = $this->createUser('swap-reject-recipient');
+        [$opportunityId, $fromShiftId] = $this->createOpportunityAndShift($ownerId);
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 5 DAY), INTERVAL 2 HOUR), 5, NOW())',
+            [self::TENANT_ID, $opportunityId]
+        );
+        $toShiftId = (int) Database::getInstance()->lastInsertId();
+        Database::query(
+            "INSERT INTO vol_shift_swap_requests (tenant_id, from_user_id, to_user_id, from_shift_id, to_shift_id, status, requires_admin_approval, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 0, NOW())",
+            [self::TENANT_ID, $requesterId, $recipientId, $fromShiftId, $toShiftId]
+        );
+        $swapId = (int) Database::getInstance()->lastInsertId();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldNotReceive('assertLocalContactAllowed');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $this->assertTrue(ShiftSwapService::respond($swapId, $recipientId, 'reject'));
+        $status = (string) Database::query(
+            'SELECT status FROM vol_shift_swap_requests WHERE id = ? AND tenant_id = ?',
+            [$swapId, self::TENANT_ID]
+        )->fetchColumn();
+        $this->assertSame('rejected', $status);
     }
 
     // ==========================================

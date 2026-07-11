@@ -7,14 +7,17 @@
 namespace Tests\Laravel\Integration;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\MarketplaceOrderService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 class MarketplaceOrderTenantEmailTest extends TestCase
@@ -67,6 +70,40 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         $this->assertSame('marketplace_order', $mailer->calls[1]['options']['category']);
         $this->assertSame(2, DB::table('notifications')->where('type', 'marketplace_order')->where('tenant_id', $marketplaceTenantId)->count());
         $this->assertSame(2, TenantContext::getId());
+    }
+
+    public function test_create_from_accepted_offer_rechecks_policy_before_order_write(): void
+    {
+        $seller = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $listingId = $this->createListing($this->testTenantId, (int) $seller->id);
+        $offerId = $this->createAcceptedOffer(
+            $this->testTenantId,
+            $listingId,
+            (int) $buyer->id,
+            (int) $seller->id,
+        );
+        $offer = MarketplaceOffer::withoutGlobalScopes()->findOrFail($offerId);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with((int) $buyer->id, (int) $seller->id, $this->testTenantId, 'marketplace_order')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            MarketplaceOrderService::createFromOffer($offer);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'tenant_id' => $this->testTenantId,
+            'marketplace_offer_id' => $offerId,
+        ]);
+        $this->assertSame('active', DB::table('marketplace_listings')->where('id', $listingId)->value('status'));
     }
 
     public function test_paid_notifications_use_order_tenant_and_auditable_payment_category(): void

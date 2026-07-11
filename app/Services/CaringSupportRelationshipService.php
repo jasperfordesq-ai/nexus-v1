@@ -96,6 +96,20 @@ class CaringSupportRelationshipService
             return ['success' => false, 'code' => 'USER_NOT_FOUND'];
         }
 
+        $interactionPolicy = app(SafeguardingInteractionPolicy::class);
+        $interactionPolicy->assertLocalContactAllowed(
+            $supporterId,
+            $recipientId,
+            $tenantId,
+            'caring_support_relationship_create',
+        );
+        $interactionPolicy->assertLocalContactAllowed(
+            $recipientId,
+            $supporterId,
+            $tenantId,
+            'caring_support_relationship_create',
+        );
+
         $frequency = $this->normaliseFrequency($input['frequency'] ?? null);
         $startDate = $this->normaliseDate($input['start_date'] ?? null) ?? date('Y-m-d');
         $expectedHours = max(0.25, min(24.0, (float) ($input['expected_hours'] ?? 1)));

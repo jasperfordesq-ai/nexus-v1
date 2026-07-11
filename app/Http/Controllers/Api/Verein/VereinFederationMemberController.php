@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Verein;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Services\Verein\VereinFederationService;
 use Illuminate\Http\JsonResponse;
@@ -78,6 +79,8 @@ class VereinFederationMemberController extends BaseApiController
                 is_string($message) ? $message : null
             );
             return $this->respondWithData($invite, null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (InvalidArgumentException | RuntimeException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
@@ -118,6 +121,8 @@ class VereinFederationMemberController extends BaseApiController
         try {
             $invite = $this->service->respondToInvitation($id, $userId, $action);
             return $this->respondWithData($invite);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (InvalidArgumentException | RuntimeException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }

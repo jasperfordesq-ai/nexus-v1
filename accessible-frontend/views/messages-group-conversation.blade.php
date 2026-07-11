@@ -10,7 +10,10 @@
         $groupName = trim((string) ($conversation['group_name'] ?? '')) !== '' ? (string) $conversation['group_name'] : __('govuk_alpha_messages.groups.untitled');
         $conversationId = (int) ($conversation['id'] ?? 0);
         $isAdmin = ($viewerRole ?? 'member') === 'admin';
-        $canSend = $directMessagingEnabled && empty($restriction['messaging_disabled']);
+        $safeguarding = $safeguarding ?? null;
+        $canSend = $directMessagingEnabled
+            && empty($restriction['messaging_disabled'])
+            && empty($safeguarding['restricted']);
         $searchQuery = trim((string) ($searchQuery ?? ''));
         $reactions = $reactions ?? [];
         $reactionEmojis = $reactionEmojis ?? [];
@@ -48,6 +51,15 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-body">{{ __('govuk_alpha.messages.restricted_detail') }}</p>
+            </div>
+        </div>
+    @elseif (!empty($safeguarding['restricted']))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="group-conv-safeguarding-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="group-conv-safeguarding-title">{{ $safeguarding['title'] ?? __('safeguarding.errors.contact_restricted_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-body">{{ $safeguarding['detail'] ?? $safeguarding['message'] ?? __('safeguarding.errors.contact_restricted') }}</p>
             </div>
         </div>
     @endif

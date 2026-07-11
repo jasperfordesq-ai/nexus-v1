@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Support\CsvExportSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -89,7 +90,11 @@ class VolunteerCommunityController extends BaseApiController
             }
         }
 
-        $entryId = $this->shiftWaitlistService->join((int) $id, $userId);
+        try {
+            $entryId = $this->shiftWaitlistService->join((int) $id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if ($entryId === null) {
             $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -135,7 +140,11 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.vol_waitlist_not_found'), null, 404);
         }
 
-        $success = $this->shiftWaitlistService->promoteUser((int) $entry->id, $tenantId);
+        try {
+            $success = $this->shiftWaitlistService->promoteUser((int) $entry->id, $tenantId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -170,7 +179,11 @@ class VolunteerCommunityController extends BaseApiController
             'message'       => trim($this->input('message', '')),
         ];
 
-        $swapId = $this->shiftSwapService->requestSwap($userId, $data);
+        try {
+            $swapId = $this->shiftSwapService->requestSwap($userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if ($swapId === null) {
             $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -199,7 +212,11 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.vol_action_accept_reject'), 'action', 400);
         }
 
-        $success = $this->shiftSwapService->respond((int) $id, $userId, $action);
+        try {
+            $success = $this->shiftSwapService->respond((int) $id, $userId, $action);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -256,7 +273,11 @@ class VolunteerCommunityController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.vol_action_approve_reject'), 'action', 400);
         }
 
-        $success = $this->shiftSwapService->adminDecision((int) $id, $adminId, $action);
+        try {
+            $success = $this->shiftSwapService->adminDecision((int) $id, $adminId, $action);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -297,7 +318,11 @@ class VolunteerCommunityController extends BaseApiController
         $memberUserId = $this->inputInt('user_id');
         if (!$memberUserId) return $this->respondWithError('VALIDATION_ERROR', __('api.vol_user_id_required'), 'user_id', 400);
 
-        $success = $this->shiftGroupReservationService->addMember((int) $id, $memberUserId, $leaderId);
+        try {
+            $success = $this->shiftGroupReservationService->addMember((int) $id, $memberUserId, $leaderId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (!$success) {
             $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
@@ -654,7 +679,11 @@ class VolunteerCommunityController extends BaseApiController
 
         $data = $this->getAllInput();
         $tenantId = TenantContext::getId();
-        $result = $this->communityProjectService->support((int) $id, $userId, $tenantId);
+        try {
+            $result = $this->communityProjectService->support((int) $id, $userId, $tenantId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         return $this->respondWithData(['success' => $result]);
     }
 

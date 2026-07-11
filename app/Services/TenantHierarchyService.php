@@ -816,8 +816,9 @@ class TenantHierarchyService
      */
     private static function seedTenantDefaults(int $tenantId): void
     {
-        // Re-read the tenant row so we can derive the country preset without
-        // threading extra arguments through the call chain.
+        // Re-read the tenant row for compatibility with the provisioning shape.
+        // Safeguarding jurisdiction is always a separate explicit decision;
+        // country code never chooses a criminal-record checking regime.
         $tenant = DB::table('tenants')->where('id', $tenantId)->first();
         $countryCode = strtoupper((string) ($tenant->country_code ?? ''));
         $presetKey = self::mapCountryCodeToPreset($countryCode);
@@ -826,10 +827,10 @@ class TenantHierarchyService
         //    admin_approval=true and email_verification=true ensure new signups
         //    require admin review and verified email — secure by default.
         //
-        //    Safeguarding is ON by default — every new community gets the step
-        //    enabled and the matching country preset auto-applied below, so that
-        //    vulnerable-adult self-declarations and vetting needs surface in the
-        //    wizard from day one.
+        //    The optional safeguarding step is available by default, but its
+        //    jurisdiction preset remains custom until an administrator makes an
+        //    explicit choice. Country alone never selects a police-checking
+        //    regime.
         $defaultSettings = [
             ['tenant_id' => $tenantId, 'setting_key' => 'general.registration_mode', 'setting_value' => 'open', 'setting_type' => 'string'],
             // Bare key — matches what TenantSettingsService::requiresAdminApproval()
@@ -854,8 +855,8 @@ class TenantHierarchyService
             DB::table('tenant_settings')->insertOrIgnore($setting);
         }
 
-        // Auto-apply country preset (seeds tenant_safeguarding_options rows).
-        // applyCountryPreset uses insert-if-not-exists, so re-runs are safe.
+        // A preset is applied only after an administrator explicitly selects a
+        // safeguarding jurisdiction. New tenants therefore remain custom here.
         if ($presetKey !== 'custom') {
             try {
                 SafeguardingPreferenceService::applyCountryPreset($tenantId, $presetKey);
@@ -944,16 +945,11 @@ class TenantHierarchyService
     }
 
     /**
-     * Map an ISO-3166 alpha-2 country code to the matching safeguarding preset.
-     * Unrecognised / empty codes fall back to 'custom' (no preset applied).
+     * Country code must never imply a safeguarding jurisdiction.
      */
     private static function mapCountryCodeToPreset(string $countryCode): string
     {
-        return match ($countryCode) {
-            'IE' => 'ireland',
-            'GB', 'UK' => 'england_wales',
-            default => 'custom',
-        };
+        return 'custom';
     }
 
     /**

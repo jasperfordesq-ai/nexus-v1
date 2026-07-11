@@ -59,6 +59,13 @@ class MarketplaceRatingService
             // Determine the ratee
             $rateeId = ($role === 'buyer') ? $order->seller_id : $order->buyer_id;
 
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $raterId,
+                (int) $rateeId,
+                $tenantId,
+                'marketplace_order_rating',
+            );
+
             // Check for existing rating
             $existingRating = MarketplaceSellerRating::where('order_id', $orderId)
                 ->where('rater_role', $role)

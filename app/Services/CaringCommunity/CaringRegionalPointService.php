@@ -475,6 +475,12 @@ class CaringRegionalPointService
         $points = $this->normalisePoints($points);
         $this->assertTenantUser($tenantId, $senderId);
         $this->assertTenantUser($tenantId, $recipientId);
+        app(\App\Services\SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $senderId,
+            $recipientId,
+            $tenantId,
+            'caring_regional_point_transfer',
+        );
 
         return DB::transaction(function () use ($tenantId, $senderId, $recipientId, $points, $message): array {
             $this->ensureAccount($tenantId, $senderId);

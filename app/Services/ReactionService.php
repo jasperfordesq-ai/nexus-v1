@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Support\FeedItemTables;
 use Illuminate\Support\Facades\DB;
 
@@ -100,6 +101,8 @@ class ReactionService
                     return ['removed', null];
                 }
 
+                $this->assertReactionContactAllowed($entityType, $entityId, $userId, $tenantId);
+
                 // Different type: update
                 DB::table('reactions')
                     ->where('id', $existing->id)
@@ -111,6 +114,8 @@ class ReactionService
 
                 return ['updated', $reactionType];
             }
+
+            $this->assertReactionContactAllowed($entityType, $entityId, $userId, $tenantId);
 
             // No existing reaction: insert
             DB::table('reactions')->insert([
@@ -133,6 +138,37 @@ class ReactionService
             'reaction_type' => $resultType,
             'reactions' => $reactions,
         ];
+    }
+
+    /**
+     * Reactions are directed contact because they are stored against a
+     * member-authored item and notify that member. Removal is handled before
+     * this assertion so a member can always withdraw an existing reaction.
+     */
+    private function assertReactionContactAllowed(
+        string $entityType,
+        int $entityId,
+        int $senderId,
+        int $tenantId,
+    ): void {
+        $ownerId = SocialNotificationService::getContentOwnerId($entityType, $entityId);
+        if ($ownerId === null || $ownerId <= 0) {
+            throw new SafeguardingPolicyException(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+            );
+        }
+
+        if ($ownerId === $senderId) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $senderId,
+            $ownerId,
+            $tenantId,
+            'reaction',
+        );
     }
 
     /**

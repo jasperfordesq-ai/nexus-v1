@@ -260,37 +260,45 @@ class GroupSSOService
             return;
         }
 
-        $now = now()->format('Y-m-d H:i:s');
+        DB::transaction(function () use ($mappings, $tenantId, $userId): void {
+            $now = now()->format('Y-m-d H:i:s');
 
-        foreach ($mappings as $mapping) {
-            $groupId = (int) $mapping->group_id;
+            foreach ($mappings as $mapping) {
+                $groupId = (int) $mapping->group_id;
 
-            // Verify the group exists and is active in this tenant
-            $group = DB::selectOne(
-                "SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? AND is_active = 1",
-                [$groupId, $tenantId]
-            );
+                // Verify the group exists and is active in this tenant
+                $group = DB::selectOne(
+                    "SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? AND is_active = 1",
+                    [$groupId, $tenantId]
+                );
 
-            if (!$group) {
-                continue;
+                if (!$group) {
+                    continue;
+                }
+
+                // Check if user is already a member
+                $existing = DB::selectOne(
+                    "SELECT id FROM group_members WHERE group_id = ? AND user_id = ? AND tenant_id = ?",
+                    [$groupId, $userId, $tenantId]
+                );
+
+                if ($existing) {
+                    continue;
+                }
+
+                GroupService::assertSafeguardingCohortAllowed(
+                    $groupId,
+                    $userId,
+                    (int) $tenantId,
+                    'group_sso_assignment',
+                );
+
+                DB::insert(
+                    "INSERT INTO group_members (tenant_id, group_id, user_id, role, status, joined_at, created_at, updated_at)
+                     VALUES (?, ?, ?, 'member', 'active', ?, ?, ?)",
+                    [$tenantId, $groupId, $userId, $now, $now, $now]
+                );
             }
-
-            // Check if user is already a member
-            $existing = DB::selectOne(
-                "SELECT id FROM group_members WHERE group_id = ? AND user_id = ? AND tenant_id = ?",
-                [$groupId, $userId, $tenantId]
-            );
-
-            if ($existing) {
-                continue;
-            }
-
-            // Add user to group
-            DB::insert(
-                "INSERT INTO group_members (tenant_id, group_id, user_id, role, status, joined_at, created_at, updated_at)
-                 VALUES (?, ?, ?, 'member', 'active', ?, ?, ?)",
-                [$tenantId, $groupId, $userId, $now, $now, $now]
-            );
-        }
+        });
     }
 }

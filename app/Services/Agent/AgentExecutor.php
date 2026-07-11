@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services\Agent;
 
 use App\Services\FCMPushService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -101,16 +102,12 @@ final class AgentExecutor
             throw new \RuntimeException("Proposal {$proposalId} is not pending review");
         }
 
-        DB::table('agent_proposals')->where('id', $proposalId)->update([
-            'proposal_data' => json_encode($editedPayload),
-            'updated_at'    => now(),
-        ]);
-
-        // Refresh proposal with edited data
+        // Dispatch first so a safeguarding denial leaves the proposal untouched.
         $proposal['proposal_data'] = $editedPayload;
         self::dispatchAction((string) $proposal['proposal_type'], $editedPayload, $proposal, $tenantId);
 
         DB::table('agent_proposals')->where('id', $proposalId)->update([
+            'proposal_data' => json_encode($editedPayload),
             'status'      => 'approved',
             'reviewer_id' => $reviewerId,
             'reviewed_at' => now(),
@@ -169,6 +166,20 @@ final class AgentExecutor
                     ->where('recipient_id', $recipientId)
                     ->exists();
                 if (!$exists) {
+                    $interactionPolicy = app(SafeguardingInteractionPolicy::class);
+                    $interactionPolicy->assertLocalContactAllowed(
+                        $supporterId,
+                        $recipientId,
+                        $tenantId,
+                        'agent_tandem_approval',
+                    );
+                    $interactionPolicy->assertLocalContactAllowed(
+                        $recipientId,
+                        $supporterId,
+                        $tenantId,
+                        'agent_tandem_approval',
+                    );
+
                     // `caring_support_relationships` requires NOT NULL `title` and
                     // `start_date` (neither has a DB default). The original insert
                     // omitted both, so the row was either rejected (strict mode) or

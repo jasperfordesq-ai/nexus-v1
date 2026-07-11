@@ -62,11 +62,8 @@ class TenantDefaultsSeeder
     /**
      * Seed the canonical member-attribute set (offer/request filters).
      *
-     * Mirrors the set every healthy tenant shares (tenant 2 'hour-timebank'
-     * and all later test tenants carry exactly these nine). The one
-     * Ireland-specific legacy term ("Garda Vetted") is replaced with the
-     * globally-neutral "Background Checked" to honour the platform's
-     * global-platform / no-locale-specific-defaults rule.
+     * Vetting/police-check attributes are deliberately absent: member-selected
+     * listing attributes must never imply a broker-confirmed safeguarding state.
      *
      * Idempotent via the (tenant_id, name, target_type) unique key.
      */
@@ -74,8 +71,7 @@ class TenantDefaultsSeeder
     {
         // [name, target_type] — all checkbox, all active.
         $attributes = [
-            // Offer-side trust/capability signals
-            ['Background Checked', 'offer'],
+            // Offer-side capability signals
             ['Tools Provided', 'offer'],
             ['Materials Provided', 'offer'],
             ['References Available', 'offer'],

@@ -431,9 +431,9 @@ export default function ExchangeDetail() {
                 </Chip>
               )}
               {risk_tag.dbs_required && (
-                <Chip size="sm" variant="soft" color="warning">
+                <Chip size="sm" variant="soft" color="danger">
                   <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-                  <Chip.Label>{t('exchanges.detail_dbs_required')}</Chip.Label>
+                  <Chip.Label>{t('exchanges.legacy_role_vetting_unavailable')}</Chip.Label>
                 </Chip>
               )}
             </div>

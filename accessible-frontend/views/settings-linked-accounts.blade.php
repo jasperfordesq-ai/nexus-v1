@@ -10,6 +10,10 @@
         $errorStates = [
             'link-email-invalid', 'link-user-not-found', 'link-self', 'link-exists',
             'link-max', 'link-failed', 'appearance-invalid', 'appearance-failed',
+            'link-vetting-required', 'link-contact-restricted', 'link-safeguarding-unavailable',
+        ];
+        $safeguardingErrorStates = [
+            'link-vetting-required', 'link-contact-restricted', 'link-safeguarding-unavailable',
         ];
         $linkTypes = $linkTypes ?? [];
         $permissionKeys = $permissionKeys ?? [];
@@ -36,7 +40,13 @@
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_settings.common.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
                             <ul class="govuk-list govuk-error-summary__list">
-                                <li><a href="#request">{{ __('govuk_alpha_settings.states.' . $status) }}</a></li>
+                                <li><a href="#request">{{ in_array($status, $safeguardingErrorStates, true)
+                                    ? (session('linked_account_safeguarding_error') ?: match ($status) {
+                                        'link-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                                        'link-vetting-required' => __('safeguarding.errors.vetting_required_title'),
+                                        default => __('safeguarding.errors.contact_restricted'),
+                                    })
+                                    : __('govuk_alpha_settings.states.' . $status) }}</a></li>
                             </ul>
                         </div>
                     </div>

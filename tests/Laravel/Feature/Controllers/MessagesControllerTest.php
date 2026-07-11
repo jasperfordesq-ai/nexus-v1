@@ -41,6 +41,21 @@ class MessagesControllerTest extends TestCase
 
     private function createSafeguardingOption(array $triggers, string $optionKey): int
     {
+        if (($triggers['vetting_type_required'] ?? null) === 'dbs_enhanced') {
+            DB::table('tenant_safeguarding_settings')->updateOrInsert(
+                ['tenant_id' => $this->testTenantId],
+                [
+                    'jurisdiction' => 'england_wales',
+                    'policy_version' => 'safeguarded-contact-v1:test',
+                    'configured_by' => null,
+                    'configured_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            );
+            app(\App\Services\SafeguardingJurisdictionService::class)->forget($this->testTenantId);
+        }
+
         return DB::table('tenant_safeguarding_options')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'option_key' => $optionKey . '_' . uniqid(),
@@ -164,10 +179,10 @@ class MessagesControllerTest extends TestCase
             'body' => 'Hello, can we arrange a time?',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
         $response->assertJsonPath('errors.0.required_vetting_types.0', 'dbs_enhanced');
-        $response->assertJsonPath('errors.0.required_vetting_labels.0', 'DBS Enhanced');
+        $response->assertJsonPath('errors.0.required_vetting_labels.0', 'Enhanced DBS');
         $this->assertStringContainsString('community safeguarding rule', $response->json('errors.0.message'));
         $this->assertStringNotContainsString('safeguarding.errors.vetting_required', $response->json('errors.0.message'));
         $this->assertDatabaseMissing('messages', [
@@ -198,7 +213,7 @@ class MessagesControllerTest extends TestCase
             'body' => 'Hello, can we arrange a time?',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(403);
 
         Event::assertDispatched(
             SafeguardingContactAttemptBlocked::class,
@@ -231,7 +246,7 @@ class MessagesControllerTest extends TestCase
             'body' => 'Hello, can we arrange a time?',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'SAFEGUARDING_CONTACT_RESTRICTED');
         $this->assertStringContainsString('coordinator', $response->json('errors.0.message'));
         $this->assertStringNotContainsString('safeguarding.errors.contact_restricted', $response->json('errors.0.message'));
@@ -304,7 +319,7 @@ class MessagesControllerTest extends TestCase
         $response->assertJsonPath('meta.conversation.safeguarding.restricted', true);
         $response->assertJsonPath('meta.conversation.safeguarding.code', 'VETTING_REQUIRED');
         $response->assertJsonPath('meta.conversation.safeguarding.required_vetting_types.0', 'dbs_enhanced');
-        $response->assertJsonPath('meta.conversation.safeguarding.required_vetting_labels.0', 'DBS Enhanced');
+        $response->assertJsonPath('meta.conversation.safeguarding.required_vetting_labels.0', 'Enhanced DBS');
 
         Event::assertNotDispatched(SafeguardingContactAttemptBlocked::class);
         Event::assertNotDispatched(SafeguardingCoordinationRequested::class);
@@ -418,15 +433,22 @@ class MessagesControllerTest extends TestCase
         ], 'vetted_interaction_allowed');
         $this->selectSafeguardingOptionForUser($recipient, $optionId);
 
-        DB::table('vetting_records')->insert([
+        $broker = User::factory()->forTenant($this->testTenantId)->create([
+            'role' => 'broker',
+            'status' => 'active',
+        ]);
+        DB::table('member_vetting_attestations')->insert([
             'tenant_id' => $this->testTenantId,
             'user_id' => $sender->id,
-            'vetting_type' => 'dbs_enhanced',
-            'status' => 'verified',
-            'reference_number' => 'TEST-DBS-1',
-            'issue_date' => now()->subMonth()->toDateString(),
-            'expiry_date' => now()->addYear()->toDateString(),
-            'verified_at' => now(),
+            'scheme_code' => 'dbs_england_wales',
+            'attestation_code' => 'dbs_enhanced',
+            'purpose_code' => 'safeguarded_member_contact',
+            'scope_type' => 'tenant',
+            'scope_identifier' => '',
+            'decision' => 'confirmed',
+            'confirmed_by' => $broker->id,
+            'confirmed_at' => now(),
+            'policy_version' => 'safeguarded-contact-v1:test',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -662,6 +684,34 @@ class MessagesControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [401, 403]);
     }
 
+    public function test_edit_message_rechecks_vetting_gate_before_changing_existing_content(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Original text',
+            'created_at' => now(),
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'edit_vetted_interaction');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPut("/v2/messages/{$messageId}", ['body' => 'Changed text']);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $this->assertDatabaseHas('messages', [
+            'id' => $messageId,
+            'body' => 'Original text',
+        ]);
+    }
+
     // ================================================================
     // DELETE MESSAGE — Authentication required
     // ================================================================
@@ -704,6 +754,72 @@ class MessagesControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    public function test_toggle_reaction_blocks_a_new_contact_signal_when_vetting_is_missing(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Before safeguarding preference',
+            'created_at' => now(),
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'reaction_vetted_interaction');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost("/v2/messages/{$messageId}/reactions", ['emoji' => '👍']);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $this->assertDatabaseMissing('message_reactions', [
+            'tenant_id' => $this->testTenantId,
+            'message_id' => $messageId,
+            'user_id' => $sender->id,
+            'emoji' => '👍',
+        ]);
+    }
+
+    public function test_toggle_reaction_allows_withdrawing_an_existing_reaction_after_gate_closes(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Before safeguarding preference',
+            'created_at' => now(),
+        ]);
+        DB::table('message_reactions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'message_id' => $messageId,
+            'user_id' => $sender->id,
+            'emoji' => '👍',
+            'created_at' => now(),
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'reaction_withdrawal');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost("/v2/messages/{$messageId}/reactions", ['emoji' => '👍']);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.action', 'removed');
+        $this->assertDatabaseMissing('message_reactions', [
+            'message_id' => $messageId,
+            'user_id' => $sender->id,
+            'emoji' => '👍',
+        ]);
     }
 
     // ================================================================

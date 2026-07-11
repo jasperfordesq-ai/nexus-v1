@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupChallengeService;
 use App\Services\GroupService;
@@ -43,7 +44,11 @@ class GroupChallengeController extends BaseApiController
             return $this->errorResponse(__('api.group_challenge_required_fields'), 400);
         }
 
-        $challengeId = GroupChallengeService::create($id, $userId, $data);
+        try {
+            $challengeId = GroupChallengeService::create($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         return $this->successResponse(['id' => $challengeId], 201);
     }
 

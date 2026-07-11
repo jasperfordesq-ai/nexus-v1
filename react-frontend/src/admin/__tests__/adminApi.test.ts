@@ -639,9 +639,11 @@ describe('adminApi', () => {
       expect(mockGet).toHaveBeenCalledWith('/v2/admin/vetting');
     });
 
-    it('verify calls POST', async () => {
-      await adminVetting.verify(5);
-      expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/5/verify');
+    it('confirm sends the metadata-only acknowledgement', async () => {
+      await adminVetting.confirm(5);
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/vetting/user/5/confirm', {
+        acknowledgement: true,
+      });
     });
   });
 

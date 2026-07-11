@@ -21,6 +21,7 @@ const STATUS_COLOR: Record<string, ChipColor> = {
   active: 'success',
   approved: 'success',
   verified: 'success',
+  confirmed: 'success',
   completed: 'success',
   accepted: 'success',
   reviewed: 'success',
@@ -31,6 +32,7 @@ const STATUS_COLOR: Record<string, ChipColor> = {
   pending_broker: 'warning',
   pending_provider: 'warning',
   pending_confirmation: 'warning',
+  review_requested: 'warning',
   in_progress: 'accent',
   // problems
   rejected: 'danger',
@@ -47,6 +49,7 @@ const STATUS_COLOR: Record<string, ChipColor> = {
   // dormant
   inactive: 'default',
   cancelled: 'default',
+  not_confirmed: 'default',
 };
 
 export function brokerStatusColor(status: string): ChipColor {

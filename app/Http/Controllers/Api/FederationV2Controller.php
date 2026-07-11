@@ -23,6 +23,8 @@ use App\Services\FederationAuditService;
 use App\Services\FederationFeatureService;
 use App\Services\FederationPartnershipService;
 use App\Services\FederationSearchService;
+use App\Services\MessageService;
+use App\Services\SafeguardingInteractionPolicy;
 
 /**
  * FederationV2Controller -- Federation v2: cross-tenant discovery, messaging, connections.
@@ -2390,6 +2392,32 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('MESSAGING_NOT_ALLOWED', __('api.fed_messaging_not_allowed'), null, 403);
             }
 
+            // The recipient tenant is authoritative for safeguarding. Until a
+            // signed cross-tenant attestation contract exists, protected
+            // recipients are routed to coordinator handling rather than being
+            // reachable through federation.
+            $safeguardingDecision = app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                $userId,
+                $tenantId,
+                (int) $receiverId,
+                (int) $receiverTenantId,
+                'federated_message',
+            );
+            if (! $safeguardingDecision->isAllowed()) {
+                $error = MessageService::buildSafeguardingError([
+                    'code' => $safeguardingDecision->code,
+                    'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                    'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+                ]);
+
+                return $this->respondWithError(
+                    $safeguardingDecision->code,
+                    (string) $error['message'],
+                    null,
+                    $safeguardingDecision->isUnavailable() ? 503 : 403,
+                );
+            }
+
             // Get sender info
             $senderRow = DB::selectOne("
                 SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
@@ -2632,6 +2660,24 @@ class FederationV2Controller extends BaseApiController
         }
 
         if (!($result['success'] ?? false)) {
+            $remoteStatus = (int) ($result['status_code'] ?? 0);
+            if ($remoteStatus === 403) {
+                return $this->respondWithError(
+                    'SAFEGUARDING_CONTACT_RESTRICTED',
+                    __('safeguarding.errors.contact_restricted'),
+                    null,
+                    403,
+                );
+            }
+            if ($remoteStatus === 503) {
+                return $this->respondWithError(
+                    'SAFEGUARDING_POLICY_UNAVAILABLE',
+                    __('safeguarding.errors.policy_unavailable'),
+                    null,
+                    503,
+                );
+            }
+
             \Illuminate\Support\Facades\Log::warning('FederationV2::sendExternalMessage rejected by partner', [
                 'partner_id' => $externalPartnerId,
                 'status_code' => $result['status_code'] ?? null,
@@ -3045,7 +3091,12 @@ class FederationV2Controller extends BaseApiController
         $result = $this->federatedConnectionService->sendRequest($userId, $receiverId, $receiverTenantId, $message);
 
         if (!$result['success']) {
-            return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
+            $code = (string) ($result['error_code'] ?? 'CONNECTION_ERROR');
+            $status = $code === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 503
+                : (in_array($code, ['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED'], true) ? 403 : 400);
+
+            return $this->respondWithError($code, $result['error'], null, $status);
         }
 
         return $this->respondWithData($result, null, 201);
@@ -3062,7 +3113,12 @@ class FederationV2Controller extends BaseApiController
         $result = $this->federatedConnectionService->acceptRequest($id, $userId);
 
         if (!$result['success']) {
-            return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
+            $code = (string) ($result['error_code'] ?? 'CONNECTION_ERROR');
+            $status = $code === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 503
+                : (in_array($code, ['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED'], true) ? 403 : 400);
+
+            return $this->respondWithError($code, $result['error'], null, $status);
         }
 
         return $this->respondWithData($result);
@@ -3228,6 +3284,30 @@ class FederationV2Controller extends BaseApiController
             $partnership = $this->federationPartnershipService->getPartnership($tenantId, $receiverTenantIdInt);
             if (!$partnership || $partnership['status'] !== 'active' || !($partnership['transactions_enabled'] ?? false)) {
                 return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partnership_no_transactions'), null, 403);
+            }
+
+            $safeguardingDecision = app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                $userId,
+                $tenantId,
+                $receiverIdInt,
+                $receiverTenantIdInt,
+                'federated_transaction',
+            );
+            if (! $safeguardingDecision->isAllowed()) {
+                $error = MessageService::buildSafeguardingError([
+                    'status' => $safeguardingDecision->status,
+                    'code' => $safeguardingDecision->code,
+                    'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                    'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+                    'can_request_coordinator' => $safeguardingDecision->canRequestCoordinator,
+                ]);
+
+                return $this->respondWithError(
+                    $safeguardingDecision->code,
+                    (string) $error['message'],
+                    null,
+                    $safeguardingDecision->isUnavailable() ? 503 : 403,
+                );
             }
 
             // Idempotency / anti-double-submit guard (H6): a client double-submit
@@ -3422,6 +3502,19 @@ class FederationV2Controller extends BaseApiController
         }
         if (!($partner['allow_transactions'] ?? false)) {
             return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partner_no_transactions'), null, 403);
+        }
+
+        // A remote recipient's community is authoritative for its contact
+        // policy. Until the partner supplies a signed, supported safeguarding
+        // trust contract, do not send a member identity and free-text transfer
+        // description to an unverifiable recipient.
+        if (! ($partner['safeguarding_attestation_contract'] ?? false)) {
+            return $this->respondWithError(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+                null,
+                503,
+            );
         }
 
         $idem = $this->claimTransactionIdempotency($tenantId, $userId, $realReceiverId, $receiverTenantStr, $amount, $description);

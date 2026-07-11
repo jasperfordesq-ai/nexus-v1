@@ -402,11 +402,27 @@ class StoryService
                 return;
             }
             // Different reaction — update in place
+            if ((int) $story->user_id !== $userId) {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $story->user_id,
+                    (int) $tenantId,
+                    'story_reaction',
+                );
+            }
             DB::update(
                 'UPDATE story_reactions SET reaction_type = ?, created_at = NOW() WHERE id = ? AND tenant_id = ?',
                 [$reactionType, $existing->id, $tenantId]
             );
         } else {
+            if ((int) $story->user_id !== $userId) {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $story->user_id,
+                    (int) $tenantId,
+                    'story_reaction',
+                );
+            }
             DB::insert(
                 'INSERT INTO story_reactions (tenant_id, story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, ?, NOW())',
                 [$tenantId, $storyId, $userId, $reactionType]
@@ -493,7 +509,7 @@ class StoryService
         $tenantId = TenantContext::getId();
 
         $story = DB::selectOne(
-            'SELECT id, media_type, poll_options FROM stories WHERE id = ? AND tenant_id = ? AND is_active = 1 AND expires_at > NOW()',
+            'SELECT id, user_id, media_type, poll_options FROM stories WHERE id = ? AND tenant_id = ? AND is_active = 1 AND expires_at > NOW()',
             [$storyId, $tenantId]
         );
 
@@ -514,7 +530,7 @@ class StoryService
         // to prevent a race condition where two concurrent requests both pass the
         // "already voted" check and both insert (violating the uk_story_poll_vote constraint).
         $alreadyVoted = false;
-        DB::transaction(function () use ($storyId, $userId, $optionIndex, $tenantId, &$alreadyVoted) {
+        DB::transaction(function () use ($storyId, $story, $userId, $optionIndex, $tenantId, &$alreadyVoted) {
             $existing = DB::selectOne(
                 'SELECT id FROM story_poll_votes WHERE story_id = ? AND user_id = ?',
                 [$storyId, $userId]
@@ -523,6 +539,15 @@ class StoryService
             if ($existing) {
                 $alreadyVoted = true;
                 return;
+            }
+
+            if ((int) $story->user_id !== $userId) {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $userId,
+                    (int) $story->user_id,
+                    (int) $tenantId,
+                    'story_poll_vote',
+                );
             }
 
             DB::table('story_poll_votes')->insertOrIgnore([
@@ -871,10 +896,6 @@ class StoryService
             'context_type' => 'story',
             'context_id' => $storyId,
         ]);
-
-        if (isset($message['error'])) {
-            throw new \RuntimeException($message['error']);
-        }
 
         return $message;
     }

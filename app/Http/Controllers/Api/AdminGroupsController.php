@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\GeocodingService;
 use App\Services\GroupPolicyRepository;
 use App\Services\GroupService;
@@ -254,6 +255,13 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
+            GroupService::assertSafeguardingCohortAllowed(
+                (int) $membership->group_id,
+                (int) $membership->user_id,
+                (int) $tenantId,
+                'admin_group_member_approval',
+            );
+
             DB::update(
                 "UPDATE group_members SET status = 'active', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
                 [(int) $id, $tenantId]
@@ -296,6 +304,8 @@ class AdminGroupsController extends BaseApiController
             }
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'active']);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
             return $this->respondWithError('GROUPS_APPROVE_ERROR', __('api.approve_failed', ['resource' => 'membership']), null, 500);
         }
@@ -1266,7 +1276,11 @@ class AdminGroupsController extends BaseApiController
             return $this->errorResponse('target_group_id required', 400);
         }
 
-        $success = \App\Services\GroupLifecycleService::mergeGroups($id, $targetGroupId, $userId);
+        try {
+            $success = \App\Services\GroupLifecycleService::mergeGroups($id, $targetGroupId, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.groups_merged')])
@@ -1286,7 +1300,11 @@ class AdminGroupsController extends BaseApiController
         }
 
         $cloneMembers = (bool) request()->input('clone_members', false);
-        $newGroupId = \App\Services\GroupLifecycleService::cloneGroup($id, $newName, $userId, $cloneMembers);
+        try {
+            $newGroupId = \App\Services\GroupLifecycleService::cloneGroup($id, $newName, $userId, $cloneMembers);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         return $newGroupId
             ? $this->successResponse(['id' => $newGroupId, 'message' => __('api_controllers_1.admin_groups.group_cloned')])

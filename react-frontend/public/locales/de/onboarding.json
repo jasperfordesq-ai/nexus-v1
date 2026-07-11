@@ -116,7 +116,7 @@
       "who_can_see_heading": "Wer kann das sehen?",
       "who_can_see_body": "Nur die Community-Koordinatoren und Administratoren können diese Einstellungen sehen. Andere Mitglieder können das nicht. Alle Zugriffe werden protokolliert.",
       "what_activates_heading": "Was dadurch aktiviert wird",
-      "activation_broker_review": "Ein Koordinator überprüft die von Ihnen gesendeten und empfangenen Nachrichten.",
+      "activation_broker_review": "Eine Koordinationsperson prüft und genehmigt geschützte Zuordnungen oder Austausche, wenn Ihre Auswahl dies verlangt. Sie erhält dadurch keinen Zugriff auf Nachrichteninhalte.",
       "activation_match_approval": "Ein Koordinator genehmigt Spiele, an denen Sie beteiligt sind, bevor sie dem anderen Mitglied vorgeschlagen werden.",
       "activation_discovery_hidden": "Für Mitglieder, die die erforderliche Überprüfung nicht abgeschlossen haben, werden Sie nicht entdeckt.",
       "activation_notification": "Ein Koordinator wurde benachrichtigt und wird sich mit Ihnen in Verbindung setzen, um zu besprechen, wie wir helfen können.",

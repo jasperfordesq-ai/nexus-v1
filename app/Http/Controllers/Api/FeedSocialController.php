@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\FeedService;
@@ -111,6 +112,8 @@ class FeedSocialController extends BaseApiController
             $result = $this->shareService->toggle($userId, $type, $id, $comment);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('INVALID_INPUT', __('api.invalid_shareable_type'), null, 422);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('NOT_FOUND', __('api.post_not_found'), null, 404);
         } catch (\DomainException $e) {

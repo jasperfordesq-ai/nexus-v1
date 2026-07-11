@@ -9,6 +9,8 @@
   "send": "Invia",
   "you": "Lei",
   "unread": "{{count}} non letti",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Le Sue conversazioni con i membri della comunità",
   "disabled_title": "Messaggistica Diretta Disabilitata",
   "disabled_subtitle": "La messaggistica diretta non è abilitata per questa comunità. Per organizzare i servizi, utilizzi il sistema di richieste di scambio.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Caricamento dei messaggi più vecchi",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Controllo di tutela necessario",
     "body": "Questa conversazione e in pausa perche una regola di tutela della comunita richiede una verifica approvata prima che tu possa inviare messaggi a questo membro.",
@@ -226,6 +226,13 @@
     "action": "Apri aiuto",
     "dismiss": "Chiudi avviso di tutela"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Controllo di salvaguardia temporaneamente non disponibile",
+    "body": "La messaggistica diretta è sospesa perché non è stato possibile controllare in modo sicuro la politica di salvaguardia della comunità.",
+    "contact_broker": "Ricontrolla a breve. Se il problema persiste, chiedi aiuto a un coordinatore della comunità.",
+    "action": "Ricontrollare",
+    "dismiss": "Respingere l'avviso di salvaguardia"
+  },
   "coordinator_request": {
     "button": "Richiedi l'aiuto di un coordinatore",
     "aria_button": "Richiedi l'aiuto di un coordinatore per organizzare il contatto",
@@ -234,11 +241,26 @@
     "sent": "Coordinatore avvisato — ti contatterà per aiutarti a organizzare il contatto.",
     "error": "Non è stato possibile inviare la tua richiesta in questo momento. Riprova tra poco."
   },
+  "vetting_review_request": {
+    "button": "Richiedi una revisione del controllo",
+    "success_title": "Richiesta revisione",
+    "success_body": "Al tuo broker della community è stato chiesto di rivedere la tua conferma di salvaguardia privata.",
+    "sent": "Richiesta revisione del controllo. La tua comunità ti contatterà riguardo al suo processo.",
+    "error": "Non potremmo richiedere una revisione di controllo in questo momento. Per favore riprova a breve."
+  },
+  "safeguarding_check_again": "Ricontrollare",
+  "safeguarding_checks": {
+    "dbs_enhanced": "DBS avanzato (Inghilterra e Galles)",
+    "pvg_scotland": "Schema PVG",
+    "access_ni": "AccessoNI (Irlanda del Nord)",
+    "garda_vetting": "Controllo del Garda"
+  },
   "composer_blocked_safeguarding": "La messaggistica diretta non è disponibile con questo membro. Usa l'opzione qui sopra per chiedere a un coordinatore di aiutarti a organizzare il contatto.",
-  "aria_conversation_unread_many": "Conversazione con {{name}}, {{count}} non letti",
+  "composer_blocked_safeguarding_unavailable": "La messaggistica diretta viene sospesa mentre viene verificata la politica di salvaguardia. Utilizzare Controlla di nuovo sopra.",
   "aria_conversation_unread_one": "Conversazione con {{name}}, {{count}} non letti",
   "aria_conversation_unread_other": "Conversazione con {{name}}, {{count}} non letti",
-  "selected_members_many": "Selezionati ({{count}})",
   "selected_members_one": "Selezionati ({{count}})",
-  "selected_members_other": "Selezionati ({{count}})"
+  "selected_members_other": "Selezionati ({{count}})",
+  "aria_conversation_unread_many": "Conversazione con {{name}}, {{count}} non letti",
+  "selected_members_many": "Selezionati ({{count}})"
 }

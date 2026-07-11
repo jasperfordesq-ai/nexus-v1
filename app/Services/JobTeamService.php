@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\JobVacancy;
 use App\Models\JobVacancyTeam;
@@ -37,6 +38,20 @@ class JobTeamService
                 return false;
             }
 
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $ownerUserId,
+                $targetUserId,
+                $tenantId,
+                'job_hiring_team_add',
+            );
+            $policy->assertLocalContactAllowed(
+                $targetUserId,
+                $ownerUserId,
+                $tenantId,
+                'job_hiring_team_add',
+            );
+
             $member = JobVacancyTeam::updateOrCreate(
                 ['vacancy_id' => $vacancyId, 'user_id' => $targetUserId],
                 [
@@ -66,6 +81,8 @@ class JobTeamService
             }
 
             return $member->toArray();
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('JobTeamService::addMember failed', ['error' => $e->getMessage()]);
             return false;

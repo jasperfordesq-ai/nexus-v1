@@ -102,24 +102,40 @@ interface PaginationState {
 }
 
 interface SafeguardingBlockNotice {
-  code: 'VETTING_REQUIRED' | 'SAFEGUARDING_CONTACT_RESTRICTED';
-  // 'preflight' = shown on conversation open; the composer must stay disabled and the
-  // panel is NOT dismissable, so a user cannot reveal the composer and trigger a staff
-  // alert via a blocked send. 'send' = shown after a blocked send attempt (dismissable,
-  // since re-sending is itself an explicit contact attempt).
+  code: 'VETTING_REQUIRED' | 'SAFEGUARDING_CONTACT_RESTRICTED' | 'SAFEGUARDING_POLICY_UNAVAILABLE';
+  status: 'deny' | 'unavailable';
   source: 'preflight' | 'send';
-  translationKey: 'safeguarding_vetting_required' | 'safeguarding_contact_restricted';
+  translationKey: 'safeguarding_vetting_required' | 'safeguarding_contact_restricted' | 'safeguarding_policy_unavailable';
   title?: string;
   message: string;
   detail?: string;
   actionLabel?: string;
   requiredVettingTypes: string[];
   requiredVettingLabels: string[];
+  canRequestCoordinator: boolean;
+}
+
+type SafeguardingPolicyStatus = 'allow' | 'deny' | 'unavailable';
+
+interface SafeguardingPolicyEvaluation {
+  status: SafeguardingPolicyStatus;
+  notice: SafeguardingBlockNotice | null;
 }
 
 type MessageSendFailure = Pick<ApiResponse<unknown>, 'code' | 'error' | 'errors'>;
 
-const SAFEGUARDING_BLOCK_CODES = new Set(['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED']);
+const SAFEGUARDING_BLOCK_CODES = new Set([
+  'VETTING_REQUIRED',
+  'SAFEGUARDING_CONTACT_RESTRICTED',
+  'SAFEGUARDING_POLICY_UNAVAILABLE',
+]);
+
+const CONTROLLED_VETTING_TRANSLATION_KEYS: Record<string, string> = {
+  dbs_enhanced: 'safeguarding_checks.dbs_enhanced',
+  pvg_scotland: 'safeguarding_checks.pvg_scotland',
+  access_ni: 'safeguarding_checks.access_ni',
+  garda_vetting: 'safeguarding_checks.garda_vetting',
+};
 
 function asString(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() !== '' ? value : undefined;
@@ -131,12 +147,23 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === 'string' && item.trim() !== '');
 }
 
-function fallbackVettingLabel(type: string): string {
-  return type
-    .split('_')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+function translationKeyForCode(code: SafeguardingBlockNotice['code']): SafeguardingBlockNotice['translationKey'] {
+  if (code === 'VETTING_REQUIRED') return 'safeguarding_vetting_required';
+  if (code === 'SAFEGUARDING_CONTACT_RESTRICTED') return 'safeguarding_contact_restricted';
+  return 'safeguarding_policy_unavailable';
+}
+
+function unavailableNotice(source: SafeguardingBlockNotice['source']): SafeguardingBlockNotice {
+  return {
+    code: 'SAFEGUARDING_POLICY_UNAVAILABLE',
+    status: 'unavailable',
+    source,
+    translationKey: 'safeguarding_policy_unavailable',
+    message: '',
+    requiredVettingTypes: [],
+    requiredVettingLabels: [],
+    canRequestCoordinator: false,
+  };
 }
 
 function extractSafeguardingBlockNotice(response: MessageSendFailure): SafeguardingBlockNotice | null {
@@ -145,29 +172,26 @@ function extractSafeguardingBlockNotice(response: MessageSendFailure): Safeguard
     ?? (response.code && SAFEGUARDING_BLOCK_CODES.has(response.code) ? details[0] : undefined);
   const code = safeguardingError?.code ?? response.code;
 
-  if (code !== 'VETTING_REQUIRED' && code !== 'SAFEGUARDING_CONTACT_RESTRICTED') {
+  if (code !== 'VETTING_REQUIRED' && code !== 'SAFEGUARDING_CONTACT_RESTRICTED' && code !== 'SAFEGUARDING_POLICY_UNAVAILABLE') {
     return null;
   }
 
   const detail = safeguardingError as ApiErrorDetail | undefined;
   const requiredVettingTypes = asStringArray(detail?.required_vetting_types);
   const requiredVettingLabels = asStringArray(detail?.required_vetting_labels);
-  const labels = requiredVettingLabels.length > 0
-    ? requiredVettingLabels
-    : requiredVettingTypes.map(fallbackVettingLabel);
 
   return {
     code,
+    status: code === 'SAFEGUARDING_POLICY_UNAVAILABLE' ? 'unavailable' : 'deny',
     source: 'send',
-    translationKey: code === 'SAFEGUARDING_CONTACT_RESTRICTED'
-      ? 'safeguarding_contact_restricted'
-      : 'safeguarding_vetting_required',
+    translationKey: translationKeyForCode(code),
     title: asString(detail?.title),
     message: asString(detail?.message) ?? response.error ?? '',
     detail: asString(detail?.detail),
     actionLabel: asString(detail?.action_label),
     requiredVettingTypes,
-    requiredVettingLabels: labels,
+    requiredVettingLabels,
+    canRequestCoordinator: Boolean(detail?.can_request_coordinator),
   };
 }
 
@@ -177,35 +201,36 @@ function extractSafeguardingBlockNotice(response: MessageSendFailure): Safeguard
  * disable — the moment the conversation opens, before the member types anything.
  * No request is made and no staff are alerted by rendering this.
  */
-function buildSafeguardingNoticeFromMeta(
+function evaluateSafeguardingMeta(
   safeguarding: SafeguardingMeta | null | undefined
-): SafeguardingBlockNotice | null {
-  if (!safeguarding || !safeguarding.restricted) {
-    return null;
+): SafeguardingPolicyEvaluation {
+  if (safeguarding === null) {
+    return { status: 'allow', notice: null };
   }
 
-  const code = safeguarding.code === 'VETTING_REQUIRED'
-    ? 'VETTING_REQUIRED'
-    : 'SAFEGUARDING_CONTACT_RESTRICTED';
+  if (!safeguarding || safeguarding.restricted !== true || !SAFEGUARDING_BLOCK_CODES.has(safeguarding.code)) {
+    return { status: 'unavailable', notice: unavailableNotice('preflight') };
+  }
+
+  const code = safeguarding.code as SafeguardingBlockNotice['code'];
   const requiredVettingTypes = asStringArray(safeguarding.required_vetting_types);
   const requiredVettingLabels = asStringArray(safeguarding.required_vetting_labels);
-  const labels = requiredVettingLabels.length > 0
-    ? requiredVettingLabels
-    : requiredVettingTypes.map(fallbackVettingLabel);
 
-  return {
+  const notice: SafeguardingBlockNotice = {
     code,
+    status: code === 'SAFEGUARDING_POLICY_UNAVAILABLE' ? 'unavailable' : 'deny',
     source: 'preflight',
-    translationKey: code === 'SAFEGUARDING_CONTACT_RESTRICTED'
-      ? 'safeguarding_contact_restricted'
-      : 'safeguarding_vetting_required',
+    translationKey: translationKeyForCode(code),
     title: asString(safeguarding.title ?? undefined),
     message: asString(safeguarding.message ?? undefined) ?? '',
     detail: asString(safeguarding.detail ?? undefined),
     actionLabel: asString(safeguarding.action_label ?? undefined),
     requiredVettingTypes,
-    requiredVettingLabels: labels,
+    requiredVettingLabels,
+    canRequestCoordinator: Boolean(safeguarding.can_request_coordinator),
   };
+
+  return { status: notice.status, notice };
 }
 
 /**
@@ -301,6 +326,11 @@ export function ConversationPage() {
   // Safeguarding notice state (reappears on reload)
   const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
   const [safeguardingBlockNotice, setSafeguardingBlockNotice] = useState<SafeguardingBlockNotice | null>(null);
+  const [safeguardingPolicyStatus, setSafeguardingPolicyStatus] = useState<SafeguardingPolicyStatus>('unavailable');
+  const [isRefreshingSafeguarding, setIsRefreshingSafeguarding] = useState(false);
+  const safeguardingRefreshInFlightRef = useRef(false);
+  const [isRequestingVettingReview, setIsRequestingVettingReview] = useState(false);
+  const [vettingReviewRequested, setVettingReviewRequested] = useState(false);
   // Explicit "request coordinator help" action state
   const [isRequestingCoordinator, setIsRequestingCoordinator] = useState(false);
   const [coordinatorRequestSent, setCoordinatorRequestSent] = useState(false);
@@ -592,6 +622,15 @@ export function ConversationPage() {
    * Poll for new messages using cursor-based pagination
    * Only fetches messages newer than the last known message
    */
+  const applySafeguardingMeta = useCallback((safeguarding: SafeguardingMeta | null | undefined) => {
+    const evaluation = evaluateSafeguardingMeta(safeguarding);
+    setSafeguardingPolicyStatus(evaluation.status);
+    setSafeguardingBlockNotice(evaluation.notice);
+    setConversation((current) => current
+      ? { ...current, meta: { ...current.meta, safeguarding } }
+      : current);
+  }, []);
+
   const pollForNewMessages = useCallback(async () => {
     // Only poll when we have a target user ID and a known last message
     if (!targetId || !lastMessageIdRef.current) return;
@@ -600,6 +639,8 @@ export function ConversationPage() {
       // Use the last message ID as cursor to get only newer messages
       const cursor = btoa(String(lastMessageIdRef.current));
       const response = await api.get<Message[]>(`/v2/messages/${targetId}?direction=newer&cursor=${cursor}`);
+      const pollConversationMeta = response.meta?.conversation as ConversationMeta | undefined;
+      applySafeguardingMeta(pollConversationMeta?.safeguarding);
 
       if (response.success && response.data && response.data.length > 0) {
         const newMessages = response.data;
@@ -627,7 +668,7 @@ export function ConversationPage() {
     } catch {
       // Silent fail for polling - don't spam console
     }
-  }, [targetId]);
+  }, [applySafeguardingMeta, targetId]);
 
   // Memoize loadConversation
   const loadConversation = useCallback(async () => {
@@ -668,7 +709,7 @@ export function ConversationPage() {
         // Surface the server-authoritative safeguarding restriction immediately, so the
         // panel shows and the composer is disabled before the member types. Page load
         // never alerts staff — only an actual send or an explicit coordinator request does.
-        setSafeguardingBlockNotice(buildSafeguardingNoticeFromMeta(conversationMeta.safeguarding));
+        applySafeguardingMeta(conversationMeta.safeguarding);
 
         // Track pagination state from response
         setPagination({
@@ -699,6 +740,7 @@ export function ConversationPage() {
           meta: { id: parseInt(targetId, 10), other_user: { id: parseInt(targetId, 10), name: '' } },
           messages,
         });
+        applySafeguardingMeta(undefined);
         if (messages.length > 0) {
           const newestMsg = messages[messages.length - 1];
           if (newestMsg) lastMessageIdRef.current = newestMsg.id;
@@ -711,15 +753,17 @@ export function ConversationPage() {
         // No existing messages — this is genuinely a new conversation.
         // Load user profile to show their info in the empty chat view.
         await loadUserForNewConversation(parseInt(targetId, 10));
+        applySafeguardingMeta(undefined);
       }
     } catch (error) {
       // API returned error (e.g., 404 for unknown user) — try new conversation fallback
       logError('Failed to load conversation, trying new conversation', error);
+      applySafeguardingMeta(undefined);
       await loadUserForNewConversation(parseInt(targetId, 10));
     } finally {
       setIsLoading(false);
     }
-  }, [targetId, isNewConversationRoute, loadUserForNewConversation, navigate, tenantPath]);
+  }, [applySafeguardingMeta, targetId, isNewConversationRoute, loadUserForNewConversation, navigate, tenantPath]);
 
   // Cleanup ref for unmount guard
   useEffect(() => {
@@ -788,7 +832,9 @@ export function ConversationPage() {
 
   useEffect(() => {
     setSafeguardingBlockNotice(null);
+    setSafeguardingPolicyStatus('unavailable');
     setCoordinatorRequestSent(false);
+    setVettingReviewRequested(false);
   }, [targetId]);
 
   /**
@@ -815,11 +861,67 @@ export function ConversationPage() {
     }
   }, [targetId, isRequestingCoordinator, coordinatorRequestSent, toast, t]);
 
+  const requestVettingReview = useCallback(async () => {
+    if (isRequestingVettingReview || vettingReviewRequested) return;
+    setIsRequestingVettingReview(true);
+    try {
+      const response = await api.post('/v2/safeguarding/vetting-review-request');
+      if (response.success) {
+        setVettingReviewRequested(true);
+        toast.success(t('vetting_review_request.success_title'), t('vetting_review_request.success_body'));
+      } else {
+        toast.error(t('error_title'), response.error || t('vetting_review_request.error'));
+      }
+    } catch (error) {
+      logError('Failed to request safeguarding vetting review', error);
+      toast.error(t('error_title'), t('vetting_review_request.error'));
+    } finally {
+      setIsRequestingVettingReview(false);
+    }
+  }, [isRequestingVettingReview, t, toast, vettingReviewRequested]);
+
+  const refreshSafeguardingPolicy = useCallback(async () => {
+    if (!targetId || safeguardingRefreshInFlightRef.current) return;
+    safeguardingRefreshInFlightRef.current = true;
+    setIsRefreshingSafeguarding(true);
+    try {
+      const cursor = lastMessageIdRef.current ? btoa(String(lastMessageIdRef.current)) : null;
+      const query = cursor
+        ? `?direction=newer&cursor=${encodeURIComponent(cursor)}&per_page=1`
+        : '?per_page=1';
+      const response = await api.get<Message[]>(`/v2/messages/${targetId}${query}`);
+      const refreshedMeta = response.meta?.conversation as ConversationMeta | undefined;
+      applySafeguardingMeta(response.success ? refreshedMeta?.safeguarding : undefined);
+    } catch {
+      applySafeguardingMeta(undefined);
+    } finally {
+      safeguardingRefreshInFlightRef.current = false;
+      setIsRefreshingSafeguarding(false);
+    }
+  }, [applySafeguardingMeta, targetId]);
+
+  useEffect(() => {
+    if (!targetId || isLoading) return;
+
+    const handleFocus = () => { void refreshSafeguardingPolicy(); };
+    const handleVisibility = () => {
+      if (!document.hidden) void refreshSafeguardingPolicy();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [isLoading, refreshSafeguardingPolicy, targetId]);
+
   function handleSendFailure(response: MessageSendFailure, fallbackKey: string): void {
     const notice = extractSafeguardingBlockNotice(response);
 
     if (notice) {
       setSafeguardingBlockNotice(notice);
+      setSafeguardingPolicyStatus(notice.status);
       refreshRestrictionStatus();
       return;
     }
@@ -1598,7 +1700,10 @@ export function ConversationPage() {
   const other_user = meta.other_user;
   const safeguardingRequiredVettingLabels = safeguardingBlockNotice?.requiredVettingLabels.length
     ? safeguardingBlockNotice.requiredVettingLabels
-    : safeguardingBlockNotice?.requiredVettingTypes.map(fallbackVettingLabel) ?? [];
+    : safeguardingBlockNotice?.requiredVettingTypes
+        .map((type) => CONTROLLED_VETTING_TRANSLATION_KEYS[type])
+        .filter((key): key is string => Boolean(key))
+        .map((key) => t(key)) ?? [];
   // Prefer live canonical presence (populated by the fetch effect above) over the
   // is_online snapshot from the initial payload. Fall back to is_online when the
   // participant isn't cached yet — the backend keeps that column fresh off the
@@ -1877,42 +1982,44 @@ export function ConversationPage() {
                 {t('coordinator_request.sent')}
               </p>
             )}
+            {vettingReviewRequested && (
+              <p className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-300" role="status">
+                {t('vetting_review_request.sent')}
+              </p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-stretch">
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white dark:text-white"
-              onPress={requestCoordinatorHelp}
-              isLoading={isRequestingCoordinator}
-              isDisabled={coordinatorRequestSent}
-              aria-label={t('coordinator_request.aria_button')}
-            >
-              {t('coordinator_request.button')}
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="bg-theme-elevated text-theme-primary"
-              onPress={() => navigate(tenantPath('/help'))}
-            >
-              {safeguardingBlockNotice.actionLabel || t(`${safeguardingBlockNotice.translationKey}.action`)}
-            </Button>
-            {/* Preflight (load-time) notices are NOT dismissable: dismissing would
-                re-enable the composer and let a blocked send alert staff, bypassing the
-                explicit coordinator-request affordance. Send-failure notices stay
-                dismissable (re-sending is itself an explicit attempt). */}
-            {safeguardingBlockNotice.source !== 'preflight' && (
+            {safeguardingBlockNotice.code === 'VETTING_REQUIRED' && (
               <Button
-                isIconOnly
                 size="sm"
-                variant="tertiary"
-                className="text-red-500 hover:text-red-700 dark:hover:text-red-200"
-                onPress={() => setSafeguardingBlockNotice(null)}
-                aria-label={t(`${safeguardingBlockNotice.translationKey}.dismiss`)}
+                onPress={requestVettingReview}
+                isPending={isRequestingVettingReview}
+                isDisabled={vettingReviewRequested}
               >
-                <X className="h-4 w-4" aria-hidden="true" />
+                {t('vetting_review_request.button')}
               </Button>
             )}
+            {safeguardingBlockNotice.canRequestCoordinator && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onPress={requestCoordinatorHelp}
+                isPending={isRequestingCoordinator}
+                isDisabled={coordinatorRequestSent}
+                aria-label={t('coordinator_request.aria_button')}
+              >
+                {t('coordinator_request.button')}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="tertiary"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={refreshSafeguardingPolicy}
+              isPending={isRefreshingSafeguarding}
+            >
+              {t('safeguarding_check_again')}
+            </Button>
           </div>
         </div>
       )}
@@ -2092,7 +2199,7 @@ export function ConversationPage() {
         <MessageInputArea
           isDirectMessagingEnabled={isDirectMessagingEnabled}
           messagingRestriction={messagingRestriction}
-          isInteractionBlocked={!!safeguardingBlockNotice}
+          safeguardingPolicyStatus={safeguardingPolicyStatus}
           newMessage={newMessage}
           onNewMessageChange={setNewMessage}
           onSendMessage={sendMessageWithAttachments}

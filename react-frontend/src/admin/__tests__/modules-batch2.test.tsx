@@ -81,7 +81,7 @@ vi.mock('recharts', () => ({
 
 vi.mock('../../api/adminApi', () => ({
   adminBroker: {
-    getDashboard: vi.fn().mockResolvedValue({ success: true, data: { pending_exchanges: 0, unreviewed_messages: 0, high_risk_listings: 0, monitored_users: 0, vetting_pending: 0, vetting_expiring: 0, safeguarding_alerts: 0, recent_activity: [] } }),
+    getDashboard: vi.fn().mockResolvedValue({ success: true, data: { pending_exchanges: 0, unreviewed_messages: 0, high_risk_listings: 0, monitored_users: 0, vetting_review_requests: 0, safeguarding_alerts: 0, recent_activity: [] } }),
     getExchanges: vi.fn().mockResolvedValue({ success: true, data: { data: [], meta: { page: 1, total_pages: 1, per_page: 20, total: 0, has_more: false } } }),
     showExchange: vi.fn().mockResolvedValue({ success: true, data: { exchange: { id: 1, requester_id: 1, requester_name: 'A', provider_id: 2, provider_name: 'B', status: 'pending', created_at: '2026-01-01' }, history: [], risk_tag: null } }),
     getRiskTags: vi.fn().mockResolvedValue({ success: true, data: [] }),

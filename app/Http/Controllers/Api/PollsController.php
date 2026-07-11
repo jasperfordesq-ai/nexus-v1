@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\Poll;
@@ -190,7 +191,11 @@ class PollsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.social_option_id_required'), 'option_id', 400);
         }
 
-        $success = $this->pollService->vote($id, (int) $optionId, $userId);
+        try {
+            $success = $this->pollService->vote($id, (int) $optionId, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (! $success) {
             return $this->respondWithError('RESOURCE_CONFLICT', __('api.poll_already_voted'), null, 409);
@@ -244,7 +249,11 @@ class PollsController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.poll_rankings_required'), 'rankings', 400);
         }
 
-        $success = $this->rankingService->submitRanking($id, $userId, $rankings);
+        try {
+            $success = $this->rankingService->submitRanking($id, $userId, $rankings);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (! $success) {
             return $this->respondWithError('RESOURCE_CONFLICT', __('api.poll_already_ranked'), null, 409);

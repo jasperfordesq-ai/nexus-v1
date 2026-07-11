@@ -458,11 +458,8 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'random_sample_percentage', label: 'Random Sample (%)', description: 'Percentage of messages randomly sampled for review', type: 'number', defaultValue: 0, category: 'Broker Visibility', min: 0, max: 100 },
       { key: 'retention_days', label: 'Retention (Days)', description: 'Days to retain broker message copies', type: 'number', defaultValue: 90, category: 'Broker Visibility', min: 1, max: 3650 },
       // Compliance
-      { key: 'vetting_enabled', label: 'Vetting Enabled', description: 'Enable member vetting requirements', type: 'boolean', defaultValue: false, category: 'Compliance' },
       { key: 'insurance_enabled', label: 'Insurance Enabled', description: 'Enable insurance requirements', type: 'boolean', defaultValue: false, category: 'Compliance' },
-      { key: 'enforce_vetting_on_exchanges', label: 'Enforce Vetting on Exchanges', description: 'Require vetting before participating in exchanges', type: 'boolean', defaultValue: false, category: 'Compliance' },
       { key: 'enforce_insurance_on_exchanges', label: 'Enforce Insurance on Exchanges', description: 'Require insurance before participating in exchanges', type: 'boolean', defaultValue: false, category: 'Compliance' },
-      { key: 'vetting_expiry_warning_days', label: 'Vetting Expiry Warning (Days)', description: 'Days before vetting expiry to warn member', type: 'number', defaultValue: 30, category: 'Compliance', min: 1, max: 90 },
       { key: 'insurance_expiry_warning_days', label: 'Insurance Expiry Warning (Days)', description: 'Days before insurance expiry to warn member', type: 'number', defaultValue: 30, category: 'Compliance', min: 1, max: 90 },
     ],
   },

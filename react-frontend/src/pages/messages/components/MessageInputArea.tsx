@@ -31,7 +31,7 @@ export interface MessageInputAreaProps {
     under_monitoring: boolean;
     restriction_reason: string | null;
   } | null;
-  isInteractionBlocked?: boolean;
+  safeguardingPolicyStatus?: 'allow' | 'deny' | 'unavailable';
   // Text message state
   newMessage: string;
   onNewMessageChange: (value: string) => void;
@@ -74,7 +74,7 @@ function formatRecordingTime(seconds: number): string {
 export function MessageInputArea({
   isDirectMessagingEnabled,
   messagingRestriction,
-  isInteractionBlocked = false,
+  safeguardingPolicyStatus = 'allow',
   newMessage,
   onNewMessageChange,
   onSendMessage,
@@ -99,7 +99,8 @@ export function MessageInputArea({
   const { t } = useTranslation('messages');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
-  const isComposerBlocked = !!messagingRestriction?.messaging_disabled || isInteractionBlocked;
+  const isSafeguardingBlocked = safeguardingPolicyStatus !== 'allow';
+  const isComposerBlocked = !!messagingRestriction?.messaging_disabled || isSafeguardingBlocked;
 
   return (
     <div className="border-t border-theme-default p-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:p-4">
@@ -137,11 +138,13 @@ export function MessageInputArea({
       {/* Safeguarding: composer replaced — direct contact requires coordinator/vetting.
           The full safeguarding panel (with the "Request coordinator help" action) renders
           above the message list; this is the in-composer explanation of why there is no input. */}
-      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isInteractionBlocked && (
+      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isSafeguardingBlocked && (
         <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg" role="status">
           <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
-            {t('composer_blocked_safeguarding')}
+            {t(safeguardingPolicyStatus === 'unavailable'
+              ? 'composer_blocked_safeguarding_unavailable'
+              : 'composer_blocked_safeguarding')}
           </p>
         </div>
       )}

@@ -512,6 +512,13 @@ trait JobsParity
         $ok = false;
         try {
             $ok = (bool) $action($userId);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return redirect()->route('govuk-alpha.jobs.responses', [
+                'tenantSlug' => $tenantSlug,
+                'status' => $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                    ? 'response-safeguarding-unavailable'
+                    : 'response-safeguarding-restricted',
+            ]);
         } catch (\Throwable $e) {
             report($e);
         }

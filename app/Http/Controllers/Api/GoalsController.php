@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Goal;
 use App\Models\Notification;
@@ -423,7 +424,11 @@ class GoalsController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('goal_buddy', 10, 60);
 
-        $goal = $this->goalService->offerBuddy($id, $userId);
+        try {
+            $goal = $this->goalService->offerBuddy($id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (! $goal) {
             return $this->respondWithError('RESOURCE_CONFLICT', __('api.cannot_become_buddy'), null, 409);
@@ -461,7 +466,11 @@ class GoalsController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('goal_buddy_nudge', 20, 60);
 
-        $note = $this->goalService->createBuddyNote($id, $userId, $this->getAllInput());
+        try {
+            $note = $this->goalService->createBuddyNote($id, $userId, $this->getAllInput());
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (! $note) {
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.goal_buddy_required'), null, 403);
         }

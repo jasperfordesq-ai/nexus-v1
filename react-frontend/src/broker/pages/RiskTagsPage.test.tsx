@@ -352,8 +352,36 @@ describe('RiskTagsPage', () => {
     const table = screen.getByRole('table');
     expect(within(table).getByText('Approval')).toBeInTheDocument();
     expect(within(table).getByText('Insurance')).toBeInTheDocument();
-    // dbs_required is false on the fixture — no DBS chip.
-    expect(within(table).queryByText('DBS')).not.toBeInTheDocument();
+    // No retired role-vetting flag is present on the fixture.
+    expect(within(table).queryByText('Legacy role-vetting requirement unavailable')).not.toBeInTheDocument();
+  });
+
+  it('shows an existing role-vetting flag read-only and never sends it in updates', async () => {
+    mockAdminBroker.getRiskTags.mockResolvedValue({
+      success: true,
+      data: [makeTag({ dbs_required: true })],
+    });
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Legacy role-vetting requirement unavailable')).toBeInTheDocument();
+    });
+
+    const editBtn = screen.getAllByRole('button').find((button) =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('edit'),
+    );
+    expect(editBtn).toBeDefined();
+    fireEvent.click(editBtn!);
+
+    await waitFor(() => {
+      expect(screen.getByText(/cannot be enabled or satisfied by the messaging contact attestation/i)).toBeInTheDocument();
+    });
+    expect(screen.getAllByTestId('switch')).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Update Tag' }));
+    await waitFor(() => expect(mockAdminBroker.saveRiskTag).toHaveBeenCalled());
+    expect(mockAdminBroker.saveRiskTag.mock.calls[0][1]).not.toHaveProperty('dbs_required');
   });
 
   it('opens create modal when Tag Listing button pressed', async () => {

@@ -7,10 +7,13 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
 use App\Services\VolunteerService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 class VolunteerServiceTest extends TestCase
@@ -278,6 +281,64 @@ class VolunteerServiceTest extends TestCase
 
         $this->assertNull($reviewId);
         $this->assertSame('FORBIDDEN', VolunteerService::getErrors()[0]['code'] ?? null);
+        $this->assertDatabaseMissing('vol_reviews', [
+            'tenant_id' => 2,
+            'reviewer_id' => $reviewer->id,
+            'target_type' => 'user',
+            'target_id' => $target->id,
+        ]);
+    }
+
+    public function test_member_review_safeguarding_denial_writes_no_review(): void
+    {
+        $owner = User::factory()->forTenant(2)->create();
+        $reviewer = User::factory()->forTenant(2)->create();
+        $target = User::factory()->forTenant(2)->create();
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $owner->id,
+            'name' => 'Safeguarding Review Org ' . uniqid(),
+            'slug' => 'safeguarding-review-org-' . uniqid(),
+            'description' => 'Organisation used for safeguarding review coverage.',
+            'contact_email' => 'review-guard@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => 2,
+            'organization_id' => $orgId,
+            'title' => 'Safeguarding review shift',
+            'description' => 'Shared placement history.',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_by' => $owner->id,
+            'created_at' => now(),
+        ]);
+        foreach ([$reviewer->id, $target->id] as $userId) {
+            DB::table('vol_applications')->insert([
+                'tenant_id' => 2,
+                'opportunity_id' => $opportunityId,
+                'user_id' => $userId,
+                'status' => 'approved',
+                'created_at' => now(),
+            ]);
+        }
+
+        TenantContext::setById(2);
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with((int) $reviewer->id, (int) $target->id, 2, 'volunteer_member_review')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            VolunteerService::createReview((int) $reviewer->id, 'user', (int) $target->id, 5, 'Must not persist');
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
         $this->assertDatabaseMissing('vol_reviews', [
             'tenant_id' => 2,
             'reviewer_id' => $reviewer->id,

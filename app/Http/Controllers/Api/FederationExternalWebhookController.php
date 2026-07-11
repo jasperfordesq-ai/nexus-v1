@@ -24,6 +24,8 @@ use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
 use App\Services\FederationLogRedactor;
+use App\Services\MessageService;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\QueryException;
@@ -174,6 +176,30 @@ class FederationExternalWebhookController extends BaseApiController
         // ---- Dispatch event ----
         try {
             $result = $this->handleEvent($event, $data, $partner);
+
+            if (($result['success'] ?? true) === false
+                && in_array(($result['error_code'] ?? null), [
+                    'VETTING_REQUIRED',
+                    'SAFEGUARDING_CONTACT_RESTRICTED',
+                    'SAFEGUARDING_POLICY_UNAVAILABLE',
+                ], true)) {
+                $status = ($result['error_code'] ?? null) === 'SAFEGUARDING_POLICY_UNAVAILABLE' ? 503 : 403;
+                DB::table('federation_external_partner_logs')
+                    ->where('id', $logId)
+                    ->update([
+                        'response_code' => $status,
+                        'success' => false,
+                        'error_message' => (string) ($result['error_code'] ?? 'SAFEGUARDING_CONTACT_RESTRICTED'),
+                    ]);
+
+                return $this->respondWithError(
+                    (string) ($result['error_code'] ?? 'SAFEGUARDING_CONTACT_RESTRICTED'),
+                    (string) ($result['error'] ?? __('safeguarding.errors.contact_restricted')),
+                    null,
+                    $status,
+                );
+            }
+
             $this->assertWebhookResultCanBeAcknowledged($result);
 
             DB::table('federation_external_partner_logs')
@@ -608,6 +634,15 @@ class FederationExternalWebhookController extends BaseApiController
             return ['status' => 'duplicate', 'local_id' => (int) $existing->id];
         }
 
+        if ($blocked = $this->externalRecipientSafeguardingBlock(
+            $receiverId,
+            (int) $partner->id,
+            $reviewerExternalId > 0 ? (string) $reviewerExternalId : $externalId,
+            'external_federated_review',
+        )) {
+            return $blocked;
+        }
+
         $comment = $this->optionalString($data, 'comment', 5000);
 
         $reviewRow = [
@@ -850,6 +885,17 @@ class FederationExternalWebhookController extends BaseApiController
                 "Local user #{$localUserId} not found in this tenant",
                 'local_user_id'
             );
+        }
+
+        if ($blocked = $this->externalRecipientSafeguardingBlock(
+            $localUserId,
+            (int) $partner->id,
+            $externalUserId,
+            $event === 'connection.accepted'
+                ? 'external_connection_accepted'
+                : 'external_connection_requested',
+        )) {
+            return $blocked;
         }
 
         $status = $event === 'connection.accepted' ? 'accepted' : 'pending';
@@ -1214,6 +1260,10 @@ class FederationExternalWebhookController extends BaseApiController
             throw new \RuntimeException((string) ($result['error'] ?? 'Federated message delivery failed'));
         }
 
+        if (($result['success'] ?? false) === false) {
+            return $result;
+        }
+
         // Update last_message_at on the partner
         DB::table('federation_external_partners')
             ->where('id', $partner->id)
@@ -1268,6 +1318,15 @@ class FederationExternalWebhookController extends BaseApiController
 
             if (!$receiver) {
                 return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
+            }
+
+            if ($blocked = $this->externalRecipientSafeguardingBlock(
+                $receiverUserId,
+                (int) $partner->id,
+                (string) $senderId,
+                'external_transaction_completed',
+            )) {
+                return $blocked;
             }
 
             $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
@@ -1493,6 +1552,15 @@ class FederationExternalWebhookController extends BaseApiController
 
         if (!$receiver) {
             return ['status' => 'rejected', 'reason' => "Recipient user #{$recipientId} not found in this tenant"];
+        }
+
+        if ($blocked = $this->externalRecipientSafeguardingBlock(
+            $receiverUserId,
+            (int) $partner->id,
+            (string) ($data['sender_id'] ?? 'unknown'),
+            'external_transaction_requested',
+        )) {
+            return $blocked;
         }
 
         $idempotencyKey = $this->externalTransactionIdempotencyKey($partner, $externalTxId);
@@ -1786,6 +1854,46 @@ class FederationExternalWebhookController extends BaseApiController
             ->where('tenant_id', $partner->tenant_id)
             ->update(['status' => 'failed']);
         return ['status' => 'terminated'];
+    }
+
+    /**
+     * External partners cannot provide a trusted local broker attestation. A
+     * protected recipient therefore rejects the transaction before any credit,
+     * row, description, email, or notification is delivered.
+     *
+     * @return array{status: string, reason: string, success: false, error: string, error_code: string, retryable: bool}|null
+     */
+    private function externalRecipientSafeguardingBlock(
+        int $recipientId,
+        int $partnerId,
+        string $externalSenderId,
+        string $channel,
+    ): ?array {
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateExternalContact(
+            $recipientId,
+            TenantContext::getId(),
+            "partner:{$partnerId}:sender:{$externalSenderId}",
+            $channel,
+        );
+        if ($decision->isAllowed()) {
+            return null;
+        }
+
+        $error = MessageService::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ]);
+        return [
+            'status' => 'rejected',
+            'reason' => (string) $error['message'],
+            'success' => false,
+            'error' => (string) $error['message'],
+            'error_code' => $decision->code,
+            'retryable' => $decision->isUnavailable(),
+        ];
     }
 
     // ----------------------------------------------------------------

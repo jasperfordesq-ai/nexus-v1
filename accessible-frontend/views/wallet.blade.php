@@ -21,6 +21,8 @@
             'too-large' => __('govuk_alpha.wallet.errors.too_large'),
             'decimals' => __('govuk_alpha.wallet.errors.decimals'),
             'failed' => __('govuk_alpha.wallet.errors.failed'),
+            'safeguarding' => __('safeguarding.errors.interaction_not_allowed'),
+            'safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
         ];
         // WAVE T1-WALLET: donate error map + transaction-filter state.
         $donateErrorMessages = [
@@ -31,6 +33,8 @@
             'too-large' => __('govuk_alpha.wallet_t1.errors.too_large'),
             'decimals' => __('govuk_alpha.wallet_t1.errors.decimals'),
             'failed' => __('govuk_alpha.wallet_t1.errors.failed'),
+            'safeguarding' => __('safeguarding.errors.interaction_not_allowed'),
+            'safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
         ];
         $activeFilter = $txFilter ?? 'all';
         $currentPage = (int) ($txPage ?? 1);

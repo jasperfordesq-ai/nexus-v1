@@ -145,6 +145,12 @@
                     'skill-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.skills.name_required'), 'anchor' => '#skills'],
                     'safeguarding-revoked' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.safeguarding.revoked')],
                     'safeguarding-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.failed'), 'anchor' => '#safeguarding'],
+                    'vetting-review-requested' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.safeguarding.vetting.review_requested_toast')],
+                    'vetting-review-evidence-prohibited' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.vetting.no_documents'), 'anchor' => '#vetting-status'],
+                    'vetting-review-unavailable' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.vetting.policy_unavailable_body'), 'anchor' => '#vetting-status'],
+                    'vetting-review-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.vetting.review_error'), 'anchor' => '#vetting-status'],
+                    'safeguarding-policy-reviewed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.safeguarding.policy_review_confirmed')],
+                    'safeguarding-policy-review-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.policy_review_error'), 'anchor' => '#safeguarding-policy-review'],
                 ];
                 $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
                 // Field-level error helper: reuse the status map (its anchor IS the
@@ -696,6 +702,88 @@
             <section aria-labelledby="safeguarding-heading" id="safeguarding">
                 <h2 class="govuk-heading-l" id="safeguarding-heading">{{ __('govuk_alpha.profile_settings.safeguarding.title') }}</h2>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.description') }}</p>
+                @php
+                    $policyReviewRequired = collect($safeguarding ?? [])->contains(
+                        static fn (array $preference): bool => (bool) ($preference['policy_review_required'] ?? false)
+                    );
+                    $vettingPolicy = is_array($vettingStatus['policy'] ?? null) ? $vettingStatus['policy'] : [];
+                    $vettingDecision = (string) ($vettingStatus['decision'] ?? 'not_confirmed');
+                    $vettingReviewPending = ($vettingStatus['review_status'] ?? null) === 'pending';
+                    $vettingPolicyAvailable = (bool) ($vettingPolicy['configured'] ?? false)
+                        && (bool) ($vettingPolicy['contact_policy_available'] ?? false);
+                    $vettingAttestationCode = (string) ($vettingPolicy['attestation_code'] ?? '');
+                    $vettingAttestationLabel = $vettingAttestationCode !== ''
+                        ? __('safeguarding.attestations.' . $vettingAttestationCode)
+                        : null;
+                    $vettingStatusLabel = $vettingReviewPending
+                        ? __('govuk_alpha.profile_settings.safeguarding.vetting.status_review_requested')
+                        : match ($vettingDecision) {
+                            'confirmed' => __('govuk_alpha.exchanges.confirmed'),
+                            'revoked' => __('govuk_alpha.profile_settings.safeguarding.vetting.status_revoked'),
+                            default => __('govuk_alpha.profile_settings.safeguarding.vetting.status_not_confirmed'),
+                        };
+                    $vettingTagClass = $vettingReviewPending
+                        ? 'govuk-tag--yellow'
+                        : match ($vettingDecision) {
+                            'confirmed' => 'govuk-tag--green',
+                            'revoked' => 'govuk-tag--red',
+                            default => 'govuk-tag--grey',
+                        };
+                    $confirmedDate = !empty($vettingStatus['confirmed_at'] ?? null)
+                        ? \Illuminate\Support\Carbon::parse($vettingStatus['confirmed_at'])->translatedFormat('j F Y')
+                        : null;
+                @endphp
+
+                @if ($policyReviewRequired)
+                    <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="safeguarding-policy-review-banner-title" id="safeguarding-policy-review">
+                        <div class="govuk-notification-banner__header">
+                            <h3 class="govuk-notification-banner__title" id="safeguarding-policy-review-banner-title">{{ __('govuk_alpha.states.important') }}</h3>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <h3 class="govuk-notification-banner__heading">{{ __('govuk_alpha.profile_settings.safeguarding.policy_review_title') }}</h3>
+                            <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.policy_review_body') }}</p>
+                            <form method="post" action="{{ route('govuk-alpha.profile.safeguarding.policy-review', ['tenantSlug' => $tenantSlug]) }}">
+                                @csrf
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" type="submit">{{ __('govuk_alpha.profile_settings.safeguarding.policy_review_confirm') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="nexus-alpha-card govuk-!-margin-bottom-6" id="vetting-status">
+                    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.title') }}</h3>
+                    @if (!is_array($vettingStatus ?? null))
+                        <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.status_unavailable') }}</p>
+                    @else
+                        <p class="govuk-body govuk-!-margin-bottom-2">
+                            <strong class="govuk-tag {{ $vettingTagClass }}">{{ $vettingStatusLabel }}</strong>
+                            @if ($vettingAttestationLabel !== null)
+                                <span class="govuk-!-margin-left-2">{{ $vettingAttestationLabel }}</span>
+                            @endif
+                        </p>
+                        @if ($vettingDecision === 'confirmed' && $confirmedDate !== null)
+                            <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.confirmed_on', ['date' => $confirmedDate]) }}</p>
+                        @elseif ($vettingReviewPending)
+                            <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.review_pending_body') }}</p>
+                        @elseif ($vettingPolicyAvailable)
+                            <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.not_confirmed_body') }}</p>
+                        @else
+                            <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.policy_unavailable_body') }}</p>
+                        @endif
+                    @endif
+                    <div class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.safeguarding.vetting.no_documents') }}</div>
+                    @if (is_array($vettingStatus ?? null) && $vettingDecision !== 'confirmed' && $vettingPolicyAvailable)
+                        <form method="post" action="{{ route('govuk-alpha.profile.safeguarding.vetting-review', ['tenantSlug' => $tenantSlug]) }}">
+                            @csrf
+                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" type="submit" @disabled($vettingReviewPending)>
+                                {{ $vettingReviewPending
+                                    ? __('govuk_alpha.profile_settings.safeguarding.vetting.review_requested_button')
+                                    : __('govuk_alpha.profile_settings.safeguarding.vetting.request_review_button') }}
+                            </button>
+                        </form>
+                    @endif
+                </div>
+
                 @if (empty($safeguarding))
                     <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.none') }}</p></div>
                 @else

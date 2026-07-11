@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\Enterprise;
 
+use App\Services\LegacyVettingEvidenceManager;
 use Illuminate\Support\Facades\DB;
 use App\Services\Enterprise\LoggerService;
 use App\Services\Enterprise\MetricsService;
@@ -330,7 +331,11 @@ class GdprService
             'ai_chat_history' => $this->safeSection('ai_chat_history', fn () => $this->getAiChatData($userId), []),
             'reviews' => $this->safeSection('reviews', fn () => $this->getReviewsData($userId), []),
             'exchanges' => $this->safeSection('exchanges', fn () => $this->getExchangeData($userId), []),
-            'vetting_records' => $this->safeSection('vetting_records', fn () => $this->getVettingRecordsData($userId), []),
+            'vetting_attestations' => $this->safeSection(
+                'vetting_attestations',
+                fn () => $this->getVettingAttestationData($userId),
+                ['attestations' => [], 'events' => [], 'review_requests' => []],
+            ),
             'insurance_certificates' => $this->safeSection('insurance_certificates', fn () => $this->getInsuranceCertificatesData($userId), []),
             'identity_verification' => $this->safeSection('identity_verification', fn () => $this->getIdentityVerificationData($userId), []),
             'safeguarding_preferences' => $this->safeSection('safeguarding_preferences', fn () => $this->getSafeguardingPreferencesData($userId), []),
@@ -1313,20 +1318,49 @@ class GdprService
                 // rows — mirroring the job-CV cleanup in 3q below. file_url is stored
                 // as 'private:<path>' by VolunteerCertificateController::uploadCredential;
                 // without this, identity-bearing PII files survive erasure (Art. 17).
-                $credentialPaths = $this->query(
-                    "SELECT file_url FROM vol_credentials WHERE user_id = ? AND tenant_id = ? AND file_url IS NOT NULL",
+                $credentials = $this->query(
+                    "SELECT id, file_url FROM vol_credentials WHERE user_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
-                )->fetchAll(\PDO::FETCH_COLUMN);
-                foreach ($credentialPaths as $storedPath) {
-                    $path = preg_replace('/^private:/', '', (string) $storedPath);
-                    if ($path === '') { continue; }
+                )->fetchAll();
+                $evidenceManager = app(LegacyVettingEvidenceManager::class);
+                foreach ($credentials as $credential) {
+                    $credentialId = (int) $credential->id;
+                    $storedPath = (string) ($credential->file_url ?? '');
+                    $deleteStatus = 'missing';
                     try {
-                        \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+                        $deleteStatus = $evidenceManager->deletePrivateCredentialPointer(
+                            $storedPath,
+                            $this->tenantId,
+                        );
                     } catch (\Throwable $e) {
-                        // best-effort file cleanup
+                        $deleteStatus = 'failed';
                     }
+
+                    if (in_array($deleteStatus, ['deleted', 'missing'], true)) {
+                        $this->query(
+                            "DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                            [$credentialId, $userId, $this->tenantId]
+                        );
+                        continue;
+                    }
+
+                    // Never destroy the only pointer to a file that failed the
+                    // narrow, content-blind deletion check. Redact all ordinary
+                    // metadata and retain a discoverable tombstone for the DPO
+                    // cleanup command instead of creating an orphaned document.
+                    $this->query(
+                        "UPDATE vol_credentials
+                         SET file_name = NULL, status = 'rejected', verified_by = NULL,
+                             verified_at = NULL, expires_at = NULL, notes = ?, updated_at = NOW()
+                         WHERE id = ? AND user_id = ? AND tenant_id = ?",
+                        [LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER, $credentialId, $userId, $this->tenantId]
+                    );
+                    $this->logger->error('GDPR credential file deletion requires DPO follow-up', [
+                        'user_id' => $userId,
+                        'credential_id' => $credentialId,
+                        'delete_status' => $deleteStatus,
+                    ]);
                 }
-                $this->query("DELETE FROM vol_credentials WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_mood_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_wellbeing_alerts WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_accessibility_needs WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
@@ -1535,33 +1569,47 @@ class GdprService
                 $this->query("DELETE FROM course_enrollments WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
             } catch (\Throwable $e) { $this->logger->warning('GDPR courses deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
-            // 3x. Identity & compliance records. The users row is ANONYMIZED,
-            // never deleted, so the ON DELETE CASCADE constraints on
-            // vetting_records / insurance_certificates never fire — without an
-            // explicit delete these highly sensitive records (DBS/Garda vetting
-            // references, insurance policy numbers, KYC session outcomes, and
-            // the uploaded document files) survive erasure. Decision 2026-06-12:
-            // the platform is not the vetting authority and holds no
-            // post-erasure retention duty for these COPIES — delete them,
-            // including files. (Safeguarding REPORTS are different and are
-            // deliberately retained: legal hold.)
+            // 3x. Identity and compliance records. Safeguarding reports remain
+            // governed by their separate legal-hold workflow.
+            // Metadata-only safeguarding records do not contain certificate
+            // evidence, but the anonymized users row means FK cascades do not
+            // run. Delete the subject's workflow and decision history directly.
+            try {
+                $this->query("DELETE FROM safeguarding_vetting_review_requests WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR vetting-review deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+            try {
+                $this->query("DELETE FROM member_vetting_attestation_events WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR vetting-event deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+            try {
+                $this->query("DELETE FROM member_vetting_attestations WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR vetting-attestation deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // Rows without an evidence pointer can be erased immediately.
+            // Pointer-bearing rows must remain as minimised cleanup tombstones
+            // until the DPO-authorised CLI has removed the local/external object;
+            // deleting the pointer first would orphan the most sensitive copy.
+            try {
+                $this->query(
+                    "DELETE FROM vetting_records
+                     WHERE user_id = ? AND tenant_id = ?
+                       AND (document_url IS NULL OR document_url = '')",
+                    [$userId, $this->tenantId]
+                );
+                $this->query(
+                    "UPDATE vetting_records
+                     SET reference_number = NULL, issue_date = NULL, expiry_date = NULL,
+                         notes = NULL, rejection_reason = NULL, verified_by = NULL,
+                         verified_at = NULL, rejected_by = NULL, rejected_at = NULL,
+                         works_with_children = 0, works_with_vulnerable_adults = 0,
+                         requires_enhanced_check = 0, status = 'revoked', updated_at = NOW()
+                     WHERE user_id = ? AND tenant_id = ?
+                       AND document_url IS NOT NULL AND document_url <> ''",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { $this->logger->warning('GDPR legacy-vetting deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
             try {
                 $docRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
-
-                $vettingDocs = $this->query(
-                    "SELECT document_url FROM vetting_records WHERE user_id = ? AND tenant_id = ? AND document_url IS NOT NULL",
-                    [$userId, $this->tenantId]
-                )->fetchAll(\PDO::FETCH_COLUMN);
-                foreach ($vettingDocs as $docUrl) {
-                    $relative = parse_url((string) $docUrl, PHP_URL_PATH);
-                    if ($docRoot !== '' && is_string($relative) && str_starts_with($relative, '/uploads/')) {
-                        $file = $docRoot . $relative;
-                        if (is_file($file)) {
-                            @unlink($file);
-                        }
-                    }
-                }
-                $this->query("DELETE FROM vetting_records WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
 
                 // Insurance certificates live in a per-user directory.
                 $insuranceDir = $docRoot . "/uploads/insurance/{$this->tenantId}/{$userId}";
@@ -2481,24 +2529,72 @@ class GdprService
     // =========================================================================
 
     /**
-     * Get vetting/background check records for a user (GDPR Article 15).
+     * Get metadata-only safeguarding attestations for a user (GDPR Article 15).
+     *
+     * The export deliberately has no legacy certificate/reference/date/note/path
+     * fields. Decision history and review workflow metadata remain transparent to
+     * the data subject.
+     *
+     * @return array{attestations: array<int, array<string, mixed>>, events: array<int, array<string, mixed>>, review_requests: array<int, array<string, mixed>>}
      */
-    private function getVettingRecordsData(int $userId): array
+    private function getVettingAttestationData(int $userId): array
     {
+        $data = ['attestations' => [], 'events' => [], 'review_requests' => []];
+
         try {
-            return $this->query(
-                "SELECT id, vetting_type, status, reference_number, issue_date, expiry_date,
-                        works_with_children, works_with_vulnerable_adults, requires_enhanced_check,
-                        notes, rejection_reason, created_at, updated_at
-                 FROM vetting_records
+            $data['attestations'] = $this->query(
+                "SELECT id, scheme_code, attestation_code, purpose_code, scope_type,
+                        scope_identifier, decision, confirmed_by, confirmed_at,
+                        revoked_by, revoked_at, revocation_reason_code, policy_version,
+                        created_at, updated_at
+                 FROM member_vetting_attestations
                  WHERE user_id = ? AND tenant_id = ?
                  ORDER BY created_at DESC",
                 [$userId, $this->tenantId]
             )->fetchAll();
         } catch (\Throwable $e) {
-            $this->logger->warning('getVettingRecordsData failed for user ' . $userId . ': ' . $e->getMessage());
-            return [];
+            $this->logger->warning('getVettingAttestationData attestations failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
         }
+
+        try {
+            $data['events'] = $this->query(
+                "SELECT id, attestation_id, scheme_code, attestation_code, purpose_code,
+                        scope_type, scope_identifier, event_type, decision_before,
+                        decision_after, reason_code, actor_user_id, policy_version, created_at
+                 FROM member_vetting_attestation_events
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $this->logger->warning('getVettingAttestationData events failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $data['review_requests'] = $this->query(
+                "SELECT id, jurisdiction, scheme_code, attestation_code, purpose_code,
+                        scope_type, scope_identifier, policy_version, status, request_source,
+                        requested_by, requested_at, handled_by, handled_at, resolution_code,
+                        created_at, updated_at
+                 FROM safeguarding_vetting_review_requests
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $this->logger->warning('getVettingAttestationData review requests failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $data;
     }
 
     /**
@@ -2548,8 +2644,8 @@ class GdprService
     private function getSafeguardingPreferencesData(int $userId): array
     {
         try {
-            return $this->query(
-                "SELECT usp.id, tso.option_key, tso.label as option_label,
+            $rows = $this->query(
+                "SELECT usp.id, tso.option_key, tso.preset_source, tso.label as option_label,
                         usp.selected_value, usp.notes, usp.consent_given_at, usp.revoked_at, usp.created_at
                  FROM user_safeguarding_preferences usp
                  LEFT JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
@@ -2557,6 +2653,17 @@ class GdprService
                  ORDER BY usp.created_at DESC",
                 [$userId, $this->tenantId]
             )->fetchAll();
+
+            return array_map(static function (array $row): array {
+                $row['option_label'] = \App\Models\TenantSafeguardingOption::localizeOptionText(
+                    isset($row['preset_source']) ? (string) $row['preset_source'] : null,
+                    isset($row['option_key']) ? (string) $row['option_key'] : null,
+                    'label',
+                    isset($row['option_label']) ? (string) $row['option_label'] : null,
+                );
+
+                return $row;
+            }, $rows);
         } catch (\Throwable $e) {
             $this->logger->warning('getSafeguardingPreferencesData failed for user ' . $userId . ': ' . $e->getMessage());
             return [];

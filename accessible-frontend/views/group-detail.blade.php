@@ -16,7 +16,7 @@
         $isAdmin = in_array((string) $viewerRole, ['owner', 'admin'], true);
         $isPending = (($group['viewer_membership']['status'] ?? ($group['my_status'] ?? null)) === 'pending');
         $successStates = ['group-joined', 'group-left', 'group-created', 'group-updated'];
-        $failStates = ['group-failed', 'group-update-failed', 'group-delete-failed'];
+        $failStates = ['group-failed', 'group-safeguarding-restricted', 'group-safeguarding-unavailable', 'group-update-failed', 'group-delete-failed'];
         // WAVE T1-GROUPS feed-compose outcomes (keyed under groups_t1.states).
         $t1SuccessStates = ['group-posted'];
         $t1FailStates = ['group-post-empty', 'group-post-failed', 'group-post-forbidden'];
@@ -40,7 +40,11 @@
     @elseif (in_array($status, $failStates, true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div></div>
+                <div class="govuk-error-summary__body"><p class="govuk-body">{{ match ($status) {
+                    'group-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'group-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha.groups.states.' . $status),
+                } }}</p></div></div>
         </div>
     @elseif (in_array($status, $t1SuccessStates, true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="grp-feed-status">

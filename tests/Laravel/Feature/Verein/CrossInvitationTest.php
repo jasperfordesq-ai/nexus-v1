@@ -9,11 +9,14 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Verein;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
 use App\Services\Verein\VereinFederationService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 class CrossInvitationTest extends TestCase
@@ -97,6 +100,45 @@ class CrossInvitationTest extends TestCase
             ->where('type', 'verein_cross_invitation')
             ->first();
         $this->assertNotNull($notif);
+    }
+
+    public function test_safeguarding_denial_writes_no_cross_invitation_or_notification(): void
+    {
+        $svc = app(VereinFederationService::class);
+        $source = $this->makeVerein('Verein Guard Source');
+        $target = $this->makeVerein('Verein Guard Target');
+        $svc->setConsent($source, 'both', '8001');
+        $svc->setConsent($target, 'both', '8001');
+
+        $inviter = $this->makeUser();
+        $invitee = $this->makeUser();
+        $this->joinOrg($source, $inviter);
+        $this->joinOrg($source, $invitee);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($inviter, $invitee, self::TENANT_ID, 'verein_cross_invitation')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        try {
+            $svc->sendCrossInvitation($source, $target, $inviter, $invitee, 'Must not persist');
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertDatabaseMissing('verein_cross_invitations', [
+            'tenant_id' => self::TENANT_ID,
+            'inviter_user_id' => $inviter,
+            'invitee_user_id' => $invitee,
+        ]);
+        $this->assertDatabaseMissing('notifications', [
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $invitee,
+            'type' => 'verein_cross_invitation',
+        ]);
     }
 
     public function test_cross_invite_targets_returns_shared_source_and_inviteable_network(): void

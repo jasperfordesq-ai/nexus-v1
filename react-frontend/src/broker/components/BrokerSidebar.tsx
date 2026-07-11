@@ -44,7 +44,7 @@ import { Button, Tooltip } from '@/components/ui';
 export interface BrokerBadgeCounts {
   pending_members: number;
   safeguarding_alerts: number;
-  vetting_expiring: number;
+  vetting_review_requests: number;
   pending_exchanges: number;
   unreviewed_messages: number;
   monitored_users: number;
@@ -132,7 +132,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       items: [
         { key: 'safeguarding', label: t('nav.safeguarding'), icon: ShieldAlert, path: '/broker/safeguarding', badgeKey: 'safeguarding_alerts' },
         { key: 'safeguarding-options', label: t('nav.safeguarding_options'), icon: SlidersHorizontal, path: '/broker/safeguarding-options' },
-        { key: 'vetting', label: t('nav.vetting'), icon: ShieldCheck, path: '/broker/vetting', badgeKey: 'vetting_expiring' },
+        { key: 'vetting', label: t('nav.vetting'), icon: ShieldCheck, path: '/broker/vetting', badgeKey: 'vetting_review_requests' },
         { key: 'monitoring', label: t('nav.monitoring'), icon: Eye, path: '/broker/monitoring', badgeKey: 'monitored_users' },
         { key: 'risk-tags', label: t('nav.risk_tags'), icon: AlertTriangle, path: '/broker/risk-tags', badgeKey: 'high_risk_listings' },
         { key: 'insurance', label: t('nav.insurance'), icon: FileText, path: '/broker/insurance' },

@@ -7,13 +7,17 @@
 namespace Tests\Laravel\Feature\Volunteering;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Services\ShiftSwapService;
 use App\Services\ShiftWaitlistService;
 use App\Services\VolunteerService;
 use App\Services\VolunteeringConfigurationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -31,7 +35,7 @@ class WaitlistFlowTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /** @return array{shiftId: int, oppId: int} */
+    /** @return array{shiftId: int, oppId: int, ownerId: int} */
     private function createShift(int $capacity = 1, bool $past = false): array
     {
         TenantContext::setById($this->testTenantId);
@@ -66,7 +70,16 @@ class WaitlistFlowTest extends TestCase
             'capacity' => $capacity,
         ]);
 
-        return ['shiftId' => $shiftId, 'oppId' => $oppId];
+        return ['shiftId' => $shiftId, 'oppId' => $oppId, 'ownerId' => (int) $orgOwner->id];
+    }
+
+    private function enableVolunteeringFeature(): void
+    {
+        $features = json_decode((string) DB::table('tenants')->where('id', $this->testTenantId)->value('features'), true);
+        $features = is_array($features) ? $features : [];
+        $features['volunteering'] = true;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($features)]);
+        TenantContext::setById($this->testTenantId);
     }
 
     private function addApprovedSignup(int $oppId, int $shiftId, int $userId): int
@@ -150,6 +163,61 @@ class WaitlistFlowTest extends TestCase
         // Capacity 1, one outstanding offer — no second offer may go out
         $this->assertFalse($result);
         $this->assertSame('waiting', $this->waitlistStatus($e2));
+    }
+
+    public function test_notify_next_policy_denial_leaves_offer_waiting(): void
+    {
+        ['shiftId' => $shiftId, 'ownerId' => $ownerId] = $this->createShift(1);
+        $waiter = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        $entry = $this->addWaitlistEntry($shiftId, (int) $waiter->id, 1);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($waiter->id, $ownerId, $this->testTenantId, 'volunteer_shift_waitlist_spot_offer')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $this->assertFalse(ShiftWaitlistService::notifyNext($shiftId, $this->testTenantId));
+        $this->assertSame('waiting', $this->waitlistStatus($entry));
+        $this->assertNull(DB::table('vol_shift_waitlist')->where('id', $entry)->value('notified_at'));
+    }
+
+    public function test_waitlist_join_api_denial_writes_no_entry(): void
+    {
+        $this->enableVolunteeringFeature();
+        ['shiftId' => $shiftId, 'oppId' => $oppId, 'ownerId' => $ownerId] = $this->createShift(1);
+        $occupant = User::factory()->forTenant($this->testTenantId)->create();
+        $waiter = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        $this->addApprovedSignup($oppId, $shiftId, (int) $occupant->id);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'shift_id' => null,
+            'user_id' => $waiter->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Sanctum::actingAs($waiter, ['*']);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($waiter->id, $ownerId, $this->testTenantId, 'volunteer_shift_waitlist_join')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $response = $this->apiPost("/v2/volunteering/shifts/{$shiftId}/waitlist");
+
+        $response->assertStatus(403)->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $this->assertDatabaseMissing('vol_shift_waitlist', [
+            'tenant_id' => $this->testTenantId,
+            'shift_id' => $shiftId,
+            'user_id' => $waiter->id,
+        ]);
     }
 
     // ================================================================
@@ -306,6 +374,59 @@ class WaitlistFlowTest extends TestCase
         $this->assertSame('notified', $this->waitlistStatus($entry));
         $this->assertSame(0, DB::table('vol_applications')
             ->where('shift_id', $shiftId)->where('user_id', $waiter->id)->count());
+    }
+
+    public function test_waitlist_promotion_api_rechecks_policy_before_application_write(): void
+    {
+        $this->enableVolunteeringFeature();
+        ['shiftId' => $shiftId, 'oppId' => $oppId, 'ownerId' => $ownerId] = $this->createShift(1);
+        $waiter = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'shift_id' => null,
+            'user_id' => $waiter->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $entry = $this->addWaitlistEntry($shiftId, (int) $waiter->id, 1, 'notified', now()->toDateTimeString());
+        Sanctum::actingAs($waiter, ['*']);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($waiter->id, $ownerId, $this->testTenantId, 'volunteer_shift_waitlist_promotion')
+            ->andThrow(new SafeguardingPolicyException('SAFEGUARDING_POLICY_UNAVAILABLE', 'Policy unavailable'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $response = $this->apiPost("/v2/volunteering/shifts/{$shiftId}/waitlist/promote");
+
+        $response->assertStatus(503)->assertJsonPath('errors.0.code', 'SAFEGUARDING_POLICY_UNAVAILABLE');
+        $this->assertSame('notified', $this->waitlistStatus($entry));
+        $this->assertNull(DB::table('vol_applications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('opportunity_id', $oppId)
+            ->where('user_id', $waiter->id)
+            ->value('shift_id'));
+    }
+
+    public function test_waitlist_leave_remains_available_without_policy_check(): void
+    {
+        $this->enableVolunteeringFeature();
+        ['shiftId' => $shiftId] = $this->createShift(1);
+        $waiter = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        $entry = $this->addWaitlistEntry($shiftId, (int) $waiter->id, 1, 'waiting');
+        Sanctum::actingAs($waiter, ['*']);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldNotReceive('assertLocalContactAllowed');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $this->apiDelete("/v2/volunteering/shifts/{$shiftId}/waitlist")->assertNoContent();
+        $this->assertSame('cancelled', $this->waitlistStatus($entry));
     }
 
     // ================================================================

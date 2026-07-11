@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\Social\AppreciationService;
 use Illuminate\Http\JsonResponse;
 
@@ -47,6 +48,8 @@ class AppreciationsController extends BaseApiController
                 $this->inputBool('is_public', true),
             );
             return $this->respondWithData($appreciation, null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\DomainException $e) {
             $code = $e->getMessage();
             $status = $code === 'rate_limit_exceeded' ? 422 : 422;
@@ -86,6 +89,8 @@ class AppreciationsController extends BaseApiController
         try {
             $result = $this->service->react($id, $userId, $type);
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\DomainException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {

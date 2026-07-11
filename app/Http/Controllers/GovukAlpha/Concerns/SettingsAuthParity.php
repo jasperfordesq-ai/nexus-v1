@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\BrokerControlConfigService;
 use App\Services\Enterprise\GdprService;
 use App\Services\InsuranceCertificateService;
@@ -236,6 +237,14 @@ trait SettingsAuthParity
                     ->route('govuk-alpha.settings.linked-accounts', ['tenantSlug' => $tenantSlug, 'status' => $status])
                     ->withFragment('request');
             }
+        } catch (SafeguardingPolicyException $e) {
+            return redirect()
+                ->route('govuk-alpha.settings.linked-accounts', [
+                    'tenantSlug' => $tenantSlug,
+                    'status' => $this->settingsLinkedAccountSafeguardingStatus($e),
+                ])
+                ->with('linked_account_safeguarding_error', $e->getMessage())
+                ->withFragment('request');
         } catch (\Throwable $e) {
             report($e);
 
@@ -262,6 +271,14 @@ trait SettingsAuthParity
         try {
             $ok = $relationshipId > 0 && app(SubAccountService::class)->approveRelationship($userId, $relationshipId);
             $status = $ok ? 'link-approved' : 'link-failed';
+        } catch (SafeguardingPolicyException $e) {
+            return redirect()
+                ->route('govuk-alpha.settings.linked-accounts', [
+                    'tenantSlug' => $tenantSlug,
+                    'status' => $this->settingsLinkedAccountSafeguardingStatus($e),
+                ])
+                ->with('linked_account_safeguarding_error', $e->getMessage())
+                ->withFragment('parents');
         } catch (\Throwable $e) {
             report($e);
             $status = 'link-failed';
@@ -296,6 +313,14 @@ trait SettingsAuthParity
         try {
             $ok = app(SubAccountService::class)->updatePermissions($userId, $relationshipId, $permissions);
             $status = $ok ? 'link-permissions-saved' : 'link-failed';
+        } catch (SafeguardingPolicyException $e) {
+            return redirect()
+                ->route('govuk-alpha.settings.linked-accounts', [
+                    'tenantSlug' => $tenantSlug,
+                    'status' => $this->settingsLinkedAccountSafeguardingStatus($e),
+                ])
+                ->with('linked_account_safeguarding_error', $e->getMessage())
+                ->withFragment('children');
         } catch (\Throwable $e) {
             report($e);
             $status = 'link-failed';
@@ -327,6 +352,15 @@ trait SettingsAuthParity
         return redirect()
             ->route('govuk-alpha.settings.linked-accounts', ['tenantSlug' => $tenantSlug, 'status' => $status])
             ->withFragment('children');
+    }
+
+    private function settingsLinkedAccountSafeguardingStatus(SafeguardingPolicyException $exception): string
+    {
+        return match ($exception->reasonCode) {
+            'SAFEGUARDING_POLICY_UNAVAILABLE' => 'link-safeguarding-unavailable',
+            'VETTING_REQUIRED' => 'link-vetting-required',
+            default => 'link-contact-restricted',
+        };
     }
 
     // =====================================================================

@@ -11,7 +11,8 @@ use App\Services\Matching\CandidateRetriever;
 use App\Services\MatchLearningService;
 use App\Services\SmartMatchingEngine;
 use App\Services\EmbeddingService;
-use App\Services\VettingService;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
@@ -19,7 +20,6 @@ class SmartMatchingEngineTest extends TestCase
 {
     private SmartMatchingEngine $engine;
     private $mockEmbedding;
-    private $mockVetting;
     private $mockRetriever;
     private $mockLearning;
 
@@ -27,7 +27,6 @@ class SmartMatchingEngineTest extends TestCase
     {
         parent::setUp();
         $this->mockEmbedding = Mockery::mock(EmbeddingService::class);
-        $this->mockVetting = Mockery::mock(VettingService::class);
         $this->mockRetriever = Mockery::mock(CandidateRetriever::class);
         $this->mockLearning = Mockery::mock(MatchLearningService::class);
         // Default: no candidates unless a test says otherwise.
@@ -36,18 +35,35 @@ class SmartMatchingEngineTest extends TestCase
         // Default: no learning history.
         $this->mockLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([])->byDefault();
         $this->mockLearning->shouldReceive('getCategoryAffinities')->andReturn([])->byDefault();
-        // Default: searcher is not staff, has all vettings — keeps existing tests passing
-        $this->mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false)->byDefault();
-        $this->mockVetting->shouldReceive('userHasAllValidVettings')->andReturn(true)->byDefault();
+        $this->bindSafeguardingDecisions([]);
         $this->engine = new SmartMatchingEngine(
-            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning
+            $this->mockEmbedding, $this->mockRetriever, $this->mockLearning
         );
     }
 
-    /** Build an engine with the shared default mocks but a custom vetting mock. */
-    private function makeEngine($mockVetting): SmartMatchingEngine
+    /** @param array<int,string> $statusesByRecipient */
+    private function bindSafeguardingDecisions(array $statusesByRecipient): void
     {
-        return new SmartMatchingEngine($this->mockEmbedding, $mockVetting, $this->mockRetriever, $this->mockLearning);
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateLocalContact')
+            ->zeroOrMoreTimes()
+            ->andReturnUsing(function (int $senderId, int $recipientId) use ($statusesByRecipient) {
+                $status = $statusesByRecipient[$recipientId] ?? SafeguardingInteractionDecision::ALLOW;
+
+                return new SafeguardingInteractionDecision(
+                    status: $status,
+                    code: $status === SafeguardingInteractionDecision::ALLOW
+                        ? 'SAFEGUARDING_ALLOWED'
+                        : ($status === SafeguardingInteractionDecision::UNAVAILABLE
+                            ? 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                            : 'VETTING_REQUIRED'),
+                    recipientTenantId: 1,
+                    purposeCode: 'safeguarded_member_contact',
+                    scopeType: 'tenant',
+                    scopeIdentifier: '',
+                );
+            });
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
     }
 
     // ── getConfig ──
@@ -137,7 +153,7 @@ class SmartMatchingEngineTest extends TestCase
         // Partial mock: real warmUpCache(), stubbed findMatchesForUser().
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
+            [$this->mockEmbedding, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')
             ->once()->withArgs(fn ($id, $opts) => $id === 1 && $opts === ['limit' => 20])
@@ -176,7 +192,7 @@ class SmartMatchingEngineTest extends TestCase
 
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
+            [$this->mockEmbedding, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')->once()->andReturn([
             ['id' => 1, 'match_score' => 130.0, 'distance_km' => 1.0, 'match_type' => 'one_way', 'match_reasons' => []],
@@ -215,7 +231,7 @@ class SmartMatchingEngineTest extends TestCase
 
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
+            [$this->mockEmbedding, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')->once()->andReturn([[
             'id' => 55,
@@ -570,7 +586,7 @@ class SmartMatchingEngineTest extends TestCase
         $penalisingLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([2 => -10.0]);
         $penalisingLearning->shouldReceive('getCategoryAffinities')->andReturn([]);
         $engine2 = new SmartMatchingEngine(
-            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $penalisingLearning
+            $this->mockEmbedding, $this->mockRetriever, $penalisingLearning
         );
         $penalised = $engine2->findMatchesForUser(1);
 
@@ -603,21 +619,20 @@ class SmartMatchingEngineTest extends TestCase
         $this->assertSame($candidates, $result);
     }
 
-    public function test_filter_returns_all_candidates_when_searcher_is_staff(): void
+    public function test_filter_does_not_bypass_policy_for_staff_in_ordinary_discovery(): void
     {
-        $mockVetting = Mockery::mock(VettingService::class);
-        $mockVetting->shouldReceive('isSafeguardingStaff')->once()->with(42)->andReturn(true);
-        // If staff bypass works, userHasAllValidVettings should NEVER be called
-        $mockVetting->shouldNotReceive('userHasAllValidVettings');
-        $engine = $this->makeEngine($mockVetting);
-
         $candidates = [
             ['id' => 1, 'user_id' => 10],
             ['id' => 2, 'user_id' => 20],
         ];
+        $this->bindSafeguardingDecisions([
+            10 => SafeguardingInteractionDecision::DENY,
+            20 => SafeguardingInteractionDecision::ALLOW,
+        ]);
 
-        $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
-        $this->assertSame($candidates, $result);
+        $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
+
+        $this->assertSame([2], array_column($result, 'id'));
     }
 
     public function test_filter_returns_all_candidates_when_none_require_vetting(): void
@@ -627,18 +642,6 @@ class SmartMatchingEngineTest extends TestCase
             ['id' => 2, 'user_id' => 20],
         ];
 
-        // getRequiredVettingTypesForUsers returns empty arrays for all user ids
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
-
-        // userHasAllValidVettings should NEVER be called — fast-path return
-        $this->mockVetting->shouldNotReceive('userHasAllValidVettings');
-
         $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertCount(2, $result);
     }
@@ -646,29 +649,9 @@ class SmartMatchingEngineTest extends TestCase
     public function test_filter_includes_candidate_when_searcher_holds_required_vetting(): void
     {
         $candidates = [['id' => 99, 'user_id' => 10]];
+        $this->bindSafeguardingDecisions([10 => SafeguardingInteractionDecision::ALLOW]);
 
-        // Owner 10 requires garda_vetting
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-        ]));
-
-        // Searcher holds it
-        $mockVetting = Mockery::mock(VettingService::class);
-        $mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false);
-        $mockVetting->shouldReceive('userHasAllValidVettings')
-            ->once()
-            ->with(42, ['garda_vetting'])
-            ->andReturn(true);
-
-        $engine = $this->makeEngine($mockVetting);
-
-        $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
+        $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertCount(1, $result);
         $this->assertSame(99, $result[0]['id']);
     }
@@ -676,97 +659,36 @@ class SmartMatchingEngineTest extends TestCase
     public function test_filter_drops_candidate_when_searcher_lacks_required_vetting(): void
     {
         $candidates = [['id' => 99, 'user_id' => 10]];
+        $this->bindSafeguardingDecisions([10 => SafeguardingInteractionDecision::DENY]);
 
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-        ]));
-
-        // Searcher lacks garda_vetting
-        $mockVetting = Mockery::mock(VettingService::class);
-        $mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false);
-        $mockVetting->shouldReceive('userHasAllValidVettings')
-            ->once()
-            ->with(42, ['garda_vetting'])
-            ->andReturn(false);
-
-        $engine = $this->makeEngine($mockVetting);
-
-        $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
+        $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertEmpty($result);
     }
 
-    public function test_filter_dedupes_vetting_checks_by_typeset_signature(): void
+    public function test_filter_excludes_candidate_when_policy_is_unavailable(): void
     {
-        // Three candidates share the same owner requirements — vetting check
-        // should only run once thanks to the signature cache.
-        $candidates = [
-            ['id' => 1, 'user_id' => 10],
-            ['id' => 2, 'user_id' => 20],
-            ['id' => 3, 'user_id' => 30],
-        ];
+        $candidates = [['id' => 1, 'user_id' => 10]];
+        $this->bindSafeguardingDecisions([10 => SafeguardingInteractionDecision::UNAVAILABLE]);
 
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 20, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 30, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-        ]));
+        $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
 
-        $mockVetting = Mockery::mock(VettingService::class);
-        $mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false);
-        // Called exactly ONCE despite three candidates with same requirements
-        $mockVetting->shouldReceive('userHasAllValidVettings')
-            ->once()
-            ->with(42, ['garda_vetting'])
-            ->andReturn(true);
-
-        $engine = $this->makeEngine($mockVetting);
-
-        $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
-        $this->assertCount(3, $result);
+        $this->assertSame([], $result);
     }
 
     public function test_filter_mixed_candidates_drops_only_flagged_without_vetting(): void
     {
         $candidates = [
             ['id' => 1, 'user_id' => 10], // no requirements
-            ['id' => 2, 'user_id' => 20], // requires garda — searcher lacks
-            ['id' => 3, 'user_id' => 30], // requires dbs — searcher has
+            ['id' => 2, 'user_id' => 20], // denied
+            ['id' => 3, 'user_id' => 30], // allowed
             ['id' => 4, 'user_id' => 40], // no requirements
         ];
+        $this->bindSafeguardingDecisions([
+            20 => SafeguardingInteractionDecision::DENY,
+            30 => SafeguardingInteractionDecision::ALLOW,
+        ]);
 
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 20, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 30, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'dbs_enhanced'])],
-        ]));
-
-        $mockVetting = Mockery::mock(VettingService::class);
-        $mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false);
-        $mockVetting->shouldReceive('userHasAllValidVettings')
-            ->with(42, ['garda_vetting'])->andReturn(false);
-        $mockVetting->shouldReceive('userHasAllValidVettings')
-            ->with(42, ['dbs_enhanced'])->andReturn(true);
-
-        $engine = $this->makeEngine($mockVetting);
-
-        $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
+        $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
 
         // 1, 3, 4 kept (indexes reindexed); 2 dropped
         $ids = array_map(fn ($c) => $c['id'], $result);
@@ -786,32 +708,23 @@ class SmartMatchingEngineTest extends TestCase
             ['id' => 2, 'user_id' => 20],
         ];
 
-        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
-        DB::shouldReceive('join')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('whereNull')->andReturnSelf();
-        DB::shouldReceive('select')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
-
         $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 10);
         $this->assertCount(2, $result);
     }
 
-    public function test_filter_fails_open_on_db_error(): void
+    public function test_filter_fails_closed_when_policy_throws(): void
     {
         $candidates = [
             ['id' => 1, 'user_id' => 10],
             ['id' => 2, 'user_id' => 20],
         ];
 
-        // getRequiredVettingTypesForUsers throws internally — filter should log warning
-        // and return unfiltered candidates (downstream gates remain fail-closed).
-        DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateLocalContact')->andThrow(new \RuntimeException('Policy unavailable'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
 
         $result = $this->engine->filterCandidatesByVettingRequirements($candidates, 42);
-        // The bulk method catches its own exception and returns empty map, which the
-        // filter then sees as "nobody requires vetting" — returns all candidates.
-        $this->assertCount(2, $result);
+
+        $this->assertSame([], $result);
     }
 }

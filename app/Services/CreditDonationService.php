@@ -50,6 +50,13 @@ class CreditDonationService
             return false;
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $fromUserId,
+            $toUserId,
+            $tenantId,
+            'credit_donation',
+        );
+
         $success = DB::transaction(function () use ($tenantId, $fromUserId, $toUserId, $amount, $message, $recipient) {
             // Atomic deduct
             $affected = DB::table('users')

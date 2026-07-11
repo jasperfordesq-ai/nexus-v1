@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
@@ -409,6 +410,15 @@ class IdeationChallengeService
             throw new \RuntimeException('Challenge not found');
         }
 
+        if ((int) $challenge->user_id !== $userId) {
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $userId,
+                (int) $challenge->user_id,
+                (int) $tenantId,
+                'ideation_idea_submission',
+            );
+        }
+
         $ideaId = DB::table('challenge_ideas')->insertGetId([
             'challenge_id' => $challengeId,
             'user_id'      => $userId,
@@ -738,7 +748,7 @@ class IdeationChallengeService
         }
 
         try {
-            return DB::transaction(function () use ($ideaId, $userId, $tenantId) {
+            return DB::transaction(function () use ($ideaId, $idea, $userId, $tenantId) {
                 $existingVote = DB::table('challenge_idea_votes')
                     ->where('idea_id', $ideaId)
                     ->where('user_id', $userId)
@@ -754,6 +764,13 @@ class IdeationChallengeService
                         ->update(['votes_count' => DB::raw('GREATEST(0, votes_count - 1)')]);
                     $voted = false;
                 } else {
+                    app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                        $userId,
+                        (int) $idea['user_id'],
+                        (int) $tenantId,
+                        'ideation_idea_vote',
+                    );
+
                     DB::table('challenge_idea_votes')->insert([
                         'idea_id'    => $ideaId,
                         'user_id'    => $userId,
@@ -777,6 +794,8 @@ class IdeationChallengeService
                     'votes_count' => (int) ($updated->votes_count ?? 0),
                 ];
             });
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::voteIdea error: ' . $e->getMessage());
             $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.idea_vote_toggle_failed')];
@@ -931,7 +950,17 @@ class IdeationChallengeService
         }
 
         try {
-            $commentId = DB::transaction(function () use ($ideaId, $userId, $body) {
+            $commentId = DB::transaction(function () use ($ideaId, $idea, $userId, $body) {
+                $ideaAuthorId = (int) $idea['user_id'];
+                if ($ideaAuthorId !== $userId) {
+                    app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                        $userId,
+                        $ideaAuthorId,
+                        (int) TenantContext::getId(),
+                        'idea_comment',
+                    );
+                }
+
                 $commentId = DB::table('challenge_idea_comments')->insertGetId([
                     'idea_id'    => $ideaId,
                     'user_id'    => $userId,
@@ -950,6 +979,8 @@ class IdeationChallengeService
             $this->notifyIdeaCommented($ideaId, (int) $idea['user_id'], $userId, $body);
 
             return $commentId;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::addComment error: ' . $e->getMessage());
             $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.comment_add_failed')];
@@ -1044,6 +1075,34 @@ class IdeationChallengeService
                         ->update(['favorites_count' => DB::raw('GREATEST(0, favorites_count - 1)')]);
                     $favorited = false;
                 } else {
+                    $challengeOwnerId = DB::table('ideation_challenges')
+                        ->where('id', $challengeId)
+                        ->where('tenant_id', $tenantId)
+                        ->value('user_id');
+
+                    if (! is_numeric($challengeOwnerId)) {
+                        Log::error('Safeguarding recipient lookup failed.', [
+                            'tenant_id' => $tenantId,
+                            'channel' => 'ideation_challenge_favorite',
+                            'challenge_id' => $challengeId,
+                        ]);
+
+                        throw new SafeguardingPolicyException(
+                            'SAFEGUARDING_POLICY_UNAVAILABLE',
+                            __('safeguarding.errors.policy_unavailable'),
+                        );
+                    }
+
+                    $challengeOwnerId = (int) $challengeOwnerId;
+                    if ($challengeOwnerId !== $userId) {
+                        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                            $userId,
+                            $challengeOwnerId,
+                            $tenantId,
+                            'ideation_challenge_favorite',
+                        );
+                    }
+
                     DB::table('challenge_favorites')->insert([
                         'challenge_id' => $challengeId,
                         'user_id'      => $userId,
@@ -1066,6 +1125,8 @@ class IdeationChallengeService
                     'favorites_count' => (int) ($updated->favorites_count ?? 0),
                 ];
             });
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('IdeationChallengeService::toggleFavorite error: ' . $e->getMessage());
             return ['favorited' => false];

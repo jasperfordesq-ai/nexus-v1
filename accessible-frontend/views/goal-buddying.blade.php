@@ -30,10 +30,14 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="nudge-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_gamify.buddy_nudge_success') }}</p></div>
         </div>
-    @elseif ($status === 'buddy-nudge-failed')
+    @elseif (in_array($status, ['buddy-nudge-failed', 'buddy-nudge-safeguarding-restricted', 'buddy-nudge-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#your-buddied-goals">{{ __('govuk_alpha.polish_gamify.buddy_nudge_failed') }}</a></li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#your-buddied-goals">{{ match ($status) {
+                    'buddy-nudge-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'buddy-nudge-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha.polish_gamify.buddy_nudge_failed'),
+                } }}</a></li></ul></div></div>
         </div>
     @elseif ($status === 'buddy-joined')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="buddy-status">

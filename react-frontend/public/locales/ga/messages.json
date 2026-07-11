@@ -9,6 +9,8 @@
   "send": "Seol",
   "you": "Tusa",
   "unread": "{{count}} gan léamh",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Do chomhráite le comhaltaí an phobail",
   "disabled_title": "Teachtaireacht Dhíreach Díchumascaithe",
   "disabled_subtitle": "Níl teachtaireacht dhíreach cumasaithe don phobal seo. Chun seirbhísí a shocrú, úsáid an córas iarratais malartú le do thoil.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Teachtaireachtaí níos sine á lódáil",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Ta seiceail chosanta de dhith",
     "body": "Ta an comhra seo curtha ar sos mar eilionn riail chosanta pobail grinnfhiosru fioraithe sula feidir leat teachtaireacht a chur chuig an gcomhalta seo.",
@@ -226,6 +226,13 @@
     "action": "Oscail cabhair",
     "dismiss": "Dibir fogra cosanta"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Níl seiceáil cosanta ar fáil go sealadach",
+    "body": "Cuirtear teachtaireachtaí díreacha ar sos toisc nach bhféadfaí an polasaí cosanta pobail a sheiceáil go sábháilte.",
+    "contact_broker": "Seiceáil arís go luath. Má leanann sé seo ar aghaidh, iarr ar chomhordaitheoir pobail cabhrú leat.",
+    "action": "Seiceáil arís",
+    "dismiss": "An fógra cosanta a dhíbhe"
+  },
   "coordinator_request": {
     "button": "Iarr cabhair comhordaitheora",
     "aria_button": "Iarr cabhair comhordaitheora chun teagmháil a eagrú",
@@ -234,15 +241,30 @@
     "sent": "Comhordaitheoir curtha ar an eolas — beidh siad i dteagmháil leat chun cabhrú leis an teagmháil a eagrú.",
     "error": "Níorbh fhéidir do iarratas a sheoladh faoi láthair. Bain triail eile as ar ball."
   },
+  "vetting_review_request": {
+    "button": "Iarr athbhreithniú grinnfhiosrúcháin",
+    "success_title": "Athbhreithniú iarrtha",
+    "success_body": "Iarradh ar do bhróicéir pobail do dheimhniú cosanta príobháideacha a athbhreithniú.",
+    "sent": "Athbhreithniú grinnfhiosrúcháin iarrtha. Rachaidh do phobal i dteagmháil leat faoina phróiseas.",
+    "error": "Níorbh fhéidir linn athbhreithniú grinnfhiosrúcháin a iarraidh díreach anois. Bain triail eile as gan mhoill."
+  },
+  "safeguarding_check_again": "Seiceáil arís",
+  "safeguarding_checks": {
+    "dbs_enhanced": "DBS feabhsaithe (Sasana agus An Bhreatain Bheag)",
+    "pvg_scotland": "Scéim PVG",
+    "access_ni": "AccessNI (Tuaisceart Éireann)",
+    "garda_vetting": "Grinnfhiosrúchán an Gharda Síochána"
+  },
   "composer_blocked_safeguarding": "Níl teachtaireachtaí díreacha ar fáil leis an gcomhalta seo. Úsáid an rogha thuas chun iarraidh ar chomhordaitheoir cabhrú leis an teagmháil a eagrú.",
-  "aria_conversation_unread_few": "Comhrá le {{name}}, {{count}} neamhléite",
-  "aria_conversation_unread_many": "Comhrá le {{name}}, {{count}} neamhléite",
+  "composer_blocked_safeguarding_unavailable": "Cuirtear teachtaireachtaí díreacha ar sos agus an beartas cosanta á sheiceáil. Úsáid Seiceáil arís thuas.",
   "aria_conversation_unread_one": "Comhrá le {{name}}, {{count}} neamhléite",
   "aria_conversation_unread_other": "Comhrá le {{name}}, {{count}} neamhléite",
+  "selected_members_one": "Roghnaithe ({{count}})",
+  "selected_members_other": "Roghnaithe ({{count}})",
+  "aria_conversation_unread_few": "Comhrá le {{name}}, {{count}} neamhléite",
+  "aria_conversation_unread_many": "Comhrá le {{name}}, {{count}} neamhléite",
   "aria_conversation_unread_two": "Comhrá le {{name}}, {{count}} neamhléite",
   "selected_members_few": "Roghnaithe ({{count}})",
   "selected_members_many": "Roghnaithe ({{count}})",
-  "selected_members_one": "Roghnaithe ({{count}})",
-  "selected_members_other": "Roghnaithe ({{count}})",
   "selected_members_two": "Roghnaithe ({{count}})"
 }

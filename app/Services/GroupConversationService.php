@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\User;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +89,20 @@ class GroupConversationService
 
         if (count($validMembers) < 2) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_not_enough_members_blocked')];
+            return null;
+        }
+
+        // Every member can contact every other member as soon as the group is
+        // created. Check the complete cohort in both directions before writing
+        // any participant row; checking only the creator leaves member-to-member
+        // protected-contact pairs exposed.
+        $decision = self::evaluateCohortPolicy(
+            array_merge([$creatorId], array_values($validMembers)),
+            $tenantId,
+            'group_create',
+        );
+        if ($decision !== null) {
+            self::setSafeguardingError($decision);
             return null;
         }
 
@@ -174,6 +189,26 @@ class GroupConversationService
 
         if ($existing && $existing->left_at === null) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.group_conversation_already_member')];
+            return null;
+        }
+
+        // Joining or rejoining exposes the existing conversation history to the
+        // target member. Every active participant is therefore a potential
+        // sender to that target. Check all directions before changing left_at or
+        // inserting a participant row; policy-unavailable takes precedence over
+        // a normal denial so callers can present a retryable outcome.
+        $activeParticipantIds = ConversationParticipant::where('conversation_id', $conversationId)
+            ->whereNull('left_at')
+            ->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $decision = self::evaluateCohortPolicy(
+            array_merge($activeParticipantIds, [$userId]),
+            $tenantId,
+            'group_member_add',
+        );
+        if ($decision !== null) {
+            self::setSafeguardingError($decision);
             return null;
         }
 
@@ -503,11 +538,31 @@ class GroupConversationService
             ];
         })->all();
 
+        $safeguarding = null;
+        if ($participant->left_at === null) {
+            $recipientIds = ConversationParticipant::where('conversation_id', $conversationId)
+                ->whereNull('left_at')
+                ->where('user_id', '!=', $userId)
+                ->pluck('user_id')
+                ->map(static fn ($id): int => (int) $id)
+                ->all();
+            $decision = app(SafeguardingInteractionPolicy::class)->evaluateManyLocalContacts(
+                $userId,
+                $recipientIds,
+                $tenantId,
+                'group_message',
+            );
+            if (! $decision->isAllowed()) {
+                $safeguarding = self::formatSafeguardingDecision($decision);
+            }
+        }
+
         return [
             'items' => array_values($items),
             'cursor' => $hasMore && $messages->isNotEmpty() ? base64_encode((string) $messages->last()->id) : null,
             'has_more' => $hasMore,
             'conversation' => self::formatConversation($conversation),
+            'safeguarding' => $safeguarding,
         ];
     }
 
@@ -542,6 +597,23 @@ class GroupConversationService
             return null;
         }
 
+        $recipientIds = ConversationParticipant::where('conversation_id', $conversationId)
+            ->whereNull('left_at')
+            ->where('user_id', '!=', $senderId)
+            ->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $decision = app(SafeguardingInteractionPolicy::class)->evaluateManyLocalContacts(
+            $senderId,
+            $recipientIds,
+            $tenantId,
+            'group_message',
+        );
+        if (! $decision->isAllowed()) {
+            self::setSafeguardingError($decision);
+            return null;
+        }
+
         $messageId = DB::table('messages')->insertGetId([
             'tenant_id' => $tenantId,
             'conversation_id' => $conversationId,
@@ -571,6 +643,81 @@ class GroupConversationService
                 'name' => trim(($sender->first_name ?? '') . ' ' . ($sender->last_name ?? '')),
                 'avatar_url' => $sender->avatar_url,
             ] : null,
+        ];
+    }
+
+    /**
+     * Evaluate every directed contact pair in a proposed group cohort.
+     *
+     * @param list<int> $userIds
+     */
+    private static function evaluateCohortPolicy(
+        array $userIds,
+        int $tenantId,
+        string $channel,
+    ): ?SafeguardingInteractionDecision {
+        $userIds = array_values(array_unique(array_filter(
+            array_map('intval', $userIds),
+            static fn (int $userId): bool => $userId > 0,
+        )));
+        $firstDenial = null;
+
+        foreach ($userIds as $senderId) {
+            foreach ($userIds as $recipientId) {
+                if ($senderId === $recipientId) {
+                    continue;
+                }
+
+                $decision = app(SafeguardingInteractionPolicy::class)->evaluateLocalContact(
+                    $senderId,
+                    $recipientId,
+                    $tenantId,
+                    $channel,
+                );
+                if ($decision->isUnavailable()) {
+                    return $decision;
+                }
+                if ($decision->isDenied() && $firstDenial === null) {
+                    $firstDenial = $decision;
+                }
+            }
+        }
+
+        return $firstDenial;
+    }
+
+    private static function setSafeguardingError(SafeguardingInteractionDecision $decision): void
+    {
+        self::$errors = [MessageService::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ])];
+    }
+
+    /** @return array<string, mixed> */
+    private static function formatSafeguardingDecision(SafeguardingInteractionDecision $decision): array
+    {
+        $error = MessageService::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ]);
+
+        return [
+            'restricted' => true,
+            'code' => $error['code'],
+            'title' => $error['title'] ?? null,
+            'message' => $error['message'] ?? null,
+            'detail' => $error['detail'] ?? null,
+            'action_label' => $error['action_label'] ?? null,
+            'required_vetting_types' => $error['required_vetting_types'] ?? [],
+            'required_vetting_labels' => $error['required_vetting_labels'] ?? [],
+            'can_request_coordinator' => $decision->canRequestCoordinator,
         ];
     }
 

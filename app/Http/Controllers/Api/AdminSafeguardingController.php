@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
+use App\Models\TenantSafeguardingOption;
 use App\Services\EmailDispatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -712,6 +713,7 @@ class AdminSafeguardingController extends BaseApiController
                     u.avatar_url as user_avatar,
                     usp.consent_given_at,
                     tso.option_key,
+                    tso.preset_source,
                     tso.label as option_label,
                     tso.triggers
                  FROM user_safeguarding_preferences usp
@@ -742,7 +744,12 @@ class AdminSafeguardingController extends BaseApiController
                 $isDeclination = $row->option_key === 'none_apply';
                 $grouped[$uid]['options'][] = [
                     'option_key' => $row->option_key,
-                    'label' => $row->option_label,
+                    'label' => TenantSafeguardingOption::localizeOptionText(
+                        $row->preset_source,
+                        $row->option_key,
+                        'label',
+                        $row->option_label,
+                    ),
                     'is_declination' => $isDeclination,
                 ];
                 if ($hasTriggers) {

@@ -9,6 +9,8 @@
   "send": "Enviar",
   "you": "Você",
   "unread": "{{count}} não lidas",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "As suas conversas com membros da comunidade",
   "disabled_title": "Mensagens Diretas Desativadas",
   "disabled_subtitle": "As mensagens diretas não estão ativadas para esta comunidade. Para organizar serviços, utilize o sistema de pedidos de troca.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Carregando mensagens mais antigas",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Verificacao de protecao necessaria",
     "body": "Esta conversa esta pausada porque uma regra de protecao da comunidade exige uma verificacao confirmada antes de poder enviar mensagens a este membro.",
@@ -226,6 +226,13 @@
     "action": "Abrir ajuda",
     "dismiss": "Dispensar aviso de protecao"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Verificação de proteção temporariamente indisponível",
+    "body": "As mensagens diretas foram pausadas porque a política de proteção da comunidade não pôde ser verificada com segurança.",
+    "contact_broker": "Verifique novamente em breve. Se isto continuar, peça ajuda a um coordenador comunitário.",
+    "action": "Verifique novamente",
+    "dismiss": "Ignorar aviso de salvaguarda"
+  },
   "coordinator_request": {
     "button": "Pedir ajuda a um coordenador",
     "aria_button": "Pedir ajuda a um coordenador para organizar o contacto",
@@ -234,11 +241,26 @@
     "sent": "Coordenador notificado — entrará em contacto para ajudar a organizar a comunicação.",
     "error": "Não foi possível enviar o seu pedido neste momento. Por favor, tente novamente em breve."
   },
+  "vetting_review_request": {
+    "button": "Solicitar revisão de verificação",
+    "success_title": "Revisão solicitada",
+    "success_body": "Seu corretor da comunidade foi solicitado a revisar sua confirmação de proteção privada.",
+    "sent": "Revisão de verificação solicitada. Sua comunidade entrará em contato com você sobre o processo.",
+    "error": "Não foi possível solicitar uma revisão de verificação agora. Por favor, tente novamente em breve."
+  },
+  "safeguarding_check_again": "Verifique novamente",
+  "safeguarding_checks": {
+    "dbs_enhanced": "DBS aprimorado (Inglaterra e País de Gales)",
+    "pvg_scotland": "Esquema PVG",
+    "access_ni": "AccessNI (Irlanda do Norte)",
+    "garda_vetting": "Verificação da polícia"
+  },
   "composer_blocked_safeguarding": "A troca de mensagens diretas não está disponível com este membro. Utilize a opção acima para pedir a um coordenador que ajude a organizar o contacto.",
-  "aria_conversation_unread_many": "Conversa com {{name}}, {{count}} por ler",
+  "composer_blocked_safeguarding_unavailable": "As mensagens diretas são pausadas enquanto a política de proteção é verificada. Use Verificar novamente acima.",
   "aria_conversation_unread_one": "Conversa com {{name}}, {{count}} por ler",
   "aria_conversation_unread_other": "Conversa com {{name}}, {{count}} por ler",
-  "selected_members_many": "Selecionados ({{count}})",
   "selected_members_one": "Selecionados ({{count}})",
-  "selected_members_other": "Selecionados ({{count}})"
+  "selected_members_other": "Selecionados ({{count}})",
+  "aria_conversation_unread_many": "Conversa com {{name}}, {{count}} por ler",
+  "selected_members_many": "Selecionados ({{count}})"
 }

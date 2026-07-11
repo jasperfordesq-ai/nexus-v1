@@ -7,6 +7,8 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Services\PodcastService;
 use App\Jobs\ProcessPodcastEpisodeMedia;
 use App\Models\User;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 class PodcastControllerTest extends TestCase
@@ -868,6 +871,67 @@ class PodcastControllerTest extends TestCase
             'reaction' => $reaction,
         ])->assertStatus(200)
             ->assertJsonPath('data.active', false);
+    }
+
+    public function test_episode_reaction_addition_is_gated_but_removal_remains_available(): void
+    {
+        $this->enablePodcasts(true);
+        $author = $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Safeguarded Reaction Show',
+            'visibility' => 'public',
+        ]);
+        $showId = (int) $show->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertOk();
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Safeguarded Reaction Episode',
+            'audio_url' => 'https://cdn.example.test/safeguarded-reaction.mp3',
+            'visibility' => 'public',
+        ]);
+        $episodeId = (int) $episode->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertOk();
+
+        $reactor = $this->actingAsMember();
+        $blockedPolicy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $blockedPolicy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($reactor->id, $author->id, $this->testTenantId, 'podcast_episode_reaction')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $blockedPolicy);
+
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", ['reaction' => 'like'])
+            ->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $this->assertDatabaseMissing('podcast_episode_reactions', [
+            'tenant_id' => $this->testTenantId,
+            'episode_id' => $episodeId,
+            'user_id' => $reactor->id,
+            'reaction' => 'like',
+        ]);
+
+        $allowedPolicy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $allowedPolicy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($reactor->id, $author->id, $this->testTenantId, 'podcast_episode_reaction');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $allowedPolicy);
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", ['reaction' => 'like'])
+            ->assertOk()
+            ->assertJsonPath('data.active', true);
+
+        $removalPolicy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $removalPolicy->shouldNotReceive('assertLocalContactAllowed');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $removalPolicy);
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", ['reaction' => 'like'])
+            ->assertOk()
+            ->assertJsonPath('data.active', false);
+        $this->assertDatabaseMissing('podcast_episode_reactions', [
+            'tenant_id' => $this->testTenantId,
+            'episode_id' => $episodeId,
+            'user_id' => $reactor->id,
+            'reaction' => 'like',
+        ]);
     }
 
     public function test_anonymous_public_listens_are_recorded_without_authentication(): void

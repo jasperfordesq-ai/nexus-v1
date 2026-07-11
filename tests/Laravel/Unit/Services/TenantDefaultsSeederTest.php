@@ -127,16 +127,15 @@ class TenantDefaultsSeederTest extends TestCase
             ->where('target_type', 'any')
             ->count();
 
-        $this->assertSame(4, $offerCount, '4 offer-side attributes expected');
+        $this->assertSame(3, $offerCount, '3 offer-side attributes expected');
         $this->assertSame(2, $requestCount, '2 request-side attributes expected');
         $this->assertSame(3, $anyCount, '3 any-type attributes expected');
     }
 
-    public function test_seed_attributes_uses_globally_neutral_name(): void
+    public function test_seed_attributes_does_not_offer_self_declared_vetting_signals(): void
     {
         TenantDefaultsSeeder::seedAttributes(self::TENANT_ID);
 
-        // Must use "Background Checked" (not Irish-specific "Garda Vetted")
         $bgChecked = DB::table('attributes')
             ->where('tenant_id', self::TENANT_ID)
             ->where('name', 'Background Checked')
@@ -147,7 +146,7 @@ class TenantDefaultsSeederTest extends TestCase
             ->where('name', 'Garda Vetted')
             ->count();
 
-        $this->assertSame(1, $bgChecked, '"Background Checked" attribute must exist');
+        $this->assertSame(0, $bgChecked, '"Background Checked" must not be self-selectable');
         $this->assertSame(0, $gardaVetted, 'Irish-specific "Garda Vetted" must NOT be seeded');
     }
 
@@ -160,7 +159,7 @@ class TenantDefaultsSeederTest extends TestCase
             ->where('tenant_id', self::TENANT_ID)
             ->count();
 
-        $this->assertSame(9, $count, 'Running seedAttributes twice must not duplicate rows');
+        $this->assertSame(8, $count, 'Running seedAttributes twice must not duplicate rows');
     }
 
     // ── seedMenus ─────────────────────────────────────────────────────────────

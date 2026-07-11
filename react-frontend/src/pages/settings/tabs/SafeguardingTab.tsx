@@ -20,6 +20,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import MinusCircle from 'lucide-react/icons/circle-minus';
 import Lock from 'lucide-react/icons/lock';
+import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -31,7 +32,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
-interface MemberPreference {
+export interface MemberPreference {
   preference_id: number;
   option_id: number;
   option_key: string;
@@ -40,6 +41,8 @@ interface MemberPreference {
   selected_value: string;
   consent_given_at: string | null;
   created_at: string | null;
+  policy_review_required?: boolean;
+  policy_review_reason_code?: string | null;
   activations: {
     requires_broker_approval: boolean;
     restricts_messaging: boolean;
@@ -54,6 +57,22 @@ interface MyPreferencesResponse {
   count: number;
 }
 
+interface MyVettingStatus {
+  policy: {
+    configured: boolean;
+    contact_policy_available: boolean;
+    jurisdiction: string;
+    label: string;
+    attestation_code: string | null;
+    attestation_label: string | null;
+    purpose_code: string;
+  };
+  decision: 'confirmed' | 'revoked' | 'not_confirmed';
+  review_status: 'pending' | 'resolved' | null;
+  confirmed_at: string | null;
+  revoked_at?: string | null;
+}
+
 export function SafeguardingTab() {
   const { t } = useTranslation('settings');
   const toast = useToast();
@@ -61,18 +80,25 @@ export function SafeguardingTab() {
 
   const [loading, setLoading] = useState(true);
   const [preferences, setPreferences] = useState<MemberPreference[]>([]);
+  const [vettingStatus, setVettingStatus] = useState<MyVettingStatus | null>(null);
+  const [isRequestingReview, setIsRequestingReview] = useState(false);
+  const [isConfirmingPolicyReview, setIsConfirmingPolicyReview] = useState(false);
   const [revokingId, setRevokingId] = useState<number | null>(null);
   const [pendingRevoke, setPendingRevoke] = useState<MemberPreference | null>(null);
 
   const loadPreferences = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await api.get<MyPreferencesResponse>('/v2/safeguarding/my-preferences');
-      if (res.success && res.data) {
-        setPreferences(res.data.preferences ?? []);
+      const [preferencesResponse, vettingResponse] = await Promise.all([
+        api.get<MyPreferencesResponse>('/v2/safeguarding/my-preferences'),
+        api.get<MyVettingStatus>('/v2/safeguarding/my-vetting-status'),
+      ]);
+      if (preferencesResponse.success && preferencesResponse.data) {
+        setPreferences(preferencesResponse.data.preferences ?? []);
       } else {
         setPreferences([]);
       }
+      setVettingStatus(vettingResponse.success && vettingResponse.data ? vettingResponse.data : null);
     } catch (error) {
       logError('Failed to load safeguarding preferences', error);
       setPreferences([]);
@@ -118,6 +144,50 @@ export function SafeguardingTab() {
     }
   }, [pendingRevoke, t, toast, confirmModal]);
 
+  const handleRequestReview = useCallback(async () => {
+    if (!vettingStatus?.policy.configured || !vettingStatus.policy.contact_policy_available || isRequestingReview) return;
+
+    setIsRequestingReview(true);
+    try {
+      const response = await api.post('/v2/safeguarding/vetting-review-request');
+      if (!response.success) {
+        toast.error(t('safeguarding.vetting.review_error'));
+        return;
+      }
+
+      setVettingStatus((current) => current ? { ...current, review_status: 'pending' } : current);
+      toast.success(t('safeguarding.vetting.review_requested_toast'));
+    } catch (error) {
+      logError('Safeguarding vetting review request failed', error);
+      toast.error(t('safeguarding.vetting.review_error'));
+    } finally {
+      setIsRequestingReview(false);
+    }
+  }, [isRequestingReview, t, toast, vettingStatus]);
+
+  const handleConfirmPolicyReview = useCallback(async () => {
+    if (isConfirmingPolicyReview) return;
+    setIsConfirmingPolicyReview(true);
+    try {
+      const response = await api.post('/v2/safeguarding/confirm-policy-review');
+      if (!response.success) {
+        toast.error(t('safeguarding.policy_review_error'));
+        return;
+      }
+      setPreferences(current => current.map(preference => ({
+        ...preference,
+        policy_review_required: false,
+        policy_review_reason_code: null,
+      })));
+      toast.success(t('safeguarding.policy_review_confirmed'));
+    } catch (error) {
+      logError('Confirm safeguarding policy review failed', error);
+      toast.error(t('safeguarding.policy_review_error'));
+    } finally {
+      setIsConfirmingPolicyReview(false);
+    }
+  }, [isConfirmingPolicyReview, t, toast]);
+
   if (loading) {
     return (
       <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-12">
@@ -140,6 +210,96 @@ export function SafeguardingTab() {
             <p className="text-sm text-theme-muted">
               {t('safeguarding.intro')}
             </p>
+          </div>
+        </div>
+
+        {preferences.some(preference => preference.policy_review_required) && (
+          <div className="mb-6 rounded-xl border border-warning-300 bg-warning-50 p-4 text-warning-900 dark:border-warning-700 dark:bg-warning-950/30 dark:text-warning-100" role="status">
+            <div className="flex items-start gap-3">
+              <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold">{t('safeguarding.policy_review_title')}</h3>
+                <p className="mt-1 text-sm">{t('safeguarding.policy_review_body')}</p>
+                <Button
+                  className="mt-3"
+                  size="sm"
+                  color="warning"
+                  isLoading={isConfirmingPolicyReview}
+                  isDisabled={isConfirmingPolicyReview}
+                  onPress={handleConfirmPolicyReview}
+                >
+                  {t('safeguarding.policy_review_confirm')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="mb-6 rounded-xl border border-theme-default bg-theme-surface p-4">
+          <div className="flex items-start gap-3">
+            <Shield className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-theme-primary">
+                {t('safeguarding.vetting.title')}
+              </h3>
+              {!vettingStatus ? (
+                <>
+                  <p className="mt-1 text-sm text-theme-muted">{t('safeguarding.vetting.status_unavailable')}</p>
+                  <p className="mt-2 text-xs text-theme-muted">{t('safeguarding.vetting.no_documents')}</p>
+                </>
+              ) : (
+                <>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Chip
+                      size="sm"
+                      variant="soft"
+                      color={
+                        vettingStatus.decision === 'confirmed'
+                          ? 'success'
+                          : vettingStatus.decision === 'revoked'
+                            ? 'danger'
+                            : vettingStatus.review_status === 'pending'
+                              ? 'warning'
+                              : 'default'
+                      }
+                    >
+                      {t(`safeguarding.vetting.status_${
+                        vettingStatus.review_status === 'pending' ? 'review_requested' : vettingStatus.decision
+                      }`)}
+                    </Chip>
+                    {vettingStatus.policy.attestation_label && (
+                      <span className="text-sm text-theme-muted">{vettingStatus.policy.attestation_label}</span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-theme-muted">
+                    {vettingStatus.decision === 'confirmed' && vettingStatus.confirmed_at
+                      ? t('safeguarding.vetting.confirmed_on', {
+                          date: new Date(vettingStatus.confirmed_at).toLocaleDateString(getFormattingLocale()),
+                        })
+                      : vettingStatus.review_status === 'pending'
+                        ? t('safeguarding.vetting.review_pending_body')
+                        : vettingStatus.policy.configured && vettingStatus.policy.contact_policy_available
+                          ? t('safeguarding.vetting.not_confirmed_body')
+                          : t('safeguarding.vetting.policy_unavailable_body')}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-theme-muted">{t('safeguarding.vetting.no_documents')}</p>
+                  {vettingStatus.decision !== 'confirmed' && vettingStatus.policy.configured && vettingStatus.policy.contact_policy_available && (
+                    <Button
+                      className="mt-3"
+                      size="sm"
+                      variant="secondary"
+                      isPending={isRequestingReview}
+                      isDisabled={vettingStatus.review_status === 'pending'}
+                      onPress={handleRequestReview}
+                    >
+                      {vettingStatus.review_status === 'pending'
+                        ? t('safeguarding.vetting.review_requested_button')
+                        : t('safeguarding.vetting.request_review_button')}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
 

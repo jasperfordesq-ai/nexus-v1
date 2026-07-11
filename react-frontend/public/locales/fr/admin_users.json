@@ -361,6 +361,7 @@
       "safeguarding": "Sauvegarde",
       "super_admin_access": "Accès super-administrateur",
       "time_credits": "Crédits de temps",
+      "contact_attestation": "Sauvegarde de l’attestation de contact",
       "vetting_status": "Statut de vérification"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Activ? le {{date}}",
       "more_certificates": "Plus de certificats",
+      "more_attestations": "Plus d'attestations",
       "more_records": "Plus d'enregistrements"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- Expire",
       "no_reference": "Aucune référence",
-      "unknown_provider": "Fournisseur inconnu"
+      "unknown_provider": "Fournisseur inconnu",
+      "attestation_dbs_enhanced": "DBS amélioré (Angleterre et Pays de Galles)",
+      "attestation_pvg_scotland": "Schéma PVG",
+      "attestation_access_ni": "AccessNI (Irlande du Nord)",
+      "attestation_garda_vetting": "Vérification Garda",
+      "safeguarding_confirmation": "Confirmation de sauvegarde",
+      "confirmed_on": "Attestation communautaire confirmée sur {{date}}",
+      "not_confirmed": "Aucune attestation communautaire n'est confirmée",
+      "decision_confirmed": "Attestation confirmée",
+      "decision_revoked": "Attestation révoquée",
+      "decision_not_confirmed": "Attestation non confirmée"
     }
   },
   "aria": {

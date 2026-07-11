@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -130,11 +131,41 @@ class GroupMediaController extends BaseApiController
             return $this->errorResponse(__('api.group_media_images_videos_only'), 422);
         }
 
+        try {
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $id,
+                $userId,
+                (int) $tenantId,
+                'group_media_upload',
+                $file->getClientOriginalName(),
+            );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
+
         $storagePath = "groups/{$tenantId}/{$id}/media";
         $path = $file->store($storagePath, 'public');
 
         if (!$path) {
             return $this->errorResponse(__('api.group_media_store_failed'), 500);
+        }
+
+        try {
+            // Re-evaluate after the potentially slow file write. If policy or
+            // membership changed during upload, remove the bytes before exit.
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $id,
+                $userId,
+                (int) $tenantId,
+                'group_media_upload',
+                $file->getClientOriginalName(),
+            );
+        } catch (SafeguardingPolicyException $e) {
+            Storage::disk('public')->delete($path);
+            return $this->safeguardingPolicyError($e);
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($path);
+            throw $e;
         }
 
         $fileUrl = Storage::disk('public')->url($path);

@@ -164,7 +164,9 @@ class CommentService
         // Server-side XSS prevention: sanitize HTML content before storage
         $content = \App\Helpers\HtmlSanitizer::sanitize(trim($data['content']));
 
-        $parentId = $data['parent_id'] ?? null;
+        $parentId = isset($data['parent_id']) && $data['parent_id'] !== null
+            ? (int) $data['parent_id']
+            : null;
 
         // Check post visibility — prevent commenting on deleted/hidden posts
         if (!self::targetIsCommentableAndVisible($targetType, $targetId, $userId)) {
@@ -196,6 +198,17 @@ class CommentService
                 throw new \InvalidArgumentException(__('api.comment_nesting_too_deep'));
             }
         }
+
+        $mentionedUserIds = self::resolveMentionRecipientIds($content, $tenantId);
+        self::assertCommentContactAllowed(
+            $targetType,
+            $targetId,
+            $parentId,
+            $userId,
+            $tenantId,
+            $mentionedUserIds,
+            'comment_create',
+        );
 
         $comment = Comment::create([
             'target_type' => $targetType,
@@ -274,18 +287,32 @@ class CommentService
 
         // Server-side XSS prevention: sanitize HTML content before storage
         $trimmedContent = \App\Helpers\HtmlSanitizer::sanitize(trim($content));
-        $comment->content = $trimmedContent;
-        $comment->save();
 
-        // Re-process @mentions
-        try {
-            MentionService::deleteMentionsForEntity($commentId, 'comment');
-            MentionService::processText($trimmedContent, $commentId, 'comment', $userId);
-        } catch (\Exception $e) {
-            Log::warning("CommentService::update mention re-processing failed: " . $e->getMessage());
-        }
+        return DB::transaction(function () use ($comment, $commentId, $userId, $tenantId, $trimmedContent): string {
+            $mentionedUserIds = self::resolveMentionRecipientIds($trimmedContent, $tenantId);
+            self::assertCommentContactAllowed(
+                (string) $comment->target_type,
+                (int) $comment->target_id,
+                $comment->parent_id !== null ? (int) $comment->parent_id : null,
+                $userId,
+                $tenantId,
+                $mentionedUserIds,
+                'comment_update',
+            );
 
-        return $trimmedContent;
+            $comment->content = $trimmedContent;
+            $comment->save();
+
+            // Re-process @mentions only after the protected-contact assertion.
+            try {
+                MentionService::deleteMentionsForEntity($commentId, 'comment');
+                MentionService::processText($trimmedContent, $commentId, 'comment', $userId);
+            } catch (\Exception $e) {
+                Log::warning("CommentService::update mention re-processing failed: " . $e->getMessage());
+            }
+
+            return $trimmedContent;
+        });
     }
 
     /**
@@ -457,44 +484,65 @@ class CommentService
             }
         }
 
-        // Insert comment
-        $commentId = DB::table('comments')->insertGetId([
-            'user_id' => $userId,
-            'tenant_id' => $tenantId,
-            'target_type' => $targetType,
-            'target_id' => $targetId,
-            'parent_id' => $parentId,
-            'content' => $content,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        // Process @mentions
         $mentions = self::extractMentions($content);
-        if (!empty($mentions)) {
-            self::saveMentions($commentId, $mentions, $userId, $tenantId);
-        }
+        $mentionedUsers = self::resolveLegacyMentionUsers($mentions, $tenantId);
 
-        // Get the created comment with author info
-        $comment = DB::table('comments as c')
-            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
-            ->where('c.id', $commentId)
-            ->select([
-                'c.*',
-                DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
-            ])
-            ->selectRaw(
-                "COALESCE(NULLIF(u.name, ''), NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), ?) as author_name",
-                [__('api.unknown_user')]
-            )
-            ->first();
+        return DB::transaction(function () use (
+            $userId,
+            $tenantId,
+            $targetType,
+            $targetId,
+            $parentId,
+            $content,
+            $mentions,
+            $mentionedUsers,
+        ): array {
+            self::assertCommentContactAllowed(
+                $targetType,
+                $targetId,
+                $parentId,
+                $userId,
+                $tenantId,
+                array_values($mentionedUsers),
+                'comment_create',
+            );
 
-        return [
-            'success' => true,
-            'status' => 'success',
-            'comment' => $comment ? (array) $comment : null,
-            'is_reply' => $parentId !== null,
-        ];
+            $commentId = DB::table('comments')->insertGetId([
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'target_type' => $targetType,
+                'target_id' => $targetId,
+                'parent_id' => $parentId,
+                'content' => $content,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            if (!empty($mentions)) {
+                self::saveMentions($commentId, $mentions, $userId, $tenantId, $mentionedUsers);
+            }
+
+            // Get the created comment with author info
+            $comment = DB::table('comments as c')
+                ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
+                ->where('c.id', $commentId)
+                ->select([
+                    'c.*',
+                    DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
+                ])
+                ->selectRaw(
+                    "COALESCE(NULLIF(u.name, ''), NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), ?) as author_name",
+                    [__('api.unknown_user')]
+                )
+                ->first();
+
+            return [
+                'success' => true,
+                'status' => 'success',
+                'comment' => $comment ? (array) $comment : null,
+                'is_reply' => $parentId !== null,
+            ];
+        });
     }
 
     /**
@@ -542,7 +590,7 @@ class CommentService
         $comment = DB::table('comments')
             ->where('id', $commentId)
             ->where('tenant_id', $tenantId)
-            ->select(['id', 'user_id', 'target_type', 'target_id'])
+            ->select(['id', 'user_id', 'target_type', 'target_id', 'parent_id'])
             ->first();
 
         if (!$comment) {
@@ -553,28 +601,52 @@ class CommentService
             return ['success' => false, 'error' => __('api.comment_unauthorized')];
         }
 
-        DB::table('comments')
-            ->where('id', $commentId)
-            ->where('tenant_id', $tenantId)
-            ->update(['content' => $newContent, 'updated_at' => now()]);
-
-        // Re-process mentions
-        DB::table('mentions')
-            ->where('comment_id', $commentId)
-            ->where('tenant_id', $tenantId)
-            ->delete();
-
         $mentions = self::extractMentions($newContent);
-        if (!empty($mentions)) {
-            self::saveMentions($commentId, $mentions, $userId, $tenantId);
-        }
+        $mentionedUsers = self::resolveLegacyMentionUsers($mentions, $tenantId);
 
-        return [
-            'success' => true,
-            'status' => 'success',
-            'content' => $newContent,
-            'is_edited' => true,
-        ];
+        return DB::transaction(function () use (
+            $comment,
+            $commentId,
+            $userId,
+            $tenantId,
+            $newContent,
+            $mentions,
+            $mentionedUsers,
+        ): array {
+            self::assertCommentContactAllowed(
+                (string) $comment->target_type,
+                (int) $comment->target_id,
+                property_exists($comment, 'parent_id') && $comment->parent_id !== null
+                    ? (int) $comment->parent_id
+                    : null,
+                $userId,
+                $tenantId,
+                array_values($mentionedUsers),
+                'comment_update',
+            );
+
+            DB::table('comments')
+                ->where('id', $commentId)
+                ->where('tenant_id', $tenantId)
+                ->update(['content' => $newContent, 'updated_at' => now()]);
+
+            // Re-process mentions only after the protected-contact assertion.
+            DB::table('mentions')
+                ->where('comment_id', $commentId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            if (!empty($mentions)) {
+                self::saveMentions($commentId, $mentions, $userId, $tenantId, $mentionedUsers);
+            }
+
+            return [
+                'success' => true,
+                'status' => 'success',
+                'content' => $newContent,
+                'is_edited' => true,
+            ];
+        });
     }
 
     /**
@@ -652,6 +724,8 @@ class CommentService
                     return 'removed';
                 }
 
+                self::assertReactionContactAllowed($commentId, $userId, $tenantId);
+
                 // Different type: update
                 DB::table('reactions')
                     ->where('id', $existing->id)
@@ -659,6 +733,8 @@ class CommentService
                     ->update(['emoji' => $emoji, 'created_at' => now()]);
                 return 'updated';
             }
+
+            self::assertReactionContactAllowed($commentId, $userId, $tenantId);
 
             DB::table('reactions')->insert([
                 'tenant_id'   => $tenantId,
@@ -690,6 +766,161 @@ class CommentService
     // =========================================================================
     // PRIVATE HELPERS
     // =========================================================================
+
+    /**
+     * Resolve every member who would receive directed contact from a comment,
+     * then assert the indivisible write before storing the comment or mentions.
+     *
+     * @param list<int> $mentionedUserIds
+     */
+    private static function assertCommentContactAllowed(
+        string $targetType,
+        int $targetId,
+        ?int $parentId,
+        int $senderId,
+        int $tenantId,
+        array $mentionedUserIds,
+        string $channel,
+    ): void {
+        if ((int) TenantContext::getId() !== $tenantId) {
+            self::throwPolicyUnavailable($tenantId, $channel, 'tenant_context_mismatch');
+        }
+
+        try {
+            $recipientIds = $mentionedUserIds;
+            $ownerId = self::resolveContentOwnerId($targetType, $targetId, $tenantId);
+            if ($ownerId !== null) {
+                $recipientIds[] = $ownerId;
+            }
+
+            if ($parentId !== null) {
+                $parentAuthorId = DB::table('comments')
+                    ->where('id', $parentId)
+                    ->where('tenant_id', $tenantId)
+                    ->value('user_id');
+                if ($parentAuthorId !== null) {
+                    $recipientIds[] = (int) $parentAuthorId;
+                }
+            }
+        } catch (\Throwable $e) {
+            self::throwPolicyUnavailable($tenantId, $channel, 'comment_recipient_lookup_failed', $e);
+        }
+
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn (mixed $id): int => (int) $id, $recipientIds),
+            static fn (int $id): bool => $id > 0 && $id !== $senderId,
+        )));
+        sort($recipientIds, SORT_NUMERIC);
+
+        if ($recipientIds === []) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+            $senderId,
+            $recipientIds,
+            $tenantId,
+            $channel,
+        );
+    }
+
+    /** @return list<int> */
+    private static function resolveMentionRecipientIds(string $content, int $tenantId): array
+    {
+        try {
+            return array_values(MentionService::resolveMentions(
+                MentionService::extractMentions($content),
+                $tenantId,
+            ));
+        } catch (\Throwable $e) {
+            self::throwPolicyUnavailable($tenantId, 'comment_mention', 'mention_recipient_lookup_failed', $e);
+        }
+    }
+
+    /**
+     * Resolve the strict legacy mention syntax used by addComment/editComment.
+     *
+     * @param list<string> $usernames
+     * @return array<string, int>
+     */
+    private static function resolveLegacyMentionUsers(array $usernames, int $tenantId): array
+    {
+        if ($usernames === []) {
+            return [];
+        }
+
+        try {
+            $resolved = [];
+            foreach ($usernames as $username) {
+                $userId = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where(function ($query) use ($username) {
+                        $query->whereRaw('LOWER(username) = ?', [strtolower($username)])
+                            ->orWhereRaw('LOWER(SUBSTRING_INDEX(email, "@", 1)) = ?', [strtolower($username)])
+                            ->orWhereRaw('LOWER(name) = ?', [strtolower($username)]);
+                    })
+                    ->value('id');
+
+                if ($userId !== null) {
+                    $resolved[$username] = (int) $userId;
+                }
+            }
+
+            return $resolved;
+        } catch (\Throwable $e) {
+            self::throwPolicyUnavailable($tenantId, 'comment_mention', 'mention_recipient_lookup_failed', $e);
+        }
+    }
+
+    private static function assertReactionContactAllowed(int $commentId, int $senderId, int $tenantId): void
+    {
+        if ((int) TenantContext::getId() !== $tenantId) {
+            self::throwPolicyUnavailable($tenantId, 'reaction', 'tenant_context_mismatch');
+        }
+
+        try {
+            $ownerId = DB::table('comments')
+                ->where('id', $commentId)
+                ->where('tenant_id', $tenantId)
+                ->value('user_id');
+        } catch (\Throwable $e) {
+            self::throwPolicyUnavailable($tenantId, 'reaction', 'reaction_recipient_lookup_failed', $e);
+        }
+
+        if ($ownerId === null || (int) $ownerId <= 0) {
+            self::throwPolicyUnavailable($tenantId, 'reaction', 'reaction_recipient_missing');
+        }
+
+        if ((int) $ownerId === $senderId) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $senderId,
+            (int) $ownerId,
+            $tenantId,
+            'reaction',
+        );
+    }
+
+    private static function throwPolicyUnavailable(
+        int $tenantId,
+        string $channel,
+        string $reason,
+        ?\Throwable $exception = null,
+    ): never {
+        Log::error('Safeguarding contact recipient resolution unavailable', array_filter([
+            'tenant_id' => $tenantId,
+            'channel' => $channel,
+            'reason_code' => $reason,
+            'exception_class' => $exception !== null ? $exception::class : null,
+        ], static fn (mixed $value): bool => $value !== null));
+
+        throw new \App\Exceptions\SafeguardingPolicyException(
+            'SAFEGUARDING_POLICY_UNAVAILABLE',
+            __('safeguarding.errors.policy_unavailable'),
+        );
+    }
 
     /**
      * Extract @mentions from content.
@@ -802,8 +1033,13 @@ class CommentService
     /**
      * Save mentions to database and notify users.
      */
-    private static function saveMentions(int $commentId, array $usernames, int $mentioningUserId, int $tenantId): void
-    {
+    private static function saveMentions(
+        int $commentId,
+        array $usernames,
+        int $mentioningUserId,
+        int $tenantId,
+        ?array $resolvedUsers = null,
+    ): void {
         // Look up the comment's target so mention notifications link to the right content
         $comment = DB::table('comments')
             ->where('id', $commentId)
@@ -811,7 +1047,9 @@ class CommentService
             ->select(['target_type', 'target_id', 'content'])
             ->first();
 
-        foreach ($usernames as $username) {
+        $resolvedUsers ??= self::resolveLegacyMentionUsers($usernames, $tenantId);
+        foreach (array_values(array_unique($resolvedUsers)) as $mentionedUserId) {
+            $mentionedUserId = (int) $mentionedUserId;
             // Strict-only matching to prevent a privacy/spam regression where
             // `@John` notified every John in the tenant. Resolution order:
             //   1. username exact (case-insensitive)
@@ -819,21 +1057,11 @@ class CommentService
             //   3. display name (`name`) exact (case-insensitive)
             // Any non-resolving mention is silently dropped — better to miss a
             // notification than spam unrelated users.
-            $user = DB::table('users')
-                ->where('tenant_id', $tenantId)
-                ->where(function ($q) use ($username) {
-                    $q->whereRaw('LOWER(username) = ?', [strtolower($username)])
-                      ->orWhereRaw('LOWER(SUBSTRING_INDEX(email, "@", 1)) = ?', [strtolower($username)])
-                      ->orWhereRaw('LOWER(name) = ?', [strtolower($username)]);
-                })
-                ->select(['id'])
-                ->first();
-
-            if ($user && (int) $user->id !== $mentioningUserId) {
+            if ($mentionedUserId !== $mentioningUserId) {
                 try {
                     DB::table('mentions')->insert([
                         'comment_id' => $commentId,
-                        'mentioned_user_id' => $user->id,
+                        'mentioned_user_id' => $mentionedUserId,
                         'mentioning_user_id' => $mentioningUserId,
                         'tenant_id' => $tenantId,
                         'created_at' => now(),
@@ -841,7 +1069,7 @@ class CommentService
 
                     if ($comment) {
                         SocialNotificationService::notifyComment(
-                            $user->id,
+                            $mentionedUserId,
                             $mentioningUserId,
                             $comment->target_type,
                             (int) $comment->target_id,

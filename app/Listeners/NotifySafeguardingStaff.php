@@ -11,6 +11,7 @@ use App\Core\TenantContext;
 use App\Events\SafeguardingFlaggedEvent;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Models\TenantSafeguardingOption;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -81,13 +82,11 @@ class NotifySafeguardingStaff implements ShouldQueue
 
             // Build a summary of what was selected
             $selectedOptions = DB::select(
-                "SELECT tso.label FROM user_safeguarding_preferences usp
+                "SELECT tso.option_key, tso.preset_source, tso.label FROM user_safeguarding_preferences usp
                  JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
                  WHERE usp.user_id = ? AND usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1",
                 [$flaggedUserId, $tenantId]
             );
-            $optionLabels = array_map(fn ($row) => $row->label, $selectedOptions);
-
             // Find all admin, tenant_admin, broker, and super_admin users for this tenant
             $staffUsers = DB::select(
                 "SELECT id, email, first_name, name, role, preferred_language FROM users
@@ -107,9 +106,18 @@ class NotifySafeguardingStaff implements ShouldQueue
 
             foreach ($staffUsers as $staff) {
                 // Each staff member sees bell copy + email in THEIR language.
-                LocaleContext::withLocale($staff, function () use ($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink) {
-                    $optionSummary = !empty($optionLabels)
-                        ? implode(', ', $optionLabels)
+                LocaleContext::withLocale($staff, function () use ($staff, $memberName, $selectedOptions, $flaggedUserId, $tenantId, $adminLink) {
+                    $localizedOptionLabels = array_map(
+                        static fn (object $option): string => TenantSafeguardingOption::localizeOptionText(
+                            $option->preset_source,
+                            $option->option_key,
+                            'label',
+                            $option->label,
+                        ) ?? $option->label,
+                        $selectedOptions,
+                    );
+                    $optionSummary = !empty($localizedOptionLabels)
+                        ? implode(', ', $localizedOptionLabels)
                         : __('emails_misc.safeguarding.onboarding_flag_options_label');
 
                     $notificationMessage = __('emails_misc.safeguarding.onboarding_flag_bell', [
@@ -128,7 +136,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                     ]);
 
                     if (!empty($staff->email)) {
-                        $this->sendEmail($staff, $memberName, $optionLabels, $flaggedUserId, $tenantId, $adminLink);
+                        $this->sendEmail($staff, $memberName, $localizedOptionLabels, $flaggedUserId, $tenantId, $adminLink);
                     }
                 });
             }
@@ -137,7 +145,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'tenant_id'        => $tenantId,
                 'flagged_user_id'  => $flaggedUserId,
                 'staff_notified'   => count($staffUsers),
-                'options_selected_count' => count($optionLabels),
+                'options_selected_count' => count($selectedOptions),
             ]);
 
             // Mark handled only after EVERY staff member was notified so a redis

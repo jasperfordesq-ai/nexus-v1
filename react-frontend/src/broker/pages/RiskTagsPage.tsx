@@ -115,7 +115,6 @@ interface RiskTagForm {
   member_visible_notes: string;
   requires_approval: boolean;
   insurance_required: boolean;
-  dbs_required: boolean;
 }
 
 const EMPTY_FORM: RiskTagForm = {
@@ -126,7 +125,6 @@ const EMPTY_FORM: RiskTagForm = {
   member_visible_notes: '',
   requires_approval: false,
   insurance_required: false,
-  dbs_required: false,
 };
 
 interface ListingSearchResult {
@@ -264,7 +262,6 @@ export function RiskTagsPage() {
       member_visible_notes: tag.member_visible_notes ?? '',
       requires_approval: tag.requires_approval,
       insurance_required: tag.insurance_required,
-      dbs_required: tag.dbs_required,
     });
     setSelectedListing(null);
     setListingSearch('');
@@ -308,7 +305,6 @@ export function RiskTagsPage() {
         member_visible_notes: form.member_visible_notes || undefined,
         requires_approval: form.requires_approval,
         insurance_required: form.insurance_required,
-        dbs_required: form.dbs_required,
       });
       if (res.success) {
         toast.success(editingTag ? t('risk_tags.updated_success') : t('risk_tags.created_success'));
@@ -423,7 +419,7 @@ export function RiskTagsPage() {
       key: 'requirements',
       label: t('risk_tags.col_requirements'),
       render: (item) => {
-        const reqs: { key: string; label: string; icon: LucideIcon; color: 'warning' | 'accent' | 'success' }[] = [];
+        const reqs: { key: string; label: string; icon: LucideIcon; color: 'warning' | 'accent' | 'success' | 'danger' }[] = [];
         if (item.requires_approval) {
           reqs.push({ key: 'approval', label: t('risk_tags.col_approval_req'), icon: ClipboardCheck, color: 'warning' });
         }
@@ -431,7 +427,12 @@ export function RiskTagsPage() {
           reqs.push({ key: 'insurance', label: t('risk_tags.col_insurance'), icon: Umbrella, color: 'accent' });
         }
         if (item.dbs_required) {
-          reqs.push({ key: 'dbs', label: t('risk_tags.col_dbs'), icon: ShieldCheck, color: 'success' });
+          reqs.push({
+            key: 'legacy-role-vetting',
+            label: t('risk_tags.legacy_role_vetting_unavailable'),
+            icon: ShieldAlert,
+            color: 'danger',
+          });
         }
         if (reqs.length === 0) {
           return <span className="text-sm text-muted">—</span>;
@@ -814,17 +815,19 @@ export function RiskTagsPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">{t('risk_tags.dbs_required_label')}</p>
-                <p className="text-xs text-muted">{t('risk_tags.dbs_required_description')}</p>
+            {editingTag?.dbs_required && (
+              <div className="flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/10 p-4" role="alert">
+                <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {t('risk_tags.legacy_role_vetting_unavailable')}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted">
+                    {t('risk_tags.legacy_role_vetting_unavailable_description')}
+                  </p>
+                </div>
               </div>
-              <Switch
-                isSelected={form.dbs_required}
-                onValueChange={v => setForm(f => ({ ...f, dbs_required: v }))}
-                size="sm"
-              />
-            </div>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" onPress={closeModal}>

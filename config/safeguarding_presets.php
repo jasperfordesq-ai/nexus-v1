@@ -21,22 +21,24 @@
  * The admin can then freely edit, add, or remove options. The preset is a
  * convenience template — no conditional logic checks which preset was used.
  *
- * Presets align with the existing vetting_records.vetting_type enum:
- * dbs_basic, dbs_standard, dbs_enhanced, garda_vetting, access_ni, pvg_scotland, international, other
+ * `vetting_type_required` values are controlled attestation codes. They never
+ * represent member self-declarations or certificate records; an automated
+ * contact gate can be activated only when the tenant's explicit jurisdiction
+ * policy supports the selected code.
  */
 
 return [
     'ireland' => [
-        'name' => 'Ireland',
-        'vetting_authority' => 'National Vetting Bureau',
-        'help_text' => 'This community takes safeguarding seriously. If you consider yourself a vulnerable adult or need additional support, please let us know so our coordinators can help arrange safe exchanges for you.',
+        'name' => 'safeguarding.presets.ireland.name',
+        'vetting_authority' => 'safeguarding.presets.ireland.vetting_authority',
+        'help_text' => 'safeguarding.presets.common.help_text',
         'options' => [
             // ── VULNERABLE ADULT SELF-IDENTIFICATION (flagging) ──────────
             [
                 'option_key' => 'is_vulnerable_adult',
                 'option_type' => 'checkbox',
-                'label' => 'I consider myself a vulnerable adult and may need additional safeguarding support',
-                'description' => 'This lets our coordinators know you may need extra support when arranging exchanges. A coordinator will be in touch to discuss how we can help. This information is confidential.',
+                'label' => 'safeguarding.presets.common.options.is_vulnerable_adult.label',
+                'description' => 'safeguarding.presets.common.options.is_vulnerable_adult.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -47,8 +49,8 @@ return [
             [
                 'option_key' => 'requires_vetted_partners',
                 'option_type' => 'checkbox',
-                'label' => 'I would prefer to only interact with members who have been appropriately vetted',
-                'description' => 'In Ireland, this means Garda Vetted members. Our coordinators will ensure you are only matched with vetted members.',
+                'label' => 'safeguarding.presets.common.options.requires_vetted_partners.label',
+                'description' => 'safeguarding.presets.ireland.options.requires_vetted_partners.description',
                 'triggers' => [
                     'requires_vetted_interaction' => true,
                     'restricts_matching' => true,
@@ -59,8 +61,8 @@ return [
             [
                 'option_key' => 'requires_coordinator_contact',
                 'option_type' => 'checkbox',
-                'label' => 'I would like a coordinator to help arrange my exchanges rather than being contacted directly',
-                'description' => 'A coordinator (broker) will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.',
+                'label' => 'safeguarding.presets.common.options.requires_coordinator_contact.label',
+                'description' => 'safeguarding.presets.ireland.options.requires_coordinator_contact.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -70,8 +72,8 @@ return [
             [
                 'option_key' => 'no_home_visits',
                 'option_type' => 'checkbox',
-                'label' => 'I do not want members visiting my home without coordinator arrangement',
-                'description' => 'All home visits will be arranged through a coordinator who can ensure appropriate safeguards are in place.',
+                'label' => 'safeguarding.presets.common.options.no_home_visits.label',
+                'description' => 'safeguarding.presets.common.options.no_home_visits.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                 ],
@@ -81,8 +83,8 @@ return [
             [
                 'option_key' => 'works_with_children',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve children or young people (under 18)',
-                'description' => 'A coordinator may discuss Garda Vetting requirements with you. In Ireland, certain activities involving children require vetting under the National Vetting Bureau Act 2012.',
+                'label' => 'safeguarding.presets.common.options.works_with_children.label',
+                'description' => 'safeguarding.presets.ireland.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'garda_vetting',
@@ -91,43 +93,35 @@ return [
             [
                 'option_key' => 'works_with_vulnerable_adults',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve vulnerable adults',
-                'description' => 'A coordinator may discuss Garda Vetting requirements with you. Activities involving vulnerable adults may require vetting.',
+                'label' => 'safeguarding.presets.common.options.works_with_vulnerable_adults.label',
+                'description' => 'safeguarding.presets.ireland.options.works_with_vulnerable_adults.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'garda_vetting',
                 ],
             ],
-            [
-                'option_key' => 'has_vetting',
-                'option_type' => 'checkbox',
-                'label' => 'I have current Garda Vetting (NVB)',
-                'description' => 'National Vetting Bureau disclosure. You can upload proof in your profile settings.',
-                'triggers' => [],
-            ],
-
             // ── DECLINATION (always last) ─────────────────────────────────
             [
                 'option_key' => 'none_apply',
                 'option_type' => 'checkbox',
-                'label' => 'None of these apply to me',
-                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'label' => 'safeguarding.presets.common.options.none_apply.label',
+                'description' => 'safeguarding.presets.common.options.none_apply.description',
                 'triggers' => [],
             ],
         ],
     ],
 
     'england_wales' => [
-        'name' => 'England & Wales',
-        'vetting_authority' => 'Disclosure and Barring Service',
-        'help_text' => 'This community takes safeguarding seriously. If you consider yourself a vulnerable adult or need additional support, please let us know so our coordinators can help arrange safe exchanges for you.',
+        'name' => 'safeguarding.presets.england_wales.name',
+        'vetting_authority' => 'safeguarding.presets.england_wales.vetting_authority',
+        'help_text' => 'safeguarding.presets.common.help_text',
         'options' => [
             // ── VULNERABLE ADULT SELF-IDENTIFICATION (flagging) ──────────
             [
                 'option_key' => 'is_vulnerable_adult',
                 'option_type' => 'checkbox',
-                'label' => 'I consider myself a vulnerable adult and may need additional safeguarding support',
-                'description' => 'This lets our coordinators know you may need extra support when arranging exchanges. A coordinator will be in touch to discuss how we can help. This information is confidential.',
+                'label' => 'safeguarding.presets.common.options.is_vulnerable_adult.label',
+                'description' => 'safeguarding.presets.common.options.is_vulnerable_adult.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -138,8 +132,8 @@ return [
             [
                 'option_key' => 'requires_vetted_partners',
                 'option_type' => 'checkbox',
-                'label' => 'I would prefer to only interact with members who have been appropriately vetted',
-                'description' => 'In England & Wales, this means DBS-checked members. Our coordinators will ensure you are only matched with vetted members.',
+                'label' => 'safeguarding.presets.common.options.requires_vetted_partners.label',
+                'description' => 'safeguarding.presets.england_wales.options.requires_vetted_partners.description',
                 'triggers' => [
                     'requires_vetted_interaction' => true,
                     'restricts_matching' => true,
@@ -150,8 +144,8 @@ return [
             [
                 'option_key' => 'requires_coordinator_contact',
                 'option_type' => 'checkbox',
-                'label' => 'I would like a coordinator to help arrange my exchanges rather than being contacted directly',
-                'description' => 'A coordinator will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.',
+                'label' => 'safeguarding.presets.common.options.requires_coordinator_contact.label',
+                'description' => 'safeguarding.presets.common.options.requires_coordinator_contact.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -161,8 +155,8 @@ return [
             [
                 'option_key' => 'no_home_visits',
                 'option_type' => 'checkbox',
-                'label' => 'I do not want members visiting my home without coordinator arrangement',
-                'description' => 'All home visits will be arranged through a coordinator who can ensure appropriate safeguards are in place.',
+                'label' => 'safeguarding.presets.common.options.no_home_visits.label',
+                'description' => 'safeguarding.presets.common.options.no_home_visits.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                 ],
@@ -172,8 +166,8 @@ return [
             [
                 'option_key' => 'works_with_children',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve children or young people (under 18)',
-                'description' => 'A coordinator may discuss DBS check requirements with you.',
+                'label' => 'safeguarding.presets.common.options.works_with_children.label',
+                'description' => 'safeguarding.presets.england_wales.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'dbs_enhanced',
@@ -182,43 +176,35 @@ return [
             [
                 'option_key' => 'works_with_vulnerable_adults',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve vulnerable adults',
-                'description' => 'A coordinator may discuss DBS check requirements with you.',
+                'label' => 'safeguarding.presets.common.options.works_with_vulnerable_adults.label',
+                'description' => 'safeguarding.presets.england_wales.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'dbs_enhanced',
                 ],
             ],
-            [
-                'option_key' => 'has_vetting',
-                'option_type' => 'checkbox',
-                'label' => 'I have a current DBS check',
-                'description' => 'Disclosure and Barring Service check. You can upload proof in your profile settings.',
-                'triggers' => [],
-            ],
-
             // ── DECLINATION (always last) ─────────────────────────────────
             [
                 'option_key' => 'none_apply',
                 'option_type' => 'checkbox',
-                'label' => 'None of these apply to me',
-                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'label' => 'safeguarding.presets.common.options.none_apply.label',
+                'description' => 'safeguarding.presets.common.options.none_apply.description',
                 'triggers' => [],
             ],
         ],
     ],
 
     'scotland' => [
-        'name' => 'Scotland',
-        'vetting_authority' => 'Disclosure Scotland (PVG Scheme)',
-        'help_text' => 'This community takes safeguarding seriously. If you consider yourself a vulnerable adult or need additional support, please let us know so our coordinators can help arrange safe exchanges for you.',
+        'name' => 'safeguarding.presets.scotland.name',
+        'vetting_authority' => 'safeguarding.presets.scotland.vetting_authority',
+        'help_text' => 'safeguarding.presets.common.help_text',
         'options' => [
             // ── VULNERABLE ADULT SELF-IDENTIFICATION (flagging) ──────────
             [
                 'option_key' => 'is_vulnerable_adult',
                 'option_type' => 'checkbox',
-                'label' => 'I consider myself a vulnerable or protected adult and may need additional safeguarding support',
-                'description' => 'This lets our coordinators know you may need extra support when arranging exchanges. A coordinator will be in touch to discuss how we can help. This information is confidential.',
+                'label' => 'safeguarding.presets.scotland.options.is_vulnerable_adult.label',
+                'description' => 'safeguarding.presets.common.options.is_vulnerable_adult.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -229,8 +215,8 @@ return [
             [
                 'option_key' => 'requires_vetted_partners',
                 'option_type' => 'checkbox',
-                'label' => 'I would prefer to only interact with members who have been appropriately vetted',
-                'description' => 'In Scotland, this means PVG scheme members. Our coordinators will ensure you are only matched with vetted members.',
+                'label' => 'safeguarding.presets.common.options.requires_vetted_partners.label',
+                'description' => 'safeguarding.presets.scotland.options.requires_vetted_partners.description',
                 'triggers' => [
                     'requires_vetted_interaction' => true,
                     'restricts_matching' => true,
@@ -241,8 +227,8 @@ return [
             [
                 'option_key' => 'requires_coordinator_contact',
                 'option_type' => 'checkbox',
-                'label' => 'I would like a coordinator to help arrange my exchanges rather than being contacted directly',
-                'description' => 'A coordinator will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.',
+                'label' => 'safeguarding.presets.common.options.requires_coordinator_contact.label',
+                'description' => 'safeguarding.presets.common.options.requires_coordinator_contact.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -252,8 +238,8 @@ return [
             [
                 'option_key' => 'no_home_visits',
                 'option_type' => 'checkbox',
-                'label' => 'I do not want members visiting my home without coordinator arrangement',
-                'description' => 'All home visits will be arranged through a coordinator who can ensure appropriate safeguards are in place.',
+                'label' => 'safeguarding.presets.common.options.no_home_visits.label',
+                'description' => 'safeguarding.presets.common.options.no_home_visits.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                 ],
@@ -263,8 +249,8 @@ return [
             [
                 'option_key' => 'works_with_children',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve children or young people (under 18)',
-                'description' => 'A coordinator may discuss PVG scheme membership with you.',
+                'label' => 'safeguarding.presets.common.options.works_with_children.label',
+                'description' => 'safeguarding.presets.scotland.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'pvg_scotland',
@@ -273,43 +259,35 @@ return [
             [
                 'option_key' => 'works_with_vulnerable_adults',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve protected adults',
-                'description' => 'A coordinator may discuss PVG scheme membership with you.',
+                'label' => 'safeguarding.presets.scotland.options.works_with_vulnerable_adults.label',
+                'description' => 'safeguarding.presets.scotland.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'pvg_scotland',
                 ],
             ],
-            [
-                'option_key' => 'has_vetting',
-                'option_type' => 'checkbox',
-                'label' => 'I am a PVG scheme member',
-                'description' => 'Protecting Vulnerable Groups scheme via Disclosure Scotland. You can upload proof in your profile settings.',
-                'triggers' => [],
-            ],
-
             // ── DECLINATION (always last) ─────────────────────────────────
             [
                 'option_key' => 'none_apply',
                 'option_type' => 'checkbox',
-                'label' => 'None of these apply to me',
-                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'label' => 'safeguarding.presets.common.options.none_apply.label',
+                'description' => 'safeguarding.presets.common.options.none_apply.description',
                 'triggers' => [],
             ],
         ],
     ],
 
     'northern_ireland' => [
-        'name' => 'Northern Ireland',
-        'vetting_authority' => 'AccessNI',
-        'help_text' => 'This community takes safeguarding seriously. If you consider yourself a vulnerable adult or need additional support, please let us know so our coordinators can help arrange safe exchanges for you.',
+        'name' => 'safeguarding.presets.northern_ireland.name',
+        'vetting_authority' => 'safeguarding.presets.northern_ireland.vetting_authority',
+        'help_text' => 'safeguarding.presets.common.help_text',
         'options' => [
             // ── VULNERABLE ADULT SELF-IDENTIFICATION (flagging) ──────────
             [
                 'option_key' => 'is_vulnerable_adult',
                 'option_type' => 'checkbox',
-                'label' => 'I consider myself a vulnerable adult and may need additional safeguarding support',
-                'description' => 'This lets our coordinators know you may need extra support when arranging exchanges. A coordinator will be in touch to discuss how we can help. This information is confidential.',
+                'label' => 'safeguarding.presets.common.options.is_vulnerable_adult.label',
+                'description' => 'safeguarding.presets.common.options.is_vulnerable_adult.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -320,8 +298,8 @@ return [
             [
                 'option_key' => 'requires_vetted_partners',
                 'option_type' => 'checkbox',
-                'label' => 'I would prefer to only interact with members who have been appropriately vetted',
-                'description' => 'In Northern Ireland, this means AccessNI-checked members. Our coordinators will ensure you are only matched with vetted members.',
+                'label' => 'safeguarding.presets.common.options.requires_vetted_partners.label',
+                'description' => 'safeguarding.presets.northern_ireland.options.requires_vetted_partners.description',
                 'triggers' => [
                     'requires_vetted_interaction' => true,
                     'restricts_matching' => true,
@@ -332,8 +310,8 @@ return [
             [
                 'option_key' => 'requires_coordinator_contact',
                 'option_type' => 'checkbox',
-                'label' => 'I would like a coordinator to help arrange my exchanges rather than being contacted directly',
-                'description' => 'A coordinator will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.',
+                'label' => 'safeguarding.presets.common.options.requires_coordinator_contact.label',
+                'description' => 'safeguarding.presets.common.options.requires_coordinator_contact.description',
                 'triggers' => [
                     'requires_broker_approval' => true,
                     'restricts_messaging' => true,
@@ -343,8 +321,8 @@ return [
             [
                 'option_key' => 'no_home_visits',
                 'option_type' => 'checkbox',
-                'label' => 'I do not want members visiting my home without coordinator arrangement',
-                'description' => 'All home visits will be arranged through a coordinator who can ensure appropriate safeguards are in place.',
+                'label' => 'safeguarding.presets.common.options.no_home_visits.label',
+                'description' => 'safeguarding.presets.common.options.no_home_visits.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                 ],
@@ -354,8 +332,8 @@ return [
             [
                 'option_key' => 'works_with_children',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve children or young people (under 18)',
-                'description' => 'A coordinator may discuss AccessNI checking with you.',
+                'label' => 'safeguarding.presets.common.options.works_with_children.label',
+                'description' => 'safeguarding.presets.northern_ireland.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'access_ni',
@@ -364,36 +342,28 @@ return [
             [
                 'option_key' => 'works_with_vulnerable_adults',
                 'option_type' => 'checkbox',
-                'label' => 'I plan to offer services that may involve vulnerable adults',
-                'description' => 'A coordinator may discuss AccessNI checking with you.',
+                'label' => 'safeguarding.presets.common.options.works_with_vulnerable_adults.label',
+                'description' => 'safeguarding.presets.northern_ireland.options.works_with_children.description',
                 'triggers' => [
                     'notify_admin_on_selection' => true,
                     'vetting_type_required' => 'access_ni',
                 ],
             ],
-            [
-                'option_key' => 'has_vetting',
-                'option_type' => 'checkbox',
-                'label' => 'I have a current AccessNI check',
-                'description' => 'AccessNI criminal record check. You can upload proof in your profile settings.',
-                'triggers' => [],
-            ],
-
             // ── DECLINATION (always last) ─────────────────────────────────
             [
                 'option_key' => 'none_apply',
                 'option_type' => 'checkbox',
-                'label' => 'None of these apply to me',
-                'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                'label' => 'safeguarding.presets.common.options.none_apply.label',
+                'description' => 'safeguarding.presets.common.options.none_apply.description',
                 'triggers' => [],
             ],
         ],
     ],
 
     'custom' => [
-        'name' => 'Custom',
-        'vetting_authority' => '',
-        'help_text' => '',
+        'name' => 'safeguarding.presets.custom.name',
+        'vetting_authority' => null,
+        'help_text' => null,
         'options' => [],
     ],
 ];

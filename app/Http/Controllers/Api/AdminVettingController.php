@@ -4,623 +4,394 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
+use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
+use App\I18n\LocaleContext;
+use App\Models\Notification;
+use App\Services\MemberVettingAttestationService;
+use App\Services\SafeguardingJurisdictionService;
+use App\Services\SafeguardingPreferenceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Core\TenantContext;
-use App\I18n\LocaleContext;
-use App\Models\ActivityLog;
-use App\Models\Notification;
-use App\Services\EmailDispatchService;
-use App\Services\VettingService;
+use Throwable;
 
 /**
- * AdminVettingController -- Admin member vetting and background check management.
+ * Metadata-only broker safeguarding confirmations.
  *
- * All methods require admin authentication.
- * All methods are native Laravel — no legacy delegation remains.
+ * There is intentionally no generic record create/edit, arbitrary status,
+ * evidence field, certificate reference/date, notes, upload, bulk-confirm, or
+ * delete endpoint in this controller.
  */
 class AdminVettingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    private const PROHIBITED_INPUT_FIELDS = [
+        'document', 'file', 'document_url', 'reference_number', 'certificate_number',
+        'issue_date', 'expiry_date', 'renewal_date', 'notes', 'result', 'status',
+        'scheme_code', 'attestation_code', 'vetting_type', 'purpose_code',
+        'scope_type', 'scope_identifier', 'policy_version', 'confirmed_at',
+        'works_with_children', 'works_with_vulnerable_adults', 'requires_enhanced_check',
+    ];
+
     public function __construct(
-        private readonly VettingService $vettingService,
+        private readonly MemberVettingAttestationService $attestations,
+        private readonly SafeguardingJurisdictionService $jurisdictions,
     ) {}
 
-    /** GET /api/v2/admin/vetting */
+    /** GET /v2/admin/vetting */
     public function list(): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireVettingDecisionMaker();
+        $tenantId = TenantContext::getId();
 
-        try {
-            $filters = [
-                'status' => $this->query('status'),
-                'vetting_type' => $this->query('vetting_type'),
-                'search' => $this->query('search'),
-                'expiring_soon' => $this->queryBool('expiring_soon'),
-                'expired' => $this->queryBool('expired'),
-                'page' => $this->queryInt('page', 1, 1),
-                'per_page' => $this->queryInt('per_page', 25, 10, 100),
-            ];
+        $result = $this->attestations->listMembers($tenantId, [
+            'status' => $this->input('status', 'all'),
+            'search' => $this->input('search', ''),
+            'page' => $this->inputInt('page', 1, 1),
+            'per_page' => $this->inputInt('per_page', 25, 1, 100),
+        ]);
 
-            $result = $this->vettingService->getAll($filters);
-
-            return $this->respondWithPaginatedCollection(
-                $result['data'],
-                $result['pagination']['total'],
-                $result['pagination']['page'],
-                $result['pagination']['per_page']
-            );
-        } catch (\Exception $e) {
-            return $this->respondWithPaginatedCollection([], 0, 1, 25);
-        }
-    }
-
-    /** GET /api/v2/admin/vetting/stats */
-    public function stats(): JsonResponse
-    {
-        $this->requireBrokerOrAdmin();
-        return $this->respondWithData($this->vettingService->getStats());
-    }
-
-    /** GET /api/v2/admin/vetting/{id} */
-    public function show(int $id): JsonResponse
-    {
-        $this->requireBrokerOrAdmin();
-
-        try {
-            $record = $this->vettingService->getById($id);
-            if (!$record) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
-            return $this->respondWithData($record);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_fetch_failed'), null, 500);
-        }
-    }
-
-    /** POST /api/v2/admin/vetting */
-    public function store(): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-
-        $userId = $this->inputInt('user_id');
-        $vettingType = $this->input('vetting_type');
-
-        if (!$userId) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id');
-        }
-
-        $validTypes = ['dbs_basic', 'dbs_standard', 'dbs_enhanced', 'garda_vetting',
-                        'access_ni', 'pvg_scotland', 'international', 'other'];
-        if ($vettingType && !in_array($vettingType, $validTypes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_vetting_type'), 'vetting_type');
-        }
-
-        $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
-        $status = $this->input('status', 'pending');
-        if (!in_array($status, $validStatuses, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
-        }
-
-        // Verify user exists in current tenant
-        $tenantId = $this->getTenantId();
-        $userExists = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
-        if (!$userExists) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.user_not_found_in_tenant'), 'user_id');
-        }
-
-        // Validate dates
-        $issueDate = $this->input('issue_date');
-        $expiryDate = $this->input('expiry_date');
-        if ($issueDate && !strtotime($issueDate)) return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_issue_date_format'), 'issue_date');
-        if ($expiryDate && !strtotime($expiryDate)) return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_expiry_date_format'), 'expiry_date');
-        if ($issueDate && $expiryDate && strtotime($expiryDate) < strtotime($issueDate)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.expiry_after_issue_date'), 'expiry_date');
-        }
-
-        try {
-            $data = [
-                'user_id' => $userId,
-                'vetting_type' => $vettingType ?? 'dbs_basic',
-                'status' => $status,
-                'reference_number' => $this->input('reference_number'),
-                'issue_date' => $issueDate,
-                'expiry_date' => $expiryDate,
-                'notes' => $this->input('notes'),
-                'works_with_children' => $this->inputBool('works_with_children') ? 1 : 0,
-                'works_with_vulnerable_adults' => $this->inputBool('works_with_vulnerable_adults') ? 1 : 0,
-                'requires_enhanced_check' => $this->inputBool('requires_enhanced_check') ? 1 : 0,
-            ];
-
-            $id = $this->vettingService->create($data);
-            ActivityLog::log($adminId, 'vetting_record_created', "Created vetting record #{$id} for user #{$userId} ({$data['vetting_type']})", false, null, 'admin', 'vetting_record', $id);
-
-            $record = $this->vettingService->getById($id);
-            return $this->respondWithData($record, null, 201);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_create_failed'), null, 500);
-        }
-    }
-
-    /** PUT /api/v2/admin/vetting/{id} */
-    public function update(int $id): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-
-        try {
-            $existing = $this->vettingService->getById($id);
-            if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
-
-            $allInput = $this->getAllInput();
-
-            $validTypes = ['dbs_basic', 'dbs_standard', 'dbs_enhanced', 'garda_vetting',
-                            'access_ni', 'pvg_scotland', 'international', 'other'];
-            $validStatuses = ['pending', 'submitted', 'verified', 'expired', 'rejected', 'revoked'];
-
-            if (array_key_exists('vetting_type', $allInput) && $allInput['vetting_type'] !== null
-                && !in_array($allInput['vetting_type'], $validTypes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_vetting_type'), 'vetting_type');
-            }
-            if (array_key_exists('status', $allInput) && $allInput['status'] !== null
-                && !in_array($allInput['status'], $validStatuses, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_status'), 'status');
-            }
-
-            // Validate dates
-            if (array_key_exists('issue_date', $allInput) && $allInput['issue_date'] !== null && !strtotime($allInput['issue_date'])) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_issue_date_format'), 'issue_date');
-            }
-            if (array_key_exists('expiry_date', $allInput) && $allInput['expiry_date'] !== null && !strtotime($allInput['expiry_date'])) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_expiry_date_format'), 'expiry_date');
-            }
-            $effectiveIssue = $allInput['issue_date'] ?? $existing['issue_date'] ?? null;
-            $effectiveExpiry = $allInput['expiry_date'] ?? $existing['expiry_date'] ?? null;
-            if ($effectiveIssue && $effectiveExpiry && strtotime($effectiveExpiry) < strtotime($effectiveIssue)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.expiry_after_issue_date'), 'expiry_date');
-            }
-
-            $data = [];
-            $allowed = ['vetting_type', 'status', 'reference_number', 'issue_date', 'expiry_date',
-                         'notes', 'works_with_children', 'works_with_vulnerable_adults', 'requires_enhanced_check'];
-            foreach ($allowed as $field) {
-                if (array_key_exists($field, $allInput)) {
-                    if (in_array($field, ['works_with_children', 'works_with_vulnerable_adults', 'requires_enhanced_check'])) {
-                        $data[$field] = $this->inputBool($field) ? 1 : 0;
-                    } else {
-                        $data[$field] = $allInput[$field];
-                    }
-                }
-            }
-
-            if (empty($data)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'));
-            }
-
-            $this->vettingService->update($id, $data);
-            $changedFields = implode(', ', array_keys($data));
-            ActivityLog::log($adminId, 'vetting_record_updated', "Updated vetting record #{$id} ({$changedFields})", false, null, 'admin', 'vetting_record', $id);
-
-            $record = $this->vettingService->getById($id);
-            return $this->respondWithData($record);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_update_failed'), null, 500);
-        }
-    }
-
-    /** POST /api/v2/admin/vetting/{id}/verify */
-    public function verify(int $id): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-
-        try {
-            $existing = $this->vettingService->getById($id);
-            if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
-            if ($existing['status'] === 'verified') {
-                return $this->respondWithError('INVALID_STATUS', __('api.vetting_already_verified'));
-            }
-
-            // Require reference number for verification (legal compliance)
-            if (empty($existing['reference_number'])) {
-                return $this->respondWithError(
-                    'VALIDATION_ERROR',
-                    __('api.vetting_reference_required'),
-                    'reference_number',
-                    422
-                );
-            }
-
-            $this->vettingService->verify($id, $adminId);
-            ActivityLog::log($adminId, 'vetting_record_verified', "Verified vetting record #{$id} for {$existing['first_name']} {$existing['last_name']}", false, null, 'admin', 'vetting_record', $id);
-
-            // Notify the user: bell + email (rendered per-recipient locale)
-            $this->sendVettingNotification(
-                (int) $existing['user_id'],
-                'svc_notifications.vetting_approved_title',
-                '/dashboard',
-                'svc_notifications.vetting_approved_heading',
-                'svc_notifications.vetting_approved_body',
-                '#22c55e',
-                '#16a34a',
-                'svc_notifications.vetting_go_to_dashboard',
-                '/dashboard'
-            );
-
-            $record = $this->vettingService->getById($id);
-            return $this->respondWithData($record);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_verify_failed'), null, 500);
-        }
-    }
-
-    /** POST /api/v2/admin/vetting/{id}/reject */
-    public function reject(int $id): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-        $reason = $this->input('reason', '');
-
-        if (empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_reject_reason_required'), 'reason');
-        }
-
-        try {
-            $existing = $this->vettingService->getById($id);
-            if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
-
-            $this->vettingService->reject($id, $adminId, $reason);
-            ActivityLog::log($adminId, 'vetting_record_rejected', "Rejected vetting record #{$id}: {$reason}", false, null, 'admin', 'vetting_record', $id);
-
-            // Notify the user: bell + email (rendered per-recipient locale)
-            $this->sendVettingNotification(
-                (int) $existing['user_id'],
-                'svc_notifications.vetting_rejected_title',
-                '/help',
-                'svc_notifications.vetting_rejected_heading',
-                'svc_notifications.vetting_rejected_body',
-                '#ef4444',
-                '#dc2626',
-                'svc_notifications.vetting_contact_support',
-                '/help'
-            );
-
-            $record = $this->vettingService->getById($id);
-            return $this->respondWithData($record);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_reject_failed'), null, 500);
-        }
-    }
-
-    /** DELETE /api/v2/admin/vetting/{id} */
-    public function destroy(int $id): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-
-        try {
-            $existing = $this->vettingService->getById($id);
-            if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
-
-            $this->vettingService->delete($id);
-            ActivityLog::log($adminId, 'vetting_record_deleted', "Deleted vetting record #{$id} ({$existing['vetting_type']})", false, null, 'admin', 'vetting_record', $id);
-
-            // Notify the user: bell only (no email for deletion)
-            try {
-                $userId = (int) $existing['user_id'];
-                if ($userId) {
-                    $recipient = DB::table('users')
-                        ->where('id', $userId)
-                        ->where('tenant_id', TenantContext::getId())
-                        ->select(['preferred_language'])
-                        ->first();
-                    LocaleContext::withLocale($recipient, function () use ($userId) {
-                        Notification::createNotification(
-                            $userId,
-                            __('api_controllers_3.admin_bells.vetting_removed'),
-                            null,
-                            'moderation',
-                            false
-                        );
-                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_removed'), null);
-                    });
-                }
-            } catch (\Throwable $e) {
-                Log::warning("AdminVettingController::destroy notification failed: " . $e->getMessage());
-            }
-
-            return $this->respondWithData(['deleted' => true]);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.vetting_delete_failed'), null, 500);
-        }
-    }
-
-    /** POST /api/v2/admin/vetting/bulk */
-    public function bulk(): JsonResponse
-    {
-        $adminId = $this->requireBrokerOrAdmin();
-
-        $ids = $this->input('ids');
-        $action = $this->input('action');
-        $reason = $this->input('reason', '');
-
-        if (!is_array($ids) || empty($ids)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.ids_non_empty_array_required'), 'ids');
-        }
-        if (count($ids) > 100) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.bulk_max_100'), 'ids');
-        }
-        if (!in_array($action, ['verify', 'reject', 'delete'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_bulk_invalid_action'), 'action');
-        }
-        if ($action === 'reject' && empty($reason)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.vetting_bulk_reject_reason_required'), 'reason');
-        }
-
-        $processed = 0;
-        $failed = 0;
-
-        // Collect user IDs for deferred notification sending (avoid blocking the loop)
-        $notifyVerified = [];
-        $notifyRejected = [];
-        $notifyDeleted = [];
-
-        foreach ($ids as $id) {
-            $id = (int) $id;
-            try {
-                $existing = $this->vettingService->getById($id);
-                if (!$existing) { $failed++; continue; }
-
-                switch ($action) {
-                    case 'verify':
-                        if (in_array($existing['status'], ['pending', 'submitted'])) {
-                            if (empty($existing['reference_number'])) {
-                                $failed++;
-                                break;
-                            }
-                            $this->vettingService->verify($id, $adminId);
-                            $notifyVerified[] = (int) $existing['user_id'];
-                            $processed++;
-                        } else {
-                            $failed++;
-                        }
-                        break;
-                    case 'reject':
-                        $this->vettingService->reject($id, $adminId, $reason);
-                        $notifyRejected[] = (int) $existing['user_id'];
-                        $processed++;
-                        break;
-                    case 'delete':
-                        $this->vettingService->delete($id);
-                        $notifyDeleted[] = (int) $existing['user_id'];
-                        $processed++;
-                        break;
-                }
-            } catch (\Exception $e) {
-                $failed++;
-            }
-        }
-
-        // Send notifications after processing (bell only for bulk — emails would be too heavy).
-        // Wrap each per-recipient to render in that user's preferred_language.
-        try {
-            $tenantId = TenantContext::getId();
-            $allRecipients = array_unique(array_merge($notifyVerified, $notifyRejected, $notifyDeleted));
-            $localeByUser = [];
-            if (!empty($allRecipients)) {
-                $rows = DB::table('users')
-                    ->whereIn('id', $allRecipients)
-                    ->where('tenant_id', $tenantId)
-                    ->select(['id', 'preferred_language'])
-                    ->get();
-                foreach ($rows as $r) {
-                    $localeByUser[(int) $r->id] = $r->preferred_language;
-                }
-            }
-
-            foreach ($notifyVerified as $userId) {
-                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
-                    Notification::createNotification(
-                        $userId,
-                        __('api_controllers_3.admin_bells.vetting_approved'),
-                        '/dashboard',
-                        'moderation',
-                        true
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_approved'), '/dashboard');
-                });
-            }
-            foreach ($notifyRejected as $userId) {
-                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
-                    Notification::createNotification(
-                        $userId,
-                        __('api_controllers_3.admin_bells.vetting_rejected'),
-                        '/help',
-                        'moderation',
-                        true
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_rejected'), '/help');
-                });
-            }
-            foreach ($notifyDeleted as $userId) {
-                LocaleContext::withLocale($localeByUser[$userId] ?? null, function () use ($userId) {
-                    Notification::createNotification(
-                        $userId,
-                        __('api_controllers_3.admin_bells.vetting_removed'),
-                        null,
-                        'moderation',
-                        false
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_removed'), null);
-                });
-            }
-        } catch (\Throwable $e) {
-            Log::warning("AdminVettingController::bulk notifications failed: " . $e->getMessage());
-        }
-
-        ActivityLog::log($adminId, "vetting_bulk_{$action}", "Bulk {$action}: {$processed} records processed, {$failed} failed", false, null, 'admin', 'vetting_record', null);
-
-        return $this->respondWithData([
-            'action' => $action,
-            'processed' => $processed,
-            'failed' => $failed,
-            'total' => count($ids),
+        return $this->respondWithData($result['data'], [
+            'pagination' => $result['pagination'],
         ]);
     }
 
-    /** GET /api/v2/admin/vetting/user/{userId} */
+    /** GET /v2/admin/vetting/stats */
+    public function stats(): JsonResponse
+    {
+        $this->requireVettingDecisionMaker();
+
+        return $this->respondWithData($this->attestations->stats(TenantContext::getId()));
+    }
+
+    /** GET /v2/admin/vetting/{id} */
+    public function show(int $id): JsonResponse
+    {
+        $this->requireVettingDecisionMaker();
+        $record = $this->attestations->getById($id, TenantContext::getId());
+
+        if ($record === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.vetting_confirmation_not_found'), null, 404);
+        }
+
+        return $this->respondWithData($record);
+    }
+
+    /** GET /v2/admin/vetting/user/{userId} */
     public function getUserRecords(int $userId): JsonResponse
     {
-        $this->requireBrokerOrAdmin();
+        $this->requireVettingDecisionMaker();
+
         try {
-            $records = $this->vettingService->getUserRecords($userId);
-            return $this->respondWithData($records);
-        } catch (\Exception $e) {
-            return $this->respondWithData([]);
+            return $this->respondWithData(
+                $this->attestations->getUserRecords($userId, TenantContext::getId())
+            );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->policyError($e);
         }
     }
 
-    /**
-     * POST /api/v2/admin/vetting/{id}/document
-     *
-     * Upload a supporting document for a vetting record. Uses request()->file() (Laravel native).
-     * Field name: 'file'. Allowed: PDF, JPEG, PNG, WebP. Max 10MB.
-     */
-    public function uploadDocument(int $id): JsonResponse
+    /** GET /v2/admin/vetting/policy */
+    public function policy(): JsonResponse
     {
-        $adminId = $this->requireBrokerOrAdmin();
+        $this->requireVettingDecisionMaker();
+        $tenantId = TenantContext::getId();
+
+        return $this->respondWithData([
+            'policy' => $this->jurisdictions->getPolicy($tenantId),
+            'jurisdictions' => $this->jurisdictions->availableJurisdictions(),
+            'revocation_reason_codes' => MemberVettingAttestationService::REVOCATION_REASON_CODES,
+            'review_resolution_codes' => MemberVettingAttestationService::REVIEW_RESOLUTION_CODES,
+        ]);
+    }
+
+    /** PUT /v2/admin/vetting/policy */
+    public function updatePolicy(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (($error = $this->rejectProhibitedInput(['jurisdiction'])) !== null) {
+            return $error;
+        }
+        $tenantId = TenantContext::getId();
+        $jurisdiction = trim((string) $this->input('jurisdiction', ''));
+
+        if ($jurisdiction === '') {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.safeguarding_jurisdiction_required'),
+                'jurisdiction',
+                422,
+            );
+        }
 
         try {
-            $existing = $this->vettingService->getById($id);
-            if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.vetting_record_not_found'), null, 404);
-            }
+            $previousPolicy = $this->jurisdictions->getPolicy($tenantId);
+            $result = DB::transaction(function () use ($tenantId, $jurisdiction, $adminId, $previousPolicy): array {
+                $policy = $this->jurisdictions->configure($tenantId, $jurisdiction, $adminId);
+                $transition = is_string($policy['preset'] ?? null) && $policy['preset'] !== ''
+                    ? SafeguardingPreferenceService::replaceCountryPreset(
+                        $tenantId,
+                        $policy['preset'],
+                        $previousPolicy['jurisdiction'] !== $policy['jurisdiction'],
+                    )
+                    : SafeguardingPreferenceService::preservePresetProtectionsForUnavailablePolicy(
+                        $tenantId,
+                        $adminId,
+                    );
 
-            $file = request()->file('file');
-            if (!$file || !$file->isValid()) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.file_upload_failed'), 'file');
-            }
+                return ['policy' => $policy, 'transition' => $transition];
+            });
+            // `configure()` resolves its response inside the transaction. Reload
+            // after commit so no uncommitted policy value can remain cached.
+            $this->jurisdictions->forget($tenantId);
+            $policy = $this->jurisdictions->getPolicy($tenantId);
 
-            // Validate file type using file content
-            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->file($file->getRealPath());
-            if (!in_array($mimeType, $allowedMimes, true)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.file_type_pdf_jpeg_png_webp'), 'file');
-            }
-
-            // 10 MB limit
-            if ($file->getSize() > 10 * 1024 * 1024) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.file_size_limit_10mb'), 'file');
-            }
-
-            // Build a $_FILES-compatible array for ImageUploader::upload()
-            $fileArray = [
-                'name'     => $file->getClientOriginalName(),
-                'type'     => $mimeType,
-                'tmp_name' => $file->getRealPath(),
-                'error'    => UPLOAD_ERR_OK,
-                'size'     => $file->getSize(),
-            ];
-
-            $url = \App\Core\ImageUploader::upload($fileArray, 'vetting/documents');
-            $this->vettingService->updateDocumentUrl($id, $url);
-
-            ActivityLog::log($adminId, 'vetting_document_uploaded', "Uploaded document for vetting record #{$id} ({$existing['first_name']} {$existing['last_name']})", false, null, 'admin', 'vetting_record', $id);
-
-            $record = $this->vettingService->getById($id);
-            return $this->respondWithData($record);
-        } catch (\Exception $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.document_upload_failed'), null, 500);
+            return $this->respondWithData([
+                'policy' => $policy,
+                'preference_transition' => $result['transition'],
+                'message' => __('api.safeguarding_jurisdiction_updated'),
+            ]);
+        } catch (SafeguardingPolicyException $e) {
+            $this->jurisdictions->forget($tenantId);
+            return $this->policyError($e);
+        } catch (Throwable $e) {
+            $this->jurisdictions->forget($tenantId);
+            throw $e;
         }
     }
 
-    /**
-     * Send a vetting-related bell notification + email to a user.
-     *
-     * Takes translation KEYS (not pre-rendered strings) for the bell message,
-     * email heading, body, and CTA label so they can be resolved under the
-     * recipient's preferred_language via LocaleContext. If the recipient has
-     * no preferred_language, falls back to the app default 'en'.
-     *
-     * Wrapped in try/catch so notification failures never break the admin action.
-     */
-    private function sendVettingNotification(
-        int $userId,
-        string $bellMessageKey,
-        ?string $bellLink,
-        string $emailHeadingKey,
-        string $emailBodyKey,
-        string $gradientFrom,
-        string $gradientTo,
-        string $ctaLabelKey,
-        string $ctaPath
-    ): void {
+    /** POST /v2/admin/vetting/policy/rotate */
+    public function rotatePolicy(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        if (($error = $this->rejectProhibitedInput(['acknowledgement', 'reason_code'])) !== null) {
+            return $error;
+        }
+        $tenantId = TenantContext::getId();
+        if (! $this->inputBool('acknowledgement', false)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.safeguarding_policy_rotation_acknowledgement_required'),
+                'acknowledgement',
+                422,
+            );
+        }
+        $reasonCode = trim((string) $this->input('reason_code', 'policy_changed'));
+        if (! in_array($reasonCode, ['policy_changed', 'scheduled_review', 'incident_response'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reason_code'), 'reason_code', 422);
+        }
+
         try {
-            $tenantId = TenantContext::getId();
-            $user = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->select(['email', 'name', 'first_name', 'preferred_language'])
-                ->first();
+            $rotation = $this->jurisdictions->rotatePolicyVersion($tenantId, $adminId, $reasonCode);
+            $policy = $rotation['policy'];
+            $affectedMembers = $rotation['affected_member_ids'];
 
-            LocaleContext::withLocale($user, function () use ($user, $userId, $bellMessageKey, $bellLink, $emailHeadingKey, $emailBodyKey, $gradientFrom, $gradientTo, $ctaLabelKey, $ctaPath, $tenantId) {
-                // Bell notification
-                Notification::createNotification(
-                    $userId,
-                    __($bellMessageKey),
-                    $bellLink,
-                    'moderation',
-                    true
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __($bellMessageKey), $bellLink);
-
-                // Email notification
-                if ($user && !empty($user->email)) {
-                    $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
-                    $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
-                    $baseUrl = TenantContext::getFrontendUrl();
-                    $basePath = TenantContext::getSlugPrefix();
-                    $fullCtaUrl = $baseUrl . $basePath . $ctaPath;
-                    $emailHeading = __($emailHeadingKey);
-                    $emailBody = __($emailBodyKey);
-                    $ctaLabel = __($ctaLabelKey);
-                    $safeEmailBody = htmlspecialchars($emailBody, ENT_QUOTES, 'UTF-8');
-                    $greeting = __('emails.common.greeting', ['name' => $recipientName]);
-                    $subject = __('emails.vetting.subject', ['heading' => $emailHeading, 'tenant' => $tenantName]);
-
-                    $html = <<<HTML
-<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
-    <div style="background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">{$emailHeading}</h1>
-        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
-    </div>
-    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$greeting}</p>
-        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">{$safeEmailBody}</p>
-        <div style="text-align: center; margin-top: 24px;">
-            <a href="{$fullCtaUrl}" style="display: inline-block; background: linear-gradient(135deg, {$gradientFrom}, {$gradientTo}); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">{$ctaLabel}</a>
-        </div>
-    </div>
-</div>
-HTML;
-                    if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'vetting', ['tenant_id' => $tenantId])) {
-                        Log::warning('AdminVettingController::sendVettingNotification mailer returned false', [
-                            'user_id' => $userId,
-                        ]);
-                    }
+            foreach ($affectedMembers as $memberId) {
+                $member = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $memberId)
+                    ->first(['preferred_language']);
+                try {
+                    LocaleContext::withLocale($member, function () use ($memberId, $tenantId): void {
+                        Notification::createNotification(
+                            $memberId,
+                            __('safeguarding.review.attestation_policy_rotated_member'),
+                            '/settings',
+                            'safeguarding_vetting_review',
+                            true,
+                            $tenantId,
+                        );
+                    });
+                } catch (Throwable $e) {
+                    Log::warning('Safeguarding policy rotation member notification failed', [
+                        'tenant_id' => $tenantId,
+                        'member_id' => $memberId,
+                        'exception' => $e::class,
+                    ]);
                 }
+            }
+
+            return $this->respondWithData([
+                'policy' => $policy,
+                'reason_code' => $reasonCode,
+                'affected_member_count' => count($affectedMembers),
+                'message' => __('api.safeguarding_policy_rotated'),
+            ]);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->policyError($e);
+        }
+    }
+
+    /** POST /v2/admin/vetting/user/{userId}/confirm */
+    public function confirm(int $userId): JsonResponse
+    {
+        $actorId = $this->requireVettingDecisionMaker();
+        if (($error = $this->rejectProhibitedInput(['acknowledgement', 'review_request_id'])) !== null) {
+            return $error;
+        }
+        if (! $this->inputBool('acknowledgement', false)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.vetting_confirmation_acknowledgement_required'),
+                'acknowledgement',
+                422,
+            );
+        }
+
+        try {
+            $record = $this->attestations->confirmForCurrentPolicy(
+                TenantContext::getId(),
+                $userId,
+                $actorId,
+                $this->optionalPositiveInt('review_request_id'),
+            );
+            $this->notifyMemberStatusUpdated($userId);
+
+            return $this->respondWithData($record, null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->policyError($e);
+        }
+    }
+
+    /** POST /v2/admin/vetting/user/{userId}/revoke */
+    public function revoke(int $userId): JsonResponse
+    {
+        $actorId = $this->requireVettingDecisionMaker();
+        if (($error = $this->rejectProhibitedInput(['reason_code', 'review_request_id'])) !== null) {
+            return $error;
+        }
+
+        $reasonCode = trim((string) $this->input('reason_code', 'community_decision_withdrawn'));
+
+        try {
+            $record = $this->attestations->revokeForCurrentPolicy(
+                TenantContext::getId(),
+                $userId,
+                $actorId,
+                $reasonCode,
+                $this->optionalPositiveInt('review_request_id'),
+            );
+            $this->notifyMemberStatusUpdated($userId);
+
+            return $this->respondWithData($record);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->policyError($e);
+        }
+    }
+
+    /** POST /v2/admin/vetting/reviews/{reviewId}/resolve */
+    public function resolveReview(int $reviewId): JsonResponse
+    {
+        $actorId = $this->requireVettingDecisionMaker();
+        if (($error = $this->rejectProhibitedInput(['resolution_code'])) !== null) {
+            return $error;
+        }
+
+        try {
+            $record = $this->attestations->resolveReview(
+                TenantContext::getId(),
+                $reviewId,
+                $actorId,
+                trim((string) $this->input('resolution_code', '')),
+            );
+
+            return $this->respondWithData($record);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->policyError($e);
+        }
+    }
+
+    /** @param list<string> $allowedFields */
+    private function rejectProhibitedInput(array $allowedFields): ?JsonResponse
+    {
+        if (request()->allFiles() !== []) {
+            return $this->respondWithError(
+                'VETTING_EVIDENCE_PROHIBITED',
+                __('api.vetting_evidence_prohibited'),
+                'file',
+                422,
+            );
+        }
+
+        $inputKeys = array_keys($this->getAllInput());
+        $prohibited = array_intersect($inputKeys, self::PROHIBITED_INPUT_FIELDS);
+        $unknown = array_diff($inputKeys, $allowedFields);
+        if ($prohibited !== [] || $unknown !== []) {
+            return $this->respondWithError(
+                'VETTING_EVIDENCE_PROHIBITED',
+                __('api.vetting_evidence_prohibited'),
+                (string) (array_values(array_merge($prohibited, $unknown))[0] ?? 'request'),
+                422,
+            );
+        }
+
+        return null;
+    }
+
+    private function optionalPositiveInt(string $key): ?int
+    {
+        $value = $this->input($key);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $parsed = (int) $value;
+
+        return $parsed > 0 ? $parsed : null;
+    }
+
+    private function policyError(SafeguardingPolicyException $e): JsonResponse
+    {
+        $status = match ($e->reasonCode) {
+            'MEMBER_NOT_FOUND', 'VETTING_CONFIRMATION_NOT_FOUND', 'VETTING_REVIEW_REQUEST_NOT_FOUND' => 404,
+            'VETTING_SELF_CONFIRMATION_FORBIDDEN', 'VETTING_DECISION_ACTOR_NOT_FOUND' => 403,
+            'SAFEGUARDING_POLICY_UNAVAILABLE', 'SAFEGUARDING_JURISDICTION_REQUIRED' => 409,
+            default => 422,
+        };
+
+        $key = 'api.' . strtolower($e->reasonCode);
+        $message = __($key);
+        if ($message === $key) {
+            $message = __('api.vetting_decision_failed');
+        }
+
+        return $this->respondWithError($e->reasonCode, $message, null, $status);
+    }
+
+    private function notifyMemberStatusUpdated(int $memberId): void
+    {
+        $member = DB::table('users')
+            ->where('id', $memberId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select(['id', 'preferred_language'])
+            ->first();
+        if ($member === null) {
+            return;
+        }
+
+        try {
+            LocaleContext::withLocale($member->preferred_language ?? null, static function () use ($memberId): void {
+                Notification::createNotification(
+                    $memberId,
+                    __('svc_notifications.vetting_status_updated'),
+                    '/settings?safeguarding=1',
+                    'safeguarding_status_updated',
+                    false,
+                    TenantContext::getId(),
+                );
             });
-        } catch (\Throwable $e) {
-            Log::warning("AdminVettingController::sendVettingNotification failed for user {$userId}: " . $e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Safeguarding attestation member notification failed', [
+                'tenant_id' => TenantContext::getId(),
+                'member_id' => $memberId,
+                'exception' => $e::class,
+            ]);
         }
     }
 }

@@ -157,13 +157,22 @@ class TeamTaskService
         }
 
         $now = now();
+        $assignedTo = isset($data['assigned_to']) ? (int) $data['assigned_to'] : null;
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $userId,
+            (int) $tenantId,
+            'team_task_create',
+            trim($title . ' ' . (string) ($data['description'] ?? '')),
+            $assignedTo !== null && $assignedTo > 0 ? [$assignedTo] : [],
+        );
 
         $id = DB::table('team_tasks')->insertGetId([
             'group_id' => $groupId,
             'tenant_id' => $tenantId,
             'title' => $title,
             'description' => $data['description'] ?? null,
-            'assigned_to' => isset($data['assigned_to']) ? (int) $data['assigned_to'] : null,
+            'assigned_to' => $assignedTo,
             'status' => $status,
             'priority' => $priority,
             'due_date' => $data['due_date'] ?? null,
@@ -267,6 +276,22 @@ class TeamTaskService
         if (empty($update)) {
             return true; // Nothing to update is still success
         }
+
+        $additionalRecipients = [];
+        if ((int) ($task->assigned_to ?? 0) > 0) {
+            $additionalRecipients[] = (int) $task->assigned_to;
+        }
+        if (isset($update['assigned_to']) && (int) $update['assigned_to'] > 0) {
+            $additionalRecipients[] = (int) $update['assigned_to'];
+        }
+        GroupService::assertSafeguardingBroadcastAllowed(
+            (int) $task->group_id,
+            $userId,
+            (int) $tenantId,
+            'team_task_update',
+            trim((string) ($update['title'] ?? '') . ' ' . (string) ($update['description'] ?? '')),
+            $additionalRecipients,
+        );
 
         $update['updated_at'] = now();
 

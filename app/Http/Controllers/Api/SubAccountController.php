@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Services\SubAccountService;
@@ -78,7 +79,11 @@ class SubAccountController extends BaseApiController
             }
         }
 
-        $relationshipId = $this->subAccountService->requestRelationship($userId, $childUserId, $relationshipType, $permissions);
+        try {
+            $relationshipId = $this->subAccountService->requestRelationship($userId, $childUserId, $relationshipType, $permissions);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($relationshipId === null) {
             return $this->respondWithErrors($this->subAccountService->getErrors(), 422);
@@ -94,7 +99,11 @@ class SubAccountController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $success = $this->subAccountService->approveRelationship($userId, $id);
+        try {
+            $success = $this->subAccountService->approveRelationship($userId, $id);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithErrors($this->subAccountService->getErrors(), 422);
@@ -127,7 +136,11 @@ class SubAccountController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'permissions']), 'permissions', 400);
         }
 
-        $success = $this->subAccountService->updatePermissions($userId, (int) $id, $permissions);
+        try {
+            $success = $this->subAccountService->updatePermissions($userId, (int) $id, $permissions);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             return $this->respondWithErrors($this->subAccountService->getErrors(), 422);

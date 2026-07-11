@@ -22,7 +22,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $ownerId]) }}">{{ __('govuk_alpha_saved.wall.back_to_profile') }}</a>
 
     @php
-        $errorStatuses = ['appreciation-message-required', 'appreciation-self', 'appreciation-too-long', 'appreciation-rate-limited', 'appreciation-failed', 'reaction-failed'];
+        $errorStatuses = ['appreciation-message-required', 'appreciation-self', 'appreciation-too-long', 'appreciation-rate-limited', 'appreciation-failed', 'appreciation-safeguarding-restricted', 'appreciation-safeguarding-unavailable', 'reaction-failed'];
     @endphp
 
     {{-- Error summary BEFORE the h1 (validation / failure) --}}
@@ -41,6 +41,8 @@
                                     @case('appreciation-too-long'){{ __('govuk_alpha_saved.status.appreciation_too_long') }}@break
                                     @case('appreciation-rate-limited'){{ __('govuk_alpha_saved.status.appreciation_rate_limited') }}@break
                                     @case('reaction-failed'){{ __('govuk_alpha_saved.status.reaction_failed') }}@break
+                                    @case('appreciation-safeguarding-restricted'){{ __('safeguarding.errors.interaction_not_allowed') }}@break
+                                    @case('appreciation-safeguarding-unavailable'){{ __('safeguarding.errors.policy_unavailable') }}@break
                                     @default{{ __('govuk_alpha_saved.status.appreciation_failed') }}
                                 @endswitch
                             @endif

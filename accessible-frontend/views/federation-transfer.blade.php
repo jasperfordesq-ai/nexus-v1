@@ -18,7 +18,8 @@
             'transfer-sent', 'transfer-insufficient', 'transfer-amount-invalid',
             'transfer-description-required', 'transfer-description-too-long',
             'transfer-not-enabled', 'transfer-recipient-unavailable', 'transfer-self',
-            'transfer-failed',
+            'transfer-failed', 'transfer-safeguarding-restricted',
+            'transfer-safeguarding-unavailable',
         ];
         $statusKey = (string) ($status ?? '');
         $statusKey = in_array($statusKey, $allowedStatuses, true) ? $statusKey : '';

@@ -54,6 +54,14 @@ class PollRankingService
         }
 
         $tenantId = \App\Core\TenantContext::getId();
+        if ((int) $poll->user_id !== $userId) {
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $userId,
+                (int) $poll->user_id,
+                (int) $tenantId,
+                'poll_ranking',
+            );
+        }
 
         DB::transaction(function () use ($pollId, $userId, $rankings, $tenantId) {
             foreach ($rankings as $ranking) {

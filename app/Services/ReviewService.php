@@ -418,6 +418,13 @@ class ReviewService
             }
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $reviewerId,
+            $receiverId,
+            $tenantId,
+            'local_review',
+        );
+
         // Prevent duplicate reviews for same transaction
         if (! empty($data['transaction_id'])) {
             $exists = $this->review->newQuery()

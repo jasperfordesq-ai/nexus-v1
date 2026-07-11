@@ -350,7 +350,9 @@
     "support_aria": "このプロジェクトを支援（支援者{{count}}人）",
     "unsupport_aria": "支援を取り消す（支援者{{count}}人）",
     "volunteers_needed_other": "{{count}} が必要です",
+    "unsupport_aria_one": "サポートを削除します ({{count}} サポーター)",
     "unsupport_aria_other": "支援を取り消す（支援者{{count}}人）",
+    "support_aria_one": "このプロジェクトをサポートします ({{count}} サポーター)",
     "support_aria_other": "このプロジェクトを支援（支援者{{count}}人）"
   },
   "donations": {
@@ -581,9 +583,7 @@
     "upload_instructions": "資格情報を確認するための文書をアップロードします。受け入れられる形式: PDF、JPG、PNG、WebP (最大 10MB)。",
     "type_label": "資格情報の種類",
     "type_placeholder": "認証情報の種類を選択してください",
-    "type_police_check": "警察のチェック",
     "type_first_aid": "応急処置",
-    "type_background_check": "身元調査",
     "type_safeguarding": "保護",
     "type_manual_handling": "手動による取り扱い",
     "type_food_hygiene": "食品衛生",
@@ -599,7 +599,23 @@
     "upload_credential": "認証情報のアップロード",
     "aria_remove_file": "選択したファイルを削除",
     "aria_upload_document": "資格証明書をアップロード",
-    "expiring_soon_desc_other": "{{count}} 認証情報は 30 日以内に期限切れになります。"
+    "vetting_documents_notice_title": "警察のチェック文書をアップロードしないでください",
+    "vetting_documents_notice_body": "DBS、警察検査、Garda 審査、AccessNI、および PVG の書類はここでは受け付けられません。代わりに、コミュニティブローカーに個人保護の確認を確認するよう依頼してください。",
+    "legacy_vetting_evidence_title": "古い警察チェック文書は削除する必要があります",
+    "legacy_vetting_evidence_body": "この過去のアップロードは編集されています。 NEXUS では、ファイル名、日付、ステータス、コンテンツ、またはダウンロード リンクは表示されません。プラットフォームから削除し、NEXUS の外部でコミュニティの承認されたプロセスを使用してください。",
+    "legacy_vetting_evidence_delete": "レガシードキュメントを削除する",
+    "legacy_vetting_evidence_delete_success": "従来の警察チェック文書は削除されました。",
+    "legacy_vetting_evidence_delete_failed": "レガシードキュメントを削除できませんでした。もう一度試してください。",
+    "status_manual_review": "手動確認が必要です",
+    "manual_review_title": "サポート対象外の過去の資格情報",
+    "manual_review_body": "この過去の資格情報の種類はサポートされていません。書類の詳細は非表示であり、確認済みまたは身元調査の証明として扱われません。削除できます。",
+    "manual_review_delete": "資格情報を削除",
+    "manual_review_delete_success": "資格情報を削除しました。",
+    "manual_review_delete_failed": "資格情報を削除できませんでした。もう一度お試しください。",
+    "expiring_soon_desc_one": "{{count}} 認証情報は 30 日以内に期限切れになります。",
+    "expiring_soon_desc_other": "{{count}} 認証情報は 30 日以内に期限切れになります。",
+    "type_police_check": "警察のチェック",
+    "type_background_check": "身元調査"
   },
   "waitlist": {
     "heading": "私の順番待ちリスト",
@@ -762,6 +778,7 @@
     "bulk_rate_limited": "{{count}}件を更新できませんでした。操作が速すぎます。1分待って再試行してください。",
     "pending_count_other": "{{count}} 保留中",
     "selected_count_other": "{{count}} が選択されました",
+    "decline_modal_description_one": "拒否する前に、{{count}} アプリケーションに関するメモを追加してください。",
     "decline_modal_description_other": "拒否する前に、{{count}} アプリケーションに関するメモを追加してください。"
   },
   "org_wallet_balance": "ウォレット残高:",
@@ -1053,6 +1070,7 @@
   "my_organisations_declined": "却下",
   "my_organisations_declined_desc": "この申請は承認されませんでした。詳細はコミュニティ管理者にお問い合わせください。",
   "hours_invalid_range": "0.25〜24時間で入力してください。",
+  "org_callout_you_manage_many_one": "あなたは {{count}} 組織を管理しています",
   "org_callout_you_manage_many_other": "あなたは {{count}} 組織を管理しています",
   "more_sections_other": "詳細 ({{count}})"
 }

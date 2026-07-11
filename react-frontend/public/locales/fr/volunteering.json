@@ -35,12 +35,12 @@
     "tab_volunteers": "Bénévoles",
     "tab_wallet": "Portefeuille",
     "tab_settings": "Paramètres",
-    "review_applications_many": "Examiner les candidatures {{count}}",
     "review_applications_one": "Examiner les candidatures {{count}}",
     "review_applications_other": "Examiner les candidatures {{count}}",
-    "review_hours_many": "Examiner les heures {{count}}",
     "review_hours_one": "Examiner les heures {{count}}",
-    "review_hours_other": "Examiner les heures {{count}}"
+    "review_hours_other": "Examiner les heures {{count}}",
+    "review_applications_many": "Examiner les candidatures {{count}}",
+    "review_hours_many": "Examiner les heures {{count}}"
   },
   "page_title": "Bénévolat",
   "heading": "Bénévolat",
@@ -353,15 +353,15 @@
     },
     "support_aria": "Soutenir ce projet ({{count}} soutiens)",
     "unsupport_aria": "Retirer votre soutien ({{count}} soutiens)",
-    "volunteers_needed_many": "{{count}} nécessaires",
     "volunteers_needed_one": "{{count}} nécessaires",
     "volunteers_needed_other": "{{count}} nécessaires",
-    "unsupport_aria_many": "Retirer votre soutien ({{count}} soutiens)",
     "unsupport_aria_one": "Retirer votre soutien ({{count}} soutiens)",
     "unsupport_aria_other": "Retirer votre soutien ({{count}} soutiens)",
-    "support_aria_many": "Soutenir ce projet ({{count}} soutiens)",
     "support_aria_one": "Soutenir ce projet ({{count}} soutiens)",
-    "support_aria_other": "Soutenir ce projet ({{count}} soutiens)"
+    "support_aria_other": "Soutenir ce projet ({{count}} soutiens)",
+    "volunteers_needed_many": "{{count}} nécessaires",
+    "unsupport_aria_many": "Retirer votre soutien ({{count}} soutiens)",
+    "support_aria_many": "Soutenir ce projet ({{count}} soutiens)"
   },
   "donations": {
     "heading": "Dons",
@@ -469,9 +469,9 @@
     "receipt_message": "Message",
     "receipt_error": "Impossible de charger le reçu.",
     "receipt_not_found": "Reçu introuvable.",
-    "donors_count_many": "{{count}} donateurs",
     "donors_count_one": "{{count}} donateurs",
-    "donors_count_other": "{{count}} donateurs"
+    "donors_count_other": "{{count}} donateurs",
+    "donors_count_many": "{{count}} donateurs"
   },
   "safeguarding": {
     "heading": "Protection",
@@ -593,9 +593,7 @@
     "upload_instructions": "Téléchargez un document pour vérifier vos informations d'identification. Formats acceptés : PDF, JPG, PNG, WebP (max 10Mo).",
     "type_label": "Type d'identifiant",
     "type_placeholder": "Sélectionnez le type d'identifiant",
-    "type_police_check": "Contrôle de police",
     "type_first_aid": "PREMIERS SECOURS",
-    "type_background_check": "Vérification des antécédents",
     "type_safeguarding": "Sauvegarde",
     "type_manual_handling": "Manutention manuelle",
     "type_food_hygiene": "Hygiène alimentaire",
@@ -611,9 +609,24 @@
     "upload_credential": "Télécharger les informations d'identification",
     "aria_remove_file": "Supprimer le fichier sélectionné",
     "aria_upload_document": "Télécharger un document de certification",
-    "expiring_soon_desc_many": "Les identifiants {{count}} expireront dans les 30 jours.",
+    "vetting_documents_notice_title": "Ne téléchargez pas de documents de contrôle de police",
+    "vetting_documents_notice_body": "Les documents DBS, contrôle de police, contrôle Garda, AccessNI et PVG ne sont pas acceptés ici. Demandez plutôt à votre courtier communautaire de revoir votre confirmation de protection privée.",
+    "legacy_vetting_evidence_title": "L'ancien document de contrôle de police doit être supprimé",
+    "legacy_vetting_evidence_body": "Ce téléchargement historique est expurgé. NEXUS n'affichera pas son nom de fichier, ses dates, son statut, son contenu ou un lien de téléchargement. Supprimez-le de la plateforme et utilisez le processus approuvé par votre communauté en dehors de NEXUS.",
+    "legacy_vetting_evidence_delete": "Supprimer l'ancien document",
+    "legacy_vetting_evidence_delete_success": "Ancien document de contrôle de police supprimé.",
+    "legacy_vetting_evidence_delete_failed": "L'ancien document n'a pas pu être supprimé. Veuillez réessayer.",
+    "status_manual_review": "Examen manuel requis",
+    "manual_review_title": "Ancien justificatif non pris en charge",
+    "manual_review_body": "Ce type d’ancien justificatif n’est pas pris en charge. Les détails du document sont masqués et il n’est considéré ni comme vérifié ni comme preuve de contrôle. Vous pouvez le supprimer.",
+    "manual_review_delete": "Supprimer le justificatif",
+    "manual_review_delete_success": "Justificatif supprimé.",
+    "manual_review_delete_failed": "Le justificatif n’a pas pu être supprimé. Veuillez réessayer.",
     "expiring_soon_desc_one": "Les identifiants {{count}} expireront dans les 30 jours.",
-    "expiring_soon_desc_other": "Les identifiants {{count}} expireront dans les 30 jours."
+    "expiring_soon_desc_other": "Les identifiants {{count}} expireront dans les 30 jours.",
+    "type_police_check": "Contrôle de police",
+    "type_background_check": "Vérification des antécédents",
+    "expiring_soon_desc_many": "Les identifiants {{count}} expireront dans les 30 jours."
   },
   "waitlist": {
     "heading": "Mes listes d'attente",
@@ -634,9 +647,9 @@
     "claim_success": "Vous êtes inscrit – inscrivez-vous pour le changement !",
     "claim_failed": "Je n'ai pas pu revendiquer la place",
     "claim_hint": "Une place s'est ouverte pour vous. Réclamez-le rapidement : les places non réclamées sont transférées à la personne suivante après 48 heures.",
-    "spots_many": "{{count}} points",
     "spots_one": "{{count}} points",
-    "spots_other": "{{count}} points"
+    "spots_other": "{{count}} points",
+    "spots_many": "{{count}} points"
   },
   "swaps": {
     "heading": "Échanges de quarts de travail",
@@ -776,15 +789,15 @@
     "bulk_success": "{{count}} candidatures mises à jour.",
     "bulk_failed": "{{count}} candidatures n'ont pas pu être mises à jour.",
     "bulk_rate_limited": "{{count}} n'ont pas pu être mises à jour — vous allez trop vite. Attendez une minute et réessayez.",
-    "pending_count_many": "{{count}} en attente",
     "pending_count_one": "{{count}} en attente",
     "pending_count_other": "{{count}} en attente",
-    "selected_count_many": "{{count}} sélectionné",
     "selected_count_one": "{{count}} sélectionné",
     "selected_count_other": "{{count}} sélectionné",
-    "decline_modal_description_many": "Ajoutez une note pour la candidature {{count}} avant de refuser.",
     "decline_modal_description_one": "Ajoutez une note pour la candidature {{count}} avant de refuser.",
-    "decline_modal_description_other": "Ajoutez une note pour la candidature {{count}} avant de refuser."
+    "decline_modal_description_other": "Ajoutez une note pour la candidature {{count}} avant de refuser.",
+    "pending_count_many": "{{count}} en attente",
+    "selected_count_many": "{{count}} sélectionné",
+    "decline_modal_description_many": "Ajoutez une note pour la candidature {{count}} avant de refuser."
   },
   "org_wallet_balance": "Solde du portefeuille :",
   "auto_pay_on": "Paiement automatique activé",
@@ -879,9 +892,9 @@
     "generated_on": "Généré",
     "download": "Télécharger",
     "verify": "Vérifier",
-    "verified_hours_many": "{{count}} heures vérifiées",
     "verified_hours_one": "{{count}} heures vérifiées",
-    "verified_hours_other": "{{count}} heures vérifiées"
+    "verified_hours_other": "{{count}} heures vérifiées",
+    "verified_hours_many": "{{count}} heures vérifiées"
   },
   "emergency": {
     "title": "Alertes d'urgence",
@@ -903,9 +916,9 @@
     "respond_error_generic": "Échec de la réponse à l'alerte. Veuillez réessayer.",
     "from": "De",
     "expires": "Expire",
-    "pending_count_many": "{{count}} en attente",
     "pending_count_one": "{{count}} en attente",
-    "pending_count_other": "{{count}} en attente"
+    "pending_count_other": "{{count}} en attente",
+    "pending_count_many": "{{count}} en attente"
   },
   "wellbeing": {
     "heading": "Bien-être des bénévoles",
@@ -1079,10 +1092,10 @@
   "my_organisations_declined": "Refusée",
   "my_organisations_declined_desc": "Cette demande n'a pas été approuvée. Contactez l'administration de votre communauté pour plus de détails.",
   "hours_invalid_range": "Saisissez entre 0,25 et 24 heures.",
-  "org_callout_you_manage_many_many": "Vous gérez des organisations {{count}}",
   "org_callout_you_manage_many_one": "Vous gérez des organisations {{count}}",
   "org_callout_you_manage_many_other": "Vous gérez des organisations {{count}}",
-  "more_sections_many": "More ({{count}})",
   "more_sections_one": "Plus ({{count}})",
-  "more_sections_other": "Plus ({{count}})"
+  "more_sections_other": "Plus ({{count}})",
+  "org_callout_you_manage_many_many": "Vous gérez des organisations {{count}}",
+  "more_sections_many": "More ({{count}})"
 }

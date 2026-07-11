@@ -97,6 +97,16 @@
     "privacy_policy_link": "Polityka Prywatności"
   },
   "privacy": {
+    "last_updated_safeguarding": "Ostatnia aktualizacja: lipiec 2026",
+    "data_safeguarding_type": "Prywatne potwierdzenie weryfikacji do celów ochrony",
+    "data_safeguarding_collected": "Społeczność, członek, określony system weryfikacji, cel i zakres, decyzja o potwierdzeniu lub cofnięciu, upoważniony decydent, znaczniki czasu, określony kod przyczyny i wersja zasad. Nie prosimy o certyfikat, numer referencyjny, daty, wynik, szczegóły dotyczące rejestru karnego, notatki w postaci swobodnego tekstu ani dokumenty tożsamości i nie przechowujemy ich.",
+    "data_safeguarding_why": "W celu egzekwowania prywatnych preferencji kontaktu członka oraz zapewnienia audytowalnego procesu korekty i weryfikacji.",
+    "data_safeguarding_basis": "Podstawa prawna udokumentowana przez administratora danych",
+    "safeguarding_data_title": "Metadane potwierdzenia ochrony",
+    "safeguarding_data_body": "Gdy społeczność zgodnie z prawem wymaga potwierdzenia rozszerzonej weryfikacji DBS dla chronionego kontaktu między członkami, przeprowadza własne kontrole poza Project NEXUS. Upoważniony pośrednik zapisuje wyłącznie wynikającą z nich decyzję społeczności. Nie stanowi to zapewnienia, że członek jest bezpieczny, nie figuruje w rejestrze karnym lub został dopuszczony do każdej roli.",
+    "safeguarding_data_access": "Dostęp jest ograniczony do upoważnionych pośredników i administratorów w społeczności członka. Dane nie są widoczne w profilach publicznych, odznakach, wynikach wyszukiwania ani zwykłych danych analitycznych.",
+    "safeguarding_data_retention": "Operator Społeczności musi opublikować i stosować udokumentowany harmonogram przechowywania oraz usuwać metadane, gdy nie są już potrzebne, z zastrzeżeniem wszelkich należycie udokumentowanych obowiązków prawnych.",
+    "safeguarding_data_correction": "Członkowie mogą wyświetlić swój prywatny status, poprosić pośrednika o weryfikację bez przesyłania dowodów oraz zwrócić się do Operatora Społeczności o poprawienie lub zakwestionowanie nieprawidłowej decyzji.",
     "meta_description": "Jak zbieramy, używamy i chronimy Twoje dane osobowe na naszej platformie społecznościowej.",
     "page_title": "Polityka Prywatności",
     "heading": "Polityka Prywatności",
@@ -721,6 +731,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Gdy zasady społeczności wymagają kontaktu między zweryfikowanymi osobami, społeczność przeprowadza zgodną z prawem kontrolę poza Project NEXUS. Upoważniony pośrednik może dla konkretnej polityki kontaktu zapisać prywatne potwierdzenie społeczności zawierające wyłącznie metadane. Project NEXUS nie prosi o certyfikaty DBS, Garda Vetting, AccessNI, PVG lub równoważne ani nie przechowuje ich, ich numerów referencyjnych, wyników czy szczegółów dotyczących rejestru karnego. Potwierdzenie nie oznacza, że dana osoba jest bezpieczna w każdej sytuacji lub dopuszczona do każdej roli.",
+    "what_we_dont_vetting_item": "Nie sprawdzamy niezależnie ani nie przechowujemy zaświadczeń dotyczących rejestru karnego, nie certyfikujemy członka do wykonywania zawodu i nie przekształcamy potwierdzenia zasad kontaktu w ogólne dopuszczenie do ról.",
+    "precautions_vetting_item": "W przypadku działań z udziałem dzieci lub osób dorosłych wymagających szczególnej ochrony skontaktuj się z koordynatorem społeczności w sprawie obowiązujących zasad. Nie proś innego członka o przesłanie certyfikatu DBS, Garda Vetting, AccessNI, PVG lub jego odpowiednika przez Project NEXUS.",
     "page_title": "Zaufanie i bezpieczeństwo",
     "meta_description": "Jak działają giełdy na {{name}}, co robimy, aby zapewnić bezpieczeństwo społeczności, czego nie robimy i jak zgłosić problem. Prosto angielskie zaufanie i ochrona.",
     "heading": "Zaufanie i bezpieczeństwo",

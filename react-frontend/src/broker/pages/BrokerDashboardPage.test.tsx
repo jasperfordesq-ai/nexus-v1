@@ -15,8 +15,7 @@ const MOCK_STATS = vi.hoisted(() => ({
   unreviewed_messages: 3,
   high_risk_listings: 2,
   monitored_users: 10,
-  vetting_pending: 4,
-  vetting_expiring: 1,
+  vetting_review_requests: 4,
   safeguarding_alerts: 0,
   onboarding_safeguarding_flags: 2,
   _partial: false,
@@ -120,14 +119,28 @@ describe('BrokerDashboard', () => {
     });
   });
 
+  it('links the vetting review-request count to the review queue', async () => {
+    mockGetDashboard.mockResolvedValueOnce({ success: true, data: MOCK_STATS });
+    render(<BrokerDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Vetting review requests').length).toBeGreaterThan(0);
+    });
+
+    const reviewLinks = screen.getAllByRole('link').filter((link) =>
+      link.getAttribute('href')?.endsWith('/broker/vetting?status=review_requested'),
+    );
+    expect(reviewLinks.length).toBeGreaterThan(0);
+  });
+
   it('renders the triage hero with the total of open items', async () => {
     mockGetDashboard.mockResolvedValueOnce({ success: true, data: MOCK_STATS });
     render(<BrokerDashboard />);
     await waitFor(() => {
       expect(screen.getByText('What needs you now')).toBeInTheDocument();
     });
-    // 5+3+2+4+1+2 = 17 open items across the non-zero queues
-    expect(screen.getByText('17')).toBeInTheDocument();
+    // 5+3+2+4+2 = 16 open items across the non-zero queues
+    expect(screen.getByText('16')).toBeInTheDocument();
   });
 
   it('renders the all-clear hero when every queue is empty', async () => {
@@ -138,8 +151,7 @@ describe('BrokerDashboard', () => {
         pending_exchanges: 0,
         unreviewed_messages: 0,
         high_risk_listings: 0,
-        vetting_pending: 0,
-        vetting_expiring: 0,
+        vetting_review_requests: 0,
         safeguarding_alerts: 0,
         onboarding_safeguarding_flags: 0,
       },

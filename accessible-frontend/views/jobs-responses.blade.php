@@ -35,6 +35,10 @@
             'interview-failed' => 'states_interview_failed',
             'offer-failed' => 'states_offer_failed',
         ];
+        $safeguardingErrors = [
+            'response-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+            'response-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+        ];
     @endphp
 
     <span class="govuk-caption-xl">{{ __('govuk_alpha_jobs.responses.caption') }}</span>
@@ -48,10 +52,10 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="responses-status">{{ __('govuk_alpha_jobs.responses.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha_jobs.responses.' . $successMap[$flash]) }}</p></div>
         </div>
-    @elseif (isset($errorMap[$flash]))
+    @elseif (isset($errorMap[$flash]) || isset($safeguardingErrors[$flash]))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha_jobs.responses.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha_jobs.responses.' . $errorMap[$flash]) }}</li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ $safeguardingErrors[$flash] ?? __('govuk_alpha_jobs.responses.' . $errorMap[$flash]) }}</li></ul></div></div>
         </div>
     @endif
 

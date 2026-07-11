@@ -6,9 +6,9 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'This conversation is paused by a community safeguarding rule. You need verified :types vetting before you can message this member. Please contact your broker or community administrator to confirm your vetting status or arrange the next step.',
+        'vetting_required' => 'This conversation is paused by a community safeguarding rule. Your community must have recorded a current :types confirmation for you before you can message this member. Ask your broker or community administrator to record this metadata-only status. Do not send or upload any vetting document.',
         'vetting_required_title' => 'Safeguarding check needed',
-        'vetting_required_detail' => 'This member can only be contacted for this type of interaction by members with verified :types vetting.',
+        'vetting_required_detail' => 'This member can only be contacted for this type of interaction by members whose community has recorded a current :types status. The record is metadata only; no document should be sent or uploaded.',
         'vetting_required_action' => 'Open help',
         'contact_restricted' => 'This member has asked for a coordinator to arrange contact on their behalf. Your message has not been sent. Please contact your broker or community administrator so they can help arrange the next safe step.',
         'contact_restricted_title' => 'Coordinator arrangement needed',
@@ -17,6 +17,14 @@ return [
         'coordination_not_required' => 'Direct contact with this member is currently available — you do not need a coordinator to arrange it. Please refresh the page and try messaging again.',
         'coordination_request_failed' => 'We could not send your request to the coordinator just now. Please try again shortly.',
         'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
+        'policy_unavailable' => 'We cannot confirm the community safeguarding policy right now. No message has been sent. Please try again shortly.',
+        'interaction_not_allowed' => 'The recipient’s community safeguarding policy does not allow this direct interaction. Ask a coordinator for help.',
+        'policy_unavailable_title' => 'Safeguarding check temporarily unavailable',
+        'policy_unavailable_detail' => 'Project NEXUS could not safely evaluate the contact policy, so this interaction has been paused.',
+        'policy_unavailable_action' => 'Check again',
+        'listing_role_confirmation_required' => 'This listing requires a separate community-confirmed Enhanced DBS decision for this role. A messenger contact confirmation does not satisfy role-specific safeguarding requirements.',
+        'listing_role_feature_unavailable' => 'Role-specific criminal-record vetting cannot be enabled here yet. Messenger contact confirmation is deliberately not reused as role clearance.',
+        'compliance_policy_unavailable' => 'We cannot safely confirm the safeguarding requirements for this listing right now. Please try again later or contact your broker.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
         'pdf_required' => 'The safeguarding statement must be a PDF file.',
@@ -29,12 +37,26 @@ return [
     'vetting_types' => [
         'dbs_basic' => 'DBS Basic',
         'dbs_standard' => 'DBS Standard',
-        'dbs_enhanced' => 'DBS Enhanced',
+        'dbs_enhanced' => 'Enhanced DBS',
         'garda_vetting' => 'Garda vetting',
         'access_ni' => 'AccessNI',
         'pvg_scotland' => 'PVG Scotland',
         'international' => 'International background check',
         'other' => 'Other vetting check',
+    ],
+    'jurisdictions' => [
+        'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'england_wales' => 'England and Wales',
+        'scotland' => 'Scotland',
+        'northern_ireland' => 'Northern Ireland',
+        'ireland' => 'Republic of Ireland',
+        'custom' => 'Custom jurisdiction',
+    ],
+    'attestations' => [
+        'dbs_enhanced' => 'Enhanced DBS confirmed for safeguarded member contact',
+        'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
+        'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
+        'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
@@ -44,7 +66,7 @@ return [
         'who_can_see_heading' => 'Who can see this',
         'who_can_see_body' => 'Only the community coordinators and administrators can see these preferences. Other members cannot. All access is logged.',
         'what_activates_heading' => 'What activates as a result',
-        'activation_broker_review' => 'A coordinator will review messages you send and receive.',
+        'activation_broker_review' => 'A coordinator will review and approve safeguarded matches or exchanges when your selected preference requires it. This does not give them access to message contents.',
         'activation_match_approval' => 'A coordinator will approve matches involving you before they are suggested to the other member.',
         'activation_discovery_hidden' => 'You will be hidden from discovery for members who have not completed the required vetting.',
         'activation_notification' => 'A coordinator has been notified and will be in touch to discuss how we can help.',
@@ -67,7 +89,79 @@ return [
         'revoked_toast' => 'Preference revoked.',
         'revoke_error_toast' => 'Something went wrong. Please try again.',
     ],
+    'presets' => [
+        'common' => [
+            'help_text' => 'This community takes safeguarding seriously. If you consider yourself a vulnerable adult or need additional support, please let us know so our coordinators can help arrange safe exchanges for you.',
+            'options' => [
+                'is_vulnerable_adult' => [
+                    'label' => 'I consider myself a vulnerable adult and may need additional safeguarding support',
+                    'description' => 'This lets our coordinators know you may need extra support when arranging exchanges. A coordinator will be in touch to discuss how we can help. This information is confidential.',
+                ],
+                'requires_vetted_partners' => [
+                    'label' => 'I would prefer to only interact with members who have been appropriately vetted',
+                ],
+                'requires_coordinator_contact' => [
+                    'label' => 'I would like a coordinator to help arrange my exchanges rather than being contacted directly',
+                    'description' => 'A coordinator will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.',
+                ],
+                'no_home_visits' => [
+                    'label' => 'I do not want members visiting my home without coordinator arrangement',
+                    'description' => 'All home visits will be arranged through a coordinator who can ensure appropriate safeguards are in place.',
+                ],
+                'works_with_children' => [
+                    'label' => 'I plan to offer services that may involve children or young people (under 18)',
+                ],
+                'works_with_vulnerable_adults' => [
+                    'label' => 'I plan to offer services that may involve vulnerable adults',
+                ],
+                'none_apply' => [
+                    'label' => 'None of these apply to me',
+                    'description' => 'I have reviewed the options above and none of them apply to my situation. This is recorded so coordinators know I have seen and considered this step.',
+                ],
+            ],
+        ],
+        'ireland' => [
+            'name' => 'Ireland',
+            'vetting_authority' => 'National Vetting Bureau',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In Ireland, this means Garda Vetted members. Our coordinators will ensure you are only matched with vetted members.'],
+                'requires_coordinator_contact' => ['description' => 'A coordinator (broker) will mediate all contact and help arrange exchanges on your behalf. Other members will not be able to message you directly.'],
+                'works_with_children' => ['description' => 'A coordinator may discuss Garda Vetting requirements with you. In Ireland, certain activities involving children require vetting under the National Vetting Bureau Act 2012.'],
+                'works_with_vulnerable_adults' => ['description' => 'A coordinator may discuss Garda Vetting requirements with you. Activities involving vulnerable adults may require vetting.'],
+            ],
+        ],
+        'england_wales' => [
+            'name' => 'England & Wales',
+            'vetting_authority' => 'Disclosure and Barring Service',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In England & Wales, this means DBS-checked members. Our coordinators will ensure you are only matched with vetted members.'],
+                'works_with_children' => ['description' => 'A coordinator may discuss DBS check requirements with you.'],
+            ],
+        ],
+        'scotland' => [
+            'name' => 'Scotland',
+            'vetting_authority' => 'Disclosure Scotland (PVG Scheme)',
+            'options' => [
+                'is_vulnerable_adult' => ['label' => 'I consider myself a vulnerable or protected adult and may need additional safeguarding support'],
+                'requires_vetted_partners' => ['description' => 'In Scotland, this means PVG scheme members. Our coordinators will ensure you are only matched with vetted members.'],
+                'works_with_children' => ['description' => 'A coordinator may discuss PVG scheme membership with you.'],
+                'works_with_vulnerable_adults' => ['label' => 'I plan to offer services that may involve protected adults'],
+            ],
+        ],
+        'northern_ireland' => [
+            'name' => 'Northern Ireland',
+            'vetting_authority' => 'AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In Northern Ireland, this means AccessNI-checked members. Our coordinators will ensure you are only matched with vetted members.'],
+                'works_with_children' => ['description' => 'A coordinator may discuss AccessNI checking with you.'],
+            ],
+        ],
+        'custom' => ['name' => 'Custom'],
+    ],
     'review' => [
+        'jurisdiction_changed_member' => 'Your community changed its safeguarding jurisdiction. Your existing protection remains active, but please review the updated wording in Settings.',
+        'jurisdiction_changed_staff' => 'The safeguarding jurisdiction changed. Affected member protections remain active and now require member review.',
+        'attestation_policy_rotated_member' => 'Your community has started a safeguarding policy review. Your broker must reconfirm your private contact status; this is not a certificate expiry.',
         'reminder_subject' => 'Please review your safeguarding preferences',
         'reminder_title' => 'Time to review your safeguarding preferences',
         'reminder_body' => 'It has been over a year since you set your safeguarding preferences for :community. Please take a moment to review them and confirm they still apply, or revoke any that no longer do.',

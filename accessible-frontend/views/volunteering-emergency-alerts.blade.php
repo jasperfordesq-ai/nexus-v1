@@ -32,11 +32,15 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="emergency-success-title">{{ __('govuk_alpha_volunteering.shared.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __($successStates[$status]) }}</p></div>
         </div>
-    @elseif ($status === 'alert-respond-failed')
+    @elseif (in_array($status, ['alert-respond-failed', 'alert-safeguarding-restricted', 'alert-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_volunteering.shared.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p>{{ __('govuk_alpha_volunteering.emergency.alert_respond_failed') }}</p></div>
+                <div class="govuk-error-summary__body"><p>{{ str_starts_with((string) $status, 'alert-safeguarding-')
+                    ? (session('emergency_alert_safeguarding_error') ?: ($status === 'alert-safeguarding-unavailable'
+                        ? __('safeguarding.errors.policy_unavailable')
+                        : __('safeguarding.errors.contact_restricted')))
+                    : __('govuk_alpha_volunteering.emergency.alert_respond_failed') }}</p></div>
             </div>
         </div>
     @endif

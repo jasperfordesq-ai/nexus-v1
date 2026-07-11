@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Services\CaringCommunity\CaringHourGiftService;
 use App\Services\CaringCommunity\CaringHourTransferService;
@@ -143,6 +144,8 @@ class CaringCommunityApiController extends BaseApiController
                 null,
                 201
             );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
@@ -209,6 +212,8 @@ class CaringCommunityApiController extends BaseApiController
                 pointsToUse: $pointsToUse,
                 orderTotalChf: $orderTotalChf,
             );
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
@@ -248,6 +253,8 @@ class CaringCommunityApiController extends BaseApiController
 
         try {
             $result = $this->hourGiftService->send($userId, $recipientId, $hours, $message);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {

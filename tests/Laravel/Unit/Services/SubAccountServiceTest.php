@@ -72,7 +72,7 @@ class SubAccountServiceTest extends TestCase
     {
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('where')->andReturnSelf();
-        $mockQuery->shouldReceive('update')->andReturn(0);
+        $mockQuery->shouldReceive('first')->andReturnNull();
         $this->mockRelationship->shouldReceive('newQuery')->andReturn($mockQuery);
 
         $result = $this->service->approve(999, 1);

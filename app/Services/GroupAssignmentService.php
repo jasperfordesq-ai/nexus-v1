@@ -64,11 +64,28 @@ class GroupAssignmentService
             return 'SKIPPED: No match above threshold';
         }
 
+        $groupId = (int) $bestGroup['id'];
+        $userId = (int) $user['id'];
+        $alreadyAssigned = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->exists();
+        if ($alreadyAssigned) {
+            return 'ASSIGNED: ' . $bestGroup['name'];
+        }
+
+        GroupService::assertSafeguardingCohortAllowed(
+            $groupId,
+            $userId,
+            (int) TenantContext::getId(),
+            'group_automatic_assignment',
+        );
+
         // Insert the user into the group (INSERT IGNORE to avoid duplicates)
         DB::insert(
             "INSERT IGNORE INTO group_members (group_id, user_id, status, created_at)
              VALUES (?, ?, 'active', NOW())",
-            [(int) $bestGroup['id'], (int) $user['id']]
+            [$groupId, $userId]
         );
 
         return 'ASSIGNED: ' . $bestGroup['name'];

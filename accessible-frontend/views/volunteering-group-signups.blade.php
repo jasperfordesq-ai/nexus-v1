@@ -45,6 +45,10 @@
             'member-remove-failed' => 'govuk_alpha_volunteering.group_signups.error_member_remove_failed',
             'reservation-cancel-failed' => 'govuk_alpha_volunteering.group_signups.error_reservation_cancel_failed',
         ];
+        $safeguardingErrors = [
+            'member-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+            'member-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+        ];
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_volunteering') }}</a>
@@ -54,13 +58,13 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="group-success-title">{{ __('govuk_alpha_volunteering.shared.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __($successMsg[$status]) }}</p></div>
         </div>
-    @elseif (isset($errorMsg[$status]))
+    @elseif (isset($errorMsg[$status]) || isset($safeguardingErrors[$status]))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_volunteering.shared.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
-                        <li>{{ __($errorMsg[$status]) }}</li>
+                        <li>{{ $safeguardingErrors[$status] ?? __($errorMsg[$status]) }}</li>
                     </ul>
                 </div>
             </div>

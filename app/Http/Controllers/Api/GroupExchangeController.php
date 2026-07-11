@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupExchangeService;
+use App\Services\MessageService;
 
 /**
  * GroupExchangeController -- Group time exchanges.
@@ -61,21 +62,22 @@ class GroupExchangeController extends BaseApiController
         $id = $this->groupExchangeService->create($userId, $data);
 
         if (!$id) {
-            return $this->respondWithError('INTERNAL_ERROR', __('api.create_failed', ['resource' => 'exchange']), null, 500);
-        }
+            if ($restriction = $this->groupExchangeService->getLastContactRestriction()) {
+                $error = MessageService::buildSafeguardingError([
+                    'code' => $restriction->code,
+                    'required_vetting_types' => $restriction->requiredAttestationCodes,
+                    'required_vetting_labels' => $restriction->requiredAttestationLabels,
+                ]);
 
-        // Add participants if provided inline
-        $participants = $data['participants'] ?? [];
-        foreach ($participants as $p) {
-            if (!empty($p['user_id']) && !empty($p['role'])) {
-                $this->groupExchangeService->addParticipant(
-                    $id,
-                    (int) $p['user_id'],
-                    $p['role'],
-                    (float) ($p['hours'] ?? 0),
-                    (float) ($p['weight'] ?? 1.0)
+                return $this->respondWithError(
+                    $restriction->code,
+                    (string) $error['message'],
+                    null,
+                    $restriction->isUnavailable() ? 503 : 403,
                 );
             }
+
+            return $this->respondWithError('INTERNAL_ERROR', __('api.create_failed', ['resource' => 'exchange']), null, 500);
         }
 
         $exchange = $this->groupExchangeService->get($id);
@@ -180,6 +182,21 @@ class GroupExchangeController extends BaseApiController
         );
 
         if (!$ok) {
+            if ($restriction = $this->groupExchangeService->getLastContactRestriction()) {
+                $error = MessageService::buildSafeguardingError([
+                    'code' => $restriction->code,
+                    'required_vetting_types' => $restriction->requiredAttestationCodes,
+                    'required_vetting_labels' => $restriction->requiredAttestationLabels,
+                ]);
+
+                return $this->respondWithError(
+                    $restriction->code,
+                    (string) $error['message'],
+                    null,
+                    $restriction->isUnavailable() ? 503 : 403,
+                );
+            }
+
             return $this->respondWithError('VALIDATION_ERROR', __('api.failed_add_participant'), null, 400);
         }
 
@@ -228,7 +245,12 @@ class GroupExchangeController extends BaseApiController
         $result = $this->groupExchangeService->start($id);
 
         if (!$result['success']) {
-            return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 400);
+            $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
+            $status = $code === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 503
+                : (in_array($code, ['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED'], true) ? 403 : 400);
+
+            return $this->respondWithError($code, $result['error'], null, $status);
         }
 
         $updated = $this->groupExchangeService->get($id);
@@ -252,6 +274,19 @@ class GroupExchangeController extends BaseApiController
         }
 
         if (!$this->groupExchangeService->confirmParticipation($id, $userId)) {
+            if ($restriction = $this->groupExchangeService->getLastContactRestriction()) {
+                $error = MessageService::buildSafeguardingError([
+                    'status' => $restriction->status,
+                    'code' => $restriction->code,
+                    'required_vetting_types' => $restriction->requiredAttestationCodes,
+                    'required_vetting_labels' => $restriction->requiredAttestationLabels,
+                    'can_request_coordinator' => $restriction->canRequestCoordinator,
+                ]);
+                $status = $restriction->isUnavailable() ? 503 : 403;
+
+                return $this->respondWithError($error['code'], $error['message'], null, $status);
+            }
+
             return $this->respondWithError('VALIDATION_ERROR', __('api.group_exchange_confirm_failed'), null, 400);
         }
 
@@ -278,7 +313,12 @@ class GroupExchangeController extends BaseApiController
         $result = $this->groupExchangeService->complete($id);
 
         if (!$result['success']) {
-            return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 400);
+            $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
+            $status = $code === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 503
+                : (in_array($code, ['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED'], true) ? 403 : 400);
+
+            return $this->respondWithError($code, $result['error'], null, $status);
         }
 
         return $this->respondWithData([

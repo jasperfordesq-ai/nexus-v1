@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\FeedService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -131,7 +132,11 @@ class FeedController extends BaseApiController
         // Fix 3: key rate limits on both tenant AND user to prevent one user exhausting tenant quota
         $this->rateLimit("feed_post:{$tenantId}:{$userId}", 10, 60);
 
-        $post = $this->feedService->createPost($userId, $this->getAllInput());
+        try {
+            $post = $this->feedService->createPost($userId, $this->getAllInput());
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         // Handle validation errors from FeedService
         if (is_array($post) && isset($post['error'])) {

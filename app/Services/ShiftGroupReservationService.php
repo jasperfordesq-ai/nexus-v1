@@ -211,6 +211,47 @@ class ShiftGroupReservationService
             return false;
         }
 
+        $policy = app(SafeguardingInteractionPolicy::class);
+        if ($leaderUserId !== $userId) {
+            $policy->assertLocalContactAllowed(
+                $leaderUserId,
+                $userId,
+                $tenantId,
+                'volunteer_group_reservation_member_add',
+            );
+            $policy->assertLocalContactAllowed(
+                $userId,
+                $leaderUserId,
+                $tenantId,
+                'volunteer_group_reservation_member_add',
+            );
+        }
+
+        $organizer = DB::table('vol_opportunities as opp')
+            ->join('vol_organizations as org', function ($join): void {
+                $join->on('opp.organization_id', '=', 'org.id')
+                    ->on('opp.tenant_id', '=', 'org.tenant_id');
+            })
+            ->where('opp.id', $opportunityId)
+            ->where('opp.tenant_id', $tenantId)
+            ->select(['opp.created_by', 'org.user_id as organization_owner_id'])
+            ->first();
+        $organizerId = (int) ($organizer->created_by ?? $organizer->organization_owner_id ?? 0);
+        if ($organizerId > 0 && $organizerId !== $userId) {
+            $policy->assertLocalContactAllowed(
+                $userId,
+                $organizerId,
+                $tenantId,
+                'volunteer_group_reservation_placement',
+            );
+            $policy->assertLocalContactAllowed(
+                $organizerId,
+                $userId,
+                $tenantId,
+                'volunteer_group_reservation_placement',
+            );
+        }
+
         try {
             return DB::transaction(function () use ($reservationId, $userId, $tenantId) {
                 // Lock the reservation row so concurrent addMember calls can't

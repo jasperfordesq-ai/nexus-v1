@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\IdeaTeamLink;
 use App\Models\Notification;
@@ -109,6 +110,22 @@ class IdeaTeamConversionService
 
         try {
             return DB::transaction(function () use ($ideaId, $userId, $tenantId, $idea, $groupName, $groupDescription, $visibility) {
+                if ((int) $idea->user_id !== $userId) {
+                    $policy = app(SafeguardingInteractionPolicy::class);
+                    $policy->assertLocalContactAllowed(
+                        $userId,
+                        (int) $idea->user_id,
+                        (int) $tenantId,
+                        'idea_team_conversion',
+                    );
+                    $policy->assertLocalContactAllowed(
+                        (int) $idea->user_id,
+                        $userId,
+                        (int) $tenantId,
+                        'idea_team_conversion',
+                    );
+                }
+
                 // Create the group
                 $groupId = DB::table('groups')->insertGetId([
                     'tenant_id'            => $tenantId,
@@ -197,6 +214,8 @@ class IdeaTeamConversionService
                     ],
                 ];
             });
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('Idea-to-team conversion failed: ' . $e->getMessage(), [
                 'idea_id' => $ideaId,

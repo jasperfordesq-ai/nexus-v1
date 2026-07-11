@@ -1040,6 +1040,13 @@ class JobVacancyService
             return null;
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $userId,
+            (int) $vacancy->user_id,
+            TenantContext::getId(),
+            'job_application',
+        );
+
         // Use transaction + row lock to prevent duplicate applications from concurrent requests
         $application = null;
         try {
@@ -1353,6 +1360,48 @@ class JobVacancyService
                 'message' => __('api.job_application_terminal_status', ['status' => $previousStatus]),
             ];
             return false;
+        }
+
+        if (! $isApplicantWithdraw) {
+            $applicantId = (int) $application->user_id;
+            $ownerId = (int) $application->vacancy->user_id;
+
+            if ($status === 'rejected') {
+                if ($notes !== null && trim($notes) !== '') {
+                    $decision = app(SafeguardingInteractionPolicy::class)->evaluateLocalContact(
+                        $adminId,
+                        $applicantId,
+                        $tenantId,
+                        'job_application_rejection_note',
+                    );
+                    if (! $decision->isAllowed()) {
+                        $notes = null;
+                    }
+                }
+            } else {
+                app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                    $adminId,
+                    $applicantId,
+                    $tenantId,
+                    'job_application_status_progression',
+                );
+
+                if (in_array($status, ['accepted'], true) && $ownerId > 0 && $ownerId !== $applicantId) {
+                    $policy = app(SafeguardingInteractionPolicy::class);
+                    $policy->assertLocalContactAllowed(
+                        $ownerId,
+                        $applicantId,
+                        $tenantId,
+                        'job_application_acceptance',
+                    );
+                    $policy->assertLocalContactAllowed(
+                        $applicantId,
+                        $ownerId,
+                        $tenantId,
+                        'job_application_acceptance',
+                    );
+                }
+            }
         }
 
         try {

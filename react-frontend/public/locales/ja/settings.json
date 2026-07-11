@@ -294,9 +294,29 @@
     "revoke_confirm_no": "保持する",
     "revoked_toast": "設定を取り消しました。",
     "revoke_error_toast": "問題が発生しました。もう一度お試しください。",
+    "policy_review_title": "安全保護設定を確認してください",
+    "policy_review_body": "コミュニティの安全保護管轄が変更されました。保護は引き続き有効です。更新された説明を確認し、希望どおりであることを確定してください。",
+    "policy_review_confirm": "設定を確定する",
+    "policy_review_confirmed": "安全保護設定を確定しました。",
+    "policy_review_error": "確認を確定できませんでした。もう一度お試しください。",
     "chip_broker_review": "ブローカー審査",
     "chip_match_approval": "マッチング承認",
-    "chip_vetted_only": "審査済み連絡先のみ"
+    "chip_vetted_only": "審査済み連絡先のみ",
+    "vetting": {
+      "title": "あなたのプライベートコミュニティの審査ステータス",
+      "status_not_confirmed": "未確認",
+      "status_review_requested": "レビューが要求されました",
+      "status_unavailable": "審査ステータスを読み込めませんでした。",
+      "confirmed_on": "コミュニティは、{{date}} でこの保護連絡先要件を満たしていることを確認しました。",
+      "review_pending_body": "ブローカーはコミュニティの確認を確認するよう求められています。",
+      "not_confirmed_body": "あなたのコミュニティは、あなたがこの安全保護のための連絡先要件を満たしていることを確認していません。",
+      "policy_unavailable_body": "このコミュニティは、その管轄区域に対してサポートされている安全保護連絡先ポリシーを構成していません。",
+      "no_documents": "DBS、警察検査、Garda 審査、AccessNI、または PVG ドキュメントを NEXUS 経由でアップロードまたは送信しないでください。あなたのコミュニティは、プラットフォーム外での合法的なチェックを手配します。",
+      "request_review_button": "ブローカーのレビューをリクエストする",
+      "review_requested_button": "レビューが要求されました",
+      "review_requested_toast": "ブローカーのレビューがリクエストされました。",
+      "review_error": "ブローカーのレビューをリクエストできませんでした。もう一度試してください。"
+    }
   },
   "header": {
     "title": "設定",
@@ -619,7 +639,10 @@
   "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。",
   "tabs_aria": "設定セクション",
   "twofa_loading_setup": "2 要素セットアップをロードしています...",
+  "biometric_all_removed_one": "{{count}} パスキーを削除しました。",
   "biometric_all_removed_other": "{{count}} パスキーを削除しました。",
+  "biometric_enabled_one": "{{count}} パスキーが登録されました",
   "biometric_enabled_other": "{{count}} パスキーが登録されました",
+  "twofa_backup_remaining_one": "{{count}} 個のバックアップ コードが残っています",
   "twofa_backup_remaining_other": "{{count}} バックアップコードが残っています"
 }

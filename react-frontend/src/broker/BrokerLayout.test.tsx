@@ -72,7 +72,7 @@ import { BrokerLayout } from './BrokerLayout';
 
 const BROKER_DASHBOARD = {
   safeguarding_alerts: 2,
-  vetting_expiring: 1,
+  vetting_review_requests: 1,
   pending_exchanges: 5,
   unreviewed_messages: 3,
   monitored_users: 0,

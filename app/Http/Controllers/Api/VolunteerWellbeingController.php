@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -359,7 +360,11 @@ class VolunteerWellbeingController extends BaseApiController
             'expires_hours' => $this->inputInt('expires_hours') ?: 24,
         ];
 
-        $alertId = $this->volunteerEmergencyAlertService->createAlert($userId, $data);
+        try {
+            $alertId = $this->volunteerEmergencyAlertService->createAlert($userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($alertId === null) {
             $errors = $this->volunteerEmergencyAlertService->getErrors();
@@ -380,7 +385,11 @@ class VolunteerWellbeingController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.vol_response_accept_decline'), 'response', 400);
         }
 
-        $success = $this->volunteerEmergencyAlertService->respond((int) $id, $userId, $response);
+        try {
+            $success = $this->volunteerEmergencyAlertService->respond((int) $id, $userId, $response);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             $errors = $this->volunteerEmergencyAlertService->getErrors();

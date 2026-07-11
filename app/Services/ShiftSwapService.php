@@ -107,6 +107,13 @@ class ShiftSwapService
             return null;
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $fromUserId,
+            $toUserId,
+            $tenantId,
+            'volunteer_shift_swap_request',
+        );
+
         // Check for duplicate pending swap request
         $duplicate = DB::table('vol_shift_swap_requests')
             ->where('from_user_id', $fromUserId)
@@ -178,6 +185,22 @@ class ShiftSwapService
             return false;
         }
 
+        if ($action === 'accept') {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                (int) $swap->from_user_id,
+                (int) $swap->to_user_id,
+                $tenantId,
+                'volunteer_shift_swap_accept',
+            );
+            $policy->assertLocalContactAllowed(
+                (int) $swap->to_user_id,
+                (int) $swap->from_user_id,
+                $tenantId,
+                'volunteer_shift_swap_accept',
+            );
+        }
+
         try {
             if ($action === 'reject') {
                 DB::table('vol_shift_swap_requests')
@@ -238,6 +261,22 @@ class ShiftSwapService
         if (! $swap) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_swap_not_found_or_not_pending')];
             return false;
+        }
+
+        if ($action === 'approve') {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                (int) $swap->from_user_id,
+                (int) $swap->to_user_id,
+                $tenantId,
+                'volunteer_shift_swap_admin_approval',
+            );
+            $policy->assertLocalContactAllowed(
+                (int) $swap->to_user_id,
+                (int) $swap->from_user_id,
+                $tenantId,
+                'volunteer_shift_swap_admin_approval',
+            );
         }
 
         try {

@@ -16,11 +16,15 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="buddy-action-status">{{ __('govuk_alpha_goals.common.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha_goals.states.buddy-action-sent') }}</p></div>
         </div>
-    @elseif ($status === 'buddy-action-failed')
+    @elseif (in_array($status, ['buddy-action-failed', 'buddy-action-safeguarding-restricted', 'buddy-action-safeguarding-unavailable'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_goals.common.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#type-nudge">{{ __('govuk_alpha_goals.states.buddy-action-failed') }}</a></li></ul></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#type-nudge">{{ match ($status) {
+                    'buddy-action-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                    'buddy-action-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                    default => __('govuk_alpha_goals.states.buddy-action-failed'),
+                } }}</a></li></ul></div>
             </div>
         </div>
     @endif

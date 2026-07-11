@@ -41,6 +41,7 @@ vi.mock('@/hooks/useLegalDocument', () => ({
   useLegalDocument: vi.fn(() => ({ document: null, loading: false })),
 }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/components/legal/CustomLegalDocument', () => ({
   default: () => <div data-testid="custom-legal">Custom Legal Doc</div>,
   CustomLegalDocument: () => <div data-testid="custom-legal">Custom Legal Doc</div>,

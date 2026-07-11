@@ -23,7 +23,7 @@ import { api } from '@/lib/api';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
+import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingAttestation, InsuranceCertificate } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -107,8 +107,8 @@ export function UserEdit() {
   const [consents, setConsents] = useState<UserConsent[]>([]);
   const [consentsLoading, setConsentsLoading] = useState(false);
 
-  // Vetting & Insurance records
-  const [vettingRecords, setVettingRecords] = useState<VettingRecord[]>([]);
+  // Metadata-only contact attestations and insurance records
+  const [vettingRecords, setVettingRecords] = useState<VettingAttestation[]>([]);
   const [insuranceRecords, setInsuranceRecords] = useState<InsuranceCertificate[]>([]);
   const [complianceLoading, setComplianceLoading] = useState(false);
 
@@ -173,7 +173,7 @@ export function UserEdit() {
         adminVetting.getUserRecords(Number(id)).catch(() => null),
         adminInsurance.getUserCertificates(Number(id)).catch(() => null),
       ]);
-      if (vRes?.success && Array.isArray(vRes.data)) setVettingRecords(vRes.data as VettingRecord[]);
+      if (vRes?.success && Array.isArray(vRes.data)) setVettingRecords(vRes.data as VettingAttestation[]);
       if (iRes?.success && Array.isArray(iRes.data)) setInsuranceRecords(iRes.data as InsuranceCertificate[]);
     } catch {
       // Compliance tables may not exist
@@ -943,26 +943,25 @@ export function UserEdit() {
               <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="sm" label={t('loading.compliance')} /></div>
             ) : (
               <div className="flex flex-col gap-6">
-                {/* Vetting Status */}
+                {/* Safeguarding contact attestation */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <ShieldCheck aria-hidden="true" size={16} className="text-accent" />
-                      <p className="font-medium text-foreground">{t('sections.vetting_status')}</p>
+                      <p className="font-medium text-foreground">{t('sections.contact_attestation')}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Chip
                         size="sm"
                         variant="soft"
                         color={
-                          user?.vetting_status === 'verified' ? 'success'
-                            : user?.vetting_status === 'pending' ? 'warning'
-                            : user?.vetting_status === 'expired' ? 'danger'
+                          vettingRecords[0]?.decision === 'confirmed' ? 'success'
+                            : vettingRecords[0]?.decision === 'revoked' ? 'danger'
                             : 'default'
                         }
                         className="capitalize"
                       >
-                        {user?.vetting_status || 'none'}
+                        {t(`values.decision_${vettingRecords[0]?.decision ?? 'not_confirmed'}`)}
                       </Chip>
                       <Button
                         as={Link}
@@ -980,30 +979,28 @@ export function UserEdit() {
                         <div key={vr.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                           <div>
                             <p className="text-sm font-medium text-foreground">
-                              {vr.vetting_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                              {t(`values.attestation_${vr.attestation_code}`, { defaultValue: t('values.safeguarding_confirmation') })}
                             </p>
                             <p className="text-xs text-muted">
-                              {vr.reference_number || t('values.no_reference')}
-                              {vr.expiry_date ? t('values.expires_prefix') : ''}
+                              {vr.confirmed_at ? t('values.confirmed_on', { date: new Date(vr.confirmed_at).toLocaleDateString(getFormattingLocale()) }) : t('values.not_confirmed')}
                             </p>
                           </div>
                           <Chip
                             size="sm"
                             variant="soft"
                             color={
-                              vr.status === 'verified' ? 'success'
-                                : vr.status === 'pending' || vr.status === 'submitted' ? 'warning'
-                                : vr.status === 'rejected' ? 'danger'
+                              vr.decision === 'confirmed' ? 'success'
+                                : vr.decision === 'revoked' ? 'danger'
                                 : 'default'
                             }
                             className="capitalize"
                           >
-                            {vr.status}
+                            {t(`values.decision_${vr.decision}`)}
                           </Chip>
                         </div>
                       ))}
                       {vettingRecords.length > 3 && (
-                        <p className="text-xs text-muted">{t('summary.more_records')}</p>
+                        <p className="text-xs text-muted">{t('summary.more_attestations')}</p>
                       )}
                     </div>
                   ) : (

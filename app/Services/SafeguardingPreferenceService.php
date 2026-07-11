@@ -7,11 +7,14 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\TenantSafeguardingOption;
+use App\Models\Notification;
 use App\Models\UserSafeguardingPreference;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * CRUD for tenant safeguarding options and member preferences.
@@ -22,6 +25,14 @@ use Illuminate\Support\Facades\Log;
  */
 class SafeguardingPreferenceService
 {
+    /** @var list<string> */
+    private const PROTECTIVE_TRIGGER_KEYS = [
+        'requires_vetted_interaction',
+        'requires_broker_approval',
+        'restricts_messaging',
+        'restricts_matching',
+    ];
+
     // =========================================================================
     // Tenant Safeguarding Options (Admin CRUD)
     // =========================================================================
@@ -36,7 +47,7 @@ class SafeguardingPreferenceService
         return TenantSafeguardingOption::where('tenant_id', $tenantId)
             ->active()
             ->get()
-            ->map(fn ($opt) => $opt->toArray())
+            ->map(fn (TenantSafeguardingOption $opt) => $opt->toLocalizedArray())
             ->all();
     }
 
@@ -50,7 +61,7 @@ class SafeguardingPreferenceService
         return TenantSafeguardingOption::where('tenant_id', $tenantId)
             ->orderBy('sort_order')
             ->get()
-            ->map(fn ($opt) => $opt->toArray())
+            ->map(fn (TenantSafeguardingOption $opt) => $opt->toLocalizedArray())
             ->all();
     }
 
@@ -92,45 +103,72 @@ class SafeguardingPreferenceService
      */
     public static function updateOption(int $optionId, array $data): bool
     {
-        $option = TenantSafeguardingOption::where('id', $optionId)
-            ->where('tenant_id', TenantContext::getId())
-            ->first();
-        if (!$option) {
+        $tenantId = TenantContext::getId();
+        $result = DB::transaction(function () use ($optionId, $data, $tenantId): ?array {
+            $option = TenantSafeguardingOption::withoutGlobalScopes()
+                ->where('id', $optionId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (!$option) {
+                return null;
+            }
+
+            $fillable = ['label', 'description', 'help_url', 'sort_order', 'is_active', 'is_required', 'option_type', 'select_options', 'triggers'];
+            $updates = array_intersect_key($data, array_flip($fillable));
+            if (isset($updates['label'])) {
+                $label = strip_tags(trim($updates['label']));
+                $managedKey = $option->managedTranslationKeyFor('label');
+                $updates['label'] = $managedKey !== null
+                    && $label === TenantSafeguardingOption::localizePresetText($managedKey)
+                    ? $managedKey
+                    : $label;
+            }
+            if (isset($updates['description'])) {
+                $description = strip_tags(trim($updates['description']));
+                $managedKey = $option->managedTranslationKeyFor('description');
+                $updates['description'] = $managedKey !== null
+                    && $description === TenantSafeguardingOption::localizePresetText($managedKey)
+                    ? $managedKey
+                    : $description;
+            }
+            if (array_key_exists('help_url', $updates)) {
+                $updates['help_url'] = self::validateUrl($updates['help_url']);
+            }
+
+            $activeSelectionUserIds = self::activeSelectionUserIds($tenantId, $optionId, true);
+            if ($activeSelectionUserIds !== [] && self::mutationWeakensProtection($option, $updates)) {
+                throw new SafeguardingPolicyException(
+                    'SAFEGUARDING_POLICY_UNAVAILABLE',
+                    __('api.safeguarding_policy_unavailable'),
+                );
+            }
+
+            $option->update($updates);
+
+            return [
+                'option' => $option,
+                'affected_user_ids' => array_key_exists('is_active', $updates) || array_key_exists('triggers', $updates)
+                    ? $activeSelectionUserIds
+                    : [],
+                'changes' => array_keys($updates),
+            ];
+        });
+        if ($result === null) {
             return false;
         }
 
-        $fillable = ['label', 'description', 'help_url', 'sort_order', 'is_active', 'is_required', 'option_type', 'select_options', 'triggers'];
-        $updates = array_intersect_key($data, array_flip($fillable));
-        if (isset($updates['label'])) {
-            $updates['label'] = strip_tags(trim($updates['label']));
-        }
-        if (isset($updates['description'])) {
-            $updates['description'] = strip_tags(trim($updates['description']));
-        }
-        if (array_key_exists('help_url', $updates)) {
-            $updates['help_url'] = self::validateUrl($updates['help_url']);
-        }
-
-        $option->update($updates);
-
-        // Re-evaluate triggers for affected users when option activation or triggers change
-        if (array_key_exists('is_active', $updates) || array_key_exists('triggers', $updates)) {
-            $affectedUserIds = \App\Models\UserSafeguardingPreference::where('option_id', $optionId)
-                ->whereNull('revoked_at')
-                ->distinct()
-                ->pluck('user_id');
-
-            $tenantId = TenantContext::getId();
-            foreach ($affectedUserIds as $userId) {
-                // Full re-evaluation: invalidates cache, re-merges triggers, updates
-                // user_messaging_restrictions, and re-dispatches notifications if needed
-                SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
-            }
+        /** @var TenantSafeguardingOption $option */
+        $option = $result['option'];
+        foreach ($result['affected_user_ids'] as $userId) {
+            // Full re-evaluation: invalidates cache, re-merges triggers, updates
+            // user_messaging_restrictions, and re-dispatches notifications if needed.
+            SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
         }
 
         self::logActivity(null, 'safeguarding_option_updated', 'safeguarding_option', $optionId, [
             'option_key' => $option->option_key,
-            'changes' => array_keys($updates),
+            'changes' => $result['changes'],
         ]);
 
         return true;
@@ -141,34 +179,46 @@ class SafeguardingPreferenceService
      */
     public static function deleteOption(int $optionId): bool
     {
-        $option = TenantSafeguardingOption::where('id', $optionId)
-            ->where('tenant_id', TenantContext::getId())
-            ->first();
-        if (!$option) {
-            return false;
-        }
-
         $tenantId = TenantContext::getId();
+        $result = DB::transaction(function () use ($optionId, $tenantId): ?array {
+            $option = TenantSafeguardingOption::withoutGlobalScopes()
+                ->where('id', $optionId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (!$option) {
+                return null;
+            }
 
-        // Capture affected users BEFORE revoking (so we know whose triggers to re-evaluate)
-        $affectedUserIds = UserSafeguardingPreference::where('option_id', $optionId)
-            ->where('tenant_id', $tenantId)
-            ->whereNull('revoked_at')
-            ->distinct()
-            ->pluck('user_id')
-            ->all();
+            $affectedUserIds = self::activeSelectionUserIds($tenantId, $optionId, true);
+            if ($affectedUserIds !== [] && self::hasProtectiveTriggers($option->triggers ?? [])) {
+                throw new SafeguardingPolicyException(
+                    'SAFEGUARDING_POLICY_UNAVAILABLE',
+                    __('api.safeguarding_policy_unavailable'),
+                );
+            }
 
-        DB::transaction(function () use ($option, $optionId, $tenantId) {
             $option->update(['is_active' => false]);
 
-            // Auto-revoke any active member preferences for this option — keeping them
-            // active would leave the data inconsistent with the option's state and
-            // weaken the audit trail (a "live" preference for a non-existent option).
+            // Legacy auto-revocation runs only for non-protective options; the
+            // guard above prevents administrators revoking live protections.
             UserSafeguardingPreference::where('option_id', $optionId)
                 ->where('tenant_id', $tenantId)
                 ->whereNull('revoked_at')
                 ->update(['revoked_at' => now()]);
+
+            return [
+                'option' => $option,
+                'affected_user_ids' => $affectedUserIds,
+            ];
         });
+        if ($result === null) {
+            return false;
+        }
+
+        /** @var TenantSafeguardingOption $option */
+        $option = $result['option'];
+        $affectedUserIds = $result['affected_user_ids'];
 
         // Re-evaluate triggers for affected users — deactivating an option may
         // remove monitoring/broker-approval requirements if it was the only trigger.
@@ -193,6 +243,72 @@ class SafeguardingPreferenceService
         return true;
     }
 
+    /** @return list<int> */
+    private static function activeSelectionUserIds(int $tenantId, int $optionId, bool $lock): array
+    {
+        $query = UserSafeguardingPreference::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('option_id', $optionId)
+            ->whereNull('revoked_at');
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        return $query->pluck('user_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /** @param array<string, mixed> $updates */
+    private static function mutationWeakensProtection(
+        TenantSafeguardingOption $option,
+        array $updates,
+    ): bool {
+        $currentTriggers = is_array($option->triggers) ? $option->triggers : [];
+        if (! self::hasProtectiveTriggers($currentTriggers)) {
+            return false;
+        }
+
+        if (array_key_exists('is_active', $updates)
+            && ! filter_var($updates['is_active'], FILTER_VALIDATE_BOOLEAN)) {
+            return true;
+        }
+        if (! array_key_exists('triggers', $updates)) {
+            return false;
+        }
+
+        $nextTriggers = is_array($updates['triggers']) ? $updates['triggers'] : [];
+        foreach (self::PROTECTIVE_TRIGGER_KEYS as $key) {
+            if (! empty($currentTriggers[$key]) && empty($nextTriggers[$key])) {
+                return true;
+            }
+        }
+
+        if (! empty($currentTriggers['requires_vetted_interaction'])) {
+            $currentCode = $currentTriggers['vetting_type_required'] ?? null;
+            $nextCode = $nextTriggers['vetting_type_required'] ?? null;
+            if ($currentCode !== $nextCode) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** @param array<string, mixed> $triggers */
+    private static function hasProtectiveTriggers(array $triggers): bool
+    {
+        foreach (self::PROTECTIVE_TRIGGER_KEYS as $key) {
+            if (! empty($triggers[$key])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Reorder options for a tenant.
      *
@@ -212,57 +328,279 @@ class SafeguardingPreferenceService
     // =========================================================================
 
     /**
-     * Apply a country preset to a tenant. Uses INSERT IGNORE to avoid
-     * overwriting existing custom options with the same option_key.
+     * Apply a country preset as an explicit replacement operation.
      *
-     * @return array List of option_keys that were created (not already existing)
+     * Existing rows with the same stable option key are updated in place so
+     * member preferences cannot display one jurisdiction while enforcing
+     * another. Preset-owned rows absent from the new preset are deactivated.
+     *
+     * @return array List of option keys that were newly created.
      */
     public static function applyCountryPreset(int $tenantId, string $presetKey): array
+    {
+        return self::replaceCountryPreset($tenantId, $presetKey)['created'];
+    }
+
+    /**
+     * @return array{created: list<string>, updated: list<string>, deactivated: list<string>, preserved: list<string>, review_required_count: int}
+     */
+    public static function replaceCountryPreset(
+        int $tenantId,
+        string $presetKey,
+        bool $requireMemberReview = false,
+    ): array
     {
         $presets = config('safeguarding_presets', []);
         $preset = $presets[$presetKey] ?? null;
 
         if (!$preset || empty($preset['options'])) {
-            return [];
+            return ['created' => [], 'updated' => [], 'deactivated' => [], 'preserved' => [], 'review_required_count' => 0];
         }
 
         $created = [];
-        $sortOrder = 0;
+        $updated = [];
+        $deactivated = [];
+        $preserved = [];
+        $affectedUserIds = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $tenantId)
+            ->whereNull('revoked_at')
+            ->distinct()
+            ->pluck('user_id')
+            ->map(static fn ($userId): int => (int) $userId)
+            ->all();
+        $reviewUserIds = $requireMemberReview
+            ? DB::table('user_safeguarding_preferences as p')
+                ->join('tenant_safeguarding_options as o', 'o.id', '=', 'p.option_id')
+                ->where('p.tenant_id', $tenantId)
+                ->whereNull('p.revoked_at')
+                ->whereNotNull('o.preset_source')
+                ->distinct()
+                ->pluck('p.user_id')
+                ->map(static fn ($userId): int => (int) $userId)
+                ->all()
+            : [];
 
-        foreach ($preset['options'] as $opt) {
-            $sortOrder += 10;
+        DB::transaction(function () use (
+            $tenantId,
+            $presetKey,
+            $preset,
+            &$created,
+            &$updated,
+            &$deactivated,
+            &$preserved,
+        ): void {
+            $newKeys = array_values(array_map(
+                static fn (array $option): string => (string) $option['option_key'],
+                $preset['options'],
+            ));
 
-            // INSERT IGNORE — won't overwrite existing option_keys
-            $existing = TenantSafeguardingOption::where('tenant_id', $tenantId)
-                ->where('option_key', $opt['option_key'])
-                ->first();
+            $stale = TenantSafeguardingOption::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereNotNull('preset_source')
+                ->whereNotIn('option_key', $newKeys)
+                ->where('is_active', true)
+                ->lockForUpdate()
+                ->get();
 
-            if ($existing) {
-                continue; // Don't overwrite admin customisations
+            foreach ($stale as $option) {
+                $activeSelectionUserIds = self::activeSelectionUserIds($tenantId, (int) $option->id, true);
+                if ($activeSelectionUserIds !== [] && self::hasProtectiveTriggers($option->triggers ?? [])) {
+                    $preserved[] = (string) $option->option_key;
+                    continue;
+                }
+
+                $option->update(['is_active' => false]);
+                UserSafeguardingPreference::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->where('option_id', $option->id)
+                    ->whereNull('revoked_at')
+                    ->update(['revoked_at' => now()]);
+                $deactivated[] = (string) $option->option_key;
             }
 
-            TenantSafeguardingOption::create([
-                'tenant_id' => $tenantId,
-                'option_key' => $opt['option_key'],
-                'option_type' => $opt['option_type'] ?? 'checkbox',
-                'label' => $opt['label'],
-                'description' => $opt['description'] ?? null,
-                'sort_order' => $sortOrder,
-                'is_active' => true,
-                'is_required' => false,
-                'triggers' => $opt['triggers'] ?? [],
-                'preset_source' => $presetKey,
-            ]);
+            $sortOrder = 0;
+            foreach ($preset['options'] as $optionData) {
+                $sortOrder += 10;
+                $optionKey = (string) $optionData['option_key'];
+                $existing = TenantSafeguardingOption::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->where('option_key', $optionKey)
+                    ->lockForUpdate()
+                    ->first();
 
-            $created[] = $opt['option_key'];
+                $values = [
+                    'option_type' => $optionData['option_type'] ?? 'checkbox',
+                    'label' => $optionData['label'],
+                    'description' => $optionData['description'] ?? null,
+                    'help_url' => $optionData['help_url'] ?? null,
+                    'sort_order' => $sortOrder,
+                    'is_active' => true,
+                    'is_required' => false,
+                    'select_options' => $optionData['select_options'] ?? null,
+                    'triggers' => $optionData['triggers'] ?? [],
+                    'preset_source' => $presetKey,
+                ];
+
+                if ($existing === null) {
+                    TenantSafeguardingOption::withoutGlobalScopes()->create(array_merge($values, [
+                        'tenant_id' => $tenantId,
+                        'option_key' => $optionKey,
+                    ]));
+                    $created[] = $optionKey;
+                } else {
+                    $existing->update($values);
+                    $updated[] = $optionKey;
+                }
+            }
+        });
+
+        foreach ($affectedUserIds as $userId) {
+            SafeguardingTriggerService::activateTriggersForUser((int) $userId, $tenantId);
+        }
+
+        if ($reviewUserIds !== [] && Schema::hasColumn('user_safeguarding_preferences', 'policy_review_required_at')) {
+            DB::table('user_safeguarding_preferences')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('user_id', $reviewUserIds)
+                ->whereNull('revoked_at')
+                ->update([
+                    'policy_review_required_at' => now(),
+                    'policy_review_reason_code' => 'jurisdiction_changed',
+                ]);
+            self::notifyJurisdictionReviewRequired($tenantId, $reviewUserIds);
         }
 
         self::logActivity(null, 'safeguarding_preset_applied', 'tenant', $tenantId, [
             'preset' => $presetKey,
             'options_created' => $created,
+            'options_updated' => $updated,
+            'options_deactivated' => $deactivated,
+            'options_preserved' => $preserved,
+            'review_required_count' => count($reviewUserIds),
         ]);
 
-        return $created;
+        return [
+            'created' => $created,
+            'updated' => $updated,
+            'deactivated' => $deactivated,
+            'preserved' => $preserved,
+            'review_required_count' => count($reviewUserIds),
+        ];
+    }
+
+    /**
+     * Move preset options into a fail-closed custom/unconfigured policy state.
+     *
+     * Unselected preset options can be retired immediately. An option with a
+     * live member selection must remain active, however: deactivating it (or
+     * revoking the preference on the member's behalf) would remove its trigger
+     * and silently make that member contactable. Preserved selections remain
+     * visible/revocable to the member and are marked for policy review while
+     * the unavailable tenant policy keeps protected interactions closed.
+     *
+     * @return array{deactivated: list<string>, preserved: list<string>, review_required_count: int}
+     */
+    public static function preservePresetProtectionsForUnavailablePolicy(
+        int $tenantId,
+        ?int $actorUserId = null,
+    ): array {
+        $transition = DB::transaction(function () use ($tenantId): array {
+            $options = TenantSafeguardingOption::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereNotNull('preset_source')
+                ->where('is_active', true)
+                ->lockForUpdate()
+                ->get(['id', 'option_key']);
+            if ($options->isEmpty()) {
+                return [
+                    'deactivated' => [],
+                    'preserved' => [],
+                    'review_user_ids' => [],
+                ];
+            }
+
+            $optionIds = $options->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $activePreferences = UserSafeguardingPreference::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereIn('option_id', $optionIds)
+                ->whereNull('revoked_at')
+                ->lockForUpdate()
+                ->get(['id', 'user_id', 'option_id']);
+            $selectedOptionIds = $activePreferences
+                ->pluck('option_id')
+                ->map(static fn ($id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+
+            $preservedOptions = $options->filter(
+                static fn (TenantSafeguardingOption $option): bool => in_array((int) $option->id, $selectedOptionIds, true),
+            );
+            $deactivatedOptions = $options->reject(
+                static fn (TenantSafeguardingOption $option): bool => in_array((int) $option->id, $selectedOptionIds, true),
+            );
+            $deactivatedIds = $deactivatedOptions
+                ->pluck('id')
+                ->map(static fn ($id): int => (int) $id)
+                ->all();
+
+            if ($deactivatedIds !== []) {
+                TenantSafeguardingOption::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereIn('id', $deactivatedIds)
+                    ->update(['is_active' => false]);
+            }
+
+            $reviewUserIds = $activePreferences
+                ->pluck('user_id')
+                ->map(static fn ($id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+            if ($reviewUserIds !== []
+                && Schema::hasColumn('user_safeguarding_preferences', 'policy_review_required_at')) {
+                UserSafeguardingPreference::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereIn('option_id', $selectedOptionIds)
+                    ->whereNull('revoked_at')
+                    ->update([
+                        'policy_review_required_at' => now(),
+                        'policy_review_reason_code' => 'jurisdiction_changed',
+                    ]);
+            }
+
+            return [
+                'deactivated' => $deactivatedOptions
+                    ->pluck('option_key')
+                    ->map(static fn ($key): string => (string) $key)
+                    ->values()
+                    ->all(),
+                'preserved' => $preservedOptions
+                    ->pluck('option_key')
+                    ->map(static fn ($key): string => (string) $key)
+                    ->values()
+                    ->all(),
+                'review_user_ids' => $reviewUserIds,
+            ];
+        });
+
+        $reviewUserIds = $transition['review_user_ids'];
+        if ($reviewUserIds !== []) {
+            self::notifyJurisdictionReviewRequired($tenantId, $reviewUserIds);
+        }
+
+        self::logActivity($actorUserId, 'safeguarding_preset_transition_fail_closed', 'tenant', $tenantId, [
+            'options_deactivated' => $transition['deactivated'],
+            'options_preserved' => $transition['preserved'],
+            'preferences_revoked' => 0,
+            'review_required_count' => count($reviewUserIds),
+        ]);
+
+        return [
+            'deactivated' => $transition['deactivated'],
+            'preserved' => $transition['preserved'],
+            'review_required_count' => count($reviewUserIds),
+        ];
     }
 
     /**
@@ -276,9 +614,9 @@ class SafeguardingPreferenceService
         foreach ($presets as $key => $preset) {
             $result[] = [
                 'key' => $key,
-                'name' => $preset['name'] ?? $key,
-                'vetting_authority' => $preset['vetting_authority'] ?? '',
-                'help_text' => $preset['help_text'] ?? '',
+                'name' => TenantSafeguardingOption::localizePresetText($preset['name'] ?? $key),
+                'vetting_authority' => TenantSafeguardingOption::localizePresetText($preset['vetting_authority'] ?? null) ?? '',
+                'help_text' => TenantSafeguardingOption::localizePresetText($preset['help_text'] ?? null) ?? '',
                 'option_count' => count($preset['options'] ?? []),
             ];
         }
@@ -319,7 +657,7 @@ class SafeguardingPreferenceService
                 'id' => $pref->id,
                 'option_id' => $pref->option_id,
                 'option_key' => $pref->option?->option_key,
-                'option_label' => $pref->option?->label,
+                'option_label' => $pref->option?->localizedField('label'),
                 'selected_value' => $pref->selected_value,
                 'notes' => $pref->notes,
                 'consent_given_at' => $pref->consent_given_at?->toISOString(),
@@ -368,6 +706,34 @@ class SafeguardingPreferenceService
 
         DB::beginTransaction();
         try {
+            // Preference activation/reactivation shares the same guaranteed
+            // tenant policy mutex and lock order as the definitive message
+            // check. A new active row therefore linearizes wholly before or
+            // after a message write; it cannot phantom past the final decision.
+            app(SafeguardingJurisdictionService::class)->lockPolicyForUpdate($tenantId);
+
+            $optionIds = array_values(array_unique(array_filter(array_map(
+                static fn (array $preference): int => (int) ($preference['option_id'] ?? 0),
+                $preferences,
+            ), static fn (int $optionId): bool => $optionId > 0)));
+
+            $existingPreferences = UserSafeguardingPreference::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->whereIn('option_id', $optionIds)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('option_id');
+
+            $lockedOptions = TenantSafeguardingOption::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $optionIds)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
             foreach ($preferences as $pref) {
                 $optionId = (int) ($pref['option_id'] ?? 0);
                 $value = (string) ($pref['value'] ?? '1');
@@ -377,14 +743,12 @@ class SafeguardingPreferenceService
                     continue;
                 }
 
-                // Validate option exists and belongs to this tenant
-                $option = TenantSafeguardingOption::where('id', $optionId)
-                    ->where('tenant_id', $tenantId)
-                    ->where('is_active', true)
-                    ->first();
-
-                if (!$option) {
-                    continue;
+                // Revalidate from the locked tenant-scoped option state. An
+                // option retired after the preflight validation must fail the
+                // save rather than partially activating stale preferences.
+                $option = $lockedOptions->get($optionId);
+                if (! $option instanceof TenantSafeguardingOption || ! $option->is_active) {
+                    throw new \InvalidArgumentException(__('api.safeguarding_preference_option_invalid'));
                 }
 
                 // For select-type options, validate submitted value against allowlist
@@ -395,21 +759,29 @@ class SafeguardingPreferenceService
                     }
                 }
 
-                // Upsert preference with consent timestamp
-                UserSafeguardingPreference::updateOrCreate(
-                    [
+                $values = [
+                    'selected_value' => $value,
+                    'notes' => $notes,
+                    'consent_given_at' => $now,
+                    'consent_ip' => $ipAddress,
+                    'revoked_at' => null, // Re-consent clears any previous revocation
+                    'policy_review_required_at' => null,
+                    'policy_review_reason_code' => null,
+                ];
+                $existing = $existingPreferences->get($optionId);
+                if ($existing instanceof UserSafeguardingPreference) {
+                    $existing->update($values);
+                } else {
+                    $created = UserSafeguardingPreference::withoutGlobalScopes()->create(array_merge(
+                        [
                         'tenant_id' => $tenantId,
                         'user_id' => $userId,
                         'option_id' => $optionId,
-                    ],
-                    [
-                        'selected_value' => $value,
-                        'notes' => $notes,
-                        'consent_given_at' => $now,
-                        'consent_ip' => $ipAddress,
-                        'revoked_at' => null, // Re-consent clears any previous revocation
-                    ]
-                );
+                        ],
+                        $values,
+                    ));
+                    $existingPreferences->put($optionId, $created);
+                }
             }
 
             DB::commit();
@@ -485,7 +857,7 @@ class SafeguardingPreferenceService
 
             if ($isMissing) {
                 throw new \InvalidArgumentException(__('api.safeguarding_required_option_missing', [
-                    'label' => $option->label,
+                    'label' => $option->localizedField('label'),
                 ]));
             }
         }
@@ -541,7 +913,9 @@ class SafeguardingPreferenceService
             return false;
         }
 
-        $optionLabel = $pref->option?->label ?? "option #{$optionId}";
+        $optionLabel = $pref->option?->getRawOriginal('label') ?? "option #{$optionId}";
+        $optionKey = $pref->option?->getRawOriginal('option_key');
+        $presetSource = $pref->option?->getRawOriginal('preset_source');
 
         $pref->update(['revoked_at' => now()]);
 
@@ -568,7 +942,13 @@ class SafeguardingPreferenceService
             );
 
             foreach ($staffUsers as $staff) {
-                LocaleContext::withLocale($staff, function () use ($staff, $tenantId, $userId, $optionLabel, $hasName, $revoker, $legacyName) {
+                LocaleContext::withLocale($staff, function () use ($staff, $tenantId, $userId, $optionLabel, $optionKey, $presetSource, $hasName, $revoker, $legacyName) {
+                    $localizedOptionLabel = TenantSafeguardingOption::localizeOptionText(
+                        $presetSource,
+                        $optionKey,
+                        'label',
+                        $optionLabel,
+                    );
                     if ($hasName) {
                         $revokerName = trim(($revoker->first_name ?? '') . ' ' . ($revoker->last_name ?? ''));
                     } elseif (!empty($legacyName)) {
@@ -582,7 +962,7 @@ class SafeguardingPreferenceService
 
                     $bellMessage = __('emails_misc.safeguarding.consent_revoked_admin_bell', [
                         'name'   => $revokerName,
-                        'option' => $optionLabel,
+                        'option' => $localizedOptionLabel,
                     ]);
 
                     \App\Models\Notification::create([
@@ -608,6 +988,54 @@ class SafeguardingPreferenceService
     // =========================================================================
     // Audit Logging
     // =========================================================================
+
+    /** @param list<int> $userIds */
+    private static function notifyJurisdictionReviewRequired(int $tenantId, array $userIds): void
+    {
+        try {
+            $members = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('id', $userIds)
+                ->where('status', 'active')
+                ->get(['id', 'preferred_language']);
+            foreach ($members as $member) {
+                LocaleContext::withLocale($member, function () use ($member, $tenantId): void {
+                    $message = __('safeguarding.review.jurisdiction_changed_member');
+                    Notification::createNotification(
+                        (int) $member->id,
+                        $message,
+                        '/settings',
+                        'safeguarding_policy_review',
+                        true,
+                        $tenantId,
+                    );
+                });
+            }
+
+            $staff = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->whereIn('role', ['admin', 'tenant_admin', 'broker', 'super_admin'])
+                ->get(['id', 'preferred_language']);
+            foreach ($staff as $recipient) {
+                LocaleContext::withLocale($recipient, function () use ($recipient, $tenantId): void {
+                    Notification::createNotification(
+                        (int) $recipient->id,
+                        __('safeguarding.review.jurisdiction_changed_staff'),
+                        '/broker/safeguarding',
+                        'safeguarding_policy_review',
+                        true,
+                        $tenantId,
+                    );
+                });
+            }
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingPreferenceService: jurisdiction review notification failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * Validate a URL is well-formed HTTPS — reject javascript:, http:, and malformed URLs.

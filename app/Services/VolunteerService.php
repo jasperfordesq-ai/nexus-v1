@@ -373,6 +373,22 @@ class VolunteerService
             throw new \RuntimeException(__('api.volunteer_cannot_apply_own'), 422);
         }
 
+        $organizerId = (int) ($opportunity->created_by ?? 0);
+        if ($organizerId <= 0) {
+            $organizerId = (int) DB::table('vol_organizations')
+                ->where('tenant_id', $tenantId)
+                ->where('id', (int) $opportunity->organization_id)
+                ->value('user_id');
+        }
+        if ($organizerId > 0 && $organizerId !== $userId) {
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $userId,
+                $organizerId,
+                $tenantId,
+                'volunteer_application',
+            );
+        }
+
         // Serialise the duplicate-check + insert under an atomic lock keyed on
         // the natural duplicate key (same pattern as logHours). vol_applications
         // has no unique key on (opportunity_id, user_id) — declined rows may
@@ -1280,8 +1296,37 @@ class VolunteerService
             return false;
         }
 
+        $noteSuppressedBySafeguarding = false;
+        if ($action === 'approve') {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $adminUserId,
+                (int) $app->user_id,
+                $tenantId,
+                'volunteer_application_approval',
+            );
+            $policy->assertLocalContactAllowed(
+                (int) $app->user_id,
+                $adminUserId,
+                $tenantId,
+                'volunteer_application_approval',
+            );
+        } elseif (trim($orgNote) !== '') {
+            $decision = app(SafeguardingInteractionPolicy::class)->evaluateLocalContact(
+                $adminUserId,
+                (int) $app->user_id,
+                $tenantId,
+                'volunteer_application_decline_note',
+            );
+            if (! $decision->isAllowed()) {
+                $orgNote = '';
+                $noteSuppressedBySafeguarding = true;
+            }
+        }
+
         if ($action === 'decline'
             && trim($orgNote) === ''
+            && ! $noteSuppressedBySafeguarding
             && VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_REQUIRE_ORG_NOTE_ON_DECLINE, false)
         ) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.missing_required_field', ['field' => 'org_note']), 'field' => 'org_note'];
@@ -1486,6 +1531,23 @@ class VolunteerService
         }
 
         $opportunityId = (int) $shift->opportunity_id;
+
+        $organizerId = (int) ($shift->opportunity_created_by ?? $shift->organization_owner_id ?? 0);
+        if ($organizerId > 0 && $organizerId !== $userId) {
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $userId,
+                $organizerId,
+                $tenantId,
+                'volunteer_shift_signup',
+            );
+            $policy->assertLocalContactAllowed(
+                $organizerId,
+                $userId,
+                $tenantId,
+                'volunteer_shift_signup',
+            );
+        }
 
         // Safeguarding re-check: a minor's guardian consent may have expired or
         // been withdrawn between application approval and shift signup.
@@ -2524,6 +2586,13 @@ class VolunteerService
                 self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_review_user_history_required')];
                 return null;
             }
+
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $reviewerId,
+                $targetId,
+                $tenantId,
+                'volunteer_member_review',
+            );
         }
 
         try {
@@ -2959,7 +3028,9 @@ class VolunteerService
         $lockSql = $lock ? ' FOR UPDATE' : '';
 
         return DB::selectOne(
-            "SELECT s.*, opp.status as opportunity_status, opp.is_active as opportunity_is_active, org.status as organization_status
+            "SELECT s.*, opp.status as opportunity_status, opp.is_active as opportunity_is_active,
+                    opp.created_by as opportunity_created_by, org.user_id as organization_owner_id,
+                    org.status as organization_status
              FROM vol_shifts s
              JOIN vol_opportunities opp ON s.opportunity_id = opp.id AND s.tenant_id = opp.tenant_id
              JOIN vol_organizations org ON opp.organization_id = org.id AND opp.tenant_id = org.tenant_id

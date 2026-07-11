@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
@@ -72,6 +73,13 @@ class JobOfferService
                 return false;
             }
 
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $employerUserId,
+                (int) $application->user_id,
+                $tenantId,
+                'job_offer',
+            );
+
             $offer = JobOffer::create([
                 'tenant_id'      => $tenantId,
                 'vacancy_id'     => (int) $application->vacancy_id,
@@ -115,6 +123,8 @@ class JobOfferService
             }
 
             return $offer->toArray();
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('JobOfferService::create failed', ['error' => $e->getMessage()]);
             return false;
@@ -158,6 +168,25 @@ class JobOfferService
                 ]);
                 return false;
             }
+
+            $employerUserId = (int) ($offer->application->vacancy->user_id ?? 0);
+            if ($employerUserId <= 0) {
+                return false;
+            }
+
+            $policy = app(SafeguardingInteractionPolicy::class);
+            $policy->assertLocalContactAllowed(
+                $employerUserId,
+                $candidateUserId,
+                $tenantId,
+                'job_offer_accept',
+            );
+            $policy->assertLocalContactAllowed(
+                $candidateUserId,
+                $employerUserId,
+                $tenantId,
+                'job_offer_accept',
+            );
 
             // Atomically accept the offer, fill the vacancy, withdraw sibling offers and
             // mint timebank credits. Serialized on the vacancy row so that two concurrent
@@ -341,6 +370,8 @@ class JobOfferService
             }
 
             return true;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             Log::error('JobOfferService::accept failed', ['error' => $e->getMessage()]);
             return false;

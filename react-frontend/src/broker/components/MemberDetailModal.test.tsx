@@ -166,7 +166,20 @@ describe('MemberDetailModal', () => {
   it('shows compliance records on the compliance tab', async () => {
     api.getUserRecords.mockResolvedValue({
       success: true,
-      data: [{ id: 1, vetting_type: 'garda', status: 'verified', expiry_date: null }],
+      data: [{
+        id: 1,
+        user_id: 5,
+        scheme_code: 'dbs',
+        attestation_code: 'dbs_enhanced',
+        purpose_code: 'safeguarded_member_contact',
+        scope_type: 'tenant',
+        scope_identifier: '2',
+        decision: 'confirmed',
+        confirmed_at: '2026-07-10T09:00:00Z',
+        revoked_at: null,
+        revocation_reason_code: null,
+        policy_version: 'ew-dbs-contact-v1',
+      }],
     });
 
     render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
@@ -175,12 +188,10 @@ describe('MemberDetailModal', () => {
     await openTab('member_detail.tab_compliance');
 
     await waitFor(() => {
-      expect(screen.getByText('member_detail.vetting_title')).toBeInTheDocument();
+      expect(screen.getByText('member_detail.contact_attestations_title')).toBeInTheDocument();
     });
-    // Record label falls back to the raw vetting type; status renders through
-    // the shared BrokerStatusChip (prettified fallback label).
-    expect(screen.getByText('garda')).toBeInTheDocument();
-    expect(screen.getByText('Verified')).toBeInTheDocument();
+    expect(screen.getByText('vetting.attestation_other')).toBeInTheDocument();
+    expect(screen.getByText('Confirmed')).toBeInTheDocument();
     expect(screen.getByText('member_detail.consents_title')).toBeInTheDocument();
   });
 

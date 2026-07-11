@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupInviteService;
 
@@ -89,7 +90,11 @@ class GroupInviteController extends BaseApiController
         }
 
         $message = request()->input('message', '');
-        $result = $this->inviteService->sendEmailInvites($id, $userId, $emails, $message);
+        try {
+            $result = $this->inviteService->sendEmailInvites($id, $userId, $emails, $message);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->inviteService->getErrors();
@@ -135,7 +140,11 @@ class GroupInviteController extends BaseApiController
             return $userId;
         }
 
-        $result = $this->inviteService->acceptInvite($token, $userId);
+        try {
+            $result = $this->inviteService->acceptInvite($token, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->inviteService->getErrors();

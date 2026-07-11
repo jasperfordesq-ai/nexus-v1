@@ -201,7 +201,7 @@ class AdminUsersController extends BaseApiController
         $user = DB::selectOne(
             "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
                     u.role, u.status, u.is_approved, u.is_super_admin, u.is_god, u.is_tenant_super_admin, u.balance, u.profile_type,
-                    u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
+                    u.organization_name, u.insurance_status, u.created_at, u.last_active_at,
                     u.email_verified_at, u.is_verified, u.date_of_birth,
                     u.tenant_id, t.name as tenant_name
              FROM users u
@@ -274,7 +274,6 @@ class AdminUsersController extends BaseApiController
             'is_approved' => (bool) ($user->is_approved ?? false),
             'email_verified_at' => $user->email_verified_at ?? null,
             'is_verified' => (bool) ($user->is_verified ?? false),
-            'vetting_status' => $user->vetting_status ?? 'none',
             'insurance_status' => $user->insurance_status ?? 'none',
             'created_at' => $user->created_at,
             'last_active_at' => $user->last_active_at ?? null,

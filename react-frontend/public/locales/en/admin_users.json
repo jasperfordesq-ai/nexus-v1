@@ -270,7 +270,7 @@
       "no_badges": "No badges",
       "no_consent_records": "No consent records",
       "no_insurance_records": "No insurance records",
-      "no_vetting_records": "No vetting records"
+      "no_vetting_records": "No contact attestation recorded"
     },
     "errors": {
       "load_error": "Load error",
@@ -361,6 +361,7 @@
       "safeguarding": "Safeguarding",
       "super_admin_access": "Super Admin Access",
       "time_credits": "Time Credits",
+      "contact_attestation": "Safeguarding contact attestation",
       "vetting_status": "Vetting Status"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "Activated on {{date}}",
       "more_certificates": "More Certificates",
+      "more_attestations": "More attestations",
       "more_records": "More Records"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": " - Expires",
       "no_reference": "No reference",
-      "unknown_provider": "Unknown Provider"
+      "unknown_provider": "Unknown Provider",
+      "attestation_dbs_enhanced": "Enhanced DBS (England and Wales)",
+      "attestation_pvg_scotland": "PVG scheme",
+      "attestation_access_ni": "AccessNI (Northern Ireland)",
+      "attestation_garda_vetting": "Garda vetting",
+      "safeguarding_confirmation": "Safeguarding confirmation",
+      "confirmed_on": "Community attestation confirmed on {{date}}",
+      "not_confirmed": "No community attestation is confirmed",
+      "decision_confirmed": "Attestation confirmed",
+      "decision_revoked": "Attestation revoked",
+      "decision_not_confirmed": "Attestation not confirmed"
     }
   },
   "aria": {

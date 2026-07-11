@@ -7,7 +7,6 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
-use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -54,38 +53,40 @@ class ContextualMessageService
             $contextType = null;
         }
 
-        // Create the message
-        $message = Message::create([
-            'tenant_id' => $tenantId,
-            'sender_id' => $senderId,
-            'receiver_id' => $receiverId,
+        // Route every contextual message through the same authoritative direct-
+        // message boundary. This keeps block, account, broker and safeguarding
+        // checks in force and ensures a denied contact creates no message row.
+        $message = MessageService::send($senderId, [
+            'recipient_id' => $receiverId,
             'body' => $body,
-            'created_at' => now(),
+            'context_type' => $contextType,
+            'context_id' => $contextId,
         ]);
 
-        if (!$message) {
+        if ($message === []) {
             return null;
         }
 
-        // Attach context if provided
-        if ($contextType !== null && $contextId !== null) {
+        $messageId = (int) ($message['id'] ?? 0);
+        if ($messageId <= 0) {
+            return null;
+        }
+
+        // Preserve the legacy listing_id alias used by older listing-message
+        // consumers. The canonical context fields were persisted atomically by
+        // MessageService before its delivery event was dispatched.
+        if ($contextType === 'listing' && $contextId !== null) {
             try {
-                $updateData = ['context_type' => $contextType, 'context_id' => $contextId];
-
-                // Also update listing_id for backward compatibility
-                if ($contextType === 'listing') {
-                    $updateData['listing_id'] = $contextId;
-                }
-
-                Message::where('id', $message->id)
+                DB::table('messages')
+                    ->where('id', $messageId)
                     ->where('tenant_id', $tenantId)
-                    ->update($updateData);
+                    ->update(['listing_id' => $contextId]);
             } catch (\Exception $e) {
                 Log::warning('ContextualMessageService: Failed to attach context: ' . $e->getMessage());
             }
         }
 
-        return (int) $message->id;
+        return $messageId;
     }
 
     /**

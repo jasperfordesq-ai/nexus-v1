@@ -9,6 +9,8 @@
   "send": "Enviar",
   "you": "Tú",
   "unread": "{{count}} sin leer",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Tus conversaciones con miembros de la comunidad",
   "disabled_title": "Mensajería Directa Deshabilitada",
   "disabled_subtitle": "La mensajería directa no está habilitada para esta comunidad. Para coordinar servicios, por favor usa el sistema de solicitud de intercambio.",
@@ -209,8 +211,6 @@
   },
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Cargando mensajes antiguos",
-  "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent",
   "safeguarding_vetting_required": {
     "title": "Se necesita una comprobacion de proteccion",
     "body": "Esta conversacion esta pausada porque una norma de proteccion de la comunidad exige una verificacion confirmada antes de que puedas enviar mensajes a este miembro.",
@@ -226,6 +226,13 @@
     "action": "Abrir ayuda",
     "dismiss": "Descartar aviso de proteccion"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Control de protección no disponible temporalmente",
+    "body": "La mensajería directa está pausada porque la política de protección de la comunidad no se pudo verificar de manera segura.",
+    "contact_broker": "Vuelva a comprobarlo en breve. Si esto continúa, pídale ayuda a un coordinador comunitario.",
+    "action": "comprobar de nuevo",
+    "dismiss": "Descartar aviso de salvaguardia"
+  },
   "coordinator_request": {
     "button": "Solicitar ayuda de un coordinador",
     "aria_button": "Solicitar ayuda de un coordinador para gestionar el contacto",
@@ -234,11 +241,26 @@
     "sent": "Coordinador notificado — se pondrá en contacto contigo para ayudar a gestionar el contacto.",
     "error": "No pudimos enviar tu solicitud en este momento. Por favor, inténtalo de nuevo en breve."
   },
+  "vetting_review_request": {
+    "button": "Solicitar revisión de investigación",
+    "success_title": "Revisión solicitada",
+    "success_body": "Se le ha pedido a su agente comunitario que revise su confirmación de protección privada.",
+    "sent": "Se solicita revisión de investigación. Su comunidad se comunicará con usted sobre su proceso.",
+    "error": "No pudimos solicitar una revisión de investigación en este momento. Inténtelo de nuevo en breve."
+  },
+  "safeguarding_check_again": "comprobar de nuevo",
+  "safeguarding_checks": {
+    "dbs_enhanced": "DBS mejorado (Inglaterra y Gales)",
+    "pvg_scotland": "esquema PVG",
+    "access_ni": "AccessNI (Irlanda del Norte)",
+    "garda_vetting": "investigación de antecedentes de la garda"
+  },
   "composer_blocked_safeguarding": "La mensajería directa no está disponible con este miembro. Usa la opción anterior para pedir a un coordinador que ayude a gestionar el contacto.",
-  "aria_conversation_unread_many": "Conversación con {{name}}, {{count}} sin leer",
+  "composer_blocked_safeguarding_unavailable": "La mensajería directa se pausa mientras se verifica la política de protección. Utilice Verificar nuevamente arriba.",
   "aria_conversation_unread_one": "Conversación con {{name}}, {{count}} sin leer",
   "aria_conversation_unread_other": "Conversación con {{name}}, {{count}} sin leer",
-  "selected_members_many": "Seleccionados ({{count}})",
   "selected_members_one": "Seleccionados ({{count}})",
-  "selected_members_other": "Seleccionados ({{count}})"
+  "selected_members_other": "Seleccionados ({{count}})",
+  "aria_conversation_unread_many": "Conversación con {{name}}, {{count}} sin leer",
+  "selected_members_many": "Seleccionados ({{count}})"
 }

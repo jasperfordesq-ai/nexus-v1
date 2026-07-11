@@ -70,13 +70,13 @@ describe('BrokerControlsHelp (presentational component)', () => {
     expect(btn).toBeTruthy();
   });
 
-  it('renders the vetting accordion item', () => {
+  it('renders the contact-attestation accordion item', () => {
     render(<BrokerControlsHelp />);
     const btn = screen
       .getAllByRole('button')
       .find((b) =>
-        b.textContent?.toLowerCase().includes('vetting') ||
-        b.getAttribute('aria-label')?.toLowerCase().includes('vetting')
+        b.textContent?.toLowerCase().includes('contact attestation') ||
+        b.getAttribute('aria-label')?.toLowerCase().includes('contact attestation')
       );
     expect(btn).toBeTruthy();
   });

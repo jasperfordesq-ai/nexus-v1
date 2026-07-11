@@ -387,6 +387,7 @@ trait GoalsParity
         $message = trim(self::asStr($request->input('message')));
 
         $note = null;
+        $status = 'buddy-action-failed';
         try {
             // createBuddyNote() verifies mentor_id === buddyId internally (tenant-scoped),
             // so a non-buddy or cross-tenant attempt simply returns null.
@@ -394,6 +395,10 @@ trait GoalsParity
                 'type' => $type,
                 'message' => $message !== '' ? mb_substr($message, 0, 1000) : '',
             ]);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'buddy-action-safeguarding-unavailable'
+                : 'buddy-action-safeguarding-restricted';
         } catch (\Throwable $e) {
             report($e);
         }
@@ -405,7 +410,7 @@ trait GoalsParity
         return redirect()->route('govuk-alpha.goals.buddy-actions', [
             'tenantSlug' => $tenantSlug,
             'id' => $id,
-            'status' => $note !== null ? 'buddy-action-sent' : 'buddy-action-failed',
+            'status' => $note !== null ? 'buddy-action-sent' : $status,
         ]);
     }
 

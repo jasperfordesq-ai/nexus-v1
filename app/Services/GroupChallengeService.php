@@ -69,6 +69,13 @@ class GroupChallengeService
     public static function create(int $groupId, int $createdBy, array $data): int
     {
         $tenantId = TenantContext::getId();
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $createdBy,
+            (int) $tenantId,
+            'group_challenge_create',
+            trim((string) ($data['title'] ?? '') . ' ' . (string) ($data['description'] ?? '')),
+        );
 
         return DB::table('group_challenges')->insertGetId([
             'tenant_id' => $tenantId,

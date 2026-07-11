@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\VolShift;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,8 @@ class ShiftWaitlistService
                 'opp.id as opportunity_id',
                 'opp.status as opportunity_status',
                 'opp.is_active as opportunity_is_active',
-                'org.status as organization_status'
+                'org.status as organization_status',
+                'org.user_id as coordinator_id'
             )
             ->first();
 
@@ -126,6 +128,13 @@ class ShiftWaitlistService
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_not_full')];
             return null;
         }
+
+        self::assertShiftRelationshipAllowed(
+            $userId,
+            (int) ($context->coordinator_id ?? 0),
+            $tenantId,
+            'volunteer_shift_waitlist_join',
+        );
 
         try {
             return DB::transaction(function () use ($shiftId, $userId, $tenantId) {
@@ -396,6 +405,13 @@ class ShiftWaitlistService
                     return false;
                 }
 
+                self::assertShiftRelationshipAllowed(
+                    (int) $entry->user_id,
+                    self::coordinatorIdForShift((int) $entry->shift_id, $tenantId),
+                    $tenantId,
+                    'volunteer_shift_waitlist_promotion',
+                );
+
                 // Attach the already-approved application to the shift. If it
                 // was already attached to a different shift, capture that so
                 // its waitlist gets the freed slot after we commit.
@@ -423,6 +439,8 @@ class ShiftWaitlistService
             }
 
             return $ok;
+        } catch (SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::promoteUser error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_waitlist_claim_failed')];
@@ -475,6 +493,13 @@ class ShiftWaitlistService
                     return null;
                 }
 
+                self::assertShiftRelationshipAllowed(
+                    (int) $entry->user_id,
+                    self::coordinatorIdForShift($shiftId, $tenantId),
+                    $tenantId,
+                    'volunteer_shift_waitlist_spot_offer',
+                );
+
                 DB::table('vol_shift_waitlist')
                     ->where('id', $entry->id)
                     ->where('tenant_id', $tenantId)
@@ -514,10 +539,55 @@ class ShiftWaitlistService
             }
 
             return true;
+        } catch (SafeguardingPolicyException $e) {
+            Log::warning('Waitlist spot offer blocked by safeguarding policy', [
+                'shift_id' => $shiftId,
+                'tenant_id' => $tenantId,
+                'reason_code' => $e->reasonCode,
+            ]);
+            return false;
         } catch (\Throwable $e) {
             Log::error('ShiftWaitlistService::notifyNext error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    private static function coordinatorIdForShift(int $shiftId, int $tenantId): int
+    {
+        return (int) (DB::table('vol_shifts as s')
+            ->join('vol_opportunities as opportunity', function ($join): void {
+                $join->on('opportunity.id', '=', 's.opportunity_id')
+                    ->on('opportunity.tenant_id', '=', 's.tenant_id');
+            })
+            ->join('vol_organizations as organization', function ($join): void {
+                $join->on('organization.id', '=', 'opportunity.organization_id')
+                    ->on('organization.tenant_id', '=', 'opportunity.tenant_id');
+            })
+            ->where('s.id', $shiftId)
+            ->where('s.tenant_id', $tenantId)
+            ->value('organization.user_id') ?? 0);
+    }
+
+    private static function assertShiftRelationshipAllowed(
+        int $volunteerId,
+        int $coordinatorId,
+        int $tenantId,
+        string $channel,
+    ): void {
+        if ($volunteerId === $coordinatorId) {
+            return;
+        }
+
+        if ($coordinatorId <= 0) {
+            throw new SafeguardingPolicyException(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+            );
+        }
+
+        $policy = app(SafeguardingInteractionPolicy::class);
+        $policy->assertLocalContactAllowed($volunteerId, $coordinatorId, $tenantId, $channel);
+        $policy->assertLocalContactAllowed($coordinatorId, $volunteerId, $tenantId, $channel);
     }
 
     /**

@@ -35,7 +35,7 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.reviews_page.submit_success') }}</p>
             </div>
         </div>
-    @elseif (in_array($status ?? null, ['review-invalid', 'review-duplicate', 'review-failed'], true))
+    @elseif (in_array($status ?? null, ['review-invalid', 'review-duplicate', 'review-failed', 'review-safeguarding-restricted', 'review-safeguarding-unavailable'], true))
         @php
             $pendingId = (int) request('for', 0);
             $errorAnchor = $pendingId > 0 ? "#rating-{$pendingId}-5" : '#pending-heading';
@@ -51,6 +51,10 @@
                                     {{ __('govuk_alpha.reviews_page.submit_duplicate') }}
                                 @elseif (($status ?? null) === 'review-invalid')
                                     {{ __('govuk_alpha.reviews_page.submit_invalid') }}
+                                @elseif (($status ?? null) === 'review-safeguarding-unavailable')
+                                    {{ __('safeguarding.errors.policy_unavailable') }}
+                                @elseif (($status ?? null) === 'review-safeguarding-restricted')
+                                    {{ __('safeguarding.errors.interaction_not_allowed') }}
                                 @else
                                     {{ __('govuk_alpha.reviews_page.submit_failed') }}
                                 @endif

@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\User;
@@ -515,7 +516,11 @@ class AdminCaringCommunityController extends BaseApiController
         $tenantId = TenantContext::getId();
         $coordinatorId = (int) auth()->id();
         $input = $this->getAllInput();
-        $result = $this->supportRelationshipService->create($tenantId, $input, $coordinatorId);
+        try {
+            $result = $this->supportRelationshipService->create($tenantId, $input, $coordinatorId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         if (($result['success'] ?? false) !== true) {
             $code = (string) ($result['code'] ?? 'VALIDATION_ERROR');
             $message = $code === 'USER_NOT_FOUND'

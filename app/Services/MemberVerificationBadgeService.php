@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * MemberVerificationBadgeService — Verification badge system.
  *
- * Badge types: email_verified, phone_verified, id_verified, address_verified, admin_verified,
- *              background_check, organization_vouched, peer_endorsed.
+ * Public badge types intentionally exclude criminal-record/vetting status.
+ * Private safeguarding attestations are never exposed as profile badges.
  * Provides grant/revoke badges, get badges for users, batch get badges, and admin badge list.
  */
 class MemberVerificationBadgeService
@@ -25,7 +25,6 @@ class MemberVerificationBadgeService
         'id_verified',
         'address_verified',
         'admin_verified',
-        'background_check',
         'organization_vouched',
         'peer_endorsed',
     ];
@@ -36,7 +35,6 @@ class MemberVerificationBadgeService
         'id_verified' => 'ID Verified',
         'address_verified' => 'Address Verified',
         'admin_verified' => 'Admin Verified',
-        'background_check' => 'Background Check Verified',
         'organization_vouched' => 'Organization Vouched',
         'peer_endorsed' => 'Peer Endorsed',
     ];
@@ -47,7 +45,6 @@ class MemberVerificationBadgeService
         'id_verified' => 'shield-check',
         'address_verified' => 'badge-check',
         'admin_verified' => 'user-check',
-        'background_check' => 'shield-check',
         'organization_vouched' => 'building-2',
         'peer_endorsed' => 'users-round',
     ];
@@ -177,6 +174,7 @@ class MemberVerificationBadgeService
             ->leftJoin('users as u', 'mvb.verified_by', '=', 'u.id')
             ->where('mvb.user_id', $userId)
             ->where('mvb.tenant_id', $tenantId)
+            ->whereIn('mvb.badge_type', self::BADGE_TYPES)
             ->whereNull('mvb.revoked_at')
             ->where(function ($q) {
                 $q->whereNull('mvb.expires_at')
@@ -212,6 +210,7 @@ class MemberVerificationBadgeService
         $rows = DB::table('member_verification_badges')
             ->whereIn('user_id', $userIds)
             ->where('tenant_id', $tenantId)
+            ->whereIn('badge_type', self::BADGE_TYPES)
             ->whereNull('revoked_at')
             ->where(function ($q) {
                 $q->whereNull('expires_at')

@@ -246,7 +246,6 @@ Route::get('/v2/messages/unread-count', [\App\Http\Controllers\Api\MessagesContr
 Route::get('/v2/messages/restriction-status', [\App\Http\Controllers\Api\MessagesController::class, 'restrictionStatus']);
 Route::post('/v2/messages', [\App\Http\Controllers\Api\MessagesController::class, 'send'])->middleware('onboarding-required');
 Route::post('/v2/messages/typing', [\App\Http\Controllers\Api\MessagesController::class, 'typing']);
-Route::post('/v2/messages/upload-voice', [\App\Http\Controllers\Api\MessagesController::class, 'uploadVoice']);
 Route::post('/v2/messages/voice', [\App\Http\Controllers\Api\MessagesController::class, 'sendVoice']);
 Route::delete('/v2/messages/conversations/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'archiveConversation']);
 Route::get('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'show']);
@@ -2084,16 +2083,15 @@ Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function
     Route::get('/v2/admin/broker/archives', [\App\Http\Controllers\Api\AdminBrokerController::class, 'archives']);
     Route::get('/v2/admin/broker/archives/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showArchive']);
     Route::get('/v2/admin/vetting/stats', [\App\Http\Controllers\Api\AdminVettingController::class, 'stats']);
+    Route::get('/v2/admin/vetting/policy', [\App\Http\Controllers\Api\AdminVettingController::class, 'policy']);
+    Route::put('/v2/admin/vetting/policy', [\App\Http\Controllers\Api\AdminVettingController::class, 'updatePolicy'])->middleware('throttle:20,1');
+    Route::post('/v2/admin/vetting/policy/rotate', [\App\Http\Controllers\Api\AdminVettingController::class, 'rotatePolicy'])->middleware('throttle:5,1');
     Route::get('/v2/admin/vetting/user/{userId}', [\App\Http\Controllers\Api\AdminVettingController::class, 'getUserRecords']);
+    Route::post('/v2/admin/vetting/user/{userId}/confirm', [\App\Http\Controllers\Api\AdminVettingController::class, 'confirm'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/vetting/user/{userId}/revoke', [\App\Http\Controllers\Api\AdminVettingController::class, 'revoke'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/vetting/reviews/{reviewId}/resolve', [\App\Http\Controllers\Api\AdminVettingController::class, 'resolveReview'])->middleware('throttle:60,1');
     Route::get('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'list']);
     Route::get('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'show']);
-    Route::post('/v2/admin/vetting/bulk', [\App\Http\Controllers\Api\AdminVettingController::class, 'bulk']);
-    Route::post('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'store']);
-    Route::put('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'update']);
-    Route::post('/v2/admin/vetting/{id}/verify', [\App\Http\Controllers\Api\AdminVettingController::class, 'verify']);
-    Route::post('/v2/admin/vetting/{id}/reject', [\App\Http\Controllers\Api\AdminVettingController::class, 'reject']);
-    Route::delete('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'destroy']);
-    Route::post('/v2/admin/vetting/{id}/upload', [\App\Http\Controllers\Api\AdminVettingController::class, 'uploadDocument']);
     Route::get('/v2/admin/insurance/stats', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'stats']);
     Route::get('/v2/admin/insurance/user/{userId}', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'getUserCertificates']);
     Route::get('/v2/admin/insurance', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'list']);
@@ -2473,6 +2471,9 @@ Route::get('/v2/admin/safeguarding/members/{userId}/activity.csv', [\App\Http\Co
 // Tier 3b — member self-service safeguarding endpoints (tenant-authenticated)
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/safeguarding/my-preferences', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myPreferences']);
+    Route::get('/v2/safeguarding/my-vetting-status', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myVettingStatus']);
+    Route::post('/v2/safeguarding/confirm-policy-review', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'confirmPolicyReview'])->middleware('throttle:10,1');
+    Route::post('/v2/safeguarding/vetting-review-request', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'requestVettingReview'])->middleware('throttle:10,1');
     Route::post('/v2/safeguarding/revoke', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'revoke']);
 });
 

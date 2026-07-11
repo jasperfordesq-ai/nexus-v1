@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupService;
 use App\Services\GroupScheduledPostService;
@@ -35,7 +36,11 @@ class GroupScheduledPostController extends BaseApiController
         if (empty($data['content']) || empty($data['scheduled_at'])) {
             return $this->errorResponse(__('api.group_scheduled_content_date_required'), 400);
         }
-        $postId = GroupScheduledPostService::schedule($id, $userId, $data);
+        try {
+            $postId = GroupScheduledPostService::schedule($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
         return $this->successResponse(['id' => $postId], 201);
     }
 

@@ -294,9 +294,29 @@
     "revoke_confirm_no": "Mantieni",
     "revoked_toast": "Preferenza revocata.",
     "revoke_error_toast": "Qualcosa è andato storto. Riprova.",
+    "policy_review_title": "Rivedi le preferenze di tutela",
+    "policy_review_body": "La tua comunità ha cambiato giurisdizione di tutela. Le protezioni restano attive. Controlla il testo aggiornato e conferma che rifletta ancora le tue preferenze.",
+    "policy_review_confirm": "Conferma le mie preferenze",
+    "policy_review_confirmed": "Preferenze di tutela confermate.",
+    "policy_review_error": "Non è stato possibile confermare la revisione. Riprova.",
     "chip_broker_review": "Revisione broker",
     "chip_match_approval": "Approvazione corrispondenza",
-    "chip_vetted_only": "Solo contatti verificati"
+    "chip_vetted_only": "Solo contatti verificati",
+    "vetting": {
+      "title": "Il tuo stato di controllo della comunità privata",
+      "status_not_confirmed": "Non confermato",
+      "status_review_requested": "Richiesta revisione",
+      "status_unavailable": "Non è stato possibile caricare il tuo stato di verifica.",
+      "confirmed_on": "La tua community ha confermato che soddisfi questo requisito di contatto di salvaguardia su {{date}}.",
+      "review_pending_body": "Al tuo broker è stato chiesto di rivedere la conferma della tua community.",
+      "not_confirmed_body": "La tua comunità non ha confermato che soddisfi questo requisito di contatto di salvaguardia.",
+      "policy_unavailable_body": "Questa comunità non ha configurato una politica di contatto di salvaguardia supportata per la sua giurisdizione.",
+      "no_documents": "Non caricare o inviare documenti DBS, controlli di polizia, controlli Garda, AccessNI o PVG tramite NEXUS. La tua comunità organizzerà qualsiasi controllo legale al di fuori della piattaforma.",
+      "request_review_button": "Richiedi la revisione del broker",
+      "review_requested_button": "Richiesta revisione",
+      "review_requested_toast": "Richiesta revisione del broker.",
+      "review_error": "Non è stato possibile richiedere la revisione del broker. Per favore riprova."
+    }
   },
   "header": {
     "title": "Impostazioni",
@@ -591,9 +611,9 @@
     "unblock_error": "Impossibile sbloccare l'utente",
     "blocked_on": "Bloccato su {{date}}",
     "link": "Utenti bloccati",
-    "count_many": "{{count}} bloccati",
     "count_one": "{{count}} bloccati",
-    "count_other": "{{count}} bloccati"
+    "count_other": "{{count}} bloccati",
+    "count_many": "{{count}} bloccati"
   },
   "block_user": {
     "title": "Bloccare {{name}}?",
@@ -621,13 +641,13 @@
   "push_campaign_opt_in_description": "Consenti a imprese e organizzazioni locali di inviarle notifiche push mirate. Può cancellarsi in qualsiasi momento.",
   "tabs_aria": "Sezioni Impostazioni",
   "twofa_loading_setup": "Caricamento della configurazione a due fattori...",
-  "biometric_all_removed_many": "Rimosse {{count}} passkey.",
   "biometric_all_removed_one": "Rimosse {{count}} passkey.",
   "biometric_all_removed_other": "Rimosse {{count}} passkey.",
-  "biometric_enabled_many": "{{count}} passkey registrate",
   "biometric_enabled_one": "{{count}} passkey registrate",
   "biometric_enabled_other": "{{count}} passkey registrate",
-  "twofa_backup_remaining_many": "{{count}} codici di backup rimanenti",
   "twofa_backup_remaining_one": "{{count}} codici di backup rimanenti",
-  "twofa_backup_remaining_other": "{{count}} codici di backup rimanenti"
+  "twofa_backup_remaining_other": "{{count}} codici di backup rimanenti",
+  "biometric_all_removed_many": "Rimosse {{count}} passkey.",
+  "biometric_enabled_many": "{{count}} passkey registrate",
+  "twofa_backup_remaining_many": "{{count}} codici di backup rimanenti"
 }

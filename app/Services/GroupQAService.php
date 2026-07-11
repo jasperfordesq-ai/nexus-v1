@@ -186,15 +186,25 @@ class GroupQAService
             return null;
         }
 
-        $id = DB::table('group_questions')->insertGetId([
-            'tenant_id' => $tenantId,
-            'group_id' => $groupId,
-            'user_id' => $userId,
-            'title' => $title,
-            'body' => $body,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $id = DB::transaction(function () use ($groupId, $userId, $tenantId, $title, $body): int {
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                $tenantId,
+                'group_question_create',
+                trim($title . ' ' . (string) $body),
+            );
+
+            return DB::table('group_questions')->insertGetId([
+                'tenant_id' => $tenantId,
+                'group_id' => $groupId,
+                'user_id' => $userId,
+                'title' => $title,
+                'body' => $body,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
 
         return ['id' => $id, 'title' => $title];
     }
@@ -228,21 +238,33 @@ class GroupQAService
             return null;
         }
 
-        $id = DB::table('group_answers')->insertGetId([
-            'tenant_id' => $tenantId,
-            'question_id' => $questionId,
-            'user_id' => $userId,
-            'body' => $body,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $id = DB::transaction(function () use ($groupId, $questionId, $question, $userId, $tenantId, $body): int {
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                $tenantId,
+                'group_answer_create',
+                $body,
+                [(int) $question->user_id],
+            );
 
-        // Update answer count
-        DB::table('group_questions')
-            ->where('id', $questionId)
-            ->where('group_id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->increment('answer_count');
+            $answerId = DB::table('group_answers')->insertGetId([
+                'tenant_id' => $tenantId,
+                'question_id' => $questionId,
+                'user_id' => $userId,
+                'body' => $body,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('group_questions')
+                ->where('id', $questionId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->increment('answer_count');
+
+            return $answerId;
+        });
 
         return ['id' => $id, 'question_id' => $questionId];
     }
@@ -287,6 +309,30 @@ class GroupQAService
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_qa_accept_forbidden')];
             return false;
         }
+
+        if ((bool) $answer->is_accepted) {
+            return true;
+        }
+
+        $affectedAuthorIds = [(int) $answer->user_id];
+        $previousAcceptedAuthorId = DB::table('group_answers')
+            ->where('question_id', $answer->question_id)
+            ->where('tenant_id', $tenantId)
+            ->where('is_accepted', true)
+            ->where('id', '!=', $answerId)
+            ->value('user_id');
+        if ($previousAcceptedAuthorId !== null) {
+            $affectedAuthorIds[] = (int) $previousAcceptedAuthorId;
+        }
+
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $userId,
+            (int) $tenantId,
+            'group_answer_accept',
+            null,
+            $affectedAuthorIds,
+        );
 
         DB::transaction(function () use ($answerId, $answer, $tenantId) {
             // Unaccept previous answer
@@ -335,21 +381,23 @@ class GroupQAService
         }
 
         $table = $type === 'question' ? 'group_questions' : 'group_answers';
-        $targetExists = $type === 'question'
+        $target = $type === 'question'
             ? DB::table('group_questions')
                 ->where('id', $targetId)
                 ->where('group_id', $groupId)
                 ->where('tenant_id', $tenantId)
-                ->exists()
+                ->select(['id', 'user_id'])
+                ->first()
             : DB::table('group_answers as ga')
                 ->join('group_questions as gq', 'gq.id', '=', 'ga.question_id')
                 ->where('ga.id', $targetId)
                 ->where('gq.group_id', $groupId)
                 ->where('ga.tenant_id', $tenantId)
                 ->where('gq.tenant_id', $tenantId)
-                ->exists();
+                ->select(['ga.id', 'ga.user_id'])
+                ->first();
 
-        if (!$targetExists) {
+        if (!$target) {
             $this->errors[] = ['code' => 'NOT_FOUND', 'message' => $type === 'question' ? __('api.group_qa_question_not_found') : __('api.group_qa_answer_not_found')];
             return false;
         }
@@ -369,12 +417,28 @@ class GroupQAService
                 DB::table($table)->where('id', $targetId)->where('tenant_id', $tenantId)->decrement('vote_count', $vote);
                 return true;
             }
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                (int) $tenantId,
+                'group_qa_vote',
+                null,
+                [(int) $target->user_id],
+            );
             // Change vote direction
             DB::table('group_qa_votes')
                 ->where('id', $existing->id)
                 ->update(['vote' => $vote]);
             DB::table($table)->where('id', $targetId)->where('tenant_id', $tenantId)->increment('vote_count', $vote * 2);
         } else {
+            GroupService::assertSafeguardingBroadcastAllowed(
+                $groupId,
+                $userId,
+                (int) $tenantId,
+                'group_qa_vote',
+                null,
+                [(int) $target->user_id],
+            );
             DB::table('group_qa_votes')->insert([
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,

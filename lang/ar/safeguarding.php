@@ -6,9 +6,9 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'Tum iyqaf hadhihi almuhadatha biqaida himaya almujtama. Tahtaj ila tahqiq :types muwathaq qabla irsal risala ila hadha aludw. Tawasul maa alwasit aw mudir almujtama litakid halat altahqiq aw tartib alkhutwa altaliya.',
+        'vetting_required' => 'تم إيقاف هذه المحادثة مؤقتًا بموجب قاعدة حماية مجتمعية. يجب أن يكون مجتمعك قد سجّل لك تأكيدًا ساريًا لحالة :types قبل أن تتمكن من مراسلة هذا العضو. اطلب من الوسيط أو مسؤول المجتمع تسجيل هذه الحالة كبيانات وصفية فقط. لا ترسل أو ترفع أي مستند فحص.',
         'vetting_required_title' => 'Yalzam fahs himaya',
-        'vetting_required_detail' => 'لا يمكن التواصل مع هذا العضو بشأن هذا النوع من التفاعل إلا من قِبل الأعضاء الحاصلين على تحقق :types معتمد.',
+        'vetting_required_detail' => 'لا يمكن التواصل مع هذا العضو بشأن هذا النوع من التفاعل إلا من قِبل أعضاء سجّل مجتمعهم حالة :types سارية. السجل عبارة عن بيانات وصفية فقط؛ ويجب عدم إرسال أو رفع أي مستند.',
         'vetting_required_action' => 'Iftah almusaada',
         'contact_restricted' => 'Hatha aludw talab an yuratib almunasiq altawasul niyabatan anhu. Lam yursil risalatak. Ittasil bialwasit aw mudir almujtamaa litarteeb alkhatwa alamina altaalia.',
         'contact_restricted_title' => 'Yalzam tartib min almunasiq',
@@ -25,6 +25,14 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+        'policy_unavailable' => 'We cannot confirm the community safeguarding policy right now. No message has been sent. Please try again shortly.',
+        'interaction_not_allowed' => 'The recipient’s community safeguarding policy does not allow this direct interaction. Ask a coordinator for help.',
+        'policy_unavailable_title' => 'Safeguarding check temporarily unavailable',
+        'policy_unavailable_detail' => 'Project NEXUS could not safely evaluate the contact policy, so this interaction has been paused.',
+        'policy_unavailable_action' => 'Check again',
+        'listing_role_confirmation_required' => 'This listing requires a separate community-confirmed Enhanced DBS decision for this role. A messenger contact confirmation does not satisfy role-specific safeguarding requirements.',
+        'listing_role_feature_unavailable' => 'Role-specific criminal-record vetting cannot be enabled here yet. Messenger contact confirmation is deliberately not reused as role clearance.',
+        'compliance_policy_unavailable' => 'We cannot safely confirm the safeguarding requirements for this listing right now. Please try again later or contact your broker.',
     ],
     'vetting_types' => [
         'dbs_basic' => 'DBS Basic',
@@ -36,6 +44,20 @@ return [
         'international' => 'International background check',
         'other' => 'Other vetting check',
     ],
+    'jurisdictions' => [
+        'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'england_wales' => 'England and Wales',
+        'scotland' => 'Scotland',
+        'northern_ireland' => 'Northern Ireland',
+        'ireland' => 'Republic of Ireland',
+        'custom' => 'Custom jurisdiction',
+    ],
+    'attestations' => [
+        'dbs_enhanced' => 'Enhanced DBS confirmed for safeguarded member contact',
+        'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
+        'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
+        'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+    ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
         'intro' => 'Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.',
@@ -44,7 +66,7 @@ return [
         'who_can_see_heading' => 'Who can see this',
         'who_can_see_body' => 'Only the community coordinators and administrators can see these preferences. Other members cannot. All access is logged.',
         'what_activates_heading' => 'What activates as a result',
-        'activation_broker_review' => 'A coordinator will review messages you send and receive.',
+        'activation_broker_review' => 'A coordinator will review and approve safeguarded matches or exchanges when your selected preference requires it. This does not give them access to message contents.',
         'activation_match_approval' => 'A coordinator will approve matches involving you before they are suggested to the other member.',
         'activation_discovery_hidden' => 'You will be hidden from discovery for members who have not completed the required vetting.',
         'activation_notification' => 'A coordinator has been notified and will be in touch to discuss how we can help.',
@@ -67,7 +89,73 @@ return [
         'revoked_toast' => 'Preference revoked.',
         'revoke_error_toast' => 'Something went wrong. Please try again.',
     ],
+    'presets' => [
+        'common' => [
+            'help_text' => 'يأخذ هذا المجتمع الحماية على محمل الجد. إذا كنت تعتبر نفسك شخصًا بالغًا معرّضًا للخطر أو تحتاج إلى دعم إضافي، فأخبرنا حتى يتمكن المنسقون من ترتيب تبادلات آمنة لك.',
+            'options' => [
+                'is_vulnerable_adult' => [
+                    'label' => 'أعتبر نفسي شخصًا بالغًا معرّضًا للخطر وقد أحتاج إلى دعم إضافي للحماية',
+                    'description' => 'يتيح ذلك للمنسقين معرفة أنك قد تحتاج إلى دعم إضافي عند ترتيب التبادلات. سيتواصل معك منسق لمناقشة كيفية مساعدتك. هذه المعلومات سرية.',
+                ],
+                'requires_vetted_partners' => ['label' => 'أفضل التعامل فقط مع أعضاء خضعوا للتدقيق المناسب'],
+                'requires_coordinator_contact' => [
+                    'label' => 'أرغب في أن يساعدني منسق في ترتيب تبادلاتي بدلًا من التواصل معي مباشرة',
+                    'description' => 'سيتوسط منسق في جميع الاتصالات ويساعد في ترتيب التبادلات نيابة عنك. لن يتمكن الأعضاء الآخرون من مراسلتك مباشرة.',
+                ],
+                'no_home_visits' => [
+                    'label' => 'لا أريد أن يزور الأعضاء منزلي دون ترتيب من منسق',
+                    'description' => 'ستُرتب جميع الزيارات المنزلية من خلال منسق يمكنه التأكد من وجود إجراءات الحماية المناسبة.',
+                ],
+                'works_with_children' => ['label' => 'أخطط لتقديم خدمات قد تشمل أطفالًا أو شبابًا دون 18 عامًا'],
+                'works_with_vulnerable_adults' => ['label' => 'أخطط لتقديم خدمات قد تشمل بالغين معرّضين للخطر'],
+                'none_apply' => [
+                    'label' => 'لا ينطبق عليّ أي مما سبق',
+                    'description' => 'راجعت الخيارات أعلاه ولا ينطبق أي منها على وضعي. يُسجل ذلك حتى يعرف المنسقون أنني رأيت هذه الخطوة وراجعتها.',
+                ],
+            ],
+        ],
+        'ireland' => [
+            'name' => 'أيرلندا',
+            'vetting_authority' => 'المكتب الوطني للتدقيق',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'في أيرلندا، يعني ذلك الأعضاء الذين خضعوا لتدقيق غاردا. سيتأكد المنسقون من مطابقتك فقط مع أعضاء خضعوا للتدقيق.'],
+                'requires_coordinator_contact' => ['description' => 'سيتوسط منسق (وسيط) في جميع الاتصالات ويساعد في ترتيب التبادلات نيابة عنك. لن يتمكن الأعضاء الآخرون من مراسلتك مباشرة.'],
+                'works_with_children' => ['description' => 'قد يناقش معك منسق متطلبات تدقيق غاردا. في أيرلندا، تتطلب بعض الأنشطة التي تشمل أطفالًا تدقيقًا بموجب قانون المكتب الوطني للتدقيق لعام 2012.'],
+                'works_with_vulnerable_adults' => ['description' => 'قد يناقش معك منسق متطلبات تدقيق غاردا. وقد تتطلب الأنشطة التي تشمل بالغين معرّضين للخطر تدقيقًا.'],
+            ],
+        ],
+        'england_wales' => [
+            'name' => 'إنجلترا وويلز',
+            'vetting_authority' => 'خدمة الإفصاح والمنع',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'في إنجلترا وويلز، يعني ذلك الأعضاء الذين خضعوا لفحص DBS. سيتأكد المنسقون من مطابقتك فقط مع أعضاء خضعوا للتدقيق.'],
+                'works_with_children' => ['description' => 'قد يناقش معك منسق متطلبات فحص DBS.'],
+            ],
+        ],
+        'scotland' => [
+            'name' => 'اسكتلندا',
+            'vetting_authority' => 'هيئة الإفصاح في اسكتلندا (نظام PVG)',
+            'options' => [
+                'is_vulnerable_adult' => ['label' => 'أعتبر نفسي شخصًا بالغًا معرّضًا للخطر أو محميًا وقد أحتاج إلى دعم إضافي للحماية'],
+                'requires_vetted_partners' => ['description' => 'في اسكتلندا، يعني ذلك أعضاء نظام PVG. سيتأكد المنسقون من مطابقتك فقط مع أعضاء خضعوا للتدقيق.'],
+                'works_with_children' => ['description' => 'قد يناقش معك منسق العضوية في نظام PVG.'],
+                'works_with_vulnerable_adults' => ['label' => 'أخطط لتقديم خدمات قد تشمل بالغين محميين'],
+            ],
+        ],
+        'northern_ireland' => [
+            'name' => 'أيرلندا الشمالية',
+            'vetting_authority' => 'AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'في أيرلندا الشمالية، يعني ذلك الأعضاء الذين خضعوا لفحص AccessNI. سيتأكد المنسقون من مطابقتك فقط مع أعضاء خضعوا للتدقيق.'],
+                'works_with_children' => ['description' => 'قد يناقش معك منسق فحص AccessNI.'],
+            ],
+        ],
+        'custom' => ['name' => 'مخصص'],
+    ],
     'review' => [
+        'jurisdiction_changed_member' => 'Your community changed its safeguarding jurisdiction. Your existing protection remains active, but please review the updated wording in Settings.',
+        'jurisdiction_changed_staff' => 'The safeguarding jurisdiction changed. Affected member protections remain active and now require member review.',
+        'attestation_policy_rotated_member' => 'Your community has started a safeguarding policy review. Your broker must reconfirm your private contact status; this is not a certificate expiry.',
         'reminder_subject' => 'Please review your safeguarding preferences',
         'reminder_title' => 'Time to review your safeguarding preferences',
         'reminder_body' => 'It has been over a year since you set your safeguarding preferences for :community. Please take a moment to review them and confirm they still apply, or revoke any that no longer do.',

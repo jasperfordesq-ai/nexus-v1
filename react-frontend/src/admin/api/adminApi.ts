@@ -125,6 +125,8 @@ import type {
   TenantFederationFeatures,
   VettingRecord,
   VettingStats,
+  VettingPolicyResponse,
+  VettingAttestation,
   InsuranceCertificate,
   InsuranceStats,
   CronLog,
@@ -755,7 +757,6 @@ export const adminBroker = {
     member_visible_notes?: string;
     requires_approval?: boolean;
     insurance_required?: boolean;
-    dbs_required?: boolean;
   }) => api.post<{ success: boolean }>(`/v2/admin/broker/risk-tags/${listingId}`, data),
 
   removeRiskTag: (listingId: number) =>
@@ -2470,43 +2471,45 @@ export const adminImpactReport = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminVetting = {
-  list: (params: { status?: string; vetting_type?: string; search?: string; page?: number; per_page?: number; expiring_soon?: boolean } = {}) =>
-    api.get<PaginatedResponse<VettingRecord>>(
+  list: (params: { status?: 'all' | 'confirmed' | 'revoked' | 'not_confirmed' | 'review_requested'; search?: string; page?: number; per_page?: number } = {}) =>
+    api.get<VettingRecord[]>(
       `/v2/admin/vetting${buildQuery(params)}`
     ),
 
   stats: () =>
     api.get<VettingStats>('/v2/admin/vetting/stats'),
 
+  policy: () =>
+    api.get<VettingPolicyResponse>('/v2/admin/vetting/policy'),
+
+  updatePolicy: (jurisdiction: string) =>
+    api.put<{ policy: VettingPolicyResponse['policy']; message: string }>(
+      '/v2/admin/vetting/policy',
+      { jurisdiction },
+    ),
+
   show: (id: number) =>
-    api.get<VettingRecord>(`/v2/admin/vetting/${id}`),
-
-  create: (data: Partial<VettingRecord>) =>
-    api.post<{ id: number }>('/v2/admin/vetting', data),
-
-  update: (id: number, data: Partial<VettingRecord>) =>
-    api.put<{ success: boolean }>(`/v2/admin/vetting/${id}`, data),
-
-  verify: (id: number) =>
-    api.post<{ success: boolean }>(`/v2/admin/vetting/${id}/verify`),
-
-  reject: (id: number, reason: string) =>
-    api.post<{ success: boolean }>(`/v2/admin/vetting/${id}/reject`, { reason }),
-
-  destroy: (id: number) =>
-    api.delete<{ success: boolean }>(`/v2/admin/vetting/${id}`),
+    api.get<VettingAttestation>(`/v2/admin/vetting/${id}`),
 
   getUserRecords: (userId: number) =>
-    api.get<VettingRecord[]>(`/v2/admin/vetting/user/${userId}`),
+    api.get<VettingAttestation[]>(`/v2/admin/vetting/user/${userId}`),
 
-  uploadDocument: (id: number, file: File) =>
-    api.upload<VettingRecord>(`/v2/admin/vetting/${id}/upload`, file),
+  confirm: (userId: number, reviewRequestId?: number | null) =>
+    api.post<VettingAttestation>(`/v2/admin/vetting/user/${userId}/confirm`, {
+      acknowledgement: true,
+      ...(reviewRequestId ? { review_request_id: reviewRequestId } : {}),
+    }),
 
-  bulk: (ids: number[], action: 'verify' | 'reject' | 'delete', reason?: string) =>
-    api.post<{ action: string; processed: number; failed: number; total: number }>(
-      '/v2/admin/vetting/bulk',
-      { ids, action, reason }
-    ),
+  revoke: (userId: number, reasonCode: string, reviewRequestId?: number | null) =>
+    api.post<VettingAttestation>(`/v2/admin/vetting/user/${userId}/revoke`, {
+      reason_code: reasonCode,
+      ...(reviewRequestId ? { review_request_id: reviewRequestId } : {}),
+    }),
+
+  resolveReview: (reviewId: number, resolutionCode: VettingPolicyResponse['review_resolution_codes'][number]) =>
+    api.post(`/v2/admin/vetting/reviews/${reviewId}/resolve`, {
+      resolution_code: resolutionCode,
+    }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

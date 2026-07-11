@@ -77,10 +77,12 @@
                 <p class="govuk-notification-banner__heading">{{ $depthMessage }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['rsvp-failed', 'event-update-failed', 'event-cancel-failed', 'waitlist-failed', 'poll-vote-failed'], true))
+    @elseif (in_array($status, ['rsvp-failed', 'rsvp-vetting-required', 'rsvp-policy-unavailable', 'event-update-failed', 'event-cancel-failed', 'waitlist-failed', 'waitlist-vetting-required', 'waitlist-policy-unavailable', 'poll-vote-failed'], true))
         @php
             $depthError = match ($status) {
                 'rsvp-failed' => __('govuk_alpha.events.rsvp_failed'),
+                'rsvp-vetting-required', 'waitlist-vetting-required' => __('safeguarding.errors.vetting_required_detail'),
+                'rsvp-policy-unavailable', 'waitlist-policy-unavailable' => __('safeguarding.errors.policy_unavailable_detail'),
                 'event-update-failed' => __('govuk_alpha.events.update_failed'),
                 'event-cancel-failed' => __('govuk_alpha.events.cancel_failed'),
                 'waitlist-failed' => __('govuk_alpha.events.states.waitlist-failed'),

@@ -24,7 +24,9 @@ class MemberVerificationBadgeServiceTest extends TestCase
     {
         $this->assertContains('email_verified', MemberVerificationBadgeService::BADGE_TYPES);
         $this->assertContains('admin_verified', MemberVerificationBadgeService::BADGE_TYPES);
-        $this->assertCount(8, MemberVerificationBadgeService::BADGE_TYPES);
+        $this->assertNotContains('background_check', MemberVerificationBadgeService::BADGE_TYPES);
+        $this->assertNotContains('dbs_checked', MemberVerificationBadgeService::BADGE_TYPES);
+        $this->assertCount(7, MemberVerificationBadgeService::BADGE_TYPES);
     }
 
     public function test_grantBadge_invalid_type_returns_null(): void
@@ -79,6 +81,7 @@ class MemberVerificationBadgeServiceTest extends TestCase
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
         DB::shouldReceive('whereNull')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([

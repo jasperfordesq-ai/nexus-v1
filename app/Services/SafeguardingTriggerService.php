@@ -20,12 +20,14 @@ use Illuminate\Support\Facades\Log;
  *
  * When a member selects safeguarding options during onboarding, this service:
  * 1. Merges triggers from all selected (non-revoked) options
- * 2. Writes to user_messaging_restrictions (existing broker infrastructure)
+ * 2. Writes only explicit broker-approval workflow flags to the existing
+ *    user_messaging_restrictions infrastructure
  * 3. Syncs user-level safeguarding flags (works_with_children, etc.)
  * 4. Dispatches SafeguardingFlaggedEvent for admin/broker notification
  *
- * The existing BrokerMessageVisibilityService already reads user_messaging_restrictions
- * — no changes needed there. This service just populates the flags.
+ * Eligibility and coordinator-contact preferences never authorise broker
+ * visibility of message contents. Content monitoring is a separate, explicit
+ * administrative control and must not be inferred from a member preference.
  */
 class SafeguardingTriggerService
 {
@@ -60,47 +62,42 @@ class SafeguardingTriggerService
         $tenantId = $tenantId ?? TenantContext::getId();
         $cacheKey = self::CACHE_PREFIX . "{$tenantId}:{$userId}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId, $tenantId) {
-            // Get all active (non-revoked) preferences with their option triggers
-            $preferences = UserSafeguardingPreference::where('tenant_id', $tenantId)
-                ->where('user_id', $userId)
-                ->active()
-                ->with('option')
-                ->get();
+        return Cache::remember(
+            $cacheKey,
+            self::CACHE_TTL,
+            static fn (): array => self::getActiveTriggersUncached($userId, $tenantId),
+        );
+    }
 
-            $merged = self::TRIGGER_DEFAULTS;
-            $vettingTypes = [];
+    /**
+     * Resolve active triggers directly from tenant-scoped database state.
+     *
+     * @return array<string, mixed>
+     */
+    public static function getActiveTriggersUncached(int $userId, ?int $tenantId = null): array
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $optionIds = self::activePreferenceOptionIds($userId, $tenantId, false);
 
-            foreach ($preferences as $pref) {
-                $option = $pref->option;
-                if (!$option || !$option->is_active) {
-                    continue;
-                }
+        return self::mergedTriggersForOptions($optionIds, $tenantId, false);
+    }
 
-                $triggers = $option->triggers ?? [];
+    /**
+     * Resolve definitive trigger state while locking preferences and their
+     * options in the common safeguarding write order. The tenant policy mutex
+     * must have been acquired first by SafeguardingJurisdictionService.
+     *
+     * @return array<string, mixed>
+     */
+    public static function getActiveTriggersForUpdate(int $userId, int $tenantId): array
+    {
+        if (DB::transactionLevel() < 1) {
+            throw new \LogicException('Safeguarding trigger locks require an active database transaction.');
+        }
 
-                // OR-merge boolean triggers
-                foreach (self::TRIGGER_DEFAULTS as $key => $default) {
-                    if (!empty($triggers[$key])) {
-                        $merged[$key] = true;
-                    }
-                }
+        $optionIds = self::activePreferenceOptionIds($userId, $tenantId, true);
 
-                // Collect vetting type requirements only for options that
-                // explicitly make vetted interaction a gate. Provider-side
-                // declarations may record their own required check without
-                // blocking everyone else from contacting that provider.
-                if (self::requiresVettedInteractionTrigger($triggers) && !empty($triggers['vetting_type_required'])) {
-                    $vettingTypes[] = $triggers['vetting_type_required'];
-                }
-            }
-
-            if (!empty($vettingTypes)) {
-                $merged['vetting_types_required'] = array_unique($vettingTypes);
-            }
-
-            return $merged;
-        });
+        return self::mergedTriggersForOptions($optionIds, $tenantId, true);
     }
 
     /**
@@ -113,43 +110,31 @@ class SafeguardingTriggerService
     {
         $tenantId = $tenantId ?? TenantContext::getId();
 
-        // Invalidate cache first
+        // Invalidate cache first. The activation side effects themselves use
+        // an uncached read so an in-flight stale cache callback cannot drive
+        // flags or notifications from pre-commit preference state.
         self::invalidateCache($userId, $tenantId);
 
         // Get fresh merged triggers
-        $triggers = self::getActiveTriggers($userId, $tenantId);
+        $triggers = self::getActiveTriggersUncached($userId, $tenantId);
 
-        $needsMonitoring = $triggers['restricts_messaging'] || $triggers['requires_vetted_interaction'];
+        // A member asking for coordinator-only or vetted contact has not
+        // consented to broker surveillance of every message body. Monitoring is
+        // deliberately never activated from self-selected safeguarding options.
+        $needsMonitoring = false;
         $needsBrokerApproval = $triggers['requires_broker_approval'];
         $needsNotification = $triggers['notify_admin_on_selection'];
 
-        // Update user_messaging_restrictions (the table that BrokerMessageVisibilityService reads)
-        if ($needsMonitoring || $needsBrokerApproval) {
-            DB::statement(
-                "INSERT INTO user_messaging_restrictions (tenant_id, user_id, under_monitoring, requires_broker_approval, monitoring_reason, monitoring_started_at)
-                 VALUES (?, ?, ?, ?, ?, NOW())
-                 ON DUPLICATE KEY UPDATE
-                   under_monitoring = VALUES(under_monitoring),
-                   requires_broker_approval = VALUES(requires_broker_approval),
-                   monitoring_reason = VALUES(monitoring_reason),
-                   monitoring_started_at = COALESCE(monitoring_started_at, NOW())",
-                [
-                    $tenantId,
-                    $userId,
-                    $needsMonitoring ? 1 : 0,
-                    $needsBrokerApproval ? 1 : 0,
-                    self::MONITORING_REASON_ONBOARDING,
-                ]
-            );
-        } else {
-            // If no triggers active, clear monitoring (but don't clear if set by other means)
-            DB::update(
-                "UPDATE user_messaging_restrictions
-                 SET under_monitoring = 0, requires_broker_approval = 0
-                 WHERE tenant_id = ? AND user_id = ? AND monitoring_reason LIKE 'Safeguarding:%'", // matches MONITORING_REASON_ONBOARDING prefix
-                [$tenantId, $userId]
-            );
-        }
+        // Preferences are evaluated directly by policy consumers. Never write
+        // them into the single-row administrative monitoring record: doing so
+        // can overwrite a separately authorised monitoring decision. Only
+        // remove the exact legacy row state created by this service.
+        DB::update(
+            "UPDATE user_messaging_restrictions
+             SET under_monitoring = 0, requires_broker_approval = 0
+             WHERE tenant_id = ? AND user_id = ? AND monitoring_reason = ?",
+            [$tenantId, $userId, self::MONITORING_REASON_ONBOARDING]
+        );
 
         // Sync user-level safeguarding flags (transactional to keep flags consistent)
         DB::transaction(function () use ($userId, $tenantId, $triggers) {
@@ -345,6 +330,78 @@ class SafeguardingTriggerService
     private static function requiresVettedInteractionTrigger(array $triggers): bool
     {
         return !empty($triggers['requires_vetted_interaction']);
+    }
+
+    /** @return list<int> */
+    private static function activePreferenceOptionIds(int $userId, int $tenantId, bool $forUpdate): array
+    {
+        $query = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->whereNull('revoked_at')
+            ->orderBy('id');
+        if ($forUpdate) {
+            $query->lockForUpdate();
+        }
+
+        return $query
+            ->pluck('option_id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param list<int> $optionIds
+     * @return array<string, mixed>
+     */
+    private static function mergedTriggersForOptions(array $optionIds, int $tenantId, bool $forUpdate): array
+    {
+        if ($optionIds === []) {
+            return self::TRIGGER_DEFAULTS;
+        }
+
+        $query = DB::table('tenant_safeguarding_options')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $optionIds)
+            ->where('is_active', true)
+            ->orderBy('id');
+        if ($forUpdate) {
+            $query->lockForUpdate();
+        }
+
+        $merged = self::TRIGGER_DEFAULTS;
+        $vettingTypes = [];
+        foreach ($query->get(['triggers']) as $option) {
+            $triggers = is_string($option->triggers ?? null)
+                ? json_decode((string) $option->triggers, true)
+                : (array) ($option->triggers ?? []);
+            if (! is_array($triggers)) {
+                $triggers = [];
+            }
+
+            foreach (self::TRIGGER_DEFAULTS as $key => $default) {
+                if (! empty($triggers[$key])) {
+                    $merged[$key] = true;
+                }
+            }
+
+            $vettingType = $triggers['vetting_type_required'] ?? null;
+            if (self::requiresVettedInteractionTrigger($triggers)
+                && is_string($vettingType)
+                && $vettingType !== '') {
+                $vettingTypes[] = $vettingType;
+            }
+        }
+
+        if ($vettingTypes !== []) {
+            $merged['vetting_types_required'] = array_values(array_unique($vettingTypes));
+        }
+
+        return $merged;
     }
 
     /**

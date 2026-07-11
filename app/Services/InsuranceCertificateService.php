@@ -146,8 +146,7 @@ class InsuranceCertificateService
             'pending' => (int) ($counts->pending ?? 0),
             'submitted' => (int) ($counts->submitted ?? 0),
             // pending_review = pending + submitted — pre-verification states
-            // the broker still owns. Mirrors VettingService::getStats and
-            // matches what a "Pending Review" stat card means to a broker.
+            // the broker still owns for insurance certificates.
             'pending_review' => (int) ($counts->pending ?? 0) + (int) ($counts->submitted ?? 0),
             'verified' => (int) ($counts->verified ?? 0),
             'expired' => (int) ($counts->expired ?? 0),

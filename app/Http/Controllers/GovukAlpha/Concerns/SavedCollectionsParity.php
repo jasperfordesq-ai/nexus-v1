@@ -405,6 +405,10 @@ trait SavedCollectionsParity
                 null,
                 $isPublic,
             );
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $status = $e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'appreciation-safeguarding-unavailable'
+                : 'appreciation-safeguarding-restricted';
         } catch (\DomainException $e) {
             $status = match ($e->getMessage()) {
                 'cannot_thank_self'   => 'appreciation-self',

@@ -97,6 +97,16 @@
     "privacy_policy_link": "Privacybeleid"
   },
   "privacy": {
+    "last_updated_safeguarding": "Laatst bijgewerkt: juli 2026",
+    "data_safeguarding_type": "Particuliere bevestiging van screening voor beschermingsdoeleinden",
+    "data_safeguarding_collected": "Gemeenschap, lid, vastgestelde screeningsregeling, doel en reikwijdte, besluit tot bevestiging of intrekking, bevoegde besluitvormer, tijdstempels, vaste redencode en beleidsversie. We vragen niet om het certificaat, referentienummer, datums, resultaat, strafrechtelijke gegevens, vrije-tekstnotities of identiteitsdocumenten en slaan deze niet op.",
+    "data_safeguarding_why": "Om de persoonlijke contactvoorkeur van een lid toe te passen en een controleerbaar correctie- en herbeoordelingsproces te bieden.",
+    "data_safeguarding_basis": "Door de verwerkingsverantwoordelijke gedocumenteerde rechtsgrond",
+    "safeguarding_data_title": "Metagegevens van de beschermingsbevestiging",
+    "safeguarding_data_body": "Wanneer een gemeenschap rechtmatig een bevestiging van een Enhanced DBS-controle vereist voor beschermd contact tussen leden, voert zij haar eigen controles buiten Project NEXUS uit. Een bevoegde bemiddelaar legt alleen het daaruit voortvloeiende besluit van de gemeenschap vast. Dit is geen bewering dat een lid veilig is, geen strafblad heeft of voor iedere rol is goedgekeurd.",
+    "safeguarding_data_access": "De toegang is beperkt tot bevoegde bemiddelaars en beheerders binnen de gemeenschap van het lid. De gegevens worden niet getoond op openbare profielen, badges, zoekresultaten of in algemene analyses.",
+    "safeguarding_data_retention": "De Gemeenschapsbeheerder moet een gedocumenteerd bewaarschema publiceren en toepassen en de metagegevens verwijderen zodra die niet meer nodig zijn, behoudens een naar behoren gedocumenteerde wettelijke verplichting.",
+    "safeguarding_data_correction": "Leden kunnen hun afgeschermde status bekijken, zonder bewijsstukken een herbeoordeling door een bemiddelaar aanvragen en de Gemeenschapsbeheerder vragen een onjuist besluit te corrigeren of opnieuw te beoordelen.",
     "meta_description": "Hoe we uw persoonlijke gegevens op ons communityplatform verzamelen, gebruiken en beschermen.",
     "page_title": "Privacybeleid",
     "heading": "Privacybeleid",
@@ -717,6 +727,9 @@
     }
   },
   "trust_safety": {
+    "vetting_attestation_body": "Wanneer een gemeenschapsbeleid contact tussen gescreende personen vereist, voert de gemeenschap de rechtmatige controle buiten Project NEXUS uit. Een bevoegde bemiddelaar kan voor het specifieke contactbeleid een particuliere bevestiging van de gemeenschap vastleggen die uitsluitend uit metagegevens bestaat. Project NEXUS vraagt niet om DBS-, Garda Vetting-, AccessNI-, PVG- of gelijkwaardige certificaten en bewaart deze, hun referentienummers, resultaten of strafrechtelijke gegevens niet. Een bevestiging betekent niet dat iemand in alle omstandigheden veilig of voor iedere rol goedgekeurd is.",
+    "what_we_dont_vetting_item": "We onderzoeken of bewaren verklaringen over strafrechtelijke gegevens niet zelfstandig, certificeren geen lid voor een beroep en maken van een bevestiging voor contactbeleid geen algemene goedkeuring voor rollen.",
+    "precautions_vetting_item": "Neem bij activiteiten met kinderen of kwetsbare volwassenen contact op met de coördinator van uw gemeenschap over de toepasselijke regels. Vraag een ander lid niet om een DBS-, Garda Vetting-, AccessNI-, PVG- of gelijkwaardig certificaat via Project NEXUS te versturen.",
     "page_title": "Vertrouwen en veiligheid",
     "meta_description": "Hoe uitwisselingen werken op {{name}}, wat we doen om de community veilig te houden, wat we niet doen en hoe we een probleem kunnen melden. Vertrouwen en bescherming in gewoon Engels.",
     "heading": "Vertrouwen en veiligheid",

@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\CaringCommunity\CaregiverService;
 use Illuminate\Http\JsonResponse;
 
@@ -311,6 +312,8 @@ class CaregiverApiController extends BaseApiController
 
         try {
             return $this->respondWithData($this->service->assignCoverCandidate($id, $userId, $tenantId, $supporterId));
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {

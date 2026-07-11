@@ -35,12 +35,12 @@
     "tab_volunteers": "Volontari",
     "tab_wallet": "Portafoglio",
     "tab_settings": "Impostazioni",
-    "review_applications_many": "Esamina le applicazioni {{count}}",
     "review_applications_one": "Esamina le applicazioni {{count}}",
     "review_applications_other": "Esamina le applicazioni {{count}}",
-    "review_hours_many": "Rivedi {{count}} Orari",
     "review_hours_one": "Rivedi {{count}} Orari",
-    "review_hours_other": "Rivedi {{count}} Orari"
+    "review_hours_other": "Rivedi {{count}} Orari",
+    "review_applications_many": "Esamina le applicazioni {{count}}",
+    "review_hours_many": "Rivedi {{count}} Orari"
   },
   "page_title": "Volontariato",
   "heading": "Volontariato",
@@ -353,15 +353,15 @@
     },
     "support_aria": "Sostieni questo progetto ({{count}} sostenitori)",
     "unsupport_aria": "Ritira il tuo sostegno ({{count}} sostenitori)",
-    "volunteers_needed_many": "{{count}} necessari",
     "volunteers_needed_one": "{{count}} necessari",
     "volunteers_needed_other": "{{count}} necessari",
-    "unsupport_aria_many": "Ritira il tuo sostegno ({{count}} sostenitori)",
     "unsupport_aria_one": "Ritira il tuo sostegno ({{count}} sostenitori)",
     "unsupport_aria_other": "Ritira il tuo sostegno ({{count}} sostenitori)",
-    "support_aria_many": "Sostieni questo progetto ({{count}} sostenitori)",
     "support_aria_one": "Sostieni questo progetto ({{count}} sostenitori)",
-    "support_aria_other": "Sostieni questo progetto ({{count}} sostenitori)"
+    "support_aria_other": "Sostieni questo progetto ({{count}} sostenitori)",
+    "volunteers_needed_many": "{{count}} necessari",
+    "unsupport_aria_many": "Ritira il tuo sostegno ({{count}} sostenitori)",
+    "support_aria_many": "Sostieni questo progetto ({{count}} sostenitori)"
   },
   "donations": {
     "heading": "Donazioni",
@@ -469,9 +469,9 @@
     "receipt_message": "Messaggio",
     "receipt_error": "Impossibile caricare la ricevuta.",
     "receipt_not_found": "Ricevuta non trovata.",
-    "donors_count_many": "{{count}} donatori",
     "donors_count_one": "{{count}} donatori",
-    "donors_count_other": "{{count}} donatori"
+    "donors_count_other": "{{count}} donatori",
+    "donors_count_many": "{{count}} donatori"
   },
   "safeguarding": {
     "heading": "Tutela",
@@ -593,9 +593,7 @@
     "upload_instructions": "Carica un documento per verificare le tue credenziali. Formati accettati: PDF, JPG, PNG, WebP (max 10MB).",
     "type_label": "Tipo di credenziale",
     "type_placeholder": "Seleziona il tipo di credenziale",
-    "type_police_check": "Controllo della polizia",
     "type_first_aid": "Primo soccorso",
-    "type_background_check": "Controllo dei precedenti",
     "type_safeguarding": "Salvaguardia",
     "type_manual_handling": "Movimentazione manuale",
     "type_food_hygiene": "Igiene alimentare",
@@ -611,9 +609,24 @@
     "upload_credential": "Carica credenziale",
     "aria_remove_file": "Rimuovi file selezionato",
     "aria_upload_document": "Carica documento credenziale",
-    "expiring_soon_desc_many": "Le credenziali {{count}} scadranno entro 30 giorni.",
+    "vetting_documents_notice_title": "Non caricare documenti di controllo della polizia",
+    "vetting_documents_notice_body": "I documenti DBS, controlli di polizia, Garda vetting, AccessNI e PVG non sono accettati qui. Chiedi invece al tuo broker di comunità di rivedere la tua conferma di salvaguardia privata.",
+    "legacy_vetting_evidence_title": "Il documento di controllo di polizia preesistente deve essere rimosso",
+    "legacy_vetting_evidence_body": "Questo caricamento storico è stato oscurato. NEXUS non mostrerà il nome del file, le date, lo stato, i contenuti o un collegamento per il download. Eliminalo dalla piattaforma e utilizza la procedura approvata dalla tua comunità al di fuori di NEXUS.",
+    "legacy_vetting_evidence_delete": "Elimina il documento precedente",
+    "legacy_vetting_evidence_delete_success": "Documento preesistente di controllo di polizia eliminato.",
+    "legacy_vetting_evidence_delete_failed": "Impossibile eliminare il documento legacy. Per favore riprova.",
+    "status_manual_review": "Revisione manuale richiesta",
+    "manual_review_title": "Credenziale storica non supportata",
+    "manual_review_body": "Questo tipo di credenziale storica non è supportato. I dettagli del documento sono nascosti e non viene considerato né verificato né una prova di controllo dei precedenti. Puoi eliminarlo.",
+    "manual_review_delete": "Elimina credenziale",
+    "manual_review_delete_success": "Credenziale eliminata.",
+    "manual_review_delete_failed": "Impossibile eliminare la credenziale. Riprova.",
     "expiring_soon_desc_one": "Le credenziali {{count}} scadranno entro 30 giorni.",
-    "expiring_soon_desc_other": "Le credenziali {{count}} scadranno entro 30 giorni."
+    "expiring_soon_desc_other": "Le credenziali {{count}} scadranno entro 30 giorni.",
+    "type_police_check": "Controllo della polizia",
+    "type_background_check": "Controllo dei precedenti",
+    "expiring_soon_desc_many": "Le credenziali {{count}} scadranno entro 30 giorni."
   },
   "waitlist": {
     "heading": "Le mie liste d'attesa",
@@ -634,9 +647,9 @@
     "claim_success": "Ci sei: iscritto al turno!",
     "claim_failed": "Non ho potuto reclamare il posto",
     "claim_hint": "Ti si è aperto un posto. Richiedilo presto: i posti non rivendicati passano alla persona successiva dopo 48 ore.",
-    "spots_many": "{{count}} spot",
     "spots_one": "{{count}} spot",
-    "spots_other": "{{count}} spot"
+    "spots_other": "{{count}} spot",
+    "spots_many": "{{count}} spot"
   },
   "swaps": {
     "heading": "Scambi di turno",
@@ -776,15 +789,15 @@
     "bulk_success": "{{count}} candidature aggiornate.",
     "bulk_failed": "Impossibile aggiornare {{count}} candidature.",
     "bulk_rate_limited": "Impossibile aggiornare {{count}}: stai andando troppo veloce. Attendi un minuto e riprova.",
-    "pending_count_many": "{{count}} in sospeso",
     "pending_count_one": "{{count}} in sospeso",
     "pending_count_other": "{{count}} in sospeso",
-    "selected_count_many": "{{count}} selezionato",
     "selected_count_one": "{{count}} selezionato",
     "selected_count_other": "{{count}} selezionato",
-    "decline_modal_description_many": "Aggiungi una nota per la richiesta {{count}} prima di rifiutare.",
     "decline_modal_description_one": "Aggiungi una nota per la richiesta {{count}} prima di rifiutare.",
-    "decline_modal_description_other": "Aggiungi una nota per la richiesta {{count}} prima di rifiutare."
+    "decline_modal_description_other": "Aggiungi una nota per la richiesta {{count}} prima di rifiutare.",
+    "pending_count_many": "{{count}} in sospeso",
+    "selected_count_many": "{{count}} selezionato",
+    "decline_modal_description_many": "Aggiungi una nota per la richiesta {{count}} prima di rifiutare."
   },
   "org_wallet_balance": "Saldo del portafoglio:",
   "auto_pay_on": "Pagamento automatico attivato",
@@ -879,9 +892,9 @@
     "generated_on": "Generato",
     "download": "Scarica",
     "verify": "Verifica",
-    "verified_hours_many": "{{count}} ore verificate",
     "verified_hours_one": "{{count}} ore verificate",
-    "verified_hours_other": "{{count}} ore verificate"
+    "verified_hours_other": "{{count}} ore verificate",
+    "verified_hours_many": "{{count}} ore verificate"
   },
   "emergency": {
     "title": "Avvisi di emergenza",
@@ -903,9 +916,9 @@
     "respond_error_generic": "Impossibile rispondere all'avviso. Riprova.",
     "from": "Da",
     "expires": "Scade",
-    "pending_count_many": "{{count}} in attesa",
     "pending_count_one": "{{count}} in attesa",
-    "pending_count_other": "{{count}} in attesa"
+    "pending_count_other": "{{count}} in attesa",
+    "pending_count_many": "{{count}} in attesa"
   },
   "wellbeing": {
     "heading": "Benessere del volontario",
@@ -1079,10 +1092,10 @@
   "my_organisations_declined": "Rifiutata",
   "my_organisations_declined_desc": "Questa richiesta non è stata approvata. Contatta l'amministrazione della tua comunità per i dettagli.",
   "hours_invalid_range": "Inserisci tra 0,25 e 24 ore.",
-  "org_callout_you_manage_many_many": "Gestisci le organizzazioni {{count}}",
   "org_callout_you_manage_many_one": "Gestisci le organizzazioni {{count}}",
   "org_callout_you_manage_many_other": "Gestisci le organizzazioni {{count}}",
-  "more_sections_many": "More ({{count}})",
   "more_sections_one": "Altro ({{count}})",
-  "more_sections_other": "Altro ({{count}})"
+  "more_sections_other": "Altro ({{count}})",
+  "org_callout_you_manage_many_many": "Gestisci le organizzazioni {{count}}",
+  "more_sections_many": "More ({{count}})"
 }

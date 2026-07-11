@@ -33,7 +33,9 @@ class AdminBrokerControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/broker/dashboard');
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertJsonStructure(['data' => ['vetting_review_requests']]);
+        $response->assertJsonMissingPath('data.vetting_pending');
+        $response->assertJsonMissingPath('data.vetting_expiring');
     }
 
     public function test_dashboard_returns_403_for_regular_member(): void
@@ -178,10 +180,26 @@ class AdminBrokerControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'broker_config'],
+            [
+                'setting_value' => json_encode([
+                    'vetting_enabled' => true,
+                    'enforce_vetting_on_exchanges' => true,
+                    'vetting_expiry_warning_days' => 30,
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+
         $response = $this->apiGet('/v2/admin/broker/configuration');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+        $response->assertJsonMissingPath('data.vetting_enabled');
+        $response->assertJsonMissingPath('data.enforce_vetting_on_exchanges');
+        $response->assertJsonMissingPath('data.vetting_expiry_warning_days');
     }
 
     public function test_get_configuration_returns_403_for_regular_member(): void
@@ -1314,6 +1332,7 @@ class AdminBrokerControllerTest extends TestCase
                     'broker_messaging_enabled' => true,
                     'broker_approval_required' => true,
                     'retention_days' => 90,
+                    'vetting_enabled' => true,
                 ]),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -1340,6 +1359,7 @@ class AdminBrokerControllerTest extends TestCase
         $this->assertFalse($config['copy_first_contact']);
         $this->assertTrue($config['broker_messaging_enabled']);
         $this->assertTrue($config['broker_approval_required']);
+        $this->assertArrayNotHasKey('vetting_enabled', $config);
     }
 
     public function test_save_configuration_syncs_flat_panel_keys_to_runtime_broker_controls(): void

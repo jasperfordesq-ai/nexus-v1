@@ -8,8 +8,6 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
-use App\Services\SafeguardingTriggerService;
-use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -60,22 +58,22 @@ class MatchApprovalWorkflowService
                 return null;
             }
 
-            // Safeguarding: check if either party has matching restrictions
-            // (set when a vulnerable person ticks safeguarding checkboxes)
+            // Administrative monitoring remains separate from self-selected
+            // broker-approval preferences.
             $hasMatchingRestriction = DB::table('user_messaging_restrictions')
                 ->where('tenant_id', $tenantId)
                 ->whereIn('user_id', [$userId, $listingOwnerId])
-                ->where(function ($q) {
-                    $q->where('under_monitoring', 1)
-                      ->orWhere('requires_broker_approval', 1);
-                })
+                ->where('under_monitoring', 1)
                 ->where(function ($q) {
                     $q->whereNull('monitoring_expires_at')
                       ->orWhere('monitoring_expires_at', '>', now());
                 })
                 ->exists();
 
-            if ($hasMatchingRestriction) {
+            $requiresBrokerApproval = SafeguardingTriggerService::requiresBrokerApproval($userId, $tenantId)
+                || SafeguardingTriggerService::requiresBrokerApproval($listingOwnerId, $tenantId);
+
+            if ($hasMatchingRestriction || $requiresBrokerApproval) {
                 Log::info('[MatchApprovalWorkflow] Blocked: user has safeguarding restrictions', [
                     'user_id' => $userId,
                     'listing_owner_id' => $listingOwnerId,
@@ -84,45 +82,8 @@ class MatchApprovalWorkflowService
                 return null;
             }
 
-            // Vetting gate — bidirectional. Sits ALONGSIDE the existing monitoring
-            // check above (does not replace it). If either party is flagged and
-            // requires vetting types, the other party must hold valid records of
-            // ALL those types. Looked up per-user via SafeguardingTriggerService
-            // (cached 5 min per user) — this is a one-off gate, so per-user calls
-            // are fine; the bulk variant is reserved for SmartMatchingEngine.
-            try {
-                $userRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($userId, $tenantId);
-                $ownerRequiredTypes = SafeguardingTriggerService::getRequiredVettingTypes($listingOwnerId, $tenantId);
-
-                if (!empty($userRequiredTypes) || !empty($ownerRequiredTypes)) {
-                    $vettingService = app(VettingService::class);
-
-                    if (!empty($userRequiredTypes)
-                        && !$vettingService->userHasAllValidVettings($listingOwnerId, $userRequiredTypes)) {
-                        Log::info('[MatchApprovalWorkflow] Blocked: listing owner lacks required vetting', [
-                            'user_id' => $userId,
-                            'listing_owner_id' => $listingOwnerId,
-                            'required_types' => $userRequiredTypes,
-                        ]);
-                        return null;
-                    }
-                    if (!empty($ownerRequiredTypes)
-                        && !$vettingService->userHasAllValidVettings($userId, $ownerRequiredTypes)) {
-                        Log::info('[MatchApprovalWorkflow] Blocked: match user lacks required vetting', [
-                            'user_id' => $userId,
-                            'listing_owner_id' => $listingOwnerId,
-                            'required_types' => $ownerRequiredTypes,
-                        ]);
-                        return null;
-                    }
-                }
-            } catch (\Throwable $e) {
-                // Lookup failure is not fatal — monitoring gate above already ran.
-                Log::warning('[MatchApprovalWorkflow] Vetting lookup failed (continuing)', [
-                    'error' => $e->getMessage(),
-                    'user_id' => $userId,
-                    'listing_owner_id' => $listingOwnerId,
-                ]);
+            if (! self::contactPolicyAllowsBoth($userId, $listingOwnerId, $tenantId, 'match_submission')) {
+                return null;
             }
 
             $matchType = $matchData['match_type'] ?? $matchData['type'] ?? 'one_way';
@@ -289,6 +250,15 @@ class MatchApprovalWorkflowService
                 return false;
             }
 
+            if (! self::contactPolicyAllowsBoth(
+                (int) $approval->user_id,
+                (int) $approval->listing_owner_id,
+                $tenantId,
+                'match_approval',
+            )) {
+                return false;
+            }
+
             $affected = DB::table('match_approvals')
                 ->where('id', $requestId)
                 ->where('tenant_id', $tenantId)
@@ -432,7 +402,7 @@ class MatchApprovalWorkflowService
 
             // Fetch pending rows before updating so we can notify users
             $pendingRows = DB::select(
-                "SELECT ma.id, ma.user_id, ma.listing_id, ma.match_score, l.title as listing_title
+                "SELECT ma.id, ma.user_id, ma.listing_owner_id, ma.listing_id, ma.match_score, l.title as listing_title
                  FROM match_approvals ma
                  LEFT JOIN listings l ON ma.listing_id = l.id
                  WHERE ma.id IN ({$placeholders})
@@ -443,6 +413,17 @@ class MatchApprovalWorkflowService
                     [$tenantId]
                 )
             );
+
+            foreach ($pendingRows as $row) {
+                if (! self::contactPolicyAllowsBoth(
+                    (int) $row->user_id,
+                    (int) $row->listing_owner_id,
+                    $tenantId,
+                    'match_bulk_approval',
+                )) {
+                    return 0;
+                }
+            }
 
             $affected = DB::update(
                 "UPDATE match_approvals
@@ -687,5 +668,30 @@ class MatchApprovalWorkflowService
                 'top_reviewers' => [],
             ];
         }
+    }
+
+    private static function contactPolicyAllowsBoth(
+        int $firstUserId,
+        int $secondUserId,
+        int $tenantId,
+        string $channel,
+    ): bool {
+        $policy = app(SafeguardingInteractionPolicy::class);
+        foreach ([[$firstUserId, $secondUserId], [$secondUserId, $firstUserId]] as [$senderId, $recipientId]) {
+            $decision = $policy->evaluateLocalContact($senderId, $recipientId, $tenantId, $channel);
+            if (! $decision->isAllowed()) {
+                Log::info('[MatchApprovalWorkflow] Blocked by safeguarding contact policy', [
+                    'tenant_id' => $tenantId,
+                    'sender_id' => $senderId,
+                    'recipient_id' => $recipientId,
+                    'reason_code' => $decision->code,
+                    'channel' => $channel,
+                ]);
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

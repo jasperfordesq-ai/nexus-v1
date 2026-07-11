@@ -6,9 +6,9 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'Kono kaiwa wa komyuniti no anzen ruuru ni yori ichiji teishi sareteimasu. Kono menba ni messeji o okuru mae ni kakunin-zumi no :types shinsa ga hitsuyo desu. Shinsa jokyo no kakunin ya tsugi no tetsuzuki ni tsuite, buroka mata wa komyuniti kanrisha ni renraku shite kudasai.',
+        'vetting_required' => 'この会話はコミュニティの安全保護ルールにより一時停止されています。このメンバーにメッセージを送るには、コミュニティが有効な :types ステータスを記録している必要があります。ブローカーまたはコミュニティ管理者に、メタデータのみの確認として記録するよう依頼してください。審査書類を送信またはアップロードしないでください。',
         'vetting_required_title' => 'Anzen kakunin ga hitsuyo desu',
-        'vetting_required_detail' => 'このメンバーへのこの種の連絡は、:types の審査を完了した認証済みメンバーのみが行えます。',
+        'vetting_required_detail' => 'この種の連絡を行えるのは、コミュニティが有効な :types ステータスを記録しているメンバーのみです。記録はメタデータのみであり、書類を送信またはアップロードしないでください。',
         'vetting_required_action' => 'Herupu o hiraku',
         'contact_restricted' => 'Kono menba wa koordineeta ga dairi de renraku wo seiri suru koto wo kibou shite imasu. Messeji wa soshin saremasen deshita. Tsugi no anzen na tejun no tame, buroka mata wa komyuniti kanrisha ni renraku shite kudasai.',
         'contact_restricted_title' => 'Koordineeta no tehai ga hitsuyo desu',
@@ -25,6 +25,14 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+        'policy_unavailable' => 'We cannot confirm the community safeguarding policy right now. No message has been sent. Please try again shortly.',
+        'interaction_not_allowed' => 'The recipient’s community safeguarding policy does not allow this direct interaction. Ask a coordinator for help.',
+        'policy_unavailable_title' => 'Safeguarding check temporarily unavailable',
+        'policy_unavailable_detail' => 'Project NEXUS could not safely evaluate the contact policy, so this interaction has been paused.',
+        'policy_unavailable_action' => 'Check again',
+        'listing_role_confirmation_required' => 'This listing requires a separate community-confirmed Enhanced DBS decision for this role. A messenger contact confirmation does not satisfy role-specific safeguarding requirements.',
+        'listing_role_feature_unavailable' => 'Role-specific criminal-record vetting cannot be enabled here yet. Messenger contact confirmation is deliberately not reused as role clearance.',
+        'compliance_policy_unavailable' => 'We cannot safely confirm the safeguarding requirements for this listing right now. Please try again later or contact your broker.',
     ],
     'vetting_types' => [
         'dbs_basic' => 'DBS Basic',
@@ -36,6 +44,20 @@ return [
         'international' => 'International background check',
         'other' => 'Other vetting check',
     ],
+    'jurisdictions' => [
+        'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'england_wales' => 'England and Wales',
+        'scotland' => 'Scotland',
+        'northern_ireland' => 'Northern Ireland',
+        'ireland' => 'Republic of Ireland',
+        'custom' => 'Custom jurisdiction',
+    ],
+    'attestations' => [
+        'dbs_enhanced' => 'Enhanced DBS confirmed for safeguarded member contact',
+        'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
+        'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
+        'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+    ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
         'intro' => 'Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.',
@@ -44,7 +66,7 @@ return [
         'who_can_see_heading' => 'Who can see this',
         'who_can_see_body' => 'Only the community coordinators and administrators can see these preferences. Other members cannot. All access is logged.',
         'what_activates_heading' => 'What activates as a result',
-        'activation_broker_review' => 'A coordinator will review messages you send and receive.',
+        'activation_broker_review' => 'A coordinator will review and approve safeguarded matches or exchanges when your selected preference requires it. This does not give them access to message contents.',
         'activation_match_approval' => 'A coordinator will approve matches involving you before they are suggested to the other member.',
         'activation_discovery_hidden' => 'You will be hidden from discovery for members who have not completed the required vetting.',
         'activation_notification' => 'A coordinator has been notified and will be in touch to discuss how we can help.',
@@ -67,7 +89,79 @@ return [
         'revoked_toast' => 'Preference revoked.',
         'revoke_error_toast' => 'Something went wrong. Please try again.',
     ],
+    'presets' => [
+        'common' => [
+            'help_text' => 'このコミュニティは安全保護を重視しています。ご自身が支援を必要とする成人であるとお考えの場合、または追加の支援が必要な場合は、安全な交流を調整できるようコーディネーターにお知らせください。',
+            'options' => [
+                'is_vulnerable_adult' => [
+                    'label' => '私は支援を必要とする成人であり、追加の安全保護支援が必要になる可能性があります',
+                    'description' => '交流を調整する際に追加の支援が必要な可能性があることをコーディネーターに知らせます。どのように支援できるかを相談するため、コーディネーターからご連絡します。この情報は機密として扱われます。',
+                ],
+                'requires_vetted_partners' => [
+                    'label' => '適切な審査を受けたメンバーとのみ交流したいです',
+                ],
+                'requires_coordinator_contact' => [
+                    'label' => '直接連絡を受けるのではなく、コーディネーターに交流の調整を手伝ってほしいです',
+                    'description' => 'コーディネーターがすべての連絡を仲介し、あなたに代わって交流を調整します。他のメンバーがあなたに直接メッセージを送ることはできません。',
+                ],
+                'no_home_visits' => [
+                    'label' => 'コーディネーターの調整なしにメンバーが自宅を訪問することを希望しません',
+                    'description' => 'すべての自宅訪問は、適切な安全対策が講じられていることを確認できるコーディネーターを通じて調整されます。',
+                ],
+                'works_with_children' => [
+                    'label' => '子どもまたは若者（18歳未満）が関わる可能性のあるサービスを提供する予定です',
+                ],
+                'works_with_vulnerable_adults' => [
+                    'label' => '支援を必要とする成人が関わる可能性のあるサービスを提供する予定です',
+                ],
+                'none_apply' => [
+                    'label' => 'いずれも私には当てはまりません',
+                    'description' => '上記の選択肢を確認しましたが、私の状況に当てはまるものはありません。この手順を確認し検討したことがコーディネーターに分かるよう記録されます。',
+                ],
+            ],
+        ],
+        'ireland' => [
+            'name' => 'アイルランド',
+            'vetting_authority' => '国家審査局',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'アイルランドでは、Garda Vettingを受けたメンバーを意味します。コーディネーターは、審査済みのメンバーとのみマッチングされるようにします。'],
+                'requires_coordinator_contact' => ['description' => 'コーディネーター（仲介担当者）がすべての連絡を仲介し、あなたに代わって交流を調整します。他のメンバーがあなたに直接メッセージを送ることはできません。'],
+                'works_with_children' => ['description' => 'コーディネーターがGarda Vettingの要件についてご説明する場合があります。アイルランドでは、2012年国家審査局法により、子どもが関わる特定の活動には審査が必要です。'],
+                'works_with_vulnerable_adults' => ['description' => 'コーディネーターがGarda Vettingの要件についてご説明する場合があります。支援を必要とする成人が関わる活動には審査が必要な場合があります。'],
+            ],
+        ],
+        'england_wales' => [
+            'name' => 'イングランドおよびウェールズ',
+            'vetting_authority' => '犯罪記録・就業制限照会サービス',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'イングランドおよびウェールズでは、DBSチェック済みのメンバーを意味します。コーディネーターは、審査済みのメンバーとのみマッチングされるようにします。'],
+                'works_with_children' => ['description' => 'コーディネーターがDBSチェックの要件についてご説明する場合があります。'],
+            ],
+        ],
+        'scotland' => [
+            'name' => 'スコットランド',
+            'vetting_authority' => 'Disclosure Scotland（PVG制度）',
+            'options' => [
+                'is_vulnerable_adult' => ['label' => '私は支援または保護を必要とする成人であり、追加の安全保護支援が必要になる可能性があります'],
+                'requires_vetted_partners' => ['description' => 'スコットランドでは、PVG制度のメンバーを意味します。コーディネーターは、審査済みのメンバーとのみマッチングされるようにします。'],
+                'works_with_children' => ['description' => 'コーディネーターがPVG制度への加入についてご説明する場合があります。'],
+                'works_with_vulnerable_adults' => ['label' => '保護を必要とする成人が関わる可能性のあるサービスを提供する予定です'],
+            ],
+        ],
+        'northern_ireland' => [
+            'name' => '北アイルランド',
+            'vetting_authority' => 'AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => '北アイルランドでは、AccessNIチェック済みのメンバーを意味します。コーディネーターは、審査済みのメンバーとのみマッチングされるようにします。'],
+                'works_with_children' => ['description' => 'コーディネーターがAccessNIチェックについてご説明する場合があります。'],
+            ],
+        ],
+        'custom' => ['name' => 'カスタム'],
+    ],
     'review' => [
+        'jurisdiction_changed_member' => 'Your community changed its safeguarding jurisdiction. Your existing protection remains active, but please review the updated wording in Settings.',
+        'jurisdiction_changed_staff' => 'The safeguarding jurisdiction changed. Affected member protections remain active and now require member review.',
+        'attestation_policy_rotated_member' => 'Your community has started a safeguarding policy review. Your broker must reconfirm your private contact status; this is not a certificate expiry.',
         'reminder_subject' => 'Please review your safeguarding preferences',
         'reminder_title' => 'Time to review your safeguarding preferences',
         'reminder_body' => 'It has been over a year since you set your safeguarding preferences for :community. Please take a moment to review them and confirm they still apply, or revoke any that no longer do.',

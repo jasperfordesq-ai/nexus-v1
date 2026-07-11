@@ -294,9 +294,29 @@
     "revoke_confirm_no": "Behouden",
     "revoked_toast": "Voorkeur herroepen.",
     "revoke_error_toast": "Er is iets misgegaan. Probeer het opnieuw.",
+    "policy_review_title": "Controleer uw veiligheidsvoorkeuren",
+    "policy_review_body": "Uw gemeenschap heeft haar veiligheidsjurisdictie gewijzigd. Uw bescherming blijft actief. Controleer de bijgewerkte tekst en bevestig uw keuze.",
+    "policy_review_confirm": "Mijn voorkeuren bevestigen",
+    "policy_review_confirmed": "Veiligheidsvoorkeuren bevestigd.",
+    "policy_review_error": "De controle kon niet worden bevestigd. Probeer het opnieuw.",
     "chip_broker_review": "Makelaarsbeoordeling",
     "chip_match_approval": "Koppelingsgoedkeuring",
-    "chip_vetted_only": "Alleen gescreende contacten"
+    "chip_vetted_only": "Alleen gescreende contacten",
+    "vetting": {
+      "title": "De controlestatus van uw privégemeenschap",
+      "status_not_confirmed": "Niet bevestigd",
+      "status_review_requested": "Beoordeling aangevraagd",
+      "status_unavailable": "Uw controlestatus kan niet worden geladen.",
+      "confirmed_on": "Je community heeft bevestigd dat je voldoet aan deze beschermende contactvereiste op {{date}}.",
+      "review_pending_body": "Uw makelaar is gevraagd uw communitybevestiging te controleren.",
+      "not_confirmed_body": "Uw gemeenschap heeft niet bevestigd dat u voldoet aan deze vereiste voor veilig contact.",
+      "policy_unavailable_body": "Deze community heeft geen ondersteund contactbeschermingsbeleid geconfigureerd voor haar rechtsgebied.",
+      "no_documents": "Upload of verzend geen DBS-, politiecontrole-, Garda-vetting-, AccessNI- of PVG-document via NEXUS. Uw community regelt eventuele wettige controles buiten het platform.",
+      "request_review_button": "Vraag makelaarsbeoordeling aan",
+      "review_requested_button": "Beoordeling aangevraagd",
+      "review_requested_toast": "Makelaarsbeoordeling aangevraagd.",
+      "review_error": "De makelaarsbeoordeling kon niet worden aangevraagd. Probeer het opnieuw."
+    }
   },
   "header": {
     "title": "Instellingen",

@@ -212,9 +212,9 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Loading older messages",
   "safeguarding_vetting_required": {
-    "title": "Safeguarding check needed",
-    "body": "This conversation is paused because a community safeguarding rule requires verified vetting before you can message this member.",
-    "contact_broker": "Contact your broker or community administrator to check your vetting status or arrange the next safe step.",
+    "title": "Community confirmation needed",
+    "body": "Your community has not confirmed that you meet its Enhanced DBS requirement for safeguarded member contact.",
+    "contact_broker": "Request a private broker review below. Do not send a DBS certificate or criminal-record information through NEXUS.",
     "required_checks": "Required checks",
     "action": "Open help",
     "dismiss": "Dismiss safeguarding notice"
@@ -226,6 +226,13 @@
     "action": "Open help",
     "dismiss": "Dismiss safeguarding notice"
   },
+  "safeguarding_policy_unavailable": {
+    "title": "Safeguarding check temporarily unavailable",
+    "body": "Direct messaging is paused because the community safeguarding policy could not be checked safely.",
+    "contact_broker": "Check again shortly. If this continues, ask a community coordinator to help.",
+    "action": "Check again",
+    "dismiss": "Dismiss safeguarding notice"
+  },
   "coordinator_request": {
     "button": "Request coordinator help",
     "aria_button": "Request coordinator help to arrange contact",
@@ -234,7 +241,22 @@
     "sent": "Coordinator notified — they will be in touch to help arrange contact.",
     "error": "We could not send your request just now. Please try again shortly."
   },
-  "composer_blocked_safeguarding": "Direct messaging is not available with this member. Use the option above to ask a coordinator to help arrange contact.",
+  "vetting_review_request": {
+    "button": "Request vetting review",
+    "success_title": "Review requested",
+    "success_body": "Your community broker has been asked to review your private safeguarding confirmation.",
+    "sent": "Vetting review requested. Your community will contact you about its process.",
+    "error": "We could not request a vetting review just now. Please try again shortly."
+  },
+  "safeguarding_check_again": "Check again",
+  "safeguarding_checks": {
+    "dbs_enhanced": "Enhanced DBS (England and Wales)",
+    "pvg_scotland": "PVG scheme",
+    "access_ni": "AccessNI (Northern Ireland)",
+    "garda_vetting": "Garda vetting"
+  },
+  "composer_blocked_safeguarding": "Direct messaging is paused by this member's community safeguarding policy. Use one of the options above.",
+  "composer_blocked_safeguarding_unavailable": "Direct messaging is paused while the safeguarding policy is checked. Use Check again above.",
   "aria_conversation_unread_one": "Conversation with {{name}}, {{count}} unread",
   "aria_conversation_unread_other": "Conversation with {{name}}, {{count}} unread",
   "selected_members_one": "Selected ({{count}})",

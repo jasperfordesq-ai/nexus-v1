@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
@@ -120,6 +121,8 @@ class ConnectionsController extends BaseApiController
 
         try {
             $result = $this->connectionService->sendRequest($userId, $this->getAllInput());
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             $msg = $e->getMessage();
             $code = 'VALIDATION_ERROR';
@@ -154,6 +157,8 @@ class ConnectionsController extends BaseApiController
             $connection = $this->connectionService->accept($id, $userId);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->respondWithError('NOT_FOUND', __('api.connection_request_not_found'), null, 404);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             $msg = $e->getMessage();
             $status = 422;

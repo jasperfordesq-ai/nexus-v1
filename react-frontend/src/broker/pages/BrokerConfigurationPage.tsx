@@ -64,9 +64,7 @@ const ADMIN_ONLY_CONFIG_KEYS = [
   'broker_approval_required',
   'auto_approve_low_risk',
   'max_hours_without_approval',
-  'vetting_enabled',
   'insurance_enabled',
-  'enforce_vetting_on_exchanges',
   'enforce_insurance_on_exchanges',
 ] as const satisfies readonly (keyof BrokerConfig)[];
 
@@ -192,11 +190,8 @@ export default function BrokerConfiguration() {
     copy_high_risk_listing_messages: true,
     random_sample_percentage: 0,
     retention_days: 90,
-    vetting_enabled: false,
     insurance_enabled: false,
-    enforce_vetting_on_exchanges: false,
     enforce_insurance_on_exchanges: false,
-    vetting_expiry_warning_days: 30,
     insurance_expiry_warning_days: 30,
   });
 
@@ -725,18 +720,6 @@ export default function BrokerConfiguration() {
             description={t('configuration.section_compliance_safeguarding_desc')}
           >
             <SettingRow
-              label={t('configuration.field_vetting_enabled_label')}
-              help={t('configuration.field_vetting_enabled_help')}
-              locked={isLocked('vetting_enabled')}
-            >
-              <Switch
-                aria-label={t('configuration.field_vetting_enabled_label')}
-                isSelected={config.vetting_enabled}
-                onValueChange={v => updateConfig('vetting_enabled', v)}
-                isDisabled={!canEditKey('vetting_enabled')}
-              />
-            </SettingRow>
-            <SettingRow
               label={t('configuration.field_insurance_enabled_label')}
               help={t('configuration.field_insurance_enabled_help')}
               locked={isLocked('insurance_enabled')}
@@ -749,18 +732,6 @@ export default function BrokerConfiguration() {
               />
             </SettingRow>
             <SettingRow
-              label={t('configuration.field_enforce_vetting_on_exchanges_label')}
-              help={t('configuration.field_enforce_vetting_on_exchanges_help')}
-              locked={isLocked('enforce_vetting_on_exchanges')}
-            >
-              <Switch
-                aria-label={t('configuration.field_enforce_vetting_on_exchanges_label')}
-                isSelected={config.enforce_vetting_on_exchanges}
-                onValueChange={v => updateConfig('enforce_vetting_on_exchanges', v)}
-                isDisabled={!config.vetting_enabled || !canEditKey('enforce_vetting_on_exchanges')}
-              />
-            </SettingRow>
-            <SettingRow
               label={t('configuration.field_enforce_insurance_on_exchanges_label')}
               help={t('configuration.field_enforce_insurance_on_exchanges_help')}
               locked={isLocked('enforce_insurance_on_exchanges')}
@@ -770,22 +741,6 @@ export default function BrokerConfiguration() {
                 isSelected={config.enforce_insurance_on_exchanges}
                 onValueChange={v => updateConfig('enforce_insurance_on_exchanges', v)}
                 isDisabled={!config.insurance_enabled || !canEditKey('enforce_insurance_on_exchanges')}
-              />
-            </SettingRow>
-            <SettingRow
-              label={t('configuration.field_vetting_expiry_warning_days_label')}
-              help={t('configuration.field_vetting_expiry_warning_days_help')}
-            >
-              <Input
-                type="number"
-                aria-label={t('configuration.field_vetting_expiry_warning_days_aria')}
-                value={String(config.vetting_expiry_warning_days)}
-                onValueChange={v => updateConfig('vetting_expiry_warning_days', parseInt(v) || 30)}
-                className="w-24 tabular-nums"
-                min={1}
-                max={365}
-                size="sm"
-                isDisabled={!config.vetting_enabled}
               />
             </SettingRow>
             <SettingRow

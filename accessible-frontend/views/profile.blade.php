@@ -21,7 +21,9 @@
     @php
         $profileSuccessStatuses = ['profile-updated', 'review-submitted', 'transfer-sent'];
         $profileErrorStatuses   = ['review-invalid', 'review-duplicate', 'review-failed',
-                                   'transfer-failed', 'transfer-self', 'transfer-insufficient'];
+                                   'review-safeguarding-restricted', 'review-safeguarding-unavailable',
+                                   'transfer-failed', 'transfer-self', 'transfer-insufficient',
+                                   'transfer-safeguarding', 'transfer-safeguarding-unavailable'];
         $profileStatusMsgMap = [
             'profile-updated'        => __('govuk_alpha.profile_settings.success'),
             'review-submitted'       => __('govuk_alpha.polish_members.write_review_success'),
@@ -29,9 +31,13 @@
             'review-invalid'         => __('govuk_alpha.reviews_page.submit_invalid'),
             'review-duplicate'       => __('govuk_alpha.reviews_page.submit_duplicate'),
             'review-failed'          => __('govuk_alpha.reviews_page.submit_failed'),
+            'review-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+            'review-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
             'transfer-failed'        => __('govuk_alpha.polish_members.send_credits_error_failed'),
             'transfer-self'          => __('govuk_alpha.polish_members.send_credits_error_self'),
             'transfer-insufficient'  => __('govuk_alpha.polish_members.send_credits_error_insufficient'),
+            'transfer-safeguarding'  => __('safeguarding.errors.interaction_not_allowed'),
+            'transfer-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
         ];
     @endphp
     @if (in_array(($status ?? ''), $profileSuccessStatuses, true))
@@ -55,16 +61,23 @@
     @endif
 
     @php
-        $connectionStatuses = ['connection-sent', 'connection-accepted', 'connection-declined', 'connection-cancelled', 'connection-removed', 'connection-failed', 'endorsement-added', 'endorsement-removed', 'endorsement-failed'];
+        $connectionStatuses = ['connection-sent', 'connection-accepted', 'connection-declined', 'connection-cancelled', 'connection-removed', 'connection-failed', 'connection-safeguarding-restricted', 'connection-safeguarding-unavailable', 'endorsement-added', 'endorsement-removed', 'endorsement-failed', 'endorsement-safeguarding-restricted', 'endorsement-safeguarding-unavailable'];
     @endphp
     @if (in_array(($status ?? ''), $connectionStatuses, true))
-        @php $isFailure = in_array($status, ['connection-failed', 'endorsement-failed'], true); @endphp
+        @php
+            $isFailure = in_array($status, ['connection-failed', 'connection-safeguarding-restricted', 'connection-safeguarding-unavailable', 'endorsement-failed', 'endorsement-safeguarding-restricted', 'endorsement-safeguarding-unavailable'], true);
+            $connectionStatusMessage = match ($status) {
+                'connection-safeguarding-restricted', 'endorsement-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+                'connection-safeguarding-unavailable', 'endorsement-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
+                default => __('govuk_alpha.states.' . $status),
+            };
+        @endphp
         <div class="govuk-notification-banner {{ $isFailure ? '' : 'govuk-notification-banner--success' }}" data-module="govuk-notification-banner" role="alert" aria-labelledby="connection-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="connection-status-title">{{ $isFailure ? __('govuk_alpha.states.important') : __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
+                <p class="govuk-notification-banner__heading">{{ $connectionStatusMessage }}</p>
             </div>
         </div>
     @endif

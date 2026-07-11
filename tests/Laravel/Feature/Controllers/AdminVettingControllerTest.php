@@ -14,8 +14,8 @@ use Tests\Laravel\TestCase;
 /**
  * Feature tests for AdminVettingController.
  *
- * Covers list, stats, show, store, update, verify, reject, destroy,
- * bulk, getUserRecords, uploadDocument.
+ * Covers metadata-only list, stats, show and per-user reads, plus regression
+ * checks proving legacy evidence/status mutation routes stay removed.
  */
 class AdminVettingControllerTest extends TestCase
 {
@@ -129,51 +129,48 @@ class AdminVettingControllerTest extends TestCase
     }
 
     // ================================================================
-    // VERIFY — POST /v2/admin/vetting/{id}/verify
+    // REMOVED LEGACY ROUTES
     // ================================================================
 
-    public function test_verify_returns_403_for_regular_member(): void
+    public function test_legacy_verify_route_is_removed(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
         Sanctum::actingAs($member);
 
         $response = $this->apiPost('/v2/admin/vetting/1/verify');
 
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     // ================================================================
-    // REJECT — POST /v2/admin/vetting/{id}/reject
-    // ================================================================
-
-    public function test_reject_returns_403_for_regular_member(): void
+    public function test_legacy_reject_route_is_removed(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
         Sanctum::actingAs($member);
 
         $response = $this->apiPost('/v2/admin/vetting/1/reject');
 
-        $response->assertStatus(403);
+        $response->assertStatus(404);
     }
 
     // ================================================================
-    // DELETE — DELETE /v2/admin/vetting/{id}
-    // ================================================================
-
-    public function test_destroy_returns_403_for_regular_member(): void
+    public function test_legacy_delete_route_is_removed(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
         Sanctum::actingAs($member);
 
         $response = $this->apiDelete('/v2/admin/vetting/1');
 
-        $response->assertStatus(403);
+        $response->assertStatus(405);
     }
 
-    public function test_destroy_returns_401_for_unauthenticated(): void
+    public function test_legacy_upload_route_is_removed(): void
     {
-        $response = $this->apiDelete('/v2/admin/vetting/1');
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
 
-        $response->assertStatus(401);
+        $response = $this->apiPost('/v2/admin/vetting/1/upload');
+
+        $response->assertStatus(404);
     }
 }

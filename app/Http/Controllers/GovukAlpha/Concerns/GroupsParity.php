@@ -187,6 +187,10 @@ trait GroupsParity
         $result = null;
         try {
             $result = $service->sendEmailInvites($id, $userId, $emails, $message);
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return $back($e->reasonCode === 'SAFEGUARDING_POLICY_UNAVAILABLE'
+                ? 'invite-safeguarding-unavailable'
+                : 'invite-safeguarding-restricted');
         } catch (\Throwable $e) {
             report($e);
         }

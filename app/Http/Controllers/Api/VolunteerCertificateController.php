@@ -8,8 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use App\Services\LegacyVettingEvidenceManager;
 use App\Services\VolunteerCertificateService;
+use App\Services\VolunteerCredentialPolicy;
 use App\Core\TenantContext;
 
 /**
@@ -121,36 +124,100 @@ class VolunteerCertificateController extends BaseApiController
         $this->rateLimit('vol_credentials', 30, 60);
 
         $tenantId = TenantContext::getId();
+        $normalisedType = DB::raw('LOWER(TRIM(credential_type))');
 
-        $credentials = DB::select(
-            "SELECT id, credential_type, file_url, file_name, status, expires_at, created_at, updated_at
-             FROM vol_credentials
-             WHERE user_id = ? AND tenant_id = ?
-             ORDER BY created_at DESC",
-            [$userId, $tenantId]
-        );
+        $credentials = DB::table('vol_credentials')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->whereIn($normalisedType, VolunteerCredentialPolicy::ALLOWED_TYPES)
+            ->where(function (Builder $query): void {
+                $query->whereNull('notes')
+                    ->orWhere('notes', '!=', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+            })
+            ->select(['id', 'credential_type', 'file_url', 'file_name', 'status', 'expires_at', 'created_at', 'updated_at'])
+            ->get()
+            ->each(static function (object $row): void {
+                $row->legacy_vetting_evidence = false;
+                $row->manual_review_required = false;
+            });
+
+        // Only explicit prohibited aliases and cleanup tombstones are
+        // removal-only. Unknown/custom types are a distinct manual-review
+        // bucket and are never silently reclassified as vetting evidence.
+        $legacyCredentials = DB::table('vol_credentials')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where(function (Builder $query) use ($normalisedType): void {
+                $query->whereIn($normalisedType, VolunteerCredentialPolicy::PROHIBITED_VETTING_TYPES)
+                    ->orWhere('notes', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+            })
+            ->select(['id', 'credential_type', 'status', 'created_at', 'updated_at'])
+            ->get()
+            ->map(static function (object $row): object {
+                $row->file_url = null;
+                $row->file_name = null;
+                $row->expires_at = null;
+                $row->legacy_vetting_evidence = true;
+                $row->manual_review_required = false;
+
+                return $row;
+            });
+
+        $manualReviewCredentials = DB::table('vol_credentials')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->whereNotIn($normalisedType, VolunteerCredentialPolicy::ALLOWED_TYPES)
+            ->whereNotIn($normalisedType, VolunteerCredentialPolicy::PROHIBITED_VETTING_TYPES)
+            ->where(function (Builder $query): void {
+                $query->whereNull('notes')
+                    ->orWhere('notes', '!=', LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER);
+            })
+            ->select(['id', 'credential_type', 'status', 'created_at', 'updated_at'])
+            ->get()
+            ->map(static function (object $row): object {
+                $row->file_url = null;
+                $row->file_name = null;
+                $row->expires_at = null;
+                $row->legacy_vetting_evidence = false;
+                $row->manual_review_required = true;
+
+                return $row;
+            });
+
+        $credentials = $credentials
+            ->concat($legacyCredentials)
+            ->concat($manualReviewCredentials)
+            ->sortByDesc('created_at')
+            ->values()
+            ->all();
 
         $mapped = array_map(static function ($row): array {
             $type = (string) ($row->credential_type ?? '');
-            $typeLabel = ucwords(str_replace('_', ' ', $type));
+            $isLegacyVettingEvidence = (bool) ($row->legacy_vetting_evidence ?? false);
+            $manualReviewRequired = (bool) ($row->manual_review_required ?? false);
+            $typeLabel = $isLegacyVettingEvidence
+                ? __('api.volunteer_vetting_credential_retired')
+                : ucwords(str_replace('_', ' ', $type));
 
             return [
                 'id' => (int) ($row->id ?? 0),
                 'credential_type' => $type,
-                'file_url' => str_starts_with((string) ($row->file_url ?? ''), 'private:')
+                'file_url' => ! $isLegacyVettingEvidence && str_starts_with((string) ($row->file_url ?? ''), 'private:')
                     ? '/api/v2/volunteering/credentials/' . (int) ($row->id ?? 0) . '/download'
-                    : ($row->file_url ?? null),
-                'file_name' => $row->file_name ?? null,
+                    : (! $isLegacyVettingEvidence ? ($row->file_url ?? null) : null),
+                'file_name' => ! $isLegacyVettingEvidence ? ($row->file_name ?? null) : null,
                 'status' => $row->status ?? 'pending',
                 'expires_at' => $row->expires_at ?? null,
                 'created_at' => $row->created_at ?? null,
                 'updated_at' => $row->updated_at ?? null,
                 'type' => $type,
                 'type_label' => $typeLabel,
-                'document_name' => $row->file_name ?? null,
+                'document_name' => ! $isLegacyVettingEvidence ? ($row->file_name ?? null) : null,
                 'upload_date' => $row->created_at ?? null,
                 'expiry_date' => $row->expires_at ?? null,
                 'rejection_reason' => null,
+                'legacy_vetting_evidence' => $isLegacyVettingEvidence,
+                'manual_review_required' => $manualReviewRequired,
             ];
         }, $credentials);
 
@@ -164,11 +231,32 @@ class VolunteerCertificateController extends BaseApiController
         $this->rateLimit('vol_credential_upload', 10, 60);
 
         $tenantId = TenantContext::getId();
-        $type = trim((string) ($this->input('credential_type') ?? $this->input('type') ?? ''));
+        $type = VolunteerCredentialPolicy::normaliseType(
+            (string) ($this->input('credential_type') ?? $this->input('type') ?? '')
+        );
         $expiresAt = $this->input('expires_at') ?? $this->input('expiry_date');
 
         if (empty($type)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'credential_type']), 'credential_type');
+        }
+
+        // Criminal-record/vetting evidence is never accepted through generic
+        // volunteering credentials. Reject before reading or storing file bytes.
+        if (VolunteerCredentialPolicy::isProhibitedVetting($type)) {
+            return $this->respondWithError(
+                'VETTING_EVIDENCE_PROHIBITED',
+                __('api.volunteer_vetting_credential_prohibited'),
+                'credential_type',
+                422,
+            );
+        }
+        if (! VolunteerCredentialPolicy::isAllowed($type)) {
+            return $this->respondWithError(
+                'UNSUPPORTED_CREDENTIAL_TYPE',
+                __('api.invalid_type'),
+                'credential_type',
+                422,
+            );
         }
 
         // Validate the optional expiry date before it reaches the DATE column —
@@ -264,11 +352,19 @@ class VolunteerCertificateController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_credential_download', 30, 60);
 
+        $credentialType = DB::selectOne(
+            "SELECT credential_type FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            [(int) $id, $userId, TenantContext::getId()]
+        );
+
+        if (!$credentialType || ! VolunteerCredentialPolicy::isAllowed((string) $credentialType->credential_type)) {
+            return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
+        }
+
         $credential = DB::selectOne(
             "SELECT id, file_url, file_name FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
             [(int) $id, $userId, TenantContext::getId()]
         );
-
         if (!$credential || !str_starts_with((string) $credential->file_url, 'private:')) {
             return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
         }
@@ -296,26 +392,45 @@ class VolunteerCertificateController extends BaseApiController
 
         $tenantId = TenantContext::getId();
         $credential = DB::selectOne(
-            "SELECT file_url FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            "SELECT id, file_url FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
             [(int) $id, $userId, $tenantId]
         );
-
-        $affected = DB::delete(
-            "DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
-            [(int) $id, $userId, $tenantId]
-        );
-
-        if ($affected === 0) {
+        if ($credential === null) {
             return $this->respondWithError('NOT_FOUND', __('api.credential_not_found'), null, 404);
         }
 
-        if ($credential && str_starts_with((string) $credential->file_url, 'private:')) {
-            $path = substr((string) $credential->file_url, strlen('private:'));
-            $expectedPrefix = 'volunteer-credentials/' . $tenantId . '/';
-            if (str_starts_with($path, $expectedPrefix) && !str_contains($path, '..')) {
-                \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
-            }
+        // Never delete the only database pointer before the personal file has
+        // been deleted (or proven absent). A malformed/refused/failed path is
+        // retained as a redacted DPO-cleanup tombstone instead of being orphaned.
+        $deleteStatus = app(LegacyVettingEvidenceManager::class)
+            ->deletePrivateCredentialPointer((string) ($credential->file_url ?? ''), $tenantId);
+        if (! in_array($deleteStatus, ['deleted', 'missing'], true)) {
+            DB::table('vol_credentials')
+                ->where('id', (int) $credential->id)
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'file_name' => null,
+                    'status' => 'rejected',
+                    'verified_by' => null,
+                    'verified_at' => null,
+                    'expires_at' => null,
+                    'notes' => LegacyVettingEvidenceManager::GDPR_CLEANUP_PENDING_MARKER,
+                    'updated_at' => now(),
+                ]);
+
+            return $this->respondWithError(
+                'CREDENTIAL_DELETE_FAILED',
+                __('api.credential_delete_failed'),
+                null,
+                503,
+            );
         }
+
+        DB::delete(
+            "DELETE FROM vol_credentials WHERE id = ? AND user_id = ? AND tenant_id = ?",
+            [(int) $id, $userId, $tenantId]
+        );
 
         return $this->respondWithData(['success' => true]);
     }

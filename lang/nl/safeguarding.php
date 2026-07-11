@@ -6,9 +6,9 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'Dit gesprek is gepauzeerd door een veiligheidsregel van de community. Je hebt bevestigde :types-screening nodig voordat je dit lid kunt berichten. Neem contact op met je bemiddelaar of communitybeheerder om je status te bevestigen of de volgende stap af te spreken.',
+        'vetting_required' => 'Dit gesprek is gepauzeerd door een beschermingsregel van de community. Je community moet een actuele :types-status voor je hebben vastgelegd voordat je dit lid een bericht kunt sturen. Vraag je bemiddelaar of communitybeheerder om deze status uitsluitend als metadata vast te leggen. Stuur of upload geen screeningsdocument.',
         'vetting_required_title' => 'Veiligheidscontrole nodig',
-        'vetting_required_detail' => 'Dit lid kan voor dit type interactie alleen worden benaderd door leden met geverifieerde :types screening.',
+        'vetting_required_detail' => 'Dit lid kan voor dit type interactie alleen worden benaderd door mensen van wie de community een actuele :types-status heeft vastgelegd. De registratie bevat uitsluitend metadata; er mag geen document worden verstuurd of geüpload.',
         'vetting_required_action' => 'Help openen',
         'contact_restricted' => 'Dit lid wil dat een coordinator het contact namens hen regelt. Je bericht is niet verzonden. Neem contact op met je broker of communitybeheerder zodat zij de volgende veilige stap kunnen regelen.',
         'contact_restricted_title' => 'Coordinatorafspraak nodig',
@@ -25,6 +25,14 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+        'policy_unavailable' => 'We cannot confirm the community safeguarding policy right now. No message has been sent. Please try again shortly.',
+        'interaction_not_allowed' => 'The recipient’s community safeguarding policy does not allow this direct interaction. Ask a coordinator for help.',
+        'policy_unavailable_title' => 'Safeguarding check temporarily unavailable',
+        'policy_unavailable_detail' => 'Project NEXUS could not safely evaluate the contact policy, so this interaction has been paused.',
+        'policy_unavailable_action' => 'Check again',
+        'listing_role_confirmation_required' => 'This listing requires a separate community-confirmed Enhanced DBS decision for this role. A messenger contact confirmation does not satisfy role-specific safeguarding requirements.',
+        'listing_role_feature_unavailable' => 'Role-specific criminal-record vetting cannot be enabled here yet. Messenger contact confirmation is deliberately not reused as role clearance.',
+        'compliance_policy_unavailable' => 'We cannot safely confirm the safeguarding requirements for this listing right now. Please try again later or contact your broker.',
     ],
     'vetting_types' => [
         'dbs_basic' => 'DBS Basic',
@@ -36,6 +44,20 @@ return [
         'international' => 'International background check',
         'other' => 'Other vetting check',
     ],
+    'jurisdictions' => [
+        'unconfigured' => 'Safeguarding jurisdiction not configured',
+        'england_wales' => 'England and Wales',
+        'scotland' => 'Scotland',
+        'northern_ireland' => 'Northern Ireland',
+        'ireland' => 'Republic of Ireland',
+        'custom' => 'Custom jurisdiction',
+    ],
+    'attestations' => [
+        'dbs_enhanced' => 'Enhanced DBS confirmed for safeguarded member contact',
+        'pvg_scotland' => 'PVG status confirmed for safeguarded member contact',
+        'access_ni' => 'AccessNI status confirmed for safeguarded member contact',
+        'garda_vetting' => 'Garda Vetting confirmed for safeguarded member contact',
+    ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',
         'intro' => 'Thank you for sharing this. Here is a summary of what you chose, who can see it, and what activates as a result.',
@@ -44,7 +66,7 @@ return [
         'who_can_see_heading' => 'Who can see this',
         'who_can_see_body' => 'Only the community coordinators and administrators can see these preferences. Other members cannot. All access is logged.',
         'what_activates_heading' => 'What activates as a result',
-        'activation_broker_review' => 'A coordinator will review messages you send and receive.',
+        'activation_broker_review' => 'A coordinator will review and approve safeguarded matches or exchanges when your selected preference requires it. This does not give them access to message contents.',
         'activation_match_approval' => 'A coordinator will approve matches involving you before they are suggested to the other member.',
         'activation_discovery_hidden' => 'You will be hidden from discovery for members who have not completed the required vetting.',
         'activation_notification' => 'A coordinator has been notified and will be in touch to discuss how we can help.',
@@ -67,7 +89,79 @@ return [
         'revoked_toast' => 'Preference revoked.',
         'revoke_error_toast' => 'Something went wrong. Please try again.',
     ],
+    'presets' => [
+        'common' => [
+            'help_text' => 'Deze gemeenschap neemt bescherming serieus. Als u zichzelf als een kwetsbare volwassene beschouwt of extra ondersteuning nodig hebt, laat het ons weten zodat onze coördinatoren u kunnen helpen veilige uitwisselingen te regelen.',
+            'options' => [
+                'is_vulnerable_adult' => [
+                    'label' => 'Ik beschouw mezelf als een kwetsbare volwassene en heb mogelijk extra ondersteuning voor mijn bescherming nodig',
+                    'description' => 'Hiermee laat u onze coördinatoren weten dat u mogelijk extra ondersteuning nodig hebt bij het regelen van uitwisselingen. Een coördinator neemt contact met u op om te bespreken hoe we kunnen helpen. Deze informatie is vertrouwelijk.',
+                ],
+                'requires_vetted_partners' => [
+                    'label' => 'Ik ga bij voorkeur alleen om met leden die op passende wijze zijn gecontroleerd',
+                ],
+                'requires_coordinator_contact' => [
+                    'label' => 'Ik wil graag dat een coördinator mijn uitwisselingen helpt regelen in plaats van rechtstreeks te worden benaderd',
+                    'description' => 'Een coördinator bemiddelt bij alle contacten en helpt namens u uitwisselingen te regelen. Andere leden kunnen u niet rechtstreeks berichten sturen.',
+                ],
+                'no_home_visits' => [
+                    'label' => 'Ik wil niet dat leden mijn woning bezoeken zonder dat een coördinator dit heeft geregeld',
+                    'description' => 'Alle huisbezoeken worden geregeld via een coördinator die kan waarborgen dat passende beschermingsmaatregelen zijn getroffen.',
+                ],
+                'works_with_children' => [
+                    'label' => 'Ik ben van plan diensten aan te bieden waarbij kinderen of jongeren (jonger dan 18 jaar) betrokken kunnen zijn',
+                ],
+                'works_with_vulnerable_adults' => [
+                    'label' => 'Ik ben van plan diensten aan te bieden waarbij kwetsbare volwassenen betrokken kunnen zijn',
+                ],
+                'none_apply' => [
+                    'label' => 'Geen van deze situaties is op mij van toepassing',
+                    'description' => 'Ik heb de bovenstaande opties bekeken en geen ervan is op mijn situatie van toepassing. Dit wordt vastgelegd zodat coördinatoren weten dat ik deze stap heb gezien en overwogen.',
+                ],
+            ],
+        ],
+        'ireland' => [
+            'name' => 'Ierland',
+            'vetting_authority' => 'Nationaal screeningsbureau',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In Ierland betekent dit leden met Garda Vetting. Onze coördinatoren zorgen ervoor dat u alleen aan gecontroleerde leden wordt gekoppeld.'],
+                'requires_coordinator_contact' => ['description' => 'Een coördinator (bemiddelaar) bemiddelt bij alle contacten en helpt namens u uitwisselingen te regelen. Andere leden kunnen u niet rechtstreeks berichten sturen.'],
+                'works_with_children' => ['description' => 'Een coördinator kan de vereisten voor Garda Vetting met u bespreken. In Ierland is voor bepaalde activiteiten met kinderen screening vereist op grond van de National Vetting Bureau Act 2012.'],
+                'works_with_vulnerable_adults' => ['description' => 'Een coördinator kan de vereisten voor Garda Vetting met u bespreken. Voor activiteiten met kwetsbare volwassenen kan screening vereist zijn.'],
+            ],
+        ],
+        'england_wales' => [
+            'name' => 'Engeland en Wales',
+            'vetting_authority' => 'Dienst voor openbaarmaking en uitsluiting',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In Engeland en Wales betekent dit leden met een DBS-controle. Onze coördinatoren zorgen ervoor dat u alleen aan gecontroleerde leden wordt gekoppeld.'],
+                'works_with_children' => ['description' => 'Een coördinator kan de vereisten voor een DBS-controle met u bespreken.'],
+            ],
+        ],
+        'scotland' => [
+            'name' => 'Schotland',
+            'vetting_authority' => 'Disclosure Scotland (PVG-regeling)',
+            'options' => [
+                'is_vulnerable_adult' => ['label' => 'Ik beschouw mezelf als een kwetsbare of beschermde volwassene en heb mogelijk extra ondersteuning voor mijn bescherming nodig'],
+                'requires_vetted_partners' => ['description' => 'In Schotland betekent dit leden van de PVG-regeling. Onze coördinatoren zorgen ervoor dat u alleen aan gecontroleerde leden wordt gekoppeld.'],
+                'works_with_children' => ['description' => 'Een coördinator kan deelname aan de PVG-regeling met u bespreken.'],
+                'works_with_vulnerable_adults' => ['label' => 'Ik ben van plan diensten aan te bieden waarbij beschermde volwassenen betrokken kunnen zijn'],
+            ],
+        ],
+        'northern_ireland' => [
+            'name' => 'Noord-Ierland',
+            'vetting_authority' => 'AccessNI',
+            'options' => [
+                'requires_vetted_partners' => ['description' => 'In Noord-Ierland betekent dit leden met een AccessNI-controle. Onze coördinatoren zorgen ervoor dat u alleen aan gecontroleerde leden wordt gekoppeld.'],
+                'works_with_children' => ['description' => 'Een coördinator kan een AccessNI-controle met u bespreken.'],
+            ],
+        ],
+        'custom' => ['name' => 'Aangepast'],
+    ],
     'review' => [
+        'jurisdiction_changed_member' => 'Your community changed its safeguarding jurisdiction. Your existing protection remains active, but please review the updated wording in Settings.',
+        'jurisdiction_changed_staff' => 'The safeguarding jurisdiction changed. Affected member protections remain active and now require member review.',
+        'attestation_policy_rotated_member' => 'Your community has started a safeguarding policy review. Your broker must reconfirm your private contact status; this is not a certificate expiry.',
         'reminder_subject' => 'Please review your safeguarding preferences',
         'reminder_title' => 'Time to review your safeguarding preferences',
         'reminder_body' => 'It has been over a year since you set your safeguarding preferences for :community. Please take a moment to review them and confirm they still apply, or revoke any that no longer do.',

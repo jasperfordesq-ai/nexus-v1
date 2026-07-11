@@ -339,6 +339,36 @@ class VolunteeringParityTest extends TestCase
         $response->assertSee(__('govuk_alpha_volunteering.credentials.title'));
     }
 
+    public function test_volunteering_unknown_credential_renders_as_manual_review_without_file_metadata(): void
+    {
+        $user = $this->authenticatedUser();
+        $credentialId = (int) DB::table('vol_credentials')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $user->id,
+            'credential_type' => 'custom_community_badge',
+            'file_url' => 'private:volunteer-credentials/' . $this->testTenantId . '/secret-custom.pdf',
+            'file_name' => 'secret-custom.pdf',
+            'status' => 'verified',
+            'expires_at' => now()->addYear()->toDateString(),
+            'notes' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/credentials");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_volunteering.credentials.status_manual_review'));
+        $response->assertSee(__('govuk_alpha_volunteering.credentials.manual_review_warning'));
+        $response->assertSee(__('govuk_alpha_volunteering.credentials.not_applicable'));
+        $response->assertDontSee('secret-custom.pdf');
+        $response->assertDontSee(__('govuk_alpha_volunteering.credentials.status_verified'));
+        $response->assertSee(route('govuk-alpha.volunteering.credentials.delete', [
+            'tenantSlug' => $this->testTenantSlug,
+            'id' => $credentialId,
+        ]), false);
+    }
+
     public function test_volunteering_credential_upload_requires_a_type(): void
     {
         $this->authenticatedUser();
@@ -368,7 +398,10 @@ class VolunteeringParityTest extends TestCase
         ]);
         $credId = (int) DB::getPdo()->lastInsertId();
 
-        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/credentials/{$credId}/delete");
+        $response = $this->withSession(['_token' => 'test-csrf-token'])
+            ->post("/{$this->testTenantSlug}/accessible/volunteering/credentials/{$credId}/delete", [
+                '_token' => 'test-csrf-token',
+            ]);
 
         $response->assertRedirect();
         // The other user's credential still exists (ownership-scoped DELETE no-op).

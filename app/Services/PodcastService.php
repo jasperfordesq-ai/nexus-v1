@@ -823,6 +823,16 @@ class PodcastService
             return false;
         }
 
+        $authorUserId = (int) $episode->author_user_id;
+        if ($authorUserId > 0 && $authorUserId !== $userId) {
+            app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+                $userId,
+                $authorUserId,
+                TenantContext::getId(),
+                'podcast_episode_reaction',
+            );
+        }
+
         PodcastEpisodeReaction::create([
             'episode_id' => $episode->id,
             'user_id' => $userId,

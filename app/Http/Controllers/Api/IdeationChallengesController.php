@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use App\Services\IdeationChallengeService;
 use App\Services\ChallengeTagService;
@@ -69,6 +70,12 @@ class IdeationChallengesController extends BaseApiController
                 return 404;
             }
             if ($code === ApiErrorCodes::RESOURCE_FORBIDDEN || $code === 'FORBIDDEN') {
+                return 403;
+            }
+            if ($code === 'SAFEGUARDING_POLICY_UNAVAILABLE') {
+                return 503;
+            }
+            if (in_array($code, ['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED'], true)) {
                 return 403;
             }
             if ($code === ApiErrorCodes::RESOURCE_CONFLICT) {
@@ -204,7 +211,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_submit_idea', 10, 60);
 
         $data = $this->getAllInput();
-        $ideaId = $this->challengeService->submitIdea($id, $userId, $data);
+        try {
+            $ideaId = $this->challengeService->submitIdea($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         return $this->respondWithData(['id' => $ideaId], null, 201);
     }
@@ -280,7 +291,11 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('ideation_favorite', 30, 60);
 
-        $result = $this->challengeService->toggleFavorite((int) $id, $userId);
+        try {
+            $result = $this->challengeService->toggleFavorite((int) $id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         $errors = $this->challengeService->getErrors();
         if (!empty($errors)) {
@@ -388,7 +403,11 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('ideation_vote', 30, 60);
 
-        $result = $this->challengeService->voteIdea((int) $id, $userId);
+        try {
+            $result = $this->challengeService->voteIdea((int) $id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->challengeService->getErrors();
@@ -467,7 +486,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_comment', 20, 60);
 
         $body = $this->input('body', '');
-        $commentId = $this->challengeService->addComment((int) $id, $userId, $body);
+        try {
+            $commentId = $this->challengeService->addComment((int) $id, $userId, $body);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($commentId === null) {
             $errors = $this->challengeService->getErrors();
@@ -509,7 +532,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_convert_group', 5, 60);
 
         $options = $this->getAllInput();
-        $result = $this->ideaTeamConversionService->convert((int) $id, $userId, $options);
+        try {
+            $result = $this->ideaTeamConversionService->convert((int) $id, $userId, $options);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$result) {
             $errors = $this->ideaTeamConversionService->getErrors();
@@ -1167,7 +1194,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('team_task', 20, 60);
 
         $data = $this->getAllInput();
-        $taskId = $this->teamTaskService->create((int) $id, $userId, $data);
+        try {
+            $taskId = $this->teamTaskService->create((int) $id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($taskId === null) {
             $errors = $this->teamTaskService->getErrors();
@@ -1203,7 +1234,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('team_task', 30, 60);
 
         $data = $this->getAllInput();
-        $success = $this->teamTaskService->update((int) $id, $userId, $data);
+        try {
+            $success = $this->teamTaskService->update((int) $id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             $errors = $this->teamTaskService->getErrors();
@@ -1295,7 +1330,11 @@ class IdeationChallengesController extends BaseApiController
             ];
         }
 
-        $docId = $this->teamDocumentService->upload((int) $id, $userId, $fileData, $title);
+        try {
+            $docId = $this->teamDocumentService->upload((int) $id, $userId, $fileData, $title);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($docId === null) {
             $errors = $this->teamDocumentService->getErrors();

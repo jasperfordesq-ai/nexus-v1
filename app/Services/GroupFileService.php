@@ -144,6 +144,16 @@ class GroupFileService
         $extension = $file->getClientOriginalExtension();
         $storedName = uniqid('grp_') . '_' . time() . '.' . $extension;
         $storagePath = "groups/{$tenantId}/{$groupId}";
+        $folder = $fileData['folder'] ?? null;
+        $description = $fileData['description'] ?? null;
+
+        GroupService::assertSafeguardingBroadcastAllowed(
+            $groupId,
+            $userId,
+            (int) $tenantId,
+            'group_file_upload',
+            trim($originalName . ' ' . (string) $folder . ' ' . (string) $description),
+        );
 
         $path = $file->storeAs($storagePath, $storedName, 'local');
 
@@ -151,9 +161,6 @@ class GroupFileService
             $this->errors[] = ['code' => 'UPLOAD_FAILED', 'message' => __('api.group_file_store_failed')];
             return null;
         }
-
-        $folder = $fileData['folder'] ?? null;
-        $description = $fileData['description'] ?? null;
 
         $id = DB::table('group_files')->insertGetId([
             'group_id' => $groupId,

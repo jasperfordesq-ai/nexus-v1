@@ -45,6 +45,12 @@ class User extends Authenticatable
         'remember_token', 'api_token', 'verification_token', 'two_factor_secret',
         'tenant_id', 'is_god', 'is_super_admin', 'is_tenant_super_admin',
         'balance', 'notification_preferences',
+        // Legacy safeguarding/vetting fields remain private even if a model is
+        // accidentally serialized outside an explicit API resource.
+        'vetting_status', 'vetting_expires_at',
+        'works_with_children', 'works_with_vulnerable_adults',
+        'no_home_visits', 'requires_home_visits',
+        'safeguarding_notes', 'safeguarding_reviewed_by', 'safeguarding_reviewed_at',
     ];
 
     protected $appends = ['avatar', 'tagline'];

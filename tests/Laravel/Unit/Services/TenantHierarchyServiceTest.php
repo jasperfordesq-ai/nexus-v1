@@ -182,4 +182,14 @@ class TenantHierarchyServiceTest extends TestCase
 
         $this->assertFalse($result['success']);
     }
+
+    public function test_gb_country_code_does_not_infer_england_and_wales_safeguarding(): void
+    {
+        $method = new \ReflectionMethod(TenantHierarchyService::class, 'mapCountryCodeToPreset');
+        $method->setAccessible(true);
+
+        $this->assertSame('custom', $method->invoke(null, 'GB'));
+        $this->assertSame('custom', $method->invoke(null, 'UK'));
+        $this->assertSame('custom', $method->invoke(null, 'IE'));
+    }
 }

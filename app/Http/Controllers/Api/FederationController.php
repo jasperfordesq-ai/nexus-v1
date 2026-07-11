@@ -20,6 +20,8 @@ use App\Models\Notification;
 use App\Services\BrokerMessageVisibilityService;
 use App\Services\FederationAuditService;
 use App\Services\FederationFeatureService;
+use App\Services\MessageService;
+use App\Services\SafeguardingInteractionPolicy;
 
 /**
  * FederationController -- Federation cross-tenant features.
@@ -631,6 +633,36 @@ class FederationController extends BaseApiController
             return $this->fedError(403, 'Recipient is not currently accepting messages', 'RECIPIENT_UNAVAILABLE');
         }
 
+        $recipientTenantId = (int) $recipient['tenant_id'];
+        $safeguardingDecision = $isExternal
+            ? app(SafeguardingInteractionPolicy::class)->evaluateExternalContact(
+                (int) $input['recipient_id'],
+                $recipientTenantId,
+                'federation-v1:' . (string) ($auth['platform_id'] ?? 'external'),
+                'federated_message_v1',
+            )
+            : app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                (int) $input['sender_id'],
+                (int) $partnerTenantId,
+                (int) $input['recipient_id'],
+                $recipientTenantId,
+                'federated_message_v1',
+            );
+
+        if (! $safeguardingDecision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'code' => $safeguardingDecision->code,
+                'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+            ]);
+
+            return $this->fedError(
+                $safeguardingDecision->isUnavailable() ? 503 : 403,
+                (string) $error['message'],
+                $safeguardingDecision->code,
+            );
+        }
+
         // FED-007: Sanitize external input to prevent stored XSS
         $sanitizedSubject = htmlspecialchars(substr($input['subject'], 0, 500), ENT_QUOTES, 'UTF-8');
         $sanitizedBody = htmlspecialchars(substr($input['body'], 0, 10000), ENT_QUOTES, 'UTF-8');
@@ -794,6 +826,36 @@ class FederationController extends BaseApiController
             if (!$senderCheck) {
                 return $this->fedError(403, 'Sender not found, not in your tenant, or has not opted into federation', 'SENDER_NOT_ELIGIBLE');
             }
+        }
+
+        $safeguardingDecision = $isExternal
+            ? app(SafeguardingInteractionPolicy::class)->evaluateExternalContact(
+                (int) $recipient['id'],
+                (int) $recipient['tenant_id'],
+                'v1-partner:' . (string) ($auth['platform_id'] ?? 'unknown') . ':sender:' . $senderId,
+                'v1_federated_transaction',
+            )
+            : app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                $senderId,
+                (int) $partnerTenantId,
+                (int) $recipient['id'],
+                (int) $recipient['tenant_id'],
+                'v1_federated_transaction',
+            );
+        if (! $safeguardingDecision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'status' => $safeguardingDecision->status,
+                'code' => $safeguardingDecision->code,
+                'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+                'can_request_coordinator' => $safeguardingDecision->canRequestCoordinator,
+            ]);
+
+            return $this->fedError(
+                $safeguardingDecision->isUnavailable() ? 503 : 403,
+                (string) $error['message'],
+                $safeguardingDecision->code,
+            );
         }
 
         // Idempotency check FIRST (before expensive partnership / credit-agreement
@@ -999,6 +1061,39 @@ class FederationController extends BaseApiController
             if (!$partnershipCheck) {
                 return $this->fedError(403, 'No active partnership between tenants', 'NO_PARTNERSHIP');
             }
+        }
+
+        $revieweeTenantId = (int) $reviewee['tenant_id'];
+        $safeguardingDecision = $isExternal
+            ? app(SafeguardingInteractionPolicy::class)->evaluateExternalContact(
+                (int) $input['reviewee_id'],
+                $revieweeTenantId,
+                'federation-v1:' . (string) ($auth['platform_id'] ?? 'external')
+                    . ':reviewer:' . (string) $input['reviewer_id'],
+                'federated_review_v1',
+            )
+            : app(SafeguardingInteractionPolicy::class)->evaluateCrossTenantContact(
+                (int) $input['reviewer_id'],
+                (int) $partnerTenantId,
+                (int) $input['reviewee_id'],
+                $revieweeTenantId,
+                'federated_review_v1',
+            );
+
+        if (! $safeguardingDecision->isAllowed()) {
+            $error = MessageService::buildSafeguardingError([
+                'status' => $safeguardingDecision->status,
+                'code' => $safeguardingDecision->code,
+                'required_vetting_types' => $safeguardingDecision->requiredAttestationCodes,
+                'required_vetting_labels' => $safeguardingDecision->requiredAttestationLabels,
+                'can_request_coordinator' => $safeguardingDecision->canRequestCoordinator,
+            ]);
+
+            return $this->fedError(
+                $safeguardingDecision->isUnavailable() ? 503 : 403,
+                (string) $error['message'],
+                $safeguardingDecision->code,
+            );
         }
 
         // Sanitize comment

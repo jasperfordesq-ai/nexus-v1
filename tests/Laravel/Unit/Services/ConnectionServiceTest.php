@@ -7,11 +7,14 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\Connection;
 use App\Models\User;
 use App\Services\ConnectionService;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -36,6 +39,15 @@ use Tests\Laravel\TestCase;
 class ConnectionServiceTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')->zeroOrMoreTimes();
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+    }
 
     /**
      * Create a user in the test tenant and re-pin the tenant context, since
@@ -136,6 +148,45 @@ class ConnectionServiceTest extends TestCase
         $this->assertSame('accepted', $accepted->status);
         $this->assertSame('accepted', (string) DB::table('connections')
             ->where('id', $connection->id)
+            ->value('status'));
+    }
+
+    public function test_accept_rechecks_policy_and_leaves_request_pending_when_denied(): void
+    {
+        $requester = $this->makeUser();
+        $receiver = $this->makeUser();
+
+        $connectionId = DB::table('connections')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'requester_id' => $requester->id,
+            'receiver_id' => $receiver->id,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with(
+                (int) $requester->id,
+                (int) $receiver->id,
+                $this->testTenantId,
+                'connection_accept',
+            )
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting required'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+        TenantContext::setById($this->testTenantId);
+
+        try {
+            ConnectionService::accept((int) $connectionId, (int) $receiver->id);
+            $this->fail('Expected safeguarding denial');
+        } catch (SafeguardingPolicyException $e) {
+            $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
+        }
+
+        $this->assertSame('pending', (string) DB::table('connections')
+            ->where('id', $connectionId)
             ->value('status'));
     }
 

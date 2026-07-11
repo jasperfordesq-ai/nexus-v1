@@ -109,6 +109,13 @@ class ShareService
             throw new \DomainException('self_share');
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $userId,
+            $ownerId,
+            (int) $tenantId,
+            'feed_share',
+        );
+
         // Sanitize comment
         $comment = $comment === null ? null : mb_substr(strip_tags($comment), 0, 1000);
         if ($comment === '') {

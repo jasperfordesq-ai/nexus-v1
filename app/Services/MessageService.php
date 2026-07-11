@@ -12,8 +12,6 @@ use App\Events\SafeguardingContactAttemptBlocked;
 use App\Events\SafeguardingCoordinationRequested;
 use App\Models\Message;
 use App\Models\User;
-use App\Services\SafeguardingTriggerService;
-use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +25,84 @@ class MessageService
     public function __construct(
         private readonly Message $message,
     ) {}
+
+    /**
+     * Read-only validation used before a controller accepts attachment/voice bytes.
+     * The definitive check still runs in send() immediately before persistence.
+     *
+     * @return array<string, mixed>|null Null when the write may proceed.
+     */
+    public static function preflightWrite(int $senderId, int $recipientId, bool $recordAttempt = false): ?array
+    {
+        $tenantId = app('tenant.id');
+
+        if ($recipientId <= 0 || $senderId === $recipientId) {
+            return [
+                'code' => 'VALIDATION_ERROR',
+                'message' => $recipientId <= 0
+                    ? __('api.message_recipient_required')
+                    : __('api.message_cannot_send_to_self'),
+            ];
+        }
+
+        $senderAllowed = User::withoutGlobalScopes()
+            ->where('id', $senderId)
+            ->where('tenant_id', $tenantId)
+            ->whereNotIn('status', ['suspended', 'banned', 'deactivated'])
+            ->exists();
+        if (! $senderAllowed) {
+            return ['code' => 'FORBIDDEN', 'message' => __('api.message_sender_not_allowed')];
+        }
+
+        $recipientExists = User::withoutGlobalScopes()
+            ->where('id', $recipientId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (! $recipientExists) {
+            return ['code' => 'NOT_FOUND', 'message' => __('api.message_recipient_not_found')];
+        }
+
+        $messagingDisabled = DB::table('user_messaging_restrictions')
+            ->where('user_id', $senderId)
+            ->where('tenant_id', $tenantId)
+            ->where('messaging_disabled', true)
+            ->exists();
+        if ($messagingDisabled) {
+            return ['code' => 'MESSAGING_DISABLED', 'message' => __('api.message_messaging_restricted')];
+        }
+
+        $blocked = DB::table('user_blocks')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($query) use ($senderId, $recipientId): void {
+                $query->where(function ($inner) use ($senderId, $recipientId): void {
+                    $inner->where('user_id', $senderId)->where('blocked_user_id', $recipientId);
+                })->orWhere(function ($inner) use ($senderId, $recipientId): void {
+                    $inner->where('user_id', $recipientId)->where('blocked_user_id', $senderId);
+                });
+            })
+            ->exists();
+        if ($blocked) {
+            return ['code' => 'BLOCKED', 'message' => __('api.message_blocked_user')];
+        }
+
+        $gate = self::evaluateSafeguardingContactGate($senderId, $recipientId, $tenantId);
+        if ($gate === null) {
+            return null;
+        }
+
+        if ($recordAttempt && ($gate['status'] ?? 'deny') === 'deny') {
+            self::dispatchSafeguardingContactAttemptBlocked(
+                $tenantId,
+                $senderId,
+                $recipientId,
+                $gate['code'],
+                $gate['required_vetting_types'],
+                $gate['required_vetting_labels'],
+            );
+        }
+
+        return self::buildSafeguardingError($gate);
+    }
 
     /**
      * Get user's conversations (inbox) with cursor-based pagination.
@@ -290,26 +366,6 @@ class MessageService
             return [];
         }
 
-        // Recipient-side safeguarding can block direct contact — either the member
-        // requires coordinator-mediated contact, or the interaction requires vetting
-        // the sender does not hold. The gate is evaluated server-side by the same
-        // method that powers the preflight notice shown when the conversation opens.
-        // When it blocks HERE — on an actual send attempt — the message is not stored
-        // and staff are alerted. Merely opening the conversation never alerts staff.
-        $safeguardingGate = self::evaluateSafeguardingContactGate($senderId, $receiverId, $tenantId);
-        if ($safeguardingGate !== null) {
-            self::dispatchSafeguardingContactAttemptBlocked(
-                $tenantId,
-                $senderId,
-                $receiverId,
-                $safeguardingGate['code'],
-                $safeguardingGate['required_vetting_types'],
-                $safeguardingGate['required_vetting_labels'],
-            );
-            self::$errors = [self::buildSafeguardingError($safeguardingGate)];
-            return [];
-        }
-
         // Check if either user has blocked the other in this tenant.
         $blocked = DB::table('user_blocks')
             ->where('tenant_id', $tenantId)
@@ -323,6 +379,25 @@ class MessageService
             ->exists();
         if ($blocked) {
             self::$errors = [['code' => 'BLOCKED', 'message' => __('api.message_blocked_user')]];
+            return [];
+        }
+
+        // Recipient-side safeguarding is evaluated after ordinary block checks so
+        // a blocked sender cannot learn a recipient's confidential preferences.
+        // The same pure policy powers preflight and every actual write.
+        $safeguardingGate = self::evaluateSafeguardingContactGate($senderId, $receiverId, $tenantId);
+        if ($safeguardingGate !== null) {
+            if (($safeguardingGate['status'] ?? 'deny') === 'deny') {
+                self::dispatchSafeguardingContactAttemptBlocked(
+                    $tenantId,
+                    $senderId,
+                    $receiverId,
+                    $safeguardingGate['code'],
+                    $safeguardingGate['required_vetting_types'],
+                    $safeguardingGate['required_vetting_labels'],
+                );
+            }
+            self::$errors = [self::buildSafeguardingError($safeguardingGate)];
             return [];
         }
 
@@ -384,6 +459,26 @@ class MessageService
             $attributes['context_id'] = (int) $data['context_id'];
         }
 
+        DB::beginTransaction();
+        try {
+            $lockedGate = self::evaluateLockedSafeguardingContactGate($senderId, $receiverId, $tenantId);
+            if ($lockedGate !== null) {
+                DB::rollBack();
+                if (($lockedGate['status'] ?? 'deny') === 'deny') {
+                    self::dispatchSafeguardingContactAttemptBlocked(
+                        $tenantId,
+                        $senderId,
+                        $receiverId,
+                        $lockedGate['code'],
+                        $lockedGate['required_vetting_types'],
+                        $lockedGate['required_vetting_labels'],
+                    );
+                }
+                self::$errors = [self::buildSafeguardingError($lockedGate)];
+
+                return [];
+            }
+
         $message = new Message($attributes);
 
         $message->save();
@@ -408,6 +503,14 @@ class MessageService
                     Log::warning('Message attachment persist failed', ['error' => $e->getMessage(), 'message_id' => $message->id]);
                 }
             }
+        }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            throw $e;
         }
 
         // Broadcast the new message event for real-time delivery
@@ -549,28 +652,6 @@ class MessageService
     }
 
     /**
-     * @param string[] $vettingTypes
-     * @return string[]
-     */
-    private static function vettingTypeLabels(array $vettingTypes): array
-    {
-        $labels = [];
-        foreach (array_values(array_unique($vettingTypes)) as $type) {
-            if (!is_string($type) || $type === '') {
-                continue;
-            }
-
-            $key = 'safeguarding.vetting_types.' . $type;
-            $label = __($key);
-            $labels[] = $label === $key
-                ? ucwords(str_replace('_', ' ', $type))
-                : $label;
-        }
-
-        return $labels;
-    }
-
-    /**
      * @param string[] $requiredVettingTypes
      * @param string[] $requiredVettingLabels
      */
@@ -610,46 +691,51 @@ class MessageService
      * the preflight notice when the page opens — no alert), and requestCoordinatorAssistance()
      * (confirm a restriction exists before alerting staff).
      *
-     * @return array{code: string, required_vetting_types: string[], required_vetting_labels: string[]}|null
+     * @return array{status: string, code: string, required_vetting_types: string[], required_vetting_labels: string[], can_request_coordinator: bool}|null
      *         Null when direct contact is permitted.
      */
     public static function evaluateSafeguardingContactGate(int $senderId, int $recipientId, int $tenantId): ?array
     {
-        // 1. Coordinator-mediated contact required (recipient opted into restricted messaging).
-        try {
-            if (SafeguardingTriggerService::isMessagingRestricted($recipientId, $tenantId)) {
-                return [
-                    'code' => 'SAFEGUARDING_CONTACT_RESTRICTED',
-                    'required_vetting_types' => [],
-                    'required_vetting_labels' => [],
-                ];
-            }
-        } catch (\Throwable $e) {
-            Log::warning('MessageService safeguarding contact-restriction lookup failed (continuing)', [
-                'error' => $e->getMessage(),
-                'recipient_id' => $recipientId,
-            ]);
+        $decision = app(SafeguardingInteractionPolicy::class)
+            ->evaluateLocalContact($senderId, $recipientId, $tenantId, 'direct_message');
+
+        return self::safeguardingDecisionToGate($decision);
+    }
+
+    /**
+     * Definitive write check. The policy service owns lock ordering and derives
+     * every decision input directly from locked tenant-scoped database rows.
+     *
+     * @return array{status: string, code: string, required_vetting_types: string[], required_vetting_labels: string[], can_request_coordinator: bool}|null
+     */
+    private static function evaluateLockedSafeguardingContactGate(
+        int $senderId,
+        int $recipientId,
+        int $tenantId,
+    ): ?array {
+        $decision = app(SafeguardingInteractionPolicy::class)
+            ->evaluateLockedLocalContact($senderId, $recipientId, $tenantId, 'direct_message');
+
+        return self::safeguardingDecisionToGate($decision);
+    }
+
+    /**
+     * @return array{status: string, code: string, required_vetting_types: string[], required_vetting_labels: string[], can_request_coordinator: bool}|null
+     */
+    private static function safeguardingDecisionToGate(
+        \App\Support\SafeguardingInteractionDecision $decision,
+    ): ?array {
+        if ($decision->isAllowed()) {
+            return null;
         }
 
-        // 2. Interaction requires vetting the sender does not hold.
-        try {
-            $recipientVettingTypes = SafeguardingTriggerService::getRequiredVettingTypes($recipientId, $tenantId);
-            if (!empty($recipientVettingTypes)
-                && !app(VettingService::class)->userHasAllValidVettings($senderId, $recipientVettingTypes)) {
-                return [
-                    'code' => 'VETTING_REQUIRED',
-                    'required_vetting_types' => array_values($recipientVettingTypes),
-                    'required_vetting_labels' => self::vettingTypeLabels($recipientVettingTypes),
-                ];
-            }
-        } catch (\Throwable $e) {
-            Log::warning('MessageService safeguarding vetting lookup failed (continuing)', [
-                'error' => $e->getMessage(),
-                'recipient_id' => $recipientId,
-            ]);
-        }
-
-        return null;
+        return [
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ];
     }
 
     /**
@@ -663,6 +749,19 @@ class MessageService
      */
     public static function buildSafeguardingError(array $gate): array
     {
+        if (($gate['code'] ?? null) === 'SAFEGUARDING_POLICY_UNAVAILABLE') {
+            return [
+                'code' => 'SAFEGUARDING_POLICY_UNAVAILABLE',
+                'message' => __('safeguarding.errors.policy_unavailable'),
+                'title' => __('safeguarding.errors.policy_unavailable_title'),
+                'detail' => __('safeguarding.errors.policy_unavailable_detail'),
+                'action_label' => __('safeguarding.errors.policy_unavailable_action'),
+                'required_vetting_types' => array_values($gate['required_vetting_types'] ?? []),
+                'required_vetting_labels' => array_values($gate['required_vetting_labels'] ?? []),
+                'retryable' => true,
+            ];
+        }
+
         if (($gate['code'] ?? null) === 'VETTING_REQUIRED') {
             $labels = array_values($gate['required_vetting_labels'] ?? []);
             $typesString = implode(', ', $labels);
@@ -1001,6 +1100,12 @@ class MessageService
             return null;
         }
 
+        $contactError = self::preflightExistingMessageInteraction($message, $userId, 'message_edit');
+        if ($contactError !== null) {
+            self::$errors[] = $contactError;
+            return null;
+        }
+
         // Server-side XSS prevention: strip all HTML (consistent with send())
         $newBody = \App\Helpers\HtmlSanitizer::stripAll($newBody);
 
@@ -1128,6 +1233,23 @@ class MessageService
 
         $tenantId = app('tenant.id');
 
+        // Removing an existing reaction is always allowed: members must be able
+        // to withdraw an earlier contact signal. Adding a new reaction is a new
+        // interaction and therefore rechecks the current safeguarding policy.
+        $hasExistingReaction = DB::table('message_reactions')
+            ->where('tenant_id', $tenantId)
+            ->where('message_id', $messageId)
+            ->where('user_id', $userId)
+            ->where('emoji', $emoji)
+            ->exists();
+        if (! $hasExistingReaction) {
+            $contactError = self::preflightExistingMessageInteraction($message, $userId, 'message_reaction');
+            if ($contactError !== null) {
+                self::$errors[] = $contactError;
+                return null;
+            }
+        }
+
         return DB::transaction(function () use ($messageId, $userId, $emoji, $tenantId) {
             // Toggle in message_reactions table
             $existing = DB::table('message_reactions')
@@ -1184,6 +1306,57 @@ class MessageService
 
             return $wasAdded;
         });
+    }
+
+    /**
+     * Re-evaluate the current policy before an existing message is used to
+     * create fresh contact (for example an edit or a new reaction).
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function preflightExistingMessageInteraction(
+        Message $message,
+        int $actorUserId,
+        string $channel,
+    ): ?array {
+        $tenantId = (int) app('tenant.id');
+        $receiverId = (int) ($message->receiver_id ?? 0);
+
+        if ($receiverId > 0) {
+            $recipientId = (int) $message->sender_id === $actorUserId
+                ? $receiverId
+                : (int) $message->sender_id;
+
+            return self::preflightWrite($actorUserId, $recipientId, true);
+        }
+
+        $conversationId = (int) ($message->conversation_id ?? 0);
+        if ($conversationId <= 0) {
+            return ['code' => 'FORBIDDEN', 'message' => __('api.message_not_participant')];
+        }
+
+        $recipientIds = DB::table('conversation_participants')
+            ->where('tenant_id', $tenantId)
+            ->where('conversation_id', $conversationId)
+            ->whereNull('left_at')
+            ->where('user_id', '!=', $actorUserId)
+            ->pluck('user_id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+
+        $decision = app(SafeguardingInteractionPolicy::class)
+            ->evaluateManyLocalContacts($actorUserId, $recipientIds, $tenantId, $channel);
+        if ($decision->isAllowed()) {
+            return null;
+        }
+
+        return self::buildSafeguardingError([
+            'status' => $decision->status,
+            'code' => $decision->code,
+            'required_vetting_types' => $decision->requiredAttestationCodes,
+            'required_vetting_labels' => $decision->requiredAttestationLabels,
+            'can_request_coordinator' => $decision->canRequestCoordinator,
+        ]);
     }
 
     // -----------------------------------------------------------------

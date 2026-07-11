@@ -120,11 +120,8 @@ const defaultConfig = {
   copy_high_risk_listing_messages: true,
   random_sample_percentage: 0,
   retention_days: 90,
-  vetting_enabled: false,
   insurance_enabled: false,
-  enforce_vetting_on_exchanges: false,
   enforce_insurance_on_exchanges: false,
-  vetting_expiry_warning_days: 30,
   insurance_expiry_warning_days: 30,
 };
 

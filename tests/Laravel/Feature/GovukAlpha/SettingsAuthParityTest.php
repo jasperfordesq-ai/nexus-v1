@@ -7,10 +7,13 @@
 namespace Tests\Laravel\Feature\GovukAlpha;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\User;
+use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -155,6 +158,40 @@ class SettingsAuthParityTest extends TestCase
             'parent_user_id' => $me->id,
             'child_user_id' => $child->id,
             'tenant_id' => $this->testTenantId,
+        ]);
+    }
+
+    public function test_settings_linked_accounts_maps_safeguarding_denial_without_writing(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Protected Requester']);
+        $child = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email' => 'protected-child-' . uniqid() . '@example.com',
+        ]);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertLocalContactAllowed')
+            ->once()
+            ->with($me->id, $child->id, $this->testTenantId, 'sub_account_request')
+            ->andThrow(new SafeguardingPolicyException('VETTING_REQUIRED', 'Vetting confirmation needed'));
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $response = $this->withSession(['_token' => 'linked-account-safeguarding-test-token'])
+            ->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/request", [
+                '_token' => 'linked-account-safeguarding-test-token',
+                'email' => $child->email,
+                'relationship_type' => 'guardian',
+                'perm_can_view_messages' => '1',
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('linked_account_safeguarding_error', 'Vetting confirmation needed');
+        $this->assertStringContainsString('status=link-vetting-required', (string) $response->headers->get('Location'));
+        $this->assertDatabaseMissing('account_relationships', [
+            'tenant_id' => $this->testTenantId,
+            'parent_user_id' => $me->id,
+            'child_user_id' => $child->id,
         ]);
     }
 

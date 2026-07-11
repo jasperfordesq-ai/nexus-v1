@@ -361,6 +361,7 @@
       "safeguarding": "保護",
       "super_admin_access": "スーパー管理者アクセス",
       "time_credits": "タイムクレジット",
+      "contact_attestation": "連絡先証明書の保護",
       "vetting_status": "審査ステータス"
     },
     "statuses": {
@@ -374,6 +375,7 @@
     "summary": {
       "email_activated_on": "{{date}} ????",
       "more_certificates": "その他の証明書",
+      "more_attestations": "さらなる証明書",
       "more_records": "さらなる記録"
     },
     "toasts": {
@@ -420,7 +422,17 @@
     "values": {
       "expires_prefix": "- 有効期限が切れます",
       "no_reference": "参考文献なし",
-      "unknown_provider": "不明なプロバイダー"
+      "unknown_provider": "不明なプロバイダー",
+      "attestation_dbs_enhanced": "強化された DBS (イングランドおよびウェールズ)",
+      "attestation_pvg_scotland": "PVGスキーム",
+      "attestation_access_ni": "アクセスNI (北アイルランド)",
+      "attestation_garda_vetting": "ガルダの審査",
+      "safeguarding_confirmation": "安全確保の確認",
+      "confirmed_on": "{{date}} でコミュニティ認証が確認されました",
+      "not_confirmed": "コミュニティ認証が確認されていません",
+      "decision_confirmed": "認証が確認されました",
+      "decision_revoked": "認証が取り消されました",
+      "decision_not_confirmed": "認証が確認されていません"
     }
   },
   "aria": {

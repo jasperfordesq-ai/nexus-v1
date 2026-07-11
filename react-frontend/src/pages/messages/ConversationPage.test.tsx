@@ -31,6 +31,7 @@ vi.mock('@/lib/api', () => ({
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string) => url,
 }));
@@ -60,6 +61,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
   useTranslation: () => ({
     t: stableMocks.t,
     i18n: { changeLanguage: vi.fn() },
@@ -149,15 +151,15 @@ vi.mock('./components/MessageBubble', () => ({
 }));
 
 vi.mock('./components/MessageInputArea', () => ({
-  MessageInputArea: ({ newMessage, onNewMessageChange, onSendMessage, isInteractionBlocked }: {
+  MessageInputArea: ({ newMessage, onNewMessageChange, onSendMessage, safeguardingPolicyStatus }: {
     newMessage: string;
     onNewMessageChange: (value: string) => void;
     onSendMessage: FormEventHandler<HTMLFormElement>;
-    isInteractionBlocked?: boolean;
+    safeguardingPolicyStatus?: 'allow' | 'deny' | 'unavailable';
   }) => (
     // Mirror the real component: when interaction is blocked (safeguarding), the
     // composer is replaced rather than rendered, so the member cannot type.
-    isInteractionBlocked ? (
+    safeguardingPolicyStatus !== 'allow' ? (
       <div data-testid="composer-blocked" />
     ) : (
       <form data-testid="message-input-area" onSubmit={onSendMessage}>
@@ -205,6 +207,7 @@ const mockConversationResponse = {
     conversation: {
       id: 42,
       other_user: { id: 20, name: 'Bob', avatar_url: null },
+      safeguarding: null,
     },
     cursor: null,
     has_more: false,
@@ -327,8 +330,8 @@ describe('ConversationPage', () => {
       expect(screen.getByText('safeguarding_contact_restricted.title')).toBeDefined();
       expect(screen.getByText(/coordinator-mediated contact/i)).toBeDefined();
     });
-    // A blocked-SEND notice IS dismissable (re-sending is itself an explicit attempt).
-    expect(screen.getByLabelText('safeguarding_contact_restricted.dismiss')).toBeDefined();
+    // Safeguarding decisions remain fail-closed and cannot be dismissed locally.
+    expect(screen.queryByLabelText('safeguarding_contact_restricted.dismiss')).toBeNull();
     expect(stableMocks.toastError).not.toHaveBeenCalledWith('error_title', expect.any(String));
   });
 
@@ -408,5 +411,161 @@ describe('ConversationPage', () => {
 
     // Sender gets clear in-panel confirmation.
     await waitFor(() => expect(screen.getByText('coordinator_request.sent')).toBeDefined());
+  });
+
+  it('requests a vetting review with an empty request body', async () => {
+    mockApi.get.mockResolvedValue({
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'VETTING_REQUIRED',
+            detail: 'Community confirmation is needed.',
+            required_vetting_types: ['dbs_enhanced'],
+            required_vetting_labels: ['Enhanced DBS'],
+            can_request_coordinator: true,
+          },
+        },
+      },
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+    mockApi.post.mockResolvedValue({ success: true, data: { status: 'pending' } });
+
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByText('vetting_review_request.button')).toBeDefined());
+    fireEvent.click(screen.getByText('vetting_review_request.button'));
+
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith('/v2/safeguarding/vetting-review-request'));
+    expect(screen.getByText('vetting_review_request.sent')).toBeDefined();
+  });
+
+  it('fails closed when the safeguarding policy is unavailable', async () => {
+    mockApi.get.mockResolvedValue({
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'SAFEGUARDING_POLICY_UNAVAILABLE',
+            detail: 'The policy could not be evaluated safely.',
+            required_vetting_types: [],
+            required_vetting_labels: [],
+            can_request_coordinator: true,
+          },
+        },
+      },
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('safeguarding_policy_unavailable.title')).toBeDefined());
+    expect(screen.getByTestId('composer-blocked')).toBeDefined();
+    expect(screen.queryByTestId('message-input-area')).toBeNull();
+  });
+
+  it('unlocks an open conversation when Check again returns allow', async () => {
+    const blocked = {
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'VETTING_REQUIRED',
+            required_vetting_types: ['dbs_enhanced'],
+            required_vetting_labels: ['Enhanced DBS'],
+          },
+        },
+      },
+    };
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.resolve({ success: true, data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null } });
+      }
+      if (url.includes('per_page=1')) {
+        return Promise.resolve(mockConversationResponse);
+      }
+      return Promise.resolve(blocked);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByText('safeguarding_check_again')).toBeDefined());
+    fireEvent.click(screen.getByText('safeguarding_check_again'));
+
+    await waitFor(() => expect(screen.getByTestId('message-input-area')).toBeDefined());
+    expect(screen.queryByText('safeguarding_vetting_required.title')).toBeNull();
+  });
+
+  it('rechecks on window focus and re-locks after revocation', async () => {
+    const revoked = {
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'VETTING_REQUIRED',
+            required_vetting_types: ['dbs_enhanced'],
+            required_vetting_labels: ['Enhanced DBS'],
+          },
+        },
+      },
+    };
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.resolve({ success: true, data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null } });
+      }
+      if (url.includes('per_page=1')) return Promise.resolve(revoked);
+      return Promise.resolve(mockConversationResponse);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByTestId('message-input-area')).toBeDefined());
+    window.dispatchEvent(new Event('focus'));
+
+    await waitFor(() => expect(screen.getByTestId('composer-blocked')).toBeDefined());
+  });
+
+  it('rechecks when the document becomes visible', async () => {
+    const blocked = {
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'VETTING_REQUIRED',
+            required_vetting_types: ['dbs_enhanced'],
+            required_vetting_labels: ['Enhanced DBS'],
+          },
+        },
+      },
+    };
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.resolve({ success: true, data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null } });
+      }
+      if (url.includes('per_page=1')) return Promise.resolve(mockConversationResponse);
+      return Promise.resolve(blocked);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+    await waitFor(() => expect(screen.getByTestId('composer-blocked')).toBeDefined());
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new Event('visibilitychange'));
+
+    await waitFor(() => expect(screen.getByTestId('message-input-area')).toBeDefined());
   });
 });

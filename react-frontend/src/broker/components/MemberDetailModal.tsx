@@ -45,7 +45,7 @@ import CheckCircle2 from 'lucide-react/icons/circle-check-big';
 import Circle from 'lucide-react/icons/circle';
 import { useToast } from '@/contexts';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance, adminCrm } from '@/admin/api/adminApi';
-import type { AdminUserDetail, VettingRecord, InsuranceCertificate } from '@/admin/api/types';
+import type { AdminUserDetail, VettingAttestation, InsuranceCertificate } from '@/admin/api/types';
 import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { BrokerStatusChip } from './BrokerStatusChip';
@@ -97,7 +97,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
 
   const [detail, setDetail] = useState<MemberDetail | null>(null);
   const [loading, setLoading] = useState(false);
-  const [vetting, setVetting] = useState<VettingRecord[]>([]);
+  const [vetting, setVetting] = useState<VettingAttestation[]>([]);
   const [insurance, setInsurance] = useState<InsuranceCertificate[]>([]);
   const [consents, setConsents] = useState<ConsentRow[]>([]);
   // Which action is currently running (disables the relevant button).
@@ -183,7 +183,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
         adminInsurance.getUserCertificates(id).catch(() => null),
         adminUsers.getConsents(id).catch(() => null),
       ]);
-      if (v?.success) setVetting(asArray<VettingRecord>(v.data));
+      if (v?.success) setVetting(asArray<VettingAttestation>(v.data));
       if (i?.success) setInsurance(asArray<InsuranceCertificate>(i.data));
       if (c?.success) setConsents(asArray<ConsentRow>(c.data));
     } catch { /* ignore */ }
@@ -458,18 +458,21 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
                   >
                     <div className="space-y-4 pt-3">
                       <div className="grid grid-cols-2 gap-3">
-                        <Overview label={t('member_detail.label_vetting')} value={t(`member_detail.compliance_${detail.vetting_status ?? 'none'}`, { defaultValue: detail.vetting_status ?? '—' })} />
+                        <Overview
+                          label={t('member_detail.label_contact_attestation')}
+                          value={t(`vetting.filter_${vetting[0]?.decision ?? 'not_confirmed'}`)}
+                        />
                         <Overview label={t('member_detail.label_insurance')} value={t(`member_detail.compliance_${detail.insurance_status ?? 'none'}`, { defaultValue: detail.insurance_status ?? '—' })} />
                       </div>
 
                       <ComplianceList
-                        title={t('member_detail.vetting_title')}
-                        empty={t('member_detail.vetting_none')}
+                        title={t('member_detail.contact_attestations_title')}
+                        empty={t('member_detail.contact_attestations_none')}
                         items={vetting.map((v) => ({
                           key: `v-${v.id}`,
-                          label: t(`vetting.type_${v.vetting_type}`, { defaultValue: v.vetting_type }),
-                          status: v.status,
-                          expiry: v.expiry_date ?? null,
+                          label: t(`vetting.attestation_${v.attestation_code}`, { defaultValue: t('vetting.attestation_other') }),
+                          status: v.decision,
+                          expiry: null,
                         }))}
                       />
                       <ComplianceList

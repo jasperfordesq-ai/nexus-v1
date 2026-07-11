@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Services\GroupFileService;
@@ -67,11 +68,15 @@ class GroupFilesController extends BaseApiController
             return $this->error(__('api.group_file_required'), 400);
         }
 
-        $result = $this->fileService->upload($groupId, $userId, [
-            'file' => $file,
-            'folder' => $request->input('folder'),
-            'description' => $request->input('description'),
-        ]);
+        try {
+            $result = $this->fileService->upload($groupId, $userId, [
+                'file' => $file,
+                'folder' => $request->input('folder'),
+                'description' => $request->input('description'),
+            ]);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->fileService->getErrors();

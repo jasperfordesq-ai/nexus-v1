@@ -473,6 +473,13 @@ class GoalService
             return null;
         }
 
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $userId,
+            (int) $goal->user_id,
+            (int) $goal->tenant_id,
+            'goal_buddy',
+        );
+
         $goal->mentor_id = $userId;
         $goal->save();
         $this->recordHistory($goal, 'buddy_joined', __('api_controllers_3.goals.history_buddy_joined'), [
@@ -492,6 +499,13 @@ class GoalService
         if (! $goal || (int) ($goal->mentor_id ?? 0) !== $buddyId) {
             return null;
         }
+
+        app(SafeguardingInteractionPolicy::class)->assertLocalContactAllowed(
+            $buddyId,
+            (int) $goal->user_id,
+            (int) $goal->tenant_id,
+            'goal_buddy_note',
+        );
 
         if (!DB::getSchemaBuilder()->hasTable('goal_buddy_notes')) {
             return null;

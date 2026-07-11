@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\ReactionService;
 use App\Services\RealtimeService;
 use App\Services\SocialNotificationService;
@@ -190,6 +191,8 @@ class ReactionController extends BaseApiController
             }
 
             return $this->respondWithData($result);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('NOT_FOUND', __('api.target_not_found'), null, 404);
         } catch (\Exception $e) {

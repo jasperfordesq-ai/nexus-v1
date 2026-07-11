@@ -102,6 +102,18 @@ class ExchangeWorkflowServiceTest extends TestCase
             'created_at'   => now(),
             'updated_at'   => now(),
         ]);
+        DB::table('tenant_safeguarding_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'jurisdiction' => 'england_wales',
+                'policy_version' => 'safeguarded-contact-v1:listing-test',
+                'configured_by' => null,
+                'configured_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+        app(\App\Services\SafeguardingJurisdictionService::class)->forget($this->testTenantId);
 
         // Re-pin: the factory creates above drift TenantContext, and the service reads
         // listing_risk_tags scoped to TenantContext::getId() — it must match the row's tenant.

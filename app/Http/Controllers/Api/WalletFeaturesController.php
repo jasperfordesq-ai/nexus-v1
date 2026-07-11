@@ -272,12 +272,16 @@ class WalletFeaturesController extends BaseApiController
             return $this->error(__('api_controllers_2.wallet.rating_required'), 400);
         }
 
-        $result = $this->exchangeRatingService->submitRating(
-            $eid,
-            $userId,
-            (int) $data['rating'],
-            $data['comment'] ?? null
-        );
+        try {
+            $result = $this->exchangeRatingService->submitRating(
+                $eid,
+                $userId,
+                (int) $data['rating'],
+                $data['comment'] ?? null
+            );
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$result['success']) {
             return $this->error($result['error'], 400);
@@ -364,6 +368,8 @@ class WalletFeaturesController extends BaseApiController
                     $data['message'] ?? ''
                 );
             }
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } finally {
             $lock->release();
         }

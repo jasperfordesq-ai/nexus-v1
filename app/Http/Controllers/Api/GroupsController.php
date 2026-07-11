@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\GroupNotificationService;
 use Illuminate\Http\JsonResponse;
 use App\Services\GroupService;
@@ -219,7 +220,11 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_join', 30, 60);
 
-        $result = $this->groupService->join($id, $userId);
+        try {
+            $result = $this->groupService->join($id, $userId);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!($result['success'] ?? false)) {
             $error = $result['error'] ?? __('api.group_join_failed');
@@ -453,7 +458,11 @@ class GroupsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.action_required'), 'action', 400);
         }
 
-        $success = $this->groupService->handleJoinRequest($id, $requesterId, $userId, $action);
+        try {
+            $success = $this->groupService->handleJoinRequest($id, $requesterId, $userId, $action);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if (!$success) {
             $errors = $this->groupService->getErrors();
@@ -550,7 +559,11 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $discussion = $this->groupService->createDiscussion($id, $userId, $data);
+        try {
+            $discussion = $this->groupService->createDiscussion($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($discussion === null) {
             $errors = $this->groupService->getErrors();
@@ -632,7 +645,11 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $message = $this->groupService->postToDiscussion($id, $discussionId, $userId, $data);
+        try {
+            $message = $this->groupService->postToDiscussion($id, $discussionId, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($message === null) {
             $errors = $this->groupService->getErrors();
@@ -692,7 +709,11 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $data = $this->getAllInput();
 
-        $result = $this->groupAnnouncementService->create($id, $userId, $data);
+        try {
+            $result = $this->groupAnnouncementService->create($id, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->groupAnnouncementService->getErrors();
@@ -721,7 +742,11 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $data = $this->getAllInput();
 
-        $result = $this->groupAnnouncementService->update($id, $announcementId, $userId, $data);
+        try {
+            $result = $this->groupAnnouncementService->update($id, $announcementId, $userId, $data);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         if ($result === null) {
             $errors = $this->groupAnnouncementService->getErrors();

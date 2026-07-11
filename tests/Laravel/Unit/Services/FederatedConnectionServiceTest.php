@@ -8,6 +8,8 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\FederatedConnectionService;
+use App\Services\SafeguardingInteractionPolicy;
+use App\Support\SafeguardingInteractionDecision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mockery;
@@ -20,6 +22,12 @@ class FederatedConnectionServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = new FederatedConnectionService();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateCrossTenantContact')
+            ->zeroOrMoreTimes()
+            ->andReturn($this->allowed());
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
     }
 
     // =========================================================================
@@ -149,6 +157,31 @@ class FederatedConnectionServiceTest extends TestCase
         $this->assertTrue($result['success']);
     }
 
+    public function test_acceptRequest_rechecks_policy_and_leaves_request_pending_when_denied(): void
+    {
+        $connection = (object) [
+            'id' => 1,
+            'status' => 'pending',
+            'requester_user_id' => 7,
+            'requester_tenant_id' => 3,
+        ];
+        DB::shouldReceive('selectOne')->once()->andReturn($connection);
+        DB::shouldReceive('update')->never();
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('evaluateCrossTenantContact')
+            ->once()
+            ->with(7, 3, 5, $this->testTenantId, 'federated_connection_accept')
+            ->andReturn($this->denied());
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $result = $this->service->acceptRequest(1, 5);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('VETTING_REQUIRED', $result['error_code']);
+        $this->assertFalse($result['retryable']);
+    }
+
     // =========================================================================
     // rejectRequest()
     // =========================================================================
@@ -234,5 +267,33 @@ class FederatedConnectionServiceTest extends TestCase
         Log::shouldReceive('error')->once();
 
         $this->assertEquals(0, $this->service->getPendingCount(1));
+    }
+
+    private function allowed(): SafeguardingInteractionDecision
+    {
+        return new SafeguardingInteractionDecision(
+            status: SafeguardingInteractionDecision::ALLOW,
+            code: 'SAFEGUARDING_ALLOWED',
+            recipientTenantId: $this->testTenantId,
+            purposeCode: 'safeguarded_member_contact',
+            scopeType: 'tenant',
+            scopeIdentifier: '',
+        );
+    }
+
+    private function denied(): SafeguardingInteractionDecision
+    {
+        return new SafeguardingInteractionDecision(
+            status: SafeguardingInteractionDecision::DENY,
+            code: 'VETTING_REQUIRED',
+            recipientTenantId: $this->testTenantId,
+            purposeCode: 'safeguarded_member_contact',
+            scopeType: 'tenant',
+            scopeIdentifier: '',
+            policyVersion: 'test-v1',
+            requiredAttestationCodes: ['dbs_enhanced'],
+            requiredAttestationLabels: ['Enhanced DBS'],
+            canRequestCoordinator: true,
+        );
     }
 }

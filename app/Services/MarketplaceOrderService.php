@@ -53,6 +53,11 @@ class MarketplaceOrderService
 
         return TenantContext::runForTenant($tenantId, function () use ($offer, $listing, $tenantId): MarketplaceOrder {
             $order = DB::transaction(function () use ($offer, $listing, $tenantId) {
+            self::assertOrderContactAllowed(
+                (int) $offer->buyer_id,
+                (int) $offer->seller_id,
+                $tenantId,
+            );
             $order = new MarketplaceOrder();
             $order->tenant_id = $tenantId;
             $order->order_number = self::generateOrderNumber($tenantId);
@@ -145,6 +150,12 @@ class MarketplaceOrderService
                 throw new \InvalidArgumentException('This listing is no longer available for purchase.');
             }
 
+            self::assertOrderContactAllowed(
+                $buyerId,
+                (int) $lockedListing->user_id,
+                $tenantId,
+            );
+
             $order = new MarketplaceOrder();
             $order->tenant_id = $tenantId;
             $order->order_number = self::generateOrderNumber($tenantId);
@@ -198,6 +209,17 @@ class MarketplaceOrderService
 
             return $order;
         });
+    }
+
+    /**
+     * Orders open a durable buyer/seller contact channel and notify both
+     * parties, so re-check both directions immediately before the write.
+     */
+    private static function assertOrderContactAllowed(int $buyerId, int $sellerId, int $tenantId): void
+    {
+        $policy = app(SafeguardingInteractionPolicy::class);
+        $policy->assertLocalContactAllowed($buyerId, $sellerId, $tenantId, 'marketplace_order');
+        $policy->assertLocalContactAllowed($sellerId, $buyerId, $tenantId, 'marketplace_order');
     }
 
     // -----------------------------------------------------------------

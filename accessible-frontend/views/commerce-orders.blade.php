@@ -28,6 +28,8 @@
             'rated' => __('govuk_alpha_commerce.orders.status_rated'),
             'rate-failed' => __('govuk_alpha_commerce.orders.status_rate_failed'),
             'rate-invalid' => __('govuk_alpha_commerce.orders.status_rate_invalid'),
+            'rate-safeguarding-restricted' => __('safeguarding.errors.interaction_not_allowed'),
+            'rate-safeguarding-unavailable' => __('safeguarding.errors.policy_unavailable'),
         ];
         $statusLabels = [
             'pending_payment' => __('govuk_alpha_commerce.orders.status_pending_payment'),
@@ -46,7 +48,7 @@
     <p class="govuk-body-l">{{ $isSeller ? __('govuk_alpha_commerce.orders_seller.description') : __('govuk_alpha_commerce.orders_buyer.description') }}</p>
 
     @if (($status ?? null) !== null && isset($statusMessages[$status]))
-        <div class="govuk-notification-banner{{ \Illuminate\Support\Str::contains($status, ['failed', 'invalid']) ? '' : ' govuk-notification-banner--success' }}" role="region" aria-labelledby="commerce-orders-status" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner{{ \Illuminate\Support\Str::contains($status, ['failed', 'invalid', 'restricted', 'unavailable']) ? '' : ' govuk-notification-banner--success' }}" role="region" aria-labelledby="commerce-orders-status" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="commerce-orders-status">{{ __('govuk_alpha_commerce.common.notice_title') }}</h2>
             </div>

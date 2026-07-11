@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Core\TenantContext;
@@ -54,6 +55,8 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
         try {
             $offer = MarketplaceCommunityDeliveryService::offerDelivery($orderId, $userId, $data);
             return $this->respondWithData($offer, null, 201);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
@@ -102,6 +105,8 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
         try {
             MarketplaceCommunityDeliveryService::acceptDeliveryOffer($orderId, $delivererId, (int) $userId);
             return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.offer_accepted')]);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (AuthorizationException $e) {
             return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
         } catch (\RuntimeException $e) {
@@ -126,6 +131,8 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
         try {
             MarketplaceCommunityDeliveryService::confirmDelivery($orderId, $delivererId, (int) $userId);
             return $this->respondWithData(['message' => __('api_controllers_2.marketplace_delivery.delivery_confirmed')]);
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
         } catch (AuthorizationException $e) {
             return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
         } catch (\RuntimeException $e) {

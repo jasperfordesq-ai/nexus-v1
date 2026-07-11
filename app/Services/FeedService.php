@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Like;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Services\FeedRankingService;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
@@ -32,6 +33,58 @@ class FeedService
      * Fix 6: Maximum allowed post body length (50 KB) to prevent oversized payload abuse.
      */
     public const MAX_POST_LENGTH = 50000;
+
+    /**
+     * Resolve and gate every @mentioned member before any post content write.
+     */
+    public static function assertMentionContactsAllowed(
+        string $content,
+        int $authorId,
+        int $tenantId,
+        string $channel,
+    ): void {
+        if ((int) TenantContext::getId() !== $tenantId) {
+            throw new SafeguardingPolicyException(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+            );
+        }
+
+        try {
+            $recipientIds = array_values(MentionService::resolveMentions(
+                MentionService::extractMentions($content),
+                $tenantId,
+            ));
+        } catch (\Throwable $e) {
+            Log::error('Safeguarding feed mention recipient resolution unavailable', [
+                'tenant_id' => $tenantId,
+                'channel' => $channel,
+                'reason_code' => 'mention_recipient_lookup_failed',
+                'exception_class' => $e::class,
+            ]);
+            throw new SafeguardingPolicyException(
+                'SAFEGUARDING_POLICY_UNAVAILABLE',
+                __('safeguarding.errors.policy_unavailable'),
+            );
+        }
+
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn (mixed $id): int => (int) $id, $recipientIds),
+            static fn (int $id): bool => $id > 0 && $id !== $authorId,
+        )));
+        sort($recipientIds, SORT_NUMERIC);
+
+        if ($recipientIds === []) {
+            return;
+        }
+
+        app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+            $authorId,
+            $recipientIds,
+            $tenantId,
+            $channel,
+        );
+    }
 
     /**
      * Map plural filter names to source_type values (matches legacy).
@@ -1282,6 +1335,8 @@ class FeedService
             $post->is_pinned   = true;
         }
 
+        self::assertMentionContactsAllowed($content, $userId, (int) $tenantId, 'feed_post_create');
+
         $post->save();
 
         // If spam was detected, hide the post and queue it for moderation review
@@ -1411,6 +1466,8 @@ class FeedService
                 'tenant_id' => $tenantId,
             ]);
         }
+
+        self::assertMentionContactsAllowed($content, $userId, (int) $tenantId, 'feed_post_update');
 
         $post->content = $content;
         if ($spamFlagged) {
@@ -1699,6 +1756,12 @@ class FeedService
         foreach ($posts as $post) {
             try {
                 TenantContext::setById((int) $post->tenant_id);
+                self::assertMentionContactsAllowed(
+                    (string) ($post->content ?? ''),
+                    (int) $post->user_id,
+                    (int) $post->tenant_id,
+                    'feed_scheduled_post_publish',
+                );
 
                 $post->update([
                     'publish_status' => 'published',

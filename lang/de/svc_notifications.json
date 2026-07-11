@@ -1,4 +1,6 @@
 {
+  "vetting_status_updated": "Your community safeguarding vetting confirmation has been updated.",
+  "vetting_review_requested": "A member has requested a safeguarding vetting review.",
   "badge_collection": {
     "collection_complete": "Sammlung abgeschlossen! Sie haben '{{name}}' beendet und {{xp}} Bonus-XP verdient! {{icon}}"
   },

@@ -15,6 +15,7 @@ use App\Models\VolEmergencyAlertRecipient;
 use App\Models\VolOpportunity;
 use App\Models\VolOrganization;
 use App\Models\VolShift;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -111,9 +112,16 @@ class VolunteerEmergencyAlertService
             }
         }
 
-        $expiresAt = now()->addHours($expiresHours);
-
         try {
+            $candidates = self::qualifiedVolunteers($shiftId, $skillsJson, $tenantId);
+            app(SafeguardingInteractionPolicy::class)->assertManyLocalContactsAllowed(
+                $createdBy,
+                $candidates->pluck('user_id')->map(static fn ($id): int => (int) $id)->all(),
+                $tenantId,
+                'volunteer_emergency_alert_broadcast',
+            );
+
+            $expiresAt = now()->addHours($expiresHours);
             $alert = VolEmergencyAlert::create([
                 'tenant_id' => $tenantId,
                 'shift_id' => $shiftId,
@@ -127,9 +135,11 @@ class VolunteerEmergencyAlertService
             ]);
 
             // Notify qualified volunteers (best-effort, non-blocking)
-            self::notifyQualifiedVolunteers($alert->id, $shiftId, $skillsJson, $tenantId, $priority, $message);
+            self::notifyQualifiedVolunteers($alert->id, $shiftId, $candidates, $tenantId, $priority, $message);
 
             return $alert->id;
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::createAlert error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_alert_create_failed')];
@@ -185,6 +195,22 @@ class VolunteerEmergencyAlertService
                     throw new \RuntimeException('RECIPIENT_NOT_FOUND');
                 }
 
+                if ($response === 'accepted') {
+                    $policy = app(SafeguardingInteractionPolicy::class);
+                    $policy->assertLocalContactAllowed(
+                        $userId,
+                        (int) $alert->created_by,
+                        $tenantId,
+                        'volunteer_emergency_alert_acceptance',
+                    );
+                    $policy->assertLocalContactAllowed(
+                        (int) $alert->created_by,
+                        $userId,
+                        $tenantId,
+                        'volunteer_emergency_alert_acceptance',
+                    );
+                }
+
                 $recipient->update([
                     'response' => $response,
                     'responded_at' => now(),
@@ -226,6 +252,8 @@ class VolunteerEmergencyAlertService
             }
 
             return true;
+        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            throw $e;
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'ALERT_INACTIVE') {
                 self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_inactive')];
@@ -463,9 +491,11 @@ class VolunteerEmergencyAlertService
     }
 
     /**
-     * Find and notify qualified volunteers for an emergency alert.
+     * Find qualified volunteers before the alert or any recipient row is written.
+     *
+     * @return Collection<int, object>
      */
-    private static function notifyQualifiedVolunteers(int $alertId, int $shiftId, ?string $skillsJson, int $tenantId, string $priority, string $message): int
+    private static function qualifiedVolunteers(int $shiftId, ?string $skillsJson, int $tenantId): Collection
     {
         // Find volunteers who:
         // 1. Have approved applications for the opportunity's org
@@ -503,15 +533,8 @@ class VolunteerEmergencyAlertService
             $requiredSkills = is_array($decoded) ? $decoded : [];
         }
 
-        $notifiedCount = 0;
-        $shift = VolShift::where('tenant_id', $tenantId)->where('id', $shiftId)->first();
-        // Keep the raw shift start; the human-readable date is formatted inside
-        // each recipient's LocaleContext below so it renders in their language.
-        $shiftStart = $shift?->start_time;
-
-        foreach ($candidates as $candidate) {
-            // If skills are required, check for match
-            if (!empty($requiredSkills)) {
+        return $candidates->filter(static function (object $candidate) use ($requiredSkills): bool {
+            if (! empty($requiredSkills)) {
                 $userSkillsRaw = $candidate->skills ?? '';
                 $userSkills = array_filter(array_map('trim', explode(',', $userSkillsRaw)));
                 $hasMatch = false;
@@ -529,11 +552,25 @@ class VolunteerEmergencyAlertService
                     }
                 }
 
-                if (!$hasMatch) {
-                    continue;
-                }
+                return $hasMatch;
             }
 
+            return true;
+        })->values();
+    }
+
+    /**
+     * @param Collection<int, object> $candidates
+     */
+    private static function notifyQualifiedVolunteers(int $alertId, int $shiftId, Collection $candidates, int $tenantId, string $priority, string $message): int
+    {
+        $notifiedCount = 0;
+        $shift = VolShift::where('tenant_id', $tenantId)->where('id', $shiftId)->first();
+        // Keep the raw shift start; the human-readable date is formatted inside
+        // each recipient's LocaleContext below so it renders in their language.
+        $shiftStart = $shift?->start_time;
+
+        foreach ($candidates as $candidate) {
             try {
                 $priorityLabel = strtoupper($priority);
                 $bellCreated = TenantContext::runForTenant($tenantId, function () use ($candidate, $priorityLabel, $message, $shiftStart, $tenantId): bool {

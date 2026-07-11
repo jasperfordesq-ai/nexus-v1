@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Http\Controllers\Api\Concerns\InteractsWithPodcasts;
 use App\Models\PodcastEpisode;
 use App\Models\PodcastShow;
@@ -412,7 +413,11 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
-        $active = PodcastService::toggleReaction($episode, $userId, (string) $this->input('reaction', 'like'));
+        try {
+            $active = PodcastService::toggleReaction($episode, $userId, (string) $this->input('reaction', 'like'));
+        } catch (SafeguardingPolicyException $e) {
+            return $this->safeguardingPolicyError($e);
+        }
 
         return $this->respondWithData(['active' => $active]);
     }
