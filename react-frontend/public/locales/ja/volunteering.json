@@ -613,9 +613,7 @@
     "manual_review_delete_success": "資格情報を削除しました。",
     "manual_review_delete_failed": "資格情報を削除できませんでした。もう一度お試しください。",
     "expiring_soon_desc_one": "{{count}} 認証情報は 30 日以内に期限切れになります。",
-    "expiring_soon_desc_other": "{{count}} 認証情報は 30 日以内に期限切れになります。",
-    "type_police_check": "警察のチェック",
-    "type_background_check": "身元調査"
+    "expiring_soon_desc_other": "{{count}} 認証情報は 30 日以内に期限切れになります。"
   },
   "waitlist": {
     "heading": "私の順番待ちリスト",

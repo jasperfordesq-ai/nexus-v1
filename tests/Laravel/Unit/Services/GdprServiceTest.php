@@ -869,12 +869,12 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
         // ID PDFs) must be deleted from disk before the vol_credentials rows —
         // otherwise identity-bearing PII files survive Article 17 erasure.
         $this->assertStringContainsString(
-            'SELECT file_url FROM vol_credentials',
+            'SELECT id, file_url FROM vol_credentials',
             $deletionSrc,
             'GDPR erasure no longer reads credential file paths for on-disk deletion'
         );
         $this->assertStringContainsString(
-            'foreach ($credentialPaths',
+            'deletePrivateCredentialPointer(',
             $deletionSrc,
             'GDPR erasure no longer deletes uploaded credential files from disk'
         );

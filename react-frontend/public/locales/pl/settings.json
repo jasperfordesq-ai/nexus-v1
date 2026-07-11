@@ -304,6 +304,8 @@
     "chip_vetted_only": "Tylko zweryfikowane kontakty",
     "vetting": {
       "title": "Twój status weryfikacji społeczności prywatnej",
+      "status_confirmed": "Potwierdzone",
+      "status_revoked": "Cofnięte",
       "status_not_confirmed": "Nie potwierdzone",
       "status_review_requested": "Zażądano przeglądu",
       "status_unavailable": "Nie można wczytać Twojego statusu weryfikacji.",

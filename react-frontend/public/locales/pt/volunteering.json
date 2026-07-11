@@ -624,8 +624,6 @@
     "manual_review_delete_failed": "Não foi possível eliminar a credencial. Tente novamente.",
     "expiring_soon_desc_one": "As credenciais {{count}} expirarão em 30 dias.",
     "expiring_soon_desc_other": "As credenciais {{count}} expirarão em 30 dias.",
-    "type_police_check": "Verificação policial",
-    "type_background_check": "Verificação de antecedentes",
     "expiring_soon_desc_many": "As credenciais {{count}} expirarão em 30 dias."
   },
   "waitlist": {

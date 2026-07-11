@@ -1289,6 +1289,7 @@
     "accepted": "Glactha",
     "in_progress": "Ar siúl",
     "pending_confirmation": "Ag fanacht le deimhniú",
+    "confirmed": "Deimhnithe",
     "review_requested": "Athbhreithniú iarrtha",
     "not_confirmed": "Gan daingniú"
   },

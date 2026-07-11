@@ -70,6 +70,7 @@ class UserSafeguardingPreferenceTest extends TestCase
         $expected = [
             'tenant_id', 'user_id', 'option_id', 'selected_value',
             'notes', 'consent_given_at', 'consent_ip', 'revoked_at',
+            'policy_review_required_at', 'policy_review_reason_code',
         ];
         $this->assertSame($expected, $model->getFillable());
     }

@@ -1278,6 +1278,7 @@
     "accepted": "Zaakceptowano",
     "in_progress": "W toku",
     "pending_confirmation": "Oczekuje na potwierdzenie",
+    "confirmed": "Potwierdzone",
     "review_requested": "Zażądano przeglądu",
     "not_confirmed": "Nie potwierdzone"
   },

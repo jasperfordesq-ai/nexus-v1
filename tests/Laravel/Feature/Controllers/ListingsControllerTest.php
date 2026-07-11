@@ -85,8 +85,10 @@ class ListingsControllerTest extends TestCase
         $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
     }
 
-    public function test_public_index_returns_full_next_public_contract_when_opted_in_without_auth(): void
+    public function test_member_index_returns_full_next_public_contract_when_opted_in(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Public',
             'last_name' => 'Provider',
@@ -156,6 +158,8 @@ class ListingsControllerTest extends TestCase
 
     public function test_public_index_omits_next_public_contract_without_explicit_flag(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,
@@ -175,6 +179,8 @@ class ListingsControllerTest extends TestCase
 
     public function test_index_returns_403_when_listings_module_disabled(): void
     {
+        $this->authenticatedUser();
+
         DB::table('tenants')
             ->where('id', $this->testTenantId)
             ->update([
@@ -373,6 +379,8 @@ class ListingsControllerTest extends TestCase
 
     public function test_public_show_returns_gallery_and_full_next_public_contract_when_opted_in(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Gallery',
             'last_name' => 'Provider',
@@ -429,6 +437,8 @@ class ListingsControllerTest extends TestCase
 
     public function test_public_show_omits_next_public_contract_without_explicit_flag(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,

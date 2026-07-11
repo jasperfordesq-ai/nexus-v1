@@ -1247,6 +1247,7 @@
     "accepted": "承諾済み",
     "in_progress": "進行中",
     "pending_confirmation": "確認待ち",
+    "confirmed": "確認済み",
     "review_requested": "レビューが要求されました",
     "not_confirmed": "未確認"
   },

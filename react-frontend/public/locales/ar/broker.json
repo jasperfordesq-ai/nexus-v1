@@ -1300,6 +1300,7 @@
     "accepted": "مقبول",
     "in_progress": "قيد التنفيذ",
     "pending_confirmation": "بانتظار التأكيد",
+    "confirmed": "مؤكد",
     "review_requested": "المراجعة مطلوبة",
     "not_confirmed": "لم يتم تأكيده"
   },

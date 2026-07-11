@@ -304,6 +304,8 @@
     "chip_vetted_only": "Nur geprüfte Kontakte",
     "vetting": {
       "title": "Ihr privater Community-Überprüfungsstatus",
+      "status_confirmed": "Bestätigt",
+      "status_revoked": "Widerrufen",
       "status_not_confirmed": "Nicht bestätigt",
       "status_review_requested": "Rezension angefordert",
       "status_unavailable": "Ihr Prüfstatus konnte nicht geladen werden.",

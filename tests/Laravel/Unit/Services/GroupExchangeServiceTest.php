@@ -22,7 +22,18 @@ class GroupExchangeServiceTest extends TestCase
 
     public function test_create_returns_id(): void
     {
-        DB::shouldReceive('table->insertGetId')->andReturn(42);
+        $users = \Mockery::mock();
+        $users->shouldReceive('where')->twice()->andReturnSelf();
+        $users->shouldReceive('whereIn')->with('id', [5])->once()->andReturnSelf();
+        $users->shouldReceive('count')->once()->andReturn(1);
+        DB::shouldReceive('table')->with('users')->once()->andReturn($users);
+
+        $exchanges = \Mockery::mock();
+        $exchanges->shouldReceive('insertGetId')->once()->andReturn(42);
+        DB::shouldReceive('table')->with('group_exchanges')->once()->andReturn($exchanges);
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(static fn (callable $callback): mixed => $callback());
 
         $result = $this->service->create(5, [
             'title' => 'Group Exchange',

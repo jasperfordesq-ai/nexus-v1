@@ -617,9 +617,7 @@
     "manual_review_delete_success": "Kwalificatie verwijderd.",
     "manual_review_delete_failed": "De kwalificatie kon niet worden verwijderd. Probeer het opnieuw.",
     "expiring_soon_desc_one": "{{count}}-inloggegevens verlopen binnen 30 dagen.",
-    "expiring_soon_desc_other": "{{count}}-inloggegevens verlopen binnen 30 dagen.",
-    "type_police_check": "Politiecontrole",
-    "type_background_check": "Achtergrondcontrole"
+    "expiring_soon_desc_other": "{{count}}-inloggegevens verlopen binnen 30 dagen."
   },
   "waitlist": {
     "heading": "Mijn wachtlijsten",

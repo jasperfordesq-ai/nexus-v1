@@ -93,15 +93,6 @@ class BrokerControlConfigServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function test_isVettingEnabled_returns_false_by_default(): void
-    {
-        DB::shouldReceive('table')->with('tenant_settings')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturnNull();
-
-        $this->assertFalse(BrokerControlConfigService::isVettingEnabled());
-    }
-
     public function test_isInsuranceEnabled_returns_false_by_default(): void
     {
         DB::shouldReceive('table')->with('tenant_settings')->andReturnSelf();

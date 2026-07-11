@@ -304,6 +304,8 @@
     "chip_vetted_only": "Teagmhálacha scagtha amháin",
     "vetting": {
       "title": "Do stádas grinnfhiosrúcháin pobail phríobháideach",
+      "status_confirmed": "Deimhnithe",
+      "status_revoked": "Cúlghairthe",
       "status_not_confirmed": "Gan daingniú",
       "status_review_requested": "Athbhreithniú iarrtha",
       "status_unavailable": "Níorbh fhéidir do stádas grinnfhiosrúcháin a lódáil.",

@@ -304,6 +304,8 @@
     "chip_vetted_only": "Solo contactos verificados",
     "vetting": {
       "title": "Su estado de investigación de comunidad privada",
+      "status_confirmed": "Confirmado",
+      "status_revoked": "Revocado",
       "status_not_confirmed": "No confirmado",
       "status_review_requested": "Revisión solicitada",
       "status_unavailable": "No se pudo cargar su estado de investigación.",

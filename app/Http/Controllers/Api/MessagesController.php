@@ -119,7 +119,9 @@ class MessagesController extends BaseApiController
         }
 
         $recipientId = (int) $data['recipient_id'];
-        $preflightError = $this->messageService->preflightWrite($userId, $recipientId);
+        // This is an actual send attempt, not a read-only conversation check.
+        // Record denied safeguarding contact attempts so staff can respond.
+        $preflightError = $this->messageService->preflightWrite($userId, $recipientId, true);
         if ($preflightError !== null) {
             return $this->respondWithErrors([$preflightError], $this->preflightErrorStatus($preflightError));
         }

@@ -642,8 +642,6 @@
     "manual_review_delete_failed": "تعذر حذف بيانات الاعتماد. يرجى المحاولة مرة أخرى.",
     "expiring_soon_desc_one": "ستنتهي صلاحية بيانات اعتماد {{count}} خلال 30 يومًا.",
     "expiring_soon_desc_other": "ستنتهي صلاحية بيانات اعتماد {{count}} خلال 30 يومًا.",
-    "type_police_check": "فحص الشرطة",
-    "type_background_check": "فحص الخلفية",
     "expiring_soon_desc_few": "ستنتهي صلاحية بيانات اعتماد {{count}} خلال 30 يومًا.",
     "expiring_soon_desc_many": "ستنتهي صلاحية بيانات اعتماد {{count}} خلال 30 يومًا.",
     "expiring_soon_desc_two": "ستنتهي صلاحية بيانات اعتماد {{count}} خلال 30 يومًا.",

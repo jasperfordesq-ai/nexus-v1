@@ -304,6 +304,8 @@
     "chip_vetted_only": "جهات الاتصال الموثوقة فقط",
     "vetting": {
       "title": "حالة فحص المجتمع الخاص بك",
+      "status_confirmed": "مؤكد",
+      "status_revoked": "ملغى",
       "status_not_confirmed": "لم يتم تأكيده",
       "status_review_requested": "المراجعة مطلوبة",
       "status_unavailable": "لا يمكن تحميل حالة الفحص الخاصة بك.",

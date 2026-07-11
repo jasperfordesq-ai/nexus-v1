@@ -38,7 +38,7 @@ final class FederationV2ExternalTransferTest extends TestCase
         TenantContext::setById(self::SOURCE_TENANT_ID);
     }
 
-    public function test_external_transfer_replay_with_same_idempotency_key_debits_and_posts_once(): void
+    public function test_external_transfer_fails_closed_without_partner_safeguarding_contract(): void
     {
         $senderId = $this->makeFederatedUser(self::SOURCE_TENANT_ID, 25);
         $partner = $this->setupPartner('nexus', self::SOURCE_TENANT_ID);
@@ -69,29 +69,17 @@ final class FederationV2ExternalTransferTest extends TestCase
             'external-transfer-idem-1'
         );
 
-        $this->assertSame(201, $first->getStatusCode(), (string) $first->getContent());
-        $this->assertSame(201, $second->getStatusCode(), (string) $second->getContent());
-        $this->assertSame(
-            $first->getData(true)['data']['transaction_id'],
-            $second->getData(true)['data']['transaction_id']
-        );
+        $this->assertSame(503, $first->getStatusCode(), (string) $first->getContent());
+        $this->assertSame(503, $second->getStatusCode(), (string) $second->getContent());
+        $this->assertSame('SAFEGUARDING_POLICY_UNAVAILABLE', $first->getData(true)['errors'][0]['code']);
 
-        $this->assertEqualsWithDelta(15, (float) DB::table('users')->where('id', $senderId)->value('balance'), 0.001);
-        $this->assertSame(1, (int) DB::table('transactions')
+        $this->assertEqualsWithDelta(25, (float) DB::table('users')->where('id', $senderId)->value('balance'), 0.001);
+        $this->assertSame(0, (int) DB::table('transactions')
             ->where('tenant_id', self::SOURCE_TENANT_ID)
             ->where('sender_id', $senderId)
             ->where('is_federated', 1)
             ->count());
-
-        Http::assertSentCount(1);
-        Http::assertSent(function ($request) use ($remoteMemberId): bool {
-            $body = $request->data();
-
-            return str_contains($request->url(), '/transactions')
-                && ($body['recipient_id'] ?? null) === $remoteMemberId
-                && isset($body['idempotency_key'])
-                && str_starts_with((string) $body['idempotency_key'], 'nexus-tx-');
-        });
+        Http::assertNothingSent();
     }
 
     public function test_external_transfer_disabled_by_partner_allow_flag_does_not_post_or_debit(): void

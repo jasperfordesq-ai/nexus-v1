@@ -28,6 +28,41 @@ class SafeguardingTriggerServiceTest extends TestCase
         parent::setUp();
     }
 
+    /** @param list<array<string, bool|string>> $triggerSets */
+    private function mockActiveOptions(int $userId, array $triggerSets): void
+    {
+        $optionIds = array_keys($triggerSets);
+        $optionIds = array_map(static fn (int $index): int => $index + 1, $optionIds);
+
+        $preferences = Mockery::mock();
+        $preferences->shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
+        $preferences->shouldReceive('where')->with('user_id', $userId)->once()->andReturnSelf();
+        $preferences->shouldReceive('whereNull')->with('revoked_at')->once()->andReturnSelf();
+        $preferences->shouldReceive('orderBy')->with('id')->once()->andReturnSelf();
+        $preferences->shouldReceive('pluck')->with('option_id')->once()->andReturn(collect($optionIds));
+        DB::shouldReceive('table')
+            ->with('user_safeguarding_preferences')
+            ->once()
+            ->andReturn($preferences);
+
+        if ($triggerSets === []) {
+            return;
+        }
+
+        $options = Mockery::mock();
+        $options->shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
+        $options->shouldReceive('whereIn')->with('id', $optionIds)->once()->andReturnSelf();
+        $options->shouldReceive('where')->with('is_active', true)->once()->andReturnSelf();
+        $options->shouldReceive('orderBy')->with('id')->once()->andReturnSelf();
+        $options->shouldReceive('get')->with(['triggers'])->once()->andReturn(collect(
+            array_map(static fn (array $triggers): object => (object) ['triggers' => $triggers], $triggerSets)
+        ));
+        DB::shouldReceive('table')
+            ->with('tenant_safeguarding_options')
+            ->once()
+            ->andReturn($options);
+    }
+
     // =========================================================================
     // getActiveTriggers
     // =========================================================================
@@ -40,9 +75,7 @@ class SafeguardingTriggerServiceTest extends TestCase
                 return $callback();
             });
 
-        $mockAlias = Mockery::mock('alias:' . UserSafeguardingPreference::class);
-        $mockAlias->shouldReceive('where->where->active->with->get')
-            ->andReturn(collect([]));
+        $this->mockActiveOptions(1, []);
 
         $triggers = SafeguardingTriggerService::getActiveTriggers(1, $this->testTenantId);
 
@@ -61,23 +94,10 @@ class SafeguardingTriggerServiceTest extends TestCase
                 return $callback();
             });
 
-        $option1 = Mockery::mock();
-        $option1->is_active = true;
-        $option1->triggers = ['requires_broker_approval' => true, 'restricts_messaging' => false];
-
-        $option2 = Mockery::mock();
-        $option2->is_active = true;
-        $option2->triggers = ['restricts_messaging' => true, 'notify_admin_on_selection' => true];
-
-        $pref1 = Mockery::mock();
-        $pref1->option = $option1;
-
-        $pref2 = Mockery::mock();
-        $pref2->option = $option2;
-
-        $mockAlias = Mockery::mock('alias:' . UserSafeguardingPreference::class);
-        $mockAlias->shouldReceive('where->where->active->with->get')
-            ->andReturn(collect([$pref1, $pref2]));
+        $this->mockActiveOptions(1, [
+            ['requires_broker_approval' => true, 'restricts_messaging' => false],
+            ['restricts_messaging' => true, 'notify_admin_on_selection' => true],
+        ]);
 
         $triggers = SafeguardingTriggerService::getActiveTriggers(1, $this->testTenantId);
 
@@ -98,19 +118,10 @@ class SafeguardingTriggerServiceTest extends TestCase
                 return $callback();
             });
 
-        $option = Mockery::mock();
-        $option->is_active = true;
-        $option->triggers = [
+        $this->mockActiveOptions(5, [[
             'requires_vetted_interaction' => true,
             'vetting_type_required' => 'garda_vetting',
-        ];
-
-        $pref = Mockery::mock();
-        $pref->option = $option;
-
-        $mockAlias = Mockery::mock('alias:' . UserSafeguardingPreference::class);
-        $mockAlias->shouldReceive('where->where->active->with->get')
-            ->andReturn(collect([$pref]));
+        ]]);
 
         $triggers = SafeguardingTriggerService::getActiveTriggers(5, $this->testTenantId);
 

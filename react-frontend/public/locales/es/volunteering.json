@@ -624,8 +624,6 @@
     "manual_review_delete_failed": "No se pudo eliminar la credencial. Inténtelo de nuevo.",
     "expiring_soon_desc_one": "Las credenciales de {{count}} caducarán en un plazo de 30 días.",
     "expiring_soon_desc_other": "Las credenciales de {{count}} caducarán en un plazo de 30 días.",
-    "type_police_check": "control policial",
-    "type_background_check": "Verificación de antecedentes",
     "expiring_soon_desc_many": "Las credenciales de {{count}} caducarán en un plazo de 30 días."
   },
   "waitlist": {

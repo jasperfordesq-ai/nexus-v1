@@ -752,9 +752,9 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
             [$result['tenant_id']]
         )->fetchColumn();
 
-        // seedTenantDefaults() seeds the canonical nine-attribute default set.
+        // seedTenantDefaults() seeds the canonical eight-attribute default set.
         $this->assertGreaterThan(0, (int)$count, 'Attributes should be seeded');
-        $this->assertSame(9, (int)$count, 'The full default attribute set (9) should be seeded');
+        $this->assertSame(8, (int)$count, 'The full default attribute set (8) should be seeded');
 
         // Re-running must be idempotent (insertOrIgnore on the unique key).
         \App\Services\TenantDefaultsSeeder::seedAttributes((int)$result['tenant_id']);
@@ -762,7 +762,7 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
             "SELECT COUNT(*) FROM attributes WHERE tenant_id = ?",
             [$result['tenant_id']]
         )->fetchColumn();
-        $this->assertSame(9, (int)$countAfter, 'Re-seeding must not duplicate attributes');
+        $this->assertSame(8, (int)$countAfter, 'Re-seeding must not duplicate attributes');
     }
 
     /**

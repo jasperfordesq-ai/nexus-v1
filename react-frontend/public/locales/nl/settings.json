@@ -304,6 +304,8 @@
     "chip_vetted_only": "Alleen gescreende contacten",
     "vetting": {
       "title": "De controlestatus van uw privégemeenschap",
+      "status_confirmed": "Bevestigd",
+      "status_revoked": "Ingetrokken",
       "status_not_confirmed": "Niet bevestigd",
       "status_review_requested": "Beoordeling aangevraagd",
       "status_unavailable": "Uw controlestatus kan niet worden geladen.",

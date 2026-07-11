@@ -617,9 +617,7 @@
     "manual_review_delete_success": "Nachweis gelöscht.",
     "manual_review_delete_failed": "Der Nachweis konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
     "expiring_soon_desc_one": "{{count}} Nachweis(e) laufen innerhalb von 30 Tagen ab.",
-    "expiring_soon_desc_other": "{{count}} Nachweis(e) laufen innerhalb von 30 Tagen ab.",
-    "type_police_check": "Polizeiliches Führungszeugnis",
-    "type_background_check": "Hintergrundprüfung"
+    "expiring_soon_desc_other": "{{count}} Nachweis(e) laufen innerhalb von 30 Tagen ab."
   },
   "waitlist": {
     "heading": "Meine Wartelisten",

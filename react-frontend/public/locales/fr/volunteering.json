@@ -624,8 +624,6 @@
     "manual_review_delete_failed": "Le justificatif n’a pas pu être supprimé. Veuillez réessayer.",
     "expiring_soon_desc_one": "Les identifiants {{count}} expireront dans les 30 jours.",
     "expiring_soon_desc_other": "Les identifiants {{count}} expireront dans les 30 jours.",
-    "type_police_check": "Contrôle de police",
-    "type_background_check": "Vérification des antécédents",
     "expiring_soon_desc_many": "Les identifiants {{count}} expireront dans les 30 jours."
   },
   "waitlist": {

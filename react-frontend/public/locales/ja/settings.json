@@ -304,6 +304,8 @@
     "chip_vetted_only": "審査済み連絡先のみ",
     "vetting": {
       "title": "あなたのプライベートコミュニティの審査ステータス",
+      "status_confirmed": "確認済み",
+      "status_revoked": "取り消し済み",
       "status_not_confirmed": "未確認",
       "status_review_requested": "レビューが要求されました",
       "status_unavailable": "審査ステータスを読み込めませんでした。",

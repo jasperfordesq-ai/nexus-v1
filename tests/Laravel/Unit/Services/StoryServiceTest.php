@@ -432,6 +432,7 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturn((object) [
                 'id' => 1,
+                'user_id' => 1,
                 'media_type' => 'poll',
                 'poll_options' => json_encode(['Red', 'Blue']),
             ]);
@@ -476,6 +477,7 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturn((object) [
                 'id' => 1,
+                'user_id' => 1,
                 'media_type' => 'poll',
                 'poll_options' => json_encode(['Red', 'Blue', 'Green']),
             ]);

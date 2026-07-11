@@ -133,6 +133,7 @@ class PodcastControllerTest extends TestCase
 
     public function test_browse_returns_403_when_feature_disabled(): void
     {
+        $this->actingAsMember();
         $this->enablePodcasts(false);
 
         $response = $this->apiGet('/v2/podcasts');
@@ -293,7 +294,7 @@ class PodcastControllerTest extends TestCase
         $privateEpisode->assertStatus(201);
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$privateEpisode->json('data.id')}/publish")->assertStatus(200);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
 
         $publicShow = $this->apiGet("/v2/podcasts/{$showSlug}");
@@ -426,18 +427,21 @@ class PodcastControllerTest extends TestCase
         $this->assertNotNull($row->audio_storage_path);
         Storage::disk('local')->assertExists($row->audio_storage_path);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
 
-        $unsigned = $this->get("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio");
+        $unsigned = $this->get(
+            "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
+            $this->withTenantHeader(),
+        );
         $unsigned->assertStatus(404);
 
         $signedPath = parse_url($audioUrl, PHP_URL_PATH) . '?' . parse_url($audioUrl, PHP_URL_QUERY);
-        $signed = $this->get($signedPath);
+        $signed = $this->get($signedPath, $this->withTenantHeader());
         $signed->assertStatus(200);
     }
 
-    public function test_public_rss_feed_can_be_fetched_with_tenant_in_url_without_header(): void
+    public function test_member_rss_feed_can_be_fetched_with_tenant_in_url(): void
     {
         $this->enablePodcasts(true);
         $this->actingAsMember();
@@ -460,10 +464,13 @@ class PodcastControllerTest extends TestCase
         $episode->assertStatus(201);
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episode->json('data.id')}/publish")->assertStatus(200);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::reset();
 
-        $rss = $this->get("/api/v2/podcasts/feed/{$this->testTenantId}/{$showSlug}.xml");
+        $rss = $this->get(
+            "/api/v2/podcasts/feed/{$this->testTenantId}/{$showSlug}.xml",
+            $this->withTenantHeader(),
+        );
         $rss->assertStatus(200);
         $rss->assertSee('Public Feed Episode', false);
     }
@@ -520,7 +527,7 @@ class PodcastControllerTest extends TestCase
         $archive->assertStatus(200);
         $archive->assertJsonPath('data.status', 'archived');
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
 
         $publicShow = $this->apiGet("/v2/podcasts/{$showSlug}");
@@ -551,12 +558,13 @@ class PodcastControllerTest extends TestCase
         $episodeId = $episode->json('data.id');
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
 
-        $range = $this->get("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", [
-            'Range' => 'bytes=0-99',
-        ]);
+        $range = $this->get(
+            "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
+            array_merge($this->withTenantHeader(), ['Range' => 'bytes=0-99']),
+        );
 
         $range->assertStatus(206);
         $this->assertSame('bytes 0-99/1024', $range->headers->get('Content-Range'));
@@ -593,22 +601,31 @@ class PodcastControllerTest extends TestCase
         $episodeId = $episode->json('data.id');
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::reset();
 
-        $rss = $this->get("/api/v2/podcasts/feed/{$this->testTenantId}/{$showSlug}.xml");
+        $rss = $this->get(
+            "/api/v2/podcasts/feed/{$this->testTenantId}/{$showSlug}.xml",
+            $this->withTenantHeader(),
+        );
         $rss->assertStatus(200);
         $rss->assertSee('/api/v2/podcasts/transcripts/' . $this->testTenantId . '/' . $episodeId . '.txt', false);
         $rss->assertSee('/api/v2/podcasts/chapters/' . $this->testTenantId . '/' . $episodeId . '.json', false);
         $rss->assertSee('podcast:transcript', false);
         $rss->assertSee('podcast:chapters', false);
 
-        $transcript = $this->get("/api/v2/podcasts/transcripts/{$this->testTenantId}/{$episodeId}.txt");
+        $transcript = $this->get(
+            "/api/v2/podcasts/transcripts/{$this->testTenantId}/{$episodeId}.txt",
+            $this->withTenantHeader(),
+        );
         $transcript->assertStatus(200);
         $this->assertSame('text/plain; charset=UTF-8', $transcript->headers->get('Content-Type'));
         $transcript->assertSee('Hello from the transcript.', false);
 
-        $chapters = $this->get("/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json");
+        $chapters = $this->get(
+            "/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json",
+            $this->withTenantHeader(),
+        );
         $chapters->assertStatus(200);
         $chapters->assertJsonPath('chapters.0.title', 'Intro');
         $chapters->assertJsonPath('chapters.1.startTime', 60);
@@ -652,10 +669,13 @@ class PodcastControllerTest extends TestCase
             ->where('title', 'Unsafe')
             ->value('url'));
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::reset();
 
-        $chapters = $this->get("/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json");
+        $chapters = $this->get(
+            "/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json",
+            $this->withTenantHeader(),
+        );
 
         $chapters->assertStatus(200);
         $chapters->assertDontSee('javascript:alert(1)', false);
@@ -699,7 +719,7 @@ class PodcastControllerTest extends TestCase
         $episode->assertStatus(201);
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episode->json('data.id')}/publish")->assertStatus(200);
 
-        $this->app['auth']->forgetGuards();
+        $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
 
         $rss = $this->get("/api/v2/podcasts/{$showSlug}/feed.xml", $this->withTenantHeader());

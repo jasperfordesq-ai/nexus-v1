@@ -218,7 +218,7 @@ class AdminOnboardingConfigTest extends TestCase
         $this->assertGreaterThan(0, $count);
     }
 
-    public function test_apply_preset_does_not_overwrite_existing_options(): void
+    public function test_apply_preset_refreshes_existing_preset_options(): void
     {
         $this->actingAsAdmin();
 
@@ -237,12 +237,13 @@ class AdminOnboardingConfigTest extends TestCase
         $created = $data['options_created'] ?? $data['data']['options_created'] ?? [];
         $this->assertNotContains('is_vulnerable_adult', $created); // Not overwritten
 
-        // Verify custom label preserved
+        // Preset-owned rows are refreshed in place so stored wording cannot
+        // drift away from the active jurisdiction policy.
         $label = DB::table('tenant_safeguarding_options')
             ->where('tenant_id', $this->testTenantId)
             ->where('option_key', 'is_vulnerable_adult')
             ->value('label');
-        $this->assertEquals('CUSTOM LABEL', $label);
+        $this->assertEquals('safeguarding.presets.common.options.is_vulnerable_adult.label', $label);
     }
 
     public function test_apply_preset_rejects_invalid_preset(): void

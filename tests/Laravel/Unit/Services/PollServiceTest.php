@@ -52,16 +52,19 @@ class PollServiceTest extends TestCase
         DB::shouldReceive('selectOne')
             ->once()
             ->ordered()
-            ->andReturn((object) ['id' => 1, 'end_date' => null]);
+            ->andReturn((object) ['id' => 1, 'user_id' => 1, 'end_date' => null]);
         DB::shouldReceive('selectOne')
             ->once()
             ->ordered()
             ->andReturn((object) ['id' => 10]);
 
         // INSERT IGNORE affected 0 rows → the user had already voted.
-        DB::shouldReceive('affectingStatement')
+        DB::shouldReceive('selectOne')
             ->once()
-            ->andReturn(0);
+            ->ordered()
+            ->andReturn((object) ['id' => 99]);
+
+        DB::shouldReceive('affectingStatement')->never();
 
         $result = PollService::vote(1, 10, 1);
         $this->assertFalse($result);
@@ -76,11 +79,16 @@ class PollServiceTest extends TestCase
         DB::shouldReceive('selectOne')
             ->once()
             ->ordered()
-            ->andReturn((object) ['id' => 1, 'end_date' => null]);
+            ->andReturn((object) ['id' => 1, 'user_id' => 1, 'end_date' => null]);
         DB::shouldReceive('selectOne')
             ->once()
             ->ordered()
             ->andReturn((object) ['id' => 10]);
+
+        DB::shouldReceive('selectOne')
+            ->once()
+            ->ordered()
+            ->andReturn(null);
 
         // INSERT IGNORE wrote a new row → vote cast.
         DB::shouldReceive('affectingStatement')

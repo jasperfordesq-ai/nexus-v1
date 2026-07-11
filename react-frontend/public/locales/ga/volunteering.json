@@ -636,8 +636,6 @@
     "manual_review_delete_failed": "Níorbh fhéidir an dintiúr a scriosadh. Bain triail eile as.",
     "expiring_soon_desc_one": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
     "expiring_soon_desc_other": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
-    "type_police_check": "Seiceáil Póilíní",
-    "type_background_check": "Seiceáil Cúlra",
     "expiring_soon_desc_few": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
     "expiring_soon_desc_many": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
     "expiring_soon_desc_two": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá."

@@ -8,6 +8,7 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\EventNotificationService;
+use App\Services\SafeguardingInteractionPolicy;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -54,6 +55,12 @@ class EventNotificationServiceTest extends TestCase
 
     public function test_notifyAttendees_skips_organizer(): void
     {
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertManyLocalContactsAllowed')
+            ->once()
+            ->with(10, [20, 30], 2, 'event_broadcast');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
         $event = (object) ['id' => 1, 'title' => 'Test Event', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
         // Attendees query: table('event_rsvps as r')->join->where->where->whereIn->select->distinct->get()

@@ -81,6 +81,8 @@ class JobVacanciesControllerTest extends TestCase
 
     public function test_public_index_returns_full_next_public_job_contract_when_opted_in(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Hiring',
             'last_name' => 'Lead',
@@ -371,6 +373,8 @@ class JobVacanciesControllerTest extends TestCase
 
     public function test_public_show_returns_full_next_public_job_contract_when_opted_in(): void
     {
+        $this->authenticatedUser();
+
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Detail',
             'last_name' => 'Employer',

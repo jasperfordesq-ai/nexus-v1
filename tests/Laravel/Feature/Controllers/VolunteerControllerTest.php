@@ -124,6 +124,8 @@ class VolunteerControllerTest extends TestCase
 
     public function test_opportunities_do_not_expose_creator_internal_id(): void
     {
+        $this->authenticatedUser();
+
         // VOL-BE-011: the public/browse list must not leak the creator's internal
         // users.id (name + avatar remain for display).
         $owner = User::factory()->forTenant($this->testTenantId)->create();
@@ -427,6 +429,8 @@ public function test_apply_requires_auth(): void
 
     public function test_organisations_public_contract_is_opt_in(): void
     {
+        $this->authenticatedUser();
+
         $this->enableVolunteeringFeature();
         $owner = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Organisation',
@@ -490,6 +494,8 @@ public function test_apply_requires_auth(): void
 
     public function test_show_organisation_public_contract_is_opt_in(): void
     {
+        $this->authenticatedUser();
+
         $this->enableVolunteeringFeature();
         $owner = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Detail',
@@ -591,6 +597,8 @@ public function test_apply_requires_auth(): void
 
     public function test_show_organisation_hides_pending_and_suspended_profiles(): void
     {
+        $this->authenticatedUser();
+
         $this->enableVolunteeringFeature();
         $owner = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',

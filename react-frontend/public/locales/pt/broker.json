@@ -1267,6 +1267,7 @@
     "accepted": "Aceite",
     "in_progress": "Em curso",
     "pending_confirmation": "Aguarda confirmação",
+    "confirmed": "Confirmado",
     "review_requested": "Revisão solicitada",
     "not_confirmed": "Não confirmado"
   },

@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services;
 use App\Services\MatchApprovalWorkflowService;
 use App\Services\SafeguardingInteractionPolicy;
 use App\Support\SafeguardingInteractionDecision;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mockery;
@@ -37,6 +38,13 @@ class MatchApprovalWorkflowServiceTest extends TestCase
     {
         parent::setUp();
         $this->bindPolicy(SafeguardingInteractionDecision::ALLOW);
+        Cache::shouldReceive('remember')->zeroOrMoreTimes()->andReturn([
+            'requires_vetted_interaction' => false,
+            'requires_broker_approval' => false,
+            'restricts_messaging' => false,
+            'restricts_matching' => false,
+            'notify_admin_on_selection' => false,
+        ]);
     }
 
     private function bindPolicy(string $status): void

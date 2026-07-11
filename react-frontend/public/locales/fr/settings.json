@@ -304,6 +304,8 @@
     "chip_vetted_only": "Contacts vérifiés uniquement",
     "vetting": {
       "title": "Votre statut de contrôle communautaire privé",
+      "status_confirmed": "Confirmé",
+      "status_revoked": "Révoqué",
       "status_not_confirmed": "Non confirmé",
       "status_review_requested": "Révision demandée",
       "status_unavailable": "Votre statut de vérification n'a pas pu être chargé.",

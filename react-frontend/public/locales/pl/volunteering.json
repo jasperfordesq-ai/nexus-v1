@@ -630,8 +630,6 @@
     "manual_review_delete_failed": "Nie można było usunąć poświadczenia. Spróbuj ponownie.",
     "expiring_soon_desc_one": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
     "expiring_soon_desc_other": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
-    "type_police_check": "Kontrola policyjna",
-    "type_background_check": "Kontrola tła",
     "expiring_soon_desc_few": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
     "expiring_soon_desc_many": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni."
   },

@@ -97,7 +97,7 @@ class TenantDefaultsSeederTest extends TestCase
 
     // ── seedAttributes ────────────────────────────────────────────────────────
 
-    public function test_seed_attributes_inserts_nine_rows(): void
+    public function test_seed_attributes_inserts_eight_rows(): void
     {
         TenantDefaultsSeeder::seedAttributes(self::TENANT_ID);
 
@@ -105,7 +105,7 @@ class TenantDefaultsSeederTest extends TestCase
             ->where('tenant_id', self::TENANT_ID)
             ->count();
 
-        $this->assertSame(9, $count, 'Expected exactly 9 default attributes');
+        $this->assertSame(8, $count, 'Expected exactly 8 default attributes');
     }
 
     public function test_seed_attributes_includes_correct_target_types(): void

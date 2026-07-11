@@ -1256,6 +1256,7 @@
     "accepted": "Geaccepteerd",
     "in_progress": "Bezig",
     "pending_confirmation": "Wacht op bevestiging",
+    "confirmed": "Bevestigd",
     "review_requested": "Beoordeling aangevraagd",
     "not_confirmed": "Niet bevestigd"
   },

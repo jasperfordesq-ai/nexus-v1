@@ -304,6 +304,8 @@
     "chip_vetted_only": "Solo contatti verificati",
     "vetting": {
       "title": "Il tuo stato di controllo della comunità privata",
+      "status_confirmed": "Confermato",
+      "status_revoked": "Revocato",
       "status_not_confirmed": "Non confermato",
       "status_review_requested": "Richiesta revisione",
       "status_unavailable": "Non è stato possibile caricare il tuo stato di verifica.",

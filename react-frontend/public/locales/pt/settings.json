@@ -304,6 +304,8 @@
     "chip_vetted_only": "Apenas contactos verificados",
     "vetting": {
       "title": "O status de verificação da sua comunidade privada",
+      "status_confirmed": "Confirmado",
+      "status_revoked": "Revogado",
       "status_not_confirmed": "Não confirmado",
       "status_review_requested": "Revisão solicitada",
       "status_unavailable": "Não foi possível carregar seu status de verificação.",

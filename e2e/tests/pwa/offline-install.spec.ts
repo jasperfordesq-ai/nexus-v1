@@ -54,7 +54,7 @@ test.describe('production PWA lifecycle', () => {
     ]);
   });
 
-  test('clean installation restarts the current route with browser HTTP cache empty', async ({ page, context }) => {
+  test('clean installation restarts the public shell with browser HTTP cache empty', async ({ page, context }) => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
 
@@ -86,6 +86,12 @@ test.describe('production PWA lifecycle', () => {
         ));
     }, undefined, { timeout: 30_000 });
 
+    // Tenant-prefixed and authenticated navigations are intentionally
+    // network-only. Prime an explicitly identity-free public route before
+    // taking the browser offline so this test exercises the public shell cache.
+    await page.goto('/about', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main, [role="main"]').first()).toBeVisible();
+
     // Remove the browser HTTP cache so only Workbox's revisioned shell,
     // startup precache, and controlled immutable-route cache can satisfy boot.
     const cdp = await context.newCDPSession(page);
@@ -95,7 +101,6 @@ test.describe('production PWA lifecycle', () => {
     await context.setOffline(true);
     try {
       await page.reload({ waitUntil: 'domcontentloaded', timeout: 30_000 });
-      await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 20_000 });
       await expect(page.locator('main, [role="main"]').first()).toBeVisible();
       expect(pageErrors).toEqual([]);
     } finally {
@@ -109,7 +114,7 @@ test.describe('production PWA lifecycle', () => {
     expect(response.ok()).toBe(true);
     const worker = await response.text();
 
-    expect(worker).toContain('nexus-html-shell-v2');
+    expect(worker).toContain('nexus-public-html-shell-v3');
     expect(worker).toContain('nexus-immutable-assets-v1');
     expect(worker).toContain('nexus-tenant-bootstrap-v1');
     expect(worker).toContain('index.html');
