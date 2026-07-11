@@ -399,6 +399,17 @@ export const adminConfig = {
       { settings }
     ),
 
+  getAuthenticationConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/authentication'
+    ),
+
+  updateAuthenticationConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/authentication/bulk',
+      { settings }
+    ),
+
   // Translation config (INT9)
   getTranslationConfig: () =>
     api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(

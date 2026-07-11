@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Votre clé d\'accès a été renommée.',
             'removed' => 'Votre clé d\'accès a été supprimée.',
             'not_found' => 'Nous n\'avons pas pu trouver cette clé d\'accès. Elle a peut-être déjà été supprimée.',
+            'last_sign_in_method' => 'Vous ne pouvez pas supprimer votre seule méthode de connexion restante. Définissez d’abord un mot de passe ou ajoutez une autre méthode de connexion.',
             'name_required' => 'Saisissez un nom pour votre clé d\'accès.',
             'add_title' => 'Ajouter une nouvelle clé d\'accès',
             'add_description' => 'Pour ajouter une clé d\'accès, vous avez besoin d\'un navigateur avec JavaScript et d\'un appareil compatible avec les clés d\'accès. Vous pouvez ajouter et gérer vos clés d\'accès depuis l\'application principale.',

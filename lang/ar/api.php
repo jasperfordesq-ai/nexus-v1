@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'لا يمكنك إزالة وسيلة تسجيل الدخول الوحيدة المتبقية. عيّن كلمة مرور أو أضف وسيلة تسجيل دخول أخرى أولاً.',
     'sso_invalid_provider_key' => 'يجب أن يتكون مفتاح المزود من 2 إلى 20 حرفًا صغيرًا أو أرقام أو شرطات أو شرطات سفلية.',
     'sso_invalid_issuer' => 'يجب أن يكون عنوان URL للمُصدر عنوان https:// صالحًا.',
     'sso_client_id_required' => 'معرف العميل مطلوب.',

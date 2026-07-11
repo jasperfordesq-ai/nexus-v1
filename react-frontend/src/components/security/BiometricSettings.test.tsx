@@ -15,6 +15,7 @@ const mockRemoveWebAuthnCredential = vi.fn();
 const mockRemoveAllWebAuthnCredentials = vi.fn();
 const mockRenameWebAuthnCredential = vi.fn();
 const mockDetectPlatform = vi.fn();
+let passkeyEnrollmentAllowed = true;
 
 vi.mock('@/lib/webauthn', () => ({
   isBiometricAvailable: (...args: unknown[]) => mockIsBiometricAvailable(...args),
@@ -41,7 +42,7 @@ vi.mock('@/contexts', () => ({
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
   useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
-  useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
+  useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p: string) => '/test' + p, isLoading: false, hasFeature: vi.fn((feature: string) => feature !== 'biometric_login' || passkeyEnrollmentAllowed), hasModule: vi.fn(() => true) }),
 }));
 
 // Mock i18next
@@ -85,6 +86,7 @@ const settingsTranslations: Record<string, string> = {
 };
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: { fallbackValue?: string; count?: number }) => {
       const template = settingsTranslations[key] ?? opts?.fallbackValue ?? key;
@@ -102,6 +104,7 @@ vi.mock('@/components/ui', async () => {
         onClick: onPress as (() => void) | undefined,
         disabled: isDisabled || isLoading,
         'data-testid': props['data-testid'],
+        'aria-label': props['aria-label'],
       }, isLoading ? 'Loading...' : children),
     Spinner: () => React.createElement('div', { 'data-testid': 'spinner' }, 'Loading...'),
     Tooltip: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
@@ -134,8 +137,11 @@ describe('BiometricSettings', () => {
     vi.clearAllMocks();
     mockDetectPlatform.mockReturnValue('windows');
     mockIsBiometricAvailable.mockResolvedValue(true);
+    passkeyEnrollmentAllowed = true;
     // getWebAuthnCredentials returns Credential[] directly (not {credentials, count})
     mockGetWebAuthnCredentials.mockResolvedValue([]);
+    mockRemoveWebAuthnCredential.mockResolvedValue({ success: true });
+    mockRemoveAllWebAuthnCredentials.mockResolvedValue({ success: true, removedCount: 0 });
   });
 
   it('renders loading state initially', () => {
@@ -251,5 +257,47 @@ describe('BiometricSettings', () => {
       // showInstructions defaults to true, so multi-device note is visible
       expect(screen.getByText(/iCloud Keychain syncs across Apple devices/)).toBeDefined();
     });
+  });
+
+  it('hides passkey setup when tenant enrollment is disabled and none exist', async () => {
+    passkeyEnrollmentAllowed = false;
+    render(<BiometricSettings />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Create a passkey')).toBeNull();
+      expect(screen.queryByText('Passkey Login')).toBeNull();
+    });
+  });
+
+  it('keeps existing passkeys manageable while hiding new enrollment', async () => {
+    passkeyEnrollmentAllowed = false;
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'abc123', device_name: 'Windows Hello', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null },
+    ]);
+
+    render(<BiometricSettings />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Windows Hello/)).toBeDefined();
+    });
+    expect(screen.queryByText('Add another passkey')).toBeNull();
+    expect(screen.queryByText(/iCloud Keychain syncs across Apple devices/)).toBeNull();
+  });
+
+  it('explains when the final sign-in method cannot be removed', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'abc123', device_name: 'Windows Hello', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null },
+    ]);
+    mockRemoveWebAuthnCredential.mockResolvedValue({
+      success: false,
+      errorCode: 'LAST_SIGN_IN_METHOD',
+    });
+    const user = userEvent.setup();
+
+    render(<BiometricSettings />);
+    const removeButton = await screen.findByRole('button', { name: 'Remove passkey' });
+    await user.click(removeButton);
+
+    expect(mockToast.error).toHaveBeenCalledWith('common:oauth.cannot_disconnect_last');
   });
 });

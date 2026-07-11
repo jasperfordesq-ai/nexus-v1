@@ -7,6 +7,14 @@ import { render, screen } from '@/test/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { SecurityTab } from './SecurityTab';
 
+let twoFactorEnrollmentAllowed = true;
+
+vi.mock('@/contexts', () => ({
+  useTenant: () => ({
+    hasFeature: (feature: string) => feature !== 'two_factor_authentication' || twoFactorEnrollmentAllowed,
+  }),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
@@ -81,6 +89,7 @@ const defaultProps = {
 describe('SecurityTab', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    twoFactorEnrollmentAllowed = true;
   });
 
   it('renders security settings heading', () => {
@@ -137,6 +146,22 @@ describe('SecurityTab', () => {
     render(<SecurityTab {...defaultProps} twoFactorEnabled={true} />);
     await user.click(screen.getByText('twofa_disable'));
     expect(defaultProps.twoFactorDisableModalOnOpen).toHaveBeenCalled();
+  });
+
+  it('hides new 2FA enrollment when the tenant feature is off', () => {
+    twoFactorEnrollmentAllowed = false;
+    render(<SecurityTab {...defaultProps} twoFactorEnabled={false} />);
+
+    expect(screen.queryByText('twofa_not_enabled')).toBeNull();
+    expect(screen.queryByText('twofa_enable')).toBeNull();
+  });
+
+  it('keeps existing 2FA enrollment manageable when the tenant feature is off', () => {
+    twoFactorEnrollmentAllowed = false;
+    render(<SecurityTab {...defaultProps} twoFactorEnabled={true} />);
+
+    expect(screen.getByText('twofa_enabled')).toBeDefined();
+    expect(screen.getByText('twofa_disable')).toBeDefined();
   });
 
   it('renders sessions section', () => {

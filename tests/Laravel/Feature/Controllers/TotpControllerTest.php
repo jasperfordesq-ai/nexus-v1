@@ -6,8 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Core\TotpEncryption;
 use App\Models\User;
+use App\Services\AuthenticationConfigurationService;
+use App\Services\TenantFeatureConfig;
 use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -53,6 +56,12 @@ class TotpControllerTest extends TestCase
         Cache::flush();
     }
 
+    protected function tearDown(): void
+    {
+        AuthenticationConfigurationService::clearCache($this->testTenantId);
+        parent::tearDown();
+    }
+
     /**
      * Create an active, approved user in the test tenant and authenticate the
      * Sanctum guard as them (used for the auth-protected /totp/status route).
@@ -88,6 +97,19 @@ class TotpControllerTest extends TestCase
         ]);
 
         return $secret;
+    }
+
+    private function disableNewTwoFactorEnrollment(): void
+    {
+        $features = TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['two_factor_authentication'] = false;
+
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
     }
 
     // ------------------------------------------------------------------
@@ -253,5 +275,36 @@ class TotpControllerTest extends TestCase
             'tenant_id' => $this->testTenantId,
             'is_enabled' => 1,
         ]);
+    }
+
+    public function test_existing_two_factor_login_still_verifies_without_issuing_trust_when_both_options_are_disabled(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $secret = $this->enableTotpForUser((int) $user->id);
+        $token = app(TwoFactorChallengeManager::class)->create((int) $user->id);
+        $this->disableNewTwoFactorEnrollment();
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES,
+            false,
+            $this->testTenantId
+        );
+
+        $response = $this->apiPost('/totp/verify', [
+            'two_factor_token' => $token,
+            'code' => TOTP::createFromSecret($secret)->now(),
+            'trust_device' => true,
+        ]);
+
+        $response->assertOk()->assertJsonPath('success', true);
+        $this->assertArrayNotHasKey('trusted_device_token', $response->json());
+        $this->assertSame(0, DB::table('user_trusted_devices')
+            ->where('user_id', $user->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->count());
     }
 }

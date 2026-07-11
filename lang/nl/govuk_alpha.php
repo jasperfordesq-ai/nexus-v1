@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Uw toegangssleutel is hernoemd.',
             'removed' => 'Uw toegangssleutel is verwijderd.',
             'not_found' => 'We konden die toegangssleutel niet vinden. Deze is mogelijk al verwijderd.',
+            'last_sign_in_method' => 'U kunt uw enige resterende aanmeldmethode niet verwijderen. Stel eerst een wachtwoord in of voeg een andere aanmeldmethode toe.',
             'name_required' => 'Voer een naam in voor uw toegangssleutel.',
             'add_title' => 'Een nieuwe toegangssleutel toevoegen',
             'add_description' => 'Om een toegangssleutel toe te voegen heeft u een browser met JavaScript nodig en een apparaat dat toegangssleutels ondersteunt. U kunt toegangssleutels toevoegen en beheren vanuit de hoofdapp.',

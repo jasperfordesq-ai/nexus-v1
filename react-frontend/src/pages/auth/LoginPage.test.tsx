@@ -42,6 +42,8 @@ const authDefaults = {
   clearError: mockClearError,
   cancel2FA: mockCancel2FA,
   twoFactorMethods: [] as string[],
+  twoFactorTrustDeviceAllowed: true,
+  twoFactorTrustedDeviceDays: 30,
   user: null,
   logout: vi.fn(),
   register: vi.fn(),
@@ -50,6 +52,7 @@ const authDefaults = {
 };
 
 let authOverrides: Partial<typeof authDefaults> = {};
+let conditionalAutofillEnabled = true;
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ ...authDefaults, ...authOverrides }),
@@ -58,6 +61,7 @@ vi.mock('@/contexts', () => ({
     branding: { name: 'Test Community', logo_url: null },
     tenantSlug: 'test',
     tenantPath: mockTenantPath,
+    authenticationConfig: { 'passkeys.conditional_autofill': conditionalAutofillEnabled },
     isLoading: false,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
@@ -85,6 +89,7 @@ vi.mock('@/contexts/TenantContext', () => ({
     branding: { name: 'Test Community', logo_url: null },
     tenantSlug: 'test',
     tenantPath: mockTenantPath,
+    authenticationConfig: { 'passkeys.conditional_autofill': conditionalAutofillEnabled },
     isLoading: false,
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
@@ -165,6 +170,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     authOverrides = {};
+    conditionalAutofillEnabled = true;
     Object.defineProperty(window, 'PublicKeyCredential', {
       value: { isConditionalMediationAvailable: vi.fn() },
       configurable: true,
@@ -256,6 +262,22 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
         expect.any(AbortSignal),
       );
     });
+  });
+
+  it('disables conditional autofill without disabling explicit passkey login', async () => {
+    conditionalAutofillEnabled = false;
+    mockIsConditionalMediationAvailable.mockResolvedValue(true);
+    const user = userEvent.setup();
+
+    render(<LoginPage />);
+    fireEvent.focus(document.querySelector('input[type="email"]') as HTMLInputElement);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(mockIsConditionalMediationAvailable).not.toHaveBeenCalled();
+    expect(mockStartConditionalAuthentication).not.toHaveBeenCalled();
+
+    await user.click(screen.getByText('Sign in with a passkey'));
+    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined);
   });
 
   // ─── 6. Conditional mediation aborted on unmount ───────────────────────────
@@ -372,5 +394,54 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/test/feed', { replace: true });
     });
+  });
+
+  it('accepts alphanumeric backup codes and normalises them before verification', async () => {
+    authOverrides = {
+      status: 'requires_2fa',
+      twoFactorMethods: ['totp', 'backup_code'],
+    };
+    mockVerify2FA.mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(<LoginPage />);
+
+    await user.click(screen.getByLabelText('Use backup code instead'));
+    fireEvent.change(screen.getByLabelText('Backup Code'), {
+      target: { value: 'AB12-CD34' },
+    });
+    await user.click(screen.getByText('Verify'));
+
+    await waitFor(() => {
+      expect(mockVerify2FA).toHaveBeenCalledWith({
+        code: 'AB12CD34',
+        use_backup_code: true,
+        trust_device: false,
+      });
+    });
+  });
+
+  it('hides trusted-device opt-in when tenant policy disables it', () => {
+    authOverrides = {
+      status: 'requires_2fa',
+      twoFactorMethods: ['totp', 'backup_code'],
+      twoFactorTrustDeviceAllowed: false,
+    };
+
+    render(<LoginPage />);
+
+    expect(screen.queryByText(/Trust this device/)).toBeNull();
+  });
+
+  it('shows the configured trusted-device duration', () => {
+    authOverrides = {
+      status: 'requires_2fa',
+      twoFactorMethods: ['totp'],
+      twoFactorTrustDeviceAllowed: true,
+      twoFactorTrustedDeviceDays: 14,
+    };
+
+    render(<LoginPage />);
+
+    expect(screen.getByText('Trust this device for 14 days')).toBeDefined();
   });
 });

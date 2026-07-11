@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Ihr Passkey wurde umbenannt.',
             'removed' => 'Ihr Passkey wurde entfernt.',
             'not_found' => 'Dieser Passkey konnte nicht gefunden werden. Er wurde möglicherweise bereits entfernt.',
+            'last_sign_in_method' => 'Sie können Ihre einzige verbleibende Anmeldemethode nicht entfernen. Legen Sie zuerst ein Passwort fest oder fügen Sie eine andere Anmeldemethode hinzu.',
             'name_required' => 'Geben Sie einen Namen für Ihren Passkey ein.',
             'add_title' => 'Neuen Passkey hinzufügen',
             'add_description' => 'Um einen Passkey hinzuzufügen, benötigen Sie einen Browser mit JavaScript und ein Gerät, das Passkeys unterstützt. Sie können Passkeys in der Hauptanwendung hinzufügen und verwalten.',

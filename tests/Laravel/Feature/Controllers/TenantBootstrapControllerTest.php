@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Services\AuthenticationConfigurationService;
 use App\Services\RedisCache;
 use App\Services\TenantHierarchyService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -44,6 +45,36 @@ class TenantBootstrapControllerTest extends TestCase
                 'compliance',
             ],
         ]);
+    }
+
+    public function test_bootstrap_exposes_typed_authentication_configuration(): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $this->testTenantId,
+                'setting_key' => AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS,
+            ],
+            [
+                'setting_value' => '14',
+                'setting_type' => 'integer',
+                'category' => 'authentication',
+                'updated_at' => now(),
+            ]
+        );
+        AuthenticationConfigurationService::clearCache($this->testTenantId);
+        app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+
+        try {
+            $response = $this->apiGet('/v2/tenant/bootstrap?slug=' . $this->testTenantSlug);
+
+            $response->assertStatus(200);
+            $authenticationConfig = $response->json('data.authentication_config');
+            $this->assertSame(14, $authenticationConfig['two_factor.trusted_device_days']);
+            $this->assertTrue($authenticationConfig['passkeys.conditional_autofill']);
+        } finally {
+            AuthenticationConfigurationService::clearCache($this->testTenantId);
+            app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+        }
     }
 
     // ================================================================
@@ -246,6 +277,34 @@ class TenantBootstrapControllerTest extends TestCase
 
         $slugs = array_column($response->json('data'), 'slug');
         $this->assertContains($this->testTenantSlug, $slugs);
+    }
+
+    public function test_list_exposes_each_tenants_conditional_passkey_autofill_policy(): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $this->testTenantId,
+                'setting_key' => AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL,
+            ],
+            [
+                'setting_value' => 'false',
+                'setting_type' => 'boolean',
+                'category' => 'authentication',
+                'updated_at' => now(),
+            ]
+        );
+        app(RedisCache::class)->delete('tenants_list_public');
+
+        try {
+            $response = $this->apiGet('/v2/tenants');
+
+            $response->assertStatus(200);
+            $tenant = collect($response->json('data'))->firstWhere('id', $this->testTenantId);
+            $this->assertNotNull($tenant);
+            $this->assertFalse($tenant['authentication_config']['passkeys.conditional_autofill']);
+        } finally {
+            app(RedisCache::class)->delete('tenants_list_public');
+        }
     }
 
     public function test_list_excludes_master_tenant_by_default(): void

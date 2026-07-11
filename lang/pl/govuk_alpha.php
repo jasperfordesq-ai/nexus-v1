@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Twój klucz dostępu został przemianowany.',
             'removed' => 'Twój klucz dostępu został usunięty.',
             'not_found' => 'Nie znaleziono tego klucza dostępu. Być może został już usunięty.',
+            'last_sign_in_method' => 'Nie możesz usunąć jedynej pozostałej metody logowania. Najpierw ustaw hasło lub dodaj inną metodę logowania.',
             'name_required' => 'Wprowadź nazwę dla klucza dostępu.',
             'add_title' => 'Dodaj nowy klucz dostępu',
             'add_description' => 'Aby dodać klucz dostępu, potrzebujesz przeglądarki z obsługą JavaScript oraz urządzenia obsługującego klucze dostępu. Klucze dostępu możesz dodawać i zarządzać nimi w głównej aplikacji.',

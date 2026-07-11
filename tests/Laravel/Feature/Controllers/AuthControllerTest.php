@@ -7,8 +7,12 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\ApiErrorCodes;
+use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\AuthenticationConfigurationService;
+use App\Services\TenantFeatureConfig;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -21,6 +25,12 @@ use Tests\Laravel\TestCase;
 class AuthControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function tearDown(): void
+    {
+        AuthenticationConfigurationService::clearCache($this->testTenantId);
+        parent::tearDown();
+    }
 
     // ================================================================
     // LOGIN — Happy path
@@ -52,6 +62,70 @@ class AuthControllerTest extends TestCase
             'expires_in',
         ]);
         $response->assertJson(['success' => true]);
+    }
+
+    public function test_disabled_trusted_devices_cannot_bypass_existing_two_factor_login(): void
+    {
+        $email = 'auth_2fa_' . uniqid() . '@example.com';
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => $email,
+            'password_hash' => Hash::make('correct-password'),
+            'status' => 'active',
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        DB::table('user_totp_settings')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'totp_secret_encrypted' => 'not-read-during-password-login',
+            'is_enabled' => 1,
+            'is_pending_setup' => 0,
+        ]);
+
+        $trustedToken = 'known-trusted-device-token-' . $user->id . '-' . uniqid('', true);
+        DB::table('user_trusted_devices')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'device_token_hash' => hash('sha256', $trustedToken),
+            'device_name' => 'Existing trusted device',
+            'ip_address' => '127.0.0.1',
+            'expires_at' => now()->addDays(30),
+            'is_revoked' => 0,
+        ]);
+
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES,
+            false,
+            $this->testTenantId
+        );
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS,
+            14,
+            $this->testTenantId
+        );
+
+        $features = TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['two_factor_authentication'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiPost('/auth/login', [
+            'email' => $email,
+            'password' => 'correct-password',
+        ], [
+            'X-Trusted-Device' => $trustedToken,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('requires_2fa', true)
+            ->assertJsonPath('allow_trusted_device', false)
+            ->assertJsonPath('trusted_device_days', 14);
+        $this->assertArrayNotHasKey('access_token', $response->json());
     }
 
     public function test_login_rejects_pending_user_before_token_issue(): void

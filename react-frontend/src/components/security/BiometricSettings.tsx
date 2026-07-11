@@ -18,7 +18,7 @@ import Tablet from 'lucide-react/icons/tablet';
 import Laptop from 'lucide-react/icons/laptop';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import {
   isBiometricAvailable,
   registerBiometric,
@@ -119,6 +119,8 @@ function getPlatformInstructions(platform: DevicePlatform, t: (key: string, opti
 export function BiometricSettings() {
   const { t } = useTranslation('settings');
   const toast = useToast();
+  const { hasFeature } = useTenant();
+  const passkeyEnrollmentAllowed = hasFeature('biometric_login');
 
   const [supported, setSupported] = useState<boolean | null>(null);
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -178,12 +180,14 @@ export function BiometricSettings() {
 
   const handleRemove = async (credentialId: string) => {
     setRemovingId(credentialId);
-    const success = await removeWebAuthnCredential(credentialId);
+    const result = await removeWebAuthnCredential(credentialId);
     setRemovingId(null);
 
-    if (success) {
+    if (result.success) {
       toast.success(t('biometric_removed'));
       setCredentials(prev => prev.filter(c => c.credential_id !== credentialId));
+    } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
+      toast.error(t('common:oauth.cannot_disconnect_last'));
     } else {
       toast.error(t('passkey_remove_failed'));
     }
@@ -201,6 +205,8 @@ export function BiometricSettings() {
         }),
       );
       setCredentials([]);
+    } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
+      toast.error(t('common:oauth.cannot_disconnect_last'));
     } else {
       toast.error(t('passkey_remove_all_failed'));
     }
@@ -225,6 +231,10 @@ export function BiometricSettings() {
   };
 
   // Not supported — show info message
+  if (!loading && !passkeyEnrollmentAllowed && credentials.length === 0) {
+    return null;
+  }
+
   if (supported === false) {
     return (
       <div className="w-full p-4 rounded-lg bg-theme-elevated text-left">
@@ -293,7 +303,7 @@ export function BiometricSettings() {
           </div>
         </div>
 
-        <Tooltip content={t('passkey_setup_tooltip')}>
+        {passkeyEnrollmentAllowed && <Tooltip content={t('passkey_setup_tooltip')}>
           <Button
             isIconOnly
             size="sm"
@@ -304,11 +314,11 @@ export function BiometricSettings() {
           >
             <Info className="w-4 h-4" />
           </Button>
-        </Tooltip>
+        </Tooltip>}
       </div>
 
       {/* Platform-specific instructions */}
-      {showInstructions && (
+      {passkeyEnrollmentAllowed && showInstructions && (
         <div className="p-3 rounded-lg bg-accent/5 border border-accent/20 space-y-2">
           <p className="text-sm font-medium text-accent dark:text-accent">
             {instructions.title} - {t('passkey_setup_subtitle')}
@@ -327,7 +337,7 @@ export function BiometricSettings() {
       )}
 
       {/* Registration button — no attachment restriction, let browser show all options */}
-      <Button
+      {passkeyEnrollmentAllowed && <Button
         size="md"
         className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
         onPress={() => handleRegister(undefined)}
@@ -335,7 +345,7 @@ export function BiometricSettings() {
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
       >
         {hasCredentials ? t('passkey_add_another') : t('passkey_create')}
-      </Button>
+      </Button>}
 
       {/* Registered credentials list */}
       {hasCredentials && (
@@ -439,7 +449,7 @@ export function BiometricSettings() {
       )}
 
       {/* Multi-device tip */}
-      {!showInstructions && (
+      {passkeyEnrollmentAllowed && !showInstructions && (
         <p className="text-xs text-theme-muted">
           {t('passkey_device_tip')}{' '}
           <Button

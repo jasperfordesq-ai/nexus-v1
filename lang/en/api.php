@@ -2418,6 +2418,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'You cannot remove your only remaining sign-in method. Set a password or add another sign-in method first.',
     'sso_invalid_provider_key' => 'Provider key must be 2-20 lowercase letters, digits, hyphens or underscores.',
     'sso_invalid_issuer' => 'Issuer URL must be a valid https:// address.',
     'sso_client_id_required' => 'Client ID is required.',

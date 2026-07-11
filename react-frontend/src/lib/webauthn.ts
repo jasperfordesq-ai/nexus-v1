@@ -498,9 +498,15 @@ export async function getWebAuthnCredentials(): Promise<WebAuthnCredential[]> {
   return res.data?.credentials ?? [];
 }
 
-export async function removeWebAuthnCredential(credentialId: string): Promise<boolean> {
+export interface WebAuthnRemovalResult {
+  success: boolean;
+  errorCode?: string;
+  error?: string;
+}
+
+export async function removeWebAuthnCredential(credentialId: string): Promise<WebAuthnRemovalResult> {
   const res = await api.post('/webauthn/remove', { credential_id: credentialId });
-  return res.success;
+  return { success: res.success, errorCode: res.code, error: res.error };
 }
 
 export async function renameWebAuthnCredential(credentialId: string, deviceName: string): Promise<boolean> {
@@ -508,7 +514,12 @@ export async function renameWebAuthnCredential(credentialId: string, deviceName:
   return res.success;
 }
 
-export async function removeAllWebAuthnCredentials(): Promise<{ success: boolean; removedCount: number }> {
+export async function removeAllWebAuthnCredentials(): Promise<WebAuthnRemovalResult & { removedCount: number }> {
   const res = await api.post<{ removed_count: number }>('/webauthn/remove-all', {});
-  return { success: res.success, removedCount: res.data?.removed_count ?? 0 };
+  return {
+    success: res.success,
+    removedCount: res.data?.removed_count ?? 0,
+    errorCode: res.code,
+    error: res.error,
+  };
 }

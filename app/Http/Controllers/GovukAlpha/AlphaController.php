@@ -14,6 +14,7 @@ use App\Models\Category;
 use App\Models\ListingImage;
 use App\Models\User;
 use App\Services\BrokerControlConfigService;
+use App\Services\Auth\AuthenticationMethodGuard;
 use App\Services\CommentService;
 use App\Services\ConnectionService;
 use App\Services\EventService;
@@ -342,6 +343,16 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'login',
             'status' => self::asStr($request->query('status')) ?: null,
+            'allowTrustedDevice' => (bool) (
+                \App\Services\AuthenticationConfigurationService::get(
+                    \App\Services\AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES
+                )
+            ),
+            'trustedDeviceDays' => (int) (
+                \App\Services\AuthenticationConfigurationService::get(
+                    \App\Services\AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS
+                )
+            ),
         ]);
     }
 
@@ -10018,6 +10029,7 @@ class AlphaController extends Controller
 
         $totp = app(\App\Services\TotpService::class);
         $enabled = $totp->isEnabled($userId);
+        abort_if(!$enabled && !TenantContext::hasFeature('two_factor_authentication'), 403);
 
         $setup = null;
         if (!$enabled) {
@@ -10055,6 +10067,7 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
+        abort_unless(TenantContext::hasFeature('two_factor_authentication'), 403);
 
         $code = trim(self::asStr($request->input('code')));
         if ($code === '') {
@@ -10371,6 +10384,9 @@ class AlphaController extends Controller
             'notificationPrefs' => $this->alphaNotificationPrefs($userId),
             'digestFrequency' => $this->alphaDigestFrequency($userId),
             'passkeys' => $this->alphaPasskeys($userId),
+            'twoFactorEnabled' => \App\Services\TotpService::isEnabled($userId),
+            'twoFactorEnrollmentAllowed' => TenantContext::hasFeature('two_factor_authentication'),
+            'passkeyEnrollmentAllowed' => TenantContext::hasFeature('biometric_login'),
             'prefersChronological' => (bool) ($account->prefers_chronological_feed ?? false),
             'autoTranslate' => (bool) ($account->auto_translate_ugc ?? false),
             'autoTranslateLocale' => (string) ($account->auto_translate_target_locale ?? $account->preferred_language ?? 'en'),
@@ -10704,14 +10720,38 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-not-found'])->withFragment('passkeys');
         }
 
-        $deleted = DB::delete(
-            'DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?',
-            [$credentialId, $userId, TenantContext::getId()]
-        );
+        $tenantId = TenantContext::getId();
+        $status = DB::transaction(function () use ($credentialId, $tenantId, $userId): string {
+            $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
+                $userId,
+                $tenantId,
+                true
+            );
+            $credentials = DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->pluck('credential_id');
+
+            if (!$credentials->contains($credentialId)) {
+                return 'passkey-not-found';
+            }
+            if ($credentials->count() === 1 && !$hasAlternative) {
+                return 'passkey-last-sign-in-method';
+            }
+
+            DB::table('webauthn_credentials')
+                ->where('credential_id', $credentialId)
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            return 'passkey-removed';
+        });
 
         return redirect()->route('govuk-alpha.profile.settings', [
             'tenantSlug' => $tenantSlug,
-            'status' => $deleted > 0 ? 'passkey-removed' : 'passkey-not-found',
+            'status' => $status,
         ])->withFragment('passkeys');
     }
 

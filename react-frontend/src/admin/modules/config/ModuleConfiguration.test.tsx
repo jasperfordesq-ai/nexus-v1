@@ -68,6 +68,8 @@ vi.mock('./moduleRegistry', () => ({
   getFeatureModules: () => [
     { id: 'events', name: 'Events', description: 'Community events', configOptions: [] },
     { id: 'gamification', name: 'Gamification', description: 'Badges & XP', configOptions: [] },
+    { id: 'two_factor_authentication', name: 'two_factor_authentication', description: 'two_factor_authentication', configOptions: [] },
+    { id: 'biometric_login', name: 'biometric_login', description: 'biometric_login', configOptions: [] },
   ],
 }));
 
@@ -78,7 +80,12 @@ import type { TenantConfig } from '../../api/types';
 const MOCK_CONFIG: TenantConfig = {
   tenant_id: 2,
   modules: { listings: true, wallet: false },
-  features: { events: true, gamification: false },
+  features: {
+    events: true,
+    gamification: false,
+    two_factor_authentication: true,
+    biometric_login: true,
+  },
 };
 
 describe('ModuleConfiguration', () => {
@@ -172,6 +179,22 @@ describe('ModuleConfiguration', () => {
 
     await waitFor(() => {
       expect(adminConfig.updateModule).toHaveBeenCalledWith('listings', false);
+      expect(mockRefreshTenant).toHaveBeenCalled();
+    });
+  });
+
+  it('updates the two-factor enrollment feature from its module card', async () => {
+    vi.mocked(adminConfig.get).mockResolvedValue({ success: true, data: MOCK_CONFIG });
+    vi.mocked(adminConfig.updateFeature).mockResolvedValue({ success: true });
+    render(<ModuleConfiguration />);
+
+    const card = await screen.findByTestId('module-card-two_factor_authentication');
+    const toggle = card.querySelector('button');
+    expect(toggle).not.toBeNull();
+    if (toggle) await userEvent.click(toggle);
+
+    await waitFor(() => {
+      expect(adminConfig.updateFeature).toHaveBeenCalledWith('two_factor_authentication', false);
       expect(mockRefreshTenant).toHaveBeenCalled();
     });
   });

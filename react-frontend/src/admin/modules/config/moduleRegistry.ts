@@ -45,6 +45,8 @@ import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Podcast from 'lucide-react/icons/podcast';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Compass from 'lucide-react/icons/compass';
+import KeyRound from 'lucide-react/icons/key-round';
+import Fingerprint from 'lucide-react/icons/fingerprint';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -62,6 +64,7 @@ export type ConfigSource =
   | 'job_config'
   | 'podcast_config'
   | 'identity_config'
+  | 'authentication_config'
   | 'group_policies'
   | 'onboarding_config'
   | 'tenant_settings'
@@ -665,6 +668,30 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     configSource: 'identity_config',
     configOptions: [
       { key: 'identity_verification_fee_cents', label: 'Verification Fee (cents)', description: 'One-time fee charged for identity verification. Set to 0 for free verification. Value in cents (e.g. 500 = €5.00)', type: 'number', defaultValue: 500, category: 'Pricing', min: 0, max: 10000 },
+    ],
+  },
+  {
+    id: 'two_factor_authentication',
+    name: 'two_factor_authentication',
+    description: 'two_factor_authentication',
+    icon: KeyRound,
+    type: 'feature',
+    configSource: 'authentication_config',
+    configOptions: [
+      { key: 'two_factor.allow_trusted_devices', label: 'two_factor.allow_trusted_devices', description: 'two_factor.allow_trusted_devices', type: 'boolean', defaultValue: true, category: 'access' },
+      { key: 'two_factor.trusted_device_days', label: 'two_factor.trusted_device_days', description: 'two_factor.trusted_device_days', type: 'number', defaultValue: 30, category: 'access', min: 1, max: 365 },
+      { key: 'two_factor.backup_code_count', label: 'two_factor.backup_code_count', description: 'two_factor.backup_code_count', type: 'number', defaultValue: 10, category: 'recovery', min: 1, max: 100 },
+    ],
+  },
+  {
+    id: 'biometric_login',
+    name: 'biometric_login',
+    description: 'biometric_login',
+    icon: Fingerprint,
+    type: 'feature',
+    configSource: 'authentication_config',
+    configOptions: [
+      { key: 'passkeys.conditional_autofill', label: 'passkeys.conditional_autofill', description: 'passkeys.conditional_autofill', type: 'boolean', defaultValue: true, category: 'access' },
     ],
   },
   {

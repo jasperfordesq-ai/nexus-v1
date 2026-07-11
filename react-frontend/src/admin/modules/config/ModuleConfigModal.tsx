@@ -111,6 +111,9 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   // Identity verification config state
   const [identityConfig, setIdentityConfig] = useState<Record<string, boolean | number | string> | null>(null);
 
+  // Authentication config state (TOTP and passkey enrollment policies)
+  const [authenticationConfig, setAuthenticationConfig] = useState<Record<string, boolean | number | string> | null>(null);
+
   // ── Loaders ───────────────────────────────────────────────────────────────
 
   const loadBrokerConfig = useCallback(async () => {
@@ -211,6 +214,20 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast, t])
 
+  const loadAuthenticationConfig = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await adminConfig.getAuthenticationConfig();
+      if (res.success && res.data) {
+        setAuthenticationConfig(res.data.config);
+      }
+    } catch {
+      toast.error(t('config.modal_authentication_load_failed'));
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, t])
+
   // Reset all config state when the modal closes or the module changes. Done
   // during render with a prev-prop comparison (not useEffect) so users never
   // see a stale frame of the previous module's config. Mirrors the original
@@ -227,6 +244,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setJobConfig(null);
       setPodcastConfig(null);
       setIdentityConfig(null);
+      setAuthenticationConfig(null);
     }
   }
 
@@ -249,8 +267,10 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       loadPodcastConfig();
     } else if (module.configSource === 'identity_config') {
       loadIdentityConfig();
+    } else if (module.configSource === 'authentication_config') {
+      loadAuthenticationConfig();
     }
-  }, [isOpen, module, loadBrokerConfig, loadGroupConfig, loadListingConfig, loadVolunteeringConfig, loadJobConfig, loadPodcastConfig, loadIdentityConfig]);
+  }, [isOpen, module, loadBrokerConfig, loadGroupConfig, loadListingConfig, loadVolunteeringConfig, loadJobConfig, loadPodcastConfig, loadIdentityConfig, loadAuthenticationConfig]);
 
   // ── Save handlers ─────────────────────────────────────────────────────────
 
@@ -392,6 +412,26 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }
 
+  async function handleSaveAuthenticationConfig() {
+    if (!authenticationConfig) return;
+    setSaving(true);
+    try {
+      const res = await adminConfig.updateAuthenticationConfigBulk(authenticationConfig);
+      if (res.success) {
+        toast.success(t('config.modal_authentication_saved'));
+        setHasChanges(false);
+        refreshTenant();
+        onClose();
+      } else {
+        toast.error(t('config.modal_save_failed'));
+      }
+    } catch {
+      toast.error(t('config.modal_save_failed'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   // ── Value updaters ────────────────────────────────────────────────────────
 
   function updateBrokerValue<K extends keyof BrokerConfig>(key: K, value: BrokerConfig[K]) {
@@ -429,6 +469,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     setHasChanges(true);
   }
 
+  function updateAuthenticationValue(key: string, value: boolean | number | string) {
+    setAuthenticationConfig(prev => prev ? { ...prev, [key]: value } : prev);
+    setHasChanges(true);
+  }
+
   function handleNavigateToDetail() {
     if (module?.detailPageUrl) {
       onClose();
@@ -449,7 +494,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   const isJobConfig = module.configSource === 'job_config';
   const isPodcastConfig = module.configSource === 'podcast_config';
   const isIdentityConfig = module.configSource === 'identity_config';
-  const isEditable = isBroker || isGroupConfig || isListingConfig || isVolunteeringConfig || isJobConfig || isPodcastConfig || isIdentityConfig;
+  const isAuthenticationConfig = module.configSource === 'authentication_config';
+  const isEditable = isBroker || isGroupConfig || isListingConfig || isVolunteeringConfig || isJobConfig || isPodcastConfig || isIdentityConfig || isAuthenticationConfig;
 
   return (
     <Modal size="4xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
@@ -548,6 +594,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                       currentValue = podcastConfig[option.key] ?? option.defaultValue;
                     } else if (isIdentityConfig && identityConfig) {
                       currentValue = identityConfig[option.key] ?? option.defaultValue;
+                    } else if (isAuthenticationConfig && authenticationConfig) {
+                      currentValue = authenticationConfig[option.key] ?? option.defaultValue;
                     }
 
                     return (
@@ -571,9 +619,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                               updatePodcastValue(option.key, val);
                             } else if (isIdentityConfig) {
                               updateIdentityValue(option.key, val);
+                            } else if (isAuthenticationConfig) {
+                              updateAuthenticationValue(option.key, val);
                             }
                           }}
-                          disabled={option.comingSoon === true || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isPodcastConfig && !podcastConfig) || (isIdentityConfig && !identityConfig)}
+                          disabled={option.comingSoon === true || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isPodcastConfig && !podcastConfig) || (isIdentityConfig && !identityConfig) || (isAuthenticationConfig && !authenticationConfig)}
                         />
                       </div>
                     );
@@ -606,8 +656,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
             <Button
               startContent={<Save size={16} />}
               isLoading={saving}
-              isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isPodcastConfig && !podcastConfig) || (isIdentityConfig && !identityConfig)}
-              onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : isPodcastConfig ? handleSavePodcastConfig : isIdentityConfig ? handleSaveIdentityConfig : handleSaveGroupConfig}
+              isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isPodcastConfig && !podcastConfig) || (isIdentityConfig && !identityConfig) || (isAuthenticationConfig && !authenticationConfig)}
+              onPress={isBroker ? handleSaveBrokerConfig : isListingConfig ? handleSaveListingConfig : isVolunteeringConfig ? handleSaveVolunteeringConfig : isJobConfig ? handleSaveJobConfig : isPodcastConfig ? handleSavePodcastConfig : isIdentityConfig ? handleSaveIdentityConfig : isAuthenticationConfig ? handleSaveAuthenticationConfig : handleSaveGroupConfig}
             >
               {t('config.save_changes')}
             </Button>

@@ -30,6 +30,7 @@ import { Description } from '@/components/ui/Description';
 import { Label } from '@/components/ui/Label';
 import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { useTranslation } from 'react-i18next';
+import { useTenant } from '@/contexts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -168,6 +169,8 @@ export function SecurityTab({
   onCopyBackupCodes,
 }: SecurityTabProps) {
   const { t } = useTranslation('settings');
+  const { hasFeature } = useTenant();
+  const twoFactorEnrollmentAllowed = hasFeature('two_factor_authentication');
 
   return (
     <>
@@ -194,7 +197,9 @@ export function SecurityTab({
               </div>
             </Button>
 
-            {/* Two-Factor Authentication */}
+            {/* Two-Factor Authentication. Keep existing enrollments manageable
+                even if the tenant stops accepting new enrollment. */}
+            {(twoFactorEnrollmentAllowed || twoFactorEnabled) && (
             <div className="w-full p-4 rounded-lg bg-theme-elevated text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -235,7 +240,7 @@ export function SecurityTab({
                       >
                         {t('twofa_disable')}
                       </Button>
-                    ) : (
+                    ) : twoFactorEnrollmentAllowed ? (
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
@@ -243,11 +248,12 @@ export function SecurityTab({
                       >
                         {t('twofa_enable')}
                       </Button>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </div>
             </div>
+            )}
 
             {/* Biometric / Passkey Authentication */}
             <BiometricSettings />

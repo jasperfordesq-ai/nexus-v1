@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => '残っている唯一のサインイン方法は削除できません。先にパスワードを設定するか、別のサインイン方法を追加してください。',
     'sso_invalid_provider_key' => 'プロバイダーキーは2〜20文字の小文字・数字・ハイフン・アンダースコアで指定してください。',
     'sso_invalid_issuer' => '発行者URLは有効なhttps://アドレスである必要があります。',
     'sso_client_id_required' => 'クライアントIDは必須です。',

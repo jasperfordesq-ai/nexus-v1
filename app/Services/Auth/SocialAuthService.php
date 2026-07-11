@@ -268,30 +268,23 @@ class SocialAuthService
             throw new \RuntimeException('User not found.');
         }
 
-        $hasPassword = ! empty($user->password_hash) || ! empty($user->password);
-        $hasPasskey = false;
-        if (\Schema::hasTable('webauthn_credentials')) {
-            $hasPasskey = DB::table('webauthn_credentials')
+        $tenantId = (int) $user->tenant_id;
+        DB::transaction(function () use ($provider, $tenantId, $userId): void {
+            if (!AuthenticationMethodGuard::hasAlternativeToOauthProvider(
+                $userId,
+                $tenantId,
+                $provider,
+                true
+            )) {
+                throw new \RuntimeException(__('api.cannot_remove_last_sign_in_method'));
+            }
+
+            DB::table('oauth_identities')
                 ->where('user_id', $userId)
-                ->exists();
-        }
-
-        $otherIdentitiesCount = DB::table('oauth_identities')
-            ->where('user_id', $userId)
-            ->where('provider', '!=', $provider)
-            ->count();
-
-        $remainingMethods = ($hasPassword ? 1 : 0) + ($hasPasskey ? 1 : 0) + $otherIdentitiesCount;
-        if ($remainingMethods < 1) {
-            throw new \RuntimeException(
-                'Cannot unlink your only remaining sign-in method. Set a password or add a passkey first.'
-            );
-        }
-
-        DB::table('oauth_identities')
-            ->where('user_id', $userId)
-            ->where('provider', $provider)
-            ->delete();
+                ->where('tenant_id', $tenantId)
+                ->where('provider', $provider)
+                ->delete();
+        });
     }
 
     /**

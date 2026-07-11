@@ -89,7 +89,10 @@ export default function ModuleConfiguration() {
         return { ...prev, features: { ...prev.features, [id]: enabled } };
       });
       const mod = [...coreModules, ...featureModules].find(m => m.id === id);
-      toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: mod?.name || id }));
+      const nameKey = mod ? `config.module_name_${mod.id}` : '';
+      const translatedName = nameKey ? t(nameKey) : id;
+      const moduleName = mod && translatedName === nameKey ? mod.name : translatedName;
+      toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: moduleName }));
       refreshTenant();
     } else {
       toast.error(res.error || t('config.failed_to_update_module'));
@@ -103,9 +106,17 @@ export default function ModuleConfiguration() {
     if (!searchQuery) return modules;
     const q = searchQuery.toLowerCase();
     return modules.filter(
-      m => m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q)
+      m => {
+        const nameKey = `config.module_name_${m.id}`;
+        const descKey = `config.module_desc_${m.id}`;
+        const translatedName = t(nameKey);
+        const translatedDesc = t(descKey);
+        const name = translatedName === nameKey ? m.name : translatedName;
+        const description = translatedDesc === descKey ? m.description : translatedDesc;
+        return name.toLowerCase().includes(q) || description.toLowerCase().includes(q);
+      }
     );
-  }, [searchQuery]);
+  }, [searchQuery, t]);
 
   const filteredCore = useMemo(
     () => filterType !== 'feature' ? filterModules(coreModules) : [],

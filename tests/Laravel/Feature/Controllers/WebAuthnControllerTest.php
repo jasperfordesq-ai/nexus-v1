@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\TenantFeatureConfig;
 
 /**
  * Feature tests for WebAuthnController — passkey registration, auth, management.
@@ -32,6 +33,19 @@ class WebAuthnControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function setPasskeyEnrollmentAllowed(bool $allowed): void
+    {
+        $features = TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['biometric_login'] = $allowed;
+
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
     }
 
     // ------------------------------------------------------------------
@@ -59,6 +73,17 @@ class WebAuthnControllerTest extends TestCase
                 'userVerification',
             ],
         ]);
+    }
+
+    public function test_auth_challenge_remains_available_when_new_passkey_enrollment_is_disabled(): void
+    {
+        $this->setPasskeyEnrollmentAllowed(false);
+
+        $this->apiPost('/webauthn/auth-challenge', [])
+            ->assertOk()
+            ->assertJsonStructure([
+                'data' => ['challenge', 'challenge_id', 'rpId'],
+            ]);
     }
 
     // ------------------------------------------------------------------
@@ -195,6 +220,20 @@ class WebAuthnControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [200, 500]);
     }
 
+    public function test_registration_endpoints_are_blocked_when_new_passkey_enrollment_is_disabled(): void
+    {
+        $this->authenticatedUser();
+        $this->setPasskeyEnrollmentAllowed(false);
+
+        $this->apiPost('/webauthn/register-challenge')
+            ->assertForbidden()
+            ->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+
+        $this->apiPost('/webauthn/register-verify', [])
+            ->assertForbidden()
+            ->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+    }
+
     // ------------------------------------------------------------------
     //  POST /webauthn/register-verify (auth required)
     // ------------------------------------------------------------------
@@ -260,6 +299,81 @@ class WebAuthnControllerTest extends TestCase
         $response = $this->apiGet('/webauthn/credentials');
 
         $response->assertStatus(200);
+    }
+
+    public function test_existing_passkeys_remain_visible_and_manageable_when_new_enrollment_is_disabled(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->setPasskeyEnrollmentAllowed(false);
+
+        DB::table('webauthn_credentials')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'existing-passkey-credential',
+            'public_key' => 'test-public-key',
+            'device_name' => 'Existing passkey',
+            'authenticator_type' => 'platform',
+            'created_at' => now(),
+        ]);
+
+        $this->apiGet('/webauthn/credentials')
+            ->assertOk()
+            ->assertJsonPath('data.count', 1)
+            ->assertJsonPath('data.credentials.0.device_name', 'Existing passkey');
+
+        $this->apiGet('/webauthn/status')
+            ->assertOk()
+            ->assertJsonPath('data.registered', true)
+            ->assertJsonPath('data.enrollment_allowed', false);
+
+        $this->apiPost('/webauthn/rename', [
+            'credential_id' => 'existing-passkey-credential',
+            'device_name' => 'Renamed passkey',
+        ])->assertOk()
+            ->assertJsonPath('data.device_name', 'Renamed passkey');
+
+        $this->apiPost('/webauthn/remove', [
+            'credential_id' => 'existing-passkey-credential',
+        ])->assertOk();
+
+        $this->assertDatabaseMissing('webauthn_credentials', [
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'existing-passkey-credential',
+        ]);
+    }
+
+    public function test_last_passkey_cannot_be_removed_without_another_sign_in_method(): void
+    {
+        $user = $this->authenticatedUser();
+        DB::table('users')->where('id', $user->id)->update([
+            'password' => null,
+            'password_hash' => null,
+        ]);
+        DB::table('webauthn_credentials')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'only-sign-in-passkey',
+            'public_key' => 'test-public-key',
+            'device_name' => 'Only sign-in passkey',
+            'authenticator_type' => 'platform',
+            'created_at' => now(),
+        ]);
+
+        $this->apiPost('/webauthn/remove', [
+            'credential_id' => 'only-sign-in-passkey',
+        ])->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'LAST_SIGN_IN_METHOD');
+
+        $this->apiPost('/webauthn/remove-all', [])
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'LAST_SIGN_IN_METHOD');
+
+        $this->assertDatabaseHas('webauthn_credentials', [
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'only-sign-in-passkey',
+        ]);
     }
 
     // ------------------------------------------------------------------

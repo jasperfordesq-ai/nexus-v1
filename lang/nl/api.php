@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'U kunt uw enige resterende aanmeldmethode niet verwijderen. Stel eerst een wachtwoord in of voeg een andere aanmeldmethode toe.',
     'sso_invalid_provider_key' => 'De providersleutel moet bestaan uit 2-20 kleine letters, cijfers, koppeltekens of underscores.',
     'sso_invalid_issuer' => 'De issuer-URL moet een geldig https://-adres zijn.',
     'sso_client_id_required' => 'Client-ID is verplicht.',

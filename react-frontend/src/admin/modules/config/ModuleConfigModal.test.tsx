@@ -28,6 +28,8 @@ const { mockAdminBroker, mockAdminConfig } = vi.hoisted(() => ({
     updatePodcastConfigBulk: vi.fn(),
     getIdentityConfig: vi.fn(),
     updateIdentityConfigBulk: vi.fn(),
+    getAuthenticationConfig: vi.fn(),
+    updateAuthenticationConfigBulk: vi.fn(),
   },
 }));
 
@@ -182,6 +184,25 @@ const makeGroupModule = (): ModuleDefinition => ({
   ],
 });
 
+const makeAuthenticationModule = (): ModuleDefinition => ({
+  id: 'two_factor_authentication',
+  name: 'two_factor_authentication',
+  description: 'two_factor_authentication',
+  icon: ListChecks,
+  type: 'feature',
+  configSource: 'authentication_config',
+  configOptions: [
+    {
+      key: 'two_factor.allow_trusted_devices',
+      label: 'two_factor.allow_trusted_devices',
+      description: 'two_factor.allow_trusted_devices',
+      type: 'boolean',
+      defaultValue: true,
+      category: 'access',
+    },
+  ],
+});
+
 const makeComingSoonModule = (): ModuleDefinition => ({
   id: 'wallet',
   name: 'Wallet',
@@ -232,6 +253,18 @@ describe('ModuleConfigModal', () => {
       data: { config: { 'groups.allow_private': true } },
     });
     mockAdminConfig.updateGroupConfigBulk.mockResolvedValue({ success: true });
+    mockAdminConfig.getAuthenticationConfig.mockResolvedValue({
+      success: true,
+      data: {
+        config: {
+          'two_factor.allow_trusted_devices': true,
+          'two_factor.trusted_device_days': 30,
+          'two_factor.backup_code_count': 10,
+          'passkeys.conditional_autofill': true,
+        },
+      },
+    });
+    mockAdminConfig.updateAuthenticationConfigBulk.mockResolvedValue({ success: true });
   });
 
   it('renders nothing visible when module prop is null', async () => {
@@ -406,6 +439,39 @@ describe('ModuleConfigModal', () => {
 
     await waitFor(() => {
       expect(mockAdminConfig.updateGroupConfigBulk).toHaveBeenCalled();
+    });
+  });
+
+  it('loads and saves tenant authentication configuration', async () => {
+    const onClose = vi.fn();
+    const { default: ModuleConfigModal } = await import('./ModuleConfigModal');
+    render(
+      <ModuleConfigModal
+        module={makeAuthenticationModule()}
+        isOpen={true}
+        onClose={onClose}
+      />
+    );
+
+    const switchEl = await screen.findByRole('checkbox', { name: /allow trusted devices/i });
+    fireEvent.click(switchEl);
+
+    const saveBtn = screen.getAllByRole('button').find((button) =>
+      button.textContent?.toLowerCase().includes('save')
+    );
+    expect(saveBtn).toBeDefined();
+    if (saveBtn) fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockAdminConfig.getAuthenticationConfig).toHaveBeenCalledTimes(1);
+      expect(mockAdminConfig.updateAuthenticationConfigBulk).toHaveBeenCalledWith({
+        'two_factor.allow_trusted_devices': false,
+        'two_factor.trusted_device_days': 30,
+        'two_factor.backup_code_count': 10,
+        'passkeys.conditional_autofill': true,
+      });
+      expect(mockRefreshTenant).toHaveBeenCalled();
+      expect(onClose).toHaveBeenCalled();
     });
   });
 

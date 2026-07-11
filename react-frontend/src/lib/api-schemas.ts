@@ -105,6 +105,8 @@ export const twoFactorRequiredSchema = z.object({
   requires_2fa: z.literal(true),
   two_factor_token: z.string(),
   methods: z.array(z.string()),
+  allow_trusted_device: z.boolean().optional(),
+  trusted_device_days: z.number().int().min(1).max(365).optional(),
 }).passthrough();
 
 /**
@@ -192,6 +194,12 @@ export const tenantBootstrapSchema = z.object({
   tagline: z.string().optional(),
   features: z.record(z.string(), z.boolean()).optional(),
   modules: z.record(z.string(), z.boolean()).optional(),
+  authentication_config: z.object({
+    'two_factor.allow_trusted_devices': z.boolean().optional(),
+    'two_factor.trusted_device_days': z.number().optional(),
+    'two_factor.backup_code_count': z.number().optional(),
+    'passkeys.conditional_autofill': z.boolean().optional(),
+  }).passthrough().optional(),
   branding: z.object({
     name: z.string().optional(),
     tagline: z.string().optional(),

@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Tá d\'eochair phas athainmnithe.',
             'removed' => 'Tá d\'eochair phas bainte.',
             'not_found' => 'Níorbh fhéidir linn an eochair phas sin a aimsiú. Is féidir go bhfuil sé bainte cheana féin.',
+            'last_sign_in_method' => 'Ní féidir leat an t-aon mhodh sínithe isteach atá fágtha agat a bhaint. Socraigh pasfhocal nó cuir modh sínithe isteach eile leis ar dtús.',
             'name_required' => 'Iontráil ainm do d\'eochair phas.',
             'add_title' => 'Cuir eochair phas nua leis',
             'add_description' => 'Chun eochair phas a chur leis, teastaíonn brabhsálaí le JavaScript agus gléas a thacaíonn le heochracha pas. Is féidir leat eochracha pas a chur leis agus a bhainistiú ón bpríomhfheidhmchlár.',

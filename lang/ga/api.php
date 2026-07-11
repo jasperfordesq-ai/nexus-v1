@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'Ní féidir leat an t-aon mhodh sínithe isteach atá fágtha agat a bhaint. Socraigh pasfhocal nó cuir modh sínithe isteach eile leis ar dtús.',
     'sso_invalid_provider_key' => 'Caithfidh eochair an tsoláthraí a bheith idir 2 agus 20 litir bheaga, dhigit, fhleiscín nó fholine.',
     'sso_invalid_issuer' => 'Caithfidh URL an eisitheora a bheith ina sheoladh bailí https://.',
     'sso_client_id_required' => 'Tá ID cliaint ag teastáil.',

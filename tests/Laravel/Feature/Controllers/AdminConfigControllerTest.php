@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\AuthenticationConfigurationService;
 use App\Services\PrerenderContentInvalidator;
+use App\Services\RedisCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -22,6 +24,12 @@ use Tests\Laravel\TestCase;
 class AdminConfigControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function tearDown(): void
+    {
+        AuthenticationConfigurationService::clearCache($this->testTenantId);
+        parent::tearDown();
+    }
 
     // ================================================================
     // GET CONFIG — GET /v2/admin/config
@@ -67,6 +75,180 @@ class AdminConfigControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors.0.message', __('api.missing_required_field', ['field' => 'settings']));
         $this->assertStringNotContainsString('Settings array is required', $response->getContent());
+    }
+
+    // ================================================================
+    // AUTHENTICATION CONFIG — /v2/admin/config/authentication
+    // ================================================================
+
+    public function test_authentication_config_returns_safe_defaults_for_super_admin(): void
+    {
+        $this->resetAuthenticationConfig();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/config/authentication');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.config', AuthenticationConfigurationService::DEFAULTS);
+        $response->assertJsonPath('data.defaults', AuthenticationConfigurationService::DEFAULTS);
+    }
+
+    public function test_authentication_config_endpoints_reject_ordinary_admins(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiGet('/v2/admin/config/authentication')->assertStatus(403);
+        $this->apiPut('/v2/admin/config/authentication/bulk', [
+            'settings' => [
+                AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL => false,
+            ],
+        ])->assertStatus(403);
+    }
+
+    public function test_authentication_config_bulk_update_persists_typed_values_and_clears_public_caches(): void
+    {
+        $this->resetAuthenticationConfig();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $this->mock(RedisCache::class, function ($mock): void {
+            $mock->shouldReceive('delete')
+                ->once()
+                ->with('tenant_bootstrap', $this->testTenantId)
+                ->andReturn(true);
+            $mock->shouldReceive('delete')
+                ->once()
+                ->with('tenants_list_public')
+                ->andReturn(true);
+            $mock->shouldReceive('delete')
+                ->once()
+                ->with('tenants_list_public_all')
+                ->andReturn(true);
+        });
+
+        $settings = [
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS => 45,
+            AuthenticationConfigurationService::CONFIG_TWO_FACTOR_BACKUP_CODE_COUNT => 12,
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL => false,
+        ];
+
+        $this->apiPut('/v2/admin/config/authentication/bulk', ['settings' => $settings])
+            ->assertStatus(200)
+            ->assertJsonPath('data.updated', $settings);
+
+        $rows = DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->whereIn('setting_key', array_keys($settings))
+            ->pluck('setting_type', 'setting_key');
+
+        $this->assertSame('integer', $rows[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS]);
+        $this->assertSame('integer', $rows[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_BACKUP_CODE_COUNT]);
+        $this->assertSame('boolean', $rows[AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL]);
+        $this->assertSame(
+            array_merge(AuthenticationConfigurationService::DEFAULTS, $settings),
+            AuthenticationConfigurationService::getAll()
+        );
+    }
+
+    public function test_authentication_config_bulk_update_validates_every_key_before_mutating(): void
+    {
+        $this->resetAuthenticationConfig();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/config/authentication/bulk', [
+            'settings' => [
+                AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS => 60,
+                'passkeys.unrecognized_policy' => true,
+            ],
+        ])->assertStatus(422);
+
+        $this->assertFalse(DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS)
+            ->exists());
+
+        $this->apiPut('/v2/admin/config/authentication/bulk', [
+            'settings' => [
+                AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS => '60',
+            ],
+        ])->assertStatus(422);
+    }
+
+    public function test_disabling_trusted_devices_revokes_only_active_devices_for_current_tenant(): void
+    {
+        $this->resetAuthenticationConfig();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+        $otherTenantId = $this->testTenantId === 1 ? 999999 : 1;
+
+        DB::table('user_trusted_devices')->insert([
+            [
+                'user_id' => $admin->id,
+                'tenant_id' => $this->testTenantId,
+                'device_token_hash' => hash('sha256', 'active-current-' . $admin->id),
+                'ip_address' => '203.0.113.10',
+                'trusted_at' => now(),
+                'expires_at' => now()->addDays(30),
+                'is_revoked' => 0,
+                'revoked_at' => null,
+                'revoked_reason' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => $admin->id,
+                'tenant_id' => $this->testTenantId,
+                'device_token_hash' => hash('sha256', 'revoked-current-' . $admin->id),
+                'ip_address' => '203.0.113.11',
+                'trusted_at' => now(),
+                'expires_at' => now()->addDays(30),
+                'is_revoked' => 1,
+                'revoked_at' => now()->subDay(),
+                'revoked_reason' => 'user_action',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_id' => $admin->id,
+                'tenant_id' => $otherTenantId,
+                'device_token_hash' => hash('sha256', 'active-other-' . $admin->id),
+                'ip_address' => '203.0.113.12',
+                'trusted_at' => now(),
+                'expires_at' => now()->addDays(30),
+                'is_revoked' => 0,
+                'revoked_at' => null,
+                'revoked_reason' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->apiPut('/v2/admin/config/authentication/bulk', [
+            'settings' => [
+                AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES => false,
+            ],
+        ])->assertStatus(200);
+
+        $currentRows = DB::table('user_trusted_devices')
+            ->where('user_id', $admin->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->orderBy('id')
+            ->get();
+        $this->assertSame(1, (int) $currentRows[0]->is_revoked);
+        $this->assertSame('tenant_policy_disabled', $currentRows[0]->revoked_reason);
+        $this->assertNotNull($currentRows[0]->revoked_at);
+        $this->assertSame('user_action', $currentRows[1]->revoked_reason);
+        $this->assertSame(
+            0,
+            (int) DB::table('user_trusted_devices')
+                ->where('user_id', $admin->id)
+                ->where('tenant_id', $otherTenantId)
+                ->where('device_token_hash', hash('sha256', 'active-other-' . $admin->id))
+                ->value('is_revoked')
+        );
     }
 
     // ================================================================
@@ -583,5 +765,52 @@ class AdminConfigControllerTest extends TestCase
         ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_authentication_feature_switches_reject_ordinary_admins(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        $original = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+
+        foreach (['two_factor_authentication', 'biometric_login'] as $feature) {
+            $this->apiPut('/v2/admin/config/features', [
+                'feature' => $feature,
+                'enabled' => false,
+            ])->assertStatus(403);
+        }
+
+        $this->assertSame(
+            $original,
+            DB::table('tenants')->where('id', $this->testTenantId)->value('features')
+        );
+    }
+
+    public function test_super_admin_can_update_authentication_feature_switches(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        foreach (['two_factor_authentication', 'biometric_login'] as $feature) {
+            $this->apiPut('/v2/admin/config/features', [
+                'feature' => $feature,
+                'enabled' => false,
+            ])->assertStatus(200);
+        }
+
+        $features = json_decode((string) DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->value('features'), true);
+        $this->assertFalse($features['two_factor_authentication']);
+        $this->assertFalse($features['biometric_login']);
+    }
+
+    private function resetAuthenticationConfig(): void
+    {
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->whereIn('setting_key', array_keys(AuthenticationConfigurationService::DEFAULTS))
+            ->delete();
+        AuthenticationConfigurationService::clearCache($this->testTenantId);
     }
 }

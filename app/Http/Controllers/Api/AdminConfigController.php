@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\AuthenticationConfigurationService;
 use App\Services\FederationFeatureService;
 use App\Services\FeedRankingService;
 use App\Services\GroupConfigurationService;
@@ -59,6 +60,12 @@ class AdminConfigController extends BaseApiController
         'contact_email', 'contact_phone', 'default_layout',
         'logo_url', 'favicon_url', 'primary_color', 'og_image_url',
         'meta_title', 'meta_description', 'h1_headline', 'hero_intro',
+    ];
+
+    /** Authentication feature switches are security policy, not delegated-admin controls. */
+    private const SUPER_ADMIN_FEATURES = [
+        'two_factor_authentication',
+        'biometric_login',
     ];
 
     private const GENERAL_SETTING_KEYS = [
@@ -238,8 +245,12 @@ class AdminConfigController extends BaseApiController
         if (!array_key_exists($featureName, TenantFeatureConfig::FEATURE_DEFAULTS)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.unknown_feature', ['feature' => $featureName]), 'feature', 422);
         }
-        if ($enabled === null) {
+        if (!is_bool($enabled)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.enabled_required'), 'enabled', 422);
+        }
+
+        if (in_array($featureName, self::SUPER_ADMIN_FEATURES, true)) {
+            $this->requireSuperAdmin();
         }
 
         $tenant = DB::selectOne("SELECT features FROM tenants WHERE id = ?", [$tenantId]);
@@ -3168,6 +3179,91 @@ class AdminConfigController extends BaseApiController
         }
 
         return $this->respondWithData(['deleted' => true]);
+    }
+
+    // =========================================================================
+    // Authentication Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/authentication */
+    public function getAuthenticationConfig(): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $tenantId = $this->getTenantId();
+
+        return $this->respondWithData([
+            'config' => AuthenticationConfigurationService::getAll($tenantId),
+            'defaults' => AuthenticationConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/authentication/bulk */
+    public function updateAuthenticationConfigBulk(): JsonResponse
+    {
+        $this->requireSuperAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.missing_required_field', ['field' => 'settings']),
+                'settings',
+                422
+            );
+        }
+
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, AuthenticationConfigurationService::DEFAULTS)) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    __('api.no_recognized_settings', ['keys' => (string) $key]),
+                    is_string($key) ? $key : 'settings',
+                    422
+                );
+            }
+
+            if (!AuthenticationConfigurationService::isValidValue($key, $value)) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    __('api.validation_failed'),
+                    $key,
+                    422
+                );
+            }
+        }
+
+        $current = AuthenticationConfigurationService::getAll($tenantId);
+        $revokeTrustedDevices = ($current[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES] ?? true) === true
+            && array_key_exists(AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES, $settings)
+            && $settings[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES] === false;
+        $actorId = (int) auth()->id();
+
+        DB::transaction(function () use ($settings, $tenantId, $revokeTrustedDevices, $actorId): void {
+            foreach ($settings as $key => $value) {
+                AuthenticationConfigurationService::set($key, $value, $tenantId, $actorId);
+            }
+
+            if ($revokeTrustedDevices && Schema::hasTable('user_trusted_devices')) {
+                DB::table('user_trusted_devices')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_revoked', 0)
+                    ->update([
+                        'is_revoked' => 1,
+                        'revoked_at' => now(),
+                        'revoked_reason' => 'tenant_policy_disabled',
+                        'updated_at' => now(),
+                    ]);
+            }
+        });
+
+        AuthenticationConfigurationService::clearCache($tenantId);
+        $this->tenantSettingsService->clearCacheForTenant($tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenants_list_public');
+        $this->redisCache->delete('tenants_list_public_all');
+
+        return $this->respondWithData(['updated' => $settings]);
     }
 
     // =========================================================================

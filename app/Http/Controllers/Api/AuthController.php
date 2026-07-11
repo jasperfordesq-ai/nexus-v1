@@ -11,6 +11,7 @@ use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
+use App\Services\AuthenticationConfigurationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -193,6 +194,7 @@ class AuthController extends BaseApiController
 
             if (
                 filter_var(env('FORCE_ADMIN_2FA', false), FILTER_VALIDATE_BOOLEAN)
+                && TenantContext::hasFeature('two_factor_authentication')
                 && $isAdminAccount
                 && !$has2faEnabled
             ) {
@@ -222,6 +224,8 @@ class AuthController extends BaseApiController
             $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
 
             if ($has2faEnabled && !$isTrustedDevice) {
+                $authenticationConfig = app(AuthenticationConfigurationService::class)
+                    ->getAll(TenantContext::getId());
                 // 2FA required - create challenge token
                 $twoFactorToken = $this->twoFactorChallengeManager->create(
                     (int)$user['id'],
@@ -242,6 +246,8 @@ class AuthController extends BaseApiController
                     'requires_2fa' => true,
                     'two_factor_token' => $twoFactorToken,
                     'methods' => ['totp', 'backup_code'],
+                    'allow_trusted_device' => (bool) ($authenticationConfig['two_factor.allow_trusted_devices'] ?? true),
+                    'trusted_device_days' => (int) ($authenticationConfig['two_factor.trusted_device_days'] ?? 30),
                     'code' => ApiErrorCodes::AUTH_2FA_REQUIRED,
                     'message' => __('api_controllers_1.auth.two_factor_required'),
                     'user' => [

@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'Sie können Ihre einzige verbleibende Anmeldemethode nicht entfernen. Legen Sie zuerst ein Passwort fest oder fügen Sie eine andere Anmeldemethode hinzu.',
     'sso_invalid_provider_key' => 'Der Anbieter-Schlüssel muss aus 2-20 Kleinbuchstaben, Ziffern, Bindestrichen oder Unterstrichen bestehen.',
     'sso_invalid_issuer' => 'Die Issuer-URL muss eine gültige https://-Adresse sein.',
     'sso_client_id_required' => 'Client-ID ist erforderlich.',

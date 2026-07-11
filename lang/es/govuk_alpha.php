@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'Su clave de acceso ha sido renombrada.',
             'removed' => 'Su clave de acceso ha sido eliminada.',
             'not_found' => 'No hemos podido encontrar esa clave de acceso. Es posible que ya haya sido eliminada.',
+            'last_sign_in_method' => 'No puedes eliminar tu único método de inicio de sesión. Primero establece una contraseña o añade otro método de inicio de sesión.',
             'name_required' => 'Introduzca un nombre para su clave de acceso.',
             'add_title' => 'Añadir una nueva clave de acceso',
             'add_description' => 'Para añadir una clave de acceso necesita un navegador con JavaScript y un dispositivo compatible con claves de acceso. Puede añadir y gestionar claves de acceso desde la aplicación principal.',

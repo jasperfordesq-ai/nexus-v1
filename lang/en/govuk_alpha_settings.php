@@ -178,7 +178,7 @@ return [
         'data_rights' => 'Your data rights',
         'insurance' => 'Insurance certificates',
         'availability' => 'Your availability',
-        'trust_device' => 'Remember this device for 30 days',
+        'trust_device' => 'Remember this device for :days days',
     ],
     'availability' => [
         'title' => 'Your availability',

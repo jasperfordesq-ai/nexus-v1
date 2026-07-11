@@ -42,7 +42,7 @@
                     @if ($hasError)
                         <p id="code-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $errorMessage }}</p>
                     @endif
-                    <input class="govuk-input govuk-input--width-10{{ $hasError ? ' govuk-input--error' : '' }}" id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" aria-describedby="code-hint{{ $hasError ? ' code-error' : '' }}">
+                    <input class="govuk-input govuk-input--width-10{{ $hasError ? ' govuk-input--error' : '' }}" id="code" name="code" type="text" inputmode="text" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" aria-describedby="code-hint{{ $hasError ? ' code-error' : '' }}">
                 </div>
 
                 <div class="govuk-checkboxes govuk-checkboxes--small govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
@@ -52,15 +52,17 @@
                     </div>
                 </div>
 
+                @if ($allowTrustedDevice ?? true)
                 <fieldset class="govuk-fieldset govuk-!-margin-bottom-4">
-                    <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ __('govuk_alpha_settings.nav.trust_device') }}</legend>
+                    <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ __('govuk_alpha_settings.nav.trust_device', ['days' => $trustedDeviceDays ?? 30]) }}</legend>
                     <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                         <div class="govuk-checkboxes__item">
                             <input class="govuk-checkboxes__input" id="trust_device" name="trust_device" type="checkbox" value="1">
-                            <label class="govuk-label govuk-checkboxes__label" for="trust_device">{{ __('govuk_alpha_settings.nav.trust_device') }}</label>
+                            <label class="govuk-label govuk-checkboxes__label" for="trust_device">{{ __('govuk_alpha_settings.nav.trust_device', ['days' => $trustedDeviceDays ?? 30]) }}</label>
                         </div>
                     </div>
                 </fieldset>
+                @endif
 
                 <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.auth.two_factor_submit') }}</button>
             </form>

@@ -1846,6 +1846,7 @@ return [
     'social_oauth_redirect_failed' => 'OAuth redirect failed.',
     'social_oauth_link_failed' => 'OAuth link failed.',
     'social_oauth_unlink_failed' => 'OAuth unlink failed.',
+    'cannot_remove_last_sign_in_method' => 'No puedes eliminar tu único método de inicio de sesión. Primero establece una contraseña o añade otro método de inicio de sesión.',
     'sso_invalid_provider_key' => 'La clave del proveedor debe tener de 2 a 20 letras minúsculas, dígitos, guiones o guiones bajos.',
     'sso_invalid_issuer' => 'La URL del emisor debe ser una dirección https:// válida.',
     'sso_client_id_required' => 'Se requiere el ID de cliente.',

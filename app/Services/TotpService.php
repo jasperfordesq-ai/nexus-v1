@@ -24,12 +24,10 @@ use Endroid\QrCode\Writer\SvgWriter;
  */
 class TotpService
 {
-    private const BACKUP_CODE_COUNT = 10;
     private const BACKUP_CODE_LENGTH = 8;
     private const MAX_ATTEMPTS = 5;
     private const LOCKOUT_SECONDS = 900; // 15 minutes
     private const ISSUER = 'Project NEXUS';
-    private const TRUSTED_DEVICE_DAYS = 30;
     private const TRUSTED_DEVICE_COOKIE = 'nexus_trusted_device';
 
     /**
@@ -139,6 +137,12 @@ class TotpService
      */
     public static function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
     {
+        $tenantId = TenantContext::getId();
+        $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
+        if (empty($config['two_factor.allow_trusted_devices'])) {
+            return false;
+        }
+
         // Prefer header (works cross-origin); fall back to cookie (legacy)
         $token = request()->header('X-Trusted-Device')
             ?? $_COOKIE[self::TRUSTED_DEVICE_COOKIE]
@@ -147,7 +151,6 @@ class TotpService
             return false;
         }
 
-        $tenantId = TenantContext::getId();
         $tokenHash = hash('sha256', $token);
 
         $device = DB::selectOne(
@@ -179,13 +182,19 @@ class TotpService
     public static function trustDevice(int $userId, ?string $deviceHash = null): ?string
     {
         $tenantId = TenantContext::getId();
+        $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
+        if (empty($config['two_factor.allow_trusted_devices'])) {
+            return null;
+        }
+
         $token = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $token);
 
         $ip = request()->ip();
         $userAgent = request()->userAgent();
         $deviceName = self::parseDeviceName($userAgent);
-        $expiresAt = date('Y-m-d H:i:s', time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60));
+        $trustedDeviceDays = (int) ($config['two_factor.trusted_device_days'] ?? 30);
+        $expiresAt = date('Y-m-d H:i:s', time() + ($trustedDeviceDays * 24 * 60 * 60));
 
         try {
             DB::insert(
@@ -488,6 +497,12 @@ class TotpService
         try {
             DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
             DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            DB::update(
+                "UPDATE user_trusted_devices
+                 SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'two_factor_disabled'
+                 WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0",
+                [$userId, $tenantId]
+            );
             DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
 
             DB::commit();
@@ -507,11 +522,13 @@ class TotpService
     public static function generateBackupCodes(int $userId): array
     {
         $tenantId = TenantContext::getId();
+        $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
+        $backupCodeCount = (int) ($config['two_factor.backup_code_count'] ?? 10);
 
         DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ? AND is_used = 0", [$userId, $tenantId]);
 
         $codes = [];
-        for ($i = 0; $i < self::BACKUP_CODE_COUNT; $i++) {
+        for ($i = 0; $i < $backupCodeCount; $i++) {
             $code = self::generateRandomCode();
             $normalizedCode = str_replace('-', '', $code);
             $hash = password_hash($normalizedCode, PASSWORD_DEFAULT);

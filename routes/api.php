@@ -1350,6 +1350,8 @@ Route::get('/v2/admin/config/jobs', [\App\Http\Controllers\Api\AdminConfigContro
 Route::put('/v2/admin/config/jobs/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateJobConfigBulk']);
 Route::get('/v2/admin/config/podcasts', [\App\Http\Controllers\Api\AdminConfigController::class, 'getPodcastConfig']);
 Route::put('/v2/admin/config/podcasts/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updatePodcastConfigBulk']);
+Route::get('/v2/admin/config/authentication', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAuthenticationConfig']);
+Route::put('/v2/admin/config/authentication/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateAuthenticationConfigBulk']);
 Route::get('/v2/admin/config/identity', [\App\Http\Controllers\Api\AdminConfigController::class, 'getIdentityConfig']);
 Route::put('/v2/admin/config/identity/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateIdentityConfigBulk']);
 Route::get('/v2/admin/config/translation', [\App\Http\Controllers\Api\AdminConfigController::class, 'getTranslationConfig']);

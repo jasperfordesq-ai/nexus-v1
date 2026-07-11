@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'La tua passkey è stata rinominata.',
             'removed' => 'La tua passkey è stata rimossa.',
             'not_found' => 'Non è stato possibile trovare questa passkey. Potrebbe essere già stata rimossa.',
+            'last_sign_in_method' => 'Non puoi rimuovere l’unico metodo di accesso rimasto. Imposta prima una password o aggiungi un altro metodo di accesso.',
             'name_required' => 'Inserisci un nome per la tua passkey.',
             'add_title' => 'Aggiungi una nuova passkey',
             'add_description' => 'Per aggiungere una passkey è necessario un browser con JavaScript e un dispositivo che supporti le passkey. Puoi aggiungere e gestire le passkey dall\'app principale.',

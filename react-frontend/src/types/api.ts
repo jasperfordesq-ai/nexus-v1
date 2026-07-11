@@ -138,6 +138,8 @@ export interface TwoFactorRequiredResponse {
   requires_2fa: true;
   two_factor_token: string;
   methods: ('totp' | 'backup_code' | 'webauthn')[];
+  allow_trusted_device?: boolean;
+  trusted_device_days?: number;
   code: 'AUTH_2FA_REQUIRED';
   message: string;
   user: {
@@ -1181,6 +1183,10 @@ export interface TenantFeatures {
   podcasts: boolean;
   /** Explore / Discover curated discovery page — default ON, gateable per tenant. */
   explore: boolean;
+  /** Authenticator-app 2FA enrollment. Existing enrollments remain enforced when disabled. */
+  two_factor_authentication: boolean;
+  /** Passkey enrollment. Existing passkeys remain usable when disabled. */
+  biometric_login: boolean;
 }
 
 export interface TenantModules {
@@ -1227,6 +1233,13 @@ export interface TenantSwitcherItem {
 export interface TenantSwitcherConfig {
   source: string;
   items: TenantSwitcherItem[];
+}
+
+export interface AuthenticationConfig {
+  'two_factor.allow_trusted_devices': boolean;
+  'two_factor.trusted_device_days': number;
+  'two_factor.backup_code_count': number;
+  'passkeys.conditional_autofill': boolean;
 }
 
 export interface TenantConfig {
@@ -1286,6 +1299,8 @@ export interface TenantConfig {
   default_language?: string;
   /** Per-tenant landing page configuration (sections, content, ordering) */
   landing_page_config?: import('./landing-page').LandingPageConfig;
+  /** Public-safe authentication capabilities and enrollment behavior. */
+  authentication_config?: Partial<AuthenticationConfig>;
   /** Utility-bar tenant switcher options resolved by the backend. */
   tenant_switcher?: TenantSwitcherConfig;
   /**

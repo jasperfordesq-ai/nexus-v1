@@ -3413,6 +3413,7 @@ return [
             'renamed' => 'Your passkey has been renamed.',
             'removed' => 'Your passkey has been removed.',
             'not_found' => 'We could not find that passkey. It may already have been removed.',
+            'last_sign_in_method' => 'You cannot remove your only remaining sign-in method. Set a password or add another sign-in method first.',
             'name_required' => 'Enter a name for your passkey.',
             'add_title' => 'Add a new passkey',
             'add_description' => 'To add a passkey you need a browser with JavaScript and a device that supports passkeys. You can add and manage passkeys from the main app.',

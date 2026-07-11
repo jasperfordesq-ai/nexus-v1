@@ -3076,6 +3076,56 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertFalse(app(\App\Services\TotpService::class)->isEnabled($user->id));
     }
 
+    public function test_authentication_enrollment_flags_are_lockout_safe_in_accessible_frontend(): void
+    {
+        $features = \App\Services\TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['two_factor_authentication'] = false;
+        $features['biometric_login'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $user = $this->authenticatedUser(['name' => 'Enrollment Disabled Member']);
+
+        $settings = $this->get("/{$this->testTenantSlug}/accessible/profile/settings");
+        $settings->assertOk();
+        $settings->assertDontSee(__('govuk_alpha.profile_settings.two_factor_heading'));
+        $settings->assertDontSee(__('govuk_alpha.profile_settings.passkeys.title'));
+
+        $this->get("/{$this->testTenantSlug}/accessible/profile/two-factor")
+            ->assertForbidden();
+        $this->post("/{$this->testTenantSlug}/accessible/profile/two-factor/verify", ['code' => '123456'])
+            ->assertForbidden();
+
+        DB::table('user_totp_settings')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'totp_secret_encrypted' => 'not-read-while-rendering-settings',
+            'is_enabled' => 1,
+            'is_pending_setup' => 0,
+        ]);
+        DB::table('webauthn_credentials')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'accessible-existing-passkey',
+            'public_key' => 'test-public-key',
+            'device_name' => 'Existing accessible passkey',
+            'authenticator_type' => 'platform',
+            'created_at' => now(),
+        ]);
+
+        $existingSettings = $this->get("/{$this->testTenantSlug}/accessible/profile/settings");
+        $existingSettings->assertOk();
+        $existingSettings->assertSee(__('govuk_alpha.profile_settings.two_factor_heading'));
+        $existingSettings->assertSee(__('govuk_alpha.profile_settings.passkeys.title'));
+        $existingSettings->assertSee('Existing accessible passkey');
+
+        $this->get("/{$this->testTenantSlug}/accessible/profile/two-factor")
+            ->assertOk();
+    }
+
     public function test_t1near_listings_show_near_me_filter(): void
     {
         $this->authenticatedUser(['name' => 'Near Listings']);

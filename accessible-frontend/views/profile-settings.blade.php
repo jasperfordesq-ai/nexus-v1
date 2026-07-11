@@ -134,6 +134,7 @@
                     'passkey-renamed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.passkeys.renamed')],
                     'passkey-removed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.passkeys.removed')],
                     'passkey-not-found' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.not_found'), 'anchor' => '#passkeys'],
+                    'passkey-last-sign-in-method' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.last_sign_in_method'), 'anchor' => '#passkeys'],
                     'passkey-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.name_required'), 'anchor' => '#passkeys'],
                     'personalisation-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.personalisation.saved')],
                     'personalisation-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.personalisation.failed'), 'anchor' => '#personalisation'],
@@ -388,11 +389,13 @@
             <section aria-labelledby="security-heading">
                 <h2 class="govuk-heading-l" id="security-heading">{{ __('govuk_alpha.profile_settings.security_title') }}</h2>
 
+                @if (($twoFactorEnrollmentAllowed ?? true) || ($twoFactorEnabled ?? false))
                 <h3 class="govuk-heading-m">{{ __('govuk_alpha.profile_settings.two_factor_heading') }}</h3>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.two_factor_intro') }}</p>
                 <p class="govuk-body">
                     <a class="govuk-link" href="{{ route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.profile_settings.two_factor_link') }}</a>
                 </p>
+                @endif
                 <p class="govuk-body">
                     <a class="govuk-link" href="{{ route('govuk-alpha.profile.blocked', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.profile_settings.blocked_link') }}</a>
                 </p>
@@ -451,6 +454,7 @@
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.password_submit') }}</button>
                 </form>
 
+                @if (($passkeyEnrollmentAllowed ?? true) || !empty($passkeys))
                 <h3 class="govuk-heading-m govuk-!-margin-top-6" id="passkeys">{{ __('govuk_alpha.profile_settings.passkeys.title') }}</h3>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.description') }}</p>
 
@@ -516,6 +520,7 @@
                     @endforeach
                 @endif
 
+                @if ($passkeyEnrollmentAllowed ?? true)
                 <details class="govuk-details govuk-!-margin-top-4">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">{{ __('govuk_alpha.profile_settings.passkeys.add_title') }}</span>
@@ -524,6 +529,8 @@
                         <p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.add_description') }}</p>
                     </div>
                 </details>
+                @endif
+                @endif
 
                 <h3 class="govuk-heading-m govuk-!-margin-top-6" id="sessions">{{ __('govuk_alpha.profile_settings.sessions.title') }}</h3>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.sessions.description') }}</p>

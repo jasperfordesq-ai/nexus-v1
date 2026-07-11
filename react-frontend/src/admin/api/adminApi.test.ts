@@ -362,6 +362,25 @@ describe('adminConfig', () => {
     expect(mockPut).toHaveBeenCalledWith('/v2/admin/config/groups/bulk', { settings: { max_members: 50, allow_join: true } });
   });
 
+  it('getAuthenticationConfig calls authentication config endpoint', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: {} });
+    await adminConfig.getAuthenticationConfig();
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/config/authentication');
+  });
+
+  it('updateAuthenticationConfigBulk puts typed authentication settings', async () => {
+    mockPut.mockResolvedValueOnce({ success: true, data: {} });
+    const settings = {
+      'two_factor.allow_trusted_devices': false,
+      'two_factor.trusted_device_days': 14,
+      'two_factor.backup_code_count': 12,
+      'passkeys.conditional_autofill': false,
+    };
+
+    await adminConfig.updateAuthenticationConfigBulk(settings);
+    expect(mockPut).toHaveBeenCalledWith('/v2/admin/config/authentication/bulk', { settings });
+  });
+
   it('getGlossary without language omits param', async () => {
     mockGet.mockResolvedValueOnce({ success: true, data: {} });
     await adminConfig.getGlossary();

@@ -34,7 +34,7 @@ import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
 import { queueSentryTenant } from '@/lib/telemetryQueue';
 import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types';
-import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig, LandingPageConfig } from '@/types';
+import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig, LandingPageConfig, AuthenticationConfig } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -57,6 +57,7 @@ interface TenantContextValue extends TenantState {
   volunteeringConfig: VolunteeringConfig;
   jobConfig: JobConfig;
   landingPageConfig: LandingPageConfig;
+  authenticationConfig: AuthenticationConfig;
   hasFeature: (feature: keyof TenantFeatures) => boolean;
   hasModule: (module: keyof TenantModules) => boolean;
   hasGroupTab: (tab: keyof GroupTabConfig) => boolean;
@@ -130,6 +131,10 @@ const defaultFeatures: TenantFeatures = {
   // Explore / Discover curated discovery page. Default ON — synced with PHP
   // TenantFeatureConfig::FEATURE_DEFAULTS. Admins can disable it per tenant.
   explore: true,
+  // Security feature switches govern new enrollment only. Existing TOTP
+  // challenges and passkey sign-in remain available to prevent lockouts.
+  two_factor_authentication: true,
+  biometric_login: true,
 };
 
 // Default modules (all enabled)
@@ -142,6 +147,13 @@ const defaultModules: TenantModules = {
   profile: true,
   settings: true,
   dashboard: true,
+};
+
+const defaultAuthenticationConfig: AuthenticationConfig = {
+  'two_factor.allow_trusted_devices': true,
+  'two_factor.trusted_device_days': 30,
+  'two_factor.backup_code_count': 10,
+  'passkeys.conditional_autofill': true,
 };
 
 // Default group tab visibility — all enabled
@@ -566,6 +578,11 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     return state.tenant.landing_page_config;
   }, [state.tenant?.landing_page_config]);
 
+  const authenticationConfig = useMemo<AuthenticationConfig>(() => ({
+    ...defaultAuthenticationConfig,
+    ...state.tenant?.authentication_config,
+  }), [state.tenant?.authentication_config]);
+
   /**
    * Get group tab config with fallback to defaults (all enabled)
    */
@@ -669,6 +686,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       volunteeringConfig,
       jobConfig,
       landingPageConfig,
+      authenticationConfig,
       hasFeature,
       hasModule,
       hasGroupTab,
@@ -685,7 +703,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       mapProvider,
       geocodingProvider,
     }),
-    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
+    [state, features, modules, branding, groupTabs, listingConfig, volunteeringConfig, jobConfig, landingPageConfig, authenticationConfig, hasFeature, hasModule, hasGroupTab, refreshTenant, effectiveTenantSlug, usePathBasedSlug, tenantPath, supportedLanguages, defaultLanguage, mapProvider, geocodingProvider]
   );
 
   return (

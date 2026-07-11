@@ -63,6 +63,7 @@ class TwoFactorController extends BaseApiController
 
         return $this->respondWithData([
             'enabled' => $this->totpService->isEnabled($userId),
+            'enrollment_allowed' => TenantContext::hasFeature('two_factor_authentication'),
             'setup_required' => $this->totpService->isSetupRequired($userId),
             'backup_codes_remaining' => $this->totpService->getBackupCodeCount($userId),
         ]);
@@ -72,6 +73,9 @@ class TwoFactorController extends BaseApiController
     public function setup(): JsonResponse
     {
         [$userId, $setupToken] = $this->resolveSetupUserId();
+        if (!TenantContext::hasFeature('two_factor_authentication')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
         $this->rateLimit('2fa_setup', 5, 300);
 
         if ($this->totpService->isEnabled($userId)) {
@@ -108,6 +112,9 @@ class TwoFactorController extends BaseApiController
     public function verify(): JsonResponse
     {
         [$userId, $setupToken] = $this->resolveSetupUserId();
+        if (!TenantContext::hasFeature('two_factor_authentication')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
         $this->rateLimit('2fa_verify', 10, 300);
 
         $data = $this->getAllInput();

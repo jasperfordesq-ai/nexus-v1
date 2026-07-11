@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Helpers\UrlHelper;
 use App\Services\BrokerControlConfigService;
+use App\Services\AuthenticationConfigurationService;
 
 /**
  * TenantBootstrapController -- Tenant configuration bootstrap for SPA init.
@@ -36,6 +37,7 @@ class TenantBootstrapController extends BaseApiController
         private readonly RedisCache $redisCache,
         private readonly TenantFeatureConfig $tenantFeatureConfig,
         private readonly BrokerControlConfigService $brokerControlConfigService,
+        private readonly AuthenticationConfigurationService $authenticationConfigurationService,
     ) {}
 
     /** Cache TTL for tenant bootstrap data (10 minutes) */
@@ -183,12 +185,22 @@ class TenantBootstrapController extends BaseApiController
 
         $tenants = $query->orderBy('id', 'asc')->get();
 
+        $conditionalAutofill = DB::table('tenant_settings')
+            ->whereIn('tenant_id', $tenants->pluck('id')->all())
+            ->where('setting_key', 'passkeys.conditional_autofill')
+            ->pluck('setting_value', 'tenant_id');
+
         $data = [];
         foreach ($tenants as $tenant) {
             $item = [
                 'id' => (int) $tenant->id,
                 'name' => $tenant->name,
                 'slug' => $tenant->slug,
+                'authentication_config' => [
+                    'passkeys.conditional_autofill' => isset($conditionalAutofill[$tenant->id])
+                        ? filter_var($conditionalAutofill[$tenant->id], FILTER_VALIDATE_BOOLEAN)
+                        : true,
+                ],
             ];
 
             if (!empty($tenant->domain)) {
@@ -346,6 +358,7 @@ class TenantBootstrapController extends BaseApiController
         $data['branding'] = $this->buildBrandingData($tenant, $config);
         $data['features'] = $this->buildFeaturesData($features);
         $data['modules'] = $this->buildModulesData($config);
+        $data['authentication_config'] = $this->authenticationConfigurationService->getAll((int) $tenant['id']);
         $data['seo'] = $this->buildSeoData($tenant);
 
         $publicConfig = $this->buildPublicConfig($config, (int) $tenant['id']);

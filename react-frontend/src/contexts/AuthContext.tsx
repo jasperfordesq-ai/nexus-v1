@@ -56,6 +56,8 @@ interface AuthState {
   error: string | null;
   twoFactorToken: string | null;  // Store in memory only!
   twoFactorMethods: string[];
+  twoFactorTrustDeviceAllowed?: boolean;
+  twoFactorTrustedDeviceDays?: number;
 }
 
 export interface RegisterResult {
@@ -306,6 +308,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         error: null,
         twoFactorToken: twoFAData.two_factor_token,
         twoFactorMethods: twoFAData.methods || ['totp'],
+        twoFactorTrustDeviceAllowed: twoFAData.allow_trusted_device !== false,
+        twoFactorTrustedDeviceDays: twoFAData.trusted_device_days ?? 30,
       }));
       return { success: true, requires2FA: true };
     }

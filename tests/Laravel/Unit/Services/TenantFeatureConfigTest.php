@@ -72,7 +72,8 @@ class TenantFeatureConfigTest extends TestCase
             'volunteering', 'exchange_workflow', 'organisations', 'federation',
             'connections', 'reviews', 'polls', 'job_vacancies', 'ideation_challenges',
             'direct_messaging', 'group_exchanges', 'search', 'ai_chat',
-            'fadp_compliance', 'local_advertising', 'identity_verification'];
+            'fadp_compliance', 'local_advertising', 'identity_verification',
+            'two_factor_authentication', 'biometric_login'];
 
         foreach ($expected as $key) {
             $this->assertArrayHasKey($key, TenantFeatureConfig::FEATURE_DEFAULTS);
@@ -105,5 +106,11 @@ class TenantFeatureConfigTest extends TestCase
         foreach (TenantFeatureConfig::MODULE_DEFAULTS as $key => $value) {
             $this->assertTrue($value, "Module default for '{$key}' should be true");
         }
+    }
+
+    public function test_authentication_enrollment_features_default_enabled(): void
+    {
+        $this->assertTrue(TenantFeatureConfig::FEATURE_DEFAULTS['two_factor_authentication']);
+        $this->assertTrue(TenantFeatureConfig::FEATURE_DEFAULTS['biometric_login']);
     }
 }

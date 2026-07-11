@@ -89,3 +89,41 @@ describe('module registry newsletter module', () => {
     expect(newsletter?.detailPageUrl).toBe('/admin/newsletters');
   });
 });
+
+describe('module registry authentication modules', () => {
+  it('registers lockout-safe two-factor and passkey enrollment controls', () => {
+    const modules = getFeatureModules();
+    const twoFactor = modules.find(module => module.id === 'two_factor_authentication');
+    const passkeys = modules.find(module => module.id === 'biometric_login');
+
+    expect(twoFactor?.configSource).toBe('authentication_config');
+    expect(passkeys?.configSource).toBe('authentication_config');
+
+    expect(twoFactor?.configOptions.map(option => option.key)).toEqual([
+      'two_factor.allow_trusted_devices',
+      'two_factor.trusted_device_days',
+      'two_factor.backup_code_count',
+    ]);
+    expect(passkeys?.configOptions.map(option => option.key)).toEqual([
+      'passkeys.conditional_autofill',
+    ]);
+  });
+
+  it('has translated names, descriptions, categories, and option copy', () => {
+    const config = adminLocale.config;
+
+    for (const moduleId of ['two_factor_authentication', 'biometric_login']) {
+      const module = getFeatureModules().find(candidate => candidate.id === moduleId);
+      expect(module).toBeDefined();
+      expect(config[`module_name_${moduleId}`]).toBeTypeOf('string');
+      expect(config[`module_desc_${moduleId}`]).toBeTypeOf('string');
+
+      for (const option of module?.configOptions ?? []) {
+        const token = optionToken(option.key);
+        expect(config[`option_${token}_label`]).toBeTypeOf('string');
+        expect(config[`option_${token}_desc`]).toBeTypeOf('string');
+        expect(config[`option_category_${slugConfigText(option.category)}`]).toBeTypeOf('string');
+      }
+    }
+  });
+});

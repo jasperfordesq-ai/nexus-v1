@@ -622,15 +622,23 @@ describe("getWebAuthnCredentials", () => {
 });
 
 describe("removeWebAuthnCredential", () => {
-  it("returns true on success", async () => {
+  it("returns a successful result", async () => {
     mockApiPost.mockResolvedValue({ success: true });
-    expect(await removeWebAuthnCredential("cred-1")).toBe(true);
+    expect(await removeWebAuthnCredential("cred-1")).toEqual({
+      success: true,
+      errorCode: undefined,
+      error: undefined,
+    });
     expect(mockApiPost).toHaveBeenCalledWith("/webauthn/remove", { credential_id: "cred-1" });
   });
 
-  it("returns false on failure", async () => {
-    mockApiPost.mockResolvedValue({ success: false });
-    expect(await removeWebAuthnCredential("cred-1")).toBe(false);
+  it("preserves the API error code on failure", async () => {
+    mockApiPost.mockResolvedValue({ success: false, code: "LAST_SIGN_IN_METHOD", error: "Blocked" });
+    expect(await removeWebAuthnCredential("cred-1")).toEqual({
+      success: false,
+      errorCode: "LAST_SIGN_IN_METHOD",
+      error: "Blocked",
+    });
   });
 });
 
@@ -651,17 +659,22 @@ describe("removeAllWebAuthnCredentials", () => {
   it("returns success with removed count", async () => {
     mockApiPost.mockResolvedValue({ success: true, data: { removed_count: 3 } });
     const result = await removeAllWebAuthnCredentials();
-    expect(result).toEqual({ success: true, removedCount: 3 });
+    expect(result).toEqual({ success: true, removedCount: 3, errorCode: undefined, error: undefined });
     expect(mockApiPost).toHaveBeenCalledWith("/webauthn/remove-all", {});
   });
 
   it("returns 0 count when API returns no data", async () => {
     mockApiPost.mockResolvedValue({ success: true, data: null });
-    expect(await removeAllWebAuthnCredentials()).toEqual({ success: true, removedCount: 0 });
+    expect(await removeAllWebAuthnCredentials()).toEqual({ success: true, removedCount: 0, errorCode: undefined, error: undefined });
   });
 
   it("returns failure on API error", async () => {
-    mockApiPost.mockResolvedValue({ success: false, data: null });
-    expect(await removeAllWebAuthnCredentials()).toEqual({ success: false, removedCount: 0 });
+    mockApiPost.mockResolvedValue({ success: false, data: null, code: "LAST_SIGN_IN_METHOD" });
+    expect(await removeAllWebAuthnCredentials()).toEqual({
+      success: false,
+      removedCount: 0,
+      errorCode: "LAST_SIGN_IN_METHOD",
+      error: undefined,
+    });
   });
 });

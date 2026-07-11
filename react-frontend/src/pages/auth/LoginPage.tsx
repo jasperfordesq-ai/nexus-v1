@@ -53,6 +53,9 @@ interface Tenant {
   domain?: string;
   tagline?: string;
   logo_url?: string;
+  authentication_config?: {
+    'passkeys.conditional_autofill'?: boolean;
+  };
 }
 
 function browserHasPasskeyApi(): boolean {
@@ -74,8 +77,10 @@ export function LoginPage() {
     clearError,
     cancel2FA,
     twoFactorMethods,
+    twoFactorTrustDeviceAllowed,
+    twoFactorTrustedDeviceDays,
   } = useAuth();
-  const { tenant, branding, tenantSlug, tenantPath, isLoading: tenantLoading } = useTenant();
+  const { tenant, branding, tenantSlug, tenantPath, authenticationConfig, isLoading: tenantLoading } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();
 
@@ -109,6 +114,10 @@ export function LoginPage() {
   const [biometricLoading, setBiometricLoading] = useState(false);
   const conditionalAbortRef = useRef<AbortController | null>(null);
   const conditionalStartedRef = useRef(false);
+  const selectedTenant = tenants.find((candidate) => String(candidate.id) === selectedTenantId);
+  const conditionalAutofillEnabled = selectedTenant?.authentication_config?.['passkeys.conditional_autofill']
+    ?? authenticationConfig?.['passkeys.conditional_autofill']
+    ?? true;
 
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/feed');
@@ -123,6 +132,7 @@ export function LoginPage() {
   const startConditionalAuth = useCallback(async () => {
     if (conditionalStartedRef.current) return;
     if (!selectedTenantId) return;
+    if (!conditionalAutofillEnabled) return;
     if (!browserHasPasskeyApi()) {
       setBiometricAvailable(false);
       return;
@@ -154,7 +164,7 @@ export function LoginPage() {
       tokenManager.setRefreshToken(result.data.refresh_token);
       window.location.href = from;
     }
-  }, [selectedTenantId, from]);
+  }, [selectedTenantId, conditionalAutofillEnabled, from]);
 
   useEffect(() => {
     return () => {
@@ -225,6 +235,8 @@ export function LoginPage() {
   const handleTenantChange = (keys: unknown) => {
     if (keys === 'all' || !keys || !(keys instanceof Set)) return;
     const tenantId = Array.from(keys as Set<string>)[0] || '';
+    conditionalAbortRef.current?.abort();
+    conditionalStartedRef.current = false;
     setSelectedTenantId(tenantId);
     if (tenantId) {
       tokenManager.setTenantId(tenantId);
@@ -315,10 +327,11 @@ export function LoginPage() {
   const handleVerify2FA = async (e: FormEvent) => {
     e.preventDefault();
 
-    const code = twoFactorCode.trim();
+    const code = twoFactorCode.trim().replace(/[-\s]/g, '').toUpperCase();
     const expectedLength = useBackupCode ? 8 : 6;
 
-    if (!code || code.length !== expectedLength || !/^\d+$/.test(code)) return;
+    const validFormat = useBackupCode ? /^[A-Z0-9]+$/.test(code) : /^\d+$/.test(code);
+    if (!code || code.length !== expectedLength || !validFormat) return;
 
     const success = await verify2FA({
       code,
@@ -700,7 +713,12 @@ export function LoginPage() {
                       label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.twofa_code_label')}
                       placeholder={useBackupCode ? t('login.twofa_backup_placeholder') : t('login.twofa_code_placeholder')}
                       value={twoFactorCode}
-                      onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, useBackupCode ? 8 : 6))}
+                      onChange={(e) => setTwoFactorCode(
+                        useBackupCode
+                          ? e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)
+                          : e.target.value.replace(/\D/g, '').slice(0, 6)
+                      )}
+                      inputMode={useBackupCode ? 'text' : 'numeric'}
                       startContent={<Shield className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       autoComplete="one-time-code"
@@ -728,7 +746,7 @@ export function LoginPage() {
                         </Checkbox>
                       )}
 
-                      <Checkbox
+                      {twoFactorTrustDeviceAllowed !== false && <Checkbox
                         isSelected={trustDevice}
                         onValueChange={setTrustDevice}
                         size="sm"
@@ -736,8 +754,8 @@ export function LoginPage() {
                           label: 'text-theme-muted text-sm',
                         }}
                       >
-                        {t('login.twofa_trust_device')}
-                      </Checkbox>
+                        {t('login.twofa_trust_device', { days: twoFactorTrustedDeviceDays ?? 30 })}
+                      </Checkbox>}
                     </div>
 
                     <div className="flex gap-3">

@@ -114,6 +114,8 @@ describe('api-schemas', () => {
         requires_2fa: true,
         two_factor_token: 'token-123',
         methods: ['totp', 'backup_code'],
+        allow_trusted_device: false,
+        trusted_device_days: 14,
       };
       expect(twoFactorRequiredSchema.safeParse(data).success).toBe(true);
     });
@@ -220,6 +222,12 @@ describe('api-schemas', () => {
         tagline: 'Community Time Exchange',
         features: { gamification: true, events: true },
         modules: { feed: true, wallet: true },
+        authentication_config: {
+          'two_factor.allow_trusted_devices': false,
+          'two_factor.trusted_device_days': 14,
+          'two_factor.backup_code_count': 12,
+          'passkeys.conditional_autofill': false,
+        },
         branding: {
           name: 'hOUR',
           primaryColor: '#6366f1',

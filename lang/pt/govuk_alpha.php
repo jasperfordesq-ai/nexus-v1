@@ -3393,6 +3393,7 @@ return [
             'renamed' => 'A sua chave de acesso foi renomeada.',
             'removed' => 'A sua chave de acesso foi removida.',
             'not_found' => 'Não foi possível encontrar essa chave de acesso. Pode já ter sido removida.',
+            'last_sign_in_method' => 'Não pode remover o seu único método de início de sessão restante. Defina primeiro uma palavra-passe ou adicione outro método de início de sessão.',
             'name_required' => 'Introduza um nome para a sua chave de acesso.',
             'add_title' => 'Adicionar uma nova chave de acesso',
             'add_description' => 'Para adicionar uma chave de acesso, precisa de um navegador com JavaScript e de um dispositivo que suporte chaves de acesso. Pode adicionar e gerir chaves de acesso na aplicação principal.',

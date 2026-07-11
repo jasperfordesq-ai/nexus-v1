@@ -12,6 +12,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\Auth\AuthenticationMethodGuard;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
@@ -42,6 +43,9 @@ class WebAuthnController extends BaseApiController
         $this->rateLimit('webauthn_register_challenge', 10, 60);
 
         $userId = $this->requireAuth();
+        if (!TenantContext::hasFeature('biometric_login')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
 
         // Per-user rate limit on challenge generation. Generous enough that a
         // user retrying after client-side ceremony failures (browser rejection,
@@ -123,6 +127,9 @@ class WebAuthnController extends BaseApiController
     public function registerVerify(): JsonResponse
     {
         $userId = $this->requireAuth();
+        if (!TenantContext::hasFeature('biometric_login')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
         $input = $this->getAllInput();
 
         // Retrieve the stored challenge
@@ -487,20 +494,58 @@ class WebAuthnController extends BaseApiController
         $userId = $this->requireAuth();
         $input = $this->getAllInput();
         $credentialId = $input['credential_id'] ?? null;
-        $tenantId = TenantContext::getId();
-        $deleted = 0;
-
-        if ($credentialId) {
-            $deleted = DB::delete(
-                "DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
-                [$credentialId, $userId, $tenantId]
-            );
-        } else {
-            $deleted = DB::delete(
-                "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
-                [$userId, $tenantId]
+        if (!is_string($credentialId) || trim($credentialId) === '') {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.missing_required_field', ['field' => 'credential_id']),
+                'credential_id',
+                422
             );
         }
+        $credentialId = trim($credentialId);
+        $tenantId = TenantContext::getId();
+        $result = DB::transaction(function () use ($credentialId, $tenantId, $userId): array {
+            // Lock the user first so passkey removal and OAuth unlinking cannot
+            // concurrently delete the two methods after each sees the other.
+            $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
+                $userId,
+                $tenantId,
+                true
+            );
+
+            $credentials = DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->pluck('credential_id');
+
+            if (!$credentials->contains($credentialId)) {
+                return ['deleted' => 0, 'blocked' => false];
+            }
+
+            if ($credentials->count() === 1 && !$hasAlternative) {
+                return ['deleted' => 0, 'blocked' => true];
+            }
+
+            $deleted = DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where('credential_id', $credentialId)
+                ->delete();
+
+            return ['deleted' => $deleted, 'blocked' => false];
+        });
+
+        if ($result['blocked']) {
+            return $this->respondWithError(
+                'LAST_SIGN_IN_METHOD',
+                __('api.cannot_remove_last_sign_in_method'),
+                null,
+                409
+            );
+        }
+
+        $deleted = (int) $result['deleted'];
 
         if ($deleted === 0) {
             return $this->respondWithData(['message' => __('api_controllers_2.webauthn.credentials_removed')]);
@@ -590,17 +635,41 @@ class WebAuthnController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
+        $result = DB::transaction(function () use ($tenantId, $userId): array {
+            $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
+                $userId,
+                $tenantId,
+                true
+            );
+            $credentialIds = DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->pluck('credential_id');
+            $count = $credentialIds->count();
 
-        $result = DB::selectOne(
-            "SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
-        );
-        $count = (int)$result->count;
+            if ($count > 0 && !$hasAlternative) {
+                return ['count' => $count, 'blocked' => true];
+            }
 
-        DB::delete(
-            "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
-        );
+            DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            return ['count' => $count, 'blocked' => false];
+        });
+
+        if ($result['blocked']) {
+            return $this->respondWithError(
+                'LAST_SIGN_IN_METHOD',
+                __('api.cannot_remove_last_sign_in_method'),
+                null,
+                409
+            );
+        }
+
+        $count = (int) $result['count'];
 
         // Security notification + email for all passkeys removed — rendered in
         // the user's preferred_language.
@@ -696,6 +765,7 @@ class WebAuthnController extends BaseApiController
         return $this->respondWithData([
             'registered' => $result->count > 0,
             'count' => (int)$result->count,
+            'enrollment_allowed' => TenantContext::hasFeature('biometric_login'),
         ]);
     }
 
