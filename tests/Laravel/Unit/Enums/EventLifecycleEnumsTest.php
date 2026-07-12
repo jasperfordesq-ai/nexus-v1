@@ -41,6 +41,8 @@ final class EventLifecycleEnumsTest extends TestCase
     public static function legacyMappings(): iterable
     {
         yield 'null compatibility state' => [null, 'published', 'scheduled'];
+        yield 'blank compatibility state' => ['', 'published', 'scheduled'];
+        yield 'whitespace compatibility state' => ['  ', 'published', 'scheduled'];
         yield 'active' => ['active', 'published', 'scheduled'];
         yield 'draft' => ['draft', 'draft', 'scheduled'];
         yield 'cancelled' => ['cancelled', 'published', 'cancelled'];
@@ -56,7 +58,7 @@ final class EventLifecycleEnumsTest extends TestCase
         self::assertSame($publication, EventPublicationState::fromLegacyStatus($legacy)->value);
         self::assertSame($operational, EventOperationalState::fromLegacyStatus($legacy)->value);
         self::assertSame(
-            $legacy ?? 'active',
+            $legacy === null || trim($legacy) === '' ? 'active' : strtolower(trim($legacy)),
             EventLifecycleCompatibility::legacyMirror(
                 EventPublicationState::fromLegacyStatus($legacy),
                 EventOperationalState::fromLegacyStatus($legacy),

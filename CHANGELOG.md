@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Page-builder image uploads now use polished, responsive spacing by default.** Images inserted or replaced through the GrapesJS page builder receive a dedicated Nexus presentation class with responsive sizing, rounded corners, and consistent separation from following content; a narrowly scoped compatibility rule also repairs existing custom pages where a bare uploaded image directly touches the following Nexus card grid.
+
 ### Added
 
 - **Events clients can now discover recurrence capabilities from an authoritative runtime contract.** Authenticated clients inside the tenant Events feature boundary can call `GET /api/v2/events/recurrence-capabilities` to select the legacy or V2 engine, supported frequencies/end types and bounded occurrence cap without guessing from a deployment version. Rolling-never, effective-revision and definition-blueprint support fail closed when rollout flags, configuration or required schema are unavailable; the exact non-sensitive resource, tenant/auth boundary, OpenAPI schema and Events test-harness membership are regression-tested.
@@ -36,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Events lifecycle rollout now preserves blank legacy statuses as active compatibility rows.** Historical Events installations can contain empty-string `events.status` values with the same meaning as the existing nullable compatibility state; the dual-axis lifecycle migration now maps both forms to published/scheduled while continuing to fail closed on every other unknown status.
 - **Accessible Event cover-upload cleanup now loads its tenant-safe image helper in production.** The accessible Events controller imports the shared uploader used by failed-create and failed-edit cleanup paths, preserving the upload lifecycle fix under PHP static analysis and at runtime.
 - **Accessible Event creation now preserves cover uploads across immediate moderation freeze and renders recurrence limits from the live capability contract.** Cover files are ingested into the creation payload before a new Event can enter pending review, failed creations clean up their tenant-scoped upload, and edit-time upload failures no longer leave orphaned files. The GOV.UK form and regression coverage now keep rolling-never hidden while its guarded writers are disabled and use the server-advertised maximum occurrence count instead of assuming the V2 ceiling.
 - **CI schema regressions now exercise the authoritative Events lifecycle and stable WebAuthn dump semantics.** The moderation regression fixture supplies a pending-review Event and an authorised admin before asserting the legacy `active` compatibility mirror, while the WebAuthn identity test accepts mysqldump's optional comma spacing without weakening its composite tenant foreign-key invariant.
