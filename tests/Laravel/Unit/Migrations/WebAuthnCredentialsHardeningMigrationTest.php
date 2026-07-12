@@ -44,9 +44,9 @@ final class WebAuthnCredentialsHardeningMigrationTest extends TestCase
             $this->assertStringContainsString($column, $credentials);
         }
 
-        $this->assertStringContainsString(
-            'FOREIGN KEY (`user_id`,`tenant_id`) REFERENCES `users` (`id`,`tenant_id`)',
-            $credentials
+        $this->assertMatchesRegularExpression(
+            '/FOREIGN KEY \(`user_id`,\s*`tenant_id`\) REFERENCES `users` \(`id`,\s*`tenant_id`\)/',
+            $credentials,
         );
         $this->assertStringContainsString(
             'UNIQUE KEY `users_id_tenant_unique` (`id`,`tenant_id`)',

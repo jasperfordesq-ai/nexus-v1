@@ -169,6 +169,7 @@ class SchemaWriteRegressionTest extends TestCase
     {
         $authorId = $this->makeUser('eventauthor');
         $adminId = $this->makeUser('eventadmin');
+        DB::table('users')->where('id', $adminId)->update(['role' => 'admin']);
 
         $eventId = (int) DB::table('events')->insertGetId([
             'tenant_id'   => $this->testTenantId,
@@ -177,6 +178,8 @@ class SchemaWriteRegressionTest extends TestCase
             'description' => 'Awaiting moderation.',
             'start_time'  => now()->addDay(),
             'status'      => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
             'created_at'  => now(),
         ]);
 
@@ -192,9 +195,8 @@ class SchemaWriteRegressionTest extends TestCase
         $result = ContentModerationService::review($queueId, $this->testTenantId, $adminId, 'approved');
 
         $this->assertTrue($result['success']);
-        // Before the fix the update wrote 'published' — not in the events.status
-        // enum — which strict=false truncated to '' and the event vanished from
-        // every status-filtered query.
+        // The authoritative publication transition must also maintain the
+        // legacy compatibility mirror with the valid enum value `active`.
         $this->assertSame(
             'active',
             DB::table('events')->where('id', $eventId)->value('status')
