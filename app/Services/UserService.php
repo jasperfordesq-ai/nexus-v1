@@ -716,10 +716,13 @@ class UserService
     {
         self::$errors = [];
 
-        $user = User::query()->find($userId);
+        $tenantId = TenantContext::getId();
+        $user = User::query()
+            ->where('tenant_id', $tenantId)
+            ->find($userId);
 
         if (! $user) {
-            self::setError('NOT_FOUND', 'User not found');
+            self::setError('NOT_FOUND', __('api.user_not_found'));
             return false;
         }
 
@@ -738,6 +741,22 @@ class UserService
                 return false;
             }
 
+            if (array_key_exists('privacy_search', $filtered)) {
+                $privacySearch = filter_var(
+                    $filtered['privacy_search'],
+                    FILTER_VALIDATE_BOOL,
+                    FILTER_NULL_ON_FAILURE,
+                );
+                if ($privacySearch === null) {
+                    self::setError(
+                        'VALIDATION_ERROR',
+                        __('api.user_invalid_notification_preference', ['field' => 'privacy_search']),
+                    );
+                    return false;
+                }
+                $filtered['privacy_search'] = $privacySearch;
+            }
+
             $user->fill($filtered);
             $user->save();
 
@@ -754,15 +773,57 @@ class UserService
      */
     public static function updateNotificationPreferences(int $userId, array $prefs): bool
     {
+        self::$errors = [];
+
+        $allowed = [
+            'email_messages', 'email_listings', 'email_digest',
+            'email_connections', 'email_transactions', 'email_reviews',
+            'email_gamification_digest', 'email_gamification_milestones',
+            'email_org_payments', 'email_org_transfers', 'email_org_membership',
+            'email_org_admin', 'push_enabled',
+        ];
+
+        $sanitized = [];
+        foreach ($allowed as $key) {
+            if (! array_key_exists($key, $prefs)) {
+                continue;
+            }
+
+            $value = filter_var($prefs[$key], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+            if ($value === null) {
+                self::setError(
+                    'VALIDATION_ERROR',
+                    __('api.user_invalid_notification_preference', ['field' => $key]),
+                );
+                return false;
+            }
+            $sanitized[$key] = $value ? 1 : 0;
+        }
+
+        if ($sanitized === []) {
+            self::setError('VALIDATION_ERROR', __('api.user_no_valid_prefs'));
+            return false;
+        }
+
         try {
+            $tenantId = TenantContext::getId();
+            $belongsToTenant = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (! $belongsToTenant) {
+                self::setError('NOT_FOUND', __('api.user_not_found'));
+                return false;
+            }
+
             DB::table('user_notification_preferences')->updateOrInsert(
                 ['user_id' => $userId],
-                $prefs
+                $sanitized,
             );
             return true;
         } catch (\Throwable $e) {
             Log::warning('Notification preferences update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            self::setError('UPDATE_FAILED', $e->getMessage());
+            self::setError('UPDATE_FAILED', __('api.user_prefs_update_failed'));
             return false;
         }
     }

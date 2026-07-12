@@ -37,7 +37,6 @@ class UsersController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
-        private readonly GdprService $gdprService,
         private readonly ListingService $listingService,
         private readonly MailchimpService $mailchimpService,
         private readonly UserService $userService,
@@ -279,7 +278,21 @@ class UsersController extends BaseApiController
 
         // Update notification preferences if provided
         if (isset($data['notifications']) && is_array($data['notifications'])) {
-            $this->userService->updateNotificationPreferences($userId, $data['notifications']);
+            $success = $this->userService->updateNotificationPreferences($userId, $data['notifications']);
+            if (! $success) {
+                $errors = $this->userService->getErrors();
+                $isValidationFailure = collect($errors)->contains(
+                    fn (array $error): bool => ($error['code'] ?? null) === 'VALIDATION_ERROR',
+                );
+
+                return $this->respondWithErrors(
+                    $errors ?: [[
+                        'code' => 'UPDATE_FAILED',
+                        'message' => __('api.user_prefs_update_failed'),
+                    ]],
+                    $isValidationFailure ? 422 : 500,
+                );
+            }
         }
 
         // AG35 — feed personalisation toggle (per-user)
@@ -619,10 +632,10 @@ class UsersController extends BaseApiController
         // wipe the previous UserService path performed.
         //
         // Build a tenant-scoped instance explicitly: GdprService captures its
-        // tenant at construction, and the container-injected $this->gdprService
-        // is resolved before the request tenant is guaranteed to be set, which
-        // could otherwise scope the erasure to the wrong tenant (a 0-row, silent
-        // no-op). $tenantId was already resolved above for the user lookup.
+        // tenant at construction, while controller dependencies may be resolved
+        // before the request tenant is guaranteed to be set. That could otherwise
+        // scope the erasure to the wrong tenant (a 0-row, silent no-op).
+        // $tenantId was already resolved above for the user lookup.
         try {
             (new GdprService($tenantId))->executeAccountDeletion($userId);
         } catch (\Throwable $e) {
@@ -835,7 +848,7 @@ class UsersController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $consents = $this->gdprService->getUserConsents($userId);
+        $consents = (new GdprService($this->getTenantId()))->getUserConsents($userId);
 
         return $this->respondWithData($consents);
     }
@@ -857,7 +870,7 @@ class UsersController extends BaseApiController
         }
 
         try {
-            $result = $this->gdprService->updateUserConsent($userId, $slug, $given);
+            $result = (new GdprService($this->getTenantId()))->updateUserConsent($userId, $slug, $given);
 
             // Sync newsletter subscription when marketing_email consent changes
             if ($slug === 'marketing_email') {
@@ -895,7 +908,7 @@ class UsersController extends BaseApiController
         }
 
         try {
-            $result = $this->gdprService->createRequest($userId, $type, [
+            $result = (new GdprService($this->getTenantId()))->createRequest($userId, $type, [
                 'notes'    => $notes,
                 'metadata' => [
                     'source'        => 'user_settings',

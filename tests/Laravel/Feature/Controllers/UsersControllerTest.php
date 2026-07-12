@@ -248,6 +248,61 @@ class UsersControllerTest extends TestCase
         $this->assertSame(0, (int) $row->privacy_search);
     }
 
+    public function test_update_preferences_rejects_invalid_privacy_search_boolean(): void
+    {
+        $user = $this->authenticatedUser();
+        DB::table('users')->where('id', $user->id)->update(['privacy_search' => 1]);
+
+        $this->apiPut('/v2/users/me/preferences', [
+            'privacy' => [
+                'privacy_search' => 'sometimes',
+            ],
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+
+        $this->assertSame(
+            1,
+            (int) DB::table('users')->where('id', $user->id)->value('privacy_search'),
+        );
+    }
+
+    public function test_update_preferences_notification_payload_cannot_mass_assign_identity_columns(): void
+    {
+        $user = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $ownPreferenceId = DB::table('user_notification_preferences')->insertGetId([
+            'user_id' => $user->id,
+            'email_messages' => 1,
+        ]);
+        $otherPreferenceId = DB::table('user_notification_preferences')->insertGetId([
+            'user_id' => $otherUser->id,
+            'email_messages' => 1,
+        ]);
+
+        $this->apiPut('/v2/users/me/preferences', [
+            'notifications' => [
+                'id' => $otherPreferenceId,
+                'user_id' => $otherUser->id,
+                'email_messages' => false,
+            ],
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('user_notification_preferences', [
+            'id' => $ownPreferenceId,
+            'user_id' => $user->id,
+            'email_messages' => 0,
+        ]);
+        $this->assertDatabaseHas('user_notification_preferences', [
+            'id' => $otherPreferenceId,
+            'user_id' => $otherUser->id,
+            'email_messages' => 1,
+        ]);
+    }
+
     // ================================================================
     // PREFERENCES — Authentication required
     // ================================================================
@@ -678,5 +733,32 @@ class UsersControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [401, 403]);
+    }
+
+    public function test_gdpr_consent_uses_the_request_tenant_when_controller_was_resolved_early(): void
+    {
+        $user = $this->authenticatedUser();
+        DB::table('user_consents')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'consent_type' => 'settings_request_tenant_test',
+            'consent_given' => 1,
+            'consent_text' => 'Request-tenant regression fixture.',
+            'consent_version' => '1.0',
+            'given_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Reproduce production controller construction before ResolveTenant:
+        // the old injected GdprService captured tenant 999 here and returned no
+        // tenant-2 consent even though the API request subsequently resolved 2.
+        \App\Core\TenantContext::setById(999);
+        $controller = $this->app->make(\App\Http\Controllers\Api\UsersController::class);
+        $this->app->instance(\App\Http\Controllers\Api\UsersController::class, $controller);
+
+        $this->apiGet('/v2/users/me/consent')
+            ->assertStatus(200)
+            ->assertJsonPath('data.0.consent_type_slug', 'settings_request_tenant_test');
     }
 }
