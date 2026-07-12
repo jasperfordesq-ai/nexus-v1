@@ -53,6 +53,16 @@ describe('GroupTabNav', () => {
     expect(screen.getByRole('tabpanel')).toHaveTextContent('Selected section content');
   });
 
+  it('keeps the desktop navigation compact and moves secondary sections into More', () => {
+    render(<GroupTabNav {...DEFAULT_PROPS} />);
+
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(5);
+    expect(screen.getByRole('tab', { name: 'Feed' })).toHaveClass('h-9', 'px-2.5');
+    expect(screen.queryByRole('tab', { name: 'Announcements' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'More' })).toHaveClass('h-9', 'px-2.5');
+  });
+
   it('changes section through native tab selection', async () => {
     const onTabChange = vi.fn();
     render(<GroupTabNav {...DEFAULT_PROPS} onTabChange={onTabChange} />);
@@ -102,13 +112,16 @@ describe('GroupTabNav', () => {
     expect(screen.queryByRole('tab', { name: 'Members' })).not.toBeInTheDocument();
   });
 
-  it('shows analytics only to group admins', () => {
-    const { rerender } = render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin={false} />);
-    expect(screen.queryByRole('tab', { name: 'Analytics' })).not.toBeInTheDocument();
+  it('shows admin sections in the compact More menu only to group admins', async () => {
+    const { unmount } = render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin={false} />);
+    await userEvent.click(screen.getByRole('button', { name: 'More' }));
+    expect(screen.queryByRole('menuitemradio', { name: 'Analytics' })).not.toBeInTheDocument();
 
-    rerender(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin />);
-    expect(screen.getByRole('tab', { name: 'Analytics' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Automation' })).toBeInTheDocument();
+    unmount();
+    render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin />);
+    await userEvent.click(screen.getByRole('button', { name: 'More' }));
+    expect(screen.getByRole('menuitemradio', { name: 'Analytics' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitemradio', { name: 'Automation' })).toBeInTheDocument();
   });
 
   it('does not expose Events when the tenant Events feature is disabled', () => {

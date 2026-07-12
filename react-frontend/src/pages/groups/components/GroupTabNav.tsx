@@ -3,10 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import type { Key, ReactNode } from 'react';
+import type { Key, KeyboardEvent, ReactNode } from 'react';
+import { Button } from '@/components/ui/Button';
 import { Dropdown } from '@heroui/react/dropdown';
 import { Label } from '@heroui/react/label';
-import { Tabs } from '@heroui/react/tabs';
 import { useTranslation } from 'react-i18next';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Calendar from 'lucide-react/icons/calendar';
@@ -34,6 +34,15 @@ interface GroupTabNavProps {
   subGroupCount: number;
   onTabChange: (tab: GroupSectionKey) => void;
 }
+
+const PRIMARY_SECTION_KEYS = new Set<GroupSectionKey>([
+  'feed',
+  'subgroups',
+  'discussion',
+  'members',
+  'events',
+  'files',
+]);
 
 export function GroupTabNav({
   activeTab,
@@ -92,10 +101,26 @@ export function GroupTabNav({
 
   if (!activeSection) return <>{children}</>;
   const ActiveIcon = activeSection.icon;
+  const primarySections = sections.filter((section) => PRIMARY_SECTION_KEYS.has(section.key));
+  const secondarySections = sections.filter((section) => !PRIMARY_SECTION_KEYS.has(section.key));
+  const activeSecondarySection = secondarySections.find((section) => section.key === activeSection.key);
+  const ActiveSecondaryIcon = activeSecondarySection?.icon;
 
   const selectSection = (key: Key) => {
     const next = String(key) as GroupSectionKey;
     if (keys.includes(next)) onTabChange(next);
+  };
+
+  const handlePrimaryKeyDown = (event: KeyboardEvent, index: number) => {
+    let nextIndex: number | null = null;
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % primarySections.length;
+    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + primarySections.length) % primarySections.length;
+    if (event.key === 'Home') nextIndex = 0;
+    if (event.key === 'End') nextIndex = primarySections.length - 1;
+    if (nextIndex === null) return;
+    event.preventDefault();
+    const nextSection = primarySections[nextIndex];
+    if (nextSection) selectSection(nextSection.key);
   };
 
   return (
@@ -134,37 +159,86 @@ export function GroupTabNav({
         </Dropdown>
       </div>
 
-      <Tabs
-        className="w-full min-w-0"
-        selectedKey={activeSection.key}
-        onSelectionChange={selectSection}
+      <div
+        className="sticky top-[calc(var(--app-header-desktop-offset,5.5rem)+0.75rem)] z-20 hidden items-center gap-1 rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur sm:flex"
       >
-        <div className="sticky top-[calc(var(--app-header-desktop-offset,5.5rem)+0.75rem)] z-20 hidden rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur sm:block">
-          <Tabs.ListContainer className="max-w-full overflow-x-auto">
-            <Tabs.List aria-label={t('detail.tab_nav_aria')} className="min-w-max gap-1">
-              {sections.map((section) => {
-                const Icon = section.icon;
-                return (
-                  <Tabs.Tab
-                    key={section.key}
-                    id={section.key}
-                    className="h-10 min-w-fit shrink-0 gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary data-[selected=true]:shadow-sm"
-                  >
-                    <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                    <span>{section.label}</span>
-                  </Tabs.Tab>
-                );
-              })}
-            </Tabs.List>
-          </Tabs.ListContainer>
+        <div className="flex min-w-0 flex-1 items-center gap-1" role="tablist" aria-label={t('detail.tab_nav_aria')}>
+          {primarySections.map((section, index) => {
+            const Icon = section.icon;
+            const isSelected = section.key === activeSection.key;
+            return (
+              <Button
+                as="button"
+                key={section.key}
+                id={`group-tab-${section.key}`}
+                role="tab"
+                aria-selected={isSelected}
+                aria-controls="group-tab-panel"
+                variant="ghost"
+                size="sm"
+                onPress={() => selectSection(section.key)}
+                onKeyDown={(event) => handlePrimaryKeyDown(event, index)}
+                className="h-9 min-w-0 shrink px-2.5 text-sm font-medium text-theme-muted hover:bg-theme-hover/60 hover:text-theme-primary data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary data-[selected=true]:shadow-sm lg:px-3"
+                data-selected={isSelected}
+              >
+                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="max-w-28 truncate xl:max-w-36">{section.label}</span>
+              </Button>
+            );
+          })}
         </div>
 
-        {sections.map((section) => (
-          <Tabs.Panel key={section.key} id={section.key} className="pt-4 outline-none sm:pt-5">
-            {section.key === activeSection.key ? children : null}
-          </Tabs.Panel>
-        ))}
-      </Tabs>
+        {secondarySections.length > 0 && (
+          <Dropdown>
+            <Dropdown.Trigger
+              aria-label={activeSecondarySection
+                ? `${t('detail.tab_more_label')}: ${activeSecondarySection.label}`
+                : t('detail.tab_more_label')}
+              className="flex h-9 min-w-0 shrink items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-theme-muted hover:bg-theme-hover/60 hover:text-theme-primary data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary data-[selected=true]:shadow-sm lg:px-3"
+              data-selected={Boolean(activeSecondarySection)}
+            >
+              {activeSecondarySection && ActiveSecondaryIcon ? (
+                <>
+                  <ActiveSecondaryIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="max-w-28 truncate xl:max-w-36">{activeSecondarySection.label}</span>
+                </>
+              ) : (
+                <span>{t('detail.tab_more_label')}</span>
+              )}
+              <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            </Dropdown.Trigger>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                aria-label={t('detail.tab_more_menu')}
+                selectionMode="single"
+                selectedKeys={activeSecondarySection ? new Set([activeSecondarySection.key]) : new Set()}
+                onAction={selectSection}
+              >
+                {secondarySections.map((section) => {
+                  const Icon = section.icon;
+                  return (
+                    <Dropdown.Item key={section.key} id={section.key} textValue={section.label}>
+                      <Dropdown.ItemIndicator />
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                      <Label>{section.label}</Label>
+                    </Dropdown.Item>
+                  );
+                })}
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
+        )}
+      </div>
+
+      <div
+        id="group-tab-panel"
+        role="tabpanel"
+        aria-labelledby={activeSecondarySection ? undefined : `group-tab-${activeSection.key}`}
+        aria-label={activeSecondarySection?.label}
+        className="pt-4 outline-none sm:pt-5"
+      >
+        {children}
+      </div>
     </>
   );
 }
