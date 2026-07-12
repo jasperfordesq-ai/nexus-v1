@@ -67,6 +67,12 @@ $DUMP_CMD \
     --no-tablespaces \
     "$DB_NAME" > "$DUMP_PATH" 2>/dev/null
 
+# Trigger/routine definers are environment-specific accounts. Keeping a
+# production definer in the committed baseline makes fresh imports fail with
+# MariaDB error 1449 when that account does not exist (including CI). Omitting
+# the clause makes each object use the schema-import account instead.
+sed -E -i 's|/\*!50017 DEFINER=`[^`]+`@`[^`]+`\*/ ?||g' "$DUMP_PATH"
+
 echo "" >> "$DUMP_PATH"
 echo "-- Laravel migrations data (so fresh migrate knows what is already applied)" >> "$DUMP_PATH"
 
