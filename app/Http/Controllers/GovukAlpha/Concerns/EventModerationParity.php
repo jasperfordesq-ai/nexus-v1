@@ -365,7 +365,12 @@ trait EventModerationParity
         return $this->eventsModerationPrivateResponse($response);
     }
 
-    /** @template T of Response|RedirectResponse @param T $response @return T */
+    /**
+     * @template T of Response|RedirectResponse
+     *
+     * @param T $response
+     * @return T
+     */
     private function eventsModerationPrivateResponse(Response|RedirectResponse $response): Response|RedirectResponse
     {
         $response->headers->set('Cache-Control', 'private, no-store');
