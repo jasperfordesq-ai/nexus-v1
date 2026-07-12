@@ -660,7 +660,7 @@ test.describe('Events enterprise lifecycle @events @enterprise @journey', () => 
     await page.goto(`${FRONTEND_BASE_URL}/${TENANT}/events/${event.id}/manage/people`);
     await expect(page).toHaveURL(new RegExp(`/${TENANT}/events/${event.id}/manage/people$`));
 
-    const peopleTable = page.getByRole('table', { name: 'Event people' });
+    const peopleTable = page.getByRole('grid', { name: 'Event people' });
     await expect(peopleTable).toBeVisible({ timeout: 20_000 });
     const confirmedRow = peopleTable.getByRole('row').filter({ hasText: current.rosterMember.name });
     const waitlistedRow = peopleTable.getByRole('row').filter({ hasText: current.participant.name });
@@ -670,7 +670,7 @@ test.describe('Events enterprise lifecycle @events @enterprise @journey', () => 
     await expect(waitlistedRow).toContainText('Position 1');
 
     await page.goto(`${FRONTEND_BASE_URL}/${TENANT}/events/${event.id}/manage/check-in`);
-    const checkInTable = page.getByRole('table', { name: 'Manual check-in roster' });
+    const checkInTable = page.getByRole('grid', { name: 'Manual check-in roster' });
     await expect(checkInTable).toBeVisible({ timeout: 25_000 });
     const checkInRow = checkInTable.getByRole('row').filter({ hasText: current.rosterMember.name });
     await expect(checkInRow).toContainText('Not checked in');
