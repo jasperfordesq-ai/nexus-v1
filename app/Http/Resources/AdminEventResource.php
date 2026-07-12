@@ -39,6 +39,15 @@ final class AdminEventResource
             'timezone' => self::nullableString($event['timezone'] ?? null),
             'all_day' => (bool) ($event['all_day'] ?? false),
             'location' => self::nullableString($event['location'] ?? null),
+            'is_recurring_template' => (bool) ($event['is_recurring_template'] ?? false),
+            'series' => [
+                'root_event_id' => self::nullableInt($event['parent_event_id'] ?? null)
+                    ?? self::int($event['id'] ?? 0),
+                'is_recurring' => (bool) ($event['is_recurring_template'] ?? false)
+                    || self::nullableInt($event['parent_event_id'] ?? null) !== null,
+                'occurrence_count' => self::int($event['occurrence_count'] ?? 0),
+                'future_occurrence_count' => self::int($event['future_occurrence_count'] ?? 0),
+            ],
             'organizer' => [
                 'id' => self::int($event['user_id'] ?? 0),
                 'display_name' => self::nullableString($event['organizer_name'] ?? null),

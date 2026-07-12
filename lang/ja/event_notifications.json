@@ -15,6 +15,8 @@
     "expired": "期限切れ"
   },
   "lifecycle": {
+    "rejected": "\u30a4\u30d9\u30f3\u30c8\u300c:title\u300d\u306f\u627f\u8a8d\u3055\u308c\u305a\u3001\u4e0b\u66f8\u304d\u306b\u623b\u3055\u308c\u307e\u3057\u305f\u3002",
+    "pending_review": "\u30a4\u30d9\u30f3\u30c8\u300c:title\u300d\u304c\u30e2\u30c7\u30ec\u30fc\u30b7\u30e7\u30f3\u5be9\u67fb\u306b\u63d0\u51fa\u3055\u308c\u307e\u3057\u305f\u3002",
     "published": "イベント「:title」が公開されました。",
     "postponed": "イベント「:title」が延期されました。",
     "cancelled": "イベント「:title」が中止されました。",

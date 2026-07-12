@@ -63,6 +63,7 @@
   "load_history_error": "Impossibile caricare la cronologia di audit.",
   "history_title": "Cronologia di audit del messaggio",
   "loading_history": "Caricamento cronologia di audit",
+  "history_load_more": "Carica altra cronologia",
   "history_entry_meta": "Versione {{version}} · {{date}}",
   "variants": { "announcement": "Annuncio", "follow_up": "Seguito dopo l’evento", "review_request": "Richiesta di recensione" },
   "statuses": { "draft": "Bozza", "scheduled": "Programmato", "sending": "Invio in corso", "sent": "Inviato", "cancelled": "Annullato", "failed": "Non riuscito" },

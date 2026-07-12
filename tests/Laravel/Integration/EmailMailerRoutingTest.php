@@ -324,31 +324,31 @@ class EmailMailerRoutingTest extends TestCase
         );
     }
 
-    public function test_event_reminder_bells_are_created_only_after_email_acceptance(): void
+    public function test_event_reminder_email_failures_are_retryable_without_duplicate_bells(): void
     {
         $legacySource = file_get_contents(app_path('Services/EventReminderService.php'));
-        $legacyFailureGuard = strpos($legacySource, 'if (!$emailOk) {');
-        $legacyBellInsert = strpos($legacySource, 'INSERT INTO notifications');
+        $emailBranch = strpos($legacySource, "if (\$channel === 'email') {");
+        $bellBranch = strpos($legacySource, "if (\$channel === 'in_app') {");
+        $emailSend = strpos($legacySource, '$sent = EmailDispatchService::sendRaw(');
+        $emailFailureGuard = $emailSend === false
+            ? false
+            : strpos($legacySource, 'if (!$sent) {', $emailSend);
+        $emailRetry = $emailFailureGuard === false
+            ? false
+            : strpos($legacySource, '$this->channelDeliveries->markRetrying(', $emailFailureGuard);
 
-        $this->assertNotFalse($legacyFailureGuard, 'EventReminderService must guard failed email sends.');
-        $this->assertNotFalse($legacyBellInsert, 'EventReminderService must still create reminder bell notifications.');
+        $this->assertNotFalse($emailBranch, 'EventReminderService must retain an email channel.');
+        $this->assertNotFalse($bellBranch, 'EventReminderService must retain an in-app reminder channel.');
+        $this->assertNotFalse($emailSend, 'EventReminderService must send through EmailDispatchService.');
+        $this->assertNotFalse($emailFailureGuard, 'EventReminderService must guard failed email sends.');
+        $this->assertNotFalse($emailRetry, 'Failed reminder emails must remain retryable in the channel ledger.');
         $this->assertLessThan(
-            $legacyBellInsert,
-            $legacyFailureGuard,
-            'EventReminderService must not create duplicate bells before a failed email can retry.'
+            $bellBranch,
+            $emailBranch,
+            'EventReminderService must attempt email before the independently idempotent in-app channel.'
         );
 
         $eventSource = file_get_contents(app_path('Services/EventNotificationService.php'));
-        $emailSend = strpos($eventSource, '$emailOk = $this->sendEventEmail(');
-        $bellCreate = strpos($eventSource, '$this->createReminderNotification($tenantId, $userId, $event, $message);');
-
-        $this->assertNotFalse($emailSend, 'EventNotificationService must send the reminder email.');
-        $this->assertNotFalse($bellCreate, 'EventNotificationService must create the reminder bell.');
-        $this->assertLessThan(
-            $bellCreate,
-            $emailSend,
-            'EventNotificationService must create event reminder bells only after email acceptance.'
-        );
 
         $this->assertStringNotContainsString(
             "'tenant_id' => TenantContext::getId(),",
@@ -357,7 +357,7 @@ class EmailMailerRoutingTest extends TestCase
         );
 
         $this->assertStringContainsString(
-            'EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, $type',
+            'EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, $unsubscribeUrl, $type, [\'tenant_id\' => $tenantId])',
             $eventSource,
             'EventNotificationService must preserve granular event email_log categories instead of collapsing all sends to event_notification.'
         );

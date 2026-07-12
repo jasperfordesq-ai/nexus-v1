@@ -183,6 +183,30 @@
                     </div>
                 </fieldset>
 
+                @php
+                    $recurrenceMax = max(1, (int) ($recurrenceCapabilities['max_occurrences'] ?? 52));
+                    $supportedFrequencies = is_array($recurrenceCapabilities['supported_frequencies'] ?? null)
+                        ? $recurrenceCapabilities['supported_frequencies']
+                        : ['daily', 'weekly', 'monthly', 'yearly'];
+                    $supportedEndTypes = is_array($recurrenceCapabilities['supported_end_types'] ?? null)
+                        ? $recurrenceCapabilities['supported_end_types']
+                        : ['after_count', 'on_date'];
+                    if ($recurrenceMax < 2) {
+                        $supportedEndTypes = array_values(array_filter(
+                            $supportedEndTypes,
+                            static fn ($endType): bool => $endType !== 'after_count',
+                        ));
+                    }
+                    $supportsRollingNever = (bool) ($recurrenceCapabilities['supports_rolling_never'] ?? false)
+                        && in_array('never', $supportedEndTypes, true);
+                    $defaultFrequency = in_array('weekly', $supportedFrequencies, true)
+                        ? 'weekly'
+                        : ($supportedFrequencies[0] ?? 'daily');
+                    $defaultEndType = in_array('after_count', $supportedEndTypes, true)
+                        ? 'after_count'
+                        : ($supportedEndTypes[0] ?? 'on_date');
+                @endphp
+
                 {{-- ===== Recurrence — WAVE NIGHT-EVENTS ===== --}}
                 <fieldset class="govuk-fieldset govuk-!-margin-top-7">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -202,27 +226,23 @@
                                     <fieldset class="govuk-fieldset">
                                         <legend class="govuk-fieldset__legend">{{ __('govuk_alpha.events.polish_events.recurrence_frequency_legend') }}</legend>
                                         <div class="govuk-radios govuk-radios--small" data-module="govuk-radios" id="recurrence_frequency">
-                                            @foreach ([
+                                            @foreach (array_filter([
                                                 'daily'   => __('govuk_alpha.events.polish_events.recurrence_freq_daily'),
                                                 'weekly'  => __('govuk_alpha.events.polish_events.recurrence_freq_weekly'),
                                                 'biweekly' => __('govuk_alpha.events.polish_events.recurrence_freq_biweekly'),
                                                 'monthly' => __('govuk_alpha.events.polish_events.recurrence_freq_monthly'),
-                                            ] as $freq => $label)
-                                                @php $freqValue = $freq === 'biweekly' ? 'weekly' : $freq; $interval = $freq === 'biweekly' ? 2 : 1; @endphp
+                                                'yearly' => __('govuk_alpha.events.polish_events.recurrence_freq_yearly'),
+                                            ], static fn ($label, $freq): bool => in_array(
+                                                $freq === 'biweekly' ? 'weekly' : $freq,
+                                                $supportedFrequencies,
+                                                true,
+                                            ), ARRAY_FILTER_USE_BOTH) as $freq => $label)
                                                 <div class="govuk-radios__item">
-                                                    <input class="govuk-radios__input" id="freq-{{ $freq }}" name="recurrence_frequency" type="radio" value="{{ $freqValue }}"
-                                                        @php
-                                                            $oldFreq = old('recurrence_frequency', 'weekly');
-                                                            $oldInterval = (int) old('recurrence_interval', 1);
-                                                            $isChecked = ($oldFreq === $freqValue && (($freq === 'biweekly' && $oldInterval === 2) || ($freq !== 'biweekly' && $oldInterval <= 1)));
-                                                        @endphp
-                                                        @checked($isChecked)>
+                                                    <input class="govuk-radios__input" id="freq-{{ $freq }}" name="recurrence_frequency" type="radio" value="{{ $freq }}" @checked(old('recurrence_frequency', $defaultFrequency) === $freq)>
                                                     <label class="govuk-label govuk-radios__label" for="freq-{{ $freq }}">{{ $label }}</label>
                                                 </div>
                                             @endforeach
                                         </div>
-                                        {{-- Hidden interval; biweekly JS-free approach: frequency=weekly + interval=2 --}}
-                                        <input type="hidden" name="recurrence_interval" value="{{ old('recurrence_interval', 1) }}">
                                     </fieldset>
                                 </div>
 
@@ -231,28 +251,39 @@
                                     <fieldset class="govuk-fieldset">
                                         <legend class="govuk-fieldset__legend">{{ __('govuk_alpha.events.polish_events.recurrence_end_legend') }}</legend>
                                         <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                            @if (in_array('after_count', $supportedEndTypes, true))
                                             <div class="govuk-radios__item">
-                                                <input class="govuk-radios__input" id="rec-end-count" name="recurrence_ends_type" type="radio" value="after_count" @checked(old('recurrence_ends_type', 'after_count') === 'after_count') data-aria-controls="rec-count-conditional">
+                                                <input class="govuk-radios__input" id="rec-end-count" name="recurrence_ends_type" type="radio" value="after_count" @checked(old('recurrence_ends_type', $defaultEndType) === 'after_count') data-aria-controls="rec-count-conditional">
                                                 <label class="govuk-label govuk-radios__label" for="rec-end-count">{{ __('govuk_alpha.events.polish_events.recurrence_end_after') }}</label>
                                             </div>
-                                            <div class="govuk-radios__conditional{{ old('recurrence_ends_type', 'after_count') === 'after_count' ? '' : ' govuk-radios__conditional--hidden' }}" id="rec-count-conditional">
+                                            <div class="govuk-radios__conditional{{ old('recurrence_ends_type', $defaultEndType) === 'after_count' ? '' : ' govuk-radios__conditional--hidden' }}" id="rec-count-conditional">
                                                 <div class="govuk-form-group">
                                                     <label class="govuk-label" for="recurrence_ends_after_count">{{ __('govuk_alpha.events.polish_events.recurrence_count_label') }}</label>
-                                                    <div id="rec-count-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.recurrence_count_hint') }}</div>
-                                                    <input class="govuk-input govuk-input--width-3" id="recurrence_ends_after_count" name="recurrence_ends_after_count" type="number" min="1" max="52" value="{{ old('recurrence_ends_after_count', 10) }}" aria-describedby="rec-count-hint">
+                                                    <div id="rec-count-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.recurrence_count_hint', ['max' => $recurrenceMax]) }}</div>
+                                                    <input class="govuk-input govuk-input--width-3" id="recurrence_ends_after_count" name="recurrence_ends_after_count" type="number" min="2" max="{{ $recurrenceMax }}" value="{{ old('recurrence_ends_after_count', min(10, $recurrenceMax)) }}" aria-describedby="rec-count-hint">
                                                 </div>
                                             </div>
+                                            @endif
+                                            @if (in_array('on_date', $supportedEndTypes, true))
                                             <div class="govuk-radios__item">
-                                                <input class="govuk-radios__input" id="rec-end-date" name="recurrence_ends_type" type="radio" value="on_date" @checked(old('recurrence_ends_type') === 'on_date') data-aria-controls="rec-date-conditional">
+                                                <input class="govuk-radios__input" id="rec-end-date" name="recurrence_ends_type" type="radio" value="on_date" @checked(old('recurrence_ends_type', $defaultEndType) === 'on_date') data-aria-controls="rec-date-conditional">
                                                 <label class="govuk-label govuk-radios__label" for="rec-end-date">{{ __('govuk_alpha.events.polish_events.recurrence_end_on_date') }}</label>
                                             </div>
-                                            <div class="govuk-radios__conditional{{ old('recurrence_ends_type') === 'on_date' ? '' : ' govuk-radios__conditional--hidden' }}" id="rec-date-conditional">
+                                            <div class="govuk-radios__conditional{{ old('recurrence_ends_type', $defaultEndType) === 'on_date' ? '' : ' govuk-radios__conditional--hidden' }}" id="rec-date-conditional">
                                                 <div class="govuk-form-group">
                                                     <label class="govuk-label" for="recurrence_ends_on_date">{{ __('govuk_alpha.events.polish_events.recurrence_end_date_label') }}</label>
                                                     <div id="rec-date-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.recurrence_end_date_hint') }}</div>
                                                     <input class="govuk-input govuk-!-width-one-half" id="recurrence_ends_on_date" name="recurrence_ends_on_date" type="date" value="{{ old('recurrence_ends_on_date') }}" aria-describedby="rec-date-hint">
                                                 </div>
                                             </div>
+                                            @endif
+                                            @if ($supportsRollingNever)
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="rec-end-never" name="recurrence_ends_type" type="radio" value="never" @checked(old('recurrence_ends_type') === 'never')>
+                                                <label class="govuk-label govuk-radios__label" for="rec-end-never">{{ __('govuk_alpha.events.polish_events.recurrence_end_never') }}</label>
+                                                <div class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha.events.polish_events.recurrence_end_never_hint') }}</div>
+                                            </div>
+                                            @endif
                                         </div>
                                     </fieldset>
                                 </div>

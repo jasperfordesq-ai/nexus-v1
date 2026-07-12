@@ -357,7 +357,37 @@ final class EventTicketEntitlementServiceTest extends TestCase
         self::assertFalse((bool) ($metadata['refund_executed'] ?? true));
     }
 
-    public function test_registration_exit_without_ticket_does_not_depend_on_concrete_ticket_scope(): void
+    public function test_registration_exit_ticket_hook_without_ticket_does_not_depend_on_concrete_ticket_scope(): void
+    {
+        $owner = $this->ticketUser();
+        $member = $this->ticketUser();
+        [$eventId] = $this->ticketEvent(
+            (int) $owner->id,
+            template: true,
+        );
+        $registrationId = $this->ticketRegistration($eventId, (int) $member->id);
+
+        $result = DB::transaction(
+            fn (): int => (new EventTicketEntitlementService())
+                ->cancelConfirmedForRegistrationExitWithinTransaction(
+                    $eventId,
+                    $registrationId,
+                    $member,
+                    'Member withdrew from the event.',
+                    'registration-exit-without-ticket',
+                ),
+        );
+
+        self::assertSame(0, $result);
+        self::assertSame('confirmed', (string) DB::table('event_registrations')
+            ->where('id', $registrationId)
+            ->value('registration_state'));
+        self::assertSame(0, DB::table('event_ticket_entitlements')
+            ->where('event_id', $eventId)
+            ->count());
+    }
+
+    public function test_registration_withdrawal_can_clean_up_a_template_registration_without_a_ticket(): void
     {
         $owner = $this->ticketUser();
         $member = $this->ticketUser();
@@ -371,7 +401,7 @@ final class EventTicketEntitlementServiceTest extends TestCase
             $eventId,
             (int) $member->id,
             $member,
-            'registration-exit-without-ticket',
+            'registration-exit-template-cleanup',
         );
 
         self::assertTrue($result->changed);

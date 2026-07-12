@@ -13,7 +13,7 @@ use App\Models\EventSafetyRequirement;
 use App\Models\EventSafetyRequirementVersion;
 use App\Support\Events\EventSafetyContractMapper;
 use App\Support\Events\EventSafetyEligibilityDecision;
-use PHPUnit\Framework\TestCase;
+use Tests\Laravel\TestCase;
 
 final class EventSafetyContractMapperTest extends TestCase
 {
@@ -26,7 +26,7 @@ final class EventSafetyContractMapperTest extends TestCase
             JSON_THROW_ON_ERROR,
         );
         $event = (new Event())->forceFill(['id' => 101]);
-        $requirements = (new EventSafetyRequirement())->forceFill([
+        $requirements = (new EventSafetyRequirement())->setRawAttributes([
             'id' => 41,
             'event_id' => 101,
             'status' => 'published',
@@ -36,7 +36,7 @@ final class EventSafetyContractMapperTest extends TestCase
             'published_at' => '2030-04-01 09:00:00',
             'created_by_user_id' => 7,
             'published_by_user_id' => 7,
-        ]);
+        ], true);
         $version = (new EventSafetyRequirementVersion())->forceFill([
             'id' => 42,
             'event_id' => 101,
@@ -122,6 +122,6 @@ final class EventSafetyContractMapperTest extends TestCase
         self::assertSame('not_required', $actual['evidence']['code_of_conduct']['status']);
         self::assertSame('not_required', $actual['evidence']['guardian_consent']['status']);
         self::assertFalse($actual['rollout']['enforcement_active']);
-        self::assertNotContains(true, $actual['permissions'], true);
+        self::assertFalse(in_array(true, $actual['permissions'], true));
     }
 }

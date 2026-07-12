@@ -58,6 +58,7 @@ vi.mock('react-i18next', () => {
     preview_summary: '{{recipients}} recipients and {{deliveries}} deliveries.',
     history_title: 'Message audit history',
     loading_history: 'Loading audit history',
+    history_load_more: 'Load more history',
     history_entry_meta: 'Version {{version}} · {{date}}',
     load_history_error: 'The audit history could not be loaded.',
     create_success: 'Draft created.',
@@ -71,6 +72,7 @@ vi.mock('react-i18next', () => {
     'channel_labels.in_app': 'In-app notification',
     'channel_labels.push': 'Push notification',
     'history_actions.created': 'Draft created',
+    'history_actions.revised': 'Draft revised',
   };
   return {
     useTranslation: () => ({
@@ -125,6 +127,13 @@ function detailFixture(body = 'Exact organizer prose.'): EventBroadcastDetail {
       metadata: {},
       created_at: '2026-07-11T10:00:00+00:00',
     }],
+    history_meta: {
+      current_page: 1,
+      per_page: 50,
+      total: 1,
+      total_pages: 1,
+      has_more: false,
+    },
   };
 }
 
@@ -146,6 +155,26 @@ describe('EventCommunicationsWorkspace', () => {
     expect(screen.getByText('12 recipients')).toBeInTheDocument();
     expect(screen.getByText('0 of 0 delivered')).toBeInTheDocument();
     expect(screen.queryByText(/@/)).not.toBeInTheDocument();
+  });
+
+  it('keeps the composer above fixed navigation and inside short viewport insets', async () => {
+    const user = userEvent.setup();
+    renderEventComponent(<EventCommunicationsWorkspace eventId={42} eventTitle="Community summit" />);
+
+    await user.click(await screen.findByRole('button', { name: 'New message' }));
+    const dialog = await screen.findByRole('dialog', { name: 'New message for Community summit' });
+    const backdrop = dialog.closest<HTMLElement>('[data-slot="modal-backdrop"]');
+    const container = dialog.closest<HTMLElement>('[data-slot="modal-container"]');
+
+    expect(backdrop).toHaveClass('z-[var(--z-modal-backdrop)]');
+    expect(container).toHaveClass(
+      'z-[var(--z-modal)]',
+      'pt-[calc(var(--safe-area-top)+1rem)]',
+      'pb-[calc(var(--safe-area-bottom)+1rem)]',
+      'sm:pt-[calc(var(--safe-area-top)+2.5rem)]',
+      'sm:pb-[calc(var(--safe-area-bottom)+2.5rem)]',
+    );
+    expect(within(dialog).getByRole('button', { name: 'accessibility.close' })).toBeInTheDocument();
   });
 
   it('requires a fresh exact-audience preview before preserving a new draft', async () => {
@@ -199,6 +228,47 @@ describe('EventCommunicationsWorkspace', () => {
     expect(within(dialog).getByText('Draft created')).toBeInTheDocument();
     expect(within(dialog).getByText('Draft')).toBeInTheDocument();
     expect(within(dialog).queryByText('Exact organizer prose.')).not.toBeInTheDocument();
+  });
+
+  it('loads every bounded page of an individual communication history', async () => {
+    const user = userEvent.setup();
+    const first = detailFixture();
+    first.history_meta = {
+      current_page: 1,
+      per_page: 50,
+      total: 51,
+      total_pages: 2,
+      has_more: true,
+    };
+    const second = detailFixture();
+    second.history = [{
+      id: 51,
+      version: 51,
+      action: 'revised',
+      from_status: 'draft',
+      to_status: 'draft',
+      metadata: {},
+      created_at: '2026-07-12T10:00:00+00:00',
+    }];
+    second.history_meta = {
+      current_page: 2,
+      per_page: 50,
+      total: 51,
+      total_pages: 2,
+      has_more: false,
+    };
+    const get = vi.spyOn(eventCommunicationsApi, 'get')
+      .mockResolvedValueOnce({ success: true, data: first })
+      .mockResolvedValueOnce({ success: true, data: second });
+    renderEventComponent(<EventCommunicationsWorkspace eventId={42} />);
+
+    await user.click(await screen.findByRole('button', { name: 'View history' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Load more history' }));
+
+    await waitFor(() => expect(get).toHaveBeenLastCalledWith(8, 2, 50));
+    expect(within(dialog).getByText('Draft revised')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: 'Load more history' })).not.toBeInTheDocument();
   });
 
   it('pages through the complete communication ledger', async () => {

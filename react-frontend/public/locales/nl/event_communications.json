@@ -63,6 +63,7 @@
   "load_history_error": "De auditgeschiedenis kon niet worden geladen.",
   "history_title": "Auditgeschiedenis van het bericht",
   "loading_history": "Auditgeschiedenis laden",
+  "history_load_more": "Meer geschiedenis laden",
   "history_entry_meta": "Versie {{version}} · {{date}}",
   "variants": { "announcement": "Aankondiging", "follow_up": "Opvolging na het evenement", "review_request": "Verzoek om beoordeling" },
   "statuses": { "draft": "Concept", "scheduled": "Gepland", "sending": "Wordt verzonden", "sent": "Verzonden", "cancelled": "Geannuleerd", "failed": "Mislukt" },

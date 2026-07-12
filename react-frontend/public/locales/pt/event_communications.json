@@ -63,6 +63,7 @@
   "load_history_error": "Não foi possível carregar o histórico de auditoria.",
   "history_title": "Histórico de auditoria da mensagem",
   "loading_history": "A carregar histórico de auditoria",
+  "history_load_more": "Carregar mais histórico",
   "history_entry_meta": "Versão {{version}} · {{date}}",
   "variants": { "announcement": "Anúncio", "follow_up": "Acompanhamento após o evento", "review_request": "Pedido de avaliação" },
   "statuses": { "draft": "Rascunho", "scheduled": "Agendada", "sending": "A enviar", "sent": "Enviada", "cancelled": "Cancelada", "failed": "Falhou" },

@@ -211,7 +211,7 @@ final class EventReminderScheduleService
 
         return $this->transactional(function () use ($eventId, $userId, $reasonCode): int {
             $tenantId = $this->tenantId();
-            $this->lockedEvent($tenantId, $eventId);
+            $this->lockEventForCancellation($tenantId, $eventId);
             $this->lockActiveUser($tenantId, $userId, false);
 
             $canonical = DB::table('event_reminder_schedules')
@@ -238,6 +238,23 @@ final class EventReminderScheduleService
 
             return $canonical + $legacy;
         });
+    }
+
+    /**
+     * Registration exits are a cleanup boundary, not a reminder-creation
+     * boundary. Historical/imported registrations can still reference a
+     * recurrence template, and those members must always be able to leave.
+     */
+    private function lockEventForCancellation(int $tenantId, int $eventId): void
+    {
+        $event = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $eventId)
+            ->lockForUpdate()
+            ->first(['id']);
+        if ($event === null) {
+            throw new InvalidArgumentException('event_reminder_event_not_found');
+        }
     }
 
     /**

@@ -103,6 +103,8 @@ $alphaRoutes = function (bool $hostMode) {
         Route::post('/events/new', [AlphaController::class, 'storeEvent'])->middleware('throttle:10,1')->name('events.store');
         Route::get('/events/{id}/edit', [AlphaController::class, 'editEvent'])->whereNumber('id')->name('events.edit');
         Route::post('/events/{id}/edit', [AlphaController::class, 'updateEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.update');
+        Route::post('/events/{id}/submit', [AlphaController::class, 'submitEventForReview'])->whereNumber('id')->middleware('throttle:10,1')->name('events.submit');
+        Route::post('/events/{id}/publish', [AlphaController::class, 'publishEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.publish');
         Route::post('/events/{id}/cancel', [AlphaController::class, 'cancelEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.cancel');
         Route::post('/events/{id}/delete', [AlphaController::class, 'deleteEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.delete');
         Route::get('/events/{id}/calendar', [AlphaController::class, 'eventsCalendarActions'])->whereNumber('id')->name('events.calendar.actions');

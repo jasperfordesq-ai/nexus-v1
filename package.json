@@ -40,6 +40,7 @@
     "test:events:react": "node scripts/test-events.mjs --react-only",
     "test:events:mobile": "node scripts/test-events.mjs --mobile-only",
     "test:events:e2e": "npx playwright test e2e/tests/events/events.spec.ts --project=chromium-modern",
+    "test:events:e2e:enterprise": "npx playwright test --config=playwright.events-enterprise.config.ts --project=events-enterprise",
     "test:e2e:headed": "npx playwright test --headed",
     "test:e2e:ui": "npx playwright test --ui",
     "test:e2e:debug": "npx playwright test --debug",

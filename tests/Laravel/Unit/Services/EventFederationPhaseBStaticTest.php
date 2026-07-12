@@ -141,7 +141,7 @@ final class EventFederationPhaseBStaticTest extends TestCase
         self::assertStringContainsString("'is_online'", $mutationBlock);
         self::assertStringNotContainsString("'online_link'", $mutationBlock);
         self::assertStringContainsString('$federationTouchedFields', $service);
-        self::assertStringContainsString('app(EventFederationPublisher::class)->publish($event)', $service);
+        self::assertStringContainsString('app(EventFederationPublisher::class)->publish($current)', $service);
         self::assertStringNotContainsString('CommunityEventUpdated::dispatch', $service);
     }
 

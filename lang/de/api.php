@@ -675,6 +675,8 @@ return [
     'event_series_not_found' => 'Series not found',
     'event_series_id_required' => 'series_id is required',
     'event_scope_must_be_single_or_all' => 'scope must be "single" or "all"',
+    'event_recurrence_template_requires_all_scope' => 'Wiederkehrende Vorlagen können nur mit dem Bereich „all“ geändert werden.',
+    'event_recurring_schedule_requires_revision' => 'Zeitplanänderungen für eine wiederkehrende Serie müssen den Vorschau-Workflow „dieses und zukünftige Ereignisse“ verwenden.',
     'event_no_image_uploaded' => 'No image file uploaded or upload error',
     'event_image_upload_failed' => 'Failed to upload image',
     'ai_streaming_not_available' => 'Streaming chat is not yet available. Use the standard chat endpoint.',

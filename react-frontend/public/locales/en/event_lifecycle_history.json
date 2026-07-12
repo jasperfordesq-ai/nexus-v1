@@ -1,0 +1,49 @@
+{
+  "title": "Lifecycle history",
+  "description": "An immutable record of publication and operational changes for this event.",
+  "loading": "Loading lifecycle history",
+  "load_error_title": "Lifecycle history could not be loaded",
+  "load_error_description": "Try again to retrieve the immutable history.",
+  "retry": "Try again",
+  "empty_title": "No lifecycle changes yet",
+  "empty_description": "Changes will appear here after the event lifecycle is updated.",
+  "list_label": "Event lifecycle changes",
+  "version": "Version {{version}}",
+  "immutable": "Immutable",
+  "publication_label": "Publication",
+  "operational_label": "Operational status",
+  "transition": "{{from}} to {{to}}",
+  "actor_label": "Changed by",
+  "reason_label": "Reason",
+  "unknown_actor": "Member {{id}}",
+  "evidence_title": "Operational evidence",
+  "notifications_suppressed": "Duplicate notifications were suppressed for this series change.",
+  "load_more": "Load more history",
+  "loading_more": "Loading more history",
+  "load_more_error_title": "More history could not be loaded",
+  "load_more_error_description": "Try loading the next page again.",
+  "timestamp_unknown": "Time not recorded",
+  "states": {
+    "publication": {
+      "draft": "Draft",
+      "pending_review": "Pending review",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "operational": {
+      "scheduled": "Scheduled",
+      "postponed": "Postponed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Reminder schedules cancelled: {{count}}",
+    "waitlist_cancelled": "Waitlist entries cancelled: {{count}}",
+    "registrations_cancelled": "Registrations cancelled: {{count}}"
+  },
+  "series": {
+    "template": "Recurring template {{id}}",
+    "occurrence": "Occurrence of recurring template {{id}}"
+  }
+}

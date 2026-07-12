@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderEventRoute } from '@/test/events-test-harness';
 import { createMockContexts } from '@/test/mock-contexts';
 
-const { mockApi, mockToast } = vi.hoisted(() => ({
+const { mockApi, mockToast, mockLogError } = vi.hoisted(() => ({
   mockApi: {
     get: vi.fn(),
     post: vi.fn(),
@@ -22,6 +22,7 @@ const { mockApi, mockToast } = vi.hoisted(() => ({
     info: vi.fn(),
     warning: vi.fn(),
   },
+  mockLogError: vi.fn(),
 }));
 
 vi.mock('@/lib/api', () => ({ api: mockApi }));
@@ -39,7 +40,7 @@ vi.mock('@/contexts', () =>
 );
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
-vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/lib/logger', () => ({ logError: mockLogError }));
 
 vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
@@ -60,12 +61,74 @@ vi.mock('@/components/feedback', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/DatePicker', async () => ({
-  DatePicker: (await import('@/test/events-test-harness')).EventDateOrTimeInputStub,
-}));
+vi.mock('@/components/ui/DatePicker', async () => {
+  const { parseDate } = await import('@internationalized/date');
+  return {
+    DatePicker: ({ label, value, onChange, isInvalid, errorMessage }: {
+      label: string;
+      value?: { toString(): string } | null;
+      onChange?: (value: ReturnType<typeof parseDate>) => void;
+      isInvalid?: boolean;
+      errorMessage?: React.ReactNode;
+    }) => (
+      <label>
+        {label}
+        <input
+          aria-label={label}
+          aria-invalid={isInvalid || undefined}
+          value={value?.toString() ?? ''}
+          onChange={(event) => event.target.value && onChange?.(parseDate(event.target.value))}
+        />
+        {isInvalid && errorMessage ? <span>{errorMessage}</span> : null}
+      </label>
+    ),
+  };
+});
 
-vi.mock('@/components/ui/TimeInput', async () => ({
-  TimeInput: (await import('@/test/events-test-harness')).EventDateOrTimeInputStub,
+vi.mock('@/components/ui/TimeInput', async () => {
+  const { parseTime } = await import('@internationalized/date');
+  return {
+    TimeInput: ({ label, value, onChange, isInvalid, errorMessage }: {
+      label: string;
+      value?: { toString(): string } | null;
+      onChange?: (value: ReturnType<typeof parseTime>) => void;
+      isInvalid?: boolean;
+      errorMessage?: React.ReactNode;
+    }) => (
+      <label>
+        {label}
+        <input
+          aria-label={label}
+          aria-invalid={isInvalid || undefined}
+          value={value?.toString() ?? ''}
+          onChange={(event) => event.target.value && onChange?.(parseTime(event.target.value))}
+        />
+        {isInvalid && errorMessage ? <span>{errorMessage}</span> : null}
+      </label>
+    ),
+  };
+});
+
+vi.mock('@/components/ui/Select', () => ({
+  Select: ({ label, 'aria-label': ariaLabel, selectedKeys, onChange, children }: {
+    label?: React.ReactNode;
+    'aria-label'?: string;
+    selectedKeys?: Iterable<string>;
+    onChange?: (event: { target: { value: string }; currentTarget: { value: string } }) => void;
+    children?: React.ReactNode;
+  }) => (
+    <label>
+      {label}
+      <select
+        aria-label={ariaLabel ?? (typeof label === 'string' ? label : undefined)}
+        value={Array.from(selectedKeys ?? [])[0] ?? ''}
+        onChange={(event) => onChange?.({ target: { value: event.target.value }, currentTarget: { value: event.target.value } })}
+      >
+        {children}
+      </select>
+    </label>
+  ),
+  SelectItem: ({ id, children }: { id?: string; children?: React.ReactNode }) => <option value={id}>{children}</option>,
 }));
 
 vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
@@ -106,7 +169,24 @@ async function renderCreateEventPage() {
 describe('CreateEventPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    mockApi.get.mockImplementation((endpoint: string) => Promise.resolve({
+      success: true,
+      data: endpoint === '/v2/events/recurrence-capabilities'
+        ? {
+            contract_version: 1,
+            engine: 'v2',
+            structured_input: true,
+            supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+            max_occurrences: 366,
+            supported_end_types: ['after_count', 'on_date', 'never'],
+            supports_rolling_never: true,
+            supports_effective_revisions: true,
+            supports_definition_blueprints: false,
+            schema_ready: true,
+            rollout_state: 'v2_rolling',
+          }
+        : [],
+    }));
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
       value: vi.fn(),
@@ -182,5 +262,57 @@ describe('CreateEventPage', () => {
       'Please fix the highlighted fields before saving',
     );
     expect(mockApi.post).not.toHaveBeenCalled();
+  });
+
+  it('submits yearly never-ending recurrence as structured fields only', async () => {
+    const eventFixture = await import('../../../../contracts/events/v2/event-detail.json');
+    mockApi.post.mockResolvedValue({
+      success: true,
+      data: { template: eventFixture.default, occurrences_created: 0 },
+    });
+    await renderCreateEventPage();
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Event Title' }), { target: { value: 'Yearly community assembly' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Description' }), { target: { value: 'A detailed annual gathering for the whole community.' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Start Date' }), { target: { value: '2099-05-01' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Start Time' }), { target: { value: '10:00' } });
+    fireEvent.click(screen.getByRole('switch', { name: 'Toggle recurring event' }));
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledWith(
+      '/v2/events/recurrence-capabilities',
+      expect.any(Object),
+    ));
+    expect(mockLogError).not.toHaveBeenCalled();
+    await screen.findByRole('option', { name: 'Never (rolling schedule)' });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Recurrence frequency' }), { target: { value: 'yearly' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'How the series ends' }), { target: { value: 'never' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Event' }));
+
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith(
+      '/v2/events/recurring',
+      expect.objectContaining({
+        recurrence_frequency: 'yearly',
+        recurrence_interval: 1,
+        recurrence_ends_type: 'never',
+      }),
+      expect.any(Object),
+    ));
+    const recurringPayload = mockApi.post.mock.calls.find(([path]) => path === '/v2/events/recurring')?.[1];
+    expect(recurringPayload).not.toHaveProperty('recurrence_rule');
+    expect(recurringPayload).not.toHaveProperty('recurrence_rrule');
+    expect(recurringPayload).not.toHaveProperty('recurrence_days');
+  });
+
+  it('renders the legacy runtime maximum in both the input and translated helper copy', async () => {
+    mockApi.get.mockImplementation((endpoint: string) => Promise.resolve({
+      success: endpoint !== '/v2/events/recurrence-capabilities',
+      data: endpoint === '/v2/events/recurrence-capabilities' ? undefined : [],
+    }));
+    await renderCreateEventPage();
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Toggle recurring event' }));
+
+    expect(screen.getByRole('spinbutton', { name: 'Number of occurrences' })).toHaveAttribute('max', '52');
+    expect(screen.getByText('Between 2 and 52 occurrences')).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Never (rolling schedule)' })).not.toBeInTheDocument();
   });
 });

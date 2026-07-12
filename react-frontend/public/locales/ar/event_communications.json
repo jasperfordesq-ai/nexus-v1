@@ -63,6 +63,7 @@
   "load_history_error": "تعذّر تحميل سجل التدقيق.",
   "history_title": "سجل تدقيق الرسالة",
   "loading_history": "جارٍ تحميل سجل التدقيق",
+  "history_load_more": "تحميل المزيد من السجل",
   "history_entry_meta": "الإصدار {{version}} · {{date}}",
   "variants": { "announcement": "إعلان", "follow_up": "متابعة بعد الفعالية", "review_request": "طلب تقييم" },
   "statuses": { "draft": "مسودة", "scheduled": "مجدولة", "sending": "جارٍ الإرسال", "sent": "مرسلة", "cancelled": "ملغاة", "failed": "فشلت" },

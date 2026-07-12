@@ -1,0 +1,49 @@
+{
+  "title": "Levenscyclusgeschiedenis",
+  "description": "Een onveranderlijk overzicht van publicatie- en operationele wijzigingen voor dit evenement.",
+  "loading": "Levenscyclusgeschiedenis laden",
+  "load_error_title": "De levenscyclusgeschiedenis kon niet worden geladen",
+  "load_error_description": "Probeer opnieuw om de onveranderlijke geschiedenis op te halen.",
+  "retry": "Opnieuw proberen",
+  "empty_title": "Nog geen levenscycluswijzigingen",
+  "empty_description": "Wijzigingen verschijnen hier nadat de levenscyclus van het evenement is bijgewerkt.",
+  "list_label": "Levenscycluswijzigingen van het evenement",
+  "version": "Versie {{version}}",
+  "immutable": "Onveranderlijk",
+  "publication_label": "Publicatie",
+  "operational_label": "Operationele status",
+  "transition": "Van {{from}} naar {{to}}",
+  "actor_label": "Gewijzigd door",
+  "reason_label": "Reden",
+  "unknown_actor": "Lid {{id}}",
+  "evidence_title": "Operationeel bewijs",
+  "notifications_suppressed": "Dubbele meldingen zijn onderdrukt voor deze seriewijziging.",
+  "load_more": "Meer geschiedenis laden",
+  "loading_more": "Meer geschiedenis laden",
+  "load_more_error_title": "Meer geschiedenis kon niet worden geladen",
+  "load_more_error_description": "Probeer de volgende pagina opnieuw te laden.",
+  "timestamp_unknown": "Tijd niet vastgelegd",
+  "states": {
+    "publication": {
+      "draft": "Concept",
+      "pending_review": "Wacht op beoordeling",
+      "published": "Gepubliceerd",
+      "archived": "Gearchiveerd"
+    },
+    "operational": {
+      "scheduled": "Gepland",
+      "postponed": "Uitgesteld",
+      "cancelled": "Geannuleerd",
+      "completed": "Voltooid"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Geannuleerde herinneringsschema’s: {{count}}",
+    "waitlist_cancelled": "Geannuleerde wachtlijstvermeldingen: {{count}}",
+    "registrations_cancelled": "Geannuleerde inschrijvingen: {{count}}"
+  },
+  "series": {
+    "template": "Terugkerend sjabloon {{id}}",
+    "occurrence": "Moment van terugkerend sjabloon {{id}}"
+  }
+}

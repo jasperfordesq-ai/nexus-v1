@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
@@ -86,6 +86,7 @@ function EventCommunicationsScreenInner() {
   const eventId = Number(id);
   const safeEventId = Number.isInteger(eventId) && eventId > 0 ? eventId : 0;
   const { show: showToast } = useAppToast();
+  const auditGeneration = useRef(0);
   const [broadcasts, setBroadcasts] = useState<MobileEventBroadcast[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -109,6 +110,7 @@ function EventCommunicationsScreenInner() {
   const [auditTarget, setAuditTarget] = useState<MobileEventBroadcast | null>(null);
   const [auditDetail, setAuditDetail] = useState<MobileEventBroadcastDetail | null>(null);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
+  const [isAuditLoadingMore, setIsAuditLoadingMore] = useState(false);
   const [auditLoadFailed, setAuditLoadFailed] = useState(false);
 
   const load = useCallback(async () => {
@@ -135,6 +137,8 @@ function EventCommunicationsScreenInner() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => () => { auditGeneration.current += 1; }, []);
 
   async function loadMore() {
     if (!hasMore || isLoadingMore) return;
@@ -181,7 +185,7 @@ function EventCommunicationsScreenInner() {
   async function openEditComposer(broadcast: MobileEventBroadcast) {
     setOpeningDraftId(broadcast.id);
     try {
-      const detail = await getEventCommunicationDetail(broadcast.id);
+      const detail = await getEventCommunicationDetail(broadcast.id, 1, 1);
       const latest = detail.broadcast;
       replaceBroadcast(latest);
       if (!latest.capabilities.edit || latest.body === null) {
@@ -208,20 +212,63 @@ function EventCommunicationsScreenInner() {
   }
 
   async function openAudit(broadcast: MobileEventBroadcast) {
+    const requestGeneration = ++auditGeneration.current;
     setAuditTarget(broadcast);
     setAuditDetail(null);
     setAuditLoadFailed(false);
     setIsAuditLoading(true);
+    setIsAuditLoadingMore(false);
     try {
-      const detail = await getEventCommunicationDetail(broadcast.id);
+      const detail = await getEventCommunicationDetail(broadcast.id, 1, 50);
+      if (requestGeneration !== auditGeneration.current) return;
       replaceBroadcast(detail.broadcast);
       setAuditTarget(detail.broadcast);
       setAuditDetail(detail);
     } catch {
+      if (requestGeneration !== auditGeneration.current) return;
       setAuditLoadFailed(true);
     } finally {
-      setIsAuditLoading(false);
+      if (requestGeneration === auditGeneration.current) setIsAuditLoading(false);
     }
+  }
+
+  async function loadMoreAuditHistory() {
+    if (!auditTarget || !auditDetail?.history_meta.has_more || isAuditLoadingMore) return;
+    const broadcastId = auditTarget.id;
+    const requestGeneration = auditGeneration.current;
+    const nextPage = auditDetail.history_meta.current_page + 1;
+    setIsAuditLoadingMore(true);
+    try {
+      const detail = await getEventCommunicationDetail(broadcastId, nextPage, 50);
+      if (requestGeneration !== auditGeneration.current || auditTarget.id !== broadcastId) return;
+      setAuditDetail((current) => {
+        if (!current || current.broadcast.id !== broadcastId || detail.broadcast.id !== broadcastId) {
+          return current;
+        }
+        const byId = new Map(current.history.map((entry) => [entry.id, entry]));
+        detail.history.forEach((entry) => byId.set(entry.id, entry));
+        return { ...detail, history: [...byId.values()] };
+      });
+      replaceBroadcast(detail.broadcast);
+    } catch {
+      if (requestGeneration !== auditGeneration.current) return;
+      showToast({
+        title: t('history_load_failed_title'),
+        description: t('history_load_failed_description'),
+        variant: 'danger',
+      });
+    } finally {
+      if (requestGeneration === auditGeneration.current) setIsAuditLoadingMore(false);
+    }
+  }
+
+  function closeAudit() {
+    auditGeneration.current += 1;
+    setAuditTarget(null);
+    setAuditDetail(null);
+    setAuditLoadFailed(false);
+    setIsAuditLoading(false);
+    setIsAuditLoadingMore(false);
   }
 
   function selectVariant(variant: MobileEventBroadcastVariant) {
@@ -683,15 +730,20 @@ function EventCommunicationsScreenInner() {
                       </Text>
                     </View>
                   ))}
+                  {auditDetail?.history_meta.has_more ? (
+                    <Button
+                      variant="secondary"
+                      isDisabled={isAuditLoadingMore}
+                      onPress={() => void loadMoreAuditHistory()}
+                    >
+                      {isAuditLoadingMore ? <Spinner size="sm" /> : t('common:buttons.loadMore')}
+                    </Button>
+                  ) : null}
                 </View>
               )}
             </Card.Body>
             <Card.Footer>
-              <Button variant="secondary" onPress={() => {
-                setAuditTarget(null);
-                setAuditDetail(null);
-                setAuditLoadFailed(false);
-              }}>
+              <Button variant="secondary" onPress={closeAudit}>
                 {t('common:buttons.done')}
               </Button>
             </Card.Footer>

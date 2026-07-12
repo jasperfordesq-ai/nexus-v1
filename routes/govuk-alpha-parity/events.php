@@ -39,6 +39,16 @@ Route::get('/events/{id}/recurring-edit', [AlphaController::class, 'eventsRecurr
     ->whereNumber('id')->name('events.recurring.edit');
 Route::post('/events/{id}/recurring-edit', [AlphaController::class, 'eventsUpdateRecurring'])
     ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurring.update');
+Route::post('/events/{id}/recurring-edit/commit', [AlphaController::class, 'eventsCommitRecurringRevision'])
+    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurring.commit');
+
+// --- Future occurrence definition blueprints (preview-first, immutable) ---
+Route::get('/events/{id}/recurrence-definition-blueprints', [AlphaController::class, 'eventsRecurrenceDefinitionBlueprints'])
+    ->whereNumber('id')->name('events.recurrence-definitions.index');
+Route::post('/events/{id}/recurrence-definition-blueprints/preview', [AlphaController::class, 'eventsPreviewRecurrenceDefinitions'])
+    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurrence-definitions.preview');
+Route::post('/events/{id}/recurrence-definition-blueprints/commit', [AlphaController::class, 'eventsCommitRecurrenceDefinitions'])
+    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurrence-definitions.commit');
 
 // --- Attach / detach polls to an owned event ---
 Route::get('/events/{id}/polls', [AlphaController::class, 'eventsPolls'])

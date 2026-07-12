@@ -21,7 +21,21 @@
         "label": "Town square",
         "latitude": null,
         "longitude": null,
-        "mode": "in_person"
+        "mode": "in_person",
+        "accessibility": {
+          "schema_version": 1,
+          "step_free_access": null,
+          "accessible_toilet": null,
+          "hearing_loop": null,
+          "quiet_space": null,
+          "seating_available": null,
+          "accessible_parking": null,
+          "parking_details": null,
+          "transit_details": null,
+          "assistance_contact": null,
+          "notes": null,
+          "provided": false
+        }
       },
       "schedule": {
         "start_at": "2030-06-01T10:00:00+00:00",
@@ -80,6 +94,7 @@
         "message": false,
         "export": false,
         "publish": false,
+        "submit_for_review": false,
         "manage_agenda": false,
         "manage_staff": false,
         "manage_registration": false,
@@ -110,6 +125,20 @@
       "latitude": null,
       "longitude": null,
       "coordinates": null,
+      "venue_accessibility": {
+        "schema_version": 1,
+        "step_free_access": null,
+        "accessible_toilet": null,
+        "hearing_loop": null,
+        "quiet_space": null,
+        "seating_available": null,
+        "accessible_parking": null,
+        "parking_details": null,
+        "transit_details": null,
+        "assistance_contact": null,
+        "notes": null,
+        "provided": false
+      },
       "start_time": "2030-06-01T10:00:00+00:00",
       "end_time": null,
       "start_date": "2030-06-01T10:00:00+00:00",

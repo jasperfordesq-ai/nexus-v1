@@ -46,7 +46,14 @@ final class EventRegistrationProductController extends BaseApiController
 
     public function organizerOverview(int $id): JsonResponse
     {
-        return $this->execute(fn (): array => $this->queries->organizerOverview($id, $this->actor()));
+        $pagination = $this->overviewPagination();
+        if ($pagination === false) {
+            return $this->validation('pagination');
+        }
+
+        return $this->execute(
+            fn (): array => $this->queries->organizerOverview($id, $this->actor(), $pagination),
+        );
     }
 
     public function attendeeState(int $id): JsonResponse
@@ -661,6 +668,28 @@ final class EventRegistrationProductController extends BaseApiController
     private function nullableNonNegativeInteger(mixed $value): int|null|false
     {
         return $value === null ? null : ($this->nonNegativeInteger($value) ?? false);
+    }
+
+    /** @return array<string,int>|false */
+    private function overviewPagination(): array|false
+    {
+        $pagination = [];
+        foreach (['submissions', 'campaigns', 'guests'] as $collection) {
+            foreach (['page', 'per_page'] as $parameter) {
+                $key = $collection . '_' . $parameter;
+                $value = request()->query($key);
+                if ($value === null) {
+                    continue;
+                }
+                $parsed = $this->positiveInteger($value);
+                if ($parsed === null) {
+                    return false;
+                }
+                $pagination[$key] = $parsed;
+            }
+        }
+
+        return $pagination;
     }
 
     private function validation(string $field): JsonResponse

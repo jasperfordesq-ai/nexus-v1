@@ -72,6 +72,52 @@ final class AccessibleEventRegistrationProductTest extends TestCase
         $this->assertPrivateNoStore($response);
     }
 
+    public function test_organiser_can_page_through_registration_submissions_without_a_silent_cap(): void
+    {
+        $owner = $this->eventUser();
+        [$eventId, $start] = $this->registrationEvent((int) $owner->id);
+        $settings = $this->registrationSettings($eventId, $owner, $start);
+        $form = $this->publishedRegistrationForm($eventId, $owner, $settings);
+        $submissionIds = [];
+        $submissions = new EventRegistrationSubmissionService();
+        for ($index = 1; $index <= 2; $index++) {
+            $member = $this->eventUser();
+            $registrationId = $this->canonicalRegistration($eventId, (int) $member->id);
+            $result = $submissions->saveDraft(
+                $eventId,
+                $registrationId,
+                (int) $form->id,
+                $member,
+                [
+                    'display_name' => "Accessible member {$index}",
+                    'meal_choice' => 'Plant-based',
+                    'waiver' => true,
+                ],
+                null,
+                "accessible-registration-pagination-{$index}",
+            );
+            $submissionIds[] = (int) $result['submission']->id;
+        }
+        $this->signIn($owner);
+
+        $first = $this->get($this->base($eventId) . '?submissions_per_page=1');
+        $first->assertOk()
+            ->assertSee("/submissions/{$submissionIds[1]}/review", false)
+            ->assertDontSee("/submissions/{$submissionIds[0]}/review", false)
+            ->assertSee('submissions_page=2', false)
+            ->assertSee('#registration-submissions', false)
+            ->assertSeeText(__('event_registration.common.next'));
+
+        $second = $this->get(
+            $this->base($eventId) . '?submissions_page=2&submissions_per_page=1',
+        );
+        $second->assertOk()
+            ->assertSee("/submissions/{$submissionIds[0]}/review", false)
+            ->assertDontSee("/submissions/{$submissionIds[1]}/review", false)
+            ->assertSee('submissions_page=1', false)
+            ->assertSeeText(__('event_registration.common.previous'));
+    }
+
     public function test_feature_tenant_and_manager_boundaries_fail_closed(): void
     {
         $owner = $this->eventUser();

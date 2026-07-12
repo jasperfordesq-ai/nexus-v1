@@ -1,0 +1,49 @@
+{
+  "title": "Historial del ciclo de vida",
+  "description": "Un registro inmutable de los cambios de publicación y operativos de este evento.",
+  "loading": "Cargando el historial del ciclo de vida",
+  "load_error_title": "No se pudo cargar el historial del ciclo de vida",
+  "load_error_description": "Inténtalo de nuevo para recuperar el historial inmutable.",
+  "retry": "Intentar de nuevo",
+  "empty_title": "Aún no hay cambios del ciclo de vida",
+  "empty_description": "Los cambios aparecerán aquí cuando se actualice el ciclo de vida del evento.",
+  "list_label": "Cambios del ciclo de vida del evento",
+  "version": "Versión {{version}}",
+  "immutable": "Inmutable",
+  "publication_label": "Publicación",
+  "operational_label": "Estado operativo",
+  "transition": "De {{from}} a {{to}}",
+  "actor_label": "Modificado por",
+  "reason_label": "Motivo",
+  "unknown_actor": "Miembro {{id}}",
+  "evidence_title": "Evidencia operativa",
+  "notifications_suppressed": "Se suprimieron las notificaciones duplicadas para este cambio de serie.",
+  "load_more": "Cargar más historial",
+  "loading_more": "Cargando más historial",
+  "load_more_error_title": "No se pudo cargar más historial",
+  "load_more_error_description": "Intenta cargar de nuevo la página siguiente.",
+  "timestamp_unknown": "Hora no registrada",
+  "states": {
+    "publication": {
+      "draft": "Borrador",
+      "pending_review": "Pendiente de revisión",
+      "published": "Publicado",
+      "archived": "Archivado"
+    },
+    "operational": {
+      "scheduled": "Programado",
+      "postponed": "Aplazado",
+      "cancelled": "Cancelado",
+      "completed": "Completado"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Programaciones de recordatorios canceladas: {{count}}",
+    "waitlist_cancelled": "Entradas de la lista de espera canceladas: {{count}}",
+    "registrations_cancelled": "Inscripciones canceladas: {{count}}"
+  },
+  "series": {
+    "template": "Plantilla recurrente {{id}}",
+    "occurrence": "Instancia de la plantilla recurrente {{id}}"
+  }
+}

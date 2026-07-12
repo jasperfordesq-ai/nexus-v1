@@ -76,6 +76,12 @@ describe('mobile Events locale content', () => {
   const attendancePaths = [...englishFlat.keys()].filter((path) => path === 'allDay' || path.startsWith('attendance.'));
   const guardedPaths = [...previouslyCopiedPaths, ...attendancePaths];
   const agendaPaths = [...englishFlat.keys()].filter((path) => path.startsWith('agenda.'));
+  const recurrencePaths = [...englishFlat.keys()].filter((path) => (
+    path.startsWith('create.recurrence') || path.startsWith('create.revision')
+  ));
+  const venueAccessibilityPaths = [...englishFlat.keys()].filter((path) => (
+    path.startsWith('create.venueAccessibility')
+  ));
   const translatedAgendaCopy = [
     'agenda.title',
     'agenda.loading',
@@ -119,6 +125,27 @@ describe('mobile Events locale content', () => {
     }
     for (const path of translatedAgendaCopy) {
       expect(translated.get(path)).not.toBe(englishFlat.get(path));
+    }
+  });
+
+  it.each(Object.entries(locales))('%s preserves translated recurrence create and revision copy', (_locale, resource) => {
+    const translated = flatten(resource as Record<string, unknown>);
+    for (const path of recurrencePaths) {
+      const source = englishFlat.get(path);
+      const value = translated.get(path);
+      expect(value).toBeDefined();
+      expect(value).not.toBe(source);
+      expect(placeholders(value ?? '')).toEqual(placeholders(source ?? ''));
+    }
+  });
+
+  it.each(Object.entries(locales))('%s preserves translated venue-accessibility copy', (_locale, resource) => {
+    const translated = flatten(resource as Record<string, unknown>);
+    for (const path of venueAccessibilityPaths) {
+      expect(translated.get(path)).toBeDefined();
+      const naturallyIdentical = path === 'create.venueAccessibilityStatus.no'
+        && (_locale === 'es' || _locale === 'it');
+      if (!naturallyIdentical) expect(translated.get(path)).not.toBe(englishFlat.get(path));
     }
   });
 });

@@ -24,6 +24,36 @@ class AdminEventsControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Config::set('events.notification_delivery.mode', 'direct');
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'events.notification_delivery_mode')
+            ->delete();
+    }
+
+    private function eventActionOutboxCountForRecipient(
+        int $eventId,
+        string $action,
+        int $recipientUserId,
+    ): int {
+        return DB::table('event_domain_outbox')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $eventId)
+            ->where('action', $action)
+            ->get(['payload'])
+            ->filter(static function (object $row) use ($recipientUserId): bool {
+                $payload = json_decode((string) $row->payload, true);
+
+                return is_array($payload)
+                    && (int) ($payload['recipient_user_id'] ?? 0) === $recipientUserId;
+            })
+            ->count();
+    }
+
     /** @param array<string,mixed> $overrides */
     private function createEvent(int $tenantId, array $overrides = [], ?User $organizer = null): int
     {
@@ -92,6 +122,55 @@ class AdminEventsControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/events');
 
         $response->assertStatus(403);
+    }
+
+    public function test_pending_review_index_paginates_canonical_roots_instead_of_series_occurrences(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+        $templateId = $this->createEvent($this->testTenantId, [
+            'title' => 'Large pending series root',
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+            'is_recurring_template' => 1,
+        ], $organizer);
+        $occurrenceIds = [];
+        for ($index = 1; $index <= 105; $index++) {
+            $occurrenceIds[] = $this->createEvent($this->testTenantId, [
+                'title' => "Pending series occurrence {$index}",
+                'status' => 'draft',
+                'publication_status' => 'pending_review',
+                'operational_status' => 'scheduled',
+                'parent_event_id' => $templateId,
+                'is_recurring_template' => 0,
+                'start_time' => now()->addDays($index),
+                'end_time' => now()->addDays($index)->addHour(),
+            ], $organizer);
+        }
+        $standaloneId = $this->createEvent($this->testTenantId, [
+            'title' => 'Unrelated pending standalone Event',
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+        ], $organizer);
+
+        $response = $this->apiGet('/v2/admin/events?publication_state=pending_review&per_page=100')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 2);
+        $ids = array_map('intval', array_column($response->json('data'), 'id'));
+        sort($ids);
+        $expected = [$templateId, $standaloneId];
+        sort($expected);
+        self::assertSame($expected, $ids);
+        self::assertSame([], array_values(array_intersect($occurrenceIds, $ids)));
+
+        $root = collect($response->json('data'))->firstWhere('id', $templateId);
+        self::assertIsArray($root);
+        self::assertTrue($root['is_recurring_template']);
+        self::assertSame(105, $root['series']['occurrence_count']);
+        self::assertSame(105, $root['series']['future_occurrence_count']);
     }
 
     public function test_index_returns_401_for_unauthenticated(): void
@@ -184,11 +263,12 @@ class AdminEventsControllerTest extends TestCase
             ->where('event_id', $eventId)
             ->where('action', 'event.lifecycle.transitioned')
             ->count());
-        $this->assertSame(1, DB::table('event_domain_outbox')
-            ->where('event_id', $eventId)
-            ->where('action', 'event.admin_publication.created')
-            ->count());
-        $this->assertSame(1, DB::table('notifications')
+        $this->assertSame(0, $this->eventActionOutboxCountForRecipient(
+            $eventId,
+            'event.admin_publication.created',
+            (int) $admin->id,
+        ));
+        $this->assertSame(0, DB::table('notifications')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $organizer->id)
             ->where('link', "/events/{$eventId}")
@@ -198,7 +278,7 @@ class AdminEventsControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.status', 'active')
             ->assertJsonPath('data.transition.changed', false);
-        $this->assertSame(1, DB::table('notifications')
+        $this->assertSame(0, DB::table('notifications')
             ->where('tenant_id', $this->testTenantId)
             ->where('user_id', $organizer->id)
             ->where('link', "/events/{$eventId}")
@@ -208,10 +288,11 @@ class AdminEventsControllerTest extends TestCase
             ->where('event_id', $eventId)
             ->where('action', 'event.lifecycle.transitioned')
             ->count());
-        $this->assertSame(1, DB::table('event_domain_outbox')
-            ->where('event_id', $eventId)
-            ->where('action', 'event.admin_publication.created')
-            ->count());
+        $this->assertSame(0, $this->eventActionOutboxCountForRecipient(
+            $eventId,
+            'event.admin_publication.created',
+            (int) $admin->id,
+        ));
     }
 
     public function test_approve_does_not_cross_tenant_boundary(): void
@@ -362,6 +443,55 @@ class AdminEventsControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_admin_cancel_and_archive_fan_out_from_a_template_to_future_occurrences(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        foreach (['cancel', 'archive'] as $action) {
+            $templateId = $this->createEvent($this->testTenantId, [
+                'title' => "Admin {$action} series",
+                'status' => 'active',
+                'publication_status' => 'published',
+                'operational_status' => 'scheduled',
+                'is_recurring_template' => 1,
+            ], $organizer);
+            $occurrenceIds = [];
+            foreach ([2, 3] as $weeks) {
+                $occurrenceIds[] = $this->createEvent($this->testTenantId, [
+                    'title' => "Admin {$action} occurrence {$weeks}",
+                    'status' => 'active',
+                    'publication_status' => 'published',
+                    'operational_status' => 'scheduled',
+                    'parent_event_id' => $templateId,
+                    'start_time' => now()->addWeeks($weeks),
+                    'end_time' => now()->addWeeks($weeks)->addHour(),
+                ], $organizer);
+            }
+
+            $this->apiPost("/v2/admin/events/{$templateId}/{$action}", [
+                'reason' => "Admin {$action} series regression",
+            ])
+                ->assertOk()
+                ->assertJsonPath('data.transition.series.target_count', 3)
+                ->assertJsonPath('data.transition.series.changed_count', 3);
+
+            $rows = DB::table('events')
+                ->whereIn('id', array_merge([$templateId], $occurrenceIds))
+                ->orderBy('id')
+                ->get(['publication_status', 'operational_status']);
+            self::assertCount(3, $rows);
+            foreach ($rows as $row) {
+                self::assertSame('cancelled', $row->operational_status);
+                self::assertSame(
+                    $action === 'archive' ? 'archived' : 'published',
+                    $row->publication_status,
+                );
+            }
+        }
+    }
+
     public function test_admin_cancel_notifies_attendees_waitlist_and_organizer(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
@@ -473,6 +603,17 @@ class AdminEventsControllerTest extends TestCase
             'operational_status' => EventOperationalState::Scheduled->value,
             'lifecycle_version' => 0,
         ], $organizer);
+        DB::table('content_moderation_queue')->insert([
+            'tenant_id' => $this->testTenantId,
+            'content_type' => 'event',
+            'content_id' => $eventId,
+            'author_id' => $organizer->id,
+            'title' => 'Moderated lifecycle event',
+            'status' => 'pending',
+            'auto_flagged' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         Sanctum::actingAs($admin);
 
         $this->apiPost("/v2/admin/events/{$eventId}/reject")

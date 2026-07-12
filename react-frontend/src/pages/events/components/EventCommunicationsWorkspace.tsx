@@ -78,6 +78,7 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
   const { t, i18n } = useTranslation('event_communications');
   const toast = useToast();
   const generation = useRef(0);
+  const auditGeneration = useRef(0);
   const [broadcasts, setBroadcasts] = useState<EventBroadcast[]>([]);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<{
@@ -109,6 +110,7 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
   const [auditTarget, setAuditTarget] = useState<EventBroadcast | null>(null);
   const [auditDetail, setAuditDetail] = useState<EventBroadcastDetail | null>(null);
   const [isAuditLoading, setIsAuditLoading] = useState(false);
+  const [isAuditLoadingMore, setIsAuditLoadingMore] = useState(false);
 
   const load = useCallback(async () => {
     const requestGeneration = ++generation.current;
@@ -141,6 +143,8 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
     return () => { generation.current += 1; };
   }, [load]);
 
+  useEffect(() => () => { auditGeneration.current += 1; }, []);
+
   function updateContent(next: Partial<EventBroadcastContentInput>) {
     setContent((current) => ({ ...current, ...next }));
     setPreview(null);
@@ -155,7 +159,7 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
 
   async function openEditComposer(broadcast: EventBroadcast) {
     try {
-      const response = await eventCommunicationsApi.get(broadcast.id);
+      const response = await eventCommunicationsApi.get(broadcast.id, 1, 1);
       if (!response.success || !response.data || response.data.broadcast.body === null) {
         toast.error(t('load_detail_error'));
         return;
@@ -333,22 +337,66 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
   }
 
   async function openAudit(broadcast: EventBroadcast) {
+    const requestGeneration = ++auditGeneration.current;
     setAuditTarget(broadcast);
     setAuditDetail(null);
     setIsAuditLoading(true);
+    setIsAuditLoadingMore(false);
     try {
-      const response = await eventCommunicationsApi.get(broadcast.id);
+      const response = await eventCommunicationsApi.get(broadcast.id, 1, 50);
+      if (requestGeneration !== auditGeneration.current) return;
       if (!response.success || !response.data) {
         toast.error(t('load_history_error'));
         return;
       }
       setAuditDetail(response.data);
     } catch (error) {
+      if (requestGeneration !== auditGeneration.current) return;
       logError('Failed to load event communication history', error);
       toast.error(t('load_history_error'));
     } finally {
-      setIsAuditLoading(false);
+      if (requestGeneration === auditGeneration.current) setIsAuditLoading(false);
     }
+  }
+
+  async function loadMoreAuditHistory() {
+    if (!auditTarget || !auditDetail?.history_meta.has_more || isAuditLoadingMore) return;
+    const broadcastId = auditTarget.id;
+    const requestGeneration = auditGeneration.current;
+    const nextPage = auditDetail.history_meta.current_page + 1;
+    setIsAuditLoadingMore(true);
+    try {
+      const response = await eventCommunicationsApi.get(broadcastId, nextPage, 50);
+      if (requestGeneration !== auditGeneration.current || auditTarget.id !== broadcastId) return;
+      if (!response.success || !response.data || response.data.broadcast.id !== broadcastId) {
+        toast.error(t('load_history_error'));
+        return;
+      }
+      const detail = response.data;
+      setAuditDetail((current) => {
+        if (!current || current.broadcast.id !== broadcastId) return current;
+        const byId = new Map(current.history.map((entry) => [entry.id, entry]));
+        detail.history.forEach((entry) => byId.set(entry.id, entry));
+        return {
+          ...detail,
+          history: [...byId.values()],
+        };
+      });
+    } catch (error) {
+      if (requestGeneration !== auditGeneration.current) return;
+      logError('Failed to load more event communication history', error);
+      toast.error(t('load_history_error'));
+    } finally {
+      if (requestGeneration === auditGeneration.current) setIsAuditLoadingMore(false);
+    }
+  }
+
+  function closeAudit() {
+    auditGeneration.current += 1;
+    setAuditTarget(null);
+    setAuditDetail(null);
+    setIsAuditLoading(false);
+    setIsAuditLoadingMore(false);
   }
 
   function replaceBroadcast(saved: EventBroadcast) {
@@ -591,10 +639,7 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
         size="2xl"
         scrollBehavior="inside"
         onOpenChange={(open) => {
-          if (!open) {
-            setAuditTarget(null);
-            setAuditDetail(null);
-          }
+          if (!open) closeAudit();
         }}
       >
         <ModalContent>
@@ -605,33 +650,41 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
                 <Spinner />
               </div>
             ) : auditDetail ? (
-              <ol className="space-y-3">
-                {auditDetail.history.map((entry) => (
-                  <li key={entry.id} className="rounded-xl border border-theme-default p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="font-medium text-theme-primary">{t(`history_actions.${entry.action}`)}</p>
-                      <Chip size="sm" variant="flat" color={statusColor(entry.to_status)}>
-                        {t(`statuses.${entry.to_status}`)}
-                      </Chip>
-                    </div>
-                    <p className="mt-1 text-sm text-theme-muted">
-                      {t('history_entry_meta', {
-                        version: entry.version,
-                        date: dateLabel(entry.created_at),
-                      })}
-                    </p>
-                  </li>
-                ))}
-              </ol>
+              <div className="space-y-4">
+                <ol className="space-y-3">
+                  {auditDetail.history.map((entry) => (
+                    <li key={entry.id} className="rounded-xl border border-theme-default p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="font-medium text-theme-primary">{t(`history_actions.${entry.action}`)}</p>
+                        <Chip size="sm" variant="flat" color={statusColor(entry.to_status)}>
+                          {t(`statuses.${entry.to_status}`)}
+                        </Chip>
+                      </div>
+                      <p className="mt-1 text-sm text-theme-muted">
+                        {t('history_entry_meta', {
+                          version: entry.version,
+                          date: dateLabel(entry.created_at),
+                        })}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+                {auditDetail.history_meta.has_more && (
+                  <Button
+                    variant="secondary"
+                    isPending={isAuditLoadingMore}
+                    onPress={() => void loadMoreAuditHistory()}
+                  >
+                    {t('history_load_more')}
+                  </Button>
+                )}
+              </div>
             ) : (
               <Alert color="danger" title={t('load_history_error')} />
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onPress={() => {
-              setAuditTarget(null);
-              setAuditDetail(null);
-            }}>
+            <Button variant="secondary" onPress={closeAudit}>
               {t('close')}
             </Button>
           </ModalFooter>

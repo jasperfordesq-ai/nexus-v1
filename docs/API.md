@@ -1,6 +1,6 @@
 # API Reference
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-12
 
 Project NEXUS exposes a large Laravel JSON API for the React frontend, mobile clients, integrations, federation, and admin surfaces. The hand-written docs do not duplicate every endpoint. **The OpenAPI contract is the source of truth.**
 
@@ -10,7 +10,7 @@ This page is a getting-started guide: base URLs, the auth model, and one worked 
 
 | Contract | Status | Notes |
 | --- | --- | --- |
-| `openapi.json` (repo root) | Main API contract | OpenAPI 3.0.3, `Project NEXUS v2 API`, version `2.0.0`. ~360 KB — render it (see below) rather than reading the raw file. |
+| `openapi.json` (repo root) | Main API contract | OpenAPI 3.0.3, `Project NEXUS v2 API`, version `2.0.0`. About 560 KB — render it (see below) rather than reading the raw file. |
 | `resources/openapi.json` | Smaller resource contract | OpenAPI 3.1.0, a focused subset. |
 | `resources/openapi.yaml` | YAML companion | Keep aligned with `resources/openapi.json` when that smaller contract changes. |
 | `routes/api.php` | Runtime route source | Laravel API route registration for v2, admin, partner, federation, support, and regional analytics routes. |
@@ -42,7 +42,7 @@ Requests that cannot resolve a tenant receive a `400` with an error code of `ten
 
 ### Authentication
 
-The API uses **bearer-token authentication** (`Authorization: Bearer <token>`). The `Authenticate` middleware is hybrid — it accepts a current Laravel Sanctum token and falls back to legacy JWT tokens issued before the migration (see `app/Http/Middleware/Authenticate.php`). The OpenAPI `securitySchemes` declares a single `bearerAuth` scheme (`type: http`, `scheme: bearer`).
+The API uses **bearer-token authentication** (`Authorization: Bearer <token>`). The `Authenticate` middleware is hybrid — it accepts a current Laravel Sanctum token and falls back to legacy JWT tokens issued before the migration (see `app/Http/Middleware/Authenticate.php`). OpenAPI declares `bearerAuth` for member/admin requests and a separate `federationBearerAuth` scheme for tenant-bound partner ingest keys. Secret calendar-feed URLs explicitly opt out of both schemes and rely on their high-entropy, redacted token path.
 
 **Obtain a token** by calling the login endpoint with a tenant header:
 
@@ -95,7 +95,11 @@ curl "https://api.project-nexus.ie/api/v2/health" \
 
 There is also a framework-level probe at `GET /api/laravel/health` that deliberately returns only `{ "status": "ok" }` and never exposes the framework version or tenant id.
 
-For a public read of real data, `GET /api/v2/listings` and `GET /api/v2/events` are registered without auth (they run with optional auth in the controller) and return tenant-scoped collections. Confirm the exact query parameters and response shapes in `openapi.json` rather than assuming them here.
+`GET /api/v2/listings` is an example of a public, tenant-scoped collection. Events are different: maintained member, organiser and admin Events endpoints, including `GET /api/v2/events`, require authentication and the tenant `events` feature. The narrow exceptions are explicit capability-token operations such as a secret personal calendar feed and one-use guardian-consent grant; neither exposes an event catalogue or roster, and invalid guardian inputs are deliberately non-enumerable. A future public event catalogue would need a separate, identity-free contract. Confirm the exact query parameters, middleware and response shapes in `routes/api.php` and `openapi.json` rather than assuming them here.
+
+Effective-dated recurring-series edits use the explicit preview/commit pair under `/api/v2/events/{occurrenceId}/recurrence-revisions`. Preview is non-mutating and returns a short-lived confidential token plus participant-redacted impact/conflict counts. Commit requires the exact patch, that token and an `Idempotency-Key` of at most 191 characters; it returns `201` for a new immutable revision or `200` for a matching replay. Stale/expired/conflicting previews return `409`, and a boundary above the configured occurrence cap returns `413`. These endpoints remain unavailable while the V2 recurrence rollout flag is off.
+
+Maintained clients must fetch `GET /api/v2/events/recurrence-capabilities` before presenting recurrence controls. The authenticated, Events-feature-gated response is an allowlisted runtime contract covering the active `legacy` or `v2` engine, structured input, supported frequencies and end types, the bounded occurrence cap, and explicit rolling-never, effective-revision and definition-blueprint support. `schema_ready` and `rollout_state` let clients degrade safely; advanced flags remain false and `never` is omitted whenever required flags, configuration or schema are unavailable. The endpoint never exposes tenant identifiers, raw configuration, schema names or probe errors and must not be cached across authenticated users or tenants.
 
 ## Rate Limiting
 
@@ -153,6 +157,7 @@ Before publishing API documentation changes:
 
 ```bash
 npm run check:docs
+npx @redocly/cli lint openapi.json
 ```
 
 Before changing version labels or public collateral:
@@ -161,4 +166,4 @@ Before changing version labels or public collateral:
 npm run check:version
 ```
 
-If a future change adds OpenAPI validation tooling, wire it into `npm run check:docs` instead of maintaining a separate manual checklist.
+The documentation CI runs Redocly against `openapi.json`. Existing route-ambiguity and generated-operation warnings are tracked separately; schema-invalid output is release-blocking.

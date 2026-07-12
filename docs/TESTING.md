@@ -14,6 +14,7 @@ This page explains what each test layer proves and where the remaining test-docu
 | React build | `cd react-frontend && npm run build` | Production build viability. |
 | Vitest | `cd react-frontend && npm test` | Component, hook, and frontend behavior tests. |
 | Playwright E2E | `npm run test:e2e` | Browser behavior against the React frontend and Laravel API. |
+| Events enterprise E2E | `npm run test:events:e2e:enterprise` | The destructive five-step create, publication, registration, waitlist, check-in, cancellation, notification, and cleanup lifecycle against an isolated fixture environment. |
 | Accessible frontend | `npm run build:accessible-frontend`, `npm run test:accessible-frontend:php`, `npm run test:accessible-frontend:a11y` | HTML-first frontend build, PHP route behavior, and accessibility smoke coverage. |
 
 ## E2E Status
@@ -27,6 +28,13 @@ Before treating E2E as release evidence, prefer tests that assert real outcomes:
 - a message, notification, listing, event, or review persists after reload;
 - route protection works for signed-out and cross-tenant users;
 - validation errors are visible and keyboard reachable.
+
+The Events enterprise journey is deliberately excluded from the broad Chromium,
+Firefox, and mobile projects. Run it only through
+`npm run test:events:e2e:enterprise`; it refuses Project NEXUS production hosts
+and requires an explicit opt-in for any other non-loopback fixture target. CI
+runs it against a disposable database with CI-local actors, not repository or
+environment secrets.
 
 ## Generated Reports
 

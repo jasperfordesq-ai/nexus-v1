@@ -6,6 +6,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Authorization\AdminTier;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -35,38 +36,9 @@ class EnsureIsAdmin
             ]);
         }
 
-        // Admin precedence (evaluated in order):
-        //   1. EXPLICIT REJECT: role === 'broker' → never admin. Brokers are
-        //      community moderators with their own scoped routes. Even if some
-        //      legacy flag is set on their row, we deny admin here to avoid
-        //      privilege-escalation via flag drift.
-        //   2. Boolean flags (backward compat): is_admin, is_super_admin,
-        //      is_tenant_super_admin, is_god. Any one grants admin.
-        //   3. Role string: 'admin', 'tenant_admin', 'super_admin'. Any one
-        //      grants admin.
-        $role = (string) ($user->role ?? '');
-
-        if ($role === 'broker') {
-            return response()->json([
-                'errors' => [
-                    ['code' => 'forbidden', 'message' => 'Admin access required'],
-                ],
-                'success' => false,
-            ], 403, [
-                'API-Version' => '2.0',
-            ]);
-        }
-
-        $hasAdminFlag = $user->is_admin
-            || $user->is_super_admin
-            || $user->is_tenant_super_admin
-            || $user->is_god;
-
-        $hasAdminRole = in_array($role, ['admin', 'tenant_admin', 'super_admin'], true);
-
-        $isAdmin = $hasAdminFlag || $hasAdminRole;
-
-        if (!$isAdmin) {
+        // The shared predicate explicitly rejects operational broker and
+        // coordinator roles before considering legacy admin flags.
+        if (! AdminTier::allows($user)) {
             if ($this->allowsScopedVereinAdmin($request, (int) $user->id, (int) ($user->tenant_id ?? 0))) {
                 return $next($request);
             }

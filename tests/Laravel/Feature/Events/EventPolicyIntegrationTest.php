@@ -10,7 +10,9 @@ namespace Tests\Laravel\Feature\Events;
 
 use App\Core\TenantContext;
 use App\Enums\EventStaffRole;
+use App\Models\Event;
 use App\Models\User;
+use App\Policies\EventPolicy;
 use App\Services\EventRoleService;
 use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -288,6 +290,35 @@ final class EventPolicyIntegrationTest extends TestCase
         );
     }
 
+    public function test_operational_roles_with_stale_admin_flags_receive_no_admin_policy_or_permission_projection(): void
+    {
+        $owner = $this->user();
+        $eventId = $this->event((int) $owner->id, [
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+        ]);
+        /** @var Event $event */
+        $event = Event::withoutGlobalScopes()->findOrFail($eventId);
+
+        foreach (['broker', 'coordinator'] as $role) {
+            $actor = $this->user([
+                'role' => $role,
+                'is_admin' => true,
+                'is_super_admin' => true,
+                'is_tenant_super_admin' => true,
+            ]);
+
+            self::assertFalse(app(EventPolicy::class)->manage($actor, $event));
+            Sanctum::actingAs($actor, ['*']);
+            $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+                ->assertOk()
+                ->assertJsonPath('data.permissions.edit', false)
+                ->assertJsonPath('data.permissions.publish', false)
+                ->assertJsonPath('data.permissions.manage_staff', false);
+            $this->apiGet('/v2/admin/events')->assertForbidden();
+        }
+    }
+
     public function test_named_series_count_only_includes_events_visible_to_the_current_actor(): void
     {
         Carbon::setTestNow('2030-05-01 10:00:00 UTC');
@@ -422,6 +453,47 @@ final class EventPolicyIntegrationTest extends TestCase
             [$rootId, $visibleOccurrenceId, $draftOccurrenceId, $privateOccurrenceId],
             array_column($organizerResponse->json('data.series.recurrence.occurrences'), 'id'),
         );
+    }
+
+    public function test_recurrence_projection_reports_the_full_visible_count_when_the_preview_is_bounded(): void
+    {
+        Carbon::setTestNow('2030-05-01 10:00:00 UTC');
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $rootId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Large recurrence template',
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'operational_status' => 'scheduled',
+            'is_recurring_template' => 1,
+            'occurrence_key' => null,
+            'start_time' => now()->addDay(),
+            'end_time' => now()->addDay()->addHour(),
+        ]);
+        $firstOccurrenceId = null;
+        for ($index = 1; $index <= 51; $index++) {
+            $occurrenceId = $this->event((int) $organizer->getKey(), [
+                'title' => "Large recurrence occurrence {$index}",
+                'parent_event_id' => $rootId,
+                'is_recurring_template' => 0,
+                'occurrence_key' => "large-recurrence-{$rootId}-{$index}",
+                'occurrence_date' => now()->addDays($index + 1)->toDateString(),
+                'publication_status' => 'published',
+                'operational_status' => 'scheduled',
+                'start_time' => now()->addDays($index + 1),
+                'end_time' => now()->addDays($index + 1)->addHour(),
+            ]);
+            $firstOccurrenceId ??= $occurrenceId;
+        }
+
+        Sanctum::actingAs($organizer, ['*']);
+        $response = $this->apiGet(
+            "/v2/events/{$firstOccurrenceId}",
+            ['X-Events-Contract' => '2'],
+        );
+
+        $response->assertOk()
+            ->assertJsonPath('data.series.recurrence.occurrence_count', 52);
+        $this->assertCount(50, $response->json('data.series.recurrence.occurrences'));
     }
 
     public function test_private_group_and_cross_tenant_direct_ids_fail_closed(): void

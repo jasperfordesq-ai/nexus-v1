@@ -60,8 +60,19 @@ final class EventBroadcastQueryService
         ];
     }
 
-    /** @return array{broadcast:array<string,mixed>,history:list<array<string,mixed>>} */
-    public function detail(int $broadcastId, User|int $actor): array
+    /**
+     * @return array{
+     *   broadcast:array<string,mixed>,
+     *   history:list<array<string,mixed>>,
+     *   history_meta:array{current_page:int,per_page:int,total:int,total_pages:int,has_more:bool}
+     * }
+     */
+    public function detail(
+        int $broadcastId,
+        User|int $actor,
+        int $historyPage = 1,
+        int $historyPerPage = 50,
+    ): array
     {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
@@ -75,10 +86,23 @@ final class EventBroadcastQueryService
         $event = $this->support->event($tenantId, (int) $broadcast->event_id);
         $persistedActor = $this->support->actor($tenantId, $actor);
         $this->support->authorize($persistedActor, $event);
-        $history = EventBroadcastHistory::withoutGlobalScopes()
+        $historyPage = max(1, $historyPage);
+        $historyPerPage = max(1, min(100, $historyPerPage));
+        $historyQuery = EventBroadcastHistory::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
-            ->where('broadcast_id', $broadcastId)
+            ->where('broadcast_id', $broadcastId);
+        $historyTotal = (clone $historyQuery)->count();
+        $historyTotalPages = $historyTotal === 0
+            ? 0
+            : (int) ceil($historyTotal / $historyPerPage);
+        $historyPage = $historyTotalPages === 0
+            ? 1
+            : min($historyPage, $historyTotalPages);
+        $history = $historyQuery
             ->orderBy('broadcast_version')
+            ->orderBy('id')
+            ->offset(($historyPage - 1) * $historyPerPage)
+            ->limit($historyPerPage)
             ->get()
             ->map(static fn (EventBroadcastHistory $item): array =>
                 EventBroadcastHistoryResource::fromModel($item))
@@ -87,6 +111,13 @@ final class EventBroadcastQueryService
         return [
             'broadcast' => EventBroadcastResource::fromModel($broadcast),
             'history' => $history,
+            'history_meta' => [
+                'current_page' => $historyPage,
+                'per_page' => $historyPerPage,
+                'total' => $historyTotal,
+                'total_pages' => $historyTotalPages,
+                'has_more' => $historyPage < $historyTotalPages,
+            ],
         ];
     }
 }

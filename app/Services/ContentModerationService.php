@@ -233,35 +233,111 @@ class ContentModerationService
             return ['success' => false, 'message' => __('svc_notifications_2.moderation.invalid_decision')];
         }
 
-        $item = ContentModerationQueue::query()->find($id);
-
-        if (!$item) {
-            return ['success' => false, 'message' => __('svc_notifications_2.moderation.item_not_found')];
-        }
-
-        if ($item->status === self::STATUS_APPROVED || $item->status === self::STATUS_REJECTED) {
-            return ['success' => false, 'message' => __('svc_notifications_2.moderation.already_reviewed')];
-        }
-
         if ($decision === self::STATUS_REJECTED && empty($rejectionReason)) {
             return ['success' => false, 'message' => __('svc_notifications_2.moderation.rejection_reason_required')];
         }
 
-        $item->update([
-            'status' => $decision,
-            'reviewer_id' => $adminId,
-            'reviewed_at' => now(),
-            'rejection_reason' => $rejectionReason,
-        ]);
+        $logContext = [
+            'moderation_item_id' => $id,
+            'tenant_id' => $tenantId,
+        ];
+        try {
+            $outcome = DB::transaction(function () use (
+                $id,
+                $decision,
+                $adminId,
+                $rejectionReason,
+                $tenantId,
+                &$logContext,
+            ): array {
+                // This first read selects the lock order only. The row is
+                // explicitly tenant-scoped and is re-read with FOR UPDATE
+                // before any decision is accepted.
+                $candidate = ContentModerationQueue::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($id)
+                    ->first(['id', 'tenant_id', 'content_type', 'content_id']);
+                if ($candidate === null) {
+                    return ['outcome' => 'not_found'];
+                }
 
-        // Apply decision to actual content
-        self::applyDecision($item, $decision);
+                $logContext['content_type'] = (string) $candidate->content_type;
+                $logContext['content_id'] = (int) $candidate->content_id;
+
+                // Events have a two-axis lifecycle, immutable history and an
+                // outbox. They must never be changed through the legacy status
+                // column. Lock their canonical root before the queue row so
+                // every publication/moderation path shares root -> queue order.
+                if ($candidate->content_type === 'event') {
+                    self::lockEventDecisionRoot(
+                        $tenantId,
+                        (int) $candidate->content_id,
+                    );
+                }
+
+                /** @var ContentModerationQueue|null $item */
+                $item = ContentModerationQueue::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($id)
+                    ->lockForUpdate()
+                    ->first();
+                if ($item === null
+                    || (string) $item->content_type !== (string) $candidate->content_type
+                    || (int) $item->content_id !== (int) $candidate->content_id) {
+                    return ['outcome' => 'not_found'];
+                }
+                if (in_array((string) $item->status, [self::STATUS_APPROVED, self::STATUS_REJECTED], true)) {
+                    return ['outcome' => 'already_reviewed'];
+                }
+                if ($item->content_type === 'event' && $item->status !== self::STATUS_PENDING) {
+                    return ['outcome' => 'already_reviewed'];
+                }
+
+                if ($item->content_type === 'event') {
+                    self::applyEventDecision(
+                        $item,
+                        $decision,
+                        $tenantId,
+                        $adminId,
+                        $rejectionReason,
+                    );
+                } else {
+                    $item->update([
+                        'status' => $decision,
+                        'reviewer_id' => $adminId,
+                        'reviewed_at' => now(),
+                        'rejection_reason' => $rejectionReason,
+                    ]);
+                    self::applyDecision($item, $decision);
+                }
+
+                return [
+                    'outcome' => 'success',
+                    'content_type' => (string) $item->content_type,
+                    'content_id' => (int) $item->content_id,
+                ];
+            }, 3);
+        } catch (\Throwable $exception) {
+            Log::warning('ContentModerationService::review event lifecycle decision failed', [
+                ...$logContext,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return ['success' => false, 'message' => __('api.invalid_status')];
+        }
+
+        if (($outcome['outcome'] ?? null) === 'not_found') {
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.item_not_found')];
+        }
+        if (($outcome['outcome'] ?? null) === 'already_reviewed') {
+            return ['success' => false, 'message' => __('svc_notifications_2.moderation.already_reviewed')];
+        }
 
         return [
             'success' => true,
             'message' => __('svc_notifications_2.moderation.content_decision', ['decision' => $decision]),
-            'content_type' => $item->content_type,
-            'content_id' => (int) $item->content_id,
+            'content_type' => (string) $outcome['content_type'],
+            'content_id' => (int) $outcome['content_id'],
         ];
     }
 
@@ -331,7 +407,6 @@ class ContentModerationService
                 match ($contentType) {
                     'post' => DB::table('feed_posts')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
                     'listing' => DB::table('listings')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'active']),
-                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'active']),
                     'comment' => DB::table('comments')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
                     default => null,
                 };
@@ -339,7 +414,6 @@ class ContentModerationService
                 match ($contentType) {
                     'post' => DB::table('feed_posts')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 1]),
                     'listing' => DB::table('listings')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'rejected']),
-                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'cancelled']),
                     'comment' => DB::table('comments')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 1]),
                     default => null,
                 };
@@ -347,5 +421,70 @@ class ContentModerationService
         } catch (\Throwable $e) {
             Log::error("ContentModerationService::applyDecision failed for {$contentType} #{$contentId}: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Lock and revalidate the canonical Event root before a queue-row lock.
+     * A concurrent occurrence detach also follows root -> occurrence order, so
+     * a changed relationship fails closed instead of reviewing another root.
+     */
+    private static function lockEventDecisionRoot(int $tenantId, int $eventId): void
+    {
+        $snapshot = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $eventId)
+            ->first(['id', 'parent_event_id']);
+        if ($snapshot === null) {
+            throw new \RuntimeException('event_lifecycle_event_not_found');
+        }
+
+        $rootId = max(0, (int) ($snapshot->parent_event_id ?? 0)) ?: $eventId;
+        $root = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $rootId)
+            ->lockForUpdate()
+            ->first(['id']);
+        $target = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $eventId)
+            ->lockForUpdate()
+            ->first(['id', 'parent_event_id']);
+        $currentRootId = $target === null
+            ? 0
+            : (max(0, (int) ($target->parent_event_id ?? 0)) ?: (int) $target->id);
+        if ($root === null || $target === null || $currentRootId !== $rootId) {
+            throw new \RuntimeException('event_lifecycle_concurrent_root_changed');
+        }
+    }
+
+    private static function applyEventDecision(
+        ContentModerationQueue $item,
+        string $decision,
+        int $tenantId,
+        int $adminId,
+        ?string $rejectionReason,
+    ): void {
+        /** @var User|null $actor */
+        $actor = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($adminId)
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->first();
+        if ($actor === null) {
+            throw new \RuntimeException('event_lifecycle_authorization_denied');
+        }
+
+        $workflow = app(EventPublicationWorkflowService::class);
+        if ($decision === self::STATUS_APPROVED) {
+            $workflow->approveModerationDecision((int) $item->content_id, $actor);
+            return;
+        }
+
+        $workflow->rejectModerationDecision(
+            (int) $item->content_id,
+            $actor,
+            trim((string) $rejectionReason),
+        );
     }
 }

@@ -75,6 +75,19 @@ const MOCK_EVENT_2 = {
   created_at: '2026-06-02T00:00:00Z',
 };
 
+const MOCK_RECURRING_EVENT = {
+  ...MOCK_EVENT,
+  id: 3,
+  title: 'Weekly Repair Café',
+  is_recurring_template: true,
+  series: {
+    root_event_id: 3,
+    is_recurring: true,
+    occurrence_count: 12,
+    future_occurrence_count: 7,
+  },
+};
+
 function eventListResponse(events = [MOCK_EVENT]) {
   return {
     success: true,
@@ -128,6 +141,77 @@ describe('EventsAdmin', () => {
       'href',
       '/test/events/1',
     );
+  });
+
+  it('honours a pending-review deep link from moderation notifications', async () => {
+    mockApi.get.mockResolvedValue(eventListResponse([]));
+
+    renderEventRoute(<EventsAdmin />, {
+      route: '/admin/events?publication_state=pending_review',
+      path: '/admin/events',
+    });
+
+    await screen.findByRole('heading', { name: 'No events found' });
+    expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('publication_state=pending_review'));
+  });
+
+  it('refreshes the moderation filter when a same-page notification changes the query', async () => {
+    mockApi.get.mockResolvedValue(eventListResponse([]));
+    const rendered = renderEventRoute(<EventsAdmin />, {
+      route: '/admin/events',
+      path: '/admin/events',
+    });
+
+    await screen.findByRole('heading', { name: 'No events found' });
+    expect(mockApi.get).toHaveBeenCalledWith(expect.not.stringContaining('publication_state='));
+    mockApi.get.mockClear();
+
+    await rendered.router.navigate('/admin/events?publication_state=pending_review');
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('publication_state=pending_review'));
+    });
+  });
+
+  it('ignores an older list response after the moderation query changes', async () => {
+    let resolveInitial!: (value: ReturnType<typeof eventListResponse>) => void;
+    let resolvePending!: (value: ReturnType<typeof eventListResponse>) => void;
+    const initialRequest = new Promise<ReturnType<typeof eventListResponse>>((resolve) => {
+      resolveInitial = resolve;
+    });
+    const pendingRequest = new Promise<ReturnType<typeof eventListResponse>>((resolve) => {
+      resolvePending = resolve;
+    });
+    mockApi.get
+      .mockReturnValueOnce(initialRequest)
+      .mockReturnValueOnce(pendingRequest);
+    const rendered = renderEventRoute(<EventsAdmin />, {
+      route: '/admin/events',
+      path: '/admin/events',
+    });
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledTimes(1));
+
+    await rendered.router.navigate('/admin/events?publication_state=pending_review');
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledTimes(2));
+
+    await act(async () => {
+      resolvePending(eventListResponse([{
+        ...MOCK_EVENT,
+        id: 9,
+        title: 'Awaiting moderation',
+        publication_state: 'pending_review',
+        status: 'draft',
+      }]));
+    });
+    expect(await screen.findByText('Awaiting moderation')).toBeInTheDocument();
+
+    await act(async () => {
+      resolveInitial(eventListResponse([MOCK_EVENT]));
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Awaiting moderation')).toBeInTheDocument();
+      expect(screen.queryByText('Community Swap Meet')).not.toBeInTheDocument();
+    });
   });
 
   it('renders an all-day event on the date defined by its event timezone', async () => {
@@ -206,6 +290,114 @@ describe('EventsAdmin', () => {
     });
     expect(mockToast.success).toHaveBeenCalledWith('Cancel event completed successfully');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('requires explicit series acknowledgement before cancelling a recurring template', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockResolvedValue({ success: true });
+    await renderLoadedAdmin([MOCK_RECURRING_EVENT]);
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Weekly Repair Café' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Cancel event' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Cancel event: Weekly Repair Café' });
+    const confirm = within(dialog).getByRole('button', { name: 'Cancel event' });
+    const acknowledgement = within(dialog).getByRole('checkbox', {
+      name: 'I understand this change applies to the recurring series and the occurrences listed above.',
+    });
+
+    expect(within(dialog).getByRole('note')).toHaveTextContent(
+      'This applies to the recurring template. Future occurrences affected: 7.',
+    );
+    await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Venue unavailable');
+    expect(confirm).toBeDisabled();
+    await user.click(confirm);
+    expect(mockApi.post).not.toHaveBeenCalled();
+
+    await user.click(acknowledgement);
+    expect(confirm).toBeEnabled();
+    await user.click(confirm);
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/events/3/cancel', {
+        reason: 'Venue unavailable',
+      });
+    });
+  });
+
+  it('requires and resets series acknowledgement before archiving a recurring template', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockResolvedValue({ success: true });
+    await renderLoadedAdmin([MOCK_RECURRING_EVENT]);
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Weekly Repair Café' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Archive' }));
+    let dialog = await screen.findByRole('dialog', { name: 'Archive: Weekly Repair Café' });
+    let confirm = within(dialog).getByRole('button', { name: 'Archive' });
+    let acknowledgement = within(dialog).getByRole('checkbox', {
+      name: 'I understand this change applies to the recurring series and the occurrences listed above.',
+    });
+
+    expect(within(dialog).getByRole('note')).toHaveTextContent(
+      'This applies to the recurring template. Future occurrences affected: 7.',
+    );
+    expect(confirm).toBeDisabled();
+    await user.click(confirm);
+    expect(mockApi.post).not.toHaveBeenCalled();
+
+    await user.click(acknowledgement);
+    expect(confirm).toBeEnabled();
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Weekly Repair Café' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Archive' }));
+    dialog = await screen.findByRole('dialog', { name: 'Archive: Weekly Repair Café' });
+    confirm = within(dialog).getByRole('button', { name: 'Archive' });
+    acknowledgement = within(dialog).getByRole('checkbox', {
+      name: 'I understand this change applies to the recurring series and the occurrences listed above.',
+    });
+    expect(acknowledgement).not.toBeChecked();
+    expect(confirm).toBeDisabled();
+
+    await user.click(acknowledgement);
+    await user.click(confirm);
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/events/3/archive', {});
+    });
+  });
+
+  it('uses the total generated count and acknowledgement for a recurring publication rejection', async () => {
+    const user = userEvent.setup();
+    mockApi.post.mockResolvedValue({ success: true });
+    await renderLoadedAdmin([{
+      ...MOCK_RECURRING_EVENT,
+      status: 'draft',
+      publication_state: 'pending_review' as const,
+    }]);
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Weekly Repair Café' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Reject' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Reject: Weekly Repair Café' });
+    const confirm = within(dialog).getByRole('button', { name: 'Reject' });
+
+    expect(within(dialog).getByRole('note')).toHaveTextContent(
+      'This applies to the recurring template and every generated occurrence. '
+      + 'Generated occurrences affected: 12.',
+    );
+    await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Policy conflict');
+    expect(confirm).toBeDisabled();
+
+    await user.click(within(dialog).getByRole('checkbox', {
+      name: 'I understand this change applies to the recurring series and the occurrences listed above.',
+    }));
+    await user.click(confirm);
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/events/3/reject', {
+        reason: 'Policy conflict',
+      });
+    });
   });
 
   it('finishes loading and shows the empty state for success:false responses', async () => {

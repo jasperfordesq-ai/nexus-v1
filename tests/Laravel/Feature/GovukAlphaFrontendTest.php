@@ -1922,6 +1922,10 @@ class GovukAlphaFrontendTest extends TestCase
         $createForm->assertSee('name="title"', false);
         $createForm->assertSee('type="datetime-local"', false);
         $createForm->assertSee('name="max_attendees"', false);
+        $createForm->assertSee('id="freq-biweekly" name="recurrence_frequency" type="radio" value="biweekly"', false);
+        $createForm->assertSee('id="freq-yearly" name="recurrence_frequency" type="radio" value="yearly"', false);
+        $createForm->assertSee('id="rec-end-never" name="recurrence_ends_type" type="radio" value="never"', false);
+        $createForm->assertSee('name="recurrence_ends_after_count" type="number" min="2" max="366"', false);
 
         $create = $this->post("/{$this->testTenantSlug}/accessible/events/new", [
             'title' => 'Alpha created event',
@@ -1954,6 +1958,14 @@ class GovukAlphaFrontendTest extends TestCase
         $createdDetail->assertSee(__('govuk_alpha.events.created'));
         $createdDetail->assertSee('Alpha created event');
 
+        // Organisers manage the event and do not occupy their own attendee
+        // capacity. Exercise the RSVP controls as a separate eligible member.
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($attendee, ['*']);
+
         $detail = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}");
 
         $detail->assertOk();
@@ -1970,11 +1982,12 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertDatabaseHas('event_rsvps', [
             'tenant_id' => $this->testTenantId,
             'event_id' => $eventId,
-            'user_id' => $user->id,
+            'user_id' => $attendee->id,
             'status' => 'going',
         ]);
 
-        // Once people have RSVP'd, the detail page shows the attendee roster.
+        // The roster is identity-bearing and remains organiser-only.
+        Sanctum::actingAs($user, ['*']);
         $afterRsvp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}");
         $afterRsvp->assertSee(__('govuk_alpha.events.attendees_title'));
     }
@@ -1994,6 +2007,44 @@ class GovukAlphaFrontendTest extends TestCase
         $create->assertSee('class="govuk-error-summary"', false);
         $create->assertSee('govuk-form-group--error', false);
         $create->assertSee('class="govuk-error-message"', false);
+    }
+
+    public function test_accessible_recurring_create_maps_biweekly_without_javascript(): void
+    {
+        config()->set('events.recurrence.engine_v2_enabled', false);
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/accessible/events/new", [
+            'title' => 'Accessible fortnightly repair event',
+            'description' => 'A detailed recurring repair event created without JavaScript.',
+            'timezone' => 'Europe/Dublin',
+            'start_time' => '2099-05-01T10:00',
+            'end_time' => '2099-05-01T12:00',
+            'is_recurring' => '1',
+            'recurrence_frequency' => 'biweekly',
+            'recurrence_ends_type' => 'after_count',
+            'recurrence_ends_after_count' => '2',
+        ]);
+
+        $templateId = DB::table('events')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('title', 'Accessible fortnightly repair event')
+            ->where('is_recurring_template', 1)
+            ->value('id');
+
+        $this->assertNotNull($templateId);
+        $this->assertDatabaseHas('event_recurrence_rules', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $templateId,
+            'frequency' => 'weekly',
+            'interval_value' => 2,
+            'ends_type' => 'after_count',
+            'ends_after_count' => 2,
+        ]);
+        $response->assertRedirect(route('govuk-alpha.events.index', [
+            'tenantSlug' => $this->testTenantSlug,
+            'status' => 'event-created',
+        ]));
     }
 
     public function test_event_organiser_can_edit_cancel_and_delete_their_event(): void
@@ -2017,6 +2068,8 @@ class GovukAlphaFrontendTest extends TestCase
         $detail->assertOk();
         $detail->assertSee(__('govuk_alpha.events.edit_event'));
         $detail->assertSee(route('govuk-alpha.events.edit', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+        $detail->assertSee('id="archive-reason"', false);
+        $detail->assertSee('name="reason" rows="2" required', false);
 
         // The edit form is prefilled.
         $edit = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/edit");
@@ -2039,7 +2092,9 @@ class GovukAlphaFrontendTest extends TestCase
         $cancel->assertRedirectContains('status=event-cancelled');
 
         // Delete the event (returns to the list).
-        $delete = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/delete");
+        $delete = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/delete", [
+            'reason' => 'The event is no longer needed.',
+        ]);
         $delete->assertRedirect("/{$this->testTenantSlug}/accessible/events?status=event-archived");
     }
 

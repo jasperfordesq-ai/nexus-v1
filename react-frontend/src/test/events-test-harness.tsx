@@ -76,6 +76,7 @@ export function createCanonicalEventFixture(overrides: Partial<Event> = {}): Eve
       message: false,
       export: false,
       publish: false,
+      submit_for_review: false,
       manage_agenda: false,
       manage_staff: false,
       manage_registration: false,

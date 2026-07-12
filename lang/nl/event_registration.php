@@ -17,6 +17,8 @@ return [
         'refresh' => 'Vernieuwen',
         'retry' => 'Probeer het opnieuw',
         'save' => 'Redden',
+        'previous' => 'Vorige',
+        'next' => 'Volgende',
     ],
     'load_error' => [
         'title' => 'Registratiewerkruimte kan niet worden geladen',

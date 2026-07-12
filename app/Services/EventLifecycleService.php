@@ -18,6 +18,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Policies\EventPolicy;
 use App\Support\Events\EventLifecycleCompatibility;
+use App\Support\Events\EventLifecycleTransitionContext;
 use App\Support\Events\EventLifecycleTransitionGuard;
 use App\Support\Events\EventLifecycleTransitionResult;
 use Illuminate\Support\Facades\DB;
@@ -76,6 +77,7 @@ final class EventLifecycleService
         ?EventOperationalState $operational = null,
         ?string $reason = null,
         ?EventLifecycleTransitionGuard $guard = null,
+        ?EventLifecycleTransitionContext $context = null,
     ): EventLifecycleTransitionResult {
         $tenantId = TenantContext::currentId();
         if ($tenantId === null || $tenantId <= 0) {
@@ -100,6 +102,7 @@ final class EventLifecycleService
                 $operational,
                 $reason,
                 $guard,
+                $context,
             ): EventLifecycleTransitionResult {
             /** @var Event|null $event */
             $event = Event::withoutGlobalScopes()
@@ -288,6 +291,9 @@ final class EventLifecycleService
                 'axes_changed' => $axesChanged,
                 'cascade' => $cascade,
             ];
+            if ($context !== null) {
+                $metadata = array_merge($metadata, $context->metadataFor($eventId));
+            }
             $historyId = (int) DB::table('event_status_history')->insertGetId([
                 'tenant_id' => $tenantId,
                 'event_id' => $eventId,
@@ -332,6 +338,20 @@ final class EventLifecycleService
                     'metadata' => $metadata,
                     'occurred_at' => $now->toIso8601String(),
                 ],
+                // Publication/moderation has no single complete legacy direct
+                // sender. Upgrade every real transition to Published, plus
+                // submit/reject, so tenant delivery-mode overrides cannot
+                // change the recipient audience or leave the organizer silent.
+                $publicationChanged && (
+                    $toPublication === EventPublicationState::Published
+                    || $toPublication === EventPublicationState::PendingReview
+                    || ($fromPublication === EventPublicationState::PendingReview
+                        && in_array($toPublication, [
+                            EventPublicationState::Draft,
+                        ], true))
+                )
+                    ? EventNotificationDeliveryMode::OutboxAuthoritative
+                    : null,
             );
 
             // This ledger is transactionally independent from notification
@@ -353,7 +373,12 @@ final class EventLifecycleService
             }, 3),
         );
 
-        $this->dispatchPublicationSideEffectsAfterCommit($result, $tenantId, $eventId);
+        $this->dispatchPublicationSideEffectsAfterCommit(
+            $result,
+            $tenantId,
+            $eventId,
+            $context?->suppressNotifications ?? false,
+        );
 
         return $result;
     }
@@ -478,8 +503,9 @@ final class EventLifecycleService
         EventLifecycleTransitionResult $result,
         int $tenantId,
         int $eventId,
+        bool $suppressed = false,
     ): void {
-        if (! $result->changed || ! $result->publicationBecamePublished) {
+        if ($suppressed || ! $result->changed || ! $result->publicationBecamePublished) {
             return;
         }
         if (! in_array($result->deliveryMode, [

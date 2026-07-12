@@ -27,6 +27,8 @@ use App\Services\CommentService;
 use App\Services\ConnectionService;
 use App\Services\EventAttendanceService;
 use App\Services\EventNotificationDeliveryModeResolver;
+use App\Services\EventPublicationWorkflowService;
+use App\Services\EventRecurrenceCapabilityService;
 use App\Services\EventRegistrationService;
 use App\Services\EventService;
 use App\Services\EventWaitlistService;
@@ -66,6 +68,8 @@ class AlphaController extends Controller
     use Concerns\ListingsParity;
     use Concerns\MessagesParity;
     use Concerns\EventsParity;
+    use Concerns\EventModerationParity;
+    use Concerns\EventLifecycleHistoryParity;
     use Concerns\EventAgendaParity;
     use Concerns\EventRemindersParity;
     use Concerns\EventSafetyParity;
@@ -1510,6 +1514,7 @@ class AlphaController extends Controller
                 'meta' => ['has_more' => false, 'cursor' => null],
                 'moduleDisabled' => true,
                 'error' => null,
+                'canModerateEvents' => false,
             ], 403);
         }
 
@@ -1557,6 +1562,7 @@ class AlphaController extends Controller
             'moduleDisabled' => false,
             'error' => $error,
             'status' => self::asStr($request->query('status')) ?: null,
+            'canModerateEvents' => $this->eventsModerationLinkVisible(),
         ]);
     }
 
@@ -1627,7 +1633,12 @@ class AlphaController extends Controller
             }
         }
 
-        $eventOperations = ['people' => false, 'attendance' => false, 'broadcast' => false];
+        $eventOperations = [
+            'people' => false,
+            'attendance' => false,
+            'broadcast' => false,
+            'recurrence_definitions' => false,
+        ];
         if ($viewerId !== null) {
             try {
                 $actor = $this->accessibleEventActor($viewerId);
@@ -1644,6 +1655,9 @@ class AlphaController extends Controller
                         'attendance' => $policy->manageAttendance($actor, $policyEvent)
                             && $policy->viewRoster($actor, $policyEvent),
                         'broadcast' => $policy->broadcast($actor, $policyEvent),
+                        'recurrence_definitions' => $this->eventsRecurrenceDefinitionEligible(
+                            $event,
+                        ),
                     ];
                 }
             } catch (\Throwable $exception) {
@@ -1685,6 +1699,7 @@ class AlphaController extends Controller
             'activeNav' => 'events',
             'categories' => $this->categoriesForTypes(['events', 'event']),
             'eventTimezone' => $this->accessibleEventDefaultTimezone(),
+            'recurrenceCapabilities' => app(EventRecurrenceCapabilityService::class)->capabilities(),
             'status' => $request->query('status') ?: session('status'),
         ]);
     }
@@ -1704,12 +1719,39 @@ class AlphaController extends Controller
             $inputData = $this->eventInput($request);
 
             if ($isRecurring) {
+                $capabilities = app(EventRecurrenceCapabilityService::class)->capabilities();
+                $supportedFrequencies = $capabilities['supported_frequencies'];
+                $frequencySelection = trim(self::asStr($request->input('recurrence_frequency')));
+                $serverFrequency = $frequencySelection === 'biweekly' ? 'weekly' : $frequencySelection;
+                if (!in_array($serverFrequency, $supportedFrequencies, true)) {
+                    throw ValidationException::withMessages([
+                        'recurrence_frequency' => __('govuk_alpha.events.polish_events.recurrence_option_unavailable'),
+                    ]);
+                }
+                $endsType = trim(self::asStr($request->input('recurrence_ends_type')));
+                if (!in_array($endsType, $capabilities['supported_end_types'], true)
+                    || ($endsType === 'never' && !$capabilities['supports_rolling_never'])
+                    || ($endsType === 'after_count' && $capabilities['max_occurrences'] < 2)) {
+                    throw ValidationException::withMessages([
+                        'recurrence_ends_type' => __('govuk_alpha.events.polish_events.recurrence_option_unavailable'),
+                    ]);
+                }
+                $rawCount = trim(self::asStr($request->input('recurrence_ends_after_count')));
+                $count = filter_var($rawCount, FILTER_VALIDATE_INT);
+                if ($endsType === 'after_count'
+                    && ($count === false || $count < 2 || $count > $capabilities['max_occurrences'])) {
+                    throw ValidationException::withMessages([
+                        'recurrence_ends_after_count' => __('govuk_alpha.events.polish_events.recurrence_count_error', [
+                            'max' => $capabilities['max_occurrences'],
+                        ]),
+                    ]);
+                }
                 // Merge recurrence fields and call the recurring path.
                 $recurrenceData = array_merge($inputData, [
-                    'recurrence_frequency' => self::asStr($request->input('recurrence_frequency')) ?: 'weekly',
-                    'recurrence_interval' => max(1, (int) ($request->input('recurrence_interval') ?? 1)),
-                    'recurrence_ends_type' => self::asStr($request->input('recurrence_ends_type')) ?: 'after_count',
-                    'recurrence_ends_after_count' => max(1, min(52, (int) ($request->input('recurrence_ends_after_count') ?? 10))),
+                    'recurrence_frequency' => $frequencySelection === 'biweekly' ? 'weekly' : $frequencySelection,
+                    'recurrence_interval' => $frequencySelection === 'biweekly' ? 2 : 1,
+                    'recurrence_ends_type' => $endsType,
+                    'recurrence_ends_after_count' => $count === false ? 10 : $count,
                     'recurrence_ends_on_date' => self::asStr($request->input('recurrence_ends_on_date')) ?: null,
                 ]);
                 $recurResult = EventService::createRecurring($userId, $recurrenceData);
@@ -1721,7 +1763,7 @@ class AlphaController extends Controller
                 $eventId = (int) $event->id;
             }
 
-            $this->attachEventCoverImage($request, $eventId, $userId);
+            $this->attachEventCoverImage($request, $eventId, $userId, $isRecurring ? 'all' : null);
 
             try {
                 \App\Services\GamificationService::awardXP(
@@ -1764,6 +1806,13 @@ class AlphaController extends Controller
             return redirect()
                 ->route('govuk-alpha.events.create', ['tenantSlug' => $tenantSlug, 'status' => 'event-create-failed'])
                 ->withInput();
+        }
+
+        if ($isRecurring) {
+            return redirect()->route('govuk-alpha.events.index', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'event-created',
+            ]);
         }
 
         return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $eventId, 'status' => 'event-created']);
@@ -1825,6 +1874,7 @@ class AlphaController extends Controller
             $ok = false;
         }
 
+        $contentChanges = $ok ? EventService::getLastMeaningfulUpdateChanges() : [];
         if ($ok) {
             // Handle image removal before attaching a new one.
             if ($request->boolean('remove_cover_image')) {
@@ -1840,12 +1890,11 @@ class AlphaController extends Controller
             // Notify everyone who RSVP'd of meaningful changes (parity with
             // EventsController::update). EventService tracks the changes internally.
             try {
-                $meaningfulChanges = EventService::getLastMeaningfulUpdateChanges();
-                if (!empty($meaningfulChanges)
+                if (!empty($contentChanges)
                     && EventNotificationDeliveryModeResolver::resolve(
                         (int) TenantContext::getId(),
                     ) !== EventNotificationDeliveryMode::OutboxAuthoritative) {
-                    app(\App\Services\EventNotificationService::class)->notifyEventUpdated($id, $meaningfulChanges);
+                    app(\App\Services\EventNotificationService::class)->notifyEventUpdated($id, $contentChanges);
                 }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Alpha event update notification failed', ['error' => $e->getMessage()]);
@@ -1883,6 +1932,62 @@ class AlphaController extends Controller
             'id' => $id,
             'status' => $ok ? 'event-cancelled' : 'event-cancel-failed',
         ]);
+    }
+
+    public function submitEventForReview(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->transitionAccessibleEventPublication($tenantSlug, $id, 'submit_for_review');
+    }
+
+    public function publishEvent(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->transitionAccessibleEventPublication($tenantSlug, $id, 'publish');
+    }
+
+    private function transitionAccessibleEventPublication(
+        string $tenantSlug,
+        int $id,
+        string $action,
+    ): RedirectResponse {
+        $actor = $this->manageableEventActorOrAbort($tenantSlug, $id);
+        $ok = false;
+        try {
+            $workflow = app(EventPublicationWorkflowService::class);
+            if ($action === 'submit_for_review') {
+                $workflow->submit($id, $actor);
+            } else {
+                $workflow->publish($id, $actor);
+            }
+            $ok = true;
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok
+                ? ($action === 'submit_for_review' ? 'event-submitted' : 'event-published')
+                : 'event-publication-failed',
+        ]);
+    }
+
+    private function manageableEventActorOrAbort(string $tenantSlug, int $id): User
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+        $userId = $this->currentUserId();
+        abort_if($userId === null, 401);
+
+        $actor = $this->accessibleEventActor($userId);
+        $event = Event::withoutGlobalScopes()
+            ->where('tenant_id', TenantContext::currentId())
+            ->whereKey($id)
+            ->first();
+        abort_if(! $event instanceof Event, 404);
+        abort_unless(app(EventPolicy::class)->manage($actor, $event), 403);
+
+        return $actor;
     }
 
     public function deleteEvent(Request $request, string $tenantSlug, int $id): RedirectResponse
@@ -12382,7 +12487,12 @@ class AlphaController extends Controller
      * or absent image never blocks event creation) and EventService::updateImage
      * re-checks ownership and tenant scope before writing.
      */
-    private function attachEventCoverImage(Request $request, int $eventId, int $userId): void
+    private function attachEventCoverImage(
+        Request $request,
+        int $eventId,
+        int $userId,
+        ?string $scope = null,
+    ): void
     {
         $file = $request->file('image');
         if ($file === null || is_array($file) || !$file->isValid()) {
@@ -12399,7 +12509,7 @@ class AlphaController extends Controller
             ], 'events');
 
             if (is_string($imageUrl) && $imageUrl !== '') {
-                EventService::updateImage($eventId, $userId, $imageUrl);
+                EventService::updateImage($eventId, $userId, $imageUrl, $scope);
             }
         } catch (\Throwable $e) {
             report($e);

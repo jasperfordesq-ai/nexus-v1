@@ -77,6 +77,9 @@
                         @if ($template['capabilities']['revise'])
                             <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="{{ route('govuk-alpha.events.templates.capture.preview', ['tenantSlug' => $tenantSlug, 'id' => $template['source_event']['id'], 'template_id' => $template['id']]) }}">{{ __('event_templates.refresh') }}</a>
                         @endif
+                        @if ($template['capabilities']['view_audit'])
+                            <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="{{ route('govuk-alpha.events.templates.history', array_filter(['tenantSlug' => $tenantSlug, 'templateId' => $template['id'], 'filter' => $filter, 'library_cursor' => $cursor])) }}">{{ __('event_templates.audit_link') }}</a>
+                        @endif
                     </div>
                 </li>
             @endforeach

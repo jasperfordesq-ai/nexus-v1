@@ -20,16 +20,20 @@ import {
   getEventAttendees,
   getEventOnlineLink,
   getEventPolls,
+  getEventRecurrenceCapabilities,
   getEventReminders,
   deleteEventReminders,
   joinEventWaitlist,
   leaveEventWaitlist,
   removeRsvp,
   rsvpEvent,
+  publishEvent,
+  submitEventForReview,
   updateEventReminders,
   voteEventPoll,
 } from '@/lib/api/events';
 import type {
+  CanonicalEvent,
   EventAgenda,
   EventAttendee,
   EventMetrics,
@@ -57,6 +61,10 @@ import { EventAnalyticsSummaryCard } from '@/components/events/EventAnalyticsSum
 import EventCheckinCredentialCard from '@/components/events/EventCheckinCredentialCard';
 import EventRegistrationPanel from '@/components/events/EventRegistrationPanel';
 import { EventAgendaEnterprisePanel } from '@/components/events/EventAgendaEnterprisePanel';
+import {
+  canUseRecurrenceDefinitionBlueprints,
+  isRecurrenceDefinitionBlueprintCandidate,
+} from '@/lib/events/recurrenceBlueprints';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const REMINDER_OPTIONS = [60, 1440, 10080] as const;
@@ -76,7 +84,14 @@ export default function EventDetailScreen() {
 }
 
 function EventDetailScreenInner() {
-  const { t } = useTranslation(['events', 'common', 'event_templates', 'event_tickets', 'event_communications']);
+  const { t } = useTranslation([
+    'events',
+    'common',
+    'event_templates',
+    'event_tickets',
+    'event_communications',
+    'event_recurrence_blueprints',
+  ]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const primary = usePrimaryColor();
@@ -267,6 +282,14 @@ function EventDetailScreenInner() {
     router.push('/(modals)/event-templates' as Href);
   }
 
+  function openEventLifecycleHistory() {
+    if (!event) return;
+    router.push({
+      pathname: '/(modals)/event-lifecycle-history',
+      params: { id: String(event.id) },
+    } as unknown as Href);
+  }
+
   function openEventTickets() {
     if (!event) return;
     router.push({ pathname: '/(modals)/event-tickets', params: { id: String(event.id) } } as unknown as Href);
@@ -309,6 +332,48 @@ function EventDetailScreenInner() {
             ? 'detail.offerDeclineError'
             : 'detail.leaveWaitlistError'
           : 'detail.joinWaitlistError'),
+        variant: 'danger',
+      });
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  function handlePublication(action: 'submit_for_review' | 'publish') {
+    if (!event || updating) return;
+    const label = t(action === 'submit_for_review' ? 'detail.submitForReview' : 'detail.publishEvent');
+    confirm({
+      title: label,
+      message: t(action === 'submit_for_review'
+        ? 'detail.submitForReviewConfirm'
+        : 'detail.publishEventConfirm'),
+      confirmLabel: label,
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'primary',
+      onConfirm: () => performPublication(action),
+    });
+  }
+
+  async function performPublication(action: 'submit_for_review' | 'publish') {
+    if (!event || updating) return;
+    setUpdating(true);
+    try {
+      if (action === 'submit_for_review') {
+        await submitEventForReview(event.id);
+      } else {
+        await publishEvent(event.id);
+      }
+      showToast({
+        title: t(action === 'submit_for_review'
+          ? 'detail.submittedForReview'
+          : 'detail.publishedSuccessfully'),
+        variant: 'success',
+      });
+      refresh();
+    } catch {
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: t('detail.publicationFailed'),
         variant: 'danger',
       });
     } finally {
@@ -553,6 +618,18 @@ function EventDetailScreenInner() {
           <HeroCard variant="secondary">
             <HeroCard.Body className="gap-3 px-4 py-4">
               <SectionTitle icon="settings-outline" title={t('detail.ownerTools')} primary={primary} theme={theme} />
+              {event.permissions.submit_for_review ? (
+                <HeroButton isDisabled={updating} onPress={() => void handlePublication('submit_for_review')}>
+                  {updating ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
+                  <HeroButton.Label>{t('detail.submitForReview')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
+              {event.permissions.publish ? (
+                <HeroButton isDisabled={updating} onPress={() => void handlePublication('publish')}>
+                  {updating ? <Spinner size="sm" /> : <Ionicons name="cloud-upload-outline" size={18} color="#fff" />}
+                  <HeroButton.Label>{t('detail.publishEvent')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
               <HeroButton variant="secondary" onPress={openEditEvent}>
                 <Ionicons name="create-outline" size={18} color={primary} />
                 <HeroButton.Label>{t('detail.edit')}</HeroButton.Label>
@@ -561,8 +638,16 @@ function EventDetailScreenInner() {
                 <Ionicons name="copy-outline" size={18} color={primary} />
                 <HeroButton.Label>{t('event_templates:templates.mobile.title')}</HeroButton.Label>
               </HeroButton>
+              <HeroButton variant="secondary" onPress={openEventLifecycleHistory}>
+                <Ionicons name="time-outline" size={18} color={primary} />
+                <HeroButton.Label>{t('lifecycleHistory.open')}</HeroButton.Label>
+              </HeroButton>
             </HeroCard.Body>
           </HeroCard>
+        ) : null}
+
+        {isRecurrenceDefinitionBlueprintCandidate(event) ? (
+          <EventRecurrenceDefinitionTool event={event} primary={primary} theme={theme} t={t} />
         ) : null}
 
         {canOpenTickets ? (
@@ -1418,6 +1503,55 @@ function ScreenShell({ title, backLabel, children }: { title: string; backLabel:
       <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/events" />
       <View className="flex-1 px-4" style={{ flex: 1 }}>{children}</View>
     </SafeAreaView>
+  );
+}
+
+function EventRecurrenceDefinitionTool({
+  event,
+  primary,
+  theme,
+  t,
+}: {
+  event: CanonicalEvent;
+  primary: string;
+  theme: Theme;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}) {
+  const recurrenceId = event.series.recurrence?.recurrence_id;
+  const capabilitiesApi = useApi(
+    getEventRecurrenceCapabilities,
+    [event.id, recurrenceId],
+    { enabled: Boolean(recurrenceId) },
+  );
+  if (!capabilitiesApi.data?.data
+    || !canUseRecurrenceDefinitionBlueprints(event, capabilitiesApi.data.data)) {
+    return null;
+  }
+
+  return (
+    <HeroCard variant="secondary">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle
+          icon="layers-outline"
+          title={t('event_recurrence_blueprints:tab')}
+          primary={primary}
+          theme={theme}
+        />
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+          {t('event_recurrence_blueprints:definition_only_description')}
+        </Text>
+        <HeroButton
+          variant="secondary"
+          onPress={() => router.push({
+            pathname: '/(modals)/event-recurrence-blueprints',
+            params: { id: String(event.id) },
+          } as unknown as Href)}
+        >
+          <Ionicons name="layers-outline" size={18} color={primary} />
+          <HeroButton.Label>{t('event_recurrence_blueprints:tab')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 

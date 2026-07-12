@@ -413,6 +413,83 @@ final class EventNotificationOutboxProcessorTest extends TestCase
         $this->assertSame(1, DB::table('event_notification_deliveries')->where('tenant_id', $this->testTenantId)->where('delivery_key', $key)->count());
     }
 
+    public function test_pending_review_fact_notifies_admins_in_locale_with_moderation_deep_link(): void
+    {
+        $organizer = $this->member('en');
+        $admin = $this->member('de', 'admin');
+        $broker = $this->member('en', 'broker');
+        $coordinator = $this->member('en', 'coordinator');
+        DB::table('users')
+            ->whereIn('id', [$broker->id, $coordinator->id])
+            ->update([
+                'is_admin' => 1,
+                'is_super_admin' => 1,
+                'is_tenant_super_admin' => 1,
+            ]);
+        $eventId = $this->eventOwnedBy((int) $organizer->id, 'Sprachwerkstatt');
+        DB::table('events')->where('id', $eventId)->update([
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+        ]);
+        $row = $this->lifecycleFact($eventId, (int) $organizer->id, 'pending_review');
+        App::setLocale('de');
+        $expected = __('event_notifications.lifecycle.pending_review', ['title' => 'Sprachwerkstatt']);
+        App::setLocale('en');
+
+        $summary = app(EventNotificationOutboxProcessor::class)->processBatch(10, $this->testTenantId);
+
+        $this->assertSame(1, $summary['processed']);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $admin->id,
+            'type' => 'event_moderation',
+            'message' => $expected,
+            'link' => '/admin/events?publication_state=pending_review',
+        ]);
+        $this->assertSame(1, DB::table('event_notification_deliveries')
+            ->where('outbox_id', $row['id'])
+            ->where('recipient_user_id', $admin->id)
+            ->where('status', 'delivered')
+            ->count());
+        $this->assertSame(0, DB::table('event_notification_deliveries')
+            ->where('outbox_id', $row['id'])
+            ->whereIn('recipient_user_id', [$broker->id, $coordinator->id])
+            ->count());
+        $this->assertSame('en', App::getLocale());
+    }
+
+    public function test_private_draft_restore_never_notifies_prior_participants(): void
+    {
+        $organizer = $this->member();
+        $participant = $this->member();
+        $eventId = $this->eventOwnedBy((int) $organizer->id, 'Private restored draft');
+        DB::table('events')->where('id', $eventId)->update([
+            'status' => 'draft',
+            'publication_status' => 'draft',
+        ]);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $participant->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $row = $this->lifecycleFact($eventId, (int) $organizer->id, 'restored_private');
+
+        app(EventNotificationOutboxProcessor::class)->processBatch(10, $this->testTenantId);
+
+        $this->assertSame(1, DB::table('event_notification_deliveries')
+            ->where('outbox_id', $row['id'])
+            ->where('recipient_user_id', $organizer->id)
+            ->where('status', 'delivered')
+            ->count());
+        $this->assertSame(0, DB::table('event_notification_deliveries')
+            ->where('outbox_id', $row['id'])
+            ->where('recipient_user_id', $participant->id)
+            ->count());
+    }
+
     public function test_dead_letter_replay_is_explicit_audited_and_resets_attempts(): void
     {
         $organizer = $this->member();
@@ -776,7 +853,19 @@ final class EventNotificationOutboxProcessorTest extends TestCase
                 'organizer_user_id' => $organizerId,
                 'affected_recipient_user_ids' => [],
                 'lifecycle_version' => 2,
-                'publication' => ['from' => 'draft', 'to' => $state === 'published' ? 'published' : 'draft'],
+                'publication' => [
+                    'from' => match ($state) {
+                        'rejected' => 'pending_review',
+                        'restored_private' => 'archived',
+                        default => 'draft',
+                    },
+                    'to' => match ($state) {
+                        'published' => 'published',
+                        'pending_review' => 'pending_review',
+                        'rejected', 'restored_private' => 'draft',
+                        default => 'draft',
+                    },
+                ],
                 'operational' => ['from' => 'scheduled', 'to' => 'scheduled'],
                 'publication_became_published' => $state === 'published',
             ],

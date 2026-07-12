@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
+use App\Support\Events\EventSearchVisibility;
 use App\Support\FeedItemTables;
 
 /**
@@ -198,6 +199,20 @@ class FeedService
             ]);
 
         $this->applyPostVisibilityScope($query, $currentUserId, $tenantId);
+
+        // Retained Event rows can be draft, under review, archived, cancelled,
+        // completed, or recurrence templates. Apply the canonical lifecycle
+        // boundary before pagination so stale activity rows cannot consume a
+        // page slot, distort has_more, or leak through a single-item lookup.
+        $query->where(function ($items) use ($tenantId): void {
+            $items->where('feed_activity.source_type', '<>', 'event')
+                ->orWhereExists(function ($events) use ($tenantId): void {
+                    $events->selectRaw('1')
+                        ->from('events as visible_events')
+                        ->whereColumn('visible_events.id', 'feed_activity.source_id');
+                    EventSearchVisibility::applyToQuery($events, $tenantId, 'visible_events');
+                });
+        });
 
         if ($sourceType !== null) {
             $query->where('feed_activity.source_type', $sourceType);
@@ -1050,11 +1065,17 @@ class FeedService
         $existsByType = [];
         foreach ($idsByType as $type => $ids) {
             $table = $sourceTables[$type];
-            $existing = DB::table($table)
-                ->whereIn('id', array_unique($ids))
-                ->where('tenant_id', $tenantId)
-                ->pluck('id')
-                ->all();
+            $query = DB::table($table)->whereIn($table . '.id', array_unique($ids));
+            if ($type === 'event') {
+                // A retained Event row is not necessarily feed-visible. Draft,
+                // review, template, cancelled, completed and archived rows all
+                // remain in the database for audit, so existence-only filtering
+                // would leak stale cards after a lifecycle transition.
+                EventSearchVisibility::applyToQuery($query, $tenantId, $table);
+            } else {
+                $query->where($table . '.tenant_id', $tenantId);
+            }
+            $existing = $query->pluck($table . '.id')->all();
             $existsByType[$type] = array_flip($existing);
         }
 

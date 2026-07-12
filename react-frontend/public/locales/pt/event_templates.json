@@ -108,6 +108,7 @@
       "audit_error_title": "Não foi possível carregar o histórico de auditoria",
       "audit_error_description": "O histórico imutável do modelo não pôde ser carregado.",
       "audit_empty": "Nenhuma entrada de auditoria foi retornada.",
+      "audit_load_more": "Carregar mais histórico",
       "audit_actions": {
         "captured": "Modelo capturado",
         "revised": "Modelo revisado",

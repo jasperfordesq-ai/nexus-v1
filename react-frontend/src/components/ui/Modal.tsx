@@ -111,6 +111,15 @@ const sizeClassName: Partial<Record<ModalSize, string>> = {
   "5xl": "sm:max-w-5xl",
 };
 
+const modalBackdropClassName = "z-[var(--z-modal-backdrop)]";
+const modalContainerClassName = [
+  "z-[var(--z-modal)] box-border",
+  "ps-[calc(var(--safe-area-left)+1rem)] pe-[calc(var(--safe-area-right)+1rem)]",
+  "pt-[calc(var(--safe-area-top)+1rem)] pb-[calc(var(--safe-area-bottom)+1rem)]",
+  "sm:ps-[calc(var(--safe-area-left)+2.5rem)] sm:pe-[calc(var(--safe-area-right)+2.5rem)]",
+  "sm:pt-[calc(var(--safe-area-top)+2.5rem)] sm:pb-[calc(var(--safe-area-bottom)+2.5rem)]",
+].join(" ");
+
 function normalizeScroll(scrollBehavior?: ModalScrollBehavior) {
   return scrollBehavior === "normal" ? "inside" : scrollBehavior;
 }
@@ -240,7 +249,7 @@ export function ModalContent({
 
   return (
     <HeroUIModal.Backdrop
-      className={classNames?.backdrop}
+      className={cn(modalBackdropClassName, classNames?.backdrop)}
       isDismissable={isDismissable}
       isKeyboardDismissDisabled={isKeyboardDismissDisabled}
       isOpen={isOpen}
@@ -249,7 +258,11 @@ export function ModalContent({
       UNSTABLE_portalContainer={portalContainer}
     >
       <HeroUIModal.Container
-        className={classNames?.wrapper}
+        className={cn(
+          "z-[var(--z-modal)]",
+          size === "full" ? undefined : modalContainerClassName,
+          classNames?.wrapper,
+        )}
         placement={normalizePlacement(placement)}
         scroll={normalizeScroll(scrollBehavior)}
         size={normalizeContainerSize(size)}

@@ -10,7 +10,7 @@ import { getFormattingLocale } from '@/lib/helpers';
 import { createCanonicalEventFixture, renderEventRoute } from '@/test/events-test-harness';
 import type { EventRosterMember } from '@/lib/events-api';
 
-const { mockApi, mockToast } = vi.hoisted(() => ({
+const { mockApi, mockToast, mockConfirm } = vi.hoisted(() => ({
   mockApi: {
     get: vi.fn(),
     post: vi.fn(),
@@ -24,11 +24,12 @@ const { mockApi, mockToast } = vi.hoisted(() => ({
     info: vi.fn(),
     warning: vi.fn(),
   },
+  mockConfirm: vi.fn(),
 }));
 
 vi.mock('@/lib/api', () => ({ api: mockApi }));
 vi.mock('@/components/ui/ConfirmDialog', () => ({
-  useConfirm: () => vi.fn(),
+  useConfirm: () => mockConfirm,
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({
@@ -138,6 +139,7 @@ async function renderLoadedEvent(includeEventsIndex = false) {
 describe('EventDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfirm.mockResolvedValue(true);
     installSuccessfulEventResponses();
   });
 
@@ -166,12 +168,132 @@ describe('EventDetailPage', () => {
     await screen.findByRole('heading', { level: 1, name: 'Community Garden Day' });
   });
 
+  it('never renders not found while a replacement detail request is still in flight', async () => {
+    let resolveFirst!: (value: { success: boolean; data: typeof mockEvent }) => void;
+    let resolveSecond!: (value: { success: boolean; data: typeof mockEvent }) => void;
+    const firstRequest = new Promise<{ success: boolean; data: typeof mockEvent }>((resolve) => {
+      resolveFirst = resolve;
+    });
+    const secondRequest = new Promise<{ success: boolean; data: typeof mockEvent }>((resolve) => {
+      resolveSecond = resolve;
+    });
+    const replacementEvent = createCanonicalEventFixture({ id: 2, title: 'Replacement Event' });
+
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/events/1') return firstRequest;
+      if (url === '/v2/events/2') return secondRequest;
+      return Promise.resolve({ success: true, data: [] });
+    });
+
+    const { router } = renderEventRoute(
+      <EventDetailPage />,
+      { route: '/test/events/1', path: '/:tenantSlug/events/:id' },
+    );
+
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledWith(
+      '/v2/events/1',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    ));
+    await router.navigate('/test/events/2');
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledWith(
+      '/v2/events/2',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    ));
+    await act(async () => {
+      resolveFirst({ success: true, data: mockEvent });
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Event Not Found')).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveSecond({ success: true, data: replacementEvent });
+    });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Replacement Event' }))
+      .toBeInTheDocument();
+  });
+
   it('renders the event title after loading', async () => {
     await renderLoadedEvent();
 
     expect(screen.getByRole('heading', { level: 1, name: 'Community Garden Day' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Attendee registration workspace' }))
       .toHaveTextContent('registration-1');
+  });
+
+  it('renders authoritative event detail while the independent roster request is still pending', async () => {
+    const user = userEvent.setup();
+    const attendee = createRosterMember(101, 'Deferred Attendee');
+    let resolveRoster!: (value: { success: boolean; data: EventRosterMember[] }) => void;
+    const rosterRequest = new Promise<{ success: boolean; data: EventRosterMember[] }>((resolve) => {
+      resolveRoster = resolve;
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees')) return rosterRequest;
+      if (url.startsWith('/v2/polls?') || url.includes('series_id=')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: mockEvent });
+    });
+
+    renderEventRoute(<EventDetailPage />, {
+      route: '/test/events/1',
+      path: '/:tenantSlug/events/:id',
+    });
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Community Garden Day' }))
+      .toBeInTheDocument();
+    expect(screen.queryByText('Event Not Found')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: /Attendees/ }));
+    expect(screen.getByRole('status')).toHaveTextContent('Loading event people');
+
+    await act(async () => {
+      resolveRoster({ success: true, data: [attendee] });
+    });
+    expect(await screen.findByText('Deferred Attendee')).toBeInTheDocument();
+  });
+
+  it('does not let a stale roster response overwrite people from the replacement route', async () => {
+    const user = userEvent.setup();
+    const staleAttendee = createRosterMember(101, 'Stale Attendee');
+    const replacementAttendee = createRosterMember(202, 'Replacement Attendee');
+    const replacementEvent = createCanonicalEventFixture({ id: 2, title: 'Replacement Event' });
+    let resolveStaleRoster!: (value: { success: boolean; data: EventRosterMember[] }) => void;
+    const staleRosterRequest = new Promise<{ success: boolean; data: EventRosterMember[] }>((resolve) => {
+      resolveStaleRoster = resolve;
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/v2/events/1/attendees')) return staleRosterRequest;
+      if (url.includes('/v2/events/2/attendees')) {
+        return Promise.resolve({ success: true, data: [replacementAttendee] });
+      }
+      if (url === '/v2/events/2') return Promise.resolve({ success: true, data: replacementEvent });
+      if (url.startsWith('/v2/polls?') || url.includes('series_id=')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: mockEvent });
+    });
+
+    const { router } = renderEventRoute(<EventDetailPage />, {
+      route: '/test/events/1',
+      path: '/:tenantSlug/events/:id',
+    });
+    await screen.findByRole('heading', { level: 1, name: 'Community Garden Day' });
+
+    await router.navigate('/test/events/2');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Replacement Event' }))
+      .toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: /Attendees/ }));
+    expect(await screen.findByText('Replacement Attendee')).toBeInTheDocument();
+
+    await act(async () => {
+      resolveStaleRoster({ success: true, data: [staleAttendee] });
+      await Promise.resolve();
+    });
+    expect(screen.getByText('Replacement Attendee')).toBeInTheDocument();
+    expect(screen.queryByText('Stale Attendee')).not.toBeInTheDocument();
   });
 
   it('loads the policy-filtered agenda only when its detail tab is opened', async () => {
@@ -558,10 +680,10 @@ describe('EventDetailPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to Load Event');
   });
 
-  it('shows the not-found description when the event response is unsuccessful', async () => {
+  it('shows the not-found description when the event API returns a genuine 404', async () => {
     mockApi.get.mockImplementation((url: string) => {
       if (url.includes('/attendees')) return Promise.resolve({ success: true, data: [] });
-      return Promise.resolve({ success: false, data: null });
+      return Promise.resolve({ success: false, data: null, code: 'HTTP_404' });
     });
 
     renderEventRoute(<EventDetailPage />, {
@@ -581,6 +703,116 @@ describe('EventDetailPage', () => {
     expect(screen.getByRole('radio', { name: 'Mark yourself as going' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Mark yourself as interested' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Mark yourself as not going' })).toBeInTheDocument();
+  });
+
+  it('confirms before leaving an active confirmed RSVP and honours cancellation', async () => {
+    const confirmedEvent = createCanonicalEventFixture({
+      relationship: {
+        ...mockEvent.relationship,
+        registration: {
+          ...mockEvent.relationship.registration,
+          state: 'confirmed',
+          can_register: false,
+          can_withdraw: true,
+        },
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: confirmedEvent });
+    });
+    mockConfirm.mockResolvedValueOnce(false);
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('radio', { name: 'Mark yourself as not going' }));
+
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'RSVP for this event',
+      confirmLabel: 'Not Going',
+      status: 'warning',
+    }));
+    expect(mockApi.post).not.toHaveBeenCalledWith(
+      '/v2/events/1/rsvp',
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('confirms before clearing the currently selected interested RSVP', async () => {
+    const interestedEvent = createCanonicalEventFixture({
+      relationship: {
+        ...mockEvent.relationship,
+        engagement: { state: 'interested', can_change: true },
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: interestedEvent });
+    });
+    mockApi.delete.mockResolvedValueOnce({ success: true });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('radio', { name: 'Mark yourself as interested' }));
+
+    await waitFor(() => expect(mockApi.delete).toHaveBeenCalledWith(
+      '/v2/events/1/rsvp',
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    ));
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'RSVP for this event',
+      confirmLabel: 'Not Going',
+      status: 'warning',
+    }));
+  });
+
+  it('confirms before leaving the waitlist and does not mutate when dismissed', async () => {
+    const waitlistedEvent = createCanonicalEventFixture({
+      relationship: {
+        ...mockEvent.relationship,
+        registration: {
+          ...mockEvent.relationship.registration,
+          state: 'waitlisted',
+          waitlist_position: 4,
+          can_register: false,
+          can_join_waitlist: false,
+          can_leave_waitlist: true,
+        },
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: waitlistedEvent });
+    });
+    mockConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    mockApi.delete.mockResolvedValueOnce({ success: true });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('button', { name: 'Leave the waitlist for this event' }));
+
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Leave Waitlist',
+      body: 'Are you sure you want to leave this waitlist? You will lose your position.',
+      status: 'warning',
+    }));
+    expect(mockApi.delete).not.toHaveBeenCalledWith(
+      '/v2/events/1/waitlist',
+      expect.anything(),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Leave the waitlist for this event' }));
+    await waitFor(() => expect(mockApi.delete).toHaveBeenCalledWith(
+      '/v2/events/1/waitlist',
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    ));
   });
 
   it('does not infer RSVP or waitlist actions when canonical capabilities deny them', async () => {
@@ -790,5 +1022,55 @@ describe('EventDetailPage', () => {
       'The event you are looking for does not exist',
     );
     expect(screen.queryByText('Community Garden Day')).not.toBeInTheDocument();
+  });
+
+  it('submits a moderated draft through the canonical publication action', async () => {
+    const draftEvent = createCanonicalEventFixture({
+      schedule: {
+        ...mockEvent.schedule,
+        state: 'draft',
+        publication_state: 'draft',
+      },
+      permissions: {
+        ...mockEvent.permissions,
+        publish: false,
+        submit_for_review: true,
+      },
+    });
+    const pendingEvent = createCanonicalEventFixture({
+      schedule: {
+        ...draftEvent.schedule,
+        state: 'pending_review',
+        publication_state: 'pending_review',
+        lifecycle_version: 1,
+      },
+      permissions: {
+        ...draftEvent.permissions,
+        submit_for_review: false,
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: draftEvent });
+    });
+    mockApi.post.mockResolvedValueOnce({ success: true, data: pendingEvent });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('button', {
+      name: 'Submit Community Garden Day for review',
+    }));
+
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith(
+      '/v2/events/1/submit',
+      {},
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    ));
+    expect(mockToast.success).toHaveBeenCalledWith('Event submitted for review.');
+    expect(screen.queryByRole('button', {
+      name: 'Submit Community Garden Day for review',
+    })).not.toBeInTheDocument();
   });
 });

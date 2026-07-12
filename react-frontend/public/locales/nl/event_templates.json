@@ -108,6 +108,7 @@
       "audit_error_title": "Kan de auditgeschiedenis niet laden",
       "audit_error_description": "De onveranderlijke sjabloongeschiedenis kan niet worden geladen.",
       "audit_empty": "Er zijn geen auditgegevens geretourneerd.",
+      "audit_load_more": "Meer geschiedenis laden",
       "audit_actions": {
         "captured": "Sjabloon vastgelegd",
         "revised": "Sjabloon herzien",

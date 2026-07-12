@@ -50,6 +50,7 @@ final class HealthEvents extends Command
             $this->line('domain_outbox=' . json_encode($snapshot['domain_outbox'], JSON_THROW_ON_ERROR));
             $this->line('reminders=' . json_encode($snapshot['reminders'], JSON_THROW_ON_ERROR));
             $this->line('waitlist=' . json_encode($snapshot['waitlist'], JSON_THROW_ON_ERROR));
+            $this->line('recurrence=' . json_encode($snapshot['recurrence'], JSON_THROW_ON_ERROR));
             $this->line('schema=' . json_encode($snapshot['schema'], JSON_THROW_ON_ERROR));
         }
 

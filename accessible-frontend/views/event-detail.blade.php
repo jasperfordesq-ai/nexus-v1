@@ -108,13 +108,18 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.rsvp_updated') }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['event-updated', 'event-cancelled'], true))
+    @elseif (in_array($status, ['event-updated', 'event-cancelled', 'event-submitted', 'event-published'], true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-organiser-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-organiser-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ $status === 'event-updated' ? __('govuk_alpha.events.updated') : __('govuk_alpha.events.cancelled') }}</p>
+                <p class="govuk-notification-banner__heading">{{ match ($status) {
+                    'event-updated' => __('govuk_alpha.events.updated'),
+                    'event-cancelled' => __('govuk_alpha.events.cancelled'),
+                    'event-submitted' => __('govuk_alpha.events.publication_submitted_success'),
+                    default => __('govuk_alpha.events.publication_published_success'),
+                } }}</p>
             </div>
         </div>
     @elseif ($status === 'checkin-success')
@@ -152,7 +157,7 @@
                 <p class="govuk-notification-banner__heading">{{ $depthMessage }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['rsvp-failed', 'rsvp-vetting-required', 'rsvp-policy-unavailable', 'event-update-failed', 'event-cancel-failed', 'waitlist-failed', 'waitlist-offer-accept-failed', 'waitlist-vetting-required', 'waitlist-policy-unavailable', 'poll-vote-failed'], true))
+    @elseif (in_array($status, ['rsvp-failed', 'rsvp-vetting-required', 'rsvp-policy-unavailable', 'event-update-failed', 'event-cancel-failed', 'event-publication-failed', 'waitlist-failed', 'waitlist-offer-accept-failed', 'waitlist-vetting-required', 'waitlist-policy-unavailable', 'poll-vote-failed'], true))
         @php
             $depthError = match ($status) {
                 'rsvp-failed' => __('govuk_alpha.events.rsvp_failed'),
@@ -160,6 +165,7 @@
                 'rsvp-policy-unavailable', 'waitlist-policy-unavailable' => __('safeguarding.errors.policy_unavailable_detail'),
                 'event-update-failed' => __('govuk_alpha.events.update_failed'),
                 'event-cancel-failed' => __('govuk_alpha.events.cancel_failed'),
+                'event-publication-failed' => __('govuk_alpha.events.publication_failed'),
                 'waitlist-offer-accept-failed' => __('govuk_alpha.events.waitlist_offer_accept_failed'),
                 'waitlist-failed' => __('govuk_alpha.events.states.waitlist-failed'),
                 default => __('govuk_alpha.events.states.poll-vote-failed'),
@@ -213,7 +219,7 @@
             <span class="govuk-caption-l">{{ __('govuk_alpha.events.detail_title') }}</span>
             <h1 class="govuk-heading-xl">{{ $event['title'] }}</h1>
 
-            @if (!empty($eventOperations['people']) || !empty($eventOperations['attendance']) || !empty($eventOperations['broadcast']) || $registrationState !== 'none' || ($isOwner ?? false))
+            @if (!empty($eventOperations['people']) || !empty($eventOperations['attendance']) || !empty($eventOperations['broadcast']) || !empty($eventOperations['recurrence_definitions']) || $registrationState !== 'none' || !empty($event['permissions']['edit']) || ($isOwner ?? false))
                 <nav class="govuk-button-group" aria-label="{{ __('govuk_alpha.events.operations_navigation') }}">
                     @if (!empty($eventOperations['people']) || $registrationState !== 'none' || ($isOwner ?? false))
                         <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.registration.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('event_registration.title') }}</a>
@@ -227,9 +233,15 @@
                     @if (!empty($eventOperations['broadcast']))
                         <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.communications.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.communications.title') }}</a>
                     @endif
+                    @if (!empty($eventOperations['recurrence_definitions']))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.recurrence-definitions.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('event_recurrence_blueprints.tab') }}</a>
+                    @endif
                     @if ($isOwner ?? false)
                         <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.analytics.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.analytics.link') }}</a>
                         <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.templates.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('event_templates.title') }}</a>
+                    @endif
+                    @if (!empty($event['permissions']['edit']))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.lifecycle-history', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('event_lifecycle_history.link') }}</a>
                     @endif
                 </nav>
             @endif
@@ -249,6 +261,23 @@
                     || !empty($event['parent_event_id'])
                     || (!empty($seriesEvents) && count($seriesEvents) > 1);
             @endphp
+            @if (!$isArchived && (!empty($event['permissions']['submit_for_review']) || !empty($event['permissions']['publish'])))
+                @php
+                    $publicationAction = !empty($event['permissions']['submit_for_review']) ? 'submit' : 'publish';
+                @endphp
+                <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">{{ $publicationAction === 'submit' ? __('govuk_alpha.events.submit_for_review') : __('govuk_alpha.events.publish_event') }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">{{ $publicationAction === 'submit' ? __('govuk_alpha.events.publication_submit_confirm') : __('govuk_alpha.events.publication_publish_confirm') }}</p>
+                        <form method="post" action="{{ route($publicationAction === 'submit' ? 'govuk-alpha.events.submit' : 'govuk-alpha.events.publish', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                            @csrf
+                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ $publicationAction === 'submit' ? __('govuk_alpha.events.submit_for_review') : __('govuk_alpha.events.publish_event') }}</button>
+                        </form>
+                    </div>
+                </details>
+            @endif
             @if (($isOwner ?? false) && !$isArchived)
                 <div class="govuk-button-group govuk-!-margin-bottom-4">
                     <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.events.edit_event') }}</a>
@@ -284,7 +313,7 @@
                             <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                             <div class="govuk-form-group">
                                 <label class="govuk-label" for="archive-reason">{{ __('govuk_alpha.events.archive_reason_label') }}</label>
-                                <textarea class="govuk-textarea" id="archive-reason" name="reason" rows="2"></textarea>
+                            <textarea class="govuk-textarea" id="archive-reason" name="reason" rows="2" required></textarea>
                             </div>
                             <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.archive_event_button') }}</button>
                         </form>

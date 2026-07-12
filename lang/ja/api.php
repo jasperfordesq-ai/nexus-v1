@@ -699,6 +699,8 @@ return [
     'event_series_not_found' => 'Series not found',
     'event_series_id_required' => 'series_id is required',
     'event_scope_must_be_single_or_all' => 'scope must be "single" or "all"',
+    'event_recurrence_template_requires_all_scope' => '繰り返しテンプレートは「all」スコープでのみ変更できます。',
+    'event_recurring_schedule_requires_revision' => '繰り返しシリーズの予定変更には、この回以降を対象とするプレビュー付き改訂フローを使用してください。',
     'event_no_image_uploaded' => 'No image file uploaded or upload error',
     'event_image_upload_failed' => 'Failed to upload image',
     'ai_streaming_not_available' => 'Streaming chat is not yet available. Use the standard chat endpoint.',

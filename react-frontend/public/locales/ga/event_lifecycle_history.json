@@ -1,0 +1,49 @@
+{
+  "title": "Stairré na saolré",
+  "description": "Taifead do-athraithe ar athruithe foilsithe agus oibríochtúla don imeacht seo.",
+  "loading": "Stair na saolré á lódáil",
+  "load_error_title": "Níorbh fhéidir stair na saolré a lódáil",
+  "load_error_description": "Bain triail eile as chun an stair do-athraithe a fháil.",
+  "retry": "Bain triail eile as",
+  "empty_title": "Níl aon athrú saolré ann fós",
+  "empty_description": "Beidh athruithe le feiceáil anseo nuair a nuashonrófar saolré an imeachta.",
+  "list_label": "Athruithe ar shaolré an imeachta",
+  "version": "Leagan {{version}}",
+  "immutable": "Do-athraithe",
+  "publication_label": "Foilsiú",
+  "operational_label": "Stádas oibríochtúil",
+  "transition": "{{from}} go {{to}}",
+  "actor_label": "Athraithe ag",
+  "reason_label": "Cúis",
+  "unknown_actor": "Ball {{id}}",
+  "evidence_title": "Fianaise oibríochtúil",
+  "notifications_suppressed": "Cuireadh fógraí dúblacha faoi chois don athrú sraithe seo.",
+  "load_more": "Lódáil tuilleadh staire",
+  "loading_more": "Tuilleadh staire á lódáil",
+  "load_more_error_title": "Níorbh fhéidir tuilleadh staire a lódáil",
+  "load_more_error_description": "Bain triail eile as an gcéad leathanach eile a lódáil.",
+  "timestamp_unknown": "Níor taifeadadh an t-am",
+  "states": {
+    "publication": {
+      "draft": "Dréacht",
+      "pending_review": "Ag feitheamh ar athbhreithniú",
+      "published": "Foilsithe",
+      "archived": "Cartlannaithe"
+    },
+    "operational": {
+      "scheduled": "Sceidealaithe",
+      "postponed": "Curtha ar athló",
+      "cancelled": "Cealaithe",
+      "completed": "Críochnaithe"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Sceidil mheabhrúcháin cealaithe: {{count}}",
+    "waitlist_cancelled": "Iontrálacha liosta feithimh cealaithe: {{count}}",
+    "registrations_cancelled": "Clárúcháin cealaithe: {{count}}"
+  },
+  "series": {
+    "template": "Teimpléad athfhillteach {{id}}",
+    "occurrence": "Tarlú de theimpléad athfhillteach {{id}}"
+  }
+}

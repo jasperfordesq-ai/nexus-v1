@@ -8,8 +8,15 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha_events.common.back_to_event') }}</a>
 
     @php
-        $toLocal = fn ($value): string => $value ? \Illuminate\Support\Carbon::parse($value)->format('Y-m-d\TH:i') : '';
+        $eventTimezone = $event['timezone'] ?? 'UTC';
+        $toLocal = fn ($value): string => $value ? \Illuminate\Support\Carbon::parse($value)->setTimezone($eventTimezone)->format('Y-m-d\TH:i') : '';
+        $visibleEnd = !empty($event['end_time'])
+            ? \Illuminate\Support\Carbon::parse($event['end_time'])->setTimezone($eventTimezone)
+                ->when(!empty($event['all_day']), static fn ($date) => $date->subDay())
+                ->format('Y-m-d\TH:i')
+            : '';
         $occWhen = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
+        $supportsEffectiveRevisions = (bool) ($recurrenceCapabilities['supports_effective_revisions'] ?? false);
     @endphp
 
     <div class="govuk-grid-row">
@@ -36,6 +43,8 @@
 
             <form method="post" action="{{ route('govuk-alpha.events.recurring.update', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" novalidate>
                 @csrf
+                <input type="hidden" name="timezone" value="{{ $eventTimezone }}">
+                <input type="hidden" name="all_day" value="{{ !empty($event['all_day']) ? '1' : '0' }}">
 
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -57,6 +66,16 @@
                             <p id="description-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha_events.common.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
                         <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="description-hint{{ $errors->has('description') ? ' description-error' : '' }}" required>{{ old('description', $event['description'] ?? '') }}</textarea>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="category_id">{{ __('govuk_alpha.events.category_label') }}</label>
+                        <select class="govuk-select" id="category_id" name="category_id">
+                            <option value="">{{ __('govuk_alpha.events.no_category') }}</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category['id'] }}" @selected((string) old('category_id', $event['category_id'] ?? '') === (string) $category['id'])>{{ $category['name'] }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="govuk-form-group">
@@ -84,18 +103,91 @@
                         @error('end_time')
                             <p id="end_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha_events.common.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
-                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $toLocal($event['end_time'] ?? null)) }}" @error('end_time') aria-describedby="end_time-error" @enderror>
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $visibleEnd) }}" @error('end_time') aria-describedby="end_time-error" @enderror>
+                    </div>
+                </fieldset>
+
+                <fieldset class="govuk-fieldset govuk-!-margin-top-7">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_place_title') }}</h2>
+                    </legend>
+
+                    <div class="govuk-form-group">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                @php $isOnlineChecked = (bool) old('is_online', $event['is_online'] ?? false); @endphp
+                                <input type="hidden" name="is_online" value="0">
+                                <input class="govuk-checkboxes__input" id="is_online" name="is_online" type="checkbox" value="1" @checked($isOnlineChecked) data-aria-controls="is-online-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="is_online">{{ __('govuk_alpha.events.is_online_label') }}</label>
+                            </div>
+                            <div class="govuk-checkboxes__conditional{{ $isOnlineChecked ? '' : ' govuk-checkboxes__conditional--hidden' }}" id="is-online-conditional">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="online_link">{{ __('govuk_alpha.events.online_link_label') }}</label>
+                                    <input class="govuk-input" id="online_link" name="online_link" type="url" value="{{ old('online_link', $event['online_link'] ?? '') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                @php $allowRemoteChecked = (bool) old('allow_remote_attendance', $event['allow_remote_attendance'] ?? false); @endphp
+                                <input type="hidden" name="allow_remote_attendance" value="0">
+                                <input class="govuk-checkboxes__input" id="allow_remote_attendance" name="allow_remote_attendance" type="checkbox" value="1" @checked($allowRemoteChecked) data-aria-controls="remote-attendance-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="allow_remote_attendance">{{ __('govuk_alpha.events.polish_events.allow_remote_label') }}</label>
+                                <div id="allow-remote-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.events.polish_events.allow_remote_hint') }}</div>
+                            </div>
+                            <div class="govuk-checkboxes__conditional{{ $allowRemoteChecked ? '' : ' govuk-checkboxes__conditional--hidden' }}" id="remote-attendance-conditional">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="video_url">{{ __('govuk_alpha.events.polish_events.video_url_label') }}</label>
+                                    <div id="video-url-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.video_url_hint') }}</div>
+                                    <input class="govuk-input" id="video_url" name="video_url" type="url" value="{{ old('video_url', $event['video_url'] ?? '') }}" aria-describedby="video-url-hint">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                @php
+                    $venueAccess = [
+                        'step_free_access' => $event['accessibility_step_free'] ?? null,
+                        'accessible_toilet' => $event['accessibility_toilet'] ?? null,
+                        'hearing_loop' => $event['accessibility_hearing_loop'] ?? null,
+                        'quiet_space' => $event['accessibility_quiet_space'] ?? null,
+                        'seating_available' => $event['accessibility_seating'] ?? null,
+                        'accessible_parking' => $event['accessibility_parking'] ?? null,
+                        'parking_details' => $event['accessibility_parking_details'] ?? null,
+                        'transit_details' => $event['accessibility_transit_details'] ?? null,
+                        'assistance_contact' => $event['accessibility_assistance_contact'] ?? null,
+                        'notes' => $event['accessibility_notes'] ?? null,
+                    ];
+                @endphp
+                @include('accessible-frontend::partials.event-venue-accessibility-fields', ['venueAccess' => $venueAccess])
+
+                <fieldset class="govuk-fieldset govuk-!-margin-top-7">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_capacity_title') }}</h2>
+                    </legend>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="max_attendees">{{ __('govuk_alpha.events.max_attendees_label') }}</label>
+                        <div id="max-attendees-hint" class="govuk-hint">{{ __('govuk_alpha.events.max_attendees_hint') }}</div>
+                        <input class="govuk-input govuk-input--width-5" id="max_attendees" name="max_attendees" type="number" min="1" step="1" value="{{ old('max_attendees', $event['max_attendees'] ?? '') }}" aria-describedby="max-attendees-hint">
                     </div>
                 </fieldset>
 
                 {{-- Scope chooser — the no-JS equivalent of React's edit-scope modal --}}
-                <div class="govuk-warning-text govuk-!-margin-top-7">
-                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                    <strong class="govuk-warning-text__text">
-                        <span class="govuk-visually-hidden">{{ __('govuk_alpha_events.common.warning') }}</span>
-                        {{ __('govuk_alpha_events.recurring_edit.scope_all_warning') }}
-                    </strong>
-                </div>
+                @if ($supportsEffectiveRevisions)
+                    <div class="govuk-warning-text govuk-!-margin-top-7">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-visually-hidden">{{ __('govuk_alpha_events.common.warning') }}</span>
+                            {{ __('govuk_alpha_events.recurring_edit.scope_all_warning') }}
+                        </strong>
+                    </div>
+                @else
+                    <div class="govuk-inset-text govuk-!-margin-top-7">{{ __('govuk_alpha_events.recurring_edit.unavailable') }}</div>
+                @endif
 
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset" aria-describedby="scope-hint">
@@ -109,11 +201,13 @@
                                 <label class="govuk-label govuk-radios__label" for="scope-single">{{ __('govuk_alpha_events.recurring_edit.scope_single') }}</label>
                                 <div class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha_events.recurring_edit.scope_single_hint') }}</div>
                             </div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="scope-all" name="scope" type="radio" value="all" @checked(old('scope') === 'all')>
-                                <label class="govuk-label govuk-radios__label" for="scope-all">{{ __('govuk_alpha_events.recurring_edit.scope_all') }}</label>
-                                <div class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha_events.recurring_edit.scope_all_hint') }}</div>
-                            </div>
+                            @if ($supportsEffectiveRevisions)
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="scope-all" name="scope" type="radio" value="all" @checked(old('scope') === 'all')>
+                                    <label class="govuk-label govuk-radios__label" for="scope-all">{{ __('govuk_alpha_events.recurring_edit.scope_all') }}</label>
+                                    <div class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha_events.recurring_edit.scope_all_hint') }}</div>
+                                </div>
+                            @endif
                         </div>
                     </fieldset>
                 </div>

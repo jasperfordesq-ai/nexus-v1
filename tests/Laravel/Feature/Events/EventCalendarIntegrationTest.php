@@ -77,7 +77,9 @@ final class EventCalendarIntegrationTest extends TestCase
 
         foreach ([
             [$member, [$publicId, $privateId]],
-            [$delegate, [$publicId, $privateId]],
+            // Event staff delegation never outranks the parent Group audience
+            // boundary. This delegate has no active Group membership.
+            [$delegate, [$publicId]],
             [$outsider, [$publicId]],
         ] as [$viewer, $expectedIds]) {
             TenantContext::setById($this->testTenantId);

@@ -1,0 +1,13 @@
+{
+  "parent_event_id": 42,
+  "root_event_id": 42,
+  "is_template": false,
+  "recurrence_id": "20300506T090000Z",
+  "engine": "sabre-vobject",
+  "engine_version": "2",
+  "frequency": "weekly",
+  "interval": 1,
+  "rrule": "FREQ=WEEKLY",
+  "occurrence_count": 0,
+  "occurrences": []
+}

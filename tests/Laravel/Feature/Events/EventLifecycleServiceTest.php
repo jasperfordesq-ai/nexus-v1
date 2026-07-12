@@ -241,7 +241,7 @@ final class EventLifecycleServiceTest extends TestCase
             EventPublicationState::Published,
         );
         self::assertTrue($first->publicationBecamePublished);
-        self::assertSame('direct', $first->deliveryMode);
+        self::assertSame('outbox_authoritative', $first->deliveryMode);
 
         $this->service->transition(
             (int) $event->id,

@@ -238,6 +238,9 @@ export const eventSchema = z.object({
       frequency: nullableString,
       interval: z.number().int().positive(),
       rrule: nullableString,
+      recurrence_id: z.string().regex(/^\d{8}T\d{6}Z$/).nullable(),
+      engine: z.literal('sabre-vobject').nullable(),
+      engine_version: z.literal('2').nullable(),
       occurrence_count: z.number().int().nonnegative(),
       occurrences: z.array(eventSeriesOccurrenceSchema),
     }).nullable(),
@@ -250,6 +253,7 @@ export const eventSchema = z.object({
     message: z.boolean(),
     export: z.boolean(),
     publish: z.boolean(),
+    submit_for_review: z.boolean(),
     manage_agenda: z.boolean(),
     manage_staff: z.boolean(),
     manage_registration: z.boolean(),
@@ -541,10 +545,25 @@ export const eventArchiveResponseSchema = z.object({
   reason: z.string().nullable(),
 }).passthrough();
 
-const waitlistResponseSchema = z.object({
+const legacyWaitlistResponseSchema = z.object({
   waitlisted: z.literal(true),
   position: z.number().int().nonnegative().nullable(),
 }).passthrough();
+
+const canonicalWaitlistResponseSchema = eventRegistrationResponseSchema
+  .refine(
+    (response) => response.relationship.registration.state === 'waitlisted',
+    { path: ['relationship', 'registration', 'state'] },
+  )
+  .transform((response) => ({
+    waitlisted: true as const,
+    position: response.waitlist_position,
+  }));
+
+const waitlistResponseSchema = z.union([
+  legacyWaitlistResponseSchema,
+  canonicalWaitlistResponseSchema,
+]);
 
 export const eventWaitlistOfferAcceptanceResponseSchema = z.object({
   relationship: z.object({
@@ -573,6 +592,164 @@ const recurringCreateResponseSchema = z.object({
   template: eventSchema,
   occurrences_created: z.number().int().nonnegative(),
 });
+
+export const eventRecurrenceCapabilitiesSchema = z.object({
+  contract_version: z.literal(1),
+  engine: z.enum(['legacy', 'v2']),
+  structured_input: z.boolean(),
+  supported_frequencies: z.array(z.enum(['daily', 'weekly', 'monthly', 'yearly'])),
+  max_occurrences: z.number().int().min(1).max(5000),
+  supported_end_types: z.array(z.enum(['after_count', 'on_date', 'never'])),
+  supports_rolling_never: z.boolean(),
+  supports_effective_revisions: z.boolean(),
+  supports_definition_blueprints: z.boolean(),
+  schema_ready: z.boolean(),
+  rollout_state: z.enum(['legacy', 'v2_degraded', 'v2_finite', 'v2_rolling']),
+}).strict();
+
+const recurrenceIdentitySchema = z.string().regex(/^\d{8}T\d{6}Z$/);
+export const eventRecurrenceDefinitionSectionSchema = z.enum([
+  'agenda',
+  'ticket_types',
+  'registration',
+  'safety',
+  'staff',
+]);
+export const eventRecurrenceDefinitionSectionsSchema = z.object({
+  agenda: z.boolean(),
+  ticket_types: z.boolean(),
+  registration: z.boolean(),
+  safety: z.boolean(),
+  staff: z.boolean(),
+}).strict();
+const eventRecurrenceDefinitionCountsSchema = z.record(
+  z.string(),
+  z.number().int().nonnegative(),
+);
+const eventRecurrenceDefinitionConflictSchema = z.object({
+  section: eventRecurrenceDefinitionSectionSchema,
+  code: z.string().min(1),
+  count: z.number().int().positive(),
+}).strict();
+
+export const eventRecurrenceDefinitionHistoryItemSchema = z.object({
+  blueprint_id: z.number().int().positive(),
+  blueprint_version: z.number().int().positive(),
+  schema_version: z.number().int().positive(),
+  effective_from_recurrence_id: recurrenceIdentitySchema,
+  source_event_id: z.number().int().positive(),
+  source_recurrence_id: recurrenceIdentitySchema,
+  selected_sections: eventRecurrenceDefinitionSectionsSchema,
+  counts: eventRecurrenceDefinitionCountsSchema,
+  manifest_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  captured_by_user_id: z.number().int().positive().nullable(),
+  created_at: z.string().min(1),
+}).strict();
+
+export const eventRecurrenceDefinitionHistorySchema = z.object({
+  items: z.array(eventRecurrenceDefinitionHistoryItemSchema),
+  next_before_version: z.number().int().positive().nullable(),
+}).strict();
+
+export const eventRecurrenceDefinitionPreviewSchema = z.object({
+  preview_token: z.string().min(1),
+  preview_expires_at: z.string().min(1),
+  schema_version: z.number().int().positive(),
+  root_event_id: z.number().int().positive(),
+  source_event_id: z.number().int().positive(),
+  source_recurrence_id: recurrenceIdentitySchema,
+  effective_from_recurrence_id: recurrenceIdentitySchema,
+  selected_sections: eventRecurrenceDefinitionSectionsSchema,
+  manifest_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  blueprint_set_version: z.number().int().nonnegative(),
+  counts: eventRecurrenceDefinitionCountsSchema,
+  conflicts: z.array(eventRecurrenceDefinitionConflictSchema),
+  can_commit: z.boolean(),
+}).strict();
+
+export const eventRecurrenceDefinitionCommitSchema = z.object({
+  blueprint_id: z.number().int().positive(),
+  blueprint_version: z.number().int().positive(),
+  schema_version: z.number().int().positive(),
+  root_event_id: z.number().int().positive(),
+  source_event_id: z.number().int().positive(),
+  source_recurrence_id: recurrenceIdentitySchema,
+  effective_from_recurrence_id: recurrenceIdentitySchema,
+  selected_sections: eventRecurrenceDefinitionSectionsSchema,
+  manifest_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  counts: eventRecurrenceDefinitionCountsSchema,
+  idempotent_replay: z.boolean(),
+  created_at: z.string().min(1),
+}).strict();
+
+export type EventRecurrenceDefinitionSection = z.infer<typeof eventRecurrenceDefinitionSectionSchema>;
+export type EventRecurrenceDefinitionSections = z.infer<typeof eventRecurrenceDefinitionSectionsSchema>;
+export type EventRecurrenceDefinitionHistoryItem = z.infer<typeof eventRecurrenceDefinitionHistoryItemSchema>;
+export type EventRecurrenceDefinitionHistory = z.infer<typeof eventRecurrenceDefinitionHistorySchema>;
+export type EventRecurrenceDefinitionPreview = z.infer<typeof eventRecurrenceDefinitionPreviewSchema>;
+export type EventRecurrenceDefinitionCommit = z.infer<typeof eventRecurrenceDefinitionCommitSchema>;
+
+const eventRecurrenceRevisionConflictSchema = z.object({
+  code: z.string().min(1),
+  event_id: z.number().int().positive().optional(),
+  field: z.string().min(1).optional(),
+}).passthrough();
+
+const eventRecurrenceRevisionImpactSchema = z.object({
+  affected_event_ids: z.array(z.number().int().positive()),
+  affected_count: z.number().int().nonnegative(),
+  changed_event_ids: z.array(z.number().int().positive()),
+  changed_count: z.number().int().nonnegative(),
+  moved_occurrences: z.array(z.object({
+    event_id: z.number().int().positive(),
+    occurrence_date: z.string(),
+    from_start_utc: z.string(),
+    from_end_utc: nullableString,
+    to_start_utc: z.string(),
+    to_end_utc: nullableString,
+  }).passthrough()),
+  created_occurrences: z.array(z.unknown()),
+  retired_occurrences: z.array(z.unknown()),
+  registrations_count: z.number().int().nonnegative(),
+  waitlist_count: z.number().int().nonnegative(),
+  ticket_count: z.number().int().nonnegative(),
+  reminder_count: z.number().int().nonnegative(),
+  unique_recipient_count: z.number().int().nonnegative(),
+  customized_exception_conflicts: z.array(z.object({
+    event_id: z.number().int().positive(),
+    skipped_fields: z.array(z.string()),
+  }).passthrough()),
+  blocking_conflicts: z.array(eventRecurrenceRevisionConflictSchema),
+}).passthrough();
+
+const eventRecurrenceRevisionPreviewSchema = z.object({
+  preview_token: z.string().min(1),
+  preview_expires_at: z.string().min(1),
+  scope: z.literal('this_and_future'),
+  selected_event_id: z.number().int().positive(),
+  root_event_id: z.number().int().positive(),
+  effective_from_utc: z.string().min(1),
+  can_commit: z.boolean(),
+  impact: eventRecurrenceRevisionImpactSchema,
+}).passthrough();
+
+const eventRecurrenceRevisionCommitSchema = z.object({
+  revision_id: z.number().int().positive(),
+  root_event_id: z.number().int().positive(),
+  revision_version: z.number().int().positive(),
+  effective_from_utc: z.string().min(1),
+  changed_event_ids: z.array(z.number().int().positive()),
+  changed_count: z.number().int().nonnegative(),
+  notification_recipient_count: z.number().int().nonnegative(),
+  notification_outbox_id: z.number().int().positive().nullable(),
+  idempotent_replay: z.boolean(),
+  created_at: z.string().min(1),
+}).passthrough();
+
+export type EventRecurrenceRevisionPatch = Record<string, unknown>;
+export type EventRecurrenceRevisionPreview = z.infer<typeof eventRecurrenceRevisionPreviewSchema>;
+export type EventRecurrenceRevisionCommit = z.infer<typeof eventRecurrenceRevisionCommitSchema>;
+export type EventRecurrenceCapabilities = z.infer<typeof eventRecurrenceCapabilitiesSchema>;
 
 export const eventCalendarProjectionSchema = z.object({
   id: z.number().int().positive(),
@@ -1049,6 +1226,25 @@ export const eventsApi = {
     return parseResponse(endpoint, await api.put(endpoint, payload, withContract()), eventSchema);
   },
 
+  async recurrenceCapabilities(options?: RequestOptions): Promise<ApiResponse<EventRecurrenceCapabilities>> {
+    const endpoint = '/v2/events/recurrence-capabilities';
+    return parseResponse(
+      endpoint,
+      await api.get(endpoint, withContract(options)),
+      eventRecurrenceCapabilitiesSchema,
+    );
+  },
+
+  async submitForReview(id: number | string): Promise<ApiResponse<Event>> {
+    const endpoint = `/v2/events/${id}/submit`;
+    return parseResponse(endpoint, await api.post(endpoint, {}, withContract()), eventSchema);
+  },
+
+  async publish(id: number | string): Promise<ApiResponse<Event>> {
+    const endpoint = `/v2/events/${id}/publish`;
+    return parseResponse(endpoint, await api.post(endpoint, {}, withContract()), eventSchema);
+  },
+
   async reminders(id: number | string): Promise<ApiResponse<EventReminderPreferences>> {
     const endpoint = `/v2/events/${id}/reminders`;
     return parseResponse(
@@ -1096,6 +1292,98 @@ export const eventsApi = {
   async updateRecurring(id: number | string, payload: EventMutationPayload): Promise<ApiResponse<Event>> {
     const endpoint = `/v2/events/${id}/recurring`;
     return parseResponse(endpoint, await api.put(endpoint, payload, withContract()), eventSchema);
+  },
+
+  async previewRecurrenceRevision(
+    id: number | string,
+    patch: EventRecurrenceRevisionPatch,
+  ): Promise<ApiResponse<EventRecurrenceRevisionPreview>> {
+    const endpoint = `/v2/events/${id}/recurrence-revisions/preview`;
+    return parseResponse(
+      endpoint,
+      await api.post(endpoint, { patch }, withContract()),
+      eventRecurrenceRevisionPreviewSchema,
+    );
+  },
+
+  async commitRecurrenceRevision(
+    id: number | string,
+    patch: EventRecurrenceRevisionPatch,
+    previewToken: string,
+    idempotencyKey: string,
+  ): Promise<ApiResponse<EventRecurrenceRevisionCommit>> {
+    const endpoint = `/v2/events/${id}/recurrence-revisions/commit`;
+    return parseResponse(
+      endpoint,
+      await api.post(
+        endpoint,
+        { patch, preview_token: previewToken },
+        withIdempotencyKey(idempotencyKey),
+      ),
+      eventRecurrenceRevisionCommitSchema,
+    );
+  },
+
+  async recurrenceDefinitionHistory(
+    id: number | string,
+    limit = 25,
+    beforeVersion?: number,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<EventRecurrenceDefinitionHistory>> {
+    const endpoint = `/v2/events/${id}/recurrence-definition-blueprints${queryString({
+      limit,
+      before_version: beforeVersion,
+    })}`;
+    return parseResponse(
+      endpoint,
+      await api.get(endpoint, withContract(options)),
+      eventRecurrenceDefinitionHistorySchema,
+    );
+  },
+
+  async previewRecurrenceDefinitions(
+    id: number | string,
+    effectiveFromRecurrenceId: string,
+    sections: EventRecurrenceDefinitionSections,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<EventRecurrenceDefinitionPreview>> {
+    const endpoint = `/v2/events/${id}/recurrence-definition-blueprints/preview`;
+    return parseResponse(
+      endpoint,
+      await api.post(
+        endpoint,
+        {
+          effective_from_recurrence_id: effectiveFromRecurrenceId,
+          sections,
+        },
+        withContract(options),
+      ),
+      eventRecurrenceDefinitionPreviewSchema,
+    );
+  },
+
+  async commitRecurrenceDefinitions(
+    id: number | string,
+    effectiveFromRecurrenceId: string,
+    sections: EventRecurrenceDefinitionSections,
+    previewToken: string,
+    idempotencyKey: string,
+    options?: RequestOptions,
+  ): Promise<ApiResponse<EventRecurrenceDefinitionCommit>> {
+    const endpoint = `/v2/events/${id}/recurrence-definition-blueprints/commit`;
+    return parseResponse(
+      endpoint,
+      await api.post(
+        endpoint,
+        {
+          effective_from_recurrence_id: effectiveFromRecurrenceId,
+          sections,
+          preview_token: previewToken,
+        },
+        withIdempotencyKey(idempotencyKey, options),
+      ),
+      eventRecurrenceDefinitionCommitSchema,
+    );
   },
 
   async archive(
@@ -1435,9 +1723,10 @@ export const eventsApi = {
   async uploadCover(
     id: number | string,
     image: File | FormData,
+    scope?: 'single' | 'all',
     options?: RequestOptions,
   ): Promise<ApiResponse<z.infer<typeof uploadResponseSchema>>> {
-    const endpoint = `/v2/events/${id}/image`;
+    const endpoint = `/v2/events/${id}/image${queryString({ scope })}`;
     return parseResponse(
       endpoint,
       await api.upload(endpoint, image, 'image', withContract(options)),

@@ -90,7 +90,10 @@ export function EventTemplatesWorkspace({
   const [auditTemplate, setAuditTemplate] = useState<EventTemplate | null>(null);
   const [audits, setAudits] = useState<EventTemplateAudit[]>([]);
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+  const [isLoadingMoreAudit, setIsLoadingMoreAudit] = useState(false);
+  const [auditNextCursor, setAuditNextCursor] = useState<string | null>(null);
   const [auditError, setAuditError] = useState(false);
+  const auditGeneration = useRef(0);
 
   const loadTemplates = useCallback(async (cursor?: string, append = false) => {
     const generation = ++loadGeneration.current;
@@ -218,23 +221,61 @@ export function EventTemplatesWorkspace({
   }
 
   async function openAudit(template: EventTemplate) {
+    const generation = ++auditGeneration.current;
     setAuditTemplate(template);
     setAudits([]);
+    setAuditNextCursor(null);
     setAuditError(false);
     setIsLoadingAudit(true);
     try {
       const response = await eventTemplatesApi.history(template.id);
+      if (generation !== auditGeneration.current) return;
       if (!response.success || !response.data) {
         setAuditError(true);
         return;
       }
       setAudits(response.data);
+      setAuditNextCursor(response.meta?.next_cursor ?? null);
     } catch (error) {
+      if (generation !== auditGeneration.current) return;
       logError('Failed to load event template audit history', error);
       setAuditError(true);
     } finally {
-      setIsLoadingAudit(false);
+      if (generation === auditGeneration.current) setIsLoadingAudit(false);
     }
+  }
+
+  async function loadMoreAudit() {
+    if (!auditTemplate || !auditNextCursor || isLoadingMoreAudit) return;
+    const generation = auditGeneration.current;
+    const templateId = auditTemplate.id;
+    const cursor = auditNextCursor;
+    setIsLoadingMoreAudit(true);
+    try {
+      const response = await eventTemplatesApi.history(templateId, cursor);
+      if (generation !== auditGeneration.current) return;
+      const entries = response.data;
+      if (!response.success || !entries) {
+        toast.error(t('manage.templates.load_more_error'));
+        return;
+      }
+      setAudits((current) => [...current, ...entries]);
+      setAuditNextCursor(response.meta?.next_cursor ?? null);
+    } catch (error) {
+      if (generation !== auditGeneration.current) return;
+      logError('Failed to load more event template audit history', error);
+      toast.error(t('manage.templates.load_more_error'));
+    } finally {
+      if (generation === auditGeneration.current) setIsLoadingMoreAudit(false);
+    }
+  }
+
+  function closeAudit() {
+    auditGeneration.current += 1;
+    setAuditTemplate(null);
+    setAuditNextCursor(null);
+    setIsLoadingAudit(false);
+    setIsLoadingMoreAudit(false);
   }
 
   function dateLabel(value: string | null): string {
@@ -585,7 +626,7 @@ export function EventTemplatesWorkspace({
       <Modal
         isOpen={auditTemplate !== null}
         onOpenChange={(open) => {
-          if (!open) setAuditTemplate(null);
+          if (!open) closeAudit();
         }}
         size="2xl"
         scrollBehavior="inside"
@@ -608,30 +649,43 @@ export function EventTemplatesWorkspace({
                     {t('manage.templates.audit_empty')}
                   </p>
                 ) : (
-                  <ol className="space-y-3">
-                    {audits.map((audit) => (
-                      <li key={audit.id} className="rounded-xl border border-theme-default p-4">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="font-medium text-theme-primary">
-                            {t(`manage.templates.audit_actions.${audit.action}`)}
+                  <div className="space-y-4">
+                    <ol className="space-y-3">
+                      {audits.map((audit) => (
+                        <li key={audit.id} className="rounded-xl border border-theme-default p-4">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="font-medium text-theme-primary">
+                              {t(`manage.templates.audit_actions.${audit.action}`)}
+                            </p>
+                            <Chip size="sm" variant="flat">
+                              {t('manage.templates.version_value', { version: audit.template_version })}
+                            </Chip>
+                          </div>
+                          <p className="mt-2 text-sm text-theme-muted">{dateLabel(audit.created_at)}</p>
+                          {audit.materialized_event_id && (
+                            <p className="mt-1 text-sm text-theme-muted">
+                              {t('manage.templates.materialized_event', { id: audit.materialized_event_id })}
+                            </p>
+                          )}
+                          <p className="mt-2 flex items-center gap-2 text-xs text-theme-subtle">
+                            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                            {t('manage.templates.immutable_audit')}
                           </p>
-                          <Chip size="sm" variant="flat">
-                            {t('manage.templates.version_value', { version: audit.template_version })}
-                          </Chip>
-                        </div>
-                        <p className="mt-2 text-sm text-theme-muted">{dateLabel(audit.created_at)}</p>
-                        {audit.materialized_event_id && (
-                          <p className="mt-1 text-sm text-theme-muted">
-                            {t('manage.templates.materialized_event', { id: audit.materialized_event_id })}
-                          </p>
-                        )}
-                        <p className="mt-2 flex items-center gap-2 text-xs text-theme-subtle">
-                          <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                          {t('manage.templates.immutable_audit')}
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
+                        </li>
+                      ))}
+                    </ol>
+                    {auditNextCursor && (
+                      <div className="flex justify-center">
+                        <Button
+                          variant="secondary"
+                          isPending={isLoadingMoreAudit}
+                          onPress={() => void loadMoreAudit()}
+                        >
+                          {t('manage.templates.audit_load_more')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </ModalBody>
               <ModalFooter>

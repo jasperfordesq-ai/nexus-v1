@@ -108,6 +108,7 @@
       "audit_error_title": "Ní féidir an stair iniúchta a lódáil",
       "audit_error_description": "Níorbh fhéidir an stair teimpléad do-mhalartaithe a luchtú.",
       "audit_empty": "Níor cuireadh aon iontrálacha iniúchta ar ais.",
+      "audit_load_more": "Lódáil tuilleadh staire",
       "audit_actions": {
         "captured": "Teimpléad gafa",
         "revised": "Teimpléad athbhreithnithe",

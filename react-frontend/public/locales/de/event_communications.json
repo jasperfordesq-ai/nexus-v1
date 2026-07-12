@@ -63,6 +63,7 @@
   "load_history_error": "Der Prüfverlauf konnte nicht geladen werden.",
   "history_title": "Prüfverlauf der Nachricht",
   "loading_history": "Prüfverlauf wird geladen",
+  "history_load_more": "Mehr Verlauf laden",
   "history_entry_meta": "Fassung {{version}} · {{date}}",
   "variants": { "announcement": "Ankündigung", "follow_up": "Nachbereitung nach der Veranstaltung", "review_request": "Bewertungsanfrage" },
   "statuses": { "draft": "Entwurf", "scheduled": "Geplant", "sending": "Wird gesendet", "sent": "Gesendet", "cancelled": "Abgebrochen", "failed": "Fehlgeschlagen" },

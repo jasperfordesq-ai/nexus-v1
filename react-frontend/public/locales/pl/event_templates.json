@@ -108,6 +108,7 @@
       "audit_error_title": "Nie można wczytać historii audytów",
       "audit_error_description": "Nie można załadować historii niezmiennych szablonów.",
       "audit_empty": "Nie zwrócono żadnych wpisów kontroli.",
+      "audit_load_more": "Załaduj więcej historii",
       "audit_actions": {
         "captured": "Szablon przechwycony",
         "revised": "Szablon poprawiony",

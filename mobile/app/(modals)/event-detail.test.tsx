@@ -30,6 +30,14 @@ jest.mock('react-i18next', () => ({
         'detail.organizer': 'Organizer',
         'detail.ownerTools': 'Event tools',
         'detail.edit': 'Edit',
+        'detail.submitForReview': 'Submit for review',
+        'detail.publishEvent': 'Publish event',
+        'detail.submitForReviewConfirm': 'Submit this event for moderation?',
+        'detail.publishEventConfirm': 'Publish this event now?',
+        'detail.submittedForReview': 'Event submitted for review',
+        'detail.publishedSuccessfully': 'Event published',
+        'detail.publicationFailed': 'Publication failed',
+        'lifecycleHistory.open': 'Open lifecycle history',
         'event_templates:templates.mobile.title': 'Event templates',
         'event_tickets:tickets.mobile.title': 'Event tickets',
         'event_tickets:tickets.mobile.gatewayDisabledDescription': 'Free tickets only. No wallet action is taken.',
@@ -37,6 +45,8 @@ jest.mock('react-i18next', () => ({
         'event_communications:title': 'Organizer communications',
         'event_communications:compose_description': 'Choose an exact event audience and delivery channels.',
         'event_communications:new_message': 'New message',
+        'event_recurrence_blueprints:tab': 'Future setup',
+        'event_recurrence_blueprints:definition_only_description': 'Definitions only; no participant records are copied.',
         'detail.organizerAttendance': 'Organizer attendance',
         'detail.loadingAttendees': 'Loading attendees',
         'detail.attendeesLoadError': 'Could not load attendees.',
@@ -301,7 +311,10 @@ jest.mock('@/lib/api/events', () => ({
   getEventPolls: jest.fn().mockResolvedValue({ data: [], meta: { per_page: 50, has_more: false, cursor: null } }),
   voteEventPoll: jest.fn().mockResolvedValue({ data: { id: 91, question: 'Which topic?', total_votes: 1, has_voted: true, voted_option_id: 12, options: [{ id: 12, text: 'Gardening', percentage: 100 }] } }),
   getEventReminders: jest.fn().mockResolvedValue({ data: [] }),
+  getEventRecurrenceCapabilities: jest.fn(),
   updateEventReminders: jest.fn().mockResolvedValue({ data: [{ remind_before_minutes: 60, reminder_type: 'both', status: 'pending', scheduled_for: '2026-05-15T13:00:00Z' }] }),
+  submitEventForReview: jest.fn().mockResolvedValue({ data: {} }),
+  publishEvent: jest.fn().mockResolvedValue({ data: {} }),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -327,7 +340,7 @@ jest.mock('@/components/ui/useConfirm', () => ({
 // --- Tests ---
 
 import EventDetailScreen from './event-detail';
-import { acceptEventWaitlistOffer, getEventAgenda, joinEventWaitlist, leaveEventWaitlist, rsvpEvent, updateEventReminders, voteEventPoll } from '@/lib/api/events';
+import { acceptEventWaitlistOffer, getEventAgenda, joinEventWaitlist, leaveEventWaitlist, publishEvent, rsvpEvent, submitEventForReview, updateEventReminders, voteEventPoll } from '@/lib/api/events';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -611,7 +624,31 @@ describe('EventDetailScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-event', params: { id: '7' } });
   });
 
-  it('opens templates and the bounded ticket catalogue from permitted event tools', () => {
+  it('confirms and submits a moderated draft from server publication permissions', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          permissions: { ...mockEvent.permissions, publish: false, submit_for_review: true },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByText } = render(<EventDetailScreen />);
+    fireEvent.press(getByText('Submit for review'));
+
+    await waitFor(() => {
+      expect(submitEventForReview).toHaveBeenCalledWith(7);
+      expect(refresh).toHaveBeenCalled();
+      expect(publishEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  it('opens templates, lifecycle history and the bounded ticket catalogue from permitted event tools', () => {
     mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<EventDetailScreen />);
@@ -619,8 +656,95 @@ describe('EventDetailScreen', () => {
     fireEvent.press(getByText('Event templates'));
     expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/event-templates');
 
+    fireEvent.press(getByText('Open lifecycle history'));
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-lifecycle-history',
+      params: { id: '7' },
+    });
+
     fireEvent.press(getByText('Available tickets'));
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/event-tickets', params: { id: '7' } });
+  });
+
+  it('shows the future-setup entry only for a concrete V2 occurrence with negotiated capability', () => {
+    const recurringEvent = {
+      ...mockEvent,
+      series: {
+        ...mockEvent.series,
+        recurrence: {
+          parent_event_id: 3,
+          root_event_id: 3,
+          is_template: false,
+          recurrence_id: '20300501T101500Z',
+          engine: 'sabre-vobject',
+          engine_version: '2',
+          frequency: 'weekly',
+          interval: 1,
+          rrule: 'FREQ=WEEKLY',
+          occurrence_count: 4,
+          occurrences: [],
+        },
+      },
+      permissions: {
+        ...mockEvent.permissions,
+        edit: true,
+        manage_agenda: true,
+      },
+    };
+    const eventState = { data: { data: recurringEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    const capabilityState = {
+      data: {
+        data: {
+          contract_version: 1,
+          engine: 'v2',
+          structured_input: true,
+          supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+          max_occurrences: 366,
+          supported_end_types: ['after_count', 'on_date', 'never'],
+          supports_rolling_never: true,
+          supports_effective_revisions: true,
+          supports_definition_blueprints: true,
+          schema_ready: true,
+          rollout_state: 'v2_rolling',
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    let hookIndex = 0;
+    mockUseApi.mockImplementation(() => {
+      const slot = hookIndex % 6;
+      hookIndex += 1;
+      if (slot === 0) return eventState;
+      if (slot === 5) return capabilityState;
+      return defaultApiState;
+    });
+
+    const permitted = render(<EventDetailScreen />);
+    const futureSetupLabels = permitted.getAllByText('Future setup');
+    fireEvent.press(futureSetupLabels[futureSetupLabels.length - 1]!);
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-recurrence-blueprints',
+      params: { id: '7' },
+    });
+    permitted.unmount();
+
+    hookIndex = 0;
+    mockUseApi.mockImplementation(() => {
+      const slot = hookIndex % 6;
+      hookIndex += 1;
+      if (slot === 0) return eventState;
+      if (slot === 5) {
+        return {
+          ...capabilityState,
+          data: { data: { ...capabilityState.data.data, supports_definition_blueprints: false } },
+        };
+      }
+      return defaultApiState;
+    });
+    const denied = render(<EventDetailScreen />);
+    expect(denied.queryByText('Future setup')).toBeNull();
   });
 
   it('opens organizer communications only when the server grants broadcast permission', () => {
@@ -661,6 +785,7 @@ describe('EventDetailScreen', () => {
 
     expect(queryByText('Edit')).toBeNull();
     expect(queryByText('Event templates')).toBeNull();
+    expect(queryByText('Open lifecycle history')).toBeNull();
     expect(queryByText('Event check-in')).toBeNull();
   });
 

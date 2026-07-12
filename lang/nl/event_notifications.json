@@ -15,6 +15,8 @@
     "expired": "verlopen"
   },
   "lifecycle": {
+    "rejected": "Het evenement \u2018:title\u2019 is niet goedgekeurd en teruggezet naar concept.",
+    "pending_review": "Het evenement \u2018:title\u2019 is ingediend voor moderatiebeoordeling.",
     "published": "Het evenement ‘:title’ is gepubliceerd.",
     "postponed": "Het evenement ‘:title’ is uitgesteld.",
     "cancelled": "Het evenement ‘:title’ is geannuleerd.",

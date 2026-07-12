@@ -7,10 +7,12 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\EventRecurrenceService;
 use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -22,6 +24,20 @@ use Tests\Laravel\TestCase;
 class EventsControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // This controller suite verifies the compatibility path's immediate
+        // notification fan-out. The production default is intentionally
+        // outbox-authoritative and is covered by the outbox-specific suites.
+        Config::set('events.notification_delivery.mode', 'direct');
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'events.notification_delivery_mode')
+            ->delete();
+    }
 
     private function authenticatedUser(array $overrides = []): User
     {
@@ -476,6 +492,8 @@ class EventsControllerTest extends TestCase
 
     public function test_series_delete_archives_future_series_preserves_evidence_and_replays_without_duplicate_fanout(): void
     {
+        config()->set('events.notification_delivery.consumer_enabled', true);
+        config()->set('events.notification_delivery.channels', ['in_app']);
         $organizer = $this->authenticatedUser();
         $attendee = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
@@ -591,10 +609,12 @@ class EventsControllerTest extends TestCase
             ->where('event_id', $templateId)
             ->where('action', 'event.lifecycle.transitioned')
             ->count());
-        $this->assertSame(2, DB::table('notifications')
+        app(\App\Services\EventNotificationOutboxProcessor::class)
+            ->processBatch(20, $this->testTenantId);
+        $this->assertSame(3, DB::table('notifications')
             ->where('tenant_id', $this->testTenantId)
-            ->where('link', "/events/{$templateId}")
-            ->where('type', 'event')
+            ->where('link', '/events')
+            ->where('type', 'event_lifecycle')
             ->count());
 
         $replay = $this->apiDelete("/v2/events/{$templateId}", $payload, $headers);
@@ -613,10 +633,10 @@ class EventsControllerTest extends TestCase
             ->where('tenant_id', $this->testTenantId)
             ->where('event_id', $templateId)
             ->count());
-        $this->assertSame(2, DB::table('notifications')
+        $this->assertSame(3, DB::table('notifications')
             ->where('tenant_id', $this->testTenantId)
-            ->where('link', "/events/{$templateId}")
-            ->where('type', 'event')
+            ->where('link', '/events')
+            ->where('type', 'event_lifecycle')
             ->count());
     }
 
@@ -900,7 +920,7 @@ class EventsControllerTest extends TestCase
             ->assertJsonPath('data.cascade.reminders_cancelled', 1);
         $this->assertSame('cancelled', DB::table('event_rsvps')->where('event_id', $eventId)->where('user_id', $attendee->id)->value('status'));
         $this->assertSame('cancelled', DB::table('event_waitlist')->where('event_id', $eventId)->where('user_id', $waitlisted->id)->value('status'));
-        $this->assertSame(2, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
+        $this->assertSame(3, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
         $this->assertSame(2, DB::table('notification_queue')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('activity_type', 'event_cancellation')->count());
 
         $replay = $this->apiPost("/v2/events/{$eventId}/cancel", [
@@ -919,7 +939,7 @@ class EventsControllerTest extends TestCase
             ->where('tenant_id', $this->testTenantId)
             ->where('event_id', $eventId)
             ->count());
-        $this->assertSame(2, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
+        $this->assertSame(3, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
     }
 
     // ================================================================
@@ -1089,10 +1109,12 @@ class EventsControllerTest extends TestCase
         ]);
         $occ1 = $this->createEvent($user->id, [
             'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(14)->addHours(2)->format('Y-m-d H:i:s'),
             'parent_event_id' => $templateId,
         ]);
         $occ2 = $this->createEvent($user->id, [
             'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(21)->addHours(2)->format('Y-m-d H:i:s'),
             'parent_event_id' => $templateId,
         ]);
 
@@ -1122,34 +1144,115 @@ class EventsControllerTest extends TestCase
         $this->assertSame(3, $rep['series_count'] ?? null);
     }
 
-    public function test_update_image_cascades_cover_to_whole_series(): void
+    public function test_recurring_image_updates_require_scope_and_preserve_single_occurrence_override(): void
     {
         $user = $this->authenticatedUser();
+        $occurrenceOneStart = now()->addDays(14)->startOfSecond();
+        $occurrenceTwoStart = now()->addDays(21)->startOfSecond();
 
         $templateId = $this->createEvent($user->id, [
             'start_time' => now()->addDays(7)->format('Y-m-d H:i:s'),
             'is_recurring_template' => 1,
+            'recurrence_engine' => EventRecurrenceService::ENGINE,
+            'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
         ]);
         $occ1 = $this->createEvent($user->id, [
-            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'start_time' => $occurrenceOneStart->format('Y-m-d H:i:s'),
+            'end_time' => $occurrenceOneStart->copy()->addHours(2)->format('Y-m-d H:i:s'),
             'parent_event_id' => $templateId,
+            'recurrence_engine' => EventRecurrenceService::ENGINE,
+            'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
+            'recurrence_id' => $occurrenceOneStart->copy()->utc()->format('Ymd\THis\Z'),
         ]);
         $occ2 = $this->createEvent($user->id, [
-            'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
+            'start_time' => $occurrenceTwoStart->format('Y-m-d H:i:s'),
+            'end_time' => $occurrenceTwoStart->copy()->addHours(2)->format('Y-m-d H:i:s'),
             'parent_event_id' => $templateId,
+            'recurrence_engine' => EventRecurrenceService::ENGINE,
+            'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
+            'recurrence_id' => $occurrenceTwoStart->copy()->utc()->format('Ymd\THis\Z'),
         ]);
 
         \App\Core\TenantContext::setById($this->testTenantId);
 
-        // Uploading the cover to the template (as the frontend does) must land on
-        // every occurrence, not just the row the upload targeted.
+        $this->apiPost("/v2/events/{$templateId}/image", [])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.0.code', 'EVENT_RECURRENCE_SCOPE_REQUIRED');
+        $this->apiPost("/v2/events/{$templateId}/image", ['scope' => 'single'])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.0.code', 'EVENT_RECURRENCE_TEMPLATE_ALL_SCOPE_REQUIRED');
+
+        $this->assertFalse(EventService::updateImage($templateId, $user->id, 'https://cdn.example.test/no-scope.jpg'));
+        $this->assertSame('EVENT_RECURRENCE_SCOPE_REQUIRED', EventService::getErrors()[0]['code'] ?? null);
+        $this->assertFalse(EventService::updateImage($templateId, $user->id, 'https://cdn.example.test/single.jpg', 'single'));
+        $this->assertSame(
+            'EVENT_RECURRENCE_TEMPLATE_ALL_SCOPE_REQUIRED',
+            EventService::getErrors()[0]['code'] ?? null,
+        );
+
         $this->assertTrue(
-            EventService::updateImage($templateId, $user->id, '/uploads/cover.jpg'),
+            EventService::updateImage($occ1, $user->id, 'https://cdn.example.test/occurrence-cover.jpg', 'single'),
+            json_encode(EventService::getErrors(), JSON_UNESCAPED_UNICODE),
+        );
+
+        // Uploading the cover to the template with explicit all-scope updates
+        // non-exception rows while preserving the occurrence override.
+        $this->assertTrue(
+            EventService::updateImage($templateId, $user->id, 'https://cdn.example.test/cover.jpg', 'all'),
             json_encode(EventService::getErrors(), JSON_UNESCAPED_UNICODE)
         );
 
-        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $templateId)->value('cover_image'));
-        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $occ1)->value('cover_image'));
-        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $occ2)->value('cover_image'));
+        $this->assertSame('https://cdn.example.test/cover.jpg', DB::table('events')->where('id', $templateId)->value('cover_image'));
+        $this->assertSame('https://cdn.example.test/occurrence-cover.jpg', DB::table('events')->where('id', $occ1)->value('cover_image'));
+        $this->assertSame('https://cdn.example.test/cover.jpg', DB::table('events')->where('id', $occ2)->value('cover_image'));
+        $this->assertSame(['cover_image'], json_decode(
+            (string) DB::table('events')->where('id', $occ1)->value('recurrence_override_fields'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        ));
+
+        $rootOutbox = DB::table('event_domain_outbox')
+            ->where('event_id', $templateId)
+            ->where('action', 'event.updated')
+            ->orderByDesc('id')
+            ->first();
+        $this->assertNotNull($rootOutbox);
+        $payload = json_decode((string) $rootOutbox->payload, true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(['cover_image'], $payload['changed_fields']);
+        $this->assertTrue($payload['metadata']['notifications_suppressed']);
+        $this->assertSame('cover_image_audit_only', $payload['metadata']['notification_policy']);
+        $this->assertSame([$templateId, $occ2], $payload['metadata']['series']['affected_event_ids']);
+        $this->assertSame([], $payload['affected_recipient_user_ids']);
+    }
+
+    public function test_standalone_image_update_has_versioned_suppressed_audit_fact(): void
+    {
+        config()->set('events.notification_delivery.consumer_enabled', true);
+        config()->set('events.notification_delivery.channels', ['in_app']);
+        $user = $this->authenticatedUser();
+        $eventId = $this->createEvent($user->id);
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        $this->assertTrue(EventService::updateImage($eventId, $user->id, 'https://cdn.example.test/standalone.jpg'));
+        $this->assertSame('https://cdn.example.test/standalone.jpg', DB::table('events')->where('id', $eventId)->value('cover_image'));
+        $this->assertSame(1, (int) DB::table('events')->where('id', $eventId)->value('calendar_sequence'));
+
+        $outbox = DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.updated')
+            ->first();
+        $this->assertNotNull($outbox);
+        $payload = json_decode((string) $outbox->payload, true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(['cover_image'], $payload['changed_fields']);
+        $this->assertTrue($payload['metadata']['notifications_suppressed']);
+        $this->assertSame('cover_image_audit_only', $payload['metadata']['notification_policy']);
+
+        app(\App\Services\EventNotificationOutboxProcessor::class)->processBatch(10, $this->testTenantId);
+        $this->assertSame('direct', DB::table('event_domain_outbox')->where('id', $outbox->id)->value('status'));
+        $this->assertSame(0, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('type', 'event_update')
+            ->count());
     }
 }

@@ -60,6 +60,10 @@ describe('api-schemas', () => {
       expect(userSchema.safeParse(data).success).toBe(true);
     });
 
+    it('accepts a null bio from member projections', () => {
+      expect(userSchema.safeParse({ id: 1, bio: null }).success).toBe(true);
+    });
+
     it('validates a full user', () => {
       const data = {
         id: 1,

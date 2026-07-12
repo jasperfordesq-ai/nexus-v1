@@ -63,6 +63,7 @@
   "load_history_error": "監査履歴を読み込めませんでした。",
   "history_title": "メッセージの監査履歴",
   "loading_history": "監査履歴を読み込んでいます",
+  "history_load_more": "履歴をさらに読み込む",
   "history_entry_meta": "バージョン {{version}} · {{date}}",
   "variants": { "announcement": "お知らせ", "follow_up": "イベント後のフォローアップ", "review_request": "レビュー依頼" },
   "statuses": { "draft": "下書き", "scheduled": "予約済み", "sending": "送信中", "sent": "送信済み", "cancelled": "キャンセル済み", "failed": "失敗" },

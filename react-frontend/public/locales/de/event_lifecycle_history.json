@@ -1,0 +1,49 @@
+{
+  "title": "Lebenszyklusverlauf",
+  "description": "Ein unveränderliches Protokoll der Veröffentlichungs- und Betriebsänderungen dieser Veranstaltung.",
+  "loading": "Lebenszyklusverlauf wird geladen",
+  "load_error_title": "Der Lebenszyklusverlauf konnte nicht geladen werden",
+  "load_error_description": "Versuchen Sie erneut, das unveränderliche Protokoll abzurufen.",
+  "retry": "Erneut versuchen",
+  "empty_title": "Noch keine Lebenszyklusänderungen",
+  "empty_description": "Änderungen erscheinen hier, sobald der Veranstaltungslebenszyklus aktualisiert wird.",
+  "list_label": "Lebenszyklusänderungen der Veranstaltung",
+  "version": "Version Nr. {{version}}",
+  "immutable": "Unveränderlich",
+  "publication_label": "Veröffentlichung",
+  "operational_label": "Betriebsstatus",
+  "transition": "{{from}} zu {{to}}",
+  "actor_label": "Geändert von",
+  "reason_label": "Grund",
+  "unknown_actor": "Mitglied {{id}}",
+  "evidence_title": "Betrieblicher Nachweis",
+  "notifications_suppressed": "Doppelte Benachrichtigungen wurden für diese Serienänderung unterdrückt.",
+  "load_more": "Mehr Verlauf laden",
+  "loading_more": "Mehr Verlauf wird geladen",
+  "load_more_error_title": "Weiterer Verlauf konnte nicht geladen werden",
+  "load_more_error_description": "Versuchen Sie erneut, die nächste Seite zu laden.",
+  "timestamp_unknown": "Zeitpunkt nicht erfasst",
+  "states": {
+    "publication": {
+      "draft": "Entwurf",
+      "pending_review": "Prüfung ausstehend",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert"
+    },
+    "operational": {
+      "scheduled": "Geplant",
+      "postponed": "Verschoben",
+      "cancelled": "Abgesagt",
+      "completed": "Abgeschlossen"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Stornierte Erinnerungspläne: {{count}}",
+    "waitlist_cancelled": "Stornierte Wartelisteneinträge: {{count}}",
+    "registrations_cancelled": "Stornierte Anmeldungen: {{count}}"
+  },
+  "series": {
+    "template": "Wiederkehrende Vorlage {{id}}",
+    "occurrence": "Termin der wiederkehrenden Vorlage {{id}}"
+  }
+}

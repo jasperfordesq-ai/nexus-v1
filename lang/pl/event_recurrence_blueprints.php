@@ -1,0 +1,141 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return array (
+  'tab' => 'Przyszła konfiguracja',
+  'title' => 'Konfiguracja przyszłych wystąpień',
+  'description' => 'Wybierz definicje wydarzenia stosowane podczas tworzenia nowych wystąpień.',
+  'definition_only_title' => 'Tylko definicje',
+  'definition_only_description' => 'Ta operacja nigdy nie kopiuje uczestników, rejestracji, obecności, płatności, przypomnień, analiz ani historii dostarczania i nie zmienia istniejących wystąpień.',
+  'effective_from_label' => 'Obowiązuje od identyfikatora cyklu',
+  'effective_from_help' => 'Ten stabilny identyfikator należy do wybranego wystąpienia i nie jest ponownie obliczany ze zmienionej godziny rozpoczęcia.',
+  'sections_title' => 'Definicje do przeniesienia',
+  'sections_description' => 'Każda sekcja jest wybierana jawnie. Przydziały personelu nigdy nie są zaznaczane automatycznie.',
+  'sections' => 
+  array (
+    'agenda' => 
+    array (
+      'label' => 'Program',
+      'description' => 'Zaplanowane sesje, prelegenci i definicje chronionych zasobów.',
+    ),
+    'ticket_types' => 
+    array (
+      'label' => 'Typy biletów',
+      'description' => 'Bezpłatne lub robocze definicje biletów i okna sprzedaży.',
+    ),
+    'registration' => 
+    array (
+      'label' => 'Rejestracja',
+      'description' => 'Ustawienia rejestracji i aktualnie opublikowany formularz.',
+    ),
+    'safety' => 
+    array (
+      'label' => 'Wymagania bezpieczeństwa',
+      'description' => 'Aktualnie opublikowane wymagania bezpieczeństwa i kwalifikacji.',
+    ),
+    'staff' => 
+    array (
+      'label' => 'Przydziały personelu',
+      'description' => 'Opcja wysokiego ryzyka: przenieś aktywne role do nowych przyszłych wystąpień.',
+    ),
+  ),
+  'section_not_permitted' => 'Twoja rola w wydarzeniu nie pozwala przenieść tej sekcji.',
+  'no_sections_title' => 'Wybierz co najmniej jedną sekcję',
+  'no_sections_description' => 'Przed zapisaniem przyszłej konfiguracji wymagana jest wersja próbna.',
+  'preview_button' => 'Podejrzyj przyszłą konfigurację',
+  'previewing' => 'Przygotowywanie podglądu',
+  'preview_title' => 'Podgląd definicji',
+  'preview_description' => 'Sprawdź ograniczone liczby i konflikty przed potwierdzeniem.',
+  'preview_expires' => 'Podgląd wygasa :date',
+  'review_button' => 'Sprawdź i potwierdź',
+  'refresh_preview' => 'Odśwież podgląd',
+  'conflicts_title' => 'Najpierw rozwiąż te konflikty',
+  'conflicts' => 
+  array (
+    'definition_limit_exceeded' => ':section przekracza bezpieczny limit definicji (znaleziono :count).',
+    'speaker_limit_exceeded' => 'Program przekracza bezpieczny limit prelegentów (znaleziono :count).',
+    'invalid_speaker_reference' => 'Program zawiera :count nieprawidłowe odwołanie do prelegenta.',
+    'resource_limit_exceeded' => 'Program przekracza bezpieczny limit zasobów (znaleziono :count).',
+    'unsupported_active_time_credit_ticket' => 'Nie można przenieść :count aktywnego typu biletu na kredyty czasowe.',
+    'published_form_missing' => 'Nie można zweryfikować opublikowanego formularza rejestracji.',
+    'question_limit_exceeded' => 'Opublikowany formularz przekracza bezpieczny limit pytań (znaleziono :count).',
+    'published_requirement_version_missing' => 'Nie można zweryfikować opublikowanej wersji wymagań bezpieczeństwa.',
+    'invalid_staff_reference' => ':count przydział personelu wskazuje niedostępnego członka.',
+    'nonportable_staff_expiry' => ':count przydział personelu wygasa przed przyszłym wystąpieniem i nie może zostać przeniesiony.',
+  ),
+  'counts' => 
+  array (
+    'none' => 'W wybranych sekcjach nie znaleziono definicji.',
+    'sessions' => 'Sesje',
+    'speakers' => 'Prelegenci',
+    'resources' => 'Zasoby',
+    'ticket_types' => 'Typy biletów',
+    'registration_settings' => 'Ustawienia rejestracji',
+    'published_forms' => 'Opublikowane formularze',
+    'form_questions' => 'Pytania formularza',
+    'safety_requirements' => 'Wymagania bezpieczeństwa',
+    'staff_assignments' => 'Przydziały personelu',
+  ),
+  'errors' => 
+  array (
+    'preview_error' => 
+    array (
+      'title' => 'Nie udało się przygotować podglądu',
+      'description' => 'Sprawdź wybrane definicje i spróbuj ponownie.',
+    ),
+    'preview_expired' => 
+    array (
+      'title' => 'Podgląd wygasł',
+      'description' => 'Odśwież podgląd przed potwierdzeniem. Nic nie zapisano.',
+    ),
+    'preview_stale' => 
+    array (
+      'title' => 'Definicje zmieniły się po podglądzie',
+      'description' => 'Przygotuj nowy podgląd z najnowszymi definicjami.',
+    ),
+    'commit_conflict' => 
+    array (
+      'title' => 'Przyszła konfiguracja nie została zapisana',
+      'description' => 'Najpierw zapisano inną wersję lub sprzeczne żądanie. Odśwież i sprawdź ponownie.',
+    ),
+    'commit_error' => 
+    array (
+      'title' => 'Nie udało się zapisać przyszłej konfiguracji',
+      'description' => 'Stabilny klucz ponowienia został zachowany. Potwierdź ponownie lub odśwież wygasły podgląd.',
+    ),
+  ),
+  'success_created_title' => 'Przyszła konfiguracja zapisana',
+  'success_created_description' => 'Niezmienna wersja definicji :version będzie stosowana wyłącznie do nowych przyszłych wystąpień.',
+  'success_replay_title' => 'Przyszła konfiguracja była już zapisana',
+  'success_replay_description' => 'Wersja :version odpowiada temu ponowieniu. Nie utworzono duplikatu.',
+  'history_title' => 'Niezmienna historia wersji',
+  'history_description' => 'Każda zapisana wersja jest przechowywana z ograniczonymi liczbami i efektywnym identyfikatorem cyklu.',
+  'history_loading' => 'Ładowanie historii',
+  'history_error_title' => 'Nie udało się załadować historii',
+  'history_error_description' => 'Spróbuj ponownie pobrać niezmienne wersje.',
+  'history_empty_title' => 'Brak wersji przyszłej konfiguracji',
+  'history_empty_description' => 'Wersja pojawi się tutaj po potwierdzeniu podglądu.',
+  'history_list_label' => 'Wersje konfiguracji przyszłych wystąpień',
+  'history_version' => 'Wersja :version',
+  'history_sections' => 'Uwzględnione definicje',
+  'immutable' => 'Niezmienna',
+  'history_load_more' => 'Wczytaj więcej wersji',
+  'history_loading_more' => 'Wczytywanie kolejnych wersji',
+  'load_more_error_title' => 'Nie udało się wczytać kolejnych wersji',
+  'load_more_error_description' => 'Spróbuj ponownie wczytać następną stronę.',
+  'retry' => 'Spróbuj ponownie',
+  'time_unknown' => 'Nie zapisano czasu',
+  'confirm_title' => 'Potwierdź przyszłą konfigurację',
+  'confirm_scope_title' => 'Tylko nowe wystąpienia',
+  'confirm_scope_description' => 'Ta wersja obowiązuje od pokazanego identyfikatora. Istniejące wystąpienia i dane uczestników nie są zmieniane.',
+  'staff_risk_title' => 'Wybrano przenoszenie personelu',
+  'staff_risk_description' => 'Aktywne role mogą przyznać dostęp operacyjny do każdego nowego wystąpienia. Dokładnie sprawdź tę opcję.',
+  'confirm_ack' => 'Potwierdzam tę wersję definicji tylko na przyszłość',
+  'confirm_ack_description' => 'Sprawdzono sekcje, liczby, konflikty i efektywny identyfikator cyklu.',
+  'cancel' => 'Anuluj',
+  'commit_button' => 'Zapisz niezmienną wersję',
+  'committing' => 'Zapisywanie wersji',
+);

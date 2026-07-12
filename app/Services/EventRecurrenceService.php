@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\EventRecurrenceTraversalLimitException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -270,6 +271,339 @@ final class EventRecurrenceService
         }
 
         return $occurrences;
+    }
+
+    /**
+     * Evaluate a bounded slice of a canonical rule without applying the
+     * initial-write occurrence or year horizon. This is the rolling contract
+     * for infinite rules: callers persist `resume_at` and call again when a
+     * dense window reaches either bound.
+     *
+     * Sabre's iterator still owns DTSTART phase, COUNT/UNTIL and DST behaviour.
+     * Infinite rules use a phase-preserving anchor a small number of frequency
+     * intervals before the window. Finite rules retain their original DTSTART
+     * and fail closed when seeking alone would exceed the total scan budget.
+     *
+     * @param list<string> $exdates Canonical UTC values from normalize().
+     * @param list<string> $rdates Canonical UTC values from normalize().
+     * @return array{
+     *   occurrences:list<array{
+     *     start_utc:string,
+     *     end_utc:?string,
+     *     local_start:string,
+     *     occurrence_date:string,
+     *     recurrence_id:string
+     *   }>,
+     *   fully_evaluated:bool,
+     *   truncated:bool,
+     *   evaluated_through_utc:string,
+     *   resume_at_utc:?string,
+     *   scanned:int
+     * }
+     */
+    public function expandWindow(
+        DateTimeInterface $startUtc,
+        ?DateTimeInterface $endUtc,
+        string $timezone,
+        string $rrule,
+        DateTimeInterface $windowStartUtc,
+        DateTimeInterface $windowEndUtc,
+        array $exdates = [],
+        array $rdates = [],
+        int $maxResults = 500,
+        int $scanLimit = 2000,
+    ): array {
+        $maxResults = max(1, min($maxResults, 5000));
+        $scanLimit = max(1, min($scanLimit, 100_000));
+        $zone = $this->timezone($timezone);
+        $utc = new DateTimeZone('UTC');
+        $startLocal = DateTimeImmutable::createFromInterface($startUtc)
+            ->setTimezone($utc)
+            ->setTimezone($zone);
+        $endLocal = $endUtc !== null
+            ? DateTimeImmutable::createFromInterface($endUtc)->setTimezone($utc)->setTimezone($zone)
+            : null;
+        $windowStart = DateTimeImmutable::createFromInterface($windowStartUtc)
+            ->setTimezone($utc)
+            ->setTimezone($zone);
+        $windowEnd = DateTimeImmutable::createFromInterface($windowEndUtc)
+            ->setTimezone($utc)
+            ->setTimezone($zone);
+        if ($windowEnd < $windowStart) {
+            $this->invalid('recurrence_rrule');
+        }
+        if ($windowStart < $startLocal) {
+            $windowStart = $startLocal;
+        }
+
+        $parts = $this->validateAndCanonicalizeParts($this->parseParts($rrule), $startLocal);
+        $iteratorParts = $this->windowIteratorParts($parts, $startLocal);
+        $canonicalRrule = $this->serializeParts($iteratorParts);
+        $excluded = [];
+        foreach ($exdates as $value) {
+            $excluded[$this->parseCanonicalUtc($value)->getTimestamp()] = true;
+        }
+
+        $iteratorAnchor = $this->windowIteratorAnchor($iteratorParts, $startLocal, $windowStart);
+        $seekCost = $this->estimatedTraversalCandidates($iteratorParts, $iteratorAnchor, $windowStart);
+        if ($seekCost >= $scanLimit) {
+            throw new EventRecurrenceTraversalLimitException();
+        }
+        $windowScanLimit = $scanLimit - $seekCost;
+
+        try {
+            $iterator = new RRuleIterator($canonicalRrule, $iteratorAnchor);
+        } catch (InvalidDataException | \InvalidArgumentException $e) {
+            $this->invalid('recurrence_rrule', $e);
+        }
+        $iterator->rewind();
+        $iterator->fastForward($windowStart);
+
+        /** @var array<int,DateTimeImmutable> $starts */
+        $starts = [];
+        $scanned = 0;
+        $resume = null;
+        $finishedWindow = false;
+        while ($iterator->valid()) {
+            $current = $iterator->current();
+            if (! $current instanceof DateTimeInterface) {
+                $finishedWindow = true;
+                break;
+            }
+            $local = DateTimeImmutable::createFromInterface($current)->setTimezone($zone);
+            if ($local > $windowEnd) {
+                $finishedWindow = true;
+                break;
+            }
+            if ($scanned >= $windowScanLimit) {
+                $resume = $local;
+                break;
+            }
+
+            $scanned++;
+            if (! isset($excluded[$local->getTimestamp()])) {
+                $starts[$local->getTimestamp()] = $local;
+            }
+            $iterator->next();
+        }
+        if (! $iterator->valid()) {
+            $finishedWindow = true;
+        }
+
+        // When the next RRULE candidate is known, the gap immediately before
+        // it is fully evaluated and may safely include RDATE additions.
+        $coverageEnd = $resume !== null
+            ? $resume->modify('-1 second')
+            : $windowEnd;
+        foreach ($rdates as $value) {
+            $addition = $this->parseCanonicalUtc($value)->setTimezone($zone);
+            if ($addition < $startLocal) {
+                $this->invalid('recurrence_rdates');
+            }
+            if ($addition >= $windowStart
+                && $addition <= $coverageEnd
+                && ! isset($excluded[$addition->getTimestamp()])) {
+                $starts[$addition->getTimestamp()] = $addition;
+            }
+        }
+
+        ksort($starts, SORT_NUMERIC);
+        if (count($starts) > $maxResults) {
+            $allStarts = array_values($starts);
+            $outputResume = $allStarts[$maxResults];
+            if ($resume === null || $outputResume < $resume) {
+                $resume = $outputResume;
+            }
+            $starts = array_slice($starts, 0, $maxResults, true);
+        }
+
+        $wallEnd = $this->wallEndDescriptor($startLocal, $endLocal);
+        $occurrences = [];
+        foreach ($starts as $local) {
+            $occurrenceEnd = $wallEnd !== null
+                ? $this->applyWallEnd($local, $wallEnd)
+                : null;
+            $startInstant = $local->setTimezone($utc);
+            $endInstant = $occurrenceEnd?->setTimezone($utc);
+            $occurrences[] = [
+                'start_utc' => $startInstant->format('Y-m-d H:i:s'),
+                'end_utc' => $endInstant?->format('Y-m-d H:i:s'),
+                'local_start' => $local->format('Y-m-d\TH:i:sP'),
+                'occurrence_date' => $local->format('Y-m-d'),
+                'recurrence_id' => $startInstant->format('Ymd\THis\Z'),
+            ];
+        }
+
+        $resumeUtc = $resume?->setTimezone($utc);
+        $evaluatedThrough = $resumeUtc !== null
+            ? $resumeUtc->modify('-1 second')
+            : DateTimeImmutable::createFromInterface($windowEndUtc)->setTimezone($utc);
+
+        return [
+            'occurrences' => $occurrences,
+            'fully_evaluated' => $finishedWindow && $resumeUtc === null,
+            'truncated' => $resumeUtc !== null,
+            'evaluated_through_utc' => $evaluatedThrough->format('Y-m-d H:i:s'),
+            'resume_at_utc' => $resumeUtc?->format('Y-m-d H:i:s'),
+            'scanned' => $scanned,
+        ];
+    }
+
+    /**
+     * Re-anchoring must not lose implicit DTSTART components. Make them
+     * explicit before moving an infinite iterator: weekly weekday, monthly
+     * month-day, and yearly month/month-day. This also preserves RFC skipping
+     * for Jan-31 and Feb-29 instead of silently clamping future instances.
+     *
+     * @param array<string,string|list<string>> $parts
+     * @return array<string,string|list<string>>
+     */
+    private function windowIteratorParts(array $parts, DateTimeImmutable $start): array
+    {
+        if (isset($parts['COUNT']) || isset($parts['UNTIL'])) {
+            return $parts;
+        }
+
+        if ($parts['FREQ'] === 'WEEKLY' && ! isset($parts['BYDAY'])) {
+            $weekday = array_search((int) $start->format('N'), self::WEEKDAY_ORDER, true);
+            if (! is_string($weekday)) {
+                $this->invalid('recurrence_rrule');
+            }
+            $parts['BYDAY'] = [$weekday];
+        }
+        if ($parts['FREQ'] === 'MONTHLY'
+            && ! isset($parts['BYDAY'])
+            && ! isset($parts['BYMONTHDAY'])) {
+            $parts['BYMONTHDAY'] = [$start->format('j')];
+        }
+        if ($parts['FREQ'] === 'YEARLY') {
+            $parts['BYMONTH'] ??= [$start->format('n')];
+            if (! isset($parts['BYDAY']) && ! isset($parts['BYMONTHDAY'])) {
+                $parts['BYMONTHDAY'] = [$start->format('j')];
+            }
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Infinite rules have no COUNT position to preserve, so the DTSTART phase
+     * can be moved forward by whole frequency intervals. Keeping two complete
+     * intervals before the window covers multi-day BY* selections while making
+     * old daily templates constant-work instead of replaying decades.
+     *
+     * @param array<string,string|list<string>> $parts
+     */
+    private function windowIteratorAnchor(
+        array $parts,
+        DateTimeImmutable $start,
+        DateTimeImmutable $windowStart,
+    ): DateTimeImmutable {
+        if (isset($parts['COUNT']) || isset($parts['UNTIL']) || $windowStart <= $start) {
+            return $start;
+        }
+
+        $interval = isset($parts['INTERVAL']) ? max(1, (int) $parts['INTERVAL']) : 1;
+        $frequency = (string) $parts['FREQ'];
+        $elapsedUnits = match ($frequency) {
+            'DAILY' => max(0, (int) $start->diff($windowStart)->days),
+            'WEEKLY' => max(0, intdiv((int) $start->diff($windowStart)->days, 7)),
+            'MONTHLY' => max(0, $this->calendarMonthsBetween($start, $windowStart)),
+            'YEARLY' => max(0, (int) $windowStart->format('Y') - (int) $start->format('Y')),
+            default => 0,
+        };
+        $cycles = max(0, intdiv($elapsedUnits, $interval) - 2);
+        if ($cycles === 0) {
+            return $start;
+        }
+        $units = $cycles * $interval;
+
+        return match ($frequency) {
+            'DAILY' => $start->modify("+{$units} days"),
+            'WEEKLY' => $start->modify("+{$units} weeks"),
+            'MONTHLY' => $this->shiftLocalMonths($start, $units, true),
+            'YEARLY' => $this->shiftLocalYears($start, $units, true),
+            default => $start,
+        };
+    }
+
+    /** @param array<string,string|list<string>> $parts */
+    private function estimatedTraversalCandidates(
+        array $parts,
+        DateTimeImmutable $anchor,
+        DateTimeImmutable $windowStart,
+    ): int {
+        if ($windowStart <= $anchor) {
+            return 0;
+        }
+
+        $interval = isset($parts['INTERVAL']) ? max(1, (int) $parts['INTERVAL']) : 1;
+        $days = max(0, (int) $anchor->diff($windowStart)->days);
+        $frequency = (string) $parts['FREQ'];
+
+        return match ($frequency) {
+            'DAILY' => (int) ceil($days / $interval) + 2,
+            'WEEKLY' => ((int) ceil($days / (7 * $interval)) + 2)
+                * (isset($parts['BYDAY']) ? count($this->listValue($parts['BYDAY'])) : 1),
+            'MONTHLY' => ((int) ceil($this->calendarMonthsBetween($anchor, $windowStart) / $interval) + 2)
+                * (isset($parts['BYDAY'])
+                    ? 31
+                    : (isset($parts['BYMONTHDAY']) ? count($this->listValue($parts['BYMONTHDAY'])) : 1)),
+            'YEARLY' => ((int) ceil(
+                max(0, (int) $windowStart->format('Y') - (int) $anchor->format('Y')) / $interval,
+            ) + 2) * $this->yearlyCandidateFactor($parts),
+            default => $days + 2,
+        };
+    }
+
+    private function calendarMonthsBetween(DateTimeImmutable $from, DateTimeImmutable $to): int
+    {
+        return ((int) $to->format('Y') - (int) $from->format('Y')) * 12
+            + ((int) $to->format('n') - (int) $from->format('n'));
+    }
+
+    private function shiftLocalMonths(
+        DateTimeImmutable $start,
+        int $months,
+        bool $anchorAtPeriodStart,
+    ): DateTimeImmutable {
+        $zeroBased = ((int) $start->format('Y') * 12 + ((int) $start->format('n') - 1)) + $months;
+        $year = intdiv($zeroBased, 12);
+        $month = ($zeroBased % 12) + 1;
+        $day = $anchorAtPeriodStart
+            ? 1
+            : min((int) $start->format('j'), cal_days_in_month(CAL_GREGORIAN, $month, $year));
+
+        return $start->setDate($year, $month, $day);
+    }
+
+    private function shiftLocalYears(
+        DateTimeImmutable $start,
+        int $years,
+        bool $anchorAtPeriodStart,
+    ): DateTimeImmutable {
+        $year = (int) $start->format('Y') + $years;
+        if ($anchorAtPeriodStart) {
+            return $start->setDate($year, 1, 1);
+        }
+        $month = (int) $start->format('n');
+        $day = min((int) $start->format('j'), cal_days_in_month(CAL_GREGORIAN, $month, $year));
+
+        return $start->setDate($year, $month, $day);
+    }
+
+    /** @param array<string,string|list<string>> $parts */
+    private function yearlyCandidateFactor(array $parts): int
+    {
+        $months = isset($parts['BYMONTH']) ? count($this->listValue($parts['BYMONTH'])) : 1;
+        if (isset($parts['BYDAY'])) {
+            return $months * 31;
+        }
+        if (isset($parts['BYMONTHDAY'])) {
+            return $months * count($this->listValue($parts['BYMONTHDAY']));
+        }
+
+        return 1;
     }
 
     public function occurrenceKey(int $tenantId, int $templateId, string $recurrenceId): string

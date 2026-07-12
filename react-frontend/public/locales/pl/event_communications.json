@@ -63,6 +63,7 @@
   "load_history_error": "Nie udało się wczytać historii audytu.",
   "history_title": "Historia audytu wiadomości",
   "loading_history": "Wczytywanie historii audytu",
+  "history_load_more": "Wczytaj więcej historii",
   "history_entry_meta": "Wersja {{version}} · {{date}}",
   "variants": { "announcement": "Ogłoszenie", "follow_up": "Wiadomość po wydarzeniu", "review_request": "Prośba o opinię" },
   "statuses": { "draft": "Wersja robocza", "scheduled": "Zaplanowana", "sending": "Wysyłanie", "sent": "Wysłana", "cancelled": "Anulowana", "failed": "Nieudana" },

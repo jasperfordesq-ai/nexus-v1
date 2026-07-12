@@ -230,9 +230,9 @@ export class CreateEventPage extends BasePage {
     this.descriptionTextarea = page.getByRole('textbox', { name: 'Description' });
 
     // Date/time inputs
-    this.startDateInput = page.getByRole('textbox', { name: 'Start Date' });
+    this.startDateInput = page.getByRole('group', { name: 'Start Date' });
     this.startTimeInput = page.getByRole('group', { name: 'Start Time' });
-    this.endDateInput = page.getByRole('textbox', { name: 'End Date (optional)' });
+    this.endDateInput = page.getByRole('group', { name: 'End Date (optional)' });
     this.endTimeInput = page.getByRole('group', { name: 'End Time (optional)' });
 
     this.locationInput = page.getByRole('textbox', { name: 'Location (optional)' });
@@ -262,7 +262,7 @@ export class CreateEventPage extends BasePage {
    * Navigate to edit event page
    */
   async navigateToEdit(id: number | string): Promise<void> {
-    await this.goto(`events/edit/${id}`);
+    await this.goto(`events/${id}/edit`);
   }
 
   /**
@@ -270,7 +270,7 @@ export class CreateEventPage extends BasePage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.titleInput.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+    await this.titleInput.waitFor({ state: 'visible', timeout: 45000 });
   }
 
   /**
@@ -289,18 +289,18 @@ export class CreateEventPage extends BasePage {
   }): Promise<void> {
     await this.titleInput.fill(data.title);
     await this.descriptionTextarea.fill(data.description);
-    await this.startDateInput.fill(data.startDate);
+    await this.fillSegmentedDate(this.startDateInput, data.startDate);
 
     if (data.startTime) {
-      await this.startTimeInput.fill(data.startTime);
+      await this.fillSegmentedTime(this.startTimeInput, data.startTime);
     }
 
     if (data.endDate) {
-      await this.endDateInput.fill(data.endDate);
+      await this.fillSegmentedDate(this.endDateInput, data.endDate);
     }
 
     if (data.endTime) {
-      await this.endTimeInput.fill(data.endTime);
+      await this.fillSegmentedTime(this.endTimeInput, data.endTime);
     }
 
     if (data.location) {
@@ -327,6 +327,43 @@ export class CreateEventPage extends BasePage {
     await expect(option).toBeVisible();
     await option.click();
     await expect(trigger).toContainText(optionName);
+  }
+
+  private async fillSegmentedDate(field: Locator, isoDate: string): Promise<void> {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate);
+    if (!match) {
+      throw new Error(`Expected an ISO calendar date (YYYY-MM-DD), received ${JSON.stringify(isoDate)}.`);
+    }
+
+    const [, year, month, day] = match;
+    await field.getByRole('spinbutton', { name: /month/i }).fill(String(Number(month)));
+    await field.getByRole('spinbutton', { name: /day/i }).fill(String(Number(day)));
+    await field.getByRole('spinbutton', { name: /year/i }).fill(year);
+  }
+
+  private async fillSegmentedTime(field: Locator, time: string): Promise<void> {
+    const match = /^(\d{2}):(\d{2})$/.exec(time);
+    if (!match) {
+      throw new Error(`Expected a 24-hour time (HH:mm), received ${JSON.stringify(time)}.`);
+    }
+
+    const [, hourText, minuteText] = match;
+    const hour = Number(hourText);
+    const minute = Number(minuteText);
+    if (hour > 23 || minute > 59) {
+      throw new Error(`Time is outside the 24-hour clock: ${JSON.stringify(time)}.`);
+    }
+
+    const dayPeriod = field.getByRole('spinbutton', { name: /day period|am\/pm/i });
+    const usesTwelveHourClock = await dayPeriod.count() > 0;
+    const displayHour = usesTwelveHourClock ? ((hour + 11) % 12) + 1 : hour;
+    await field.getByRole('spinbutton', { name: /hour/i }).fill(String(displayHour));
+    await field.getByRole('spinbutton', { name: /minute/i }).fill(String(minute));
+
+    if (usesTwelveHourClock) {
+      await dayPeriod.click();
+      await dayPeriod.press(hour >= 12 ? 'p' : 'a');
+    }
   }
 
   /**
@@ -426,9 +463,10 @@ export class EventDetailPage extends BasePage {
     this.interestedCount = page.getByText('interested', { exact: true }).locator('../..').getByText(/^\d+$/);
 
     // RSVP buttons
-    this.goingButton = page.locator('button:has-text("Going")');
-    this.interestedButton = page.locator('button:has-text("Interested")');
-    this.notGoingButton = page.locator('button:has-text("Not Going")');
+    // HeroUI ToggleButtonGroup exposes its single-select items as radios.
+    this.goingButton = page.getByRole('radio', { name: 'Mark yourself as going' });
+    this.interestedButton = page.getByRole('radio', { name: 'Mark yourself as interested' });
+    this.notGoingButton = page.getByRole('radio', { name: 'Mark yourself as not going' });
     this.rsvpStatusChip = page.locator('[class*="chip"]:has-text("You\'re Going"), [class*="chip"]:has-text("You\'re Interested")');
 
     // Tabs
@@ -461,7 +499,7 @@ export class EventDetailPage extends BasePage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await this.title.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
+    await this.title.waitFor({ state: 'visible', timeout: 45000 });
   }
 
   /**

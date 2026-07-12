@@ -35,6 +35,14 @@ function broadcastFixture(body: string | null = null) {
   };
 }
 
+const historyMeta = {
+  current_page: 1,
+  per_page: 50,
+  total: 0,
+  total_pages: 0,
+  has_more: false,
+};
+
 describe('eventCommunicationsApi', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -58,6 +66,7 @@ describe('eventCommunicationsApi', () => {
       data: {
         broadcast: broadcastFixture('Exact organizer prose.'),
         history: [],
+        history_meta: historyMeta,
         changed: true,
         idempotent_replay: false,
       },
@@ -89,6 +98,7 @@ describe('eventCommunicationsApi', () => {
       data: {
         broadcast: { ...broadcastFixture('Body'), status: 'scheduled', version: 2, scheduled_at: '2026-07-12T10:00:00+00:00' },
         history: [],
+        history_meta: historyMeta,
         changed: true,
         idempotent_replay: false,
       },
@@ -120,5 +130,22 @@ describe('eventCommunicationsApi', () => {
     expect(response.success).toBe(false);
     expect(response.code).toBe('EVENTS_CONTRACT_DRIFT');
     expect(response.data).toBeUndefined();
+  });
+
+  it('requests an independent bounded history page', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: {
+        broadcast: broadcastFixture('Body'),
+        history: [],
+        history_meta: { ...historyMeta, current_page: 2, total: 51, total_pages: 2 },
+      },
+    });
+
+    const response = await eventCommunicationsApi.get(8, 2, 50);
+
+    expect(response.success).toBe(true);
+    expect(response.data?.history_meta.current_page).toBe(2);
+    expect(mockApi.get).toHaveBeenCalledWith('/v2/event-broadcasts/8?history_page=2&history_per_page=50');
   });
 });

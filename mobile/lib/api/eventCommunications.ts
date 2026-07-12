@@ -64,6 +64,14 @@ export const mobileEventBroadcastHistorySchema = z.object({
   created_at: timestamp,
 }).strict();
 
+const historyMetaSchema = z.object({
+  current_page: z.number().int().positive(),
+  per_page: z.number().int().positive().max(100),
+  total: z.number().int().nonnegative(),
+  total_pages: z.number().int().nonnegative(),
+  has_more: z.boolean(),
+}).strict();
+
 export const mobileEventBroadcastPreviewSchema = z.object({
   contract_version: z.literal(1),
   event_id: z.number().int().positive(),
@@ -79,6 +87,7 @@ export const mobileEventBroadcastPreviewSchema = z.object({
 const detailSchema = z.object({
   broadcast: mobileEventBroadcastSchema,
   history: z.array(mobileEventBroadcastHistorySchema),
+  history_meta: historyMetaSchema,
 }).strict();
 const mutationSchema = detailSchema.extend({
   changed: z.boolean(),
@@ -173,9 +182,14 @@ export async function createEventCommunication(
 
 export async function getEventCommunicationDetail(
   broadcastId: number,
+  historyPage = 1,
+  historyPerPage = 50,
 ): Promise<MobileEventBroadcastDetail> {
   const endpoint = `${API_V2}/event-broadcasts/${broadcastId}`;
-  const response = await api.get<unknown>(endpoint);
+  const response = await api.get<unknown>(endpoint, {
+    history_page: String(historyPage),
+    history_per_page: String(historyPerPage),
+  });
   return parseContract(endpoint, detailEnvelopeSchema, response).data;
 }
 

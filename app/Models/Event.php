@@ -46,6 +46,9 @@ class Event extends Model
         'moderated_by',
         'moderation_reason',
         'lifecycle_reason',
+        'recurrence_id',
+        'recurrence_override_fields',
+        'recurrence_override_updated_by',
     ];
 
     protected $casts = [
@@ -69,6 +72,10 @@ class Event extends Model
         'calendar_sequence' => 'integer',
         'federation_version' => 'integer',
         'agenda_version' => 'integer',
+        'is_recurrence_exception' => 'boolean',
+        'recurrence_override_fields' => 'array',
+        'recurrence_override_version' => 'integer',
+        'recurrence_override_updated_at' => 'datetime',
         'publication_status_changed_at' => 'datetime',
         'operational_status_changed_at' => 'datetime',
         'moderation_submitted_at' => 'datetime',

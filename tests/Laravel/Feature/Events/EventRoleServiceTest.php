@@ -202,6 +202,34 @@ final class EventRoleServiceTest extends TestCase
         );
     }
 
+    public function test_broker_and_coordinator_stale_admin_flags_never_grant_implicit_staff_authority(): void
+    {
+        $owner = $this->user();
+        $target = $this->user();
+        $eventId = $this->event((int) $owner->id);
+
+        foreach (['broker', 'coordinator'] as $role) {
+            $actor = $this->user([
+                'role' => $role,
+                'is_admin' => true,
+                'is_super_admin' => true,
+                'is_tenant_super_admin' => true,
+            ]);
+
+            $this->assertReason(
+                'event_staff_role_authorization_denied',
+                fn () => $this->service->grant(
+                    $eventId,
+                    (int) $target->id,
+                    EventStaffRole::CheckInStaff,
+                    $actor,
+                ),
+            );
+        }
+
+        self::assertSame(0, DB::table('event_staff_assignments')->where('event_id', $eventId)->count());
+    }
+
     public function test_co_organizer_can_manage_only_subordinate_operational_roles(): void
     {
         $owner = $this->user();

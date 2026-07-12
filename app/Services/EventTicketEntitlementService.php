@@ -168,6 +168,39 @@ final class EventTicketEntitlementService
                 throw new EventTicketingException('event_ticket_confirmed_registration_required');
             }
             $ticket = $this->ticketRow($tenantId, $eventId, $ticketTypeId, true);
+            // A fast replay check above avoids unnecessary locking for the
+            // common case, but it is not a serialization boundary. A competing
+            // request can commit the same idempotency key while this request is
+            // waiting on the registration or ticket row. Re-check only after
+            // both authoritative locks are held so a concurrent replay cannot
+            // fall through to the inventory limits and be misreported as sold
+            // out.
+            $replay = $this->allocationReplay(
+                $tenantId,
+                $eventId,
+                $ticketTypeId,
+                $registrationId,
+                (int) $member->id,
+                (int) $persistedActor->id,
+                $units,
+                $keyHash,
+                $requestHash,
+                true,
+            );
+            if ($replay !== null) {
+                [$confirmedUnits] = $this->confirmedUnitTotalsForUpdate(
+                    $tenantId,
+                    $eventId,
+                    (int) $replay->ticket_type_id,
+                    (int) $replay->user_id,
+                );
+
+                return [
+                    'entitlement' => $this->entitlementModelFromReplay($replay),
+                    'changed' => false,
+                    'confirmed_units_after' => $confirmedUnits,
+                ];
+            }
             if ((string) $ticket->kind === EventTicketKind::TimeCredit->value) {
                 throw new EventTicketingException('event_ticket_time_credit_gateway_unavailable');
             }

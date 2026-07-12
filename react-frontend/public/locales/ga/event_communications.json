@@ -63,6 +63,7 @@
   "load_history_error": "Níorbh fhéidir stair an iniúchta a lódáil.",
   "history_title": "Stair iniúchta na teachtaireachta",
   "loading_history": "Stair iniúchta á lódáil",
+  "history_load_more": "Luchtaigh tuilleadh staire",
   "history_entry_meta": "Leagan {{version}} · {{date}}",
   "variants": { "announcement": "Fógra", "follow_up": "Obair leantach i ndiaidh na himeachta", "review_request": "Iarratas ar léirmheas" },
   "statuses": { "draft": "Dréacht", "scheduled": "Sceidealaithe", "sending": "Á sheoladh", "sent": "Seolta", "cancelled": "Cealaithe", "failed": "Teipthe" },

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(RequireAccessibleAuthentication::class)->group(function (): void {
     Route::get('/events/templates', [AlphaController::class, 'eventsTemplates'])
         ->name('events.templates.index');
+    Route::get('/event-templates/{templateId}/history', [AlphaController::class, 'eventsTemplateHistory'])
+        ->whereNumber('templateId')->name('events.templates.history');
     Route::get('/events/{id}/template-preview', [AlphaController::class, 'eventsTemplateCapturePreview'])
         ->whereNumber('id')->name('events.templates.capture.preview');
     Route::post('/events/{id}/templates', [AlphaController::class, 'eventsTemplateCapture'])

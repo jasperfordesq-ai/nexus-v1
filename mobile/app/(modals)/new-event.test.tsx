@@ -7,13 +7,33 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
+const mockCreateRecurringEvent = jest.fn().mockResolvedValue({ data: { template: { id: 60 }, occurrences_created: 10 } });
+const mockCommitEventRecurrenceRevision = jest.fn();
 const mockGetEvent = jest.fn();
 const mockGetEventCategories = jest.fn();
+const mockGetEventRecurrenceCapabilities = jest.fn();
 const mockUpdateEvent = jest.fn().mockResolvedValue({ data: { id: 7 } });
+const mockUpdateRecurringEvent = jest.fn().mockResolvedValue({ data: { id: 7 } });
+const mockPreviewEventRecurrenceRevision = jest.fn();
 const mockUploadEventImage = jest.fn();
 const mockLaunchImageLibraryAsync = jest.fn();
 const mockReplace = jest.fn();
 let mockSearchParams: Record<string, string> = {};
+const v2RecurrenceCapabilitiesResponse = {
+  data: {
+    contract_version: 1,
+    engine: 'v2',
+    structured_input: true,
+    supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+    max_occurrences: 366,
+    supported_end_types: ['after_count', 'on_date', 'never'],
+    supports_rolling_never: true,
+    supports_effective_revisions: true,
+    supports_definition_blueprints: false,
+    schema_ready: true,
+    rollout_state: 'v2_rolling',
+  },
+};
 
 jest.mock('expo-router', () => ({
   router: { replace: (...args: unknown[]) => mockReplace(...args), back: jest.fn() },
@@ -22,7 +42,7 @@ jest.mock('expo-router', () => ({
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'create.eyebrow': 'New event',
         'create.title': 'Create Event',
@@ -62,12 +82,67 @@ jest.mock('react-i18next', () => ({
         'create.latitudePlaceholder': '51.5007',
         'create.longitudeLabel': 'Longitude',
         'create.longitudePlaceholder': '-0.1246',
+        'create.venueAccessibilityTitle': 'Venue accessibility',
+        'create.venueAccessibilityHint': 'Share confirmed information.',
+        'create.venueAccessibilityFeatures.step_free_access': 'Step-free access',
+        'create.venueAccessibilityFeatures.accessible_toilet': 'Accessible toilet',
+        'create.venueAccessibilityFeatures.hearing_loop': 'Hearing loop',
+        'create.venueAccessibilityFeatures.quiet_space': 'Quiet space',
+        'create.venueAccessibilityFeatures.seating_available': 'Seating available',
+        'create.venueAccessibilityFeatures.accessible_parking': 'Accessible parking',
+        'create.venueAccessibilityStatus.unknown': 'Not known',
+        'create.venueAccessibilityStatus.yes': 'Yes',
+        'create.venueAccessibilityStatus.no': 'No',
+        'create.venueAccessibilityParkingDetails': 'Accessible parking details',
+        'create.venueAccessibilityParkingPlaceholder': 'Spaces, access route, or booking instructions',
+        'create.venueAccessibilityTransitDetails': 'Public transport and arrival details',
+        'create.venueAccessibilityTransitPlaceholder': 'Nearest stop, station, or drop-off point',
+        'create.venueAccessibilityAssistanceContact': 'Accessibility contact',
+        'create.venueAccessibilityAssistancePlaceholder': 'Name, email, or phone for assistance',
+        'create.venueAccessibilityNotes': 'Other accessibility notes',
+        'create.venueAccessibilityNotesPlaceholder': 'Anything else members should know',
+        'create.venueAccessibilityPrivacy': 'Share safe contact details only.',
         'create.remoteAttendance': 'Allow remote attendance',
         'create.videoUrlLabel': 'Video link',
         'create.videoUrlPlaceholder': 'https://...',
         'create.maxAttendeesLabel': 'Capacity',
         'create.maxAttendeesPlaceholder': 'Optional attendee limit',
         'create.federated': 'Share with federation',
+        'create.recurrenceTitle': 'Repeating schedule',
+        'create.recurrenceToggle': 'Make this a recurring event',
+        'create.recurrenceFrequency': 'Frequency',
+        'create.recurrenceFrequencies.daily': 'Daily',
+        'create.recurrenceFrequencies.weekly': 'Weekly',
+        'create.recurrenceFrequencies.biweekly': 'Every two weeks',
+        'create.recurrenceFrequencies.monthly': 'Monthly',
+        'create.recurrenceFrequencies.yearly': 'Yearly',
+        'create.recurrenceDays': 'Repeat on',
+        'create.recurrenceWeekdays.MO': 'Mon',
+        'create.recurrenceWeekdays.TU': 'Tue',
+        'create.recurrenceWeekdays.WE': 'Wed',
+        'create.recurrenceWeekdays.TH': 'Thu',
+        'create.recurrenceWeekdays.FR': 'Fri',
+        'create.recurrenceWeekdays.SA': 'Sat',
+        'create.recurrenceWeekdays.SU': 'Sun',
+        'create.recurrenceEnds': 'Ends',
+        'create.recurrenceEndTypes.after_count': 'After a number of events',
+        'create.recurrenceEndTypes.on_date': 'On a date',
+        'create.recurrenceEndTypes.never': 'Never',
+        'create.recurrenceCount': 'Number of events',
+        'create.recurrenceCountPlaceholder': '2 to {{max}}',
+        'create.recurrenceEndDate': 'Series end date',
+        'create.recurrenceNeverHint': 'Future dates are added automatically.',
+        'create.recurrenceValidation': 'Choose valid recurrence details.',
+        'create.recurrenceEditScope': 'Apply changes to',
+        'create.recurrenceScopeSingle': 'Only this event',
+        'create.recurrenceScopeFuture': 'This and future events',
+        'create.recurrenceScopeSingleHint': 'Only this occurrence.',
+        'create.recurrenceScopeFutureHint': 'Preview the impact.',
+        'create.revisionPreview': 'Preview changes',
+        'create.revisionImpactTitle': 'Review recurring changes',
+        'create.revisionConfirm': 'Apply changes',
+        'create.revisionPreviewStale': 'Preview is stale.',
+        'create.revisionCommitFailed': 'Commit failed.',
         'create.reviewTitle': 'Ready to publish?',
         'create.reviewSubtitle': 'Review first.',
         'create.editReviewTitle': 'Ready to update?',
@@ -89,7 +164,11 @@ jest.mock('react-i18next', () => ({
         'category.other': 'Other',
         'common:back': 'Back',
       };
-      return map[key] ?? key;
+      let value = map[key] ?? key;
+      Object.entries(options ?? {}).forEach(([name, replacement]) => {
+        value = value.split(`{{${name}}}`).join(String(replacement));
+      });
+      return value;
     },
     i18n: { language: 'en' },
   }),
@@ -113,11 +192,18 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 
 jest.mock('@/lib/api/events', () => ({
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
+  createRecurringEvent: (...args: unknown[]) => mockCreateRecurringEvent(...args),
+  commitEventRecurrenceRevision: (...args: unknown[]) => mockCommitEventRecurrenceRevision(...args),
   getEvent: (...args: unknown[]) => mockGetEvent(...args),
   getEventCategories: (...args: unknown[]) => mockGetEventCategories(...args),
+  getEventRecurrenceCapabilities: (...args: unknown[]) => mockGetEventRecurrenceCapabilities(...args),
+  previewEventRecurrenceRevision: (...args: unknown[]) => mockPreviewEventRecurrenceRevision(...args),
   updateEvent: (...args: unknown[]) => mockUpdateEvent(...args),
+  updateRecurringEvent: (...args: unknown[]) => mockUpdateRecurringEvent(...args),
   uploadEventImage: (...args: unknown[]) => mockUploadEventImage(...args),
 }));
+
+jest.mock('expo-crypto', () => ({ randomUUID: () => 'mobile-revision-key-1' }));
 
 jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
@@ -235,9 +321,14 @@ describe('NewEventRoute', () => {
     showToast.mockClear();
     mockSearchParams = {};
     mockCreateEvent.mockClear();
+    mockCreateRecurringEvent.mockClear();
+    mockCommitEventRecurrenceRevision.mockReset();
     mockGetEvent.mockReset();
     mockGetEventCategories.mockReset().mockReturnValue(new Promise(() => undefined));
+    mockGetEventRecurrenceCapabilities.mockReset().mockReturnValue(new Promise(() => undefined));
     mockUpdateEvent.mockClear();
+    mockUpdateRecurringEvent.mockClear();
+    mockPreviewEventRecurrenceRevision.mockReset();
     mockUploadEventImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/events/cover.jpg' } });
     mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({
       canceled: false,
@@ -345,12 +436,143 @@ describe('NewEventRoute', () => {
         latitude: 51.501,
         longitude: -0.125,
         is_online: true,
+        allow_remote_attendance: true,
         video_url: 'https://meet.example/workshop',
         timezone: expect.any(String),
         all_day: false,
       }));
     });
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } }));
+  });
+
+  it('creates canonical venue-accessibility facts', async () => {
+    const { getAllByText, getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Accessible repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'A detailed workshop with confirmed venue access information.');
+    fireEvent.press(getAllByText('Yes')[0]);
+    fireEvent.changeText(getByPlaceholderText('Spaces, access route, or booking instructions'), 'Two bays beside the east entrance');
+    fireEvent.changeText(getByPlaceholderText('Name, email, or phone for assistance'), 'access@example.test');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({
+      venue_accessibility: expect.objectContaining({
+        step_free_access: true,
+        parking_details: 'Two bays beside the east entrance',
+        assistance_contact: 'access@example.test',
+      }),
+    })));
+  });
+
+  it('creates a structured biweekly never-ending series without a client-authored RRULE', async () => {
+    mockGetEventRecurrenceCapabilities.mockResolvedValueOnce(v2RecurrenceCapabilitiesResponse);
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Recurring repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend together.');
+    fireEvent.press(getByText('Make this a recurring event'));
+    await waitFor(() => expect(getByText('Never')).toBeTruthy());
+    fireEvent.press(getByText('Every two weeks'));
+    fireEvent.press(getByText('Mon'));
+    fireEvent.press(getByText('Never'));
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => expect(mockCreateRecurringEvent).toHaveBeenCalledWith(expect.objectContaining({
+      recurrence_frequency: 'weekly',
+      recurrence_interval: 2,
+      recurrence_days: 'MO',
+      recurrence_ends_type: 'never',
+    })));
+    const payload = mockCreateRecurringEvent.mock.calls[0][0];
+    expect(payload).not.toHaveProperty('recurrence_rule');
+    expect(payload).not.toHaveProperty('recurrence_rrule');
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/(tabs)/events'));
+  });
+
+  it('falls back to legacy recurrence limits when runtime capability negotiation fails', async () => {
+    mockGetEventRecurrenceCapabilities.mockRejectedValueOnce(new Error('offline'));
+
+    const { getByPlaceholderText, getByText, queryByText } = render(<NewEventRoute />);
+    await waitFor(() => expect(mockGetEventRecurrenceCapabilities).toHaveBeenCalledTimes(1));
+    fireEvent.press(getByText('Make this a recurring event'));
+
+    expect(getByPlaceholderText('2 to 52')).toBeTruthy();
+    expect(queryByText('Never')).toBeNull();
+  });
+
+  it('previews and commits this-and-future edits instead of using the generic update endpoint', async () => {
+    mockGetEventRecurrenceCapabilities.mockResolvedValueOnce(v2RecurrenceCapabilitiesResponse);
+    mockSearchParams = { id: '7' };
+    mockGetEvent.mockResolvedValueOnce({
+      data: {
+        ...canonicalEditEvent,
+        series: {
+          ...canonicalEditEvent.series,
+          recurrence: {
+            parent_event_id: 70,
+            root_event_id: 70,
+            is_template: false,
+            frequency: 'weekly',
+            interval: 1,
+            rrule: 'FREQ=WEEKLY;COUNT=10',
+            occurrence_count: 10,
+            occurrences: [],
+          },
+        },
+      },
+    });
+    mockPreviewEventRecurrenceRevision.mockResolvedValue({
+      data: {
+        preview_token: 'preview-token',
+        preview_expires_at: '2099-01-01T00:05:00Z',
+        scope: 'this_and_future',
+        selected_event_id: 7,
+        root_event_id: 70,
+        effective_from_utc: '2099-01-02 12:00:00',
+        can_commit: true,
+        impact: {
+          changed_count: 4,
+          unique_recipient_count: 2,
+          blocking_conflicts: [],
+        },
+      },
+    });
+    mockCommitEventRecurrenceRevision
+      .mockRejectedValueOnce(new Error('lost response'))
+      .mockResolvedValueOnce({ data: { revision_id: 8 } });
+
+    const { getByDisplayValue, getByPlaceholderText, getByText } = render(<NewEventRoute />);
+    await waitFor(() => expect(getByDisplayValue('Existing workshop')).toBeTruthy());
+    fireEvent.changeText(getByDisplayValue('Existing workshop'), 'Updated future workshops');
+    fireEvent.press(getByText('This and future events'));
+    fireEvent.press(getByText('Preview changes'));
+
+    await waitFor(() => expect(mockPreviewEventRecurrenceRevision).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({ title: 'Updated future workshops' }),
+    ));
+    expect(mockUpdateEvent).not.toHaveBeenCalled();
+    expect(mockUpdateRecurringEvent).not.toHaveBeenCalled();
+
+    fireEvent.changeText(getByPlaceholderText('Anything else members should know'), 'Changed after preview');
+    fireEvent.press(getByText('Apply changes'));
+    expect(mockCommitEventRecurrenceRevision).not.toHaveBeenCalled();
+    expect(showToast).toHaveBeenCalledWith(expect.objectContaining({ description: 'Preview is stale.' }));
+
+    fireEvent.press(getByText('Preview changes'));
+    await waitFor(() => expect(mockPreviewEventRecurrenceRevision).toHaveBeenCalledTimes(2));
+    fireEvent.press(getByText('Apply changes'));
+    await waitFor(() => expect(mockCommitEventRecurrenceRevision).toHaveBeenCalledTimes(1));
+    fireEvent.press(getByText('Apply changes'));
+    await waitFor(() => expect(mockCommitEventRecurrenceRevision).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({ accessibility_notes: 'Changed after preview' }),
+      'preview-token',
+      'mobile-revision-key-1',
+    ));
+    expect(mockCommitEventRecurrenceRevision.mock.calls[0][3]).toBe('mobile-revision-key-1');
+    expect(mockCommitEventRecurrenceRevision.mock.calls[1][3]).toBe('mobile-revision-key-1');
   });
 
   it('converts an inclusive all-day range in the selected IANA timezone', async () => {

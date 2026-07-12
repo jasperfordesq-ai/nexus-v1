@@ -22,6 +22,10 @@ use Illuminate\Support\Facades\Schema;
 /** Private product projections; decrypted answers remain in the audited submission service. */
 final class EventRegistrationProductQueryService
 {
+    private const DEFAULT_OVERVIEW_PAGE_SIZE = 50;
+
+    private const MAX_OVERVIEW_PAGE_SIZE = 100;
+
     public function __construct(
         private readonly EventRegistrationFoundationSupport $support = new EventRegistrationFoundationSupport(),
         private readonly EventPolicy $eventPolicy = new EventPolicy(),
@@ -29,8 +33,11 @@ final class EventRegistrationProductQueryService
     ) {
     }
 
-    /** @return array<string,mixed> */
-    public function organizerOverview(int $eventId, User|int $actor): array
+    /**
+     * @param array<string,int> $pagination
+     * @return array<string,mixed>
+     */
+    public function organizerOverview(int $eventId, User|int $actor, array $pagination = []): array
     {
         $this->assertSchema();
         $tenantId = $this->support->tenantId();
@@ -51,15 +58,20 @@ final class EventRegistrationProductQueryService
             ->where('event_id', $eventId)
             ->orderByDesc('version_number')
             ->get();
-        $submissions = DB::table('event_registration_form_submissions as submission')
+        [$submissionPage, $submissionPerPage] = $this->overviewPage($pagination, 'submissions');
+        $submissionQuery = DB::table('event_registration_form_submissions as submission')
             ->join('users as member', function ($join): void {
                 $join->on('member.id', '=', 'submission.user_id')
                     ->on('member.tenant_id', '=', 'submission.tenant_id');
             })
             ->where('submission.tenant_id', $tenantId)
-            ->where('submission.event_id', $eventId)
+            ->where('submission.event_id', $eventId);
+        $submissionTotal = (clone $submissionQuery)->count('submission.id');
+        $submissionPage = $this->clampPage($submissionPage, $submissionPerPage, $submissionTotal);
+        $submissions = $submissionQuery
             ->orderByDesc('submission.updated_at')
-            ->limit(1000)
+            ->orderByDesc('submission.id')
+            ->forPage($submissionPage, $submissionPerPage)
             ->get([
                 'submission.id', 'submission.registration_id', 'submission.form_version_id',
                 'submission.user_id', 'submission.status', 'submission.revision',
@@ -78,35 +90,48 @@ final class EventRegistrationProductQueryService
                 return $result;
             })
             ->all();
-        $campaigns = EventInvitationCampaign::withoutGlobalScopes()
+        [$campaignPage, $campaignPerPage] = $this->overviewPage($pagination, 'campaigns');
+        $campaignQuery = EventInvitationCampaign::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
-            ->where('event_id', $eventId)
+            ->where('event_id', $eventId);
+        $campaignTotal = (clone $campaignQuery)->count();
+        $campaignPage = $this->clampPage($campaignPage, $campaignPerPage, $campaignTotal);
+        $campaigns = $campaignQuery
             ->withCount('invitations')
             ->orderByDesc('id')
-            ->limit(500)
+            ->forPage($campaignPage, $campaignPerPage)
             ->get();
-        $campaignDeliveryCounts = DB::table('event_invitation_delivery_evidence')
-            ->where('tenant_id', $tenantId)
-            ->where('event_id', $eventId)
-            ->selectRaw('campaign_id, status, COUNT(*) AS aggregate_count')
-            ->groupBy('campaign_id', 'status')
-            ->get()
-            ->groupBy('campaign_id')
-            ->map(static fn ($rows): array => $rows->mapWithKeys(
-                static fn (object $row): array => [(string) $row->status => (int) $row->aggregate_count],
-            )->all())
-            ->all();
-        $guests = DB::table('event_registration_guests as guest')
+        $campaignIds = $campaigns->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all();
+        $campaignDeliveryCounts = $campaignIds === []
+            ? []
+            : DB::table('event_invitation_delivery_evidence')
+                ->where('tenant_id', $tenantId)
+                ->where('event_id', $eventId)
+                ->whereIn('campaign_id', $campaignIds)
+                ->selectRaw('campaign_id, status, COUNT(*) AS aggregate_count')
+                ->groupBy('campaign_id', 'status')
+                ->get()
+                ->groupBy('campaign_id')
+                ->map(static fn ($rows): array => $rows->mapWithKeys(
+                    static fn (object $row): array => [(string) $row->status => (int) $row->aggregate_count],
+                )->all())
+                ->all();
+        [$guestPage, $guestPerPage] = $this->overviewPage($pagination, 'guests');
+        $guestQuery = DB::table('event_registration_guests as guest')
             ->leftJoin('event_registration_guest_attendance as attendance', function ($join): void {
                 $join->on('attendance.tenant_id', '=', 'guest.tenant_id')
                     ->on('attendance.event_id', '=', 'guest.event_id')
                     ->on('attendance.guest_id', '=', 'guest.id');
             })
             ->where('guest.tenant_id', $tenantId)
-            ->where('guest.event_id', $eventId)
+            ->where('guest.event_id', $eventId);
+        $guestTotal = (clone $guestQuery)->count('guest.id');
+        $guestPage = $this->clampPage($guestPage, $guestPerPage, $guestTotal);
+        $guests = $guestQuery
             ->orderBy('guest.registration_id')
             ->orderBy('guest.guest_number')
-            ->limit(5000)
+            ->orderBy('guest.id')
+            ->forPage($guestPage, $guestPerPage)
             ->get([
                 'guest.id', 'guest.registration_id', 'guest.ticket_entitlement_id',
                 'guest.guest_number', 'guest.revision', 'guest.status',
@@ -168,6 +193,31 @@ final class EventRegistrationProductQueryService
                 return $row;
             })->all(),
             'guests' => $guests,
+            'pagination' => [
+                'submissions' => $this->pageMetadata(
+                    $submissionPage,
+                    $submissionPerPage,
+                    $submissionTotal,
+                    count($submissions),
+                ),
+                'campaigns' => $this->pageMetadata(
+                    $campaignPage,
+                    $campaignPerPage,
+                    $campaignTotal,
+                    $campaigns->count(),
+                ),
+                'guests' => $this->pageMetadata(
+                    $guestPage,
+                    $guestPerPage,
+                    $guestTotal,
+                    count($guests),
+                ),
+            ],
+            'summary' => [
+                'submissions_total' => $submissionTotal,
+                'campaigns_total' => $campaignTotal,
+                'guests_total' => $guestTotal,
+            ],
             'permissions' => [
                 'view_roster' => $canViewRoster,
                 'view_sensitive_answers' => $canViewSensitive,
@@ -288,5 +338,42 @@ final class EventRegistrationProductQueryService
                 throw new EventRegistrationFoundationException('event_registration_product_schema_unavailable');
             }
         }
+    }
+
+    /** @param array<string,int> $pagination @return array{0:int,1:int} */
+    private function overviewPage(array $pagination, string $collection): array
+    {
+        $page = max(1, (int) ($pagination[$collection . '_page'] ?? 1));
+        $perPage = max(1, min(
+            self::MAX_OVERVIEW_PAGE_SIZE,
+            (int) ($pagination[$collection . '_per_page'] ?? self::DEFAULT_OVERVIEW_PAGE_SIZE),
+        ));
+
+        return [$page, $perPage];
+    }
+
+    private function clampPage(int $page, int $perPage, int $total): int
+    {
+        return min($page, max(1, (int) ceil($total / $perPage)));
+    }
+
+    /** @return array<string,int|bool|null> */
+    private function pageMetadata(int $page, int $perPage, int $total, int $pageCount): array
+    {
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        $from = $pageCount === 0 ? null : (($page - 1) * $perPage) + 1;
+
+        return [
+            'page' => $page,
+            'per_page' => $perPage,
+            'total' => $total,
+            'last_page' => $lastPage,
+            'page_count' => $pageCount,
+            'from' => $from,
+            'to' => $from === null ? null : $from + $pageCount - 1,
+            'has_more' => $page < $lastPage,
+            'previous_page' => $page > 1 ? $page - 1 : null,
+            'next_page' => $page < $lastPage ? $page + 1 : null,
+        ];
     }
 }

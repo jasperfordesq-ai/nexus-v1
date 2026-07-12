@@ -65,13 +65,14 @@ describe('i18n language persistence', () => {
   });
 
   it.each(['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'])(
-    'registers the event templates, tickets and communications bundles for %s',
+    'registers the event enterprise bundles for %s',
     (language) => {
       loadLanguage(language);
 
       expect(i18n.hasResourceBundle(language, 'event_templates')).toBe(true);
       expect(i18n.hasResourceBundle(language, 'event_tickets')).toBe(true);
       expect(i18n.hasResourceBundle(language, 'event_communications')).toBe(true);
+      expect(i18n.hasResourceBundle(language, 'event_recurrence_blueprints')).toBe(true);
     },
   );
 });

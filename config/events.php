@@ -119,9 +119,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | Version 2 uses a standards-based RRULE adapter and deterministic concrete
-    | occurrence identities. It remains opt-in while existing clients continue
-    | to depend on the legacy recurrence materialiser. Expansion is deliberately
-    | bounded even for an RRULE without COUNT or UNTIL.
+    | occurrence identities. It remains an explicit tenant-canary/rollback flag
+    | until client DTSTART, local-UNTIL and effective-dated revision parity is
+    | complete. Never-ending v2 rules are topped up by a bounded, durable rolling
+    | materializer; active legacy never roots remain a health blocker.
     |
     */
 
@@ -129,6 +130,56 @@ return [
         'engine_v2_enabled' => env('EVENTS_RECURRENCE_V2_ENABLED', false),
         'max_occurrences' => (int) env('EVENTS_RECURRENCE_MAX_OCCURRENCES', 366),
         'max_horizon_years' => (int) env('EVENTS_RECURRENCE_MAX_HORIZON_YEARS', 20),
+        'materialization' => [
+            'enabled' => env('EVENTS_RECURRENCE_MATERIALIZATION_ENABLED', false),
+            'lookahead_days' => (int) env('EVENTS_RECURRENCE_LOOKAHEAD_DAYS', 365),
+            'refresh_margin_days' => (int) env('EVENTS_RECURRENCE_REFRESH_MARGIN_DAYS', 30),
+            'overdue_grace_hours' => (int) env('EVENTS_RECURRENCE_OVERDUE_GRACE_HOURS', 6),
+            'retry_grace_minutes' => (int) env('EVENTS_RECURRENCE_RETRY_GRACE_MINUTES', 15),
+            'repair_lookback_days' => (int) env('EVENTS_RECURRENCE_REPAIR_LOOKBACK_DAYS', 30),
+            'series_limit' => (int) env('EVENTS_RECURRENCE_SERIES_LIMIT', 50),
+            'occurrence_limit' => (int) env('EVENTS_RECURRENCE_OCCURRENCE_LIMIT', 500),
+            'scan_limit' => (int) env('EVENTS_RECURRENCE_SCAN_LIMIT', 2000),
+        ],
+        'revisions' => [
+            'preview_ttl_seconds' => (int) env(
+                'EVENTS_RECURRENCE_REVISION_PREVIEW_TTL_SECONDS',
+                600,
+            ),
+            'max_affected_occurrences' => (int) env(
+                'EVENTS_RECURRENCE_REVISION_MAX_AFFECTED_OCCURRENCES',
+                1000,
+            ),
+            'preview_envelope' => [
+                'active_key_version' => env(
+                    'EVENTS_RECURRENCE_REVISION_KEY_VERSION',
+                    'app-key-v1',
+                ),
+                'active_key' => env('EVENTS_RECURRENCE_REVISION_KEY'),
+                'previous_keys' => json_decode((string) env(
+                    'EVENTS_RECURRENCE_REVISION_PREVIOUS_KEYS',
+                    '{}',
+                ), true) ?: [],
+                'fallback_to_app_key' => env(
+                    'EVENTS_RECURRENCE_REVISION_FALLBACK_APP_KEY',
+                    true,
+                ),
+            ],
+        ],
+        'definition_blueprints' => [
+            // Definition propagation is a separate canary boundary. It must
+            // never become active merely because the V2 writer is enabled.
+            'enabled' => env('EVENTS_RECURRENCE_DEFINITION_BLUEPRINTS_ENABLED', false),
+            'schema_version' => 1,
+            // Preview envelopes intentionally share the recurrence revision
+            // TTL/key ring so expiry and rotation semantics cannot diverge.
+            'max_sessions' => 100,
+            'max_speakers_per_session' => 50,
+            'max_resources_per_session' => 50,
+            'max_ticket_types' => 100,
+            'max_form_questions' => 200,
+            'max_staff_assignments' => 100,
+        ],
     ],
 
     /*

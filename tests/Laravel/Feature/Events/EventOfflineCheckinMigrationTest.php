@@ -44,6 +44,10 @@ final class EventOfflineCheckinMigrationTest extends TestCase
         '2026_07_11_000065_expand_event_agenda_enterprise.php',
         '2026_07_11_000066_add_event_context_to_notification_queue.php',
         '2026_07_11_000067_pin_event_agenda_registration_versions.php',
+        '2026_07_12_000068_add_event_recurrence_override_fields.php',
+        '2026_07_12_000069_add_event_recurrence_materialization_state.php',
+        '2026_07_12_000070_add_event_recurrence_revision_ledger.php',
+        '2026_07_12_000071_add_event_recurrence_definition_blueprints.php',
     ];
 
     public function test_schema_is_tenant_scoped_versioned_bounded_and_append_only(): void
@@ -581,4 +585,5 @@ final class EventOfflineCheckinMigrationTest extends TestCase
 
         return $migration;
     }
+
 }

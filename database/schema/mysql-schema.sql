@@ -1,4 +1,4 @@
-/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -144,7 +144,7 @@ CREATE TABLE `activity_log` (
   KEY `idx_activity_log_created_at` (`created_at`),
   KEY `idx_activity_log_user_created` (`user_id`,`created_at`),
   KEY `idx_activity_log_tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1939 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2685 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ad_campaigns`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -912,7 +912,7 @@ CREATE TABLE `bookmarks` (
   KEY `bookmarks_tenant_id_index` (`tenant_id`),
   KEY `bookmarks_user_id_index` (`user_id`),
   CONSTRAINT `bookmarks_collection_id_foreign` FOREIGN KEY (`collection_id`) REFERENCES `bookmark_collections` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `broker_control_config`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2088,7 +2088,7 @@ CREATE TABLE `comments` (
   KEY `idx_comments_tenant_target` (`tenant_id`,`target_type`,`target_id`),
   CONSTRAINT `comments_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `comments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=168 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `community_fund_accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2106,7 +2106,7 @@ CREATE TABLE `community_fund_accounts` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_tenant` (`tenant_id`),
   CONSTRAINT `community_fund_accounts_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `community_fund_transactions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2155,7 +2155,7 @@ CREATE TABLE `community_ranks` (
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_rank_score` (`rank_score`),
   KEY `idx_position` (`tenant_id`,`rank_position`)
-) ENGINE=InnoDB AUTO_INCREMENT=12289 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
+) ENGINE=InnoDB AUTO_INCREMENT=12305 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Community rank scores for users';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `communityrank_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2415,7 +2415,7 @@ CREATE TABLE `cookie_consents` (
   KEY `idx_consent_version` (`consent_version`),
   KEY `idx_valid_consent` (`user_id`,`tenant_id`,`expires_at`,`withdrawal_date`),
   KEY `idx_session_tenant` (`session_id`,`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cookie_inventory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3258,7 +3258,7 @@ CREATE TABLE `email_log` (
   KEY `email_log_source_index` (`source`),
   KEY `email_log_idempotency_key_index` (`idempotency_key`),
   KEY `email_log_dispatch_id_index` (`dispatch_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30930 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31179 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `email_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3343,6 +3343,190 @@ CREATE TABLE `error_404_log` (
   CONSTRAINT `error_404_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=10961 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_analytics_access_audits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_analytics_access_audits` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `access_scope` varchar(32) NOT NULL,
+  `purpose_code` varchar(64) NOT NULL,
+  `query_hash` char(64) NOT NULL,
+  `result_count` int(10) unsigned NOT NULL,
+  `suppressed_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `privacy_threshold` smallint(5) unsigned NOT NULL DEFAULT 5,
+  `created_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_event_analytics_access_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `idx_event_analytics_access_actor` (`tenant_id`,`actor_user_id`,`created_at`,`id`),
+  KEY `fk_event_analytics_access_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_analytics_access_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_analytics_access_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_analytics_access_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_analytics_access_scope` CHECK (`access_scope` in ('organizer_summary','tenant_summary','csv_export')),
+  CONSTRAINT `chk_event_analytics_access_threshold` CHECK (`privacy_threshold` >= 5 and `suppressed_count` <= `result_count`),
+  CONSTRAINT `chk_event_analytics_access_hash` CHECK (`query_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_access_no_update` BEFORE UPDATE ON `event_analytics_access_audits` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_access_no_delete` BEFORE DELETE ON `event_analytics_access_audits` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_analytics_optional_facts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_analytics_optional_facts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) DEFAULT NULL,
+  `metric` varchar(64) NOT NULL,
+  `deduplication_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `subject_hash` char(64) DEFAULT NULL,
+  `pseudonym_key_version` char(16) DEFAULT NULL,
+  `consent_record_id` bigint(20) unsigned DEFAULT NULL,
+  `consent_version` varchar(20) DEFAULT NULL,
+  `source_surface` varchar(32) NOT NULL,
+  `client_platform` varchar(32) NOT NULL,
+  `dimensions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`dimensions`)),
+  `is_late` tinyint(1) NOT NULL DEFAULT 0,
+  `occurred_at` datetime(6) NOT NULL,
+  `received_at` datetime(6) NOT NULL,
+  `retention_due_at` datetime(6) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `withdrawn_at` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_analytics_fact_dedup` (`tenant_id`,`deduplication_hash`),
+  UNIQUE KEY `uq_event_analytics_fact_scope` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_event_analytics_fact_event` (`tenant_id`,`event_id`,`metric`,`status`,`occurred_at`,`id`),
+  KEY `idx_event_analytics_fact_consent` (`tenant_id`,`consent_record_id`,`status`,`id`),
+  KEY `idx_event_analytics_fact_retention` (`tenant_id`,`retention_due_at`,`status`,`id`),
+  CONSTRAINT `fk_event_analytics_fact_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_analytics_fact_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_analytics_fact_metric` CHECK (`metric` in ('event_viewed','registration_started')),
+  CONSTRAINT `chk_event_analytics_fact_hashes` CHECK (`deduplication_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_analytics_fact_time` CHECK (`occurred_at` <= `received_at` + interval 5 minute and `retention_due_at` > `occurred_at`),
+  CONSTRAINT `chk_event_analytics_fact_state` CHECK (`status` = 'active' and `subject_hash` is not null and `pseudonym_key_version` is not null and `consent_record_id` is not null and `consent_version` is not null and `withdrawn_at` is null or `status` = 'withdrawn' and `subject_hash` is null and `pseudonym_key_version` is null and `consent_record_id` is null and `consent_version` is null and `withdrawn_at` is not null),
+  CONSTRAINT `chk_event_analytics_fact_subject` CHECK (`status` = 'withdrawn' or `subject_hash` regexp '^[0-9a-f]{64}$' and `pseudonym_key_version` regexp '^[0-9a-f]{16}$'),
+  CONSTRAINT `chk_event_analytics_fact_dimensions` CHECK (`status` = 'withdrawn' and json_length(`dimensions`) = 0 or `status` = 'active' and json_length(`dimensions`) = 2 and json_contains_path(`dimensions`,'all','$.source_surface','$.client_platform') and json_unquote(json_extract(`dimensions`,'$.source_surface')) in ('event_list','event_detail','calendar','search','notification','direct','registration') and json_unquote(json_extract(`dimensions`,'$.client_platform')) in ('react_web','accessible_web','native_mobile'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_fact_update` BEFORE UPDATE ON `event_analytics_optional_facts` FOR EACH ROW BEGIN IF OLD.`status` <> 'active' OR NEW.`status` <> 'withdrawn' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_fact_immutable'; END IF; IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`metric` <=> NEW.`metric`) OR NOT (OLD.`deduplication_hash` <=> NEW.`deduplication_hash`) OR NOT (OLD.`request_hash` <=> NEW.`request_hash`) OR NOT (OLD.`source_surface` <=> NEW.`source_surface`) OR NOT (OLD.`client_platform` <=> NEW.`client_platform`) OR NOT (OLD.`is_late` <=> NEW.`is_late`) OR NOT (OLD.`occurred_at` <=> NEW.`occurred_at`) OR NOT (OLD.`received_at` <=> NEW.`received_at`) OR NOT (OLD.`retention_due_at` <=> NEW.`retention_due_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_fact_evidence_immutable'; END IF; IF NEW.`subject_hash` IS NOT NULL OR NEW.`pseudonym_key_version` IS NOT NULL OR NEW.`consent_record_id` IS NOT NULL OR NEW.`consent_version` IS NOT NULL OR NEW.`withdrawn_at` IS NULL OR JSON_LENGTH(NEW.`dimensions`) <> 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_fact_withdrawal_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_fact_no_delete` BEFORE DELETE ON `event_analytics_optional_facts` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_fact_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_analytics_withdrawal_runs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_analytics_withdrawal_runs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `consent_count` int(10) unsigned NOT NULL,
+  `fact_count` int(10) unsigned NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_analytics_withdraw_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_analytics_withdraw_actor` (`tenant_id`,`actor_user_id`,`created_at`,`id`),
+  KEY `fk_event_analytics_withdraw_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_analytics_withdraw_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_analytics_withdraw_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_analytics_withdraw_hash` CHECK (`idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_withdraw_no_update` BEFORE UPDATE ON `event_analytics_withdrawal_runs` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_withdrawal_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_analytics_withdraw_no_delete` BEFORE DELETE ON `event_analytics_withdrawal_runs` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_analytics_withdrawal_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_attendance`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3394,12 +3578,43 @@ CREATE TABLE `event_attendance_activity` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_event_attendance_activity_key` (`tenant_id`,`idempotency_key`),
   UNIQUE KEY `uq_event_attendance_activity_version` (`tenant_id`,`attendance_id`,`attendance_version`),
+  UNIQUE KEY `uq_event_attendance_activity_checkin_scope` (`tenant_id`,`event_id`,`id`),
   KEY `idx_event_attendance_activity_event` (`tenant_id`,`event_id`,`created_at`,`id`),
   KEY `idx_event_attendance_activity_user` (`tenant_id`,`user_id`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_attendance_activity_no_update` BEFORE UPDATE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable';
-CREATE TRIGGER `trg_event_attendance_activity_no_delete` BEFORE DELETE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable';
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_attendance_activity_no_update` BEFORE UPDATE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_attendance_activity_no_delete` BEFORE DELETE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_attendance_credit_claims`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3437,7 +3652,509 @@ CREATE TABLE `event_attendance_credit_claims` (
   KEY `idx_event_credit_claim_attendance` (`tenant_id`,`event_id`,`attendance_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_attendance_claim_no_delete` BEFORE DELETE ON `event_attendance_credit_claims` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_credit_claim_immutable';
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_attendance_claim_no_delete` BEFORE DELETE ON `event_attendance_credit_claims` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_credit_claim_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_broadcast_deliveries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_broadcast_deliveries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `broadcast_id` bigint(20) unsigned NOT NULL,
+  `frozen_broadcast_version` int(10) unsigned NOT NULL,
+  `recipient_user_id` int(11) NOT NULL,
+  `channel` varchar(16) NOT NULL,
+  `delivery_key` char(64) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'pending',
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `available_at` timestamp NOT NULL,
+  `next_attempt_at` timestamp NULL DEFAULT NULL,
+  `claim_token` char(36) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `suppressed_at` timestamp NULL DEFAULT NULL,
+  `dead_lettered_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `preference_reason` varchar(100) DEFAULT NULL,
+  `suppression_reason` varchar(100) DEFAULT NULL,
+  `provider` varchar(50) DEFAULT NULL,
+  `provider_evidence_id` varchar(255) DEFAULT NULL,
+  `last_error_code` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_broadcast_delivery_key` (`tenant_id`,`delivery_key`),
+  UNIQUE KEY `uq_event_broadcast_recipient_channel` (`broadcast_id`,`recipient_user_id`,`channel`),
+  UNIQUE KEY `uq_event_broadcast_delivery_scope` (`tenant_id`,`event_id`,`broadcast_id`,`id`),
+  KEY `idx_event_broadcast_delivery_claim` (`status`,`available_at`,`next_attempt_at`,`id`),
+  KEY `idx_event_broadcast_delivery_status` (`tenant_id`,`broadcast_id`,`status`,`id`),
+  KEY `fk_event_broadcast_delivery_recipient` (`recipient_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_broadcast_delivery_parent` FOREIGN KEY (`tenant_id`, `event_id`, `broadcast_id`) REFERENCES `event_broadcasts` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_broadcast_delivery_recipient` FOREIGN KEY (`recipient_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_broadcast_delivery_channel` CHECK (`channel` in ('email','in_app','push')),
+  CONSTRAINT `chk_event_broadcast_delivery_status` CHECK (`status` in ('pending','processing','retry','delivered','suppressed','dead_letter','cancelled'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_delivery_lifecycle_guard` BEFORE UPDATE ON `event_broadcast_deliveries` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`broadcast_id` <=> NEW.`broadcast_id`) OR NOT (OLD.`frozen_broadcast_version` <=> NEW.`frozen_broadcast_version`) OR NOT (OLD.`recipient_user_id` <=> NEW.`recipient_user_id`) OR NOT (OLD.`channel` <=> NEW.`channel`) OR NOT (OLD.`delivery_key` <=> NEW.`delivery_key`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_delivery_identity_immutable'; END IF; IF OLD.`status` IN ('delivered','suppressed','cancelled') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_delivery_terminal_immutable'; END IF; IF NOT ((OLD.`status` = NEW.`status`) OR (OLD.`status` IN ('pending','retry') AND NEW.`status` IN ('processing','cancelled')) OR (OLD.`status` = 'processing' AND NEW.`status` IN ('delivered','suppressed','retry','dead_letter')) OR (OLD.`status` = 'dead_letter' AND NEW.`status` = 'retry')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_delivery_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_delivery_no_delete` BEFORE DELETE ON `event_broadcast_deliveries` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_broadcast_delivery_attempts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_broadcast_delivery_attempts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `broadcast_id` bigint(20) unsigned NOT NULL,
+  `delivery_id` bigint(20) unsigned NOT NULL,
+  `attempt_number` smallint(5) unsigned NOT NULL,
+  `outcome` varchar(16) NOT NULL,
+  `provider` varchar(50) DEFAULT NULL,
+  `provider_evidence_id` varchar(255) DEFAULT NULL,
+  `reason_code` varchar(100) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_broadcast_attempt_outcome` (`tenant_id`,`delivery_id`,`attempt_number`,`outcome`),
+  KEY `idx_event_broadcast_attempt_parent` (`tenant_id`,`broadcast_id`,`created_at`,`id`),
+  KEY `fk_event_broadcast_attempt_delivery` (`tenant_id`,`event_id`,`broadcast_id`,`delivery_id`),
+  CONSTRAINT `fk_event_broadcast_attempt_delivery` FOREIGN KEY (`tenant_id`, `event_id`, `broadcast_id`, `delivery_id`) REFERENCES `event_broadcast_deliveries` (`tenant_id`, `event_id`, `broadcast_id`, `id`),
+  CONSTRAINT `chk_event_broadcast_attempt_outcome` CHECK (`outcome` in ('processing','delivered','suppressed','retry','dead_letter','cancelled'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_attempt_no_update` BEFORE UPDATE ON `event_broadcast_delivery_attempts` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_attempt_no_delete` BEFORE DELETE ON `event_broadcast_delivery_attempts` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_broadcast_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_broadcast_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `broadcast_id` bigint(20) unsigned NOT NULL,
+  `broadcast_version` int(10) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `from_status` varchar(16) DEFAULT NULL,
+  `to_status` varchar(16) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `content_hash` char(64) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_broadcast_history_version` (`tenant_id`,`broadcast_id`,`broadcast_version`),
+  UNIQUE KEY `uq_event_broadcast_history_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_broadcast_history_event` (`tenant_id`,`event_id`,`broadcast_id`,`created_at`,`id`),
+  KEY `fk_event_broadcast_history_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_broadcast_history_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_broadcast_history_parent` FOREIGN KEY (`tenant_id`, `event_id`, `broadcast_id`) REFERENCES `event_broadcasts` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `chk_event_broadcast_history_action` CHECK (`action` in ('created','revised','scheduled','sending','sent','cancelled','failed','retried'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_history_no_update` BEFORE UPDATE ON `event_broadcast_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_history_no_delete` BEFORE DELETE ON `event_broadcast_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_broadcasts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_broadcasts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `variant` varchar(32) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `broadcast_version` int(10) unsigned NOT NULL DEFAULT 1,
+  `audience_segments` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`audience_segments`)),
+  `channels` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`channels`)),
+  `body` longtext NOT NULL,
+  `content_hash` char(64) NOT NULL,
+  `scheduled_at` timestamp NULL DEFAULT NULL,
+  `recipient_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `delivery_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `delivered_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `suppressed_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `dead_letter_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_by_user_id` int(11) NOT NULL,
+  `updated_by_user_id` int(11) NOT NULL,
+  `scheduled_by_user_id` int(11) DEFAULT NULL,
+  `cancelled_by_user_id` int(11) DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `failed_at` timestamp NULL DEFAULT NULL,
+  `failure_code` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_broadcast_scope_id` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_event_broadcast_event_status` (`tenant_id`,`event_id`,`status`,`created_at`,`id`),
+  KEY `idx_event_broadcast_schedule` (`status`,`scheduled_at`,`id`),
+  KEY `fk_event_broadcast_event` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_broadcast_creator` (`created_by_user_id`,`tenant_id`),
+  KEY `fk_event_broadcast_updater` (`updated_by_user_id`,`tenant_id`),
+  KEY `fk_event_broadcast_scheduler` (`scheduled_by_user_id`,`tenant_id`),
+  KEY `fk_event_broadcast_canceller` (`cancelled_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_broadcast_canceller` FOREIGN KEY (`cancelled_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_broadcast_creator` FOREIGN KEY (`created_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_broadcast_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_broadcast_scheduler` FOREIGN KEY (`scheduled_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_broadcast_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_broadcast_updater` FOREIGN KEY (`updated_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_broadcast_status` CHECK (`status` in ('draft','scheduled','sending','sent','cancelled','failed')),
+  CONSTRAINT `chk_event_broadcast_variant` CHECK (`variant` in ('announcement','follow_up','review_request'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_lifecycle_guard` BEFORE UPDATE ON `event_broadcasts` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`created_by_user_id` <=> NEW.`created_by_user_id`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_identity_immutable'; END IF; IF OLD.`status` IN ('sent','cancelled') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_terminal_immutable'; END IF; IF OLD.`status` <> 'draft' AND (NOT (OLD.`variant` <=> NEW.`variant`) OR NOT (OLD.`audience_segments` <=> NEW.`audience_segments`) OR NOT (OLD.`channels` <=> NEW.`channels`) OR NOT (OLD.`body` <=> NEW.`body`) OR NOT (OLD.`content_hash` <=> NEW.`content_hash`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_content_frozen'; END IF; IF NOT ((OLD.`status` = NEW.`status`) OR (OLD.`status` = 'draft' AND NEW.`status` IN ('scheduled','cancelled')) OR (OLD.`status` = 'scheduled' AND NEW.`status` IN ('sending','cancelled')) OR (OLD.`status` = 'sending' AND NEW.`status` IN ('sent','failed')) OR (OLD.`status` = 'failed' AND NEW.`status` = 'scheduled')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_transition_invalid'; END IF; IF NEW.`broadcast_version` < OLD.`broadcast_version` OR NEW.`broadcast_version` > OLD.`broadcast_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_version_invalid'; END IF; IF (NOT (OLD.`status` <=> NEW.`status`) OR NOT (OLD.`variant` <=> NEW.`variant`) OR NOT (OLD.`audience_segments` <=> NEW.`audience_segments`) OR NOT (OLD.`channels` <=> NEW.`channels`) OR NOT (OLD.`body` <=> NEW.`body`) OR NOT (OLD.`content_hash` <=> NEW.`content_hash`)) AND NEW.`broadcast_version` <> OLD.`broadcast_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_version_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_broadcast_no_delete` BEFORE DELETE ON `event_broadcasts` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_broadcast_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_calendar_feed_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_calendar_feed_tokens` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `token_prefix` varchar(16) NOT NULL,
+  `label` varchar(100) DEFAULT NULL,
+  `locale` varchar(10) NOT NULL DEFAULT 'en',
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_calendar_feed_token_hash` (`token_hash`),
+  KEY `idx_event_calendar_feed_token_owner` (`tenant_id`,`user_id`,`revoked_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_checkin_credentials`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_checkin_credentials` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `credential_version` bigint(20) unsigned NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `active_slot` tinyint(3) unsigned DEFAULT 1,
+  `token_hash` char(64) NOT NULL,
+  `token_fingerprint` char(16) NOT NULL,
+  `issue_idempotency_hash` char(64) NOT NULL,
+  `issued_by_user_id` int(11) NOT NULL,
+  `issued_at` timestamp NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `superseded_by_id` bigint(20) unsigned DEFAULT NULL,
+  `rotated_at` timestamp NULL DEFAULT NULL,
+  `revoked_by_user_id` int(11) DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revocation_reason` varchar(500) DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_qr_credential_hash` (`token_hash`),
+  UNIQUE KEY `uq_event_qr_credential_idempotency` (`tenant_id`,`issue_idempotency_hash`),
+  UNIQUE KEY `uq_event_qr_credential_version` (`tenant_id`,`registration_id`,`credential_version`),
+  UNIQUE KEY `uq_event_qr_credential_scope_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_qr_credential_active` (`tenant_id`,`registration_id`,`active_slot`),
+  KEY `idx_event_qr_credential_manifest` (`tenant_id`,`event_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_qr_credential_fingerprint` (`tenant_id`,`event_id`,`token_fingerprint`),
+  KEY `fk_event_qr_credential_occurrence` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_qr_credential_registration` (`tenant_id`,`event_id`,`registration_id`,`user_id`),
+  KEY `fk_event_qr_credential_issuer_tenant` (`issued_by_user_id`,`tenant_id`),
+  KEY `fk_event_qr_credential_revoker_tenant` (`revoked_by_user_id`,`tenant_id`),
+  KEY `fk_event_qr_credential_successor` (`tenant_id`,`event_id`,`superseded_by_id`),
+  CONSTRAINT `fk_event_qr_credential_issuer_tenant` FOREIGN KEY (`issued_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_qr_credential_occurrence` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_qr_credential_registration` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`, `user_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_event_qr_credential_revoker_tenant` FOREIGN KEY (`revoked_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_qr_credential_successor` FOREIGN KEY (`tenant_id`, `event_id`, `superseded_by_id`) REFERENCES `event_checkin_credentials` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_qr_credential_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_qr_credential_hash` CHECK (`token_hash` regexp '^[0-9a-f]{64}$' and `token_fingerprint` = left(`token_hash`,16)),
+  CONSTRAINT `chk_event_qr_credential_version` CHECK (`credential_version` > 0),
+  CONSTRAINT `chk_event_qr_credential_expiry` CHECK (`issued_at` < `expires_at`),
+  CONSTRAINT `chk_event_qr_credential_state` CHECK (`status` = 'active' and `active_slot` = 1 and `superseded_by_id` is null and `rotated_at` is null and `revoked_by_user_id` is null and `revoked_at` is null and `revocation_reason` is null and `expired_at` is null or `status` = 'rotated' and `active_slot` is null and `rotated_at` is not null and `revoked_by_user_id` is null and `revoked_at` is null and `revocation_reason` is null and `expired_at` is null or `status` = 'revoked' and `active_slot` is null and `superseded_by_id` is null and `revoked_at` is not null and `revoked_by_user_id` is not null and `revocation_reason` is not null and char_length(trim(`revocation_reason`)) > 0 and `rotated_at` is null and `expired_at` is null or `status` = 'expired' and `active_slot` is null and `superseded_by_id` is null and `expired_at` is not null and `rotated_at` is null and `revoked_by_user_id` is null and `revoked_at` is null and `revocation_reason` is null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_qr_credential_validate` BEFORE INSERT ON `event_checkin_credentials` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_concrete_occurrence_required'; END IF; IF (SELECT COUNT(*) FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`registration_id` AND `user_id` = NEW.`user_id` AND `registration_state` = 'confirmed') <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_confirmed_registration_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_qr_credential_update` BEFORE UPDATE ON `event_checkin_credentials` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`registration_id` <=> NEW.`registration_id`) OR NOT (OLD.`user_id` <=> NEW.`user_id`) OR NOT (OLD.`credential_version` <=> NEW.`credential_version`) OR NOT (OLD.`token_hash` <=> NEW.`token_hash`) OR NOT (OLD.`token_fingerprint` <=> NEW.`token_fingerprint`) OR NOT (OLD.`issue_idempotency_hash` <=> NEW.`issue_idempotency_hash`) OR NOT (OLD.`issued_by_user_id` <=> NEW.`issued_by_user_id`) OR NOT (OLD.`issued_at` <=> NEW.`issued_at`) OR NOT (OLD.`expires_at` <=> NEW.`expires_at`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_credential_identity_immutable'; END IF; IF OLD.`status` = 'active' AND NEW.`status` = 'active' AND NOT (OLD.`superseded_by_id` <=> NEW.`superseded_by_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_credential_successor_invalid'; END IF; IF OLD.`status` = 'active' AND NEW.`status` = 'rotated' AND NEW.`superseded_by_id` IS NOT NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_credential_successor_invalid'; END IF; IF OLD.`status` <> 'active' AND NOT (OLD.`status` = 'rotated' AND NEW.`status` = 'rotated' AND OLD.`superseded_by_id` IS NULL AND NEW.`superseded_by_id` IS NOT NULL AND OLD.`active_slot` <=> NEW.`active_slot` AND OLD.`rotated_at` <=> NEW.`rotated_at` AND OLD.`revoked_by_user_id` <=> NEW.`revoked_by_user_id` AND OLD.`revoked_at` <=> NEW.`revoked_at` AND OLD.`revocation_reason` <=> NEW.`revocation_reason` AND OLD.`expired_at` <=> NEW.`expired_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_credential_terminal_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_qr_credential_no_delete` BEFORE DELETE ON `event_checkin_credentials` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_qr_credential_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_checkin_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_checkin_devices` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `public_id` char(36) NOT NULL,
+  `label` varchar(120) NOT NULL,
+  `registered_by_user_id` int(11) NOT NULL,
+  `device_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `secret_hash` char(64) NOT NULL,
+  `secret_fingerprint` char(16) NOT NULL,
+  `registration_idempotency_hash` char(64) NOT NULL,
+  `last_rotation_idempotency_hash` char(64) DEFAULT NULL,
+  `registered_at` timestamp NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `rotated_at` timestamp NULL DEFAULT NULL,
+  `revoked_by_user_id` int(11) DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revocation_reason` varchar(500) DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_checkin_device_public` (`public_id`),
+  UNIQUE KEY `uq_event_checkin_device_secret` (`secret_hash`),
+  UNIQUE KEY `uq_event_checkin_device_idempotency` (`tenant_id`,`registration_idempotency_hash`),
+  UNIQUE KEY `uq_event_checkin_device_scope_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_checkin_device_rotation` (`tenant_id`,`last_rotation_idempotency_hash`),
+  KEY `idx_event_checkin_device_event` (`tenant_id`,`event_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_checkin_device_fingerprint` (`tenant_id`,`event_id`,`secret_fingerprint`),
+  KEY `fk_event_checkin_device_occurrence` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_checkin_device_actor_tenant` (`registered_by_user_id`,`tenant_id`),
+  KEY `fk_event_checkin_device_revoker_tenant` (`revoked_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_checkin_device_actor_tenant` FOREIGN KEY (`registered_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_checkin_device_occurrence` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_checkin_device_revoker_tenant` FOREIGN KEY (`revoked_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_checkin_device_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_checkin_device_hash` CHECK (`secret_hash` regexp '^[0-9a-f]{64}$' and `secret_fingerprint` = left(`secret_hash`,16)),
+  CONSTRAINT `chk_event_checkin_device_version` CHECK (`device_version` > 0),
+  CONSTRAINT `chk_event_checkin_device_expiry` CHECK (`registered_at` < `expires_at`),
+  CONSTRAINT `chk_event_checkin_device_state` CHECK (`status` = 'active' and `revoked_by_user_id` is null and `revoked_at` is null and `revocation_reason` is null and `expired_at` is null or `status` = 'revoked' and `revoked_at` is not null and `revoked_by_user_id` is not null and `revocation_reason` is not null and char_length(trim(`revocation_reason`)) > 0 and `expired_at` is null or `status` = 'expired' and `expired_at` is not null and `revoked_by_user_id` is null and `revoked_at` is null and `revocation_reason` is null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_checkin_device_validate` BEFORE INSERT ON `event_checkin_devices` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_device_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_checkin_device_update` BEFORE UPDATE ON `event_checkin_devices` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`public_id` <=> NEW.`public_id`) OR NOT (OLD.`label` <=> NEW.`label`) OR NOT (OLD.`registered_by_user_id` <=> NEW.`registered_by_user_id`) OR NOT (OLD.`registration_idempotency_hash` <=> NEW.`registration_idempotency_hash`) OR NOT (OLD.`registered_at` <=> NEW.`registered_at`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_identity_immutable'; END IF; IF OLD.`status` <> 'active' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_terminal_immutable'; END IF; IF NEW.`device_version` < OLD.`device_version` OR NEW.`device_version` > OLD.`device_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_version_invalid'; END IF; IF (NOT (OLD.`secret_hash` <=> NEW.`secret_hash`) OR NOT (OLD.`secret_fingerprint` <=> NEW.`secret_fingerprint`)) AND (NEW.`status` <> 'active' OR NEW.`device_version` <> OLD.`device_version` + 1 OR NEW.`last_rotation_idempotency_hash` IS NULL OR NEW.`last_rotation_idempotency_hash` <=> OLD.`last_rotation_idempotency_hash` OR NEW.`rotated_at` IS NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_rotation_invalid'; END IF; IF OLD.`secret_hash` <=> NEW.`secret_hash` AND OLD.`secret_fingerprint` <=> NEW.`secret_fingerprint` AND NEW.`status` = 'active' AND (NEW.`device_version` <> OLD.`device_version` OR NOT (OLD.`last_rotation_idempotency_hash` <=> NEW.`last_rotation_idempotency_hash`) OR NOT (OLD.`expires_at` <=> NEW.`expires_at`) OR NOT (OLD.`rotated_at` <=> NEW.`rotated_at`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_rotation_invalid'; END IF; IF NEW.`status` <> OLD.`status` AND NEW.`device_version` <> OLD.`device_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_version_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_checkin_device_no_delete` BEFORE DELETE ON `event_checkin_devices` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_checkin_device_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_domain_outbox`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3464,11 +4181,681 @@ CREATE TABLE `event_domain_outbox` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_event_outbox_tenant_key` (`tenant_id`,`idempotency_key`),
+  UNIQUE KEY `uq_event_outbox_scope_id` (`tenant_id`,`event_id`,`id`),
   KEY `idx_event_outbox_claim` (`status`,`available_at`,`next_attempt_at`,`id`),
   KEY `idx_event_outbox_aggregate` (`tenant_id`,`event_id`,`aggregate_version`),
   KEY `idx_event_outbox_stream` (`tenant_id`,`event_id`,`aggregate_stream`,`aggregate_version`,`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_federation_deliveries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_federation_deliveries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `external_partner_id` int(11) NOT NULL,
+  `payload_schema_version` smallint(5) unsigned NOT NULL,
+  `event_aggregate_version` bigint(20) unsigned NOT NULL,
+  `event_calendar_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `action` varchar(16) NOT NULL,
+  `idempotency_key` char(64) NOT NULL,
+  `payload_hash` char(64) NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`payload`)),
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `available_at` timestamp NULL DEFAULT NULL,
+  `next_attempt_at` timestamp NULL DEFAULT NULL,
+  `claim_token` char(36) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `last_attempt_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `dead_lettered_at` timestamp NULL DEFAULT NULL,
+  `last_error_code` varchar(64) DEFAULT NULL,
+  `last_error` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_fed_delivery_idempotency` (`tenant_id`,`external_partner_id`,`idempotency_key`),
+  UNIQUE KEY `uq_event_fed_delivery_version` (`tenant_id`,`event_id`,`external_partner_id`,`payload_schema_version`,`event_aggregate_version`,`event_calendar_version`),
+  KEY `idx_event_fed_delivery_claim` (`status`,`available_at`,`next_attempt_at`,`id`),
+  KEY `idx_event_fed_delivery_partner` (`tenant_id`,`external_partner_id`,`status`,`id`),
+  KEY `idx_event_fed_delivery_event` (`tenant_id`,`event_id`,`external_partner_id`,`event_aggregate_version`,`id`),
+  CONSTRAINT `chk_event_fed_delivery_action` CHECK (`action` in ('upsert','tombstone')),
+  CONSTRAINT `chk_event_fed_delivery_status` CHECK (`status` in ('pending','retry','processing','delivered','dead_letter')),
+  CONSTRAINT `chk_event_fed_delivery_attempts` CHECK (`payload_schema_version` > 0 and `attempts` <= 5),
+  CONSTRAINT `chk_event_fed_delivery_claim` CHECK (`status` = 'processing' and `claim_token` is not null and `claimed_at` is not null or `status` <> 'processing' and `claim_token` is null and `claimed_at` is null),
+  CONSTRAINT `chk_event_fed_delivery_terminal` CHECK ((`status` <> 'delivered' or `delivered_at` is not null) and (`status` <> 'dead_letter' or `dead_lettered_at` is not null))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_guardian_consent_delivery_access`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_guardian_consent_delivery_access` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `envelope_id` bigint(20) unsigned NOT NULL,
+  `consent_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `consent_version` bigint(20) unsigned NOT NULL,
+  `operation` varchar(32) NOT NULL,
+  `consumer` varchar(191) DEFAULT NULL,
+  `claim_id_hash` char(64) DEFAULT NULL,
+  `from_status` varchar(32) DEFAULT NULL,
+  `to_status` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_guardian_delivery_access_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_guardian_delivery_access_envelope` (`tenant_id`,`envelope_id`,`created_at`,`id`),
+  KEY `idx_event_guardian_delivery_access_event` (`tenant_id`,`event_id`,`operation`,`created_at`,`id`),
+  KEY `fk_event_guardian_delivery_access_envelope` (`tenant_id`,`event_id`,`envelope_id`,`consent_id`,`outbox_id`,`consent_version`),
+  KEY `fk_event_guardian_delivery_access_consent` (`tenant_id`,`event_id`,`consent_id`),
+  KEY `fk_event_guardian_delivery_access_outbox` (`tenant_id`,`event_id`,`outbox_id`),
+  CONSTRAINT `fk_event_guardian_delivery_access_consent` FOREIGN KEY (`tenant_id`, `event_id`, `consent_id`) REFERENCES `event_guardian_consents` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_guardian_delivery_access_envelope` FOREIGN KEY (`tenant_id`, `event_id`, `envelope_id`, `consent_id`, `outbox_id`, `consent_version`) REFERENCES `event_guardian_consent_delivery_envelopes` (`tenant_id`, `event_id`, `id`, `consent_id`, `outbox_id`, `consent_version`),
+  CONSTRAINT `fk_event_guardian_delivery_access_outbox` FOREIGN KEY (`tenant_id`, `event_id`, `outbox_id`) REFERENCES `event_domain_outbox` (`tenant_id`, `event_id`, `id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_delivery_access_no_update` BEFORE UPDATE ON `event_guardian_consent_delivery_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_delivery_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_delivery_access_no_delete` BEFORE DELETE ON `event_guardian_consent_delivery_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_delivery_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_guardian_consent_delivery_envelopes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_guardian_consent_delivery_envelopes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `consent_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `consent_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(80) NOT NULL,
+  `cipher_version` varchar(32) NOT NULL,
+  `key_version` varchar(64) NOT NULL,
+  `key_fingerprint` char(64) NOT NULL,
+  `aad_hash` char(64) NOT NULL,
+  `token_ciphertext` longtext DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'sealed',
+  `envelope_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `claim_token_hash` char(64) DEFAULT NULL,
+  `claimed_by` varchar(191) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `handed_off_at` timestamp NULL DEFAULT NULL,
+  `erased_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_guardian_delivery_envelope_outbox` (`tenant_id`,`outbox_id`),
+  UNIQUE KEY `uq_event_guardian_delivery_envelope_version` (`tenant_id`,`consent_id`,`consent_version`),
+  UNIQUE KEY `uq_event_guardian_delivery_envelope_scope` (`tenant_id`,`event_id`,`id`,`consent_id`,`outbox_id`,`consent_version`),
+  KEY `idx_event_guardian_delivery_envelope_status` (`tenant_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_guardian_delivery_envelope_consent` (`tenant_id`,`event_id`,`consent_id`,`id`),
+  KEY `fk_event_guardian_delivery_outbox` (`tenant_id`,`event_id`,`outbox_id`),
+  CONSTRAINT `fk_event_guardian_delivery_consent` FOREIGN KEY (`tenant_id`, `event_id`, `consent_id`) REFERENCES `event_guardian_consents` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_guardian_delivery_outbox` FOREIGN KEY (`tenant_id`, `event_id`, `outbox_id`) REFERENCES `event_domain_outbox` (`tenant_id`, `event_id`, `id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_guardian_consent_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_guardian_consent_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `consent_id` bigint(20) unsigned NOT NULL,
+  `minor_user_id` int(11) NOT NULL,
+  `consent_version` bigint(20) unsigned NOT NULL,
+  `status` varchar(16) NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `actor_type` varchar(24) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `evidence` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`evidence`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_guardian_consent_history_version` (`tenant_id`,`consent_id`,`consent_version`),
+  UNIQUE KEY `uq_event_guardian_consent_history_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_guardian_consent_history_minor` (`tenant_id`,`event_id`,`minor_user_id`,`created_at`,`id`),
+  KEY `fk_event_guardian_history_consent` (`tenant_id`,`event_id`,`consent_id`,`minor_user_id`),
+  KEY `fk_event_guardian_history_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_guardian_history_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_guardian_history_consent` FOREIGN KEY (`tenant_id`, `event_id`, `consent_id`, `minor_user_id`) REFERENCES `event_guardian_consents` (`tenant_id`, `event_id`, `id`, `minor_user_id`),
+  CONSTRAINT `fk_event_guardian_history_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_guardian_history_action` CHECK (`action` in ('requested','granted','withdrawn','expired')),
+  CONSTRAINT `chk_event_guardian_history_status` CHECK (`status` in ('pending','active','withdrawn','expired')),
+  CONSTRAINT `chk_event_guardian_history_actor` CHECK (`actor_type` = 'platform_user' and `actor_user_id` is not null or `actor_type` = 'guardian_external' and `actor_user_id` is null),
+  CONSTRAINT `chk_event_guardian_history_version` CHECK (`consent_version` > 0),
+  CONSTRAINT `chk_event_guardian_history_hashes` CHECK (`idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_history_no_update` BEFORE UPDATE ON `event_guardian_consent_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_history_no_delete` BEFORE DELETE ON `event_guardian_consent_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_guardian_consents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_guardian_consents` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `requirements_id` bigint(20) unsigned NOT NULL,
+  `requirements_version_id` bigint(20) unsigned NOT NULL,
+  `requirements_version_number` int(10) unsigned NOT NULL,
+  `minor_user_id` int(11) NOT NULL,
+  `guardian_email_ciphertext` longtext NOT NULL,
+  `guardian_identity_ciphertext` longtext NOT NULL,
+  `guardian_email_blind_hash` char(64) NOT NULL,
+  `relationship_code` varchar(32) NOT NULL,
+  `guardian_locale` varchar(15) DEFAULT NULL,
+  `consent_text` longtext NOT NULL,
+  `consent_text_version` varchar(64) NOT NULL,
+  `consent_text_hash` char(64) NOT NULL,
+  `policy_binding_hash` char(64) NOT NULL,
+  `token_hash` char(64) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'pending',
+  `active_slot` tinyint(3) unsigned DEFAULT 1,
+  `consent_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `requested_by_user_id` int(11) NOT NULL,
+  `request_idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `requested_at` timestamp NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `token_consumed_at` timestamp NULL DEFAULT NULL,
+  `granted_at` timestamp NULL DEFAULT NULL,
+  `withdrawn_by_user_id` int(11) DEFAULT NULL,
+  `withdrawn_at` timestamp NULL DEFAULT NULL,
+  `expired_by_user_id` int(11) DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_guardian_consent_token` (`token_hash`),
+  UNIQUE KEY `uq_event_guardian_consent_request_key` (`tenant_id`,`request_idempotency_hash`),
+  UNIQUE KEY `uq_event_guardian_consent_id` (`tenant_id`,`event_id`,`id`,`minor_user_id`),
+  UNIQUE KEY `uq_event_guardian_consent_scope_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_guardian_consent_active` (`tenant_id`,`event_id`,`minor_user_id`,`active_slot`),
+  KEY `idx_event_guardian_consent_minor` (`tenant_id`,`event_id`,`minor_user_id`,`status`,`expires_at`,`id`),
+  KEY `fk_event_guardian_consent_event` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_guardian_consent_version` (`tenant_id`,`event_id`,`requirements_id`,`requirements_version_id`,`requirements_version_number`),
+  KEY `fk_event_guardian_consent_minor` (`minor_user_id`,`tenant_id`),
+  KEY `fk_event_guardian_consent_requester` (`requested_by_user_id`,`tenant_id`),
+  KEY `fk_event_guardian_consent_withdrawer` (`withdrawn_by_user_id`,`tenant_id`),
+  KEY `fk_event_guardian_consent_expirer` (`expired_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_guardian_consent_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_guardian_consent_expirer` FOREIGN KEY (`expired_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_guardian_consent_minor` FOREIGN KEY (`minor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_guardian_consent_requester` FOREIGN KEY (`requested_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_guardian_consent_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_guardian_consent_version` FOREIGN KEY (`tenant_id`, `event_id`, `requirements_id`, `requirements_version_id`, `requirements_version_number`) REFERENCES `event_safety_requirement_versions` (`tenant_id`, `event_id`, `requirements_id`, `id`, `version_number`),
+  CONSTRAINT `fk_event_guardian_consent_withdrawer` FOREIGN KEY (`withdrawn_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_guardian_consent_relationship` CHECK (`relationship_code` in ('parent','guardian','legal_guardian','carer')),
+  CONSTRAINT `chk_event_guardian_consent_version` CHECK (`requirements_version_number` > 0 and `consent_version` > 0),
+  CONSTRAINT `chk_event_guardian_consent_hashes` CHECK (`guardian_email_blind_hash` regexp '^[0-9a-f]{64}$' and `consent_text_hash` regexp '^[0-9a-f]{64}$' and `policy_binding_hash` regexp '^[0-9a-f]{64}$' and `token_hash` regexp '^[0-9a-f]{64}$' and `request_idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_guardian_consent_expiry` CHECK (`requested_at` < `expires_at`),
+  CONSTRAINT `chk_event_guardian_consent_state` CHECK (`status` = 'pending' and `active_slot` = 1 and `token_consumed_at` is null and `granted_at` is null and `withdrawn_by_user_id` is null and `withdrawn_at` is null and `expired_by_user_id` is null and `expired_at` is null or `status` = 'active' and `active_slot` = 1 and `token_consumed_at` is not null and `granted_at` is not null and `withdrawn_by_user_id` is null and `withdrawn_at` is null and `expired_by_user_id` is null and `expired_at` is null or `status` = 'withdrawn' and `active_slot` is null and `withdrawn_by_user_id` is not null and `withdrawn_at` is not null and `expired_by_user_id` is null and `expired_at` is null or `status` = 'expired' and `active_slot` is null and `expired_by_user_id` is not null and `expired_at` is not null and `withdrawn_by_user_id` is null and `withdrawn_at` is null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_consent_update` BEFORE UPDATE ON `event_guardian_consents` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`requirements_id` <=> NEW.`requirements_id`) OR NOT (OLD.`requirements_version_id` <=> NEW.`requirements_version_id`) OR NOT (OLD.`requirements_version_number` <=> NEW.`requirements_version_number`) OR NOT (OLD.`minor_user_id` <=> NEW.`minor_user_id`) OR NOT (OLD.`guardian_email_ciphertext` <=> NEW.`guardian_email_ciphertext`) OR NOT (OLD.`guardian_identity_ciphertext` <=> NEW.`guardian_identity_ciphertext`) OR NOT (OLD.`guardian_email_blind_hash` <=> NEW.`guardian_email_blind_hash`) OR NOT (OLD.`relationship_code` <=> NEW.`relationship_code`) OR NOT (OLD.`consent_text` <=> NEW.`consent_text`) OR NOT (OLD.`consent_text_version` <=> NEW.`consent_text_version`) OR NOT (OLD.`consent_text_hash` <=> NEW.`consent_text_hash`) OR NOT (OLD.`policy_binding_hash` <=> NEW.`policy_binding_hash`) OR NOT (OLD.`token_hash` <=> NEW.`token_hash`) OR NOT (OLD.`requested_by_user_id` <=> NEW.`requested_by_user_id`) OR NOT (OLD.`request_idempotency_hash` <=> NEW.`request_idempotency_hash`) OR NOT (OLD.`request_hash` <=> NEW.`request_hash`) OR NOT (OLD.`requested_at` <=> NEW.`requested_at`) OR NOT (OLD.`expires_at` <=> NEW.`expires_at`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_identity_immutable'; END IF; IF OLD.`status` IN ('withdrawn','expired') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_terminal_immutable'; END IF; IF NEW.`consent_version` <> OLD.`consent_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_version_invalid'; END IF; IF (OLD.`status` = 'pending' AND NEW.`status` NOT IN ('active','withdrawn','expired')) OR (OLD.`status` = 'active' AND NEW.`status` NOT IN ('withdrawn','expired')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_guardian_consent_no_delete` BEFORE DELETE ON `event_guardian_consents` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_guardian_consent_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_invitation_campaign_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_invitation_campaign_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL,
+  `action` varchar(24) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_inv_campaign_hist_rev` (`tenant_id`,`campaign_id`,`revision`),
+  UNIQUE KEY `uq_event_inv_campaign_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_inv_campaign_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_event_inv_campaign_hist_campaign` (`tenant_id`,`event_id`,`campaign_id`),
+  KEY `fk_event_inv_campaign_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_inv_campaign_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_inv_campaign_hist_campaign` FOREIGN KEY (`tenant_id`, `event_id`, `campaign_id`) REFERENCES `event_invitation_campaigns` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_inv_campaign_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_inv_campaign_hist_action` CHECK (`action` in ('previewed','scheduled','cancelled','issuing','issued'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_campaign_hist_no_update` BEFORE UPDATE ON `event_invitation_campaign_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_campaign_hist_no_delete` BEFORE DELETE ON `event_invitation_campaign_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_invitation_campaigns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_invitation_campaigns` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `campaign_type` varchar(16) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'previewed',
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `source_hash` char(64) NOT NULL,
+  `source_schema_version` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `source_snapshot_ciphertext` longtext DEFAULT NULL,
+  `segment_criteria_summary` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`segment_criteria_summary`)),
+  `source_reference` varchar(191) DEFAULT NULL,
+  `preview_count` int(10) unsigned NOT NULL,
+  `valid_count` int(10) unsigned NOT NULL,
+  `error_count` int(10) unsigned NOT NULL,
+  `preview_errors` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`preview_errors`)),
+  `default_locale` varchar(15) NOT NULL DEFAULT 'en',
+  `scheduled_for_utc` datetime DEFAULT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `issued_at` timestamp NULL DEFAULT NULL,
+  `started_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `cancelled_reason` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_inv_campaign_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_event_inv_campaign_id` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_event_inv_campaign_event` (`tenant_id`,`event_id`,`status`,`id`),
+  KEY `fk_event_inv_campaign_event` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_inv_campaign_creator` (`created_by`,`tenant_id`),
+  KEY `fk_event_inv_campaign_updater` (`updated_by`,`tenant_id`),
+  CONSTRAINT `fk_event_inv_campaign_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_inv_campaign_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_inv_campaign_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_inv_campaign_updater` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_inv_campaign_type` CHECK (`campaign_type` in ('member','email','group','audience','csv')),
+  CONSTRAINT `chk_event_inv_campaign_counts` CHECK (`preview_count` = `valid_count` + `error_count`),
+  CONSTRAINT `chk_event_inv_campaign_status` CHECK (`status` in ('previewed','scheduled','issuing','issued','cancelled')),
+  CONSTRAINT `chk_event_inv_campaign_state` CHECK (`status` = 'previewed' and `scheduled_for_utc` is null and `issued_at` is null and `started_at` is null and `completed_at` is null and `cancelled_at` is null and `cancelled_reason` is null or `status` = 'scheduled' and `scheduled_for_utc` is not null and `issued_at` is null and `started_at` is null and `completed_at` is null and `cancelled_at` is null and `cancelled_reason` is null or `status` = 'issuing' and `started_at` is not null and `issued_at` is null and `completed_at` is null and `cancelled_at` is null and `cancelled_reason` is null or `status` = 'issued' and `issued_at` is not null and `started_at` is not null and `completed_at` is not null and `cancelled_at` is null and `cancelled_reason` is null or `status` = 'cancelled' and `issued_at` is null and `completed_at` is null and `cancelled_at` is not null and `cancelled_reason` is not null and char_length(trim(`cancelled_reason`)) > 0),
+  CONSTRAINT `chk_event_inv_campaign_source_snapshot` CHECK (`source_schema_version` > 0 and (`source_snapshot_ciphertext` is null or char_length(`source_snapshot_ciphertext`) > 0) and (`segment_criteria_summary` is null or json_type(`segment_criteria_summary`) = 'OBJECT'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_campaign_concrete_insert` BEFORE INSERT ON `event_invitation_campaigns` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_campaign_concrete_update` BEFORE UPDATE ON `event_invitation_campaigns` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_campaign_evidence_update` BEFORE UPDATE ON `event_invitation_campaigns` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`campaign_type` <=> NEW.`campaign_type`) OR NOT (OLD.`source_hash` <=> NEW.`source_hash`) OR NOT (OLD.`source_schema_version` <=> NEW.`source_schema_version`) OR NOT (OLD.`source_snapshot_ciphertext` <=> NEW.`source_snapshot_ciphertext`) OR NOT (OLD.`segment_criteria_summary` <=> NEW.`segment_criteria_summary`) OR NOT (OLD.`source_reference` <=> NEW.`source_reference`) OR NOT (OLD.`preview_count` <=> NEW.`preview_count`) OR NOT (OLD.`valid_count` <=> NEW.`valid_count`) OR NOT (OLD.`error_count` <=> NEW.`error_count`) OR NOT (OLD.`preview_errors` <=> NEW.`preview_errors`) OR NOT (OLD.`default_locale` <=> NEW.`default_locale`) OR NOT (OLD.`idempotency_hash` <=> NEW.`idempotency_hash`) OR NOT (OLD.`request_hash` <=> NEW.`request_hash`) OR NOT (OLD.`created_by` <=> NEW.`created_by`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_evidence_immutable'; END IF; IF OLD.`status` IN ('issued','cancelled') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_terminal_state_immutable'; END IF; IF NEW.`revision` <> OLD.`revision` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_revision_invalid'; END IF; IF NOT ((OLD.`status` = 'previewed' AND NEW.`status` IN ('scheduled','issuing','issued','cancelled')) OR (OLD.`status` = 'scheduled' AND NEW.`status` IN ('issuing','cancelled')) OR (OLD.`status` = 'issuing' AND NEW.`status` = 'issued') OR (OLD.`status` = NEW.`status`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_campaign_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_invitation_delivery_evidence`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_invitation_delivery_evidence` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
+  `invitation_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned DEFAULT NULL,
+  `notification_delivery_id` bigint(20) unsigned DEFAULT NULL,
+  `evidence_version` bigint(20) unsigned NOT NULL,
+  `channel` varchar(32) NOT NULL,
+  `recipient_locale` varchar(15) NOT NULL,
+  `preference_decision` varchar(16) NOT NULL,
+  `preference_reason` varchar(100) DEFAULT NULL,
+  `status` varchar(32) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `provider_evidence_id` varchar(255) DEFAULT NULL,
+  `failure_code` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_inv_delivery_version` (`tenant_id`,`invitation_id`,`channel`,`evidence_version`),
+  UNIQUE KEY `uq_event_inv_delivery_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_inv_delivery_campaign` (`tenant_id`,`event_id`,`campaign_id`,`status`,`id`),
+  KEY `fk_event_inv_delivery_invitation` (`tenant_id`,`event_id`,`invitation_id`),
+  KEY `fk_event_inv_delivery_outbox` (`tenant_id`,`event_id`,`outbox_id`),
+  KEY `fk_event_inv_delivery_notification` (`notification_delivery_id`),
+  CONSTRAINT `fk_event_inv_delivery_campaign` FOREIGN KEY (`tenant_id`, `event_id`, `campaign_id`) REFERENCES `event_invitation_campaigns` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_inv_delivery_invitation` FOREIGN KEY (`tenant_id`, `event_id`, `invitation_id`) REFERENCES `event_invitations` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_inv_delivery_notification` FOREIGN KEY (`notification_delivery_id`) REFERENCES `event_notification_deliveries` (`id`),
+  CONSTRAINT `fk_event_inv_delivery_outbox` FOREIGN KEY (`tenant_id`, `event_id`, `outbox_id`) REFERENCES `event_domain_outbox` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_inv_delivery_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_inv_delivery_fields` CHECK (`evidence_version` > 0 and `channel` in ('email','in_app','web_push','fcm','realtime') and `preference_decision` in ('deliver','suppressed') and `status` in ('queued','suppressed','dispatched','delivered','failed','dead_letter'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_delivery_no_update` BEFORE UPDATE ON `event_invitation_delivery_evidence` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_delivery_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_inv_delivery_no_delete` BEFORE DELETE ON `event_invitation_delivery_evidence` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_delivery_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_invitation_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_invitation_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `invitation_id` bigint(20) unsigned NOT NULL,
+  `invitation_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_invitation_hist_version` (`tenant_id`,`invitation_id`,`invitation_version`),
+  UNIQUE KEY `uq_event_invitation_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_invitation_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_event_invitation_hist_invitation` (`tenant_id`,`event_id`,`invitation_id`),
+  KEY `fk_event_invitation_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_invitation_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_invitation_hist_invitation` FOREIGN KEY (`tenant_id`, `event_id`, `invitation_id`) REFERENCES `event_invitations` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_invitation_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_invitation_history_no_update` BEFORE UPDATE ON `event_invitation_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_invitation_history_no_delete` BEFORE DELETE ON `event_invitation_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_invitations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_invitations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `campaign_id` bigint(20) unsigned NOT NULL,
+  `target_type` varchar(16) NOT NULL,
+  `member_user_id` int(11) DEFAULT NULL,
+  `email_ciphertext` longtext DEFAULT NULL,
+  `email_blind_hash` char(64) DEFAULT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'issued',
+  `invitation_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `token_hash` char(64) NOT NULL,
+  `token_fingerprint` char(16) NOT NULL,
+  `token_expires_at` datetime NOT NULL,
+  `token_used_at` timestamp NULL DEFAULT NULL,
+  `accepted_by_user_id` int(11) DEFAULT NULL,
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `issue_idempotency_hash` char(64) NOT NULL,
+  `issue_request_hash` char(64) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_invitation_token` (`token_hash`),
+  UNIQUE KEY `uq_event_invitation_issue_key` (`tenant_id`,`issue_idempotency_hash`),
+  UNIQUE KEY `uq_event_invitation_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_invitation_member` (`tenant_id`,`campaign_id`,`member_user_id`),
+  UNIQUE KEY `uq_event_invitation_email` (`tenant_id`,`campaign_id`,`email_blind_hash`),
+  KEY `idx_event_invitation_event_status` (`tenant_id`,`event_id`,`status`,`token_expires_at`,`id`),
+  KEY `fk_event_invitation_campaign` (`tenant_id`,`event_id`,`campaign_id`),
+  KEY `fk_event_invitation_member` (`member_user_id`,`tenant_id`),
+  KEY `fk_event_invitation_acceptor` (`accepted_by_user_id`,`tenant_id`),
+  KEY `fk_event_invitation_creator` (`created_by`,`tenant_id`),
+  CONSTRAINT `fk_event_invitation_acceptor` FOREIGN KEY (`accepted_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_invitation_campaign` FOREIGN KEY (`tenant_id`, `event_id`, `campaign_id`) REFERENCES `event_invitation_campaigns` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_invitation_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_invitation_member` FOREIGN KEY (`member_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_invitation_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_invitation_target` CHECK (`target_type` = 'member' and `member_user_id` is not null and `email_ciphertext` is null and `email_blind_hash` is null or `target_type` = 'email' and `member_user_id` is null and `email_ciphertext` is not null and `email_blind_hash` is not null),
+  CONSTRAINT `chk_event_invitation_status` CHECK (`status` in ('issued','accepted','revoked','expired')),
+  CONSTRAINT `chk_event_invitation_version` CHECK (`invitation_version` > 0),
+  CONSTRAINT `chk_event_invitation_state` CHECK (`status` = 'issued' and `token_used_at` is null and `accepted_by_user_id` is null and `accepted_at` is null and `revoked_at` is null and `expired_at` is null or `status` = 'accepted' and `token_used_at` is not null and `accepted_by_user_id` is not null and `accepted_at` is not null and `revoked_at` is null and `expired_at` is null or `status` = 'revoked' and `token_used_at` is null and `accepted_at` is null and `revoked_at` is not null and `expired_at` is null or `status` = 'expired' and `token_used_at` is null and `accepted_at` is null and `revoked_at` is null and `expired_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_invitation_identity_update` BEFORE UPDATE ON `event_invitations` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`campaign_id` <=> NEW.`campaign_id`) OR NOT (OLD.`target_type` <=> NEW.`target_type`) OR NOT (OLD.`member_user_id` <=> NEW.`member_user_id`) OR NOT (OLD.`email_ciphertext` <=> NEW.`email_ciphertext`) OR NOT (OLD.`email_blind_hash` <=> NEW.`email_blind_hash`) OR NOT (OLD.`token_hash` <=> NEW.`token_hash`) OR NOT (OLD.`token_fingerprint` <=> NEW.`token_fingerprint`) OR NOT (OLD.`token_expires_at` <=> NEW.`token_expires_at`) OR NOT (OLD.`issue_idempotency_hash` <=> NEW.`issue_idempotency_hash`) OR NOT (OLD.`issue_request_hash` <=> NEW.`issue_request_hash`) OR NOT (OLD.`created_by` <=> NEW.`created_by`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_identity_immutable'; END IF; IF OLD.`status` <> 'issued' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_terminal_state_immutable'; END IF; IF (NEW.`status` = 'issued' AND NEW.`invitation_version` <> OLD.`invitation_version`) OR (NEW.`status` <> 'issued' AND NEW.`invitation_version` <> OLD.`invitation_version` + 1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_version_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_invitation_no_delete` BEFORE DELETE ON `event_invitations` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_invitation_evidence_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_notification_deliveries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3476,7 +4863,8 @@ CREATE TABLE `event_notification_deliveries` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
   `outbox_id` bigint(20) unsigned NOT NULL,
-  `recipient_user_id` int(11) NOT NULL,
+  `recipient_user_id` int(11) DEFAULT NULL,
+  `external_recipient_hash` char(64) DEFAULT NULL,
   `channel` varchar(32) NOT NULL,
   `delivery_key` varchar(191) NOT NULL,
   `status` varchar(32) NOT NULL DEFAULT 'pending',
@@ -3497,11 +4885,771 @@ CREATE TABLE `event_notification_deliveries` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_event_delivery_tenant_key` (`tenant_id`,`delivery_key`),
   UNIQUE KEY `uq_event_delivery_recipient_channel` (`outbox_id`,`recipient_user_id`,`channel`),
+  UNIQUE KEY `uq_event_delivery_external_recipient_channel` (`outbox_id`,`external_recipient_hash`,`channel`),
   KEY `idx_event_delivery_claim` (`status`,`next_attempt_at`,`id`),
   KEY `idx_event_delivery_recipient` (`tenant_id`,`recipient_user_id`,`status`),
-  CONSTRAINT `fk_event_delivery_outbox` FOREIGN KEY (`outbox_id`) REFERENCES `event_domain_outbox` (`id`)
+  CONSTRAINT `fk_event_delivery_outbox` FOREIGN KEY (`outbox_id`) REFERENCES `event_domain_outbox` (`id`),
+  CONSTRAINT `chk_event_delivery_recipient_xor` CHECK (`recipient_user_id` is not null and `external_recipient_hash` is null or `recipient_user_id` is null and `external_recipient_hash` is not null),
+  CONSTRAINT `chk_event_delivery_external_hash` CHECK (`external_recipient_hash` is null or `external_recipient_hash` regexp '^[0-9a-f]{64}$')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_notification_outbox_replays`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_notification_outbox_replays` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `requested_by` varchar(191) NOT NULL,
+  `reason` varchar(1000) NOT NULL,
+  `previous_attempts` smallint(5) unsigned NOT NULL,
+  `previous_error_fingerprint` char(64) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_event_outbox_replay_tenant` (`tenant_id`,`created_at`,`id`),
+  KEY `idx_event_outbox_replay_outbox` (`outbox_id`,`created_at`,`id`),
+  CONSTRAINT `fk_event_outbox_replay_outbox` FOREIGN KEY (`outbox_id`) REFERENCES `event_domain_outbox` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_outbox_replay_no_update` BEFORE UPDATE ON `event_notification_outbox_replays` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_notification_outbox_replay_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_outbox_replay_no_delete` BEFORE DELETE ON `event_notification_outbox_replays` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_notification_outbox_replay_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_notification_preferences`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_notification_preferences` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `event_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `email_enabled` tinyint(1) DEFAULT NULL,
+  `in_app_enabled` tinyint(1) DEFAULT NULL,
+  `web_push_enabled` tinyint(1) DEFAULT NULL,
+  `fcm_enabled` tinyint(1) DEFAULT NULL,
+  `realtime_enabled` tinyint(1) DEFAULT NULL,
+  `cadence` varchar(16) DEFAULT NULL,
+  `reminders_enabled` tinyint(1) DEFAULT NULL,
+  `preference_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_notification_preference_event` (`tenant_id`,`user_id`,`event_id`),
+  UNIQUE KEY `uq_event_notification_preference_category` (`tenant_id`,`user_id`,`category_id`),
+  KEY `idx_event_notification_preference_event` (`tenant_id`,`event_id`,`user_id`),
+  KEY `idx_event_notification_preference_category` (`tenant_id`,`category_id`,`user_id`),
+  KEY `fk_event_notification_preference_user` (`user_id`),
+  KEY `fk_event_notification_preference_event` (`event_id`),
+  KEY `fk_event_notification_preference_category` (`category_id`),
+  CONSTRAINT `fk_event_notification_preference_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_event_notification_preference_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_event_notification_preference_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_event_notification_preference_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_event_notification_preference_scope` CHECK (`event_id` is not null and `category_id` is null or `event_id` is null and `category_id` is not null),
+  CONSTRAINT `chk_event_notification_preference_cadence` CHECK (`cadence` is null or `cadence` in ('instant','daily','monthly','off'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_offline_sync_batches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_offline_sync_batches` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `device_id` bigint(20) unsigned NOT NULL,
+  `submitted_by_user_id` int(11) NOT NULL,
+  `client_batch_id` varchar(100) NOT NULL,
+  `payload_hash` char(64) NOT NULL,
+  `manifest_version` bigint(20) unsigned NOT NULL,
+  `item_count` smallint(5) unsigned NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'pending',
+  `claim_attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `available_at` timestamp NOT NULL,
+  `claim_token_hash` char(64) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `claim_expires_at` timestamp NULL DEFAULT NULL,
+  `last_claimed_at` timestamp NULL DEFAULT NULL,
+  `last_released_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `dead_lettered_at` timestamp NULL DEFAULT NULL,
+  `terminal_code` varchar(64) DEFAULT NULL,
+  `terminal_reason` varchar(500) DEFAULT NULL,
+  `terminal_by_user_id` int(11) DEFAULT NULL,
+  `accepted_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `conflict_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `rejected_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_offline_batch_client` (`tenant_id`,`device_id`,`client_batch_id`),
+  UNIQUE KEY `uq_event_offline_batch_scope_id` (`tenant_id`,`event_id`,`device_id`,`id`),
+  KEY `idx_event_offline_batch_claim` (`status`,`available_at`,`claim_expires_at`,`id`),
+  KEY `idx_event_offline_batch_event` (`tenant_id`,`event_id`,`status`,`id`),
+  KEY `fk_event_offline_batch_occurrence` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_offline_batch_actor_tenant` (`submitted_by_user_id`,`tenant_id`),
+  KEY `fk_event_offline_batch_terminal_actor_tenant` (`terminal_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_offline_batch_actor_tenant` FOREIGN KEY (`submitted_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_offline_batch_device` FOREIGN KEY (`tenant_id`, `event_id`, `device_id`) REFERENCES `event_checkin_devices` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_offline_batch_occurrence` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_offline_batch_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_offline_batch_terminal_actor_tenant` FOREIGN KEY (`terminal_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_offline_batch_count` CHECK (`item_count` between 1 and 500),
+  CONSTRAINT `chk_event_offline_batch_status` CHECK (`status` in ('pending','processing','completed','dead_letter')),
+  CONSTRAINT `chk_event_offline_batch_attempts` CHECK (`claim_attempts` <= 100),
+  CONSTRAINT `chk_event_offline_batch_claim` CHECK (`status` = 'processing' and `claim_token_hash` is not null and `claimed_at` is not null and `claim_expires_at` is not null or `status` <> 'processing' and `claim_token_hash` is null and `claimed_at` is null and `claim_expires_at` is null),
+  CONSTRAINT `chk_event_offline_batch_outcomes` CHECK (`accepted_count` + `conflict_count` + `rejected_count` <= `item_count` and (`status` <> 'completed' or `accepted_count` + `conflict_count` + `rejected_count` = `item_count` and `completed_at` is not null) and (`status` = 'completed' or `completed_at` is null)),
+  CONSTRAINT `chk_event_offline_batch_terminal` CHECK (`status` = 'dead_letter' and `dead_lettered_at` is not null and `terminal_code` is not null and char_length(trim(`terminal_code`)) > 0 and `completed_at` is null or `status` <> 'dead_letter' and `dead_lettered_at` is null and `terminal_code` is null and `terminal_reason` is null and `terminal_by_user_id` is null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_batch_update` BEFORE UPDATE ON `event_offline_sync_batches` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`device_id` <=> NEW.`device_id`) OR NOT (OLD.`submitted_by_user_id` <=> NEW.`submitted_by_user_id`) OR NOT (OLD.`client_batch_id` <=> NEW.`client_batch_id`) OR NOT (OLD.`payload_hash` <=> NEW.`payload_hash`) OR NOT (OLD.`manifest_version` <=> NEW.`manifest_version`) OR NOT (OLD.`item_count` <=> NEW.`item_count`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_evidence_immutable'; END IF; IF OLD.`status` IN ('completed','dead_letter') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_terminal_immutable'; END IF; IF NEW.`claim_attempts` < OLD.`claim_attempts` OR NEW.`claim_attempts` > OLD.`claim_attempts` + 1 OR NEW.`accepted_count` < OLD.`accepted_count` OR NEW.`conflict_count` < OLD.`conflict_count` OR NEW.`rejected_count` < OLD.`rejected_count` THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_progress_invalid'; END IF; IF NEW.`status` = 'processing' AND ((OLD.`status` = 'pending' AND NEW.`claim_attempts` <> OLD.`claim_attempts` + 1) OR (OLD.`status` = 'processing' AND NOT ((NEW.`claim_attempts` = OLD.`claim_attempts` AND NEW.`claim_token_hash` <=> OLD.`claim_token_hash`) OR (NEW.`claim_attempts` = OLD.`claim_attempts` + 1 AND NOT (NEW.`claim_token_hash` <=> OLD.`claim_token_hash`))))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_claim_invalid'; END IF; IF (OLD.`status` = 'pending' AND NEW.`status` NOT IN ('processing','dead_letter')) OR (OLD.`status` = 'processing' AND NEW.`status` NOT IN ('processing','pending','completed','dead_letter')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_batch_no_delete` BEFORE DELETE ON `event_offline_sync_batches` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_batch_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_offline_sync_decisions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_offline_sync_decisions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `batch_id` bigint(20) unsigned NOT NULL,
+  `item_id` bigint(20) unsigned NOT NULL,
+  `decision_version` bigint(20) unsigned NOT NULL,
+  `outcome` varchar(16) NOT NULL,
+  `decision_code` varchar(64) NOT NULL,
+  `decision_reason` varchar(500) DEFAULT NULL,
+  `attendance_version_before` bigint(20) unsigned DEFAULT NULL,
+  `attendance_version_after` bigint(20) unsigned DEFAULT NULL,
+  `attendance_activity_id` bigint(20) unsigned DEFAULT NULL,
+  `decided_by_user_id` int(11) NOT NULL,
+  `idempotency_key_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_offline_decision_version` (`tenant_id`,`item_id`,`decision_version`),
+  UNIQUE KEY `uq_event_offline_decision_idempotency` (`tenant_id`,`idempotency_key_hash`),
+  KEY `idx_event_offline_decision_batch` (`tenant_id`,`event_id`,`batch_id`,`outcome`,`id`),
+  KEY `fk_event_offline_decision_item` (`tenant_id`,`event_id`,`batch_id`,`item_id`),
+  KEY `fk_event_offline_decision_actor_tenant` (`decided_by_user_id`,`tenant_id`),
+  KEY `fk_event_offline_decision_attendance` (`tenant_id`,`event_id`,`attendance_activity_id`),
+  CONSTRAINT `fk_event_offline_decision_actor_tenant` FOREIGN KEY (`decided_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_offline_decision_attendance` FOREIGN KEY (`tenant_id`, `event_id`, `attendance_activity_id`) REFERENCES `event_attendance_activity` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_offline_decision_item` FOREIGN KEY (`tenant_id`, `event_id`, `batch_id`, `item_id`) REFERENCES `event_offline_sync_items` (`tenant_id`, `event_id`, `batch_id`, `id`),
+  CONSTRAINT `fk_event_offline_decision_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_offline_decision_outcome` CHECK (`outcome` in ('accepted','conflict','rejected')),
+  CONSTRAINT `chk_event_offline_decision_version` CHECK (`decision_version` > 0),
+  CONSTRAINT `chk_event_offline_decision_attendance` CHECK (`outcome` = 'accepted' and `attendance_version_before` is not null and `attendance_version_after` is not null and `attendance_version_after` > `attendance_version_before` and `attendance_activity_id` is not null or `outcome` in ('conflict','rejected') and `attendance_version_after` is null and `attendance_activity_id` is null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_decision_validate` BEFORE INSERT ON `event_offline_sync_decisions` FOR EACH ROW BEGIN IF NEW.`outcome` = 'accepted' AND (SELECT COUNT(*) FROM `event_offline_sync_items` AS i INNER JOIN `event_attendance_activity` AS a ON a.`tenant_id` = i.`tenant_id` AND a.`event_id` = i.`event_id` AND a.`user_id` = i.`user_id` WHERE i.`tenant_id` = NEW.`tenant_id` AND i.`event_id` = NEW.`event_id` AND i.`batch_id` = NEW.`batch_id` AND i.`id` = NEW.`item_id` AND a.`id` = NEW.`attendance_activity_id` AND a.`attendance_version` = NEW.`attendance_version_after`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_decision_attendance_mismatch'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_decision_no_update` BEFORE UPDATE ON `event_offline_sync_decisions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_decision_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_decision_no_delete` BEFORE DELETE ON `event_offline_sync_decisions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_decision_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_offline_sync_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_offline_sync_items` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `batch_id` bigint(20) unsigned NOT NULL,
+  `device_id` bigint(20) unsigned NOT NULL,
+  `item_position` smallint(5) unsigned NOT NULL,
+  `client_nonce` varchar(100) NOT NULL,
+  `operation` varchar(16) NOT NULL,
+  `observed_at` datetime NOT NULL,
+  `expected_attendance_version` bigint(20) unsigned NOT NULL,
+  `credential_fingerprint` char(16) NOT NULL,
+  `credential_hash_reference` char(64) NOT NULL,
+  `credential_id` bigint(20) unsigned DEFAULT NULL,
+  `registration_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `submitted_reason` varchar(500) DEFAULT NULL,
+  `submitted_payload_hash` char(64) NOT NULL,
+  `initial_outcome` varchar(16) NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_offline_item_nonce` (`tenant_id`,`device_id`,`client_nonce`),
+  UNIQUE KEY `uq_event_offline_item_position` (`tenant_id`,`batch_id`,`item_position`),
+  UNIQUE KEY `uq_event_offline_item_scope_id` (`tenant_id`,`event_id`,`batch_id`,`id`),
+  KEY `idx_event_offline_item_credential` (`tenant_id`,`event_id`,`credential_fingerprint`,`id`),
+  KEY `idx_event_offline_item_subject` (`tenant_id`,`event_id`,`user_id`,`observed_at`,`id`),
+  KEY `fk_event_offline_item_batch` (`tenant_id`,`event_id`,`device_id`,`batch_id`),
+  KEY `fk_event_offline_item_credential` (`tenant_id`,`event_id`,`credential_id`),
+  KEY `fk_event_offline_item_registration` (`tenant_id`,`event_id`,`registration_id`,`user_id`),
+  CONSTRAINT `fk_event_offline_item_batch` FOREIGN KEY (`tenant_id`, `event_id`, `device_id`, `batch_id`) REFERENCES `event_offline_sync_batches` (`tenant_id`, `event_id`, `device_id`, `id`),
+  CONSTRAINT `fk_event_offline_item_credential` FOREIGN KEY (`tenant_id`, `event_id`, `credential_id`) REFERENCES `event_checkin_credentials` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_offline_item_registration` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`, `user_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_event_offline_item_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_offline_item_operation` CHECK (`operation` in ('check_in','check_out','no_show','undo')),
+  CONSTRAINT `chk_event_offline_item_hash` CHECK (`credential_hash_reference` regexp '^[0-9a-f]{64}$' and `credential_fingerprint` = left(`credential_hash_reference`,16)),
+  CONSTRAINT `chk_event_offline_item_outcome` CHECK (`initial_outcome` = 'pending'),
+  CONSTRAINT `chk_event_offline_item_subject` CHECK (`credential_id` is null and `registration_id` is null and `user_id` is null or `credential_id` is not null and `registration_id` is not null and `user_id` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_item_no_update` BEFORE UPDATE ON `event_offline_sync_items` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_item_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_offline_item_no_delete` BEFORE DELETE ON `event_offline_sync_items` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_offline_item_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_participation_denial_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_participation_denial_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `denial_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `decision_version` bigint(20) unsigned NOT NULL,
+  `decision` varchar(16) NOT NULL,
+  `reason_code` varchar(32) NOT NULL,
+  `status` varchar(16) NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `reviewer_user_id` int(11) NOT NULL,
+  `effective_from` datetime NOT NULL,
+  `effective_until` datetime DEFAULT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_participation_denial_history_version` (`tenant_id`,`denial_id`,`decision_version`),
+  UNIQUE KEY `uq_event_participation_denial_history_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_participation_denial_history_user` (`tenant_id`,`event_id`,`user_id`,`created_at`,`id`),
+  KEY `fk_event_denial_history_denial` (`tenant_id`,`event_id`,`denial_id`,`user_id`),
+  KEY `fk_event_denial_history_reviewer` (`reviewer_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_denial_history_denial` FOREIGN KEY (`tenant_id`, `event_id`, `denial_id`, `user_id`) REFERENCES `event_participation_denials` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_event_denial_history_reviewer` FOREIGN KEY (`reviewer_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_denial_history_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_denial_history_action` CHECK (`action` in ('recorded','withdrawn','expired')),
+  CONSTRAINT `chk_event_denial_history_status` CHECK (`status` in ('active','withdrawn','expired')),
+  CONSTRAINT `chk_event_denial_history_decision` CHECK (`decision` in ('deny','remove')),
+  CONSTRAINT `chk_event_denial_history_reason` CHECK (`reason_code` in ('safeguarding_policy','minimum_age','guardian_consent','code_of_conduct','conduct_violation','safety_review','user_block')),
+  CONSTRAINT `chk_event_denial_history_window` CHECK (`effective_until` is null or `effective_until` > `effective_from`),
+  CONSTRAINT `chk_event_denial_history_version` CHECK (`decision_version` > 0),
+  CONSTRAINT `chk_event_denial_history_hashes` CHECK (`idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_denial_history_no_update` BEFORE UPDATE ON `event_participation_denial_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_denial_history_no_delete` BEFORE DELETE ON `event_participation_denial_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_participation_denials`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_participation_denials` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `decision` varchar(16) NOT NULL,
+  `reason_code` varchar(32) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `active_slot` tinyint(3) unsigned DEFAULT 1,
+  `decision_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `reviewed_by_user_id` int(11) NOT NULL,
+  `effective_from` datetime NOT NULL,
+  `effective_until` datetime DEFAULT NULL,
+  `create_idempotency_hash` char(64) NOT NULL,
+  `create_request_hash` char(64) NOT NULL,
+  `withdrawn_by_user_id` int(11) DEFAULT NULL,
+  `withdrawn_at` timestamp NULL DEFAULT NULL,
+  `expired_by_user_id` int(11) DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_participation_denial_create_key` (`tenant_id`,`create_idempotency_hash`),
+  UNIQUE KEY `uq_event_participation_denial_id` (`tenant_id`,`event_id`,`id`,`user_id`),
+  UNIQUE KEY `uq_event_participation_denial_active` (`tenant_id`,`event_id`,`user_id`,`active_slot`),
+  KEY `idx_event_participation_denial_effective` (`tenant_id`,`event_id`,`user_id`,`status`,`effective_from`,`effective_until`),
+  KEY `fk_event_participation_denial_event` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_participation_denial_user` (`user_id`,`tenant_id`),
+  KEY `fk_event_participation_denial_reviewer` (`reviewed_by_user_id`,`tenant_id`),
+  KEY `fk_event_participation_denial_withdrawer` (`withdrawn_by_user_id`,`tenant_id`),
+  KEY `fk_event_participation_denial_expirer` (`expired_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_participation_denial_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_participation_denial_expirer` FOREIGN KEY (`expired_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_participation_denial_reviewer` FOREIGN KEY (`reviewed_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_participation_denial_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_participation_denial_user` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_participation_denial_withdrawer` FOREIGN KEY (`withdrawn_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_participation_denial_decision` CHECK (`decision` in ('deny','remove')),
+  CONSTRAINT `chk_event_participation_denial_reason` CHECK (`reason_code` in ('safeguarding_policy','minimum_age','guardian_consent','code_of_conduct','conduct_violation','safety_review','user_block')),
+  CONSTRAINT `chk_event_participation_denial_window` CHECK (`effective_until` is null or `effective_until` > `effective_from`),
+  CONSTRAINT `chk_event_participation_denial_version` CHECK (`decision_version` > 0),
+  CONSTRAINT `chk_event_participation_denial_state` CHECK (`status` = 'active' and `active_slot` = 1 and `withdrawn_by_user_id` is null and `withdrawn_at` is null and `expired_by_user_id` is null and `expired_at` is null or `status` = 'withdrawn' and `active_slot` is null and `withdrawn_by_user_id` is not null and `withdrawn_at` is not null and `expired_by_user_id` is null and `expired_at` is null or `status` = 'expired' and `active_slot` is null and `expired_by_user_id` is not null and `expired_at` is not null and `withdrawn_by_user_id` is null and `withdrawn_at` is null),
+  CONSTRAINT `chk_event_participation_denial_hashes` CHECK (`create_idempotency_hash` regexp '^[0-9a-f]{64}$' and `create_request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_participation_denial_insert` BEFORE INSERT ON `event_participation_denials` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_concrete_event_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_participation_denial_update` BEFORE UPDATE ON `event_participation_denials` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`user_id` <=> NEW.`user_id`) OR NOT (OLD.`create_idempotency_hash` <=> NEW.`create_idempotency_hash`) OR NOT (OLD.`create_request_hash` <=> NEW.`create_request_hash`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_identity_immutable'; END IF; IF OLD.`status` IN ('withdrawn','expired') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_terminal_immutable'; END IF; IF NEW.`decision_version` <> OLD.`decision_version` + 1 OR (OLD.`status` = 'active' AND NEW.`status` NOT IN ('active','withdrawn','expired')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_participation_denial_no_delete` BEFORE DELETE ON `event_participation_denials` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_participation_denial_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_recurrence_definition_applications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_recurrence_definition_applications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `root_event_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `recurrence_id` varchar(32) NOT NULL,
+  `blueprint_id` bigint(20) unsigned NOT NULL,
+  `blueprint_version` int(10) unsigned NOT NULL,
+  `manifest_hash` char(64) NOT NULL,
+  `application_hash` char(64) NOT NULL,
+  `applied_counts` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`applied_counts`)),
+  `status` varchar(16) NOT NULL DEFAULT 'applied',
+  `applied_by_user_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_rec_def_app_event` (`tenant_id`,`event_id`),
+  UNIQUE KEY `uq_ev_rec_def_app_recurrence` (`tenant_id`,`root_event_id`,`recurrence_id`),
+  KEY `idx_ev_rec_def_app_root` (`tenant_id`,`root_event_id`,`blueprint_version`,`created_at`),
+  KEY `fk_ev_rec_def_app_blueprint` (`tenant_id`,`root_event_id`,`blueprint_id`),
+  CONSTRAINT `fk_ev_rec_def_app_blueprint` FOREIGN KEY (`tenant_id`, `root_event_id`, `blueprint_id`) REFERENCES `event_recurrence_definition_blueprints` (`tenant_id`, `root_event_id`, `id`),
+  CONSTRAINT `fk_ev_rec_def_app_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_rec_def_app_root` FOREIGN KEY (`tenant_id`, `root_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_rec_def_app_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_rec_def_app_version` CHECK (`blueprint_version` > 0),
+  CONSTRAINT `chk_ev_rec_def_app_recurrence` CHECK (`recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$'),
+  CONSTRAINT `chk_ev_rec_def_app_hashes` CHECK (`manifest_hash` regexp '^[0-9a-f]{64}$' and `application_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_ev_rec_def_app_status` CHECK (`status` = 'applied')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_rec_def_app_no_update` BEFORE UPDATE ON `event_recurrence_definition_applications` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_definition_application_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_rec_def_app_no_delete` BEFORE DELETE ON `event_recurrence_definition_applications` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_definition_application_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_recurrence_definition_blueprints`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_recurrence_definition_blueprints` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `root_event_id` int(11) NOT NULL,
+  `source_event_id` int(11) NOT NULL,
+  `source_recurrence_id` varchar(32) NOT NULL,
+  `source_occurrence_key` varchar(191) NOT NULL,
+  `blueprint_version` int(10) unsigned NOT NULL,
+  `schema_version` smallint(5) unsigned NOT NULL,
+  `effective_from_recurrence_id` varchar(32) NOT NULL,
+  `selected_sections` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`selected_sections`)),
+  `manifest` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`manifest`)),
+  `manifest_hash` char(64) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `captured_by_user_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_rec_def_bp_version` (`tenant_id`,`root_event_id`,`blueprint_version`),
+  UNIQUE KEY `uq_ev_rec_def_bp_scope` (`tenant_id`,`root_event_id`,`id`),
+  UNIQUE KEY `uq_ev_rec_def_bp_idempotency` (`tenant_id`,`root_event_id`,`idempotency_hash`),
+  KEY `idx_ev_rec_def_bp_effective` (`tenant_id`,`root_event_id`,`effective_from_recurrence_id`,`blueprint_version`),
+  KEY `fk_ev_rec_def_bp_source` (`tenant_id`,`source_event_id`),
+  CONSTRAINT `fk_ev_rec_def_bp_root` FOREIGN KEY (`tenant_id`, `root_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_rec_def_bp_source` FOREIGN KEY (`tenant_id`, `source_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_rec_def_bp_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_rec_def_bp_versions` CHECK (`blueprint_version` > 0 and `schema_version` > 0),
+  CONSTRAINT `chk_ev_rec_def_bp_source_id` CHECK (`source_recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$'),
+  CONSTRAINT `chk_ev_rec_def_bp_effective_id` CHECK (`effective_from_recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$'),
+  CONSTRAINT `chk_ev_rec_def_bp_hashes` CHECK (`manifest_hash` regexp '^[0-9a-f]{64}$' and `idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_rec_def_bp_no_update` BEFORE UPDATE ON `event_recurrence_definition_blueprints` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_definition_blueprint_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_rec_def_bp_no_delete` BEFORE DELETE ON `event_recurrence_definition_blueprints` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_definition_blueprint_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_recurrence_occurrence_ledger`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_recurrence_occurrence_ledger` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `root_event_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `recurrence_id` varchar(32) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `state` varchar(32) NOT NULL,
+  `state_version` bigint(20) unsigned NOT NULL,
+  `revision_version` bigint(20) unsigned DEFAULT NULL,
+  `start_time_utc` datetime DEFAULT NULL,
+  `end_time_utc` datetime DEFAULT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_recur_occ_ledger_event_version` (`tenant_id`,`root_event_id`,`event_id`,`state_version`),
+  UNIQUE KEY `uq_event_recur_occ_ledger_identity_version` (`tenant_id`,`root_event_id`,`recurrence_id`,`state_version`),
+  KEY `idx_event_recur_occ_ledger_effective` (`tenant_id`,`root_event_id`,`recurrence_id`,`id`),
+  KEY `idx_event_recur_occ_ledger_state` (`tenant_id`,`root_event_id`,`state`,`created_at`,`id`),
+  KEY `fk_event_recur_occ_ledger_event` (`tenant_id`,`event_id`),
+  CONSTRAINT `fk_event_recur_occ_ledger_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_recur_occ_ledger_root` FOREIGN KEY (`tenant_id`, `root_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `chk_event_recur_occ_ledger_state` CHECK (`state` in ('materialized','customized','excluded','retired') and `recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$' and `state_version` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_recur_occ_ledger_no_update` BEFORE UPDATE ON `event_recurrence_occurrence_ledger` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_occurrence_ledger_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_recur_occ_ledger_no_delete` BEFORE DELETE ON `event_recurrence_occurrence_ledger` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_occurrence_ledger_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_recurrence_revisions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_recurrence_revisions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `root_event_id` int(11) NOT NULL,
+  `revision_version` bigint(20) unsigned NOT NULL,
+  `effective_from_recurrence_id` varchar(32) NOT NULL,
+  `effective_from_utc` datetime NOT NULL,
+  `effective_until_recurrence_id` varchar(32) DEFAULT NULL,
+  `effective_until_utc` datetime DEFAULT NULL,
+  `canonical_timezone` varchar(64) NOT NULL,
+  `canonical_rrule` text NOT NULL,
+  `rule_hash` char(64) NOT NULL,
+  `blueprint_patch` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`blueprint_patch`)),
+  `patch_hash` char(64) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `root_calendar_sequence` bigint(20) unsigned NOT NULL,
+  `rule_version` bigint(20) unsigned NOT NULL,
+  `materialized_set_version` bigint(20) unsigned NOT NULL,
+  `materialized_checksum_before` char(64) NOT NULL,
+  `materialized_checksum_after` char(64) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `impact_summary` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`impact_summary`)),
+  `previewed_at` timestamp NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_recur_revision_version` (`tenant_id`,`root_event_id`,`revision_version`),
+  UNIQUE KEY `uq_event_recur_revision_idempotency` (`tenant_id`,`root_event_id`,`idempotency_hash`),
+  KEY `idx_event_recur_revision_effective` (`tenant_id`,`root_event_id`,`effective_from_recurrence_id`,`revision_version`),
+  KEY `idx_event_recur_revision_actor` (`tenant_id`,`actor_user_id`,`created_at`,`id`),
+  CONSTRAINT `fk_event_recur_revision_root` FOREIGN KEY (`tenant_id`, `root_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_recur_revision_rule` FOREIGN KEY (`tenant_id`, `root_event_id`) REFERENCES `event_recurrence_rules` (`tenant_id`, `event_id`),
+  CONSTRAINT `chk_event_recur_revision_identity` CHECK (`effective_from_recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$' and (`effective_until_recurrence_id` is null or `effective_until_recurrence_id` regexp '^[0-9]{8}T[0-9]{6}Z$' and `effective_until_recurrence_id` > `effective_from_recurrence_id`) and `effective_until_utc` is null = (`effective_until_recurrence_id` is null))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_recurrence_revision_no_update` BEFORE UPDATE ON `event_recurrence_revisions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_revision_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_recurrence_revision_no_delete` BEFORE DELETE ON `event_recurrence_revisions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_revision_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_recurrence_rules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3515,17 +5663,1079 @@ CREATE TABLE `event_recurrence_rules` (
   `day_of_month` int(10) unsigned DEFAULT NULL COMMENT 'For monthly: 1-31',
   `month_of_year` int(10) unsigned DEFAULT NULL COMMENT 'For yearly: 1-12',
   `rrule` text DEFAULT NULL COMMENT 'iCal RRULE string for custom patterns',
+  `exdates` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`exdates`)),
+  `rdates` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`rdates`)),
+  `recurrence_engine` varchar(32) DEFAULT NULL,
+  `recurrence_engine_version` varchar(32) DEFAULT NULL,
+  `rule_hash` char(64) DEFAULT NULL,
+  `effective_revision_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `materialized_set_version` bigint(20) unsigned NOT NULL DEFAULT 0,
   `ends_type` enum('never','after_count','on_date') NOT NULL DEFAULT 'never',
   `ends_after_count` int(10) unsigned DEFAULT NULL COMMENT 'Stop after N occurrences',
   `ends_on_date` date DEFAULT NULL COMMENT 'Stop on this date',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `materialized_through_at` datetime DEFAULT NULL,
+  `materialization_resume_at` datetime DEFAULT NULL,
+  `materialization_last_attempted_at` timestamp NULL DEFAULT NULL,
+  `materialization_last_succeeded_at` timestamp NULL DEFAULT NULL,
+  `materialization_last_failed_at` timestamp NULL DEFAULT NULL,
+  `materialization_error_code` varchar(64) DEFAULT NULL,
+  `materialization_truncated` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_recurrence_rule_tenant_event` (`tenant_id`,`event_id`),
   KEY `idx_recurrence_event` (`event_id`),
   KEY `idx_recurrence_tenant` (`tenant_id`),
+  KEY `idx_event_recurrence_materialization_due` (`tenant_id`,`recurrence_engine`,`ends_type`,`materialized_through_at`),
+  CONSTRAINT `fk_event_recurrence_rule_event_tenant` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`) ON DELETE CASCADE,
   CONSTRAINT `fk_recurrence_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_recurrence_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_registration_answer_access_audits`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_answer_access_audits` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `submission_id` bigint(20) unsigned NOT NULL,
+  `answer_id` bigint(20) unsigned NOT NULL,
+  `question_id` bigint(20) unsigned NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `purpose` varchar(500) NOT NULL,
+  `correlation_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_ev_reg_answer_audit_submission` (`tenant_id`,`event_id`,`submission_id`,`created_at`,`id`),
+  KEY `idx_ev_reg_answer_audit_actor` (`tenant_id`,`actor_user_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_answer_audit_answer` (`tenant_id`,`event_id`,`submission_id`,`question_id`,`answer_id`),
+  KEY `fk_ev_reg_answer_audit_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_answer_audit_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_answer_audit_answer` FOREIGN KEY (`tenant_id`, `event_id`, `submission_id`, `question_id`, `answer_id`) REFERENCES `event_registration_form_answers` (`tenant_id`, `event_id`, `submission_id`, `question_id`, `id`),
+  CONSTRAINT `fk_ev_reg_answer_audit_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_answer_audit_action` CHECK (`action` in ('read','export'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_answer_access_audit_no_update` BEFORE UPDATE ON `event_registration_answer_access_audits` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_answer_access_audit_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_answer_access_audit_no_delete` BEFORE DELETE ON `event_registration_answer_access_audits` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_answer_access_audit_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_form_answers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_form_answers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `submission_id` bigint(20) unsigned NOT NULL,
+  `form_version_id` bigint(20) unsigned NOT NULL,
+  `question_id` bigint(20) unsigned NOT NULL,
+  `data_classification` varchar(24) NOT NULL,
+  `answer_ciphertext` longtext DEFAULT NULL,
+  `retention_due_at` datetime NOT NULL,
+  `consented_at` timestamp NULL DEFAULT NULL,
+  `displayed_text_hash` char(64) DEFAULT NULL,
+  `displayed_text_version` varchar(64) DEFAULT NULL,
+  `purged_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_answer_question` (`tenant_id`,`submission_id`,`question_id`),
+  UNIQUE KEY `uq_ev_reg_answer_id` (`tenant_id`,`event_id`,`submission_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_answer_event_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_answer_question_id` (`tenant_id`,`event_id`,`submission_id`,`question_id`,`id`),
+  KEY `idx_ev_reg_answer_retention` (`tenant_id`,`event_id`,`retention_due_at`,`purged_at`,`id`),
+  KEY `fk_ev_reg_answer_submission` (`tenant_id`,`event_id`,`form_version_id`,`submission_id`),
+  KEY `fk_ev_reg_answer_question` (`tenant_id`,`event_id`,`form_version_id`,`question_id`),
+  CONSTRAINT `fk_ev_reg_answer_question` FOREIGN KEY (`tenant_id`, `event_id`, `form_version_id`, `question_id`) REFERENCES `event_registration_form_questions` (`tenant_id`, `event_id`, `form_version_id`, `id`),
+  CONSTRAINT `fk_ev_reg_answer_submission` FOREIGN KEY (`tenant_id`, `event_id`, `form_version_id`, `submission_id`) REFERENCES `event_registration_form_submissions` (`tenant_id`, `event_id`, `form_version_id`, `id`),
+  CONSTRAINT `fk_ev_reg_answer_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_answer_class` CHECK (`data_classification` in ('public','internal','confidential','sensitive')),
+  CONSTRAINT `chk_ev_reg_answer_purge` CHECK (`purged_at` is null and `answer_ciphertext` is not null or `purged_at` is not null and `answer_ciphertext` is null),
+  CONSTRAINT `chk_ev_reg_answer_consent` CHECK (`consented_at` is null and `displayed_text_hash` is null and `displayed_text_version` is null or `consented_at` is not null and `displayed_text_hash` is not null and `displayed_text_version` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_answer_insert_guard` BEFORE INSERT ON `event_registration_form_answers` FOR EACH ROW BEGIN IF (SELECT `status` FROM `event_registration_form_submissions` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`submission_id`) <> 'draft' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submitted_answer_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_answer_update_guard` BEFORE UPDATE ON `event_registration_form_answers` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`submission_id` <=> NEW.`submission_id`) OR NOT (OLD.`form_version_id` <=> NEW.`form_version_id`) OR NOT (OLD.`question_id` <=> NEW.`question_id`) OR NOT (OLD.`data_classification` <=> NEW.`data_classification`) OR NOT (OLD.`retention_due_at` <=> NEW.`retention_due_at`) OR NOT (OLD.`consented_at` <=> NEW.`consented_at`) OR NOT (OLD.`displayed_text_hash` <=> NEW.`displayed_text_hash`) OR NOT (OLD.`displayed_text_version` <=> NEW.`displayed_text_version`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_answer_evidence_immutable'; END IF; IF (SELECT `status` FROM `event_registration_form_submissions` WHERE `tenant_id` = OLD.`tenant_id` AND `event_id` = OLD.`event_id` AND `id` = OLD.`submission_id`) <> 'draft' AND NOT (OLD.`answer_ciphertext` IS NOT NULL AND OLD.`purged_at` IS NULL AND NEW.`answer_ciphertext` IS NULL AND NEW.`purged_at` IS NOT NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submitted_answer_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_answer_delete_guard` BEFORE DELETE ON `event_registration_form_answers` FOR EACH ROW BEGIN IF (SELECT `status` FROM `event_registration_form_submissions` WHERE `tenant_id` = OLD.`tenant_id` AND `event_id` = OLD.`event_id` AND `id` = OLD.`submission_id`) <> 'draft' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submitted_answer_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_form_questions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_form_questions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `form_version_id` bigint(20) unsigned NOT NULL,
+  `stable_key` varchar(64) NOT NULL,
+  `position` smallint(5) unsigned NOT NULL,
+  `question_type` varchar(32) NOT NULL,
+  `prompt` text NOT NULL,
+  `help_text` text DEFAULT NULL,
+  `is_required` tinyint(1) NOT NULL DEFAULT 0,
+  `data_classification` varchar(24) NOT NULL,
+  `purpose` varchar(500) NOT NULL,
+  `retention_days` smallint(5) unsigned NOT NULL,
+  `choice_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`choice_options`)),
+  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
+  `visibility_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`visibility_rules`)),
+  `displayed_text` longtext DEFAULT NULL,
+  `displayed_text_version` varchar(64) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_question_key` (`tenant_id`,`form_version_id`,`stable_key`),
+  UNIQUE KEY `uq_ev_reg_question_position` (`tenant_id`,`form_version_id`,`position`),
+  UNIQUE KEY `uq_ev_reg_question_id` (`tenant_id`,`event_id`,`form_version_id`,`id`),
+  CONSTRAINT `fk_ev_reg_question_form` FOREIGN KEY (`tenant_id`, `event_id`, `form_version_id`) REFERENCES `event_registration_form_versions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_question_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_question_key` CHECK (`stable_key` regexp '^[a-z][a-z0-9_]{0,63}$'),
+  CONSTRAINT `chk_ev_reg_question_type` CHECK (`question_type` in ('short_text','long_text','single_choice','multiple_choice','dietary','accessibility','consent','waiver')),
+  CONSTRAINT `chk_ev_reg_question_class` CHECK (`data_classification` in ('public','internal','confidential','sensitive')),
+  CONSTRAINT `chk_ev_reg_question_retention` CHECK (`retention_days` between 1 and 36500),
+  CONSTRAINT `chk_ev_reg_question_choices` CHECK (`question_type` in ('single_choice','multiple_choice') and `choice_options` is not null or `question_type` not in ('single_choice','multiple_choice') and `choice_options` is null),
+  CONSTRAINT `chk_ev_reg_question_consent` CHECK (`question_type` in ('consent','waiver') and `displayed_text` is not null and char_length(trim(`displayed_text`)) > 0 and `displayed_text_version` is not null and char_length(trim(`displayed_text_version`)) > 0 or `question_type` not in ('consent','waiver') and `displayed_text` is null and `displayed_text_version` is null),
+  CONSTRAINT `chk_ev_reg_question_validation_rules` CHECK (`validation_rules` is null or json_type(`validation_rules`) = 'OBJECT'),
+  CONSTRAINT `chk_ev_reg_question_visibility_rules` CHECK (`visibility_rules` is null or json_type(`visibility_rules`) = 'OBJECT')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_question_insert` BEFORE INSERT ON `event_registration_form_questions` FOR EACH ROW BEGIN IF (SELECT `status` FROM `event_registration_form_versions` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`form_version_id`) = 'published' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_published_question_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_question_update` BEFORE UPDATE ON `event_registration_form_questions` FOR EACH ROW BEGIN IF (SELECT `status` FROM `event_registration_form_versions` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`form_version_id`) = 'published' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_published_question_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_question_delete` BEFORE DELETE ON `event_registration_form_questions` FOR EACH ROW BEGIN IF (SELECT `status` FROM `event_registration_form_versions` WHERE `tenant_id` = OLD.`tenant_id` AND `event_id` = OLD.`event_id` AND `id` = OLD.`form_version_id`) = 'published' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_published_question_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_form_submissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_form_submissions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `form_version_id` bigint(20) unsigned NOT NULL,
+  `supersedes_submission_id` bigint(20) unsigned DEFAULT NULL,
+  `lineage_root_submission_id` bigint(20) unsigned DEFAULT NULL,
+  `attempt_number` int(10) unsigned NOT NULL DEFAULT 1,
+  `effective_slot` tinyint(3) unsigned DEFAULT 1,
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `withdrawn_at` timestamp NULL DEFAULT NULL,
+  `anonymised_at` timestamp NULL DEFAULT NULL,
+  `superseded_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_submission_id` (`tenant_id`,`event_id`,`form_version_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_submission_event_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_submission_effective` (`tenant_id`,`registration_id`,`form_version_id`,`effective_slot`),
+  KEY `idx_ev_reg_submission_event` (`tenant_id`,`event_id`,`status`,`id`),
+  KEY `idx_ev_reg_submission_user` (`tenant_id`,`user_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_submission_registration` (`tenant_id`,`event_id`,`registration_id`),
+  KEY `fk_ev_reg_submission_user` (`user_id`,`tenant_id`),
+  KEY `fk_ev_reg_submission_supersedes` (`tenant_id`,`event_id`,`supersedes_submission_id`),
+  KEY `fk_ev_reg_submission_lineage_root` (`tenant_id`,`event_id`,`lineage_root_submission_id`),
+  CONSTRAINT `fk_ev_reg_submission_form` FOREIGN KEY (`tenant_id`, `event_id`, `form_version_id`) REFERENCES `event_registration_form_versions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_submission_lineage_root` FOREIGN KEY (`tenant_id`, `event_id`, `lineage_root_submission_id`) REFERENCES `event_registration_form_submissions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_submission_registration` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_submission_supersedes` FOREIGN KEY (`tenant_id`, `event_id`, `supersedes_submission_id`) REFERENCES `event_registration_form_submissions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_submission_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_reg_submission_user` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_reg_submission_revision` CHECK (`revision` > 0),
+  CONSTRAINT `chk_ev_reg_submission_status` CHECK (`status` in ('draft','submitted','withdrawn','anonymised')),
+  CONSTRAINT `chk_ev_reg_submission_state` CHECK (`status` = 'draft' and `submitted_at` is null and `withdrawn_at` is null and `anonymised_at` is null or `status` = 'submitted' and `submitted_at` is not null and `withdrawn_at` is null and `anonymised_at` is null or `status` = 'withdrawn' and `withdrawn_at` is not null and `anonymised_at` is null or `status` = 'anonymised' and `anonymised_at` is not null),
+  CONSTRAINT `chk_ev_reg_submission_lineage` CHECK (`attempt_number` > 0 and (`attempt_number` = 1 and `supersedes_submission_id` is null and `lineage_root_submission_id` is null or `attempt_number` > 1 and `supersedes_submission_id` is not null and `lineage_root_submission_id` is not null) and (`effective_slot` = 1 and `superseded_at` is null or `effective_slot` is null and `superseded_at` is not null))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_submission_insert_guard` BEFORE INSERT ON `event_registration_form_submissions` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `event_registration_form_versions` AS form INNER JOIN `event_registration_settings` AS settings ON settings.`tenant_id` = form.`tenant_id` AND settings.`event_id` = form.`event_id` AND settings.`published_form_version` = form.`version_number` WHERE form.`tenant_id` = NEW.`tenant_id` AND form.`event_id` = NEW.`event_id` AND form.`id` = NEW.`form_version_id` AND form.`status` = 'published' AND settings.`form_state` = 'published') <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_active_published_form_required'; END IF; IF (SELECT COUNT(*) FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`registration_id` AND `user_id` = NEW.`user_id`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_identity_mismatch'; END IF; IF NEW.`attempt_number` = 1 AND (NEW.`supersedes_submission_id` IS NOT NULL OR NEW.`lineage_root_submission_id` IS NOT NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_lineage_invalid'; END IF; IF NEW.`attempt_number` > 1 AND (SELECT COUNT(*) FROM `event_registration_form_submissions` AS predecessor WHERE predecessor.`tenant_id` = NEW.`tenant_id` AND predecessor.`event_id` = NEW.`event_id` AND predecessor.`id` = NEW.`supersedes_submission_id` AND predecessor.`registration_id` = NEW.`registration_id` AND predecessor.`user_id` = NEW.`user_id` AND predecessor.`form_version_id` = NEW.`form_version_id` AND predecessor.`attempt_number` + 1 = NEW.`attempt_number` AND predecessor.`effective_slot` IS NULL AND predecessor.`superseded_at` IS NOT NULL AND COALESCE(predecessor.`lineage_root_submission_id`, predecessor.`id`) = NEW.`lineage_root_submission_id`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_lineage_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_submission_update_guard` BEFORE UPDATE ON `event_registration_form_submissions` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`registration_id` <=> NEW.`registration_id`) OR NOT (OLD.`user_id` <=> NEW.`user_id`) OR NOT (OLD.`form_version_id` <=> NEW.`form_version_id`) OR NOT (OLD.`supersedes_submission_id` <=> NEW.`supersedes_submission_id`) OR NOT (OLD.`lineage_root_submission_id` <=> NEW.`lineage_root_submission_id`) OR NOT (OLD.`attempt_number` <=> NEW.`attempt_number`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_identity_immutable'; END IF; IF NOT (OLD.`effective_slot` <=> NEW.`effective_slot`) OR NOT (OLD.`superseded_at` <=> NEW.`superseded_at`) THEN IF NOT (OLD.`effective_slot` = 1 AND NEW.`effective_slot` IS NULL AND OLD.`superseded_at` IS NULL AND NEW.`superseded_at` IS NOT NULL AND OLD.`status` = 'submitted' AND NEW.`status` = OLD.`status` AND NEW.`revision` = OLD.`revision` + 1 AND OLD.`submitted_at` <=> NEW.`submitted_at` AND OLD.`withdrawn_at` <=> NEW.`withdrawn_at` AND OLD.`anonymised_at` <=> NEW.`anonymised_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_supersession_invalid'; END IF; END IF; IF OLD.`status` IN ('submitted','withdrawn','anonymised') AND NOT ((OLD.`status` = 'submitted' AND NEW.`status` = 'submitted' AND OLD.`effective_slot` = 1 AND NEW.`effective_slot` IS NULL AND NEW.`revision` = OLD.`revision` + 1 AND NEW.`superseded_at` IS NOT NULL) OR (OLD.`status` IN ('submitted','withdrawn') AND NEW.`status` = 'anonymised' AND NEW.`anonymised_at` IS NOT NULL AND OLD.`revision` <=> NEW.`revision` AND OLD.`submitted_at` <=> NEW.`submitted_at` AND OLD.`withdrawn_at` <=> NEW.`withdrawn_at` AND OLD.`effective_slot` <=> NEW.`effective_slot` AND OLD.`superseded_at` <=> NEW.`superseded_at`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_evidence_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_submission_delete_guard` BEFORE DELETE ON `event_registration_form_submissions` FOR EACH ROW BEGIN IF OLD.`status` <> 'draft' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_submission_evidence_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_form_versions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_form_versions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `version_number` int(10) unsigned NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `name` varchar(191) NOT NULL,
+  `description` text DEFAULT NULL,
+  `definition_hash` char(64) DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `published_by` int(11) DEFAULT NULL,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_form_version_number` (`tenant_id`,`event_id`,`version_number`),
+  UNIQUE KEY `uq_ev_reg_form_version_id` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_ev_reg_form_event_status` (`tenant_id`,`event_id`,`status`,`id`),
+  KEY `fk_ev_reg_form_creator` (`created_by`,`tenant_id`),
+  KEY `fk_ev_reg_form_updater` (`updated_by`,`tenant_id`),
+  KEY `fk_ev_reg_form_publisher` (`published_by`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_form_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_form_publisher` FOREIGN KEY (`published_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_form_settings` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `event_registration_settings` (`tenant_id`, `event_id`),
+  CONSTRAINT `fk_ev_reg_form_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_reg_form_updater` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_reg_form_version` CHECK (`version_number` > 0 and `revision` > 0),
+  CONSTRAINT `chk_ev_reg_form_status` CHECK (`status` in ('draft','published')),
+  CONSTRAINT `chk_ev_reg_form_publish` CHECK (`status` = 'draft' and `definition_hash` is null and `published_by` is null and `published_at` is null or `status` = 'published' and `definition_hash` is not null and `published_by` is not null and `published_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_form_version_update` BEFORE UPDATE ON `event_registration_form_versions` FOR EACH ROW BEGIN IF OLD.`status` = 'published' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_published_form_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_form_version_delete` BEFORE DELETE ON `event_registration_form_versions` FOR EACH ROW BEGIN IF OLD.`status` = 'published' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_published_form_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_guest_attendance`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_guest_attendance` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `guest_id` bigint(20) unsigned NOT NULL,
+  `attendance_status` varchar(32) NOT NULL DEFAULT 'not_checked_in',
+  `attendance_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status_changed_at` timestamp NOT NULL,
+  `status_changed_by` int(11) NOT NULL,
+  `checked_in_at` timestamp NULL DEFAULT NULL,
+  `checked_out_at` timestamp NULL DEFAULT NULL,
+  `attended_at` timestamp NULL DEFAULT NULL,
+  `no_show_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_guest_attendance_guest` (`tenant_id`,`event_id`,`guest_id`),
+  UNIQUE KEY `uq_ev_reg_guest_attendance_scope` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_ev_reg_guest_attendance_event` (`tenant_id`,`event_id`,`attendance_status`,`id`),
+  KEY `fk_ev_reg_guest_attendance_guest` (`tenant_id`,`event_id`,`registration_id`,`guest_id`),
+  KEY `fk_ev_reg_guest_attendance_actor` (`status_changed_by`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_guest_attendance_actor` FOREIGN KEY (`status_changed_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_guest_attendance_guest` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`, `guest_id`) REFERENCES `event_registration_guests` (`tenant_id`, `event_id`, `registration_id`, `id`),
+  CONSTRAINT `fk_ev_reg_guest_attendance_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_guest_attendance_status` CHECK (`attendance_version` > 0 and (`attendance_status` = 'not_checked_in' and `checked_in_at` is null and `checked_out_at` is null and `attended_at` is null and `no_show_at` is null or `attendance_status` = 'checked_in' and `checked_in_at` is not null and `checked_out_at` is null and `attended_at` is null and `no_show_at` is null or `attendance_status` = 'checked_out' and `checked_in_at` is not null and `checked_out_at` is not null and `attended_at` is null and `no_show_at` is null or `attendance_status` = 'attended' and `attended_at` is not null and `no_show_at` is null or `attendance_status` = 'no_show' and `checked_in_at` is null and `checked_out_at` is null and `attended_at` is null and `no_show_at` is not null))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_attendance_insert` BEFORE INSERT ON `event_registration_guest_attendance` FOR EACH ROW BEGIN IF NEW.`attendance_version` <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_version_invalid'; END IF; IF NEW.`attendance_status` NOT IN ('checked_in','no_show') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_transition_invalid'; END IF; IF (SELECT COUNT(*) FROM `event_registration_guests` AS guest INNER JOIN `event_registrations` AS registration ON registration.`tenant_id` = guest.`tenant_id` AND registration.`event_id` = guest.`event_id` AND registration.`id` = guest.`registration_id` WHERE guest.`tenant_id` = NEW.`tenant_id` AND guest.`event_id` = NEW.`event_id` AND guest.`registration_id` = NEW.`registration_id` AND guest.`id` = NEW.`guest_id` AND guest.`status` = 'captured' AND registration.`registration_state` = 'confirmed') <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_identity_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_attendance_update` BEFORE UPDATE ON `event_registration_guest_attendance` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`registration_id` <=> NEW.`registration_id`) OR NOT (OLD.`guest_id` <=> NEW.`guest_id`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_identity_immutable'; END IF; IF NEW.`attendance_version` <> OLD.`attendance_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_version_invalid'; END IF; IF NOT ((OLD.`attendance_status` = 'not_checked_in' AND NEW.`attendance_status` IN ('checked_in','no_show')) OR (OLD.`attendance_status` = 'checked_in' AND NEW.`attendance_status` IN ('checked_out','not_checked_in')) OR (OLD.`attendance_status` = 'checked_out' AND NEW.`attendance_status` = 'checked_in') OR (OLD.`attendance_status` = 'no_show' AND NEW.`attendance_status` = 'not_checked_in')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_attendance_no_delete` BEFORE DELETE ON `event_registration_guest_attendance` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_guest_attendance_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_guest_attendance_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `attendance_id` bigint(20) unsigned NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `guest_id` bigint(20) unsigned NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `attendance_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(32) NOT NULL,
+  `from_status` varchar(32) DEFAULT NULL,
+  `to_status` varchar(32) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `reason` varchar(500) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_guest_att_hist_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_ev_reg_guest_att_hist_version` (`tenant_id`,`attendance_id`,`attendance_version`),
+  KEY `idx_ev_reg_guest_att_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_guest_att_hist_attendance` (`tenant_id`,`event_id`,`attendance_id`),
+  KEY `fk_ev_reg_guest_att_hist_guest` (`tenant_id`,`event_id`,`registration_id`,`guest_id`),
+  KEY `fk_ev_reg_guest_att_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_guest_att_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_guest_att_hist_attendance` FOREIGN KEY (`tenant_id`, `event_id`, `attendance_id`) REFERENCES `event_registration_guest_attendance` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_guest_att_hist_guest` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`, `guest_id`) REFERENCES `event_registration_guests` (`tenant_id`, `event_id`, `registration_id`, `id`),
+  CONSTRAINT `fk_ev_reg_guest_att_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_guest_att_hist_status` CHECK (`to_status` in ('not_checked_in','checked_in','checked_out','attended','no_show') and (`from_status` is null or `from_status` in ('not_checked_in','checked_in','checked_out','attended','no_show')) and `attendance_version` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_att_hist_no_update` BEFORE UPDATE ON `event_registration_guest_attendance_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_att_hist_no_delete` BEFORE DELETE ON `event_registration_guest_attendance_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_attendance_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_guests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_guests` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `ticket_entitlement_id` bigint(20) unsigned DEFAULT NULL,
+  `guest_number` tinyint(3) unsigned NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'captured',
+  `display_name_ciphertext` longtext DEFAULT NULL,
+  `email_ciphertext` longtext DEFAULT NULL,
+  `phone_ciphertext` longtext DEFAULT NULL,
+  `preferred_locale` varchar(15) DEFAULT NULL,
+  `notification_consent` tinyint(1) NOT NULL DEFAULT 0,
+  `notification_consent_version` varchar(64) DEFAULT NULL,
+  `notification_consent_text_hash` char(64) DEFAULT NULL,
+  `notification_consented_at` timestamp NULL DEFAULT NULL,
+  `identity_fingerprint` char(64) DEFAULT NULL,
+  `consent_text_version` varchar(64) NOT NULL,
+  `consent_text_hash` char(64) NOT NULL,
+  `consented_at` timestamp NOT NULL,
+  `retention_due_at` datetime NOT NULL,
+  `captured_by_user_id` int(11) NOT NULL,
+  `withdrawn_at` timestamp NULL DEFAULT NULL,
+  `anonymised_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_guest_number` (`tenant_id`,`registration_id`,`guest_number`),
+  UNIQUE KEY `uq_ev_reg_guest_event_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_guest_id` (`tenant_id`,`event_id`,`registration_id`,`id`),
+  KEY `idx_ev_reg_guest_retention` (`tenant_id`,`event_id`,`retention_due_at`,`anonymised_at`,`id`),
+  KEY `fk_ev_reg_guest_actor` (`captured_by_user_id`,`tenant_id`),
+  KEY `fk_ev_reg_guest_ticket` (`tenant_id`,`event_id`,`ticket_entitlement_id`),
+  CONSTRAINT `fk_ev_reg_guest_actor` FOREIGN KEY (`captured_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_guest_registration` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_guest_settings` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `event_registration_settings` (`tenant_id`, `event_id`),
+  CONSTRAINT `fk_ev_reg_guest_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_reg_guest_ticket` FOREIGN KEY (`tenant_id`, `event_id`, `ticket_entitlement_id`) REFERENCES `event_ticket_entitlements` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `chk_ev_reg_guest_number` CHECK (`guest_number` between 1 and 10 and `revision` > 0),
+  CONSTRAINT `chk_ev_reg_guest_status` CHECK (`status` in ('captured','withdrawn','anonymised')),
+  CONSTRAINT `chk_ev_reg_guest_identity` CHECK (`status` in ('captured','withdrawn') and `display_name_ciphertext` is not null and `identity_fingerprint` is not null and `anonymised_at` is null or `status` = 'anonymised' and `display_name_ciphertext` is null and `email_ciphertext` is null and `phone_ciphertext` is null and `identity_fingerprint` is null and `anonymised_at` is not null),
+  CONSTRAINT `chk_ev_reg_guest_withdrawal` CHECK (`status` = 'captured' and `withdrawn_at` is null or `status` = 'withdrawn' and `withdrawn_at` is not null or `status` = 'anonymised'),
+  CONSTRAINT `chk_ev_reg_guest_notification_consent` CHECK (`notification_consent` = 0 and `notification_consent_version` is null and `notification_consent_text_hash` is null and `notification_consented_at` is null or `notification_consent` = 1 and `preferred_locale` is not null and (`email_ciphertext` is not null or `status` = 'anonymised') and `notification_consent_version` is not null and `notification_consent_text_hash` is not null and `notification_consented_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_insert_guard` BEFORE INSERT ON `event_registration_guests` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `event_registration_settings` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `status` = 'published' AND `guests_enabled` = 1 AND NEW.`guest_number` <= `max_guests_per_registration`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guests_disabled_or_unbounded'; END IF; IF (SELECT COUNT(*) FROM `event_registration_guests` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `registration_id` = NEW.`registration_id` AND `status` <> 'anonymised') >= (SELECT `max_guests_per_registration` FROM `event_registration_settings` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_limit_reached'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_privacy_update` BEFORE UPDATE ON `event_registration_guests` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`registration_id` <=> NEW.`registration_id`) OR NOT (OLD.`guest_number` <=> NEW.`guest_number`) OR NOT (OLD.`consent_text_version` <=> NEW.`consent_text_version`) OR NOT (OLD.`consent_text_hash` <=> NEW.`consent_text_hash`) OR NOT (OLD.`consented_at` <=> NEW.`consented_at`) OR NOT (OLD.`retention_due_at` <=> NEW.`retention_due_at`) OR NOT (OLD.`captured_by_user_id` <=> NEW.`captured_by_user_id`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_evidence_immutable'; END IF; IF OLD.`status` = 'anonymised' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_anonymisation_terminal'; END IF; IF NEW.`status` = 'anonymised' AND NOT (OLD.`status` IN ('captured','withdrawn') AND NEW.`display_name_ciphertext` IS NULL AND NEW.`email_ciphertext` IS NULL AND NEW.`phone_ciphertext` IS NULL AND NEW.`identity_fingerprint` IS NULL AND NEW.`anonymised_at` IS NOT NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_anonymisation_invalid'; END IF; IF NEW.`status` <> 'anonymised' AND (NOT (OLD.`display_name_ciphertext` <=> NEW.`display_name_ciphertext`) OR NOT (OLD.`email_ciphertext` <=> NEW.`email_ciphertext`) OR NOT (OLD.`phone_ciphertext` <=> NEW.`phone_ciphertext`) OR NOT (OLD.`identity_fingerprint` <=> NEW.`identity_fingerprint`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_identity_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_guest_phase_b_update` BEFORE UPDATE ON `event_registration_guests` FOR EACH ROW BEGIN IF NOT (OLD.`preferred_locale` <=> NEW.`preferred_locale`) OR NOT (OLD.`notification_consent` <=> NEW.`notification_consent`) OR NOT (OLD.`notification_consent_version` <=> NEW.`notification_consent_version`) OR NOT (OLD.`notification_consent_text_hash` <=> NEW.`notification_consent_text_hash`) OR NOT (OLD.`notification_consented_at` <=> NEW.`notification_consented_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_notification_evidence_immutable'; END IF; IF OLD.`ticket_entitlement_id` IS NOT NULL AND NOT (OLD.`ticket_entitlement_id` <=> NEW.`ticket_entitlement_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_guest_ticket_link_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL,
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `registration_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(64) NOT NULL,
+  `from_state` varchar(32) DEFAULT NULL,
+  `to_state` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_registration_history_version` (`tenant_id`,`registration_id`,`registration_version`),
+  UNIQUE KEY `uq_event_registration_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_registration_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
+  KEY `idx_event_registration_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_registration_history_no_update` BEFORE UPDATE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_registration_history_no_delete` BEFORE DELETE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_retention_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_retention_items` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `run_id` bigint(20) unsigned NOT NULL,
+  `answer_id` bigint(20) unsigned DEFAULT NULL,
+  `guest_id` bigint(20) unsigned DEFAULT NULL,
+  `action` varchar(16) NOT NULL,
+  `ciphertext_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_retention_answer` (`tenant_id`,`run_id`,`answer_id`),
+  UNIQUE KEY `uq_ev_reg_retention_guest` (`tenant_id`,`run_id`,`guest_id`),
+  KEY `idx_ev_reg_retention_items_run` (`tenant_id`,`event_id`,`run_id`,`id`),
+  KEY `fk_ev_reg_retention_item_answer` (`tenant_id`,`event_id`,`answer_id`),
+  KEY `fk_ev_reg_retention_item_guest` (`tenant_id`,`event_id`,`guest_id`),
+  CONSTRAINT `fk_ev_reg_retention_item_answer` FOREIGN KEY (`tenant_id`, `event_id`, `answer_id`) REFERENCES `event_registration_form_answers` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_retention_item_guest` FOREIGN KEY (`tenant_id`, `event_id`, `guest_id`) REFERENCES `event_registration_guests` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_retention_item_run` FOREIGN KEY (`tenant_id`, `event_id`, `run_id`) REFERENCES `event_registration_retention_runs` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_retention_item_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_retention_subject` CHECK (`answer_id` is not null and `guest_id` is null or `answer_id` is null and `guest_id` is not null),
+  CONSTRAINT `chk_ev_reg_retention_action` CHECK (`action` in ('preview','purged','skipped'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_retention_item_no_update` BEFORE UPDATE ON `event_registration_retention_items` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_retention_item_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_retention_item_no_delete` BEFORE DELETE ON `event_registration_retention_items` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_retention_item_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_retention_runs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_retention_runs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `mode` varchar(16) NOT NULL,
+  `dry_run_id` bigint(20) unsigned DEFAULT NULL,
+  `as_of_utc` datetime NOT NULL,
+  `eligible_count` int(10) unsigned NOT NULL,
+  `affected_count` int(10) unsigned NOT NULL,
+  `candidate_hash` char(64) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `completed_at` timestamp NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_retention_run_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_ev_reg_retention_run_id` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_ev_reg_retention_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_retention_run_preview` (`tenant_id`,`event_id`,`dry_run_id`),
+  KEY `fk_ev_reg_retention_run_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_retention_run_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_retention_run_preview` FOREIGN KEY (`tenant_id`, `event_id`, `dry_run_id`) REFERENCES `event_registration_retention_runs` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_retention_run_settings` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `event_registration_settings` (`tenant_id`, `event_id`),
+  CONSTRAINT `fk_ev_reg_retention_run_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_ev_reg_retention_mode` CHECK (`mode` = 'dry_run' and `dry_run_id` is null and `affected_count` = 0 or `mode` = 'apply' and `dry_run_id` is not null and `affected_count` <= `eligible_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_retention_run_no_update` BEFORE UPDATE ON `event_registration_retention_runs` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_retention_run_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_retention_run_no_delete` BEFORE DELETE ON `event_registration_retention_runs` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_retention_run_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_settings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `approval_mode` varchar(16) NOT NULL DEFAULT 'auto',
+  `event_starts_at_utc_snapshot` datetime NOT NULL,
+  `event_timezone_snapshot` varchar(64) NOT NULL,
+  `opens_at_utc` datetime DEFAULT NULL,
+  `closes_at_utc` datetime DEFAULT NULL,
+  `cancellation_cutoff_at_utc` datetime DEFAULT NULL,
+  `per_member_limit` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `guests_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `max_guests_per_registration` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `guest_retention_days` smallint(5) unsigned NOT NULL DEFAULT 30,
+  `form_state` varchar(16) NOT NULL DEFAULT 'none',
+  `published_form_version` int(10) unsigned DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `published_by` int(11) DEFAULT NULL,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_settings_event` (`tenant_id`,`event_id`),
+  UNIQUE KEY `uq_ev_reg_settings_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_ev_reg_settings_occurrence` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `idx_ev_reg_settings_window` (`tenant_id`,`status`,`closes_at_utc`,`event_id`),
+  KEY `fk_ev_reg_settings_creator` (`created_by`,`tenant_id`),
+  KEY `fk_ev_reg_settings_updater` (`updated_by`,`tenant_id`),
+  KEY `fk_ev_reg_settings_publisher` (`published_by`,`tenant_id`),
+  KEY `fk_ev_reg_settings_form` (`tenant_id`,`event_id`,`published_form_version`),
+  CONSTRAINT `fk_ev_reg_settings_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_settings_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_ev_reg_settings_form` FOREIGN KEY (`tenant_id`, `event_id`, `published_form_version`) REFERENCES `event_registration_form_versions` (`tenant_id`, `event_id`, `version_number`),
+  CONSTRAINT `fk_ev_reg_settings_publisher` FOREIGN KEY (`published_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_settings_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_reg_settings_updater` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_reg_settings_revision` CHECK (`revision` > 0),
+  CONSTRAINT `chk_ev_reg_settings_status` CHECK (`status` in ('draft','published')),
+  CONSTRAINT `chk_ev_reg_settings_approval` CHECK (`approval_mode` in ('auto','manual')),
+  CONSTRAINT `chk_ev_reg_settings_limit` CHECK (`per_member_limit` between 1 and 10),
+  CONSTRAINT `chk_ev_reg_settings_guests` CHECK (`guests_enabled` = 0 and `max_guests_per_registration` = 0 or `guests_enabled` = 1 and `max_guests_per_registration` between 1 and 10),
+  CONSTRAINT `chk_ev_reg_settings_guest_retention` CHECK (`guest_retention_days` between 1 and 36500),
+  CONSTRAINT `chk_ev_reg_settings_form_state` CHECK (`form_state` in ('none','draft') and `published_form_version` is null or `form_state` = 'published' and `published_form_version` is not null and `published_form_version` > 0),
+  CONSTRAINT `chk_ev_reg_settings_window_pair` CHECK (`opens_at_utc` is null and `closes_at_utc` is null or `opens_at_utc` is not null and `closes_at_utc` is not null and `opens_at_utc` < `closes_at_utc`),
+  CONSTRAINT `chk_ev_reg_settings_event_bounds` CHECK ((`closes_at_utc` is null or `closes_at_utc` <= `event_starts_at_utc_snapshot`) and (`cancellation_cutoff_at_utc` is null or `cancellation_cutoff_at_utc` <= `event_starts_at_utc_snapshot`)),
+  CONSTRAINT `chk_ev_reg_settings_publish` CHECK (`status` = 'draft' and `published_by` is null and `published_at` is null or `status` = 'published' and `published_by` is not null and `published_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_settings_concrete_insert` BEFORE INSERT ON `event_registration_settings` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_settings_concrete_update` BEFORE UPDATE ON `event_registration_settings` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_settings_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_settings_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `settings_id` bigint(20) unsigned NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL,
+  `action` varchar(32) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `changed_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`changed_fields`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_settings_hist_rev` (`tenant_id`,`settings_id`,`revision`),
+  UNIQUE KEY `uq_ev_reg_settings_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_ev_reg_settings_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_settings_hist_settings` (`tenant_id`,`event_id`,`settings_id`),
+  KEY `fk_ev_reg_settings_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_settings_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_settings_hist_settings` FOREIGN KEY (`tenant_id`, `event_id`, `settings_id`) REFERENCES `event_registration_settings` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_settings_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_settings_history_no_update` BEFORE UPDATE ON `event_registration_settings_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_settings_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_settings_history_no_delete` BEFORE DELETE ON `event_registration_settings_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_settings_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registration_submission_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_submission_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `submission_id` bigint(20) unsigned NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL,
+  `action` varchar(24) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `answer_keys` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answer_keys`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_reg_submission_hist_rev` (`tenant_id`,`submission_id`,`revision`),
+  UNIQUE KEY `uq_ev_reg_submission_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_ev_reg_submission_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_ev_reg_submission_hist_submission` (`tenant_id`,`event_id`,`submission_id`),
+  KEY `fk_ev_reg_submission_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_reg_submission_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_reg_submission_hist_submission` FOREIGN KEY (`tenant_id`, `event_id`, `submission_id`) REFERENCES `event_registration_form_submissions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_reg_submission_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_submission_history_no_update` BEFORE UPDATE ON `event_registration_submission_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_submission_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_reg_submission_history_no_delete` BEFORE DELETE ON `event_registration_submission_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ev_reg_submission_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_registrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registrations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `registration_state` varchar(32) NOT NULL,
+  `registration_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `party_size` tinyint(3) unsigned NOT NULL DEFAULT 1 COMMENT 'Canonical capacity units; guest activation remains opt-in',
+  `state_changed_at` timestamp NOT NULL,
+  `state_changed_by` int(11) DEFAULT NULL,
+  `invited_at` timestamp NULL DEFAULT NULL,
+  `pending_at` timestamp NULL DEFAULT NULL,
+  `confirmed_at` timestamp NULL DEFAULT NULL,
+  `declined_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_registration_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
+  UNIQUE KEY `uq_event_registrations_checkin_scope` (`tenant_id`,`event_id`,`id`,`user_id`),
+  KEY `idx_event_registration_capacity` (`tenant_id`,`event_id`,`capacity_pool_key`,`registration_state`,`id`),
+  KEY `idx_event_registration_user` (`tenant_id`,`user_id`,`registration_state`,`event_id`),
+  CONSTRAINT `chk_event_reg_party_size` CHECK (`party_size` between 1 and 11)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_reminder_delivery_claims`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3545,6 +6755,83 @@ CREATE TABLE `event_reminder_delivery_claims` (
   UNIQUE KEY `uk_event_reminder_delivery_claim` (`tenant_id`,`event_id`,`user_id`,`reminder_type`),
   KEY `idx_event_reminder_claim_status` (`tenant_id`,`status`,`claimed_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2007 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_reminder_rules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_reminder_rules` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `offset_minutes` int(10) unsigned NOT NULL,
+  `email_enabled` tinyint(1) DEFAULT NULL,
+  `in_app_enabled` tinyint(1) DEFAULT NULL,
+  `web_push_enabled` tinyint(1) DEFAULT NULL,
+  `fcm_enabled` tinyint(1) DEFAULT NULL,
+  `realtime_enabled` tinyint(1) DEFAULT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT 1,
+  `rule_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_reminder_rule_offset` (`tenant_id`,`event_id`,`user_id`,`offset_minutes`),
+  KEY `idx_event_reminder_rule_subject` (`tenant_id`,`event_id`,`user_id`,`enabled`,`offset_minutes`),
+  KEY `idx_event_reminder_rule_user` (`tenant_id`,`user_id`,`enabled`,`event_id`),
+  KEY `fk_event_reminder_rule_event` (`event_id`),
+  KEY `fk_event_reminder_rule_user` (`user_id`),
+  CONSTRAINT `fk_event_reminder_rule_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_event_reminder_rule_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_event_reminder_rule_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_event_reminder_rule_offset` CHECK (`offset_minutes` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_reminder_schedules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_reminder_schedules` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rule_id` bigint(20) unsigned DEFAULT NULL,
+  `registration_id` bigint(20) unsigned DEFAULT NULL,
+  `offset_minutes` int(10) unsigned NOT NULL,
+  `rule_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `registration_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `event_calendar_sequence` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `schedule_version` bigint(20) unsigned NOT NULL,
+  `scheduled_for` timestamp NOT NULL,
+  `deliver_until` timestamp NULL DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'pending',
+  `reason_code` varchar(100) DEFAULT NULL,
+  `outbox_id` bigint(20) unsigned DEFAULT NULL,
+  `queued_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `superseded_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_reminder_schedule_version` (`tenant_id`,`event_id`,`user_id`,`offset_minutes`,`schedule_version`),
+  KEY `idx_event_reminder_schedule_due` (`tenant_id`,`status`,`scheduled_for`,`id`),
+  KEY `idx_event_reminder_schedule_reconcile` (`tenant_id`,`event_id`,`user_id`,`event_calendar_sequence`,`status`),
+  KEY `idx_event_reminder_schedule_registration` (`tenant_id`,`registration_id`,`registration_version`),
+  KEY `fk_event_reminder_schedule_event` (`event_id`),
+  KEY `fk_event_reminder_schedule_user` (`user_id`),
+  KEY `fk_event_reminder_schedule_rule` (`rule_id`),
+  KEY `fk_event_reminder_schedule_registration` (`registration_id`),
+  KEY `fk_event_reminder_schedule_outbox` (`outbox_id`),
+  CONSTRAINT `fk_event_reminder_schedule_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
+  CONSTRAINT `fk_event_reminder_schedule_outbox` FOREIGN KEY (`outbox_id`) REFERENCES `event_domain_outbox` (`id`),
+  CONSTRAINT `fk_event_reminder_schedule_registration` FOREIGN KEY (`registration_id`) REFERENCES `event_registrations` (`id`),
+  CONSTRAINT `fk_event_reminder_schedule_rule` FOREIGN KEY (`rule_id`) REFERENCES `event_reminder_rules` (`id`),
+  CONSTRAINT `fk_event_reminder_schedule_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_reminder_schedule_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_event_reminder_schedule_offset` CHECK (`offset_minutes` > 0),
+  CONSTRAINT `chk_event_reminder_schedule_status` CHECK (`status` in ('pending','queued','delivered','cancelled','superseded','suppressed','failed_terminal')),
+  CONSTRAINT `chk_event_reminder_schedule_terminal_timestamps` CHECK ((`status` <> 'delivered' or `delivered_at` is not null) and (`status` <> 'cancelled' or `cancelled_at` is not null) and (`status` <> 'superseded' or `superseded_at` is not null))
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_reminder_sent`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3589,186 +6876,6 @@ CREATE TABLE `event_reminders` (
   CONSTRAINT `fk_reminder_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `event_registrations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_registrations` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
-  `allocation_key` varchar(191) DEFAULT NULL,
-  `registration_state` varchar(32) NOT NULL,
-  `registration_version` bigint(20) unsigned NOT NULL DEFAULT 1,
-  `state_changed_at` timestamp NOT NULL,
-  `state_changed_by` int(11) DEFAULT NULL,
-  `invited_at` timestamp NULL DEFAULT NULL,
-  `pending_at` timestamp NULL DEFAULT NULL,
-  `confirmed_at` timestamp NULL DEFAULT NULL,
-  `declined_at` timestamp NULL DEFAULT NULL,
-  `cancelled_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_registration_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
-  KEY `idx_event_registration_capacity` (`tenant_id`,`event_id`,`capacity_pool_key`,`registration_state`,`id`),
-  KEY `idx_event_registration_user` (`tenant_id`,`user_id`,`registration_state`,`event_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `event_registration_history`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_registration_history` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `registration_id` bigint(20) unsigned NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `actor_user_id` int(11) DEFAULT NULL,
-  `capacity_pool_key` varchar(100) NOT NULL,
-  `allocation_key` varchar(191) DEFAULT NULL,
-  `registration_version` bigint(20) unsigned NOT NULL,
-  `action` varchar(64) NOT NULL,
-  `from_state` varchar(32) DEFAULT NULL,
-  `to_state` varchar(32) NOT NULL,
-  `idempotency_key` varchar(191) NOT NULL,
-  `reason` text DEFAULT NULL,
-  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_registration_history_version` (`tenant_id`,`registration_id`,`registration_version`),
-  UNIQUE KEY `uq_event_registration_history_key` (`tenant_id`,`idempotency_key`),
-  KEY `idx_event_registration_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
-  KEY `idx_event_registration_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_registration_history_no_update` BEFORE UPDATE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable';
-CREATE TRIGGER `trg_event_registration_history_no_delete` BEFORE DELETE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable';
-DROP TABLE IF EXISTS `event_waitlist_entries`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_waitlist_entries` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
-  `allocation_key` varchar(191) DEFAULT NULL,
-  `queue_state` varchar(32) NOT NULL,
-  `queue_version` bigint(20) unsigned NOT NULL DEFAULT 1,
-  `queue_sequence` bigint(20) unsigned NOT NULL,
-  `state_changed_at` timestamp NOT NULL,
-  `state_changed_by` int(11) DEFAULT NULL,
-  `offered_at` timestamp NULL DEFAULT NULL,
-  `offer_expires_at` timestamp NULL DEFAULT NULL,
-  `offer_token_hash` char(64) DEFAULT NULL,
-  `offer_token_used_at` timestamp NULL DEFAULT NULL,
-  `accepted_at` timestamp NULL DEFAULT NULL,
-  `accepted_registration_id` bigint(20) unsigned DEFAULT NULL,
-  `expired_at` timestamp NULL DEFAULT NULL,
-  `cancelled_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_waitlist_entry_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
-  UNIQUE KEY `uq_event_waitlist_entry_sequence` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_sequence`),
-  UNIQUE KEY `uq_event_waitlist_offer_token` (`offer_token_hash`),
-  KEY `idx_event_waitlist_queue` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_state`,`queue_sequence`,`id`),
-  KEY `idx_event_waitlist_expiry` (`queue_state`,`offer_expires_at`,`id`),
-  KEY `idx_event_waitlist_user` (`tenant_id`,`user_id`,`queue_state`,`event_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `event_waitlist_entry_history`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_waitlist_entry_history` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `actor_user_id` int(11) DEFAULT NULL,
-  `capacity_pool_key` varchar(100) NOT NULL,
-  `allocation_key` varchar(191) DEFAULT NULL,
-  `queue_version` bigint(20) unsigned NOT NULL,
-  `queue_sequence` bigint(20) unsigned NOT NULL,
-  `action` varchar(64) NOT NULL,
-  `from_state` varchar(32) DEFAULT NULL,
-  `to_state` varchar(32) NOT NULL,
-  `idempotency_key` varchar(191) NOT NULL,
-  `reason` text DEFAULT NULL,
-  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_waitlist_history_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
-  UNIQUE KEY `uq_event_waitlist_history_key` (`tenant_id`,`idempotency_key`),
-  KEY `idx_event_waitlist_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
-  KEY `idx_event_waitlist_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_waitlist_history_no_update` BEFORE UPDATE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable';
-CREATE TRIGGER `trg_event_waitlist_history_no_delete` BEFORE DELETE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable';
-DROP TABLE IF EXISTS `event_waitlist_offer_envelopes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_waitlist_offer_envelopes` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
-  `outbox_id` bigint(20) unsigned NOT NULL,
-  `queue_version` bigint(20) unsigned NOT NULL,
-  `action` varchar(80) NOT NULL,
-  `cipher_version` varchar(32) NOT NULL,
-  `key_version` varchar(64) NOT NULL,
-  `key_fingerprint` char(64) NOT NULL,
-  `aad_hash` char(64) NOT NULL,
-  `token_ciphertext` longtext DEFAULT NULL,
-  `status` varchar(32) NOT NULL DEFAULT 'sealed',
-  `envelope_version` bigint(20) unsigned NOT NULL DEFAULT 1,
-  `claim_token_hash` char(64) DEFAULT NULL,
-  `claimed_by` varchar(191) DEFAULT NULL,
-  `claimed_at` timestamp NULL DEFAULT NULL,
-  `handed_off_at` timestamp NULL DEFAULT NULL,
-  `erased_at` timestamp NULL DEFAULT NULL,
-  `expires_at` timestamp NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_waitlist_offer_envelope_outbox` (`tenant_id`,`outbox_id`),
-  UNIQUE KEY `uq_event_waitlist_offer_envelope_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
-  KEY `idx_event_waitlist_offer_envelope_status` (`tenant_id`,`status`,`expires_at`,`id`),
-  KEY `idx_event_waitlist_offer_envelope_entry` (`tenant_id`,`event_id`,`waitlist_entry_id`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `event_waitlist_offer_envelope_access`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_waitlist_offer_envelope_access` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `envelope_id` bigint(20) unsigned NOT NULL,
-  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
-  `outbox_id` bigint(20) unsigned NOT NULL,
-  `queue_version` bigint(20) unsigned NOT NULL,
-  `operation` varchar(32) NOT NULL,
-  `consumer` varchar(191) DEFAULT NULL,
-  `claim_id_hash` char(64) DEFAULT NULL,
-  `from_status` varchar(32) DEFAULT NULL,
-  `to_status` varchar(32) NOT NULL,
-  `idempotency_key` varchar(191) NOT NULL,
-  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_waitlist_envelope_access_key` (`tenant_id`,`idempotency_key`),
-  KEY `idx_event_waitlist_envelope_access_envelope` (`tenant_id`,`envelope_id`,`created_at`,`id`),
-  KEY `idx_event_waitlist_envelope_access_event` (`tenant_id`,`event_id`,`operation`,`created_at`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_waitlist_envelope_access_no_update` BEFORE UPDATE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable';
-CREATE TRIGGER `trg_event_waitlist_envelope_access_no_delete` BEFORE DELETE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable';
 DROP TABLE IF EXISTS `event_rsvps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3794,8 +6901,331 @@ CREATE TABLE `event_rsvps` (
   KEY `idx_rsvps_tenant_event_status` (`tenant_id`,`event_id`,`status`),
   CONSTRAINT `event_rsvps_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `event_rsvps_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=925 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=948 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_safety_code_acknowledgements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_safety_code_acknowledgements` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `requirements_id` bigint(20) unsigned NOT NULL,
+  `requirements_version_id` bigint(20) unsigned NOT NULL,
+  `requirements_version_number` int(10) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `evidence_sequence` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `referenced_acknowledgement_id` bigint(20) unsigned DEFAULT NULL,
+  `text_version` varchar(64) NOT NULL,
+  `text_hash` char(64) NOT NULL,
+  `acknowledged_at` timestamp NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `recorded_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_safety_coc_sequence` (`tenant_id`,`event_id`,`user_id`,`evidence_sequence`),
+  UNIQUE KEY `uq_event_safety_coc_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_event_safety_coc_id` (`tenant_id`,`event_id`,`user_id`,`id`),
+  KEY `idx_event_safety_coc_current` (`tenant_id`,`event_id`,`user_id`,`action`,`recorded_at`,`id`),
+  KEY `fk_event_safety_coc_version` (`tenant_id`,`event_id`,`requirements_id`,`requirements_version_id`,`requirements_version_number`),
+  KEY `fk_event_safety_coc_user` (`user_id`,`tenant_id`),
+  KEY `fk_event_safety_coc_actor` (`actor_user_id`,`tenant_id`),
+  KEY `fk_event_safety_coc_reference` (`tenant_id`,`event_id`,`user_id`,`referenced_acknowledgement_id`),
+  CONSTRAINT `fk_event_safety_coc_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_coc_reference` FOREIGN KEY (`tenant_id`, `event_id`, `user_id`, `referenced_acknowledgement_id`) REFERENCES `event_safety_code_acknowledgements` (`tenant_id`, `event_id`, `user_id`, `id`),
+  CONSTRAINT `fk_event_safety_coc_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_safety_coc_user` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_coc_version` FOREIGN KEY (`tenant_id`, `event_id`, `requirements_id`, `requirements_version_id`, `requirements_version_number`) REFERENCES `event_safety_requirement_versions` (`tenant_id`, `event_id`, `requirements_id`, `id`, `version_number`),
+  CONSTRAINT `chk_event_safety_coc_action` CHECK (`actor_user_id` = `user_id` and (`action` = 'acknowledged' and `referenced_acknowledgement_id` is null or `action` in ('withdrawn','replaced') and `referenced_acknowledgement_id` is not null)),
+  CONSTRAINT `chk_event_safety_coc_versions` CHECK (`requirements_version_number` > 0 and `evidence_sequence` > 0),
+  CONSTRAINT `chk_event_safety_coc_hashes` CHECK (`text_hash` regexp '^[0-9a-f]{64}$' and `idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_coc_insert` BEFORE INSERT ON `event_safety_code_acknowledgements` FOR EACH ROW BEGIN IF NEW.`action` = 'acknowledged' AND (SELECT COUNT(*) FROM `event_safety_requirement_versions` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `requirements_id` = NEW.`requirements_id` AND `id` = NEW.`requirements_version_id` AND `version_number` = NEW.`requirements_version_number` AND `code_of_conduct_required` = 1 AND `code_of_conduct_text_version` = NEW.`text_version` AND `code_of_conduct_text_hash` = NEW.`text_hash`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_coc_policy_binding_invalid'; END IF; IF NEW.`action` IN ('withdrawn','replaced') AND (SELECT COUNT(*) FROM `event_safety_code_acknowledgements` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `user_id` = NEW.`user_id` AND `id` = NEW.`referenced_acknowledgement_id` AND `action` = 'acknowledged' AND `requirements_id` = NEW.`requirements_id` AND `requirements_version_id` = NEW.`requirements_version_id` AND `requirements_version_number` = NEW.`requirements_version_number` AND `text_version` = NEW.`text_version` AND `text_hash` = NEW.`text_hash` AND `acknowledged_at` = NEW.`acknowledged_at`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_coc_reference_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_coc_no_update` BEFORE UPDATE ON `event_safety_code_acknowledgements` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_code_acknowledgement_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_coc_no_delete` BEFORE DELETE ON `event_safety_code_acknowledgements` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_code_acknowledgement_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_safety_requirement_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_safety_requirement_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `requirements_id` bigint(20) unsigned NOT NULL,
+  `requirements_revision` bigint(20) unsigned NOT NULL,
+  `requirements_version_id` bigint(20) unsigned NOT NULL,
+  `requirements_version_number` int(10) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_safety_requirement_history_revision` (`tenant_id`,`requirements_id`,`requirements_revision`),
+  UNIQUE KEY `uq_event_safety_requirement_history_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_safety_requirement_history_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_event_safety_history_version` (`tenant_id`,`event_id`,`requirements_id`,`requirements_version_id`,`requirements_version_number`),
+  KEY `fk_event_safety_history_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_safety_history_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_history_requirements` FOREIGN KEY (`tenant_id`, `event_id`, `requirements_id`) REFERENCES `event_safety_requirements` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_safety_history_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_safety_history_version` FOREIGN KEY (`tenant_id`, `event_id`, `requirements_id`, `requirements_version_id`, `requirements_version_number`) REFERENCES `event_safety_requirement_versions` (`tenant_id`, `event_id`, `requirements_id`, `id`, `version_number`),
+  CONSTRAINT `chk_event_safety_history_action` CHECK (`action` in ('saved','published','archived')),
+  CONSTRAINT `chk_event_safety_history_versions` CHECK (`requirements_revision` > 0 and `requirements_version_number` > 0),
+  CONSTRAINT `chk_event_safety_history_hashes` CHECK (`idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_history_no_update` BEFORE UPDATE ON `event_safety_requirement_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirement_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_history_no_delete` BEFORE DELETE ON `event_safety_requirement_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirement_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_safety_requirement_versions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_safety_requirement_versions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `requirements_id` bigint(20) unsigned NOT NULL,
+  `version_number` int(10) unsigned NOT NULL,
+  `minimum_age` tinyint(3) unsigned DEFAULT NULL,
+  `guardian_consent_required` tinyint(1) NOT NULL DEFAULT 0,
+  `minor_age_threshold` tinyint(3) unsigned DEFAULT NULL,
+  `code_of_conduct_required` tinyint(1) NOT NULL DEFAULT 0,
+  `code_of_conduct_text` longtext DEFAULT NULL,
+  `code_of_conduct_text_version` varchar(64) DEFAULT NULL,
+  `code_of_conduct_text_hash` char(64) DEFAULT NULL,
+  `eligibility_policy_metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`eligibility_policy_metadata`)),
+  `eligibility_policy_hash` char(64) NOT NULL,
+  `captured_by_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_safety_requirement_version` (`tenant_id`,`requirements_id`,`version_number`),
+  UNIQUE KEY `uq_event_safety_requirement_version_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_event_safety_requirement_version_id` (`tenant_id`,`event_id`,`requirements_id`,`id`,`version_number`),
+  KEY `fk_event_safety_version_actor` (`captured_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_safety_version_actor` FOREIGN KEY (`captured_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_version_requirements` FOREIGN KEY (`tenant_id`, `event_id`, `requirements_id`) REFERENCES `event_safety_requirements` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_safety_version_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_safety_version_number` CHECK (`version_number` > 0),
+  CONSTRAINT `chk_event_safety_version_ages` CHECK ((`minimum_age` is null or `minimum_age` <= 125) and (`guardian_consent_required` = 0 and `minor_age_threshold` is null or `guardian_consent_required` = 1 and `minor_age_threshold` between 1 and 125)),
+  CONSTRAINT `chk_event_safety_version_coc` CHECK (`code_of_conduct_required` = 0 and `code_of_conduct_text` is null and `code_of_conduct_text_version` is null and `code_of_conduct_text_hash` is null or `code_of_conduct_required` = 1 and `code_of_conduct_text` is not null and char_length(trim(`code_of_conduct_text`)) > 0 and `code_of_conduct_text_version` is not null and char_length(trim(`code_of_conduct_text_version`)) > 0 and `code_of_conduct_text_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_safety_version_hashes` CHECK (`eligibility_policy_hash` regexp '^[0-9a-f]{64}$' and `idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_version_insert` BEFORE INSERT ON `event_safety_requirement_versions` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `event_safety_requirements` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`requirements_id` AND `status` = 'draft' AND `current_version` = NEW.`version_number`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirement_version_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_version_no_update` BEFORE UPDATE ON `event_safety_requirement_versions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirement_version_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_version_no_delete` BEFORE DELETE ON `event_safety_requirement_versions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirement_version_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_safety_requirements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_safety_requirements` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `revision` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `current_version` int(10) unsigned NOT NULL DEFAULT 1,
+  `published_version` int(10) unsigned DEFAULT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `created_by_user_id` int(11) NOT NULL,
+  `updated_by_user_id` int(11) NOT NULL,
+  `published_by_user_id` int(11) DEFAULT NULL,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `archived_by_user_id` int(11) DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_safety_requirements_event` (`tenant_id`,`event_id`),
+  UNIQUE KEY `uq_event_safety_requirements_id` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_safety_requirements_occurrence` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `idx_event_safety_requirements_status` (`tenant_id`,`status`,`updated_at`,`event_id`),
+  KEY `fk_event_safety_requirements_creator` (`created_by_user_id`,`tenant_id`),
+  KEY `fk_event_safety_requirements_updater` (`updated_by_user_id`,`tenant_id`),
+  KEY `fk_event_safety_requirements_publisher` (`published_by_user_id`,`tenant_id`),
+  KEY `fk_event_safety_requirements_archiver` (`archived_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_safety_requirements_archiver` FOREIGN KEY (`archived_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_requirements_creator` FOREIGN KEY (`created_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_requirements_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_safety_requirements_publisher` FOREIGN KEY (`published_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_safety_requirements_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_safety_requirements_updater` FOREIGN KEY (`updated_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_safety_requirements_versions` CHECK (`revision` > 0 and `current_version` > 0 and (`published_version` is null or `published_version` > 0 and `published_version` <= `current_version`)),
+  CONSTRAINT `chk_event_safety_requirements_state` CHECK (`status` = 'draft' and `published_version` is null and `published_by_user_id` is null and `published_at` is null and `archived_by_user_id` is null and `archived_at` is null or `status` = 'published' and `published_version` = `current_version` and `published_by_user_id` is not null and `published_at` is not null and `archived_by_user_id` is null and `archived_at` is null or `status` = 'archived' and `archived_by_user_id` is not null and `archived_at` is not null and (`published_version` is null and `published_by_user_id` is null and `published_at` is null or `published_version` is not null and `published_by_user_id` is not null and `published_at` is not null))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_requirements_insert` BEFORE INSERT ON `event_safety_requirements` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_concrete_event_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_requirements_update` BEFORE UPDATE ON `event_safety_requirements` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`created_by_user_id` <=> NEW.`created_by_user_id`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_identity_immutable'; END IF; IF OLD.`status` = 'archived' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_archived_immutable'; END IF; IF NEW.`revision` <> OLD.`revision` + 1 OR NEW.`current_version` < OLD.`current_version` OR NEW.`current_version` > OLD.`current_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_version_invalid'; END IF; IF NEW.`current_version` = OLD.`current_version` + 1 AND NOT (NEW.`status` = 'draft' AND NEW.`published_version` IS NULL AND NEW.`published_by_user_id` IS NULL AND NEW.`published_at` IS NULL AND NEW.`archived_by_user_id` IS NULL AND NEW.`archived_at` IS NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_draft_transition_invalid'; END IF; IF NEW.`current_version` = OLD.`current_version` AND NOT ((OLD.`status` = 'draft' AND NEW.`status` = 'published' AND NEW.`published_version` = NEW.`current_version`) OR (OLD.`status` IN ('draft','published') AND NEW.`status` = 'archived')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_state_transition_invalid'; END IF; IF NEW.`status` = 'published' AND (SELECT COUNT(*) FROM `event_safety_requirement_versions` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `requirements_id` = NEW.`id` AND `version_number` = NEW.`published_version`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_publish_version_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_safety_requirements_no_delete` BEFORE DELETE ON `event_safety_requirements` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_safety_requirements_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_series`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3814,36 +7244,328 @@ CREATE TABLE `event_series` (
   CONSTRAINT `fk_series_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `event_staff_assignments`;
+DROP TABLE IF EXISTS `event_session_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `event_staff_assignments` (
+CREATE TABLE `event_session_history` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tenant_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
+  `session_id` bigint(20) unsigned DEFAULT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `agenda_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `changed_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`changed_fields`)),
+  `affected_session_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`affected_session_ids`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_session_history_version` (`tenant_id`,`event_id`,`agenda_version`),
+  UNIQUE KEY `uq_event_session_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_session_history_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `idx_event_session_history_session` (`tenant_id`,`session_id`,`created_at`,`id`),
+  KEY `fk_event_session_history_session_tenant` (`tenant_id`,`event_id`,`session_id`),
+  KEY `fk_event_session_history_actor_tenant` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_session_history_actor_tenant` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_session_history_event_tenant` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_session_history_session_tenant` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`) REFERENCES `event_sessions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_session_history_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_session_history_no_update` BEFORE UPDATE ON `event_session_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_session_history_no_delete` BEFORE DELETE ON `event_session_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_session_registration_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_session_registration_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `session_id` bigint(20) unsigned NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
   `user_id` int(11) NOT NULL,
-  `role` varchar(40) NOT NULL,
-  `status` varchar(16) NOT NULL DEFAULT 'active',
-  `assignment_version` bigint(20) unsigned NOT NULL DEFAULT 1,
-  `granted_at` timestamp NOT NULL,
-  `granted_by` int(11) NOT NULL,
-  `revoked_at` timestamp NULL DEFAULT NULL,
-  `revoked_by` int(11) DEFAULT NULL,
-  `expires_at` timestamp NULL DEFAULT NULL,
+  `event_registration_id` bigint(20) unsigned NOT NULL,
+  `event_registration_version` bigint(20) unsigned DEFAULT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `registration_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_session_reg_history_version` (`tenant_id`,`registration_id`,`registration_version`),
+  UNIQUE KEY `uq_ev_session_reg_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_ev_session_reg_history_session` (`tenant_id`,`event_id`,`session_id`,`created_at`,`id`),
+  KEY `fk_ev_session_reg_hist_registration` (`tenant_id`,`event_id`,`session_id`,`registration_id`,`user_id`,`event_registration_id`),
+  KEY `fk_ev_session_reg_hist_event_reg` (`tenant_id`,`event_id`,`event_registration_id`,`user_id`),
+  KEY `fk_ev_session_reg_hist_user` (`user_id`,`tenant_id`),
+  KEY `fk_ev_session_reg_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_session_reg_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_session_reg_hist_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_session_reg_hist_event_reg` FOREIGN KEY (`tenant_id`, `event_id`, `event_registration_id`, `user_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_ev_session_reg_hist_registration` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`, `registration_id`, `user_id`, `event_registration_id`) REFERENCES `event_session_registrations` (`tenant_id`, `event_id`, `session_id`, `id`, `user_id`, `event_registration_id`),
+  CONSTRAINT `fk_ev_session_reg_hist_session` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`) REFERENCES `event_sessions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_session_reg_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_session_reg_hist_user` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_session_reg_hist_version` CHECK (`registration_version` >= 1),
+  CONSTRAINT `chk_ev_session_reg_hist_action` CHECK (`action` in ('registered','withdrawn')),
+  CONSTRAINT `chk_ev_session_reg_hist_event_version` CHECK (`event_registration_version` >= 1)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_session_reg_hist_pin_insert` BEFORE INSERT ON `event_session_registration_history` FOR EACH ROW BEGIN IF NEW.`event_registration_version` IS NULL THEN SET NEW.`event_registration_version` = (SELECT `event_registration_version` FROM `event_session_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `session_id` = NEW.`session_id` AND `id` = NEW.`registration_id` AND `user_id` = NEW.`user_id` AND `event_registration_id` = NEW.`event_registration_id` LIMIT 1); END IF; IF NEW.`event_registration_version` IS NULL OR (SELECT COUNT(*) FROM `event_session_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `session_id` = NEW.`session_id` AND `id` = NEW.`registration_id` AND `user_id` = NEW.`user_id` AND `event_registration_id` = NEW.`event_registration_id` AND `event_registration_version` = NEW.`event_registration_version`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_history_version_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_session_reg_hist_no_update` BEFORE UPDATE ON `event_session_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_session_reg_hist_no_delete` BEFORE DELETE ON `event_session_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_session_registrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_session_registrations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `session_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `event_registration_id` bigint(20) unsigned NOT NULL,
+  `event_registration_version` bigint(20) unsigned DEFAULT NULL,
+  `version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'registered',
+  `registered_at` timestamp NOT NULL,
+  `withdrawn_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_event_staff_assignment_subject` (`tenant_id`,`event_id`,`user_id`,`role`),
-  KEY `idx_event_staff_assignment_event` (`tenant_id`,`event_id`,`status`,`expires_at`,`id`),
-  KEY `idx_event_staff_assignment_user` (`tenant_id`,`user_id`,`status`,`expires_at`),
-  KEY `fk_event_staff_assignment_event` (`event_id`),
-  KEY `fk_event_staff_assignment_user` (`user_id`),
-  KEY `fk_event_staff_assignment_grantor` (`granted_by`),
-  KEY `fk_event_staff_assignment_revoker` (`revoked_by`),
-  CONSTRAINT `fk_event_staff_assignment_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
-  CONSTRAINT `fk_event_staff_assignment_grantor` FOREIGN KEY (`granted_by`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_event_staff_assignment_revoker` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_event_staff_assignment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  UNIQUE KEY `uq_ev_session_reg_member` (`tenant_id`,`event_id`,`session_id`,`user_id`),
+  UNIQUE KEY `uq_ev_session_reg_scope_id` (`tenant_id`,`event_id`,`session_id`,`id`,`user_id`,`event_registration_id`),
+  KEY `idx_ev_session_reg_capacity` (`tenant_id`,`event_id`,`session_id`,`status`,`id`),
+  KEY `idx_ev_session_reg_member_state` (`tenant_id`,`user_id`,`status`,`event_id`,`session_id`),
+  KEY `fk_ev_session_reg_event_reg` (`tenant_id`,`event_id`,`event_registration_id`,`user_id`),
+  KEY `fk_ev_session_reg_user` (`user_id`,`tenant_id`),
+  CONSTRAINT `fk_ev_session_reg_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_session_reg_event_reg` FOREIGN KEY (`tenant_id`, `event_id`, `event_registration_id`, `user_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_ev_session_reg_session` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`) REFERENCES `event_sessions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_session_reg_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_session_reg_user` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_session_reg_version` CHECK (`version` >= 1),
+  CONSTRAINT `chk_ev_session_reg_status` CHECK (`status` in ('registered','withdrawn')),
+  CONSTRAINT `chk_ev_session_reg_state` CHECK (`status` = 'registered' and `registered_at` is not null and `withdrawn_at` is null or `status` = 'withdrawn' and `registered_at` is not null and `withdrawn_at` is not null),
+  CONSTRAINT `chk_ev_session_reg_event_version` CHECK (`event_registration_version` >= 1)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_session_reg_validate_insert` BEFORE INSERT ON `event_session_registrations` FOR EACH ROW BEGIN IF NEW.`event_registration_version` IS NULL THEN SET NEW.`event_registration_version` = (SELECT `registration_version` FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` LIMIT 1); END IF; IF NEW.`event_registration_version` IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_version_required'; END IF; IF NEW.`status` = 'registered' AND (SELECT COUNT(*) FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` AND `registration_state` = 'confirmed' AND `registration_version` = NEW.`event_registration_version`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_confirmed_registration_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_ev_session_reg_validate_update` BEFORE UPDATE ON `event_session_registrations` FOR EACH ROW BEGIN IF OLD.`status` = 'withdrawn' AND NEW.`status` = 'registered' AND (NEW.`event_registration_version` <=> OLD.`event_registration_version`) THEN SET NEW.`event_registration_version` = (SELECT `registration_version` FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` LIMIT 1); ELSEIF NEW.`event_registration_version` IS NULL THEN SET NEW.`event_registration_version` = (SELECT `registration_version` FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` LIMIT 1); END IF; IF NEW.`event_registration_version` IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_version_required'; END IF; IF NEW.`status` <> 'registered' AND OLD.`event_registration_version` IS NOT NULL AND NOT (NEW.`event_registration_version` <=> OLD.`event_registration_version`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_version_immutable'; END IF; IF NEW.`status` <> 'registered' AND OLD.`event_registration_version` IS NULL AND NEW.`event_registration_version` <> (SELECT `registration_version` FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` LIMIT 1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_registration_version_invalid'; END IF; IF NEW.`status` = 'registered' AND (SELECT COUNT(*) FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`event_registration_id` AND `user_id` = NEW.`user_id` AND `registration_state` = 'confirmed' AND `registration_version` = NEW.`event_registration_version`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_session_confirmed_registration_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_session_resources`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_session_resources` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `session_id` bigint(20) unsigned NOT NULL,
+  `resource_type` varchar(24) NOT NULL,
+  `visibility` varchar(24) NOT NULL DEFAULT 'public',
+  `title` varchar(191) NOT NULL,
+  `url_ciphertext` text NOT NULL,
+  `position` int(10) unsigned NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ev_session_resource_scope_id` (`tenant_id`,`event_id`,`session_id`,`id`),
+  KEY `idx_ev_session_resources_order` (`tenant_id`,`event_id`,`session_id`,`position`,`id`),
+  KEY `fk_ev_session_resource_creator` (`created_by`,`tenant_id`),
+  KEY `fk_ev_session_resource_updater` (`updated_by`,`tenant_id`),
+  CONSTRAINT `fk_ev_session_resource_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_ev_session_resource_event` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_ev_session_resource_session` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`) REFERENCES `event_sessions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_ev_session_resource_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_ev_session_resource_updater` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_ev_session_resource_type` CHECK (`resource_type` in ('link','document','slides','download','stream','recording')),
+  CONSTRAINT `chk_ev_session_resource_visibility` CHECK (`visibility` in ('public','registered','staff')),
+  CONSTRAINT `chk_ev_session_resource_position` CHECK (`position` >= 1),
+  CONSTRAINT `chk_ev_session_resource_title` CHECK (char_length(trim(`title`)) > 0),
+  CONSTRAINT `chk_ev_session_resource_url` CHECK (char_length(`url_ciphertext`) > 0),
+  CONSTRAINT `chk_ev_session_resource_media` CHECK (`resource_type` not in ('stream','recording') or `visibility` in ('registered','staff'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_session_speakers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_session_speakers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `session_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `display_name` varchar(191) DEFAULT NULL,
+  `role_label` varchar(120) DEFAULT NULL,
+  `position` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_session_speaker_member` (`tenant_id`,`session_id`,`user_id`),
+  KEY `idx_event_session_speakers_order` (`tenant_id`,`event_id`,`session_id`,`position`,`id`),
+  KEY `idx_event_session_speakers_user` (`tenant_id`,`user_id`,`event_id`,`session_id`),
+  KEY `fk_event_session_speakers_user_tenant` (`user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_session_speakers_event_tenant` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_session_speakers_session_tenant` FOREIGN KEY (`tenant_id`, `event_id`, `session_id`) REFERENCES `event_sessions` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `fk_event_session_speakers_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_session_speakers_user_tenant` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_session_speaker_identity` CHECK (`user_id` is not null and `display_name` is null or `user_id` is null and `display_name` is not null and char_length(trim(`display_name`)) > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_sessions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `title` varchar(191) NOT NULL,
+  `description` text DEFAULT NULL,
+  `session_type` varchar(32) NOT NULL DEFAULT 'session',
+  `visibility` varchar(24) NOT NULL DEFAULT 'public',
+  `capacity` int(10) unsigned DEFAULT NULL COMMENT 'Optional independent capacity for this session; null means unlimited',
+  `status` varchar(16) NOT NULL DEFAULT 'scheduled',
+  `starts_at_utc` datetime NOT NULL,
+  `ends_at_utc` datetime NOT NULL,
+  `timezone` varchar(64) NOT NULL,
+  `track_name` varchar(120) DEFAULT NULL,
+  `room_name` varchar(120) DEFAULT NULL,
+  `room_key` char(64) DEFAULT NULL,
+  `position` int(10) unsigned NOT NULL DEFAULT 0,
+  `cancellation_reason` varchar(500) DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `cancelled_by` int(11) DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_sessions_tenant_event_id` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_event_sessions_event_time` (`tenant_id`,`event_id`,`status`,`starts_at_utc`,`position`,`id`),
+  KEY `idx_event_sessions_room_time` (`tenant_id`,`event_id`,`room_key`,`status`,`starts_at_utc`,`ends_at_utc`),
+  KEY `idx_event_sessions_tenant_time` (`tenant_id`,`starts_at_utc`,`ends_at_utc`,`status`),
+  KEY `fk_event_sessions_creator_tenant` (`created_by`,`tenant_id`),
+  KEY `fk_event_sessions_updater_tenant` (`updated_by`,`tenant_id`),
+  KEY `fk_event_sessions_canceller_tenant` (`cancelled_by`,`tenant_id`),
+  CONSTRAINT `fk_event_sessions_canceller_tenant` FOREIGN KEY (`cancelled_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_sessions_creator_tenant` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_sessions_event_tenant` FOREIGN KEY (`tenant_id`, `event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_sessions_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_sessions_updater_tenant` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_sessions_type` CHECK (`session_type` in ('session','keynote','workshop','panel','break','networking','other')),
+  CONSTRAINT `chk_event_sessions_visibility` CHECK (`visibility` in ('public','registered','staff')),
+  CONSTRAINT `chk_event_sessions_status` CHECK (`status` in ('scheduled','cancelled')),
+  CONSTRAINT `chk_event_sessions_time_range` CHECK (`starts_at_utc` < `ends_at_utc`),
+  CONSTRAINT `chk_event_sessions_cancellation` CHECK (`status` = 'scheduled' and `cancellation_reason` is null and `cancelled_by` is null and `cancelled_at` is null or `status` = 'cancelled' and `cancellation_reason` is not null and char_length(trim(`cancellation_reason`)) > 0 and `cancelled_by` is not null and `cancelled_at` is not null),
+  CONSTRAINT `chk_ev_session_capacity` CHECK (`capacity` is null or `capacity` >= 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_staff_assignment_history`;
@@ -3877,8 +7599,70 @@ CREATE TABLE `event_staff_assignment_history` (
   CONSTRAINT `fk_event_staff_history_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `event_staff_assignments` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_staff_history_no_update` BEFORE UPDATE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable';
-CREATE TRIGGER `trg_event_staff_history_no_delete` BEFORE DELETE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable';
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_staff_history_no_update` BEFORE UPDATE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_staff_history_no_delete` BEFORE DELETE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_staff_assignments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_staff_assignments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role` varchar(40) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `assignment_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `granted_at` timestamp NOT NULL,
+  `granted_by` int(11) NOT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revoked_by` int(11) DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_staff_assignment_subject` (`tenant_id`,`event_id`,`user_id`,`role`),
+  KEY `idx_event_staff_assignment_event` (`tenant_id`,`event_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_staff_assignment_user` (`tenant_id`,`user_id`,`status`,`expires_at`),
+  KEY `fk_event_staff_assignment_event` (`event_id`),
+  KEY `fk_event_staff_assignment_user` (`user_id`),
+  KEY `fk_event_staff_assignment_grantor` (`granted_by`),
+  KEY `fk_event_staff_assignment_revoker` (`revoked_by`),
+  CONSTRAINT `fk_event_staff_assignment_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_grantor` FOREIGN KEY (`granted_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_revoker` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_status_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3901,10 +7685,730 @@ CREATE TABLE `event_status_history` (
   UNIQUE KEY `uq_event_status_history_version` (`tenant_id`,`event_id`,`lifecycle_version`),
   KEY `idx_event_status_history_event` (`tenant_id`,`event_id`,`created_at`,`id`),
   KEY `idx_event_status_history_actor` (`tenant_id`,`actor_user_id`,`created_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_status_history_no_update` BEFORE UPDATE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_status_history_no_delete` BEFORE DELETE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_template_audit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_template_audit` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
+  `template_version_id` bigint(20) unsigned DEFAULT NULL,
+  `template_version_number` int(10) unsigned NOT NULL,
+  `source_event_id` int(11) NOT NULL,
+  `materialized_event_id` int(11) DEFAULT NULL,
+  `action` varchar(24) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_template_audit_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_template_audit_template` (`tenant_id`,`template_id`,`created_at`,`id`),
+  KEY `idx_event_template_audit_source` (`tenant_id`,`source_event_id`,`created_at`,`id`),
+  KEY `fk_event_template_audit_version` (`tenant_id`,`template_id`,`template_version_id`,`template_version_number`,`source_event_id`),
+  KEY `fk_event_template_audit_created` (`tenant_id`,`materialized_event_id`),
+  KEY `fk_event_template_audit_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_template_audit_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_template_audit_created` FOREIGN KEY (`tenant_id`, `materialized_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_audit_source` FOREIGN KEY (`tenant_id`, `source_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_audit_template` FOREIGN KEY (`tenant_id`, `template_id`) REFERENCES `event_templates` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_audit_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_template_audit_version` FOREIGN KEY (`tenant_id`, `template_id`, `template_version_id`, `template_version_number`, `source_event_id`) REFERENCES `event_template_versions` (`tenant_id`, `template_id`, `id`, `version_number`, `source_event_id`),
+  CONSTRAINT `chk_event_template_audit_action` CHECK (`action` in ('captured','revised','archived','materialized')),
+  CONSTRAINT `chk_event_template_audit_hashes` CHECK (`idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_template_audit_version` CHECK (`template_version_number` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-CREATE TRIGGER `trg_event_status_history_no_update` BEFORE UPDATE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable';
-CREATE TRIGGER `trg_event_status_history_no_delete` BEFORE DELETE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable';
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_audit_no_update` BEFORE UPDATE ON `event_template_audit` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_audit_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_audit_no_delete` BEFORE DELETE ON `event_template_audit` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_audit_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_template_materializations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_template_materializations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
+  `template_version_id` bigint(20) unsigned NOT NULL,
+  `template_version_number` int(10) unsigned NOT NULL,
+  `source_event_id` int(11) NOT NULL,
+  `created_event_id` int(11) NOT NULL,
+  `materialized_by_user_id` int(11) NOT NULL,
+  `schema_version` smallint(5) unsigned NOT NULL,
+  `template_payload_hash` char(64) NOT NULL,
+  `effective_payload_hash` char(64) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `schedule_start_utc` datetime NOT NULL,
+  `schedule_end_utc` datetime DEFAULT NULL,
+  `schedule_timezone` varchar(64) NOT NULL,
+  `schedule_all_day` tinyint(1) NOT NULL DEFAULT 0,
+  `override_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`override_fields`)),
+  `federation_normalized` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_template_materialize_key` (`tenant_id`,`idempotency_hash`),
+  UNIQUE KEY `uq_event_template_materialized_event` (`tenant_id`,`created_event_id`),
+  KEY `idx_event_template_materialized_version` (`tenant_id`,`template_id`,`template_version_number`,`created_at`,`id`),
+  KEY `fk_event_template_material_version` (`tenant_id`,`template_id`,`template_version_id`,`template_version_number`,`source_event_id`),
+  KEY `fk_event_template_material_source` (`tenant_id`,`source_event_id`),
+  KEY `fk_event_template_material_actor` (`materialized_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_template_material_actor` FOREIGN KEY (`materialized_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_template_material_created` FOREIGN KEY (`tenant_id`, `created_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_material_source` FOREIGN KEY (`tenant_id`, `source_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_material_template` FOREIGN KEY (`tenant_id`, `template_id`) REFERENCES `event_templates` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_material_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_template_material_version` FOREIGN KEY (`tenant_id`, `template_id`, `template_version_id`, `template_version_number`, `source_event_id`) REFERENCES `event_template_versions` (`tenant_id`, `template_id`, `id`, `version_number`, `source_event_id`),
+  CONSTRAINT `chk_event_template_material_hashes` CHECK (`template_payload_hash` regexp '^[0-9a-f]{64}$' and `effective_payload_hash` regexp '^[0-9a-f]{64}$' and `idempotency_hash` regexp '^[0-9a-f]{64}$' and `request_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_template_material_schedule` CHECK (`schedule_end_utc` is null or `schedule_end_utc` > `schedule_start_utc`),
+  CONSTRAINT `chk_event_template_material_safe` CHECK (`template_version_number` > 0 and `schema_version` > 0 and `federation_normalized` = 1)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_materialize_validate` BEFORE INSERT ON `event_template_materializations` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`created_event_id` AND `user_id` = NEW.`materialized_by_user_id` AND `status` = 'draft' AND `publication_status` = 'draft' AND `operational_status` = 'scheduled' AND `is_recurring_template` = 0 AND `parent_event_id` IS NULL AND `series_id` IS NULL AND `federated_visibility` = 'none') <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_materialized_event_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_materialize_no_update` BEFORE UPDATE ON `event_template_materializations` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_materialization_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_materialize_no_delete` BEFORE DELETE ON `event_template_materializations` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_materialization_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_template_versions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_template_versions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
+  `source_event_id` int(11) NOT NULL,
+  `version_number` int(10) unsigned NOT NULL,
+  `schema_version` smallint(5) unsigned NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`payload`)),
+  `payload_hash` char(64) NOT NULL,
+  `copied_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`copied_fields`)),
+  `skipped_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`skipped_fields`)),
+  `source_lifecycle_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `source_calendar_sequence` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `source_updated_at` timestamp NULL DEFAULT NULL,
+  `captured_by_user_id` int(11) NOT NULL,
+  `capture_idempotency_hash` char(64) NOT NULL,
+  `capture_request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_template_version` (`tenant_id`,`template_id`,`version_number`),
+  UNIQUE KEY `uq_event_template_capture_key` (`tenant_id`,`capture_idempotency_hash`),
+  UNIQUE KEY `uq_event_template_version_provenance` (`tenant_id`,`template_id`,`id`,`version_number`,`source_event_id`),
+  KEY `idx_event_template_version_source` (`tenant_id`,`source_event_id`,`created_at`,`id`),
+  KEY `fk_event_template_version_actor` (`captured_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_template_version_actor` FOREIGN KEY (`captured_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_template_version_source` FOREIGN KEY (`tenant_id`, `source_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_version_template` FOREIGN KEY (`tenant_id`, `template_id`) REFERENCES `event_templates` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_version_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_template_version_number` CHECK (`version_number` > 0 and `schema_version` > 0),
+  CONSTRAINT `chk_event_template_payload_hash` CHECK (`payload_hash` regexp '^[0-9a-f]{64}$'),
+  CONSTRAINT `chk_event_template_capture_hashes` CHECK (`capture_idempotency_hash` regexp '^[0-9a-f]{64}$' and `capture_request_hash` regexp '^[0-9a-f]{64}$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_version_no_update` BEFORE UPDATE ON `event_template_versions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_version_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_version_no_delete` BEFORE DELETE ON `event_template_versions` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_version_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `public_id` char(36) NOT NULL,
+  `source_event_id` int(11) NOT NULL,
+  `current_version` int(10) unsigned NOT NULL DEFAULT 1,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `created_by_user_id` int(11) NOT NULL,
+  `archived_by_user_id` int(11) DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT NULL,
+  `archive_reason` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_template_public` (`public_id`),
+  UNIQUE KEY `uq_event_template_tenant_id` (`tenant_id`,`id`),
+  KEY `idx_event_template_status` (`tenant_id`,`status`,`updated_at`,`id`),
+  KEY `idx_event_template_source` (`tenant_id`,`source_event_id`,`created_at`,`id`),
+  KEY `fk_event_template_creator` (`created_by_user_id`,`tenant_id`),
+  KEY `fk_event_template_archiver` (`archived_by_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_template_archiver` FOREIGN KEY (`archived_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_template_creator` FOREIGN KEY (`created_by_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_template_source_event` FOREIGN KEY (`tenant_id`, `source_event_id`) REFERENCES `events` (`tenant_id`, `id`),
+  CONSTRAINT `fk_event_template_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_template_version` CHECK (`current_version` > 0),
+  CONSTRAINT `chk_event_template_status` CHECK (`status` in ('active','archived')),
+  CONSTRAINT `chk_event_template_archive` CHECK (`status` = 'active' and `archived_by_user_id` is null and `archived_at` is null and `archive_reason` is null or `status` = 'archived' and `archived_by_user_id` is not null and `archived_at` is not null and `archive_reason` is not null and char_length(trim(`archive_reason`)) > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_update` BEFORE UPDATE ON `event_templates` FOR EACH ROW BEGIN IF NOT (OLD.`id` <=> NEW.`id`) OR NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`public_id` <=> NEW.`public_id`) OR NOT (OLD.`source_event_id` <=> NEW.`source_event_id`) OR NOT (OLD.`created_by_user_id` <=> NEW.`created_by_user_id`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_identity_immutable'; END IF; IF OLD.`status` = 'archived' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_archived_immutable'; END IF; IF NEW.`current_version` < OLD.`current_version` OR NEW.`current_version` > OLD.`current_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_version_transition_invalid'; END IF; IF NEW.`status` = 'active' AND (NEW.`current_version` <> OLD.`current_version` + 1 OR NOT (OLD.`archived_by_user_id` <=> NEW.`archived_by_user_id`) OR NOT (OLD.`archived_at` <=> NEW.`archived_at`) OR NOT (OLD.`archive_reason` <=> NEW.`archive_reason`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_revision_transition_invalid'; END IF; IF NEW.`status` = 'archived' AND (NEW.`current_version` <> OLD.`current_version` OR OLD.`status` <> 'active') THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_archive_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_template_no_delete` BEFORE DELETE ON `event_templates` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_template_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_ticket_entitlement_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_ticket_entitlement_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `ticket_type_id` bigint(20) unsigned NOT NULL,
+  `entitlement_id` bigint(20) unsigned NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `entitlement_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `units` int(10) unsigned NOT NULL,
+  `ticket_kind_snapshot` varchar(24) NOT NULL,
+  `unit_price_credits_snapshot` decimal(10,2) NOT NULL,
+  `total_price_credits_snapshot` decimal(12,2) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `reason` varchar(500) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_ticket_ent_hist_version` (`tenant_id`,`entitlement_id`,`entitlement_version`),
+  UNIQUE KEY `uq_event_ticket_ent_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_ticket_ent_hist_event` (`tenant_id`,`event_id`,`ticket_type_id`,`created_at`,`id`),
+  KEY `fk_event_ticket_ent_hist_entitlement` (`tenant_id`,`event_id`,`ticket_type_id`,`registration_id`,`user_id`,`entitlement_id`),
+  KEY `fk_event_ticket_ent_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_ticket_ent_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_ent_hist_entitlement` FOREIGN KEY (`tenant_id`, `event_id`, `ticket_type_id`, `registration_id`, `user_id`, `entitlement_id`) REFERENCES `event_ticket_entitlements` (`tenant_id`, `event_id`, `ticket_type_id`, `registration_id`, `user_id`, `id`),
+  CONSTRAINT `fk_event_ticket_ent_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_ticket_ent_hist_action` CHECK (`action` in ('confirmed','cancelled')),
+  CONSTRAINT `chk_event_ticket_ent_hist_version` CHECK (`entitlement_version` > 0),
+  CONSTRAINT `chk_event_ticket_ent_hist_units` CHECK (`units` between 1 and 1000),
+  CONSTRAINT `chk_event_ticket_ent_hist_free` CHECK (`ticket_kind_snapshot` = 'free' and `unit_price_credits_snapshot` = 0.00 and `total_price_credits_snapshot` = 0.00),
+  CONSTRAINT `chk_event_ticket_ent_hist_total` CHECK (`total_price_credits_snapshot` = `unit_price_credits_snapshot` * `units`),
+  CONSTRAINT `chk_event_ticket_ent_hist_reason` CHECK (`action` = 'confirmed' and `reason` is null or `action` = 'cancelled' and `reason` is not null and char_length(trim(`reason`)) > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_ent_hist_no_update` BEFORE UPDATE ON `event_ticket_entitlement_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_entitlement_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_ent_hist_no_delete` BEFORE DELETE ON `event_ticket_entitlement_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_entitlement_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_ticket_entitlements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_ticket_entitlements` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `ticket_type_id` bigint(20) unsigned NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `units` int(10) unsigned NOT NULL,
+  `ticket_kind_snapshot` varchar(24) NOT NULL,
+  `unit_price_credits_snapshot` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `total_price_credits_snapshot` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `status` varchar(16) NOT NULL DEFAULT 'confirmed',
+  `entitlement_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `allocation_idempotency_hash` char(64) NOT NULL,
+  `allocation_request_hash` char(64) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `cancelled_by` int(11) DEFAULT NULL,
+  `cancellation_reason` varchar(500) DEFAULT NULL,
+  `confirmed_at` timestamp NOT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_ticket_entitlement_key` (`tenant_id`,`allocation_idempotency_hash`),
+  UNIQUE KEY `uq_event_ticket_entitlement_scope` (`tenant_id`,`event_id`,`id`),
+  UNIQUE KEY `uq_event_ticket_entitlement_type` (`tenant_id`,`event_id`,`ticket_type_id`,`id`),
+  UNIQUE KEY `uq_event_ticket_entitlement_identity` (`tenant_id`,`event_id`,`ticket_type_id`,`registration_id`,`user_id`,`id`),
+  KEY `idx_event_ticket_entitlement_cohort` (`tenant_id`,`event_id`,`ticket_type_id`,`status`,`user_id`,`id`),
+  KEY `idx_event_ticket_entitlement_user` (`tenant_id`,`user_id`,`status`,`event_id`,`id`),
+  KEY `fk_event_ticket_entitlement_registration` (`tenant_id`,`event_id`,`registration_id`,`user_id`),
+  KEY `fk_event_ticket_entitlement_creator` (`created_by`,`tenant_id`),
+  KEY `fk_event_ticket_entitlement_canceller` (`cancelled_by`,`tenant_id`),
+  CONSTRAINT `fk_event_ticket_entitlement_canceller` FOREIGN KEY (`cancelled_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_entitlement_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_entitlement_registration` FOREIGN KEY (`tenant_id`, `event_id`, `registration_id`, `user_id`) REFERENCES `event_registrations` (`tenant_id`, `event_id`, `id`, `user_id`),
+  CONSTRAINT `fk_event_ticket_entitlement_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_ticket_entitlement_type` FOREIGN KEY (`tenant_id`, `event_id`, `ticket_type_id`) REFERENCES `event_ticket_types` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `chk_event_ticket_ent_units` CHECK (`units` between 1 and 1000),
+  CONSTRAINT `chk_event_ticket_ent_free_only` CHECK (`ticket_kind_snapshot` = 'free' and `unit_price_credits_snapshot` = 0.00 and `total_price_credits_snapshot` = 0.00),
+  CONSTRAINT `chk_event_ticket_ent_total` CHECK (`total_price_credits_snapshot` = `unit_price_credits_snapshot` * `units`),
+  CONSTRAINT `chk_event_ticket_ent_status` CHECK (`status` in ('confirmed','cancelled') and `entitlement_version` > 0),
+  CONSTRAINT `chk_event_ticket_ent_lifecycle` CHECK (`status` = 'confirmed' and `cancelled_by` is null and `cancellation_reason` is null and `cancelled_at` is null or `status` = 'cancelled' and `cancelled_by` is not null and `cancellation_reason` is not null and char_length(trim(`cancellation_reason`)) > 0 and `cancelled_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_entitlement_validate_insert` BEFORE INSERT ON `event_ticket_entitlements` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `event_ticket_types` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`ticket_type_id` AND `status` = 'active' AND `kind` = 'free' AND `unit_price_credits` = 0.00 AND UTC_TIMESTAMP(6) >= `sales_opens_at_utc` AND UTC_TIMESTAMP(6) < `sales_closes_at_utc`) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_free_type_not_allocatable'; END IF; IF (SELECT COUNT(*) FROM `event_registrations` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`registration_id` AND `user_id` = NEW.`user_id` AND `registration_state` = 'confirmed') <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_confirmed_registration_required'; END IF; IF NEW.`status` <> 'confirmed' OR NEW.`entitlement_version` <> 1 OR NEW.`ticket_kind_snapshot` <> 'free' OR NEW.`unit_price_credits_snapshot` <> 0.00 OR NEW.`total_price_credits_snapshot` <> 0.00 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_free_snapshot_required'; END IF; IF (SELECT COALESCE(SUM(`units`), 0) FROM `event_ticket_entitlements` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `ticket_type_id` = NEW.`ticket_type_id` AND `status` = 'confirmed') + NEW.`units` > (SELECT `allocation_limit` FROM `event_ticket_types` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`ticket_type_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_allocation_exhausted'; END IF; IF (SELECT COALESCE(SUM(`units`), 0) FROM `event_ticket_entitlements` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `ticket_type_id` = NEW.`ticket_type_id` AND `user_id` = NEW.`user_id` AND `status` = 'confirmed') + NEW.`units` > (SELECT `per_member_limit` FROM `event_ticket_types` WHERE `tenant_id` = NEW.`tenant_id` AND `event_id` = NEW.`event_id` AND `id` = NEW.`ticket_type_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_per_member_limit_exceeded'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_entitlement_validate_update` BEFORE UPDATE ON `event_ticket_entitlements` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`ticket_type_id` <=> NEW.`ticket_type_id`) OR NOT (OLD.`registration_id` <=> NEW.`registration_id`) OR NOT (OLD.`user_id` <=> NEW.`user_id`) OR NOT (OLD.`units` <=> NEW.`units`) OR NOT (OLD.`ticket_kind_snapshot` <=> NEW.`ticket_kind_snapshot`) OR NOT (OLD.`unit_price_credits_snapshot` <=> NEW.`unit_price_credits_snapshot`) OR NOT (OLD.`total_price_credits_snapshot` <=> NEW.`total_price_credits_snapshot`) OR NOT (OLD.`allocation_idempotency_hash` <=> NEW.`allocation_idempotency_hash`) OR NOT (OLD.`allocation_request_hash` <=> NEW.`allocation_request_hash`) OR NOT (OLD.`created_by` <=> NEW.`created_by`) OR NOT (OLD.`confirmed_at` <=> NEW.`confirmed_at`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_entitlement_identity_immutable'; END IF; IF OLD.`status` <> 'confirmed' OR NEW.`status` <> 'cancelled' OR NEW.`entitlement_version` <> OLD.`entitlement_version` + 1 OR NEW.`cancelled_by` IS NULL OR NEW.`cancellation_reason` IS NULL OR CHAR_LENGTH(TRIM(NEW.`cancellation_reason`)) = 0 OR NEW.`cancelled_at` IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_entitlement_transition_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_entitlement_no_delete` BEFORE DELETE ON `event_ticket_entitlements` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_entitlement_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_ticket_inventory_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_ticket_inventory_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `ticket_type_id` bigint(20) unsigned NOT NULL,
+  `entitlement_id` bigint(20) unsigned NOT NULL,
+  `entitlement_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `quantity_delta` int(11) NOT NULL,
+  `confirmed_units_after` int(10) unsigned NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_ticket_inv_hist_version` (`tenant_id`,`entitlement_id`,`entitlement_version`),
+  UNIQUE KEY `uq_event_ticket_inv_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_ticket_inv_hist_event` (`tenant_id`,`event_id`,`ticket_type_id`,`created_at`,`id`),
+  KEY `fk_event_ticket_inv_hist_entitlement` (`tenant_id`,`event_id`,`ticket_type_id`,`entitlement_id`),
+  KEY `fk_event_ticket_inv_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_ticket_inv_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_inv_hist_entitlement` FOREIGN KEY (`tenant_id`, `event_id`, `ticket_type_id`, `entitlement_id`) REFERENCES `event_ticket_entitlements` (`tenant_id`, `event_id`, `ticket_type_id`, `id`),
+  CONSTRAINT `fk_event_ticket_inv_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `chk_event_ticket_inv_hist_version` CHECK (`entitlement_version` > 0),
+  CONSTRAINT `chk_event_ticket_inv_hist_action` CHECK (`action` = 'allocated' and `quantity_delta` > 0 or `action` = 'released' and `quantity_delta` < 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_inv_hist_no_update` BEFORE UPDATE ON `event_ticket_inventory_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_inventory_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_inv_hist_no_delete` BEFORE DELETE ON `event_ticket_inventory_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_inventory_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_ticket_type_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_ticket_type_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `ticket_type_id` bigint(20) unsigned NOT NULL,
+  `ticket_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `idempotency_hash` char(64) NOT NULL,
+  `request_hash` char(64) NOT NULL,
+  `changed_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`changed_fields`)),
+  `reason` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_ticket_type_hist_version` (`tenant_id`,`ticket_type_id`,`ticket_version`),
+  UNIQUE KEY `uq_event_ticket_type_hist_key` (`tenant_id`,`idempotency_hash`),
+  KEY `idx_event_ticket_type_hist_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `fk_event_ticket_type_hist_type` (`tenant_id`,`event_id`,`ticket_type_id`),
+  KEY `fk_event_ticket_type_hist_actor` (`actor_user_id`,`tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_hist_actor` FOREIGN KEY (`actor_user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_hist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_ticket_type_hist_type` FOREIGN KEY (`tenant_id`, `event_id`, `ticket_type_id`) REFERENCES `event_ticket_types` (`tenant_id`, `event_id`, `id`),
+  CONSTRAINT `chk_event_ticket_type_hist_action` CHECK (`action` in ('created','updated','activated','paused','archived')),
+  CONSTRAINT `chk_event_ticket_type_hist_version` CHECK (`ticket_version` > 0),
+  CONSTRAINT `chk_event_ticket_type_hist_reason` CHECK (`action` in ('created','updated','activated') and `reason` is null or `action` in ('paused','archived') and `reason` is not null and char_length(trim(`reason`)) > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_type_hist_no_update` BEFORE UPDATE ON `event_ticket_type_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_type_hist_no_delete` BEFORE DELETE ON `event_ticket_type_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_ticket_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_ticket_types` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `occurrence_key` varchar(191) NOT NULL,
+  `ticket_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `name` varchar(191) NOT NULL,
+  `description` text DEFAULT NULL,
+  `kind` varchar(24) NOT NULL,
+  `unit_price_credits` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `allocation_limit` int(10) unsigned NOT NULL,
+  `sales_opens_at_utc` datetime NOT NULL,
+  `sales_closes_at_utc` datetime NOT NULL,
+  `event_starts_at_utc_snapshot` datetime NOT NULL,
+  `event_timezone_snapshot` varchar(64) NOT NULL,
+  `per_member_limit` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `eligibility_policy` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`eligibility_policy`)),
+  `refund_cutoff_at_utc` datetime DEFAULT NULL,
+  `organizer_cancel_refundable` tinyint(1) NOT NULL DEFAULT 0,
+  `status` varchar(16) NOT NULL DEFAULT 'draft',
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `activated_by` int(11) DEFAULT NULL,
+  `paused_by` int(11) DEFAULT NULL,
+  `archived_by` int(11) DEFAULT NULL,
+  `activated_at` timestamp NULL DEFAULT NULL,
+  `paused_at` timestamp NULL DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_ticket_type_scope` (`tenant_id`,`event_id`,`id`),
+  KEY `idx_event_ticket_type_sales` (`tenant_id`,`event_id`,`status`,`sales_opens_at_utc`,`sales_closes_at_utc`,`id`),
+  KEY `idx_event_ticket_type_kind` (`tenant_id`,`event_id`,`kind`,`status`,`id`),
+  KEY `fk_event_ticket_type_event` (`tenant_id`,`event_id`,`occurrence_key`),
+  KEY `fk_event_ticket_type_creator` (`created_by`,`tenant_id`),
+  KEY `fk_event_ticket_type_updater` (`updated_by`,`tenant_id`),
+  KEY `fk_event_ticket_type_activator` (`activated_by`,`tenant_id`),
+  KEY `fk_event_ticket_type_pauser` (`paused_by`,`tenant_id`),
+  KEY `fk_event_ticket_type_archiver` (`archived_by`,`tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_activator` FOREIGN KEY (`activated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_archiver` FOREIGN KEY (`archived_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_creator` FOREIGN KEY (`created_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_event` FOREIGN KEY (`tenant_id`, `event_id`, `occurrence_key`) REFERENCES `events` (`tenant_id`, `id`, `occurrence_key`),
+  CONSTRAINT `fk_event_ticket_type_pauser` FOREIGN KEY (`paused_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `fk_event_ticket_type_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`),
+  CONSTRAINT `fk_event_ticket_type_updater` FOREIGN KEY (`updated_by`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`),
+  CONSTRAINT `chk_event_ticket_type_version` CHECK (`ticket_version` > 0),
+  CONSTRAINT `chk_event_ticket_type_name` CHECK (char_length(trim(`name`)) between 1 and 191),
+  CONSTRAINT `chk_event_ticket_type_kind` CHECK (`kind` in ('free','time_credit')),
+  CONSTRAINT `chk_event_ticket_type_price` CHECK (`kind` = 'free' and `unit_price_credits` = 0.00 or `kind` = 'time_credit' and `unit_price_credits` > 0.00 and `unit_price_credits` <= 100000.00),
+  CONSTRAINT `chk_event_ticket_type_allocation` CHECK (`allocation_limit` between 1 and 1000000 and `per_member_limit` between 1 and 1000 and `per_member_limit` <= `allocation_limit`),
+  CONSTRAINT `chk_event_ticket_type_sales` CHECK (`sales_opens_at_utc` < `sales_closes_at_utc` and `sales_closes_at_utc` <= `event_starts_at_utc_snapshot`),
+  CONSTRAINT `chk_event_ticket_type_refund` CHECK (`refund_cutoff_at_utc` is null or `refund_cutoff_at_utc` <= `event_starts_at_utc_snapshot`),
+  CONSTRAINT `chk_event_ticket_type_policy` CHECK (json_type(`eligibility_policy`) = 'OBJECT'),
+  CONSTRAINT `chk_event_ticket_type_status` CHECK (`status` in ('draft','active','paused','archived')),
+  CONSTRAINT `chk_event_ticket_type_lifecycle` CHECK (`status` = 'draft' and `activated_by` is null and `activated_at` is null and `paused_by` is null and `paused_at` is null and `archived_by` is null and `archived_at` is null or `status` = 'active' and `activated_by` is not null and `activated_at` is not null and `archived_by` is null and `archived_at` is null or `status` = 'paused' and `activated_by` is not null and `activated_at` is not null and `paused_by` is not null and `paused_at` is not null and `archived_by` is null and `archived_at` is null or `status` = 'archived' and `archived_by` is not null and `archived_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_type_validate_insert` BEFORE INSERT ON `event_ticket_types` FOR EACH ROW BEGIN IF (SELECT COUNT(*) FROM `events` WHERE `tenant_id` = NEW.`tenant_id` AND `id` = NEW.`event_id` AND `occurrence_key` = NEW.`occurrence_key` AND `is_recurring_template` = 0) <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_concrete_occurrence_required'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_type_validate_update` BEFORE UPDATE ON `event_ticket_types` FOR EACH ROW BEGIN IF NOT (OLD.`tenant_id` <=> NEW.`tenant_id`) OR NOT (OLD.`event_id` <=> NEW.`event_id`) OR NOT (OLD.`occurrence_key` <=> NEW.`occurrence_key`) OR NOT (OLD.`created_by` <=> NEW.`created_by`) OR NOT (OLD.`created_at` <=> NEW.`created_at`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_identity_immutable'; END IF; IF OLD.`status` = 'archived' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_archived_immutable'; END IF; IF NEW.`ticket_version` <> OLD.`ticket_version` + 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_version_invalid'; END IF; IF NOT ((OLD.`status` = 'draft' AND NEW.`status` IN ('draft','active','archived')) OR (OLD.`status` = 'active' AND NEW.`status` IN ('paused','archived')) OR (OLD.`status` = 'paused' AND NEW.`status` IN ('paused','active','archived'))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_transition_invalid'; END IF; IF (SELECT COUNT(*) FROM `event_ticket_entitlements` WHERE `tenant_id` = OLD.`tenant_id` AND `event_id` = OLD.`event_id` AND `ticket_type_id` = OLD.`id`) > 0 AND (NOT (OLD.`kind` <=> NEW.`kind`) OR NOT (OLD.`unit_price_credits` <=> NEW.`unit_price_credits`) OR NOT (OLD.`allocation_limit` <=> NEW.`allocation_limit`) OR NOT (OLD.`per_member_limit` <=> NEW.`per_member_limit`)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_inventory_fields_immutable'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_ticket_type_no_delete` BEFORE DELETE ON `event_ticket_types` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_ticket_type_delete_forbidden'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `event_waitlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3929,6 +8433,190 @@ CREATE TABLE `event_waitlist` (
   CONSTRAINT `fk_waitlist_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_waitlist_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_waitlist_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_waitlist_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_entries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `queue_state` varchar(32) NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `queue_sequence` bigint(20) unsigned NOT NULL,
+  `state_changed_at` timestamp NOT NULL,
+  `state_changed_by` int(11) DEFAULT NULL,
+  `offered_at` timestamp NULL DEFAULT NULL,
+  `offer_expires_at` timestamp NULL DEFAULT NULL,
+  `offer_token_hash` char(64) DEFAULT NULL,
+  `offer_token_used_at` timestamp NULL DEFAULT NULL,
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `accepted_registration_id` bigint(20) unsigned DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_entry_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
+  UNIQUE KEY `uq_event_waitlist_entry_sequence` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_sequence`),
+  UNIQUE KEY `uq_event_waitlist_offer_token` (`offer_token_hash`),
+  KEY `idx_event_waitlist_queue` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_state`,`queue_sequence`,`id`),
+  KEY `idx_event_waitlist_expiry` (`queue_state`,`offer_expires_at`,`id`),
+  KEY `idx_event_waitlist_user` (`tenant_id`,`user_id`,`queue_state`,`event_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_waitlist_entry_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_entry_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL,
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `queue_sequence` bigint(20) unsigned NOT NULL,
+  `action` varchar(64) NOT NULL,
+  `from_state` varchar(32) DEFAULT NULL,
+  `to_state` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_history_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
+  UNIQUE KEY `uq_event_waitlist_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_waitlist_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
+  KEY `idx_event_waitlist_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_waitlist_history_no_update` BEFORE UPDATE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_waitlist_history_no_delete` BEFORE DELETE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_waitlist_offer_envelope_access`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_offer_envelope_access` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `envelope_id` bigint(20) unsigned NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `operation` varchar(32) NOT NULL,
+  `consumer` varchar(191) DEFAULT NULL,
+  `claim_id_hash` char(64) DEFAULT NULL,
+  `from_status` varchar(32) DEFAULT NULL,
+  `to_status` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_envelope_access_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_waitlist_envelope_access_envelope` (`tenant_id`,`envelope_id`,`created_at`,`id`),
+  KEY `idx_event_waitlist_envelope_access_event` (`tenant_id`,`event_id`,`operation`,`created_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_waitlist_envelope_access_no_update` BEFORE UPDATE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_event_waitlist_envelope_access_no_delete` BEFORE DELETE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable'
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+DROP TABLE IF EXISTS `event_waitlist_offer_envelopes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_offer_envelopes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(80) NOT NULL,
+  `cipher_version` varchar(32) NOT NULL,
+  `key_version` varchar(64) NOT NULL,
+  `key_fingerprint` char(64) NOT NULL,
+  `aad_hash` char(64) NOT NULL,
+  `token_ciphertext` longtext DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'sealed',
+  `envelope_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `claim_token_hash` char(64) DEFAULT NULL,
+  `claimed_by` varchar(191) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `handed_off_at` timestamp NULL DEFAULT NULL,
+  `erased_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_offer_envelope_outbox` (`tenant_id`,`outbox_id`),
+  UNIQUE KEY `uq_event_waitlist_offer_envelope_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
+  KEY `idx_event_waitlist_offer_envelope_status` (`tenant_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_waitlist_offer_envelope_entry` (`tenant_id`,`event_id`,`waitlist_entry_id`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `events`;
@@ -3980,6 +8668,8 @@ CREATE TABLE `events` (
   `publication_status` varchar(32) DEFAULT NULL COMMENT 'Canonical editorial/publication lifecycle state',
   `operational_status` varchar(32) DEFAULT NULL COMMENT 'Canonical scheduling/delivery lifecycle state',
   `lifecycle_version` bigint(20) unsigned DEFAULT NULL COMMENT 'Monotonic version for lifecycle history and outbox ordering',
+  `calendar_sequence` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'Monotonic revision for calendar reconciliation',
+  `agenda_version` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'Monotonic version for the ordered per-event agenda aggregate',
   `publication_status_changed_at` timestamp NULL DEFAULT NULL,
   `publication_status_changed_by` int(11) DEFAULT NULL,
   `operational_status_changed_at` timestamp NULL DEFAULT NULL,
@@ -3995,13 +8685,24 @@ CREATE TABLE `events` (
   `occurrence_key` varchar(191) DEFAULT NULL COMMENT 'Stable identity for a concrete registrable occurrence; NULL for templates',
   `recurrence_engine` varchar(32) DEFAULT NULL COMMENT 'Engine that materialised this recurrence tree or occurrence',
   `recurrence_engine_version` varchar(32) DEFAULT NULL COMMENT 'Engine contract version used to materialise this row',
+  `recurrence_id` varchar(32) DEFAULT NULL COMMENT 'Immutable canonical UTC recurrence identity (Ymd\\THis\\Z); NULL for roots and rollout gaps',
+  `is_recurrence_exception` tinyint(1) NOT NULL DEFAULT 0,
+  `recurrence_override_fields` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`recurrence_override_fields`)),
+  `recurrence_override_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `recurrence_override_updated_at` timestamp NULL DEFAULT NULL,
+  `recurrence_override_updated_by` int(11) DEFAULT NULL COMMENT 'Signed users.id evidence; deliberately no FK so actor evidence survives account deletion',
   `is_recurring_template` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True if this event is a recurrence template',
   `cancellation_reason` text DEFAULT NULL,
   `cancelled_at` timestamp NULL DEFAULT NULL,
   `cancelled_by` int(11) DEFAULT NULL,
   `series_id` int(11) DEFAULT NULL COMMENT 'Links event to a series',
+  `federation_version` bigint(20) unsigned NOT NULL DEFAULT 1 COMMENT 'Monotonic revision for every federation-visible mutation',
+  `checkin_manifest_version` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'Monotonic version of the revocable offline check-in projection',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_events_tenant_id` (`tenant_id`,`id`),
   UNIQUE KEY `uq_events_tenant_occurrence` (`tenant_id`,`occurrence_key`),
+  UNIQUE KEY `uq_events_checkin_occurrence` (`tenant_id`,`id`,`occurrence_key`),
+  UNIQUE KEY `uq_events_tenant_parent_recurrence_id` (`tenant_id`,`parent_event_id`,`recurrence_id`),
   KEY `idx_event_tenant` (`tenant_id`),
   KEY `idx_event_start` (`start_time`),
   KEY `fk_event_group` (`group_id`),
@@ -4015,13 +8716,47 @@ CREATE TABLE `events` (
   KEY `idx_events_group` (`group_id`),
   KEY `idx_events_tenant_status_start` (`tenant_id`,`status`,`start_time`),
   KEY `idx_events_tenant_start_id` (`tenant_id`,`start_time`,`id`),
-  KEY `idx_events_tenant_step_free_start` (`tenant_id`,`accessibility_step_free`,`start_time`),
   KEY `idx_events_tenant_lifecycle_start` (`tenant_id`,`publication_status`,`operational_status`,`start_time`,`id`),
+  KEY `idx_events_checkin_manifest_version` (`tenant_id`,`checkin_manifest_version`,`id`),
+  KEY `idx_events_tenant_step_free_start` (`tenant_id`,`accessibility_step_free`,`start_time`),
+  KEY `idx_events_recurrence_exception` (`tenant_id`,`parent_event_id`,`is_recurrence_exception`),
   CONSTRAINT `fk_event_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_event_opportunity` FOREIGN KEY (`volunteer_opportunity_id`) REFERENCES `vol_opportunities` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_events_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_events_recurrence_id_validate_insert` BEFORE INSERT ON `events` FOR EACH ROW BEGIN IF NEW.`recurrence_id` IS NOT NULL AND NEW.`recurrence_id` NOT REGEXP '^[0-9]{8}T[0-9]{6}Z$' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_id_invalid'; ELSEIF NEW.`recurrence_id` IS NOT NULL AND (NEW.`parent_event_id` IS NULL OR NEW.`is_recurring_template` <> 0 OR NOT (NEW.`recurrence_engine` <=> 'sabre-vobject') OR NOT (NEW.`recurrence_engine_version` <=> '2')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_id_scope_invalid'; ELSEIF ((NEW.`is_recurrence_exception` = 1 AND (NEW.`parent_event_id` IS NULL OR NEW.`is_recurring_template` <> 0 OR NEW.`recurrence_id` IS NULL OR NOT (NEW.`recurrence_engine` <=> 'sabre-vobject') OR NOT (NEW.`recurrence_engine_version` <=> '2') OR NEW.`recurrence_override_fields` IS NULL OR JSON_TYPE(NEW.`recurrence_override_fields`) <> 'ARRAY' OR JSON_LENGTH(NEW.`recurrence_override_fields`) = 0 OR JSON_LENGTH(NEW.`recurrence_override_fields`) <> (JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('title')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('description')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('location')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('latitude')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('longitude')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('start_time')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('end_time')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('timezone')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('timezone_source')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('all_day')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('category_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('group_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('series_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('max_attendees')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('is_online')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('allow_remote_attendance')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('online_link')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('video_url')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('image_url')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('cover_image')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('federated_visibility')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_step_free')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_toilet')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_hearing_loop')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_quiet_space')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_seating')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_parking')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_parking_details')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_transit_details')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_assistance_contact')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_notes'))) OR NEW.`recurrence_override_version` < 1 OR NEW.`recurrence_override_updated_at` IS NULL OR NEW.`recurrence_override_updated_by` IS NULL OR NOT EXISTS (SELECT 1 FROM `users` AS `override_actor` WHERE `override_actor`.`id` = NEW.`recurrence_override_updated_by` AND `override_actor`.`tenant_id` = NEW.`tenant_id`))) OR (NEW.`is_recurrence_exception` = 0 AND (NEW.`recurrence_override_fields` IS NOT NULL OR NEW.`recurrence_override_version` <> 0 OR NEW.`recurrence_override_updated_at` IS NOT NULL OR NEW.`recurrence_override_updated_by` IS NOT NULL))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_override_evidence_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`nexus`@`%`*/ /*!50003 TRIGGER `trg_events_recurrence_id_immutable` BEFORE UPDATE ON `events` FOR EACH ROW BEGIN IF NEW.`recurrence_id` IS NOT NULL AND NEW.`recurrence_id` NOT REGEXP '^[0-9]{8}T[0-9]{6}Z$' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_id_invalid'; ELSEIF OLD.`recurrence_id` IS NOT NULL AND NOT (OLD.`recurrence_id` <=> NEW.`recurrence_id`) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_id_immutable'; ELSEIF NEW.`recurrence_id` IS NOT NULL AND (NEW.`parent_event_id` IS NULL OR NEW.`is_recurring_template` <> 0 OR NOT (NEW.`recurrence_engine` <=> 'sabre-vobject') OR NOT (NEW.`recurrence_engine_version` <=> '2')) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_id_scope_invalid'; ELSEIF ((NEW.`is_recurrence_exception` = 1 AND (NEW.`parent_event_id` IS NULL OR NEW.`is_recurring_template` <> 0 OR NEW.`recurrence_id` IS NULL OR NOT (NEW.`recurrence_engine` <=> 'sabre-vobject') OR NOT (NEW.`recurrence_engine_version` <=> '2') OR NEW.`recurrence_override_fields` IS NULL OR JSON_TYPE(NEW.`recurrence_override_fields`) <> 'ARRAY' OR JSON_LENGTH(NEW.`recurrence_override_fields`) = 0 OR JSON_LENGTH(NEW.`recurrence_override_fields`) <> (JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('title')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('description')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('location')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('latitude')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('longitude')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('start_time')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('end_time')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('timezone')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('timezone_source')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('all_day')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('category_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('group_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('series_id')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('max_attendees')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('is_online')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('allow_remote_attendance')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('online_link')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('video_url')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('image_url')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('cover_image')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('federated_visibility')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_step_free')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_toilet')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_hearing_loop')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_quiet_space')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_seating')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_parking')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_parking_details')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_transit_details')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_assistance_contact')) + JSON_CONTAINS(NEW.`recurrence_override_fields`, JSON_QUOTE('accessibility_notes'))) OR NEW.`recurrence_override_version` < 1 OR NEW.`recurrence_override_updated_at` IS NULL OR NEW.`recurrence_override_updated_by` IS NULL OR NOT EXISTS (SELECT 1 FROM `users` AS `override_actor` WHERE `override_actor`.`id` = NEW.`recurrence_override_updated_by` AND `override_actor`.`tenant_id` = NEW.`tenant_id`))) OR (NEW.`is_recurrence_exception` = 0 AND (NEW.`recurrence_override_fields` IS NOT NULL OR NEW.`recurrence_override_version` <> 0 OR NEW.`recurrence_override_updated_at` IS NOT NULL OR NEW.`recurrence_override_updated_by` IS NOT NULL))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_recurrence_override_evidence_invalid'; END IF; END
+*/;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 DROP TABLE IF EXISTS `exchange_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -4535,10 +9270,31 @@ CREATE TABLE `federation_events` (
   `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `payload_schema_version` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'Zero marks a legacy unversioned projection',
+  `source_aggregate_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `source_calendar_version` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `source_action` varchar(16) NOT NULL DEFAULT 'upsert',
+  `source_payload_hash` char(64) DEFAULT NULL,
+  `source_occurred_at` datetime DEFAULT NULL,
+  `is_tombstone` tinyint(1) NOT NULL DEFAULT 0,
+  `tombstoned_at` timestamp NULL DEFAULT NULL COMMENT 'Accepted tombstone time while the current source action is tombstone',
+  `tombstone_reason` varchar(64) DEFAULT NULL,
+  `last_received_at` timestamp NULL DEFAULT NULL,
+  `replay_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_replayed_at` timestamp NULL DEFAULT NULL,
+  `stale_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_stale_at` timestamp NULL DEFAULT NULL,
+  `last_stale_hash` char(64) DEFAULT NULL,
+  `conflict_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_conflict_at` timestamp NULL DEFAULT NULL,
+  `last_conflict_hash` char(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_fed_events_partner_ext` (`external_partner_id`,`external_id`),
   KEY `federation_events_tenant_id_index` (`tenant_id`),
-  KEY `federation_events_external_partner_id_index` (`external_partner_id`)
+  KEY `federation_events_external_partner_id_index` (`external_partner_id`),
+  KEY `idx_federation_events_current` (`tenant_id`,`is_tombstone`,`starts_at`,`id`),
+  CONSTRAINT `chk_federation_events_source_action` CHECK (`source_action` in ('upsert','tombstone')),
+  CONSTRAINT `chk_federation_events_tombstone` CHECK (`source_action` = 'tombstone' and `is_tombstone` = 1 and `tombstoned_at` is not null and `tombstone_reason` is not null and `tombstone_reason` in ('visibility_withdrawn','unpublished','cancelled','archived','deleted') or `source_action` = 'upsert' and `is_tombstone` = 0 and `tombstoned_at` is null and `tombstone_reason` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `federation_exports`;
@@ -5171,7 +9927,7 @@ CREATE TABLE `feed_activity` (
   KEY `idx_source_lookup` (`source_type`,`source_id`),
   KEY `idx_feed_activity_cursor` (`tenant_id`,`created_at`,`id`),
   FULLTEXT KEY `ft_feed_search` (`title`,`content`)
-) ENGINE=InnoDB AUTO_INCREMENT=1892 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1942 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `feed_clicks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5315,7 +10071,7 @@ CREATE TABLE `feed_posts` (
   CONSTRAINT `feed_posts_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `feed_posts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_feed_posts_quoted` FOREIGN KEY (`quoted_post_id`) REFERENCES `feed_posts` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=162 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `fraud_alerts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5452,7 +10208,7 @@ CREATE TABLE `gdpr_audit_log` (
   KEY `idx_created_at` (`created_at`),
   KEY `idx_tenant_id` (`tenant_id`),
   KEY `idx_entity` (`entity_type`,`entity_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=293 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `gdpr_requests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5724,7 +10480,7 @@ CREATE TABLE `group_announcements` (
   KEY `idx_group_announcements_tenant` (`tenant_id`),
   KEY `idx_group_announcements_pinned` (`is_pinned`,`priority` DESC),
   KEY `idx_group_announcements_expires` (`expires_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_answers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5743,7 +10499,7 @@ CREATE TABLE `group_answers` (
   KEY `idx_ga_question` (`question_id`),
   KEY `idx_ga_votes` (`question_id`,`vote_count` DESC),
   KEY `group_answers_tenant_id_index` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_approval_requests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5782,7 +10538,7 @@ CREATE TABLE `group_audit_log` (
   PRIMARY KEY (`id`),
   KEY `idx_tenant_group_date` (`tenant_id`,`group_id`,`created_at`),
   KEY `idx_tenant_action_date` (`tenant_id`,`action`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=861 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_auto_assign_rules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5798,6 +10554,25 @@ CREATE TABLE `group_auto_assign_rules` (
   PRIMARY KEY (`id`),
   KEY `idx_gaar_tenant` (`tenant_id`,`is_active`),
   KEY `idx_gaar_group` (`group_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `group_challenge_rewards`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_challenge_rewards` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `challenge_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `reward_xp` int(10) unsigned NOT NULL,
+  `awarded_at` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_group_challenge_reward_user` (`challenge_id`,`user_id`),
+  KEY `idx_group_challenge_reward_tenant_user` (`tenant_id`,`user_id`),
+  KEY `group_challenge_rewards_user_id_foreign` (`user_id`),
+  CONSTRAINT `group_challenge_rewards_challenge_id_foreign` FOREIGN KEY (`challenge_id`) REFERENCES `group_challenges` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `group_challenge_rewards_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `group_challenge_rewards_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_challenges`;
@@ -5813,7 +10588,7 @@ CREATE TABLE `group_challenges` (
   `metric` varchar(50) NOT NULL COMMENT 'e.g. posts, discussions, events, members, files',
   `target_value` int(11) NOT NULL,
   `current_value` int(11) NOT NULL DEFAULT 0,
-  `reward_xp` int(11) NOT NULL DEFAULT 100,
+  `reward_xp` int(11) NOT NULL DEFAULT 0,
   `reward_badge` varchar(100) DEFAULT NULL,
   `status` enum('active','completed','expired','cancelled') NOT NULL DEFAULT 'active',
   `starts_at` datetime NOT NULL DEFAULT current_timestamp(),
@@ -5825,7 +10600,7 @@ CREATE TABLE `group_challenges` (
   KEY `idx_gc_group` (`group_id`,`status`),
   KEY `idx_gc_tenant` (`tenant_id`),
   KEY `idx_gc_active` (`status`,`ends_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_chatroom_messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5880,7 +10655,7 @@ CREATE TABLE `group_chatrooms` (
   PRIMARY KEY (`id`),
   KEY `idx_group` (`group_id`,`tenant_id`),
   KEY `idx_tenant` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_collection_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5980,6 +10755,29 @@ CREATE TABLE `group_custom_fields` (
   KEY `idx_gcf_tenant` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `group_data_exports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_data_exports` (
+  `id` char(36) NOT NULL,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `group_id` int(10) unsigned NOT NULL,
+  `requested_by` int(10) unsigned NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'queued',
+  `storage_path` varchar(500) DEFAULT NULL,
+  `byte_size` bigint(20) unsigned DEFAULT NULL,
+  `error_code` varchar(100) DEFAULT NULL,
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `processing_started_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_group_exports_requester` (`tenant_id`,`group_id`,`requested_by`,`created_at`),
+  KEY `idx_group_exports_expiry` (`status`,`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_discussion_messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6021,7 +10819,7 @@ CREATE TABLE `group_discussions` (
   KEY `idx_tenant_id` (`tenant_id`),
   CONSTRAINT `group_discussions_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `group_discussions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_exchange_participants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6112,6 +10910,7 @@ CREATE TABLE `group_files` (
   `download_count` int(11) NOT NULL DEFAULT 0,
   `uploaded_by` int(11) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_group_files_group` (`group_id`),
   KEY `idx_group_files_tenant` (`tenant_id`),
@@ -6142,7 +10941,7 @@ CREATE TABLE `group_invites` (
   KEY `idx_group_invites_group` (`group_id`,`status`),
   KEY `idx_group_invites_email` (`email`,`status`),
   KEY `idx_group_invites_tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_match_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6174,6 +10973,8 @@ CREATE TABLE `group_media` (
   `group_id` int(11) NOT NULL,
   `uploaded_by` int(11) NOT NULL,
   `media_type` enum('image','video') NOT NULL DEFAULT 'image',
+  `original_name` varchar(255) DEFAULT NULL,
+  `mime_type` varchar(100) DEFAULT NULL,
   `file_path` varchar(500) DEFAULT NULL,
   `url` varchar(500) DEFAULT NULL COMMENT 'External URL for video embeds',
   `thumbnail_path` varchar(500) DEFAULT NULL,
@@ -6182,6 +10983,7 @@ CREATE TABLE `group_media` (
   `width` int(11) DEFAULT NULL,
   `height` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_gm_group` (`group_id`,`tenant_id`),
   KEY `idx_gm_type` (`group_id`,`media_type`)
@@ -6228,7 +11030,7 @@ CREATE TABLE `group_members` (
   KEY `idx_group_members_role` (`role`),
   CONSTRAINT `group_members_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `group_members_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4723 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4975 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_notification_preferences`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6246,7 +11048,7 @@ CREATE TABLE `group_notification_preferences` (
   UNIQUE KEY `uk_gnp` (`user_id`,`group_id`),
   KEY `idx_gnp_group` (`group_id`),
   KEY `group_notification_preferences_tenant_id_index` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_policies`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6266,7 +11068,7 @@ CREATE TABLE `group_policies` (
   KEY `idx_tenant_category` (`tenant_id`,`category`),
   KEY `idx_tenant` (`tenant_id`),
   CONSTRAINT `group_policies_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Flexible tenant-specific policies for groups module';
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Flexible tenant-specific policies for groups module';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6286,7 +11088,33 @@ CREATE TABLE `group_posts` (
   KEY `idx_tenant_id` (`tenant_id`),
   CONSTRAINT `group_posts_ibfk_1` FOREIGN KEY (`discussion_id`) REFERENCES `group_discussions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `group_posts_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `group_private_storage_migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_private_storage_migrations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `group_id` int(10) unsigned NOT NULL,
+  `source_table` varchar(32) NOT NULL,
+  `source_id` bigint(20) unsigned NOT NULL,
+  `asset_role` varchar(32) NOT NULL,
+  `source_disk` varchar(32) NOT NULL,
+  `source_path` varchar(500) NOT NULL,
+  `target_disk` varchar(32) NOT NULL DEFAULT 'local',
+  `target_path` varchar(500) NOT NULL,
+  `sha256` char(64) NOT NULL,
+  `bytes` bigint(20) unsigned NOT NULL,
+  `migrated_at` timestamp NOT NULL,
+  `source_deleted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_group_storage_migration_asset` (`source_table`,`source_id`,`asset_role`),
+  KEY `idx_group_storage_migration_cleanup` (`tenant_id`,`source_deleted_at`,`id`),
+  KEY `idx_group_storage_migration_source` (`source_disk`,`source_path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_qa_votes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6326,7 +11154,7 @@ CREATE TABLE `group_questions` (
   KEY `idx_gq_group` (`group_id`,`tenant_id`),
   KEY `idx_gq_user` (`user_id`),
   KEY `idx_gq_votes` (`group_id`,`vote_count` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_ranking_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6457,7 +11285,7 @@ CREATE TABLE `group_tags` (
   UNIQUE KEY `uk_group_tags_slug` (`tenant_id`,`slug`),
   KEY `idx_group_tags_tenant` (`tenant_id`),
   KEY `idx_group_tags_usage` (`tenant_id`,`usage_count` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_templates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6509,7 +11337,7 @@ CREATE TABLE `group_types` (
   KEY `idx_sort` (`sort_order`),
   KEY `idx_is_hub` (`is_hub`),
   CONSTRAINT `group_types_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_user_bans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6553,27 +11381,6 @@ CREATE TABLE `group_views` (
   KEY `idx_tenant` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `group_webhooks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `group_webhooks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  `url` varchar(500) NOT NULL,
-  `events` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Array of event types to trigger on' CHECK (json_valid(`events`)),
-  `secret` varchar(255) DEFAULT NULL COMMENT 'HMAC secret for signature verification',
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `last_fired_at` datetime DEFAULT NULL,
-  `failure_count` int(11) NOT NULL DEFAULT 0,
-  `disabled_at` timestamp NULL DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `idx_group_webhooks_group` (`group_id`,`is_active`),
-  KEY `idx_group_webhooks_tenant` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_webhook_deliveries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6604,6 +11411,27 @@ CREATE TABLE `group_webhook_deliveries` (
   KEY `idx_group_webhook_delivery_webhook` (`webhook_id`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `group_webhooks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_webhooks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `url` varchar(500) NOT NULL,
+  `events` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Array of event types to trigger on' CHECK (json_valid(`events`)),
+  `secret` varchar(255) DEFAULT NULL COMMENT 'HMAC secret for signature verification',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `last_fired_at` datetime DEFAULT NULL,
+  `failure_count` int(11) NOT NULL DEFAULT 0,
+  `disabled_at` timestamp NULL DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_group_webhooks_group` (`group_id`,`is_active`),
+  KEY `idx_group_webhooks_tenant` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_wiki_pages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -6625,7 +11453,7 @@ CREATE TABLE `group_wiki_pages` (
   UNIQUE KEY `uk_gwp_slug` (`group_id`,`slug`),
   KEY `idx_gwp_group` (`group_id`,`tenant_id`),
   KEY `idx_gwp_parent` (`parent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_wiki_revisions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6639,7 +11467,7 @@ CREATE TABLE `group_wiki_revisions` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_gwr_page` (`page_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6648,12 +11476,14 @@ CREATE TABLE `groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) DEFAULT NULL,
   `type_id` int(11) DEFAULT NULL,
+  `template_id` int(10) unsigned DEFAULT NULL,
+  `template_features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`template_features`)),
   `tenant_id` int(11) NOT NULL,
   `owner_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `slug` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
-  `visibility` enum('public','private') NOT NULL DEFAULT 'public',
+  `visibility` enum('public','private','secret') NOT NULL DEFAULT 'public',
   `is_featured` tinyint(1) DEFAULT 0,
   `image_url` varchar(255) DEFAULT NULL,
   `cover_image_url` varchar(255) DEFAULT NULL,
@@ -6704,10 +11534,12 @@ CREATE TABLE `groups` (
   KEY `idx_tenant_featured_created` (`tenant_id`,`is_featured`,`created_at`),
   KEY `idx_owner_id` (`owner_id`),
   KEY `idx_groups_status` (`tenant_id`,`status`),
+  KEY `idx_groups_tenant_template` (`tenant_id`,`template_id`),
   CONSTRAINT `groups_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `groups_ibfk_2` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `groups_ibfk_3` FOREIGN KEY (`type_id`) REFERENCES `group_types` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=966 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `groups_ibfk_3` FOREIGN KEY (`type_id`) REFERENCES `group_types` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `chk_groups_status_canonical` CHECK (`status` in ('pending_review','active','dormant','archived','rejected'))
+) ENGINE=InnoDB AUTO_INCREMENT=1180 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `hashtags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7616,7 +12448,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=342 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=384 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7654,7 +12486,7 @@ CREATE TABLE `leaderboard_seasons` (
   KEY `idx_tenant_active` (`tenant_id`,`is_active`),
   KEY `idx_dates` (`start_date`,`end_date`),
   KEY `idx_tenant_status` (`tenant_id`,`status`,`start_date`,`end_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `legal_document_versions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7927,7 +12759,7 @@ CREATE TABLE `listing_views` (
   KEY `idx_listing_views_date` (`viewed_at`),
   KEY `idx_listing_views_lookup` (`tenant_id`,`listing_id`,`user_id`),
   CONSTRAINT `fk_listing_views_listing_id` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2497 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2498 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `listings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7995,7 +12827,7 @@ CREATE TABLE `listings` (
   CONSTRAINT `listings_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `listings_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=514 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `login_attempts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8010,7 +12842,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=149372 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=151813 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -9967,7 +14799,7 @@ CREATE TABLE `nexus_score_cache` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `nexus_score_cache_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `nexus_score_cache_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cached Nexus Score calculations for performance';
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Cached Nexus Score calculations for performance';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `nexus_score_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10052,6 +14884,7 @@ CREATE TABLE `notification_queue` (
   `sent_at` datetime DEFAULT NULL,
   `frequency` enum('instant','daily','weekly','monthly') DEFAULT 'daily',
   `email_body` longtext DEFAULT NULL,
+  `event_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_notification_queue_tenant_key` (`tenant_id`,`idempotency_key`),
   KEY `user_id` (`user_id`),
@@ -10060,8 +14893,9 @@ CREATE TABLE `notification_queue` (
   KEY `notification_queue_frequency_status_batch_idx` (`frequency`,`status`,`processing_batch_id`),
   KEY `notification_queue_retry_idx` (`frequency`,`status`,`last_attempted_at`,`attempts`),
   KEY `idx_notification_queue_event_delivery` (`event_delivery_id`),
+  KEY `idx_notification_queue_event_context` (`tenant_id`,`event_id`,`status`,`frequency`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=362 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notification_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10108,7 +14942,7 @@ CREATE TABLE `notifications` (
   KEY `idx_notif_tenant_user_read_id` (`tenant_id`,`user_id`,`is_read`,`id`),
   KEY `idx_notif_tenant_user_type_id` (`tenant_id`,`user_id`,`type`,`id`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5802 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5877 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `oauth_identities`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10172,7 +15006,7 @@ CREATE TABLE `org_audit_log` (
   KEY `idx_org_audit` (`tenant_id`,`organization_id`,`created_at`),
   KEY `idx_user_audit` (`tenant_id`,`user_id`,`created_at`),
   KEY `idx_action` (`tenant_id`,`action`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=281 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=283 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `org_balance_alerts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -10598,7 +15432,7 @@ CREATE TABLE `personal_access_tokens` (
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
   KEY `pat_tenant_tokenable_idx` (`tenant_id`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=541 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1057 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pilot_inquiries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11020,7 +15854,7 @@ CREATE TABLE `post_views` (
   UNIQUE KEY `post_views_ip_unique` (`tenant_id`,`post_id`,`ip_hash`),
   KEY `post_views_tenant_id_index` (`tenant_id`),
   KEY `post_views_post_id_index` (`post_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1487 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1488 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11106,7 +15940,7 @@ CREATE TABLE `prerender_jobs` (
   KEY `idx_prerender_jobs_claim` (`status`,`priority`,`queued_at`),
   KEY `idx_prerender_jobs_running_lease` (`status`,`heartbeat_at`,`started_at`),
   KEY `idx_prerender_jobs_fence_claim` (`status`,`fence_state`,`fence_ready_at`,`priority`,`queued_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `progress_notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11231,7 +16065,7 @@ CREATE TABLE `reactions` (
   KEY `idx_emoji` (`emoji`),
   CONSTRAINT `reactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reactions_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `recurring_shift_patterns`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -11539,7 +16373,7 @@ CREATE TABLE `revoked_tokens` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_expires_at` (`expires_at`),
   CONSTRAINT `revoked_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=225 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `role_permissions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12018,7 +16852,7 @@ CREATE TABLE `skill_categories` (
   KEY `idx_tenant_slug` (`tenant_id`,`slug`),
   KEY `idx_tenant_parent` (`tenant_id`,`parent_id`),
   CONSTRAINT `fk_skill_cat_parent` FOREIGN KEY (`parent_id`) REFERENCES `skill_categories` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `skill_endorsements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12379,13 +17213,15 @@ CREATE TABLE `support_reports` (
   KEY `idx_support_reports_assignee` (`tenant_id`,`assigned_user_id`),
   KEY `idx_support_reports_sentry_event` (`tenant_id`,`sentry_event_id`),
   KEY `idx_support_reports_user_created` (`tenant_id`,`user_id`,`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `team_documents`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `team_documents` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `group_file_id` int(10) unsigned DEFAULT NULL,
+  `storage_migrated_at` timestamp NULL DEFAULT NULL,
   `group_id` int(10) unsigned NOT NULL,
   `tenant_id` int(10) unsigned NOT NULL,
   `title` varchar(255) NOT NULL,
@@ -12396,7 +17232,8 @@ CREATE TABLE `team_documents` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_group` (`group_id`,`tenant_id`),
-  KEY `idx_uploader` (`uploaded_by`)
+  KEY `idx_uploader` (`uploaded_by`),
+  KEY `idx_team_documents_group_file` (`group_file_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `team_tasks`;
@@ -12421,7 +17258,7 @@ CREATE TABLE `team_tasks` (
   KEY `idx_assigned` (`assigned_to`),
   KEY `idx_status` (`group_id`,`status`),
   KEY `idx_due` (`group_id`,`due_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tenant_badge_overrides`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13040,7 +17877,7 @@ CREATE TABLE `transactions` (
   KEY `idx_txn_external_transaction_id` (`tenant_id`,`external_transaction_id`),
   CONSTRAINT `fk_transactions_giver` FOREIGN KEY (`giver_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=260 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=261 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `translation_glossaries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13115,7 +17952,7 @@ CREATE TABLE `user_badges` (
   KEY `idx_user_badges_tenant_user` (`tenant_id`,`user_id`),
   CONSTRAINT `user_badges_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `user_badges_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2763 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2768 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_blocks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13247,7 +18084,7 @@ CREATE TABLE `user_consents` (
   KEY `idx_consent_type` (`consent_type`),
   KEY `idx_given_at` (`given_at`),
   KEY `idx_user_consents_version_check` (`tenant_id`,`consent_type`,`consent_given`,`consent_version`)
-) ENGINE=InnoDB AUTO_INCREMENT=1044 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1046 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_distance_preference`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13685,7 +18522,7 @@ CREATE TABLE `user_totp_settings` (
   UNIQUE KEY `unique_user_totp` (`user_id`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_enabled` (`tenant_id`,`is_enabled`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TOTP 2FA settings and encrypted secrets per user';
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TOTP 2FA settings and encrypted secrets per user';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_trusted_devices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13730,7 +18567,7 @@ CREATE TABLE `user_xp_log` (
   UNIQUE KEY `uniq_user_xp_log_ref` (`tenant_id`,`user_id`,`action`,`source_reference`),
   KEY `idx_user` (`tenant_id`,`user_id`),
   KEY `idx_user_xp_log_action` (`tenant_id`,`action`)
-) ENGINE=InnoDB AUTO_INCREMENT=17564 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17833 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_xp_purchases`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13873,9 +18710,9 @@ CREATE TABLE `users` (
   `resume_summary` text DEFAULT NULL,
   `stripe_customer_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_id_tenant_unique` (`id`,`tenant_id`),
   UNIQUE KEY `unique_email_tenant` (`email`,`tenant_id`),
   UNIQUE KEY `idx_tenant_username` (`tenant_id`,`username`),
+  UNIQUE KEY `users_id_tenant_unique` (`id`,`tenant_id`),
   KEY `idx_users_email` (`email`),
   KEY `idx_users_tenant` (`tenant_id`),
   KEY `idx_privacy_profile` (`privacy_profile`),
@@ -13915,7 +18752,7 @@ CREATE TABLE `users` (
   KEY `idx_users_tenant_privacy_status_id` (`tenant_id`,`privacy_search`,`status`,`id`),
   FULLTEXT KEY `ft_users_search` (`first_name`,`last_name`,`bio`,`skills`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=668 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=990006 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `v_active_listings_with_coords`;
 /*!50001 DROP VIEW IF EXISTS `v_active_listings_with_coords`*/;
@@ -14113,6 +18950,7 @@ CREATE TABLE `vetting_records` (
   `verified_at` datetime DEFAULT NULL,
   `document_url` varchar(500) DEFAULT NULL COMMENT 'Optional uploaded document path',
   `notes` text DEFAULT NULL COMMENT 'Internal broker notes',
+  `legacy_sensitive_metadata_redacted` tinyint(1) NOT NULL DEFAULT 0,
   `works_with_children` tinyint(1) NOT NULL DEFAULT 0,
   `works_with_vulnerable_adults` tinyint(1) NOT NULL DEFAULT 0,
   `requires_enhanced_check` tinyint(1) NOT NULL DEFAULT 0,
@@ -15034,7 +19872,7 @@ CREATE TABLE `webauthn_credentials` (
   KEY `idx_webauthn_user_tenant` (`user_id`,`tenant_id`),
   CONSTRAINT `webauthn_credentials_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `webauthn_credentials_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `webauthn_credentials_user_tenant_foreign` FOREIGN KEY (`user_id`,`tenant_id`) REFERENCES `users` (`id`,`tenant_id`) ON DELETE CASCADE
+  CONSTRAINT `webauthn_credentials_user_tenant_foreign` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `weekly_rank_snapshots`;
@@ -15174,7 +20012,7 @@ CREATE TABLE `xp_shop_items` (
 
 
 -- Laravel migrations data (so fresh migrate knows what is already applied)
-/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
@@ -15518,8 +20356,48 @@ INSERT INTO `laravel_migrations` VALUES
 (338,'2026_07_11_000010_create_event_domain_outbox',98),
 (339,'2026_07_11_000011_create_event_notification_deliveries',99),
 (340,'2026_07_11_000012_add_event_delivery_identity_to_notification_queue',100),
-(341,'2026_07_11_000013_add_event_time_identity_foundation',101),
-(342,'2026_07_11_000045_harden_webauthn_credentials',102);
+(341,'2026_07_11_000004_canonicalize_group_lifecycle',101),
+(342,'2026_07_11_000020_harden_group_challenge_rewards',102),
+(343,'2026_07_11_000030_create_group_data_exports',103),
+(344,'2026_07_11_000040_harden_group_forms_and_files',104),
+(345,'2026_07_11_000041_harden_group_media_metadata',105),
+(346,'2026_07_11_000042_record_group_template_payload',106),
+(347,'2026_07_11_000043_harden_group_scheduled_posts_and_webhooks',107),
+(348,'2026_07_11_000044_track_legacy_team_document_migration',108),
+(349,'2026_07_11_000003_add_legacy_vetting_redaction_marker',109),
+(350,'2026_07_11_000013_add_event_time_identity_foundation',109),
+(351,'2026_07_11_000014_add_event_lifecycle_foundation',109),
+(352,'2026_07_11_000015_add_event_attendance_ledger_foundation',109),
+(353,'2026_07_11_000016_add_event_staff_role_foundation',109),
+(354,'2026_07_11_000017_add_event_registration_waitlist_foundation',109),
+(355,'2026_07_11_000018_add_event_outbox_aggregate_stream',109),
+(356,'2026_07_11_000019_add_event_recurrence_v2_foundation',109),
+(357,'2026_07_11_000021_add_event_waitlist_offer_delivery_envelopes',109),
+(358,'2026_07_11_000022_add_event_calendar_integration',109),
+(359,'2026_07_11_000023_add_event_notification_outbox_replay_audit',109),
+(360,'2026_07_11_000045_harden_webauthn_credentials',109),
+(361,'2026_07_11_000050_create_event_notification_preferences_and_reminder_rules',109),
+(362,'2026_07_11_000051_create_versioned_event_reminder_schedules',109),
+(363,'2026_07_11_000052_backfill_event_reminder_rules_and_schedules',109),
+(364,'2026_07_11_000053_create_event_agenda_sessions',109),
+(365,'2026_07_11_000054_create_event_federation_reliability_foundation',109),
+(366,'2026_07_11_000055_create_event_offline_checkin_foundation',109),
+(367,'2026_07_11_000056_create_event_registration_forms_and_invitations',109),
+(368,'2026_07_11_000057_create_event_ticketing_foundation',109),
+(369,'2026_07_11_000058_create_event_templates_foundation',109),
+(370,'2026_07_11_000059_create_event_analytics_foundation',109),
+(371,'2026_07_11_000060_create_event_safety_foundation',109),
+(372,'2026_07_11_000061_add_event_guardian_delivery_boundary',109),
+(373,'2026_07_11_000062_create_event_broadcast_foundation',109),
+(374,'2026_07_11_000063_expand_event_registration_forms_and_invitations_phase_b',109),
+(375,'2026_07_11_000064_add_event_venue_accessibility',109),
+(376,'2026_07_11_000065_expand_event_agenda_enterprise',109),
+(377,'2026_07_11_000066_add_event_context_to_notification_queue',109),
+(378,'2026_07_11_000067_pin_event_agenda_registration_versions',109),
+(380,'2026_07_12_000068_add_event_recurrence_override_fields',110),
+(381,'2026_07_12_000069_add_event_recurrence_materialization_state',111),
+(382,'2026_07_12_000070_add_event_recurrence_revision_ledger',111),
+(383,'2026_07_12_000071_add_event_recurrence_definition_blueprints',111);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -15529,7 +20407,7 @@ INSERT INTO `laravel_migrations` VALUES
 
 
 -- Legacy SQL migrations data (prevents replay after schema bootstrap)
-/*M!999999\- enable the sandbox mode */ 
+/*M!999999\- enable the sandbox mode */
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;

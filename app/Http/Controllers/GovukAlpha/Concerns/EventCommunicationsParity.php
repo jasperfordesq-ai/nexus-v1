@@ -67,7 +67,15 @@ trait EventCommunicationsParity
                 $request->query('broadcast_id'),
             );
             if ($broadcastId !== null) {
-                $detail = app(EventBroadcastQueryService::class)->detail($broadcastId, $actor);
+                $historyPage = $this->eventsCommunicationsPositiveInteger(
+                    $request->query('history_page'),
+                ) ?? 1;
+                $detail = app(EventBroadcastQueryService::class)->detail(
+                    $broadcastId,
+                    $actor,
+                    $historyPage,
+                    50,
+                );
                 if ((int) $detail['broadcast']['event_id'] !== $id) {
                     abort(404);
                 }

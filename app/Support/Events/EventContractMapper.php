@@ -30,6 +30,9 @@ final class EventContractMapper
 {
     public const VERSION = 2;
 
+    private const MAINTAINED_RECURRENCE_ENGINE = 'sabre-vobject';
+    private const MAINTAINED_RECURRENCE_ENGINE_VERSION = '2';
+
     /** @return array<string, mixed> */
     public static function event(array $event, array $facts = [], bool $detail = true): array
     {
@@ -231,13 +234,14 @@ final class EventContractMapper
         $manageAttendance = (bool) ($abilities['manageAttendance'] ?? false);
 
         return [
-            'edit' => $manage,
+            'edit' => (bool) ($facts['can_edit'] ?? $manage),
             'cancel' => $manage,
             'manage_people' => $viewRoster || $viewWaitlist || $manageAttendance,
             'check_in' => $manageAttendance,
             'message' => (bool) ($abilities['messagePeople'] ?? false),
             'export' => (bool) ($abilities['exportPeople'] ?? false),
-            'publish' => $manage,
+            'publish' => (bool) ($facts['can_publish'] ?? false),
+            'submit_for_review' => (bool) ($facts['can_submit_for_review'] ?? false),
             'manage_agenda' => (bool) ($abilities['manageAgenda'] ?? $manage),
             'manage_staff' => (bool) ($abilities['manageStaff'] ?? false),
             'manage_registration' => (bool) ($abilities['manageRegistration'] ?? false),
@@ -694,6 +698,24 @@ final class EventContractMapper
         $recurrence = null;
         if ($isRecurring) {
             $rule = is_array($facts['recurrence'] ?? null) ? $facts['recurrence'] : [];
+            $identity = is_array($facts['recurrence_identity'] ?? null)
+                ? $facts['recurrence_identity']
+                : [];
+            $parentEventId = self::nullableInt($event['parent_event_id'] ?? null);
+            $isTemplate = (bool) ($event['is_recurring_template'] ?? false);
+            $rawRecurrenceId = self::nullableString(
+                $identity['recurrence_id'] ?? $event['recurrence_id'] ?? null
+            );
+            $isMaintainedConcreteOccurrence = ! $isTemplate
+                && $parentEventId !== null
+                && $rawRecurrenceId !== null
+                && preg_match('/^[0-9]{8}T[0-9]{6}Z$/D', $rawRecurrenceId) === 1
+                && self::nullableString($identity['engine'] ?? $event['recurrence_engine'] ?? null)
+                    === self::MAINTAINED_RECURRENCE_ENGINE
+                && self::nullableString(
+                    $identity['engine_version'] ?? $event['recurrence_engine_version'] ?? null
+                )
+                    === self::MAINTAINED_RECURRENCE_ENGINE_VERSION;
             $hasProjectedOccurrences = is_array($event['series_occurrences'] ?? null)
                 || is_array($rule['occurrences'] ?? null);
             $occurrences = is_array($event['series_occurrences'] ?? null)
@@ -704,21 +726,38 @@ final class EventContractMapper
                 'start_at' => self::dateString($occurrence['start_at'] ?? $occurrence['start_time'] ?? null),
                 'date' => self::nullableString($occurrence['date'] ?? $occurrence['occurrence_date'] ?? null),
             ], $occurrences));
+            $reportedOccurrenceCount = array_key_exists('series_count', $event)
+                ? self::intValue($event['series_count'])
+                : (array_key_exists('occurrence_count', $rule)
+                    ? self::intValue($rule['occurrence_count'])
+                    : null);
             $recurrence = [
-                'parent_event_id' => self::nullableInt($event['parent_event_id'] ?? null),
+                'parent_event_id' => $parentEventId,
                 'root_event_id' => self::intValue(
                     $event['parent_event_id']
                         ?? $rule['event_id']
                         ?? $event['id']
                         ?? 0
                 ),
-                'is_template' => (bool) ($event['is_recurring_template'] ?? false),
+                'is_template' => $isTemplate,
+                // Recurrence identity is an allowlisted manager contract, not
+                // a raw rule projection. Templates, legacy engines and invalid
+                // identities remain explicit nulls so clients fail closed.
+                'recurrence_id' => $isMaintainedConcreteOccurrence ? $rawRecurrenceId : null,
+                'engine' => $isMaintainedConcreteOccurrence
+                    ? self::MAINTAINED_RECURRENCE_ENGINE
+                    : null,
+                'engine_version' => $isMaintainedConcreteOccurrence
+                    ? self::MAINTAINED_RECURRENCE_ENGINE_VERSION
+                    : null,
                 'frequency' => self::nullableString($rule['frequency'] ?? $event['recurrence_frequency'] ?? null),
                 'interval' => self::intValue($rule['interval_value'] ?? 1),
                 'rrule' => self::nullableString($rule['rrule'] ?? null),
-                'occurrence_count' => $hasProjectedOccurrences
-                    ? count($projectedOccurrences)
-                    : self::intValue($event['series_count'] ?? 0),
+                // `occurrences` is a bounded preview. Preserve the separately
+                // computed policy-visible total when one is available.
+                'occurrence_count' => $reportedOccurrenceCount === null
+                    ? ($hasProjectedOccurrences ? count($projectedOccurrences) : 0)
+                    : max($reportedOccurrenceCount, count($projectedOccurrences)),
                 'occurrences' => $projectedOccurrences,
             ];
         }

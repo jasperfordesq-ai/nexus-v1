@@ -17,6 +17,8 @@ return [
         'refresh' => 'Refrescar',
         'retry' => 'Intentar otra vez',
         'save' => 'Ahorrar',
+        'previous' => 'Anterior',
+        'next' => 'Siguiente',
     ],
     'load_error' => [
         'title' => 'No se pudo cargar el espacio de trabajo de registro',

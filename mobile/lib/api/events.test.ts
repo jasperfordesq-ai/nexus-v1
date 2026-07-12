@@ -41,7 +41,10 @@ import {
   EVENTS_CONTRACT_VERSION,
   acceptEventWaitlistOffer,
   checkInEventAttendee,
+  commitEventRecurrenceDefinitions,
+  commitEventRecurrenceRevision,
   createEvent,
+  createRecurringEvent,
   deleteEventReminders,
   eventAgendaSchema,
   eventAgendaSpeakerSchema,
@@ -57,17 +60,22 @@ import {
   getEventAttendees,
   getEventAttendanceRoster,
   getEventCategories,
+  getEventRecurrenceCapabilities,
+  getEventRecurrenceDefinitionHistory,
   getEventPolls,
   getEventReminders,
   getEvents,
   getEventSeries,
   joinEventWaitlist,
   leaveEventWaitlist,
+  previewEventRecurrenceRevision,
+  previewEventRecurrenceDefinitions,
   removeRsvp,
   registerEventAgendaSession,
   rsvpEvent,
   transitionEventAttendance,
   updateEvent,
+  updateRecurringEvent,
   updateEventReminders,
   voteEventPoll,
   withdrawEventAgendaSession,
@@ -289,6 +297,236 @@ describe('canonical Events boundary', () => {
     expect(detail.data.organizer.display_name).toBe('Alex Morgan');
     expect(created.data.schedule.state).toBe('upcoming');
     expect(updated.data.permissions.edit).toBe(false);
+  });
+
+  it('uses structured recurring create and preview/commit revision contracts', async () => {
+    const payload = {
+      title: 'Recurring repair morning',
+      description: 'Repair together.',
+      start_time: '2030-05-01T10:15:00+00:00',
+      timezone: 'Europe/Dublin',
+      all_day: false,
+      recurrence_frequency: 'weekly' as const,
+      recurrence_interval: 2,
+      recurrence_days: 'MO',
+      recurrence_ends_type: 'never' as const,
+    };
+    const patch = { title: 'Updated series', local_start_time: '11:30' };
+    const impact = {
+      affected_event_ids: [101], affected_count: 1,
+      changed_event_ids: [101], changed_count: 1,
+      moved_occurrences: [], created_occurrences: [], retired_occurrences: [],
+      registrations_count: 2, waitlist_count: 0, ticket_count: 0, reminder_count: 1,
+      unique_recipient_count: 2, customized_exception_conflicts: [], blocking_conflicts: [],
+    };
+    (api.post as jest.Mock)
+      .mockResolvedValueOnce({ data: { template: eventDetailFixture, occurrences_created: 10 } })
+      .mockResolvedValueOnce({
+        data: {
+          preview_token: 'preview-token', preview_expires_at: '2030-04-01T08:05:00Z',
+          scope: 'this_and_future', selected_event_id: 101, root_event_id: 99,
+          effective_from_utc: '2030-05-01 10:15:00', can_commit: true, impact,
+        },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          revision_id: 8, root_event_id: 99, revision_version: 2,
+          effective_from_utc: '2030-05-01 10:15:00', changed_event_ids: [101], changed_count: 1,
+          notification_recipient_count: 2, notification_outbox_id: 900,
+          idempotent_replay: false, created_at: '2030-04-01T08:00:00Z',
+        },
+      });
+    (api.put as jest.Mock).mockResolvedValue({ data: eventDetailFixture });
+
+    const created = await createRecurringEvent(payload);
+    const updated = await updateRecurringEvent(101, { ...payload, scope: 'single' });
+    const preview = await previewEventRecurrenceRevision(101, patch);
+    const committed = await commitEventRecurrenceRevision(101, patch, preview.data.preview_token, 'mobile-revision-1');
+
+    expect(created.data.occurrences_created).toBe(10);
+    expect(updated.data.id).toBe(101);
+    expect(committed.data.revision_version).toBe(2);
+    expect(api.post).toHaveBeenNthCalledWith(1, '/api/v2/events/recurring', payload, contractOptions);
+    expect(api.put).toHaveBeenCalledWith('/api/v2/events/101/recurring', { ...payload, scope: 'single' }, contractOptions);
+    expect(api.post).toHaveBeenNthCalledWith(2, '/api/v2/events/101/recurrence-revisions/preview', { patch }, contractOptions);
+    expect(api.post).toHaveBeenNthCalledWith(3, '/api/v2/events/101/recurrence-revisions/commit', {
+      patch,
+      preview_token: 'preview-token',
+    }, { headers: { ...contractOptions.headers, 'Idempotency-Key': 'mobile-revision-1' } });
+  });
+
+  it('strictly parses the authoritative runtime recurrence capability contract', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: {
+        contract_version: 1,
+        engine: 'legacy',
+        structured_input: true,
+        supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+        max_occurrences: 52,
+        supported_end_types: ['after_count', 'on_date'],
+        supports_rolling_never: false,
+        supports_effective_revisions: false,
+        supports_definition_blueprints: false,
+        schema_ready: true,
+        rollout_state: 'legacy',
+      },
+      meta: { contract: 'events-v2' },
+    });
+
+    const response = await getEventRecurrenceCapabilities();
+
+    expect(response.data.max_occurrences).toBe(52);
+    expect(response.data.supports_effective_revisions).toBe(false);
+    expect(api.get).toHaveBeenCalledWith(
+      '/api/v2/events/recurrence-capabilities',
+      undefined,
+      contractOptions,
+    );
+  });
+
+  it('uses canonical blueprint pagination and signed preview/idempotent commit contracts', async () => {
+    const sections = {
+      agenda: true,
+      ticket_types: false,
+      registration: true,
+      safety: false,
+      staff: false,
+    };
+    const counts = {
+      sessions: 2,
+      speakers: 1,
+      resources: 0,
+      ticket_types: 0,
+      registration_settings: 1,
+      published_forms: 1,
+      form_questions: 3,
+      safety_requirements: 0,
+      staff_assignments: 0,
+    };
+    const historyItem = {
+      blueprint_id: 9,
+      blueprint_version: 4,
+      schema_version: 1,
+      effective_from_recurrence_id: '20300501T101500Z',
+      source_event_id: 101,
+      source_recurrence_id: '20300501T101500Z',
+      selected_sections: sections,
+      counts,
+      manifest_hash: 'a'.repeat(64),
+      captured_by_user_id: 7,
+      created_at: '2030-04-01T08:00:00Z',
+    };
+    const preview = {
+      preview_token: 'signed-preview-token',
+      preview_expires_at: '2030-04-01T08:05:00Z',
+      schema_version: 1,
+      root_event_id: 99,
+      source_event_id: 101,
+      source_recurrence_id: '20300501T101500Z',
+      effective_from_recurrence_id: '20300501T101500Z',
+      selected_sections: sections,
+      manifest_hash: 'b'.repeat(64),
+      blueprint_set_version: 3,
+      counts,
+      conflicts: [],
+      can_commit: true,
+    };
+    const commit = {
+      blueprint_id: 10,
+      blueprint_version: 4,
+      schema_version: 1,
+      root_event_id: 99,
+      source_event_id: 101,
+      source_recurrence_id: '20300501T101500Z',
+      effective_from_recurrence_id: '20300501T101500Z',
+      selected_sections: sections,
+      manifest_hash: 'b'.repeat(64),
+      counts,
+      idempotent_replay: false,
+      created_at: '2030-04-01T08:01:00Z',
+    };
+    (api.get as jest.Mock).mockResolvedValue({
+      data: { items: [historyItem], next_before_version: 4 },
+    });
+    (api.post as jest.Mock)
+      .mockResolvedValueOnce({ data: preview })
+      .mockResolvedValueOnce({ data: commit });
+
+    const history = await getEventRecurrenceDefinitionHistory(101, 7);
+    const prepared = await previewEventRecurrenceDefinitions(
+      101,
+      '20300501T101500Z',
+      sections,
+    );
+    const saved = await commitEventRecurrenceDefinitions(
+      101,
+      '20300501T101500Z',
+      sections,
+      prepared.data.preview_token,
+      'mobile-definition-stable-retry',
+    );
+
+    expect(history.data.next_before_version).toBe(4);
+    expect(saved.data.blueprint_version).toBe(4);
+    expect(api.get).toHaveBeenCalledWith(
+      '/api/v2/events/101/recurrence-definition-blueprints',
+      { limit: '10', before_version: '7' },
+      contractOptions,
+    );
+    expect(api.post).toHaveBeenNthCalledWith(
+      1,
+      '/api/v2/events/101/recurrence-definition-blueprints/preview',
+      { effective_from_recurrence_id: '20300501T101500Z', sections },
+      contractOptions,
+    );
+    expect(api.post).toHaveBeenNthCalledWith(
+      2,
+      '/api/v2/events/101/recurrence-definition-blueprints/commit',
+      {
+        effective_from_recurrence_id: '20300501T101500Z',
+        sections,
+        preview_token: 'signed-preview-token',
+      },
+      {
+        headers: {
+          ...contractOptions.headers,
+          'Idempotency-Key': 'mobile-definition-stable-retry',
+        },
+      },
+    );
+  });
+
+  it('rejects blueprint history that leaks manifest values outside the manager projection', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: {
+        items: [{
+          blueprint_id: 9,
+          blueprint_version: 1,
+          schema_version: 1,
+          effective_from_recurrence_id: '20300501T101500Z',
+          source_event_id: 101,
+          source_recurrence_id: '20300501T101500Z',
+          selected_sections: {
+            agenda: true,
+            ticket_types: false,
+            registration: false,
+            safety: false,
+            staff: false,
+          },
+          counts: {},
+          manifest_hash: 'c'.repeat(64),
+          captured_by_user_id: 7,
+          created_at: '2030-04-01T08:00:00Z',
+          manifest: { attendees: ['private-member'] },
+        }],
+        next_before_version: null,
+      },
+    });
+
+    await expect(getEventRecurrenceDefinitionHistory(101))
+      .rejects.toMatchObject({ message: 'EVENTS_CONTRACT_DRIFT' });
+    expect(JSON.stringify((Sentry.captureMessage as jest.Mock).mock.calls[0][1]))
+      .not.toContain('private-member');
   });
 
   it('reports privacy-safe, stable drift telemetry and rejects the response', async () => {

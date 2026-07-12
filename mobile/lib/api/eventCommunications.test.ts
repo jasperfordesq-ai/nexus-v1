@@ -50,11 +50,20 @@ function broadcastFixture(body: string | null = null) {
   };
 }
 
+const historyMeta = {
+  current_page: 1,
+  per_page: 50,
+  total: 0,
+  total_pages: 0,
+  has_more: false,
+};
+
 function mutationEnvelope(broadcast = broadcastFixture('Exact organizer prose.')) {
   return {
     data: {
       broadcast,
       history: [],
+      history_meta: historyMeta,
       changed: true,
       idempotent_replay: false,
     },
@@ -172,6 +181,7 @@ describe('mobile event communications API', () => {
           metadata: { recipient_count: 12 },
           created_at: '2026-07-11T10:00:00+00:00',
         }],
+        history_meta: { ...historyMeta, total: 1, total_pages: 1 },
       },
       meta: { base_url: 'https://api.example.test' },
     });
@@ -180,7 +190,29 @@ describe('mobile event communications API', () => {
 
     expect(detail.broadcast.body).toBe('Exact organizer prose.');
     expect(detail.history[0]).toEqual(expect.objectContaining({ action: 'created', version: 1 }));
-    expect(api.get).toHaveBeenCalledWith('/api/v2/event-broadcasts/8');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/event-broadcasts/8', {
+      history_page: '1',
+      history_per_page: '50',
+    });
+  });
+
+  it('requests an independent bounded detail-history page', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: {
+        broadcast: broadcastFixture('Exact organizer prose.'),
+        history: [],
+        history_meta: { ...historyMeta, current_page: 2, total: 51, total_pages: 2 },
+      },
+      meta: { base_url: 'https://api.example.test' },
+    });
+
+    const detail = await getEventCommunicationDetail(8, 2, 50);
+
+    expect(detail.history_meta.current_page).toBe(2);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/event-broadcasts/8', {
+      history_page: '2',
+      history_per_page: '50',
+    });
   });
 
   it('revises an eligible draft with optimistic versioning and an idempotency header', async () => {

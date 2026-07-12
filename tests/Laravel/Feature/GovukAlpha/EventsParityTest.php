@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\GovukAlpha;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EventCalendarService;
+use App\Services\EventRecurrenceCapabilityService;
 use App\Services\TenantSettingsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -135,6 +136,86 @@ class EventsParityTest extends TestCase
             'question' => 'What time suits you best?',
             'created_at' => now(),
         ], $overrides));
+    }
+
+    /** @return array{root:int,occurrences:list<int>} */
+    private function eventsParityCreateSeries(User $organizer, int $count = 3): array
+    {
+        config()->set('events.recurrence.engine_v2_enabled', true);
+        config()->set('events.recurrence.revisions.preview_ttl_seconds', 60);
+        config()->set('events.recurrence.revisions.max_affected_occurrences', 1000);
+        config()->set('events.notification_delivery.mode', 'outbox_authoritative');
+        Sanctum::actingAs($organizer, ['*']);
+        $start = CarbonImmutable::now('UTC')->addYear()->startOfDay()->setTime(9, 0);
+        $response = $this->apiPost('/v2/events/recurring', [
+            'title' => 'Accessible recurring fixture',
+            'description' => 'Effective-dated accessible recurrence fixture.',
+            'start_time' => $start->format('Y-m-d H:i:s'),
+            'end_time' => $start->addHour()->format('Y-m-d H:i:s'),
+            'timezone' => 'Europe/Dublin',
+            'all_day' => false,
+            'location' => 'Community hall',
+            'is_online' => false,
+            'allow_remote_attendance' => false,
+            'federated_visibility' => 'none',
+            'recurrence_frequency' => 'daily',
+            'recurrence_ends_type' => 'after_count',
+            'recurrence_ends_after_count' => $count,
+        ])->assertCreated();
+        $root = (int) $response->json('data.template.id');
+        $occurrences = DB::table('events')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('parent_event_id', $root)
+            ->orderBy('recurrence_id')
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+
+        return ['root' => $root, 'occurrences' => $occurrences];
+    }
+
+    /** @return array<string,mixed> */
+    private function eventsParityV2Capabilities(int $maxOccurrences = 366): array
+    {
+        return [
+            'contract_version' => 1,
+            'engine' => 'v2',
+            'structured_input' => true,
+            'supported_frequencies' => ['daily', 'weekly', 'monthly', 'yearly'],
+            'max_occurrences' => $maxOccurrences,
+            'supported_end_types' => ['after_count', 'on_date', 'never'],
+            'supports_rolling_never' => true,
+            'supports_effective_revisions' => true,
+            'supports_definition_blueprints' => false,
+            'schema_ready' => true,
+            'rollout_state' => 'v2_rolling',
+        ];
+    }
+
+    private function eventsParityMockV2Capabilities(int $maxOccurrences = 366): void
+    {
+        $capabilities = $this->eventsParityV2Capabilities($maxOccurrences);
+        $this->mock(EventRecurrenceCapabilityService::class, static function ($mock) use ($capabilities): void {
+            $mock->shouldReceive('capabilities')->andReturn($capabilities);
+        });
+    }
+
+    private function eventsParityMockBlueprintCapabilities(): void
+    {
+        $capabilities = array_merge($this->eventsParityV2Capabilities(), [
+            'supports_definition_blueprints' => true,
+        ]);
+        $this->mock(EventRecurrenceCapabilityService::class, static function ($mock) use ($capabilities): void {
+            $mock->shouldReceive('capabilities')->andReturn($capabilities);
+        });
+    }
+
+    private function eventsParityHiddenValue(TestResponse $response, string $name): string
+    {
+        $pattern = '/name="' . preg_quote($name, '/') . '" value="([^"]*)"/';
+        self::assertSame(1, preg_match($pattern, (string) $response->getContent(), $matches));
+
+        return html_entity_decode((string) $matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     // ================================================================
@@ -337,6 +418,55 @@ class EventsParityTest extends TestCase
     }
 
     // ================================================================
+    //  Runtime recurrence capability negotiation
+    // ================================================================
+
+    public function test_accessible_create_uses_legacy_runtime_limit_and_hides_rolling_never(): void
+    {
+        config()->set('events.recurrence.engine_v2_enabled', false);
+        $this->eventsParityUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/accessible/events/new");
+
+        $response->assertOk()
+            ->assertSee('max="52"', false)
+            ->assertSee(__('govuk_alpha.events.polish_events.recurrence_count_hint', ['max' => 52]))
+            ->assertDontSee('value="never"', false);
+    }
+
+    public function test_accessible_create_rejects_recurrence_values_outside_runtime_contract(): void
+    {
+        config()->set('events.recurrence.engine_v2_enabled', false);
+        $this->eventsParityUser();
+        $base = [
+            'is_recurring' => '1',
+            'recurrence_frequency' => 'weekly',
+            'recurrence_ends_type' => 'after_count',
+            'recurrence_ends_after_count' => '53',
+        ];
+
+        $this->post("/{$this->testTenantSlug}/accessible/events/new", $base)
+            ->assertSessionHasErrors('recurrence_ends_after_count');
+        $this->post("/{$this->testTenantSlug}/accessible/events/new", [
+            ...$base,
+            'recurrence_ends_type' => 'never',
+        ])->assertSessionHasErrors('recurrence_ends_type');
+    }
+
+    public function test_accessible_create_renders_rolling_capabilities_without_javascript(): void
+    {
+        $this->eventsParityMockV2Capabilities(366);
+        $this->eventsParityUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/accessible/events/new");
+
+        $response->assertOk()
+            ->assertSee('max="366"', false)
+            ->assertSee(__('govuk_alpha.events.polish_events.recurrence_count_hint', ['max' => 366]))
+            ->assertSee('value="never"', false);
+    }
+
+    // ================================================================
     //  Recurring-series occurrence edit with scope
     // ================================================================
 
@@ -365,6 +495,7 @@ class EventsParityTest extends TestCase
 
     public function test_events_recurring_edit_renders_for_owner(): void
     {
+        config()->set('events.recurrence.engine_v2_enabled', false);
         $owner = $this->eventsParityUser();
         $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
 
@@ -373,7 +504,21 @@ class EventsParityTest extends TestCase
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.recurring_edit.title'));
         $resp->assertSee(__('govuk_alpha_events.recurring_edit.scope_single'));
-        $resp->assertSee(__('govuk_alpha_events.recurring_edit.scope_all'));
+        $resp->assertDontSee('value="all"', false);
+        $resp->assertSee(__('govuk_alpha_events.recurring_edit.unavailable'));
+    }
+
+    public function test_events_recurring_edit_exposes_effective_scope_only_when_runtime_supports_it(): void
+    {
+        $this->eventsParityMockV2Capabilities();
+        $owner = $this->eventsParityUser();
+        $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
+
+        $response = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit");
+
+        $response->assertOk()
+            ->assertSee(__('govuk_alpha_events.recurring_edit.scope_all'))
+            ->assertSee('value="all"', false);
     }
 
     public function test_events_recurring_edit_redirects_non_series_to_plain_edit(): void
@@ -390,19 +535,294 @@ class EventsParityTest extends TestCase
     public function test_events_recurring_update_single_scope_persists(): void
     {
         $owner = $this->eventsParityUser();
-        $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $eventId = $series['occurrences'][0];
+        $event = DB::table('events')->where('id', $eventId)->first();
+        self::assertNotNull($event);
+        $start = CarbonImmutable::parse((string) $event->start_time, 'UTC')->setTimezone('Europe/Dublin');
 
         $resp = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit", [
             'title' => 'Updated recurring title',
             'description' => 'Updated recurring description.',
-            'start_time' => now()->addDays(7)->format('Y-m-d\TH:i'),
+            'start_time' => $start->format('Y-m-d\TH:i'),
+            'end_time' => $start->addHour()->format('Y-m-d\TH:i'),
+            'timezone' => 'Europe/Dublin',
             'scope' => 'single',
         ]);
 
         $resp->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$eventId}?status=event-updated");
         $this->assertSame('Updated recurring title', DB::table('events')->where('id', $eventId)->value('title'));
-        // scope=single detaches the occurrence from its parent.
-        $this->assertNull(DB::table('events')->where('id', $eventId)->value('parent_event_id'));
+        $stored = DB::table('events')->where('id', $eventId)->first();
+        self::assertSame($series['root'], (int) $stored->parent_event_id);
+        self::assertSame(1, (int) $stored->is_recurrence_exception);
+        self::assertContains('title', json_decode((string) $stored->recurrence_override_fields, true));
+    }
+
+    public function test_accessible_effective_preview_is_non_mutating_and_commit_preserves_every_submitted_field(): void
+    {
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 3);
+        $this->eventsParityMockV2Capabilities();
+        $selectedId = $series['occurrences'][1];
+        DB::table('events')->whereIn('id', array_slice($series['occurrences'], 1))
+            ->update(['accessibility_hearing_loop' => 1]);
+        $selected = DB::table('events')->where('id', $selectedId)->first();
+        self::assertNotNull($selected);
+        $start = CarbonImmutable::parse((string) $selected->start_time, 'UTC')->setTimezone('Europe/Dublin');
+        $end = CarbonImmutable::parse((string) $selected->end_time, 'UTC')->setTimezone('Europe/Dublin');
+
+        $preview = $this->post("/{$this->testTenantSlug}/accessible/events/{$selectedId}/recurring-edit", [
+            'title' => 'Accessible effective title',
+            'description' => 'Effective-dated accessible recurrence fixture.',
+            'location' => 'Accessible community centre',
+            'start_time' => $start->format('Y-m-d\TH:i'),
+            'end_time' => $end->format('Y-m-d\TH:i'),
+            'timezone' => 'Europe/Dublin',
+            'is_online' => '1',
+            'online_link' => 'https://events.example.test/join',
+            'allow_remote_attendance' => '1',
+            'video_url' => 'https://video.example.test/room',
+            'max_attendees' => '44',
+            'accessibility_step_free' => 'yes',
+            'accessibility_toilet' => 'no',
+            'accessibility_hearing_loop' => 'unknown',
+            'accessibility_quiet_space' => 'yes',
+            'accessibility_seating' => 'yes',
+            'accessibility_parking' => 'no',
+            'accessibility_parking_details' => 'Drop-off beside the main entrance.',
+            'accessibility_transit_details' => 'Bus stop 20 metres from the entrance.',
+            'accessibility_assistance_contact' => 'access@example.test',
+            'accessibility_notes' => 'Ask the organiser for a quiet arrival.',
+            'scope' => 'all',
+        ]);
+
+        $preview->assertOk()
+            ->assertHeader('Pragma', 'no-cache')
+            ->assertSee(__('govuk_alpha_events.recurring_edit.confirm_title'));
+        self::assertStringContainsString('private', (string) $preview->headers->get('Cache-Control'));
+        self::assertStringContainsString('no-store', (string) $preview->headers->get('Cache-Control'));
+        $patchJson = $this->eventsParityHiddenValue($preview, 'patch_json');
+        $patch = json_decode($patchJson, true, 32, JSON_THROW_ON_ERROR);
+        self::assertSame('Accessible effective title', $patch['title']);
+        self::assertSame(44, $patch['max_attendees']);
+        self::assertTrue($patch['is_online']);
+        self::assertTrue($patch['allow_remote_attendance']);
+        self::assertTrue($patch['accessibility_step_free']);
+        self::assertFalse($patch['accessibility_toilet']);
+        self::assertNull($patch['accessibility_hearing_loop']);
+        self::assertSame('Ask the organiser for a quiet arrival.', $patch['accessibility_notes']);
+        self::assertSame('Accessible recurring fixture', DB::table('events')->where('id', $selectedId)->value('title'));
+        self::assertNull(DB::table('events')->where('id', $selectedId)->value('accessibility_notes'));
+
+        $commit = $this->post("/{$this->testTenantSlug}/accessible/events/{$selectedId}/recurring-edit/commit", [
+            'preview_token' => $this->eventsParityHiddenValue($preview, 'preview_token'),
+            'patch_json' => $patchJson,
+            'idempotency_key' => $this->eventsParityHiddenValue($preview, 'idempotency_key'),
+        ]);
+
+        $commit->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$selectedId}?status=event-updated");
+        self::assertSame('Accessible recurring fixture', DB::table('events')
+            ->where('id', $series['occurrences'][0])->value('title'));
+        foreach (array_slice($series['occurrences'], 1) as $eventId) {
+            $row = DB::table('events')->where('id', $eventId)->first();
+            self::assertSame('Accessible effective title', $row->title);
+            self::assertSame(44, (int) $row->max_attendees);
+            self::assertSame(1, (int) $row->is_online);
+            self::assertSame(1, (int) $row->allow_remote_attendance);
+            self::assertSame(1, (int) $row->accessibility_step_free);
+            self::assertSame(0, (int) $row->accessibility_toilet);
+            self::assertNull($row->accessibility_hearing_loop);
+            self::assertSame('Ask the organiser for a quiet arrival.', $row->accessibility_notes);
+        }
+    }
+
+    public function test_accessible_effective_scope_rejects_date_moves_before_preview(): void
+    {
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $this->eventsParityMockV2Capabilities();
+        $selectedId = $series['occurrences'][0];
+        $selected = DB::table('events')->where('id', $selectedId)->first();
+        self::assertNotNull($selected);
+        $start = CarbonImmutable::parse((string) $selected->start_time, 'UTC')->setTimezone('Europe/Dublin');
+        $end = CarbonImmutable::parse((string) $selected->end_time, 'UTC')->setTimezone('Europe/Dublin');
+
+        $response = $this->post("/{$this->testTenantSlug}/accessible/events/{$selectedId}/recurring-edit", [
+            'title' => 'Moved series',
+            'description' => 'Effective-dated accessible recurrence fixture.',
+            'location' => 'Community hall',
+            'start_time' => $start->addDay()->format('Y-m-d\TH:i'),
+            'end_time' => $end->addDay()->format('Y-m-d\TH:i'),
+            'timezone' => 'Europe/Dublin',
+            'scope' => 'all',
+        ]);
+
+        $response->assertRedirect(route('govuk-alpha.events.recurring.edit', [
+            'tenantSlug' => $this->testTenantSlug,
+            'id' => $selectedId,
+        ]))->assertSessionHasErrors('scope');
+        self::assertSame('Accessible recurring fixture', DB::table('events')->where('id', $selectedId)->value('title'));
+    }
+
+    public function test_recurrence_definition_manager_entry_requires_concrete_identity_and_capability(): void
+    {
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $occurrenceId = $series['occurrences'][0];
+
+        $this->eventsParityMockBlueprintCapabilities();
+        $this->get("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}")
+            ->assertOk()
+            ->assertSee(__('event_recurrence_blueprints.tab'))
+            ->assertSee(route('govuk-alpha.events.recurrence-definitions.index', [
+                'tenantSlug' => $this->testTenantSlug,
+                'id' => $occurrenceId,
+            ]), false);
+        $this->get("/{$this->testTenantSlug}/accessible/events/{$series['root']}/recurrence-definition-blueprints")
+            ->assertNotFound();
+    }
+
+    public function test_recurrence_definition_manager_fails_closed_when_capability_is_off(): void
+    {
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $this->eventsParityMockV2Capabilities();
+
+        $this->get("/{$this->testTenantSlug}/accessible/events/{$series['occurrences'][0]}/recurrence-definition-blueprints")
+            ->assertNotFound();
+    }
+
+    public function test_accessible_recurrence_definition_preview_and_idempotent_commit_are_private_and_explicit(): void
+    {
+        config()->set('events.recurrence.materialization.enabled', true);
+        config()->set('events.recurrence.definition_blueprints.enabled', true);
+        $this->eventsParityMockBlueprintCapabilities();
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $occurrenceId = $series['occurrences'][0];
+
+        $manager = $this->get("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints");
+        $manager->assertOk()
+            ->assertHeader('Pragma', 'no-cache')
+            ->assertSee(__('event_recurrence_blueprints.definition_only_description'))
+            ->assertSee('name="sections[]"', false)
+            ->assertDontSee('participant_email', false)
+            ->assertDontSee('delivery_history', false);
+        self::assertStringContainsString('private', (string) $manager->headers->get('Cache-Control'));
+        self::assertStringContainsString('no-store', (string) $manager->headers->get('Cache-Control'));
+
+        $preview = $this->post("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints/preview", [
+            'sections' => ['safety'],
+        ]);
+        $preview->assertOk()
+            ->assertHeader('Pragma', 'no-cache')
+            ->assertSee(__('event_recurrence_blueprints.preview_title'))
+            ->assertSee('name="confirm_definition_version"', false)
+            ->assertDontSee('manifest_hash', false)
+            ->assertDontSee('captured_by_user_id', false);
+        $this->assertDatabaseCount('event_recurrence_definition_blueprints', 0);
+        $token = $this->eventsParityHiddenValue($preview, 'preview_token');
+        $idempotencyKey = $this->eventsParityHiddenValue($preview, 'idempotency_key');
+
+        $commitPayload = [
+            'sections' => ['safety'],
+            'preview_token' => $token,
+            'idempotency_key' => $idempotencyKey,
+            'confirm_definition_version' => '1',
+        ];
+        $commit = $this->post("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints/commit", $commitPayload);
+        $commit->assertRedirect(route('govuk-alpha.events.recurrence-definitions.index', [
+            'tenantSlug' => $this->testTenantSlug,
+            'id' => $occurrenceId,
+            'status' => 'created',
+            'version' => 1,
+        ]));
+        $this->assertDatabaseCount('event_recurrence_definition_blueprints', 1);
+
+        $replay = $this->post("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints/commit", $commitPayload);
+        $replay->assertRedirect(route('govuk-alpha.events.recurrence-definitions.index', [
+            'tenantSlug' => $this->testTenantSlug,
+            'id' => $occurrenceId,
+            'status' => 'replayed',
+            'version' => 1,
+        ]));
+        $this->assertDatabaseCount('event_recurrence_definition_blueprints', 1);
+        $storedSections = json_decode((string) DB::table('event_recurrence_definition_blueprints')
+            ->value('selected_sections'), true, 32, JSON_THROW_ON_ERROR);
+        $expectedSections = [
+            'agenda' => false,
+            'ticket_types' => false,
+            'registration' => false,
+            'safety' => true,
+            'staff' => false,
+        ];
+        ksort($expectedSections);
+        ksort($storedSections);
+        self::assertSame($expectedSections, $storedSections);
+    }
+
+    public function test_accessible_recurrence_definition_history_uses_canonical_before_version_pagination(): void
+    {
+        $this->eventsParityMockBlueprintCapabilities();
+        $owner = $this->eventsParityUser();
+        $series = $this->eventsParityCreateSeries($owner, 2);
+        $occurrenceId = $series['occurrences'][0];
+        $source = DB::table('events')->where('id', $occurrenceId)->first();
+        self::assertNotNull($source);
+        $sections = json_encode([
+            'agenda' => false,
+            'ticket_types' => false,
+            'registration' => false,
+            'safety' => true,
+            'staff' => false,
+        ], JSON_THROW_ON_ERROR);
+        $manifest = json_encode([
+            'schema_version' => 1,
+            'definitions' => [
+                'agenda' => [],
+                'ticket_types' => [],
+                'registration' => [],
+                'safety' => [],
+                'staff' => [],
+            ],
+        ], JSON_THROW_ON_ERROR);
+        for ($version = 1; $version <= 11; $version++) {
+            DB::table('event_recurrence_definition_blueprints')->insert([
+                'tenant_id' => $this->testTenantId,
+                'root_event_id' => $series['root'],
+                'source_event_id' => $occurrenceId,
+                'source_recurrence_id' => (string) $source->recurrence_id,
+                'source_occurrence_key' => (string) $source->occurrence_key,
+                'blueprint_version' => $version,
+                'schema_version' => 1,
+                'effective_from_recurrence_id' => (string) $source->recurrence_id,
+                'selected_sections' => $sections,
+                'manifest' => $manifest,
+                'manifest_hash' => hash('sha256', "manifest-{$version}"),
+                'idempotency_hash' => hash('sha256', "idempotency-{$version}"),
+                'request_hash' => hash('sha256', "request-{$version}"),
+                'captured_by_user_id' => $owner->id,
+                'created_at' => now()->addSeconds($version),
+            ]);
+        }
+
+        $historyHeading = static fn (int $version): string => sprintf(
+            '<h3 class="govuk-summary-card__title">%s</h3>',
+            e(__('event_recurrence_blueprints.history_version', ['version' => $version])),
+        );
+        $first = $this->get("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints");
+        $first->assertOk()
+            ->assertSee($historyHeading(11), false)
+            ->assertSee($historyHeading(2), false)
+            ->assertDontSee($historyHeading(1), false)
+            ->assertSee('before_version=2', false);
+
+        $second = $this->get("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints?before_version=2");
+        $second->assertOk()
+            ->assertSee($historyHeading(1), false)
+            ->assertDontSee('rel="next"', false);
+        $this->get("/{$this->testTenantSlug}/accessible/events/{$occurrenceId}/recurrence-definition-blueprints?before_version=02")
+            ->assertStatus(422);
     }
 
     // ================================================================

@@ -235,5 +235,27 @@
                 </li>
             @endforeach
         </ol>
+        @php
+            $historyMeta = $detail['history_meta'];
+            $historyPage = (int) $historyMeta['current_page'];
+            $historyTotalPages = (int) $historyMeta['total_pages'];
+            $historyRoute = static fn (int $targetPage): string => route('govuk-alpha.events.communications.index', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $eventId,
+                'page' => (int) $pagination['page'],
+                'broadcast_id' => $detail['broadcast']['id'],
+                'history_page' => $targetPage,
+            ]);
+        @endphp
+        @if ($historyTotalPages > 1)
+            <nav class="govuk-pagination" aria-label="{{ __($translation . 'audit_title') }}">
+                @if ($historyPage > 1)
+                    <div class="govuk-pagination__prev"><a class="govuk-link govuk-pagination__link" href="{{ $historyRoute($historyPage - 1) }}">{{ __($translation . 'previous') }}</a></div>
+                @endif
+                @if ($historyPage < $historyTotalPages)
+                    <div class="govuk-pagination__next"><a class="govuk-link govuk-pagination__link" href="{{ $historyRoute($historyPage + 1) }}">{{ __($translation . 'next') }}</a></div>
+                @endif
+            </nav>
+        @endif
     @endif
 @endsection

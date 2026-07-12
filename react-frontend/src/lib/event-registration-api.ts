@@ -162,12 +162,44 @@ export interface RegistrationRetentionRun {
   completed_at: string;
 }
 
+export interface RegistrationOverviewPage {
+  page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  page_count: number;
+  from: number | null;
+  to: number | null;
+  has_more: boolean;
+  previous_page: number | null;
+  next_page: number | null;
+}
+
+export interface RegistrationOverviewQuery {
+  submissions_page?: number;
+  submissions_per_page?: number;
+  campaigns_page?: number;
+  campaigns_per_page?: number;
+  guests_page?: number;
+  guests_per_page?: number;
+}
+
 export interface EventRegistrationOverview {
   settings: RegistrationSettings | null;
   forms: RegistrationForm[];
   submissions: RegistrationSubmission[];
   campaigns: InvitationCampaign[];
   guests: RegistrationGuest[];
+  pagination?: {
+    submissions: RegistrationOverviewPage;
+    campaigns: RegistrationOverviewPage;
+    guests: RegistrationOverviewPage;
+  };
+  summary?: {
+    submissions_total: number;
+    campaigns_total: number;
+    guests_total: number;
+  };
   permissions: {
     view_roster: boolean;
     view_sensitive_answers: boolean;
@@ -230,8 +262,15 @@ function questionPayload(question: RegistrationQuestion): Omit<RegistrationQuest
 }
 
 export const eventRegistrationApi = {
-  organizerOverview: (eventId: number) =>
-    api.get<EventRegistrationOverview>(`/v2/events/${eventId}/registration-product/manage`),
+  organizerOverview: (eventId: number, query: RegistrationOverviewQuery = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([name, value]) => {
+      if (value !== undefined) params.set(name, String(value));
+    });
+    const suffix = params.size > 0 ? `?${params.toString()}` : '';
+
+    return api.get<EventRegistrationOverview>(`/v2/events/${eventId}/registration-product/manage${suffix}`);
+  },
 
   attendeeState: (eventId: number) =>
     api.get<AttendeeRegistrationState>(`/v2/events/${eventId}/registration-product`),

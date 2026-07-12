@@ -63,6 +63,7 @@
   "load_history_error": "Impossible de charger l’historique d’audit.",
   "history_title": "Historique d’audit du message",
   "loading_history": "Chargement de l’historique d’audit",
+  "history_load_more": "Charger plus d’historique",
   "history_entry_meta": "Révision {{version}} · {{date}}",
   "variants": { "announcement": "Annonce", "follow_up": "Suivi après l’événement", "review_request": "Demande d’avis" },
   "statuses": { "draft": "Brouillon", "scheduled": "Programmé", "sending": "En cours d’envoi", "sent": "Envoyé", "cancelled": "Annulé", "failed": "Échec" },

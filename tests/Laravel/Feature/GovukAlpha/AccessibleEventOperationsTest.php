@@ -85,6 +85,42 @@ final class AccessibleEventOperationsTest extends TestCase
         $this->get($checkInPath)->assertForbidden();
     }
 
+    public function test_co_organizer_can_confirm_and_submit_a_moderated_draft(): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'moderation.enabled'],
+            ['setting_value' => '1', 'updated_at' => now()],
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'moderation.require_event'],
+            ['setting_value' => '1', 'updated_at' => now()],
+        );
+        $owner = $this->member('Accessible Publication Owner');
+        $manager = $this->member('Accessible Co-organizer');
+        $eventId = $this->event($owner, false, [
+            'status' => 'draft',
+            'publication_status' => 'draft',
+        ]);
+        $this->assignStaff($eventId, $manager, EventStaffRole::CoOrganizer, $owner);
+        Sanctum::actingAs($manager, ['*']);
+        $path = "/{$this->testTenantSlug}/accessible/events/{$eventId}";
+
+        $this->get($path)
+            ->assertOk()
+            ->assertSeeText(__('govuk_alpha.events.submit_for_review'))
+            ->assertSeeText(__('govuk_alpha.events.publication_submit_confirm'));
+        $this->accessiblePost($path . '/submit', [])
+            ->assertRedirect($path . '?status=event-submitted');
+
+        self::assertSame('pending_review', DB::table('events')->where('id', $eventId)->value('publication_status'));
+        self::assertSame(1, DB::table('content_moderation_queue')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('content_type', 'event')
+            ->where('content_id', $eventId)
+            ->where('status', 'pending')
+            ->count());
+    }
+
     public function test_check_in_staff_receive_redacted_roster_and_version_conflicts_use_prg(): void
     {
         $owner = $this->member('Accessible Attendance Owner');

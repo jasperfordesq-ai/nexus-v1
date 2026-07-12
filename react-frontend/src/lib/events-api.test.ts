@@ -94,6 +94,7 @@ function canonicalEvent(overrides: Record<string, unknown> = {}) {
       message: false,
       export: false,
       publish: false,
+      submit_for_review: false,
       manage_agenda: false,
       manage_staff: false,
       manage_registration: false,
@@ -213,6 +214,327 @@ describe('Events v2 API boundary', () => {
     const [endpoint, options] = apiMock.get.mock.calls[0];
     expect(endpoint).toBe('/v2/events?when=upcoming&category_id=4');
     expect(new Headers(options.headers).get(EVENTS_CONTRACT_HEADER)).toBe(String(EVENTS_CONTRACT_VERSION));
+  });
+
+  it('strictly validates the authoritative recurrence capability contract', async () => {
+    apiMock.get.mockResolvedValue({
+      success: true,
+      data: {
+        contract_version: 1,
+        engine: 'legacy',
+        structured_input: true,
+        supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+        max_occurrences: 52,
+        supported_end_types: ['after_count', 'on_date'],
+        supports_rolling_never: false,
+        supports_effective_revisions: false,
+        supports_definition_blueprints: false,
+        schema_ready: true,
+        rollout_state: 'legacy',
+      },
+      meta: { contract: 'events-v2' },
+    });
+
+    const response = await eventsApi.recurrenceCapabilities();
+
+    expect(response.success).toBe(true);
+    expect(response.data?.max_occurrences).toBe(52);
+    expect(response.data?.supports_effective_revisions).toBe(false);
+    const [endpoint, options] = apiMock.get.mock.calls[0];
+    expect(endpoint).toBe('/v2/events/recurrence-capabilities');
+    expect(new Headers(options.headers).get(EVENTS_CONTRACT_HEADER)).toBe('2');
+  });
+
+  it('submits and publishes using the unchanged strict canonical Event envelope', async () => {
+    const pending = canonicalEvent();
+    pending.schedule = {
+      ...pending.schedule,
+      state: 'pending_review',
+      publication_state: 'pending_review',
+    };
+    apiMock.post
+      .mockResolvedValueOnce({ success: true, data: pending })
+      .mockResolvedValueOnce({ success: true, data: canonicalEvent() });
+
+    const submitted = await eventsApi.submitForReview(101);
+    const published = await eventsApi.publish(101);
+
+    expect(submitted.success).toBe(true);
+    expect(submitted.data?.schedule.publication_state).toBe('pending_review');
+    expect(published.success).toBe(true);
+    expect(apiMock.post).toHaveBeenNthCalledWith(1, '/v2/events/101/submit', {}, expect.any(Object));
+    expect(apiMock.post).toHaveBeenNthCalledWith(2, '/v2/events/101/publish', {}, expect.any(Object));
+  });
+
+  it('sends explicit recurrence scope with a cover image upload', async () => {
+    apiMock.upload.mockResolvedValue({ success: true, data: { image_url: '/uploads/events/cover.jpg' } });
+    const formData = new FormData();
+
+    const response = await eventsApi.uploadCover(101, formData, 'all');
+
+    expect(response).toMatchObject({ success: true, data: { image_url: '/uploads/events/cover.jpg' } });
+    expect(apiMock.upload).toHaveBeenCalledWith(
+      '/v2/events/101/image?scope=all',
+      formData,
+      'image',
+      expect.any(Object),
+    );
+  });
+
+  it('previews and commits effective-dated recurrence revisions with a stable idempotency key', async () => {
+    const patch = { title: 'Updated workshop', local_start_time: '11:30', timezone: 'Europe/Dublin' };
+    const impact = {
+      affected_event_ids: [101, 102],
+      affected_count: 2,
+      changed_event_ids: [101, 102],
+      changed_count: 2,
+      moved_occurrences: [],
+      created_occurrences: [],
+      retired_occurrences: [],
+      registrations_count: 4,
+      waitlist_count: 1,
+      ticket_count: 0,
+      reminder_count: 3,
+      unique_recipient_count: 4,
+      customized_exception_conflicts: [],
+      blocking_conflicts: [],
+    };
+    apiMock.post
+      .mockResolvedValueOnce({
+        success: true,
+        data: {
+          preview_token: 'private-preview-token',
+          preview_expires_at: '2030-04-01T08:05:00Z',
+          scope: 'this_and_future',
+          selected_event_id: 101,
+          root_event_id: 99,
+          effective_from_utc: '2030-05-01 10:15:00',
+          can_commit: true,
+          impact,
+        },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: {
+          revision_id: 7,
+          root_event_id: 99,
+          revision_version: 2,
+          effective_from_utc: '2030-05-01 10:15:00',
+          changed_event_ids: [101, 102],
+          changed_count: 2,
+          notification_recipient_count: 4,
+          notification_outbox_id: 501,
+          idempotent_replay: false,
+          created_at: '2030-04-01T08:00:00Z',
+        },
+      });
+
+    const preview = await eventsApi.previewRecurrenceRevision(101, patch);
+    const committed = await eventsApi.commitRecurrenceRevision(
+      101,
+      patch,
+      preview.data!.preview_token,
+      'web-recurrence-revision-1',
+    );
+
+    expect(preview.data?.impact.changed_count).toBe(2);
+    expect(committed.data?.revision_version).toBe(2);
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      1,
+      '/v2/events/101/recurrence-revisions/preview',
+      { patch },
+      expect.any(Object),
+    );
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      2,
+      '/v2/events/101/recurrence-revisions/commit',
+      { patch, preview_token: 'private-preview-token' },
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+    const commitHeaders = new Headers(apiMock.post.mock.calls[1]?.[2]?.headers);
+    expect(commitHeaders.get('Idempotency-Key')).toBe('web-recurrence-revision-1');
+  });
+
+  it('validates definition blueprint history, preview and commit with contracted idempotency', async () => {
+    const sections = {
+      agenda: true,
+      ticket_types: true,
+      registration: true,
+      safety: true,
+      staff: false,
+    };
+    const counts = { sessions: 2, ticket_types: 1, registration_settings: 1 };
+    const historyItem = {
+      blueprint_id: 41,
+      blueprint_version: 2,
+      schema_version: 1,
+      effective_from_recurrence_id: '20300506T090000Z',
+      source_event_id: 101,
+      source_recurrence_id: '20300506T090000Z',
+      selected_sections: sections,
+      counts,
+      manifest_hash: 'a'.repeat(64),
+      captured_by_user_id: 7,
+      created_at: '2030-04-01 08:00:00',
+    };
+    const preview = {
+      preview_token: 'signed-private-preview-token',
+      preview_expires_at: '2030-04-01T08:05:00+00:00',
+      schema_version: 1,
+      root_event_id: 99,
+      source_event_id: 101,
+      source_recurrence_id: '20300506T090000Z',
+      effective_from_recurrence_id: '20300506T090000Z',
+      selected_sections: sections,
+      manifest_hash: 'a'.repeat(64),
+      blueprint_set_version: 1,
+      counts,
+      conflicts: [],
+      can_commit: true,
+    };
+    const commit = {
+      blueprint_id: 42,
+      blueprint_version: 3,
+      schema_version: 1,
+      root_event_id: 99,
+      source_event_id: 101,
+      source_recurrence_id: '20300506T090000Z',
+      effective_from_recurrence_id: '20300506T090000Z',
+      selected_sections: sections,
+      manifest_hash: 'a'.repeat(64),
+      counts,
+      idempotent_replay: false,
+      created_at: '2030-04-01 08:01:00',
+    };
+    apiMock.get.mockResolvedValueOnce({
+      success: true,
+      data: { items: [historyItem], next_before_version: 2 },
+    });
+    apiMock.post
+      .mockResolvedValueOnce({ success: true, data: preview })
+      .mockResolvedValueOnce({ success: true, data: commit });
+
+    const history = await eventsApi.recurrenceDefinitionHistory(101, 10, 3);
+    const reviewed = await eventsApi.previewRecurrenceDefinitions(
+      101,
+      '20300506T090000Z',
+      sections,
+    );
+    const committed = await eventsApi.commitRecurrenceDefinitions(
+      101,
+      '20300506T090000Z',
+      sections,
+      reviewed.data!.preview_token,
+      'web-definition-blueprint-1',
+    );
+
+    expect(history.data?.items[0]?.blueprint_version).toBe(2);
+    expect(reviewed.data?.can_commit).toBe(true);
+    expect(committed.data?.blueprint_version).toBe(3);
+    expect(apiMock.get).toHaveBeenCalledWith(
+      '/v2/events/101/recurrence-definition-blueprints?limit=10&before_version=3',
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      1,
+      '/v2/events/101/recurrence-definition-blueprints/preview',
+      { effective_from_recurrence_id: '20300506T090000Z', sections },
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      2,
+      '/v2/events/101/recurrence-definition-blueprints/commit',
+      {
+        effective_from_recurrence_id: '20300506T090000Z',
+        sections,
+        preview_token: 'signed-private-preview-token',
+      },
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+    const historyHeaders = new Headers(apiMock.get.mock.calls[0]?.[1]?.headers);
+    const previewHeaders = new Headers(apiMock.post.mock.calls[0]?.[2]?.headers);
+    const commitHeaders = new Headers(apiMock.post.mock.calls[1]?.[2]?.headers);
+    expect(historyHeaders.get(EVENTS_CONTRACT_HEADER)).toBe('2');
+    expect(previewHeaders.get(EVENTS_CONTRACT_HEADER)).toBe('2');
+    expect(commitHeaders.get(EVENTS_CONTRACT_HEADER)).toBe('2');
+    expect(commitHeaders.get('Idempotency-Key')).toBe('web-definition-blueprint-1');
+  });
+
+  it('fails closed if a blueprint history response exposes manifest or staff identities', async () => {
+    apiMock.get.mockResolvedValue({
+      success: true,
+      data: {
+        items: [{
+          blueprint_id: 41,
+          blueprint_version: 2,
+          schema_version: 1,
+          effective_from_recurrence_id: '20300506T090000Z',
+          source_event_id: 101,
+          source_recurrence_id: '20300506T090000Z',
+          selected_sections: {
+            agenda: true,
+            ticket_types: false,
+            registration: false,
+            safety: false,
+            staff: false,
+          },
+          counts: { sessions: 1 },
+          manifest_hash: 'a'.repeat(64),
+          captured_by_user_id: 7,
+          created_at: '2030-04-01 08:00:00',
+          manifest: { private: true },
+          staff_user_ids: [44],
+        }],
+        next_before_version: null,
+      },
+    });
+
+    const response = await eventsApi.recurrenceDefinitionHistory(101);
+
+    expect(response).toMatchObject({ success: false, code: 'EVENTS_CONTRACT_DRIFT' });
+    expect(response.data).toBeUndefined();
+    expect(logErrorMock).toHaveBeenCalledWith(
+      'Events contract drift',
+      expect.objectContaining({ endpoint: expect.stringContaining('recurrence-definition-blueprints') }),
+    );
+  });
+
+  it('normalizes canonical and legacy waitlist mutation responses', async () => {
+    const event = canonicalEvent();
+    apiMock.post
+      .mockResolvedValueOnce({
+        success: true,
+        data: {
+          contract_version: 2,
+          event_id: 101,
+          relationship: {
+            ...event.relationship,
+            registration: {
+              ...event.relationship.registration,
+              state: 'waitlisted',
+              waitlist_position: 3,
+              can_register: false,
+              can_join_waitlist: false,
+              can_leave_waitlist: true,
+            },
+          },
+          metrics: { ...event.metrics, waitlist_count: 1 },
+          status: null,
+          rsvp_counts: { going: 8, interested: 2 },
+          waitlist_position: 3,
+          message: null,
+        },
+      })
+      .mockResolvedValueOnce({ success: true, data: { waitlisted: true, position: 4 } });
+
+    const canonical = await eventsApi.joinWaitlist(101);
+    const legacy = await eventsApi.joinWaitlist(101);
+
+    expect(canonical).toMatchObject({ success: true, data: { waitlisted: true, position: 3 } });
+    expect(legacy).toMatchObject({ success: true, data: { waitlisted: true, position: 4 } });
+    expect(apiMock.post).toHaveBeenNthCalledWith(1, '/v2/events/101/waitlist', {}, expect.any(Object));
+    expect(new Headers(apiMock.post.mock.calls[0]?.[2]?.headers).get(EVENTS_CONTRACT_HEADER))
+      .toBe(String(EVENTS_CONTRACT_VERSION));
   });
 
   it('validates versioned reminder preferences and sends reset revision in the query', async () => {

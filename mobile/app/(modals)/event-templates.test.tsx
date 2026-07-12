@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockGetTemplates = jest.fn();
 const mockGetHistory = jest.fn();
@@ -107,6 +107,39 @@ const template = {
   capabilities: { materialize: true, view_audit: true },
 };
 
+const secondTemplate = {
+  ...template,
+  id: 5,
+  source_event: { id: 10, title: 'Second source event' },
+  version: {
+    ...template.version,
+    configuration: { ...template.version.configuration, title: 'Second reusable event' },
+  },
+};
+
+function auditEntry(id: number, materializedEventId: number) {
+  return {
+    id,
+    action: 'materialized',
+    template_version: 1,
+    source_event_id: 9,
+    materialized_event_id: materializedEventId,
+    evidence: {},
+    created_at: '2026-07-11T10:00:00+00:00',
+    immutable: true,
+  };
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockGetTemplates.mockResolvedValue({
@@ -129,6 +162,7 @@ beforeEach(() => {
     will_create: {
       publication_status: 'draft',
       publish: false,
+      submit_for_review: false,
       register: false,
       notify: false,
       federate: false,
@@ -277,5 +311,116 @@ describe('EventTemplatesScreen', () => {
 
     await waitFor(() => expect(mockGetHistory).toHaveBeenLastCalledWith(4, 'audit-cursor-18'));
     expect(await screen.findByText('Template revised')).toBeTruthy();
+  });
+
+  it('ignores an older template audit response after another template is opened', async () => {
+    const first = deferred<{
+      data: ReturnType<typeof auditEntry>[];
+      meta: { per_page: number; next_cursor: null; has_more: false };
+    }>();
+    const second = deferred<{
+      data: ReturnType<typeof auditEntry>[];
+      meta: { per_page: number; next_cursor: null; has_more: false };
+    }>();
+    mockGetTemplates.mockResolvedValue({
+      data: [template, secondTemplate],
+      meta: { per_page: 20, next_cursor: null, has_more: false },
+    });
+    mockGetHistory.mockReset()
+      .mockReturnValueOnce(first.promise)
+      .mockReturnValueOnce(second.promise);
+    const screen = render(<EventTemplatesScreen />);
+    await screen.findByText('Second reusable event');
+
+    fireEvent.press(screen.getByTestId('event-template-audit-button-4'));
+    expect(await screen.findByText('Audit: Reusable event')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('event-template-audit-button-5'));
+    expect(await screen.findByText('Audit: Second reusable event')).toBeTruthy();
+
+    await act(async () => {
+      second.resolve({
+        data: [auditEntry(28, 202)],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    });
+    expect(await screen.findByText('Created event #202')).toBeTruthy();
+
+    await act(async () => {
+      first.resolve({
+        data: [auditEntry(18, 101)],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Created event #101')).toBeNull();
+      expect(screen.getByText('Created event #202')).toBeTruthy();
+    });
+  });
+
+  it('does not append a prior template load-more response after switching audits', async () => {
+    const olderPage = deferred<{
+      data: ReturnType<typeof auditEntry>[];
+      meta: { per_page: number; next_cursor: null; has_more: false };
+    }>();
+    mockGetTemplates.mockResolvedValue({
+      data: [template, secondTemplate],
+      meta: { per_page: 20, next_cursor: null, has_more: false },
+    });
+    mockGetHistory.mockReset()
+      .mockResolvedValueOnce({
+        data: [auditEntry(18, 101)],
+        meta: { per_page: 50, next_cursor: 'older-audit-page', has_more: true },
+      })
+      .mockReturnValueOnce(olderPage.promise)
+      .mockResolvedValueOnce({
+        data: [auditEntry(28, 202)],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    const screen = render(<EventTemplatesScreen />);
+    await screen.findByText('Second reusable event');
+
+    fireEvent.press(screen.getByTestId('event-template-audit-button-4'));
+    await screen.findByText('Created event #101');
+    fireEvent.press(screen.getByText('Load more'));
+    await waitFor(() => expect(mockGetHistory).toHaveBeenCalledWith(4, 'older-audit-page'));
+    fireEvent.press(screen.getByTestId('event-template-audit-button-5'));
+    expect(await screen.findByText('Created event #202')).toBeTruthy();
+
+    await act(async () => {
+      olderPage.resolve({
+        data: [auditEntry(17, 303)],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Created event #303')).toBeNull();
+      expect(screen.getByText('Created event #202')).toBeTruthy();
+    });
+  });
+
+  it('invalidates an audit request when the history panel is closed', async () => {
+    const pending = deferred<{
+      data: ReturnType<typeof auditEntry>[];
+      meta: { per_page: number; next_cursor: null; has_more: false };
+    }>();
+    mockGetHistory.mockReset().mockReturnValue(pending.promise);
+    const screen = render(<EventTemplatesScreen />);
+    await screen.findByText('Reusable event');
+
+    fireEvent.press(screen.getByText('Audit history'));
+    expect(await screen.findByText('Audit: Reusable event')).toBeTruthy();
+    fireEvent.press(screen.getByText('Done'));
+    expect(screen.queryByText('Audit: Reusable event')).toBeNull();
+
+    await act(async () => {
+      pending.resolve({
+        data: [auditEntry(18, 101)],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Created event #101')).toBeNull();
+      expect(screen.queryByText('Audit: Reusable event')).toBeNull();
+    });
   });
 });

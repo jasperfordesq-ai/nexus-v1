@@ -15,6 +15,7 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Support\Authorization\AdminTier;
 use App\Support\Events\EventSafetyFoundationSupport;
 use App\Support\Events\EventNotificationOutboxHandleResult;
 use Carbon\CarbonImmutable;
@@ -71,7 +72,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             : EventNotificationChannelConfiguration::resolve();
         $superseded = $this->participantFactSuperseded($tenantId, $eventId, $descriptor, $payload);
 
-        $event = DB::table('events')
+        $aggregateEvent = DB::table('events')
             ->where('tenant_id', $tenantId)
             ->where('id', $eventId)
             ->first([
@@ -86,14 +87,65 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
                 'status',
                 'publication_status',
                 'operational_status',
+                'parent_event_id',
+                'is_recurring_template',
             ]);
-        if ($event === null) {
+        if ($aggregateEvent === null) {
             throw new RuntimeException('event_notification_event_not_found');
         }
+        $event = $this->presentationEvent($tenantId, $aggregateEvent, $descriptor, $payload);
+        $payload['presentation_event_id'] = (int) $event->id;
 
-        $plans = $this->recipientPlans($tenantId, $eventId, (int) $event->user_id, $descriptor, $payload);
+        $plans = $this->recipientPlans(
+            $tenantId,
+            $eventId,
+            (int) $aggregateEvent->user_id,
+            $descriptor,
+            $payload,
+        );
         if ($plans === []) {
             return new EventNotificationOutboxHandleResult(0, 0, 0, true);
+        }
+        $seriesMetadata = is_array($payload['metadata']['series'] ?? null)
+            ? $payload['metadata']['series']
+            : [];
+        $recipientContextIds = $this->recipientEventContexts(
+            $tenantId,
+            $eventId,
+            $plans,
+            $seriesMetadata,
+        );
+        $contextEvents = collect([(int) $event->id => $event]);
+        $requestedContextIds = array_values(array_unique(array_diff(
+            array_values($recipientContextIds),
+            [(int) $event->id],
+        )));
+        if ($requestedContextIds !== []) {
+            $resolvedContexts = DB::table('events')
+                ->where('tenant_id', $tenantId)
+                ->where('parent_event_id', $eventId)
+                ->where('is_recurring_template', 0)
+                ->whereIn('id', $requestedContextIds)
+                ->get([
+                    'id',
+                    'tenant_id',
+                    'user_id',
+                    'title',
+                    'start_time',
+                    'timezone',
+                    'all_day',
+                    'calendar_sequence',
+                    'status',
+                    'publication_status',
+                    'operational_status',
+                    'parent_event_id',
+                    'is_recurring_template',
+                ])
+                ->keyBy('id');
+            if ($resolvedContexts->count() !== count($requestedContextIds)) {
+                throw new RuntimeException('event_notification_recipient_context_invalid');
+            }
+            $contextEvents = $contextEvents->union($resolvedContexts);
         }
 
         $users = DB::table('users')
@@ -125,13 +177,17 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             }
 
             try {
+                $recipientEvent = $contextEvents->get($recipientContextIds[$userId] ?? (int) $event->id);
+                if ($recipientEvent === null) {
+                    throw new RuntimeException('event_notification_recipient_context_invalid');
+                }
                 $statuses = LocaleContext::withLocale(
                     $recipient,
                     fn (): array => $this->deliverRecipient(
                         $outbox,
                         $payload,
                         $descriptor,
-                        $event,
+                        $recipientEvent,
                         $recipient,
                         $audience,
                         $channels,
@@ -357,7 +413,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
                     );
                 }
 
-                return Mailer::forCurrentTenant()->send(
+                return EmailDispatchService::sendRaw(
                     $guardianEmail,
                     $subject,
                     $html,
@@ -430,6 +486,252 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
     }
 
     /**
+     * Series facts retain the template as their aggregate identity, but every
+     * member-facing decision must use a concrete occurrence for preferences,
+     * rendering, and links.
+     *
+     * @param array{kind:string,state:string,notification_type:string,offer_secret:bool} $descriptor
+     * @param array<string,mixed> $payload
+     */
+    private function presentationEvent(
+        int $tenantId,
+        object $aggregateEvent,
+        array $descriptor,
+        array $payload,
+    ): object {
+        if (! (bool) ($aggregateEvent->is_recurring_template ?? false)) {
+            return $aggregateEvent;
+        }
+        if (! in_array($descriptor['kind'], ['update', 'lifecycle'], true)) {
+            throw new RuntimeException('event_notification_recurring_template_subject_invalid');
+        }
+
+        $series = is_array($payload['metadata']['series'] ?? null)
+            ? $payload['metadata']['series']
+            : [];
+        $explicit = max(0, (int) ($payload['presentation_event_id']
+            ?? $series['presentation_event_id']
+            ?? 0));
+        $candidateIds = [];
+        if ($explicit > 0) {
+            $candidateIds[] = $explicit;
+        } else {
+            foreach ([
+                $series['effective_from_event_id'] ?? null,
+                $payload['effective_from_event_id'] ?? null,
+            ] as $candidate) {
+                $candidate = max(0, (int) $candidate);
+                if ($candidate > 0) {
+                    $candidateIds[] = $candidate;
+                }
+            }
+            foreach ((array) ($series['affected_event_ids'] ?? []) as $candidate) {
+                $candidate = max(0, (int) $candidate);
+                if ($candidate > 0 && $candidate !== (int) $aggregateEvent->id) {
+                    $candidateIds[] = $candidate;
+                }
+            }
+        }
+        $candidateIds = array_values(array_unique($candidateIds));
+        $candidates = $candidateIds === []
+            ? collect()
+            : DB::table('events')
+                ->where('tenant_id', $tenantId)
+                ->where('parent_event_id', (int) $aggregateEvent->id)
+                ->where('is_recurring_template', 0)
+                ->whereIn('id', $candidateIds)
+                ->get([
+                'id',
+                'tenant_id',
+                'user_id',
+                'title',
+                'start_time',
+                'timezone',
+                'all_day',
+                'calendar_sequence',
+                'status',
+                'publication_status',
+                'operational_status',
+                'parent_event_id',
+                'is_recurring_template',
+                ])
+                ->keyBy('id');
+        if ($explicit > 0) {
+            $presentation = $candidates->get($explicit);
+            if ($presentation === null) {
+                throw new RuntimeException('event_notification_presentation_event_invalid');
+            }
+
+            return $presentation;
+        }
+        foreach ($candidateIds as $candidateId) {
+            $presentation = $candidates->get($candidateId);
+            if ($presentation !== null) {
+                return $presentation;
+            }
+        }
+        $fallback = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('parent_event_id', (int) $aggregateEvent->id)
+            ->where('is_recurring_template', 0)
+            ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
+            ->orderBy('start_time')
+            ->orderBy('id')
+            ->first([
+                'id',
+                'tenant_id',
+                'user_id',
+                'title',
+                'start_time',
+                'timezone',
+                'all_day',
+                'calendar_sequence',
+                'status',
+                'publication_status',
+                'operational_status',
+                'parent_event_id',
+                'is_recurring_template',
+            ]);
+        if ($fallback === null) {
+            throw new RuntimeException('event_notification_presentation_event_missing');
+        }
+
+        return $fallback;
+    }
+
+    /**
+     * Older series aggregate producers did not persist a recipient-to-
+     * occurrence map. Derive only the missing entries from the bounded set of
+     * affected concrete IDs so event-level opt-outs and links remain exact.
+     *
+     * @param array<int,string> $plans
+     * @param array<string,mixed> $series
+     * @return array<int,int>
+     */
+    private function recipientEventContexts(
+        int $tenantId,
+        int $rootEventId,
+        array $plans,
+        array $series,
+    ): array {
+        $contexts = [];
+        foreach ((array) ($series['recipient_event_ids'] ?? []) as $recipientId => $contextEventId) {
+            $recipientId = (int) $recipientId;
+            $contextEventId = (int) $contextEventId;
+            if (isset($plans[$recipientId]) && $contextEventId > 0) {
+                $contexts[$recipientId] = $contextEventId;
+            }
+        }
+
+        $recipientIds = array_values(array_filter(
+            array_map(static fn (int|string $id): int => (int) $id, array_keys($plans)),
+            static fn (int $id): bool => $id > 0 && ! isset($contexts[$id]),
+        ));
+        $affectedIds = array_values(array_unique(array_filter(
+            array_map(
+                static fn (mixed $id): int => (int) $id,
+                (array) ($series['affected_event_ids'] ?? []),
+            ),
+            static fn (int $id): bool => $id > 0 && $id !== $rootEventId,
+        )));
+        if ($recipientIds === [] || $affectedIds === []) {
+            ksort($contexts, SORT_NUMERIC);
+            return $contexts;
+        }
+
+        $concreteRows = collect();
+        foreach (array_chunk($affectedIds, 250) as $eventChunk) {
+            $concreteRows = $concreteRows->merge(DB::table('events')
+                ->where('tenant_id', $tenantId)
+                ->where('parent_event_id', $rootEventId)
+                ->where('is_recurring_template', 0)
+                ->whereIn('id', $eventChunk)
+                ->get(['id', 'start_time']));
+        }
+        $threshold = now()->format('Y-m-d H:i:s');
+        $orderedEventRows = $concreteRows
+            ->unique('id')
+            ->sort(static function (object $left, object $right) use ($threshold): int {
+                $leftFuture = (string) $left->start_time >= $threshold ? 0 : 1;
+                $rightFuture = (string) $right->start_time >= $threshold ? 0 : 1;
+                if ($leftFuture !== $rightFuture) {
+                    return $leftFuture <=> $rightFuture;
+                }
+                $timeOrder = strcmp((string) $left->start_time, (string) $right->start_time);
+
+                return $timeOrder !== 0 ? $timeOrder : ((int) $left->id <=> (int) $right->id);
+            })
+            ->values();
+        $orderedEventIds = $orderedEventRows
+            ->map(static fn (object $row): int => (int) $row->id)
+            ->all();
+        if ($orderedEventIds === []) {
+            ksort($contexts, SORT_NUMERIC);
+            return $contexts;
+        }
+
+        $candidateSets = [];
+        $record = static function ($baseQuery) use (
+            $tenantId,
+            $orderedEventIds,
+            $recipientIds,
+            &$candidateSets,
+        ): void {
+            foreach (array_chunk($orderedEventIds, 250) as $eventChunk) {
+                foreach (array_chunk($recipientIds, 250) as $recipientChunk) {
+                    $rows = (clone $baseQuery)
+                        ->where('tenant_id', $tenantId)
+                        ->whereIn('event_id', $eventChunk)
+                        ->whereIn('user_id', $recipientChunk)
+                        ->get(['event_id', 'user_id']);
+                    foreach ($rows as $row) {
+                        $eventId = (int) $row->event_id;
+                        $userId = (int) $row->user_id;
+                        if ($eventId > 0 && $userId > 0) {
+                            $candidateSets[$userId][$eventId] = true;
+                        }
+                    }
+                }
+            }
+        };
+
+        if (Schema::hasTable('event_registrations')) {
+            $record(DB::table('event_registrations')
+                ->whereIn('registration_state', ['invited', 'pending', 'confirmed']));
+        }
+        if (Schema::hasTable('event_waitlist_entries')) {
+            $record(DB::table('event_waitlist_entries')
+                ->whereIn('queue_state', ['waiting', 'offered']));
+        }
+        if (Schema::hasTable('event_rsvps')) {
+            $record(DB::table('event_rsvps')
+                ->whereIn('status', ['going', 'interested', 'maybe', 'invited', 'waitlisted']));
+        }
+        if (Schema::hasTable('event_staff_assignments')) {
+            $record(DB::table('event_staff_assignments')
+                ->where('status', 'active')
+                ->where(static fn ($expiry) => $expiry
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now())));
+        }
+        if (Schema::hasTable('event_waitlist')) {
+            $record(DB::table('event_waitlist')->where('status', 'waiting'));
+        }
+
+        foreach ($candidateSets as $recipientId => $eventSet) {
+            foreach ($orderedEventIds as $candidateId) {
+                if (isset($eventSet[$candidateId])) {
+                    $contexts[(int) $recipientId] = $candidateId;
+                    break;
+                }
+            }
+        }
+        ksort($contexts, SORT_NUMERIC);
+
+        return $contexts;
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array{kind:string,state:string,notification_type:string,offer_secret:bool}|null
      */
@@ -451,6 +753,9 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         }
 
         if ($action === 'event.updated') {
+            if (($payload['metadata']['notifications_suppressed'] ?? false) === true) {
+                return null;
+            }
             $changed = $payload['changed_fields'] ?? null;
             if (! is_array($changed) || $changed === [] || ! array_is_list($changed)) {
                 throw new RuntimeException('event_notification_update_fields_invalid');
@@ -465,19 +770,36 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         }
 
         if ($action === 'event.lifecycle.transitioned') {
+            if (($payload['metadata']['notifications_suppressed'] ?? false) === true) {
+                return null;
+            }
             $publicationFrom = (string) ($payload['publication']['from'] ?? '');
             $publicationTo = (string) ($payload['publication']['to'] ?? '');
             $operationalFrom = (string) ($payload['operational']['from'] ?? '');
             $operationalTo = (string) ($payload['operational']['to'] ?? '');
+            $seriesAction = (string) ($payload['metadata']['series']['action'] ?? '');
 
             $state = match (true) {
+                $seriesAction === 'reject'
+                    && $publicationFrom === $publicationTo
+                    && $operationalFrom === $operationalTo => 'rejected',
+                $seriesAction === 'restore'
+                    && $publicationFrom === $publicationTo
+                    && $operationalFrom === $operationalTo
+                    && $publicationTo === 'draft' => 'restored_private',
+                $seriesAction === 'restore'
+                    && $publicationFrom === $publicationTo
+                    && $operationalFrom === $operationalTo => 'restored',
                 $publicationTo === 'archived' => 'archived',
+                $publicationFrom === 'pending_review' && $publicationTo === 'draft' => 'rejected',
+                $publicationFrom === 'archived' && $publicationTo === 'draft' => 'restored_private',
                 $publicationFrom === 'archived' => 'restored',
                 $operationalTo === 'cancelled' => 'cancelled',
                 $operationalTo === 'postponed' => 'postponed',
                 $operationalTo === 'completed' => 'completed',
                 in_array($operationalFrom, ['cancelled', 'postponed'], true)
                     && $operationalTo === 'scheduled' => 'restored',
+                $publicationTo === 'pending_review' => 'pending_review',
                 $publicationTo === 'published' => 'published',
                 default => null,
             };
@@ -488,7 +810,11 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             return [
                 'kind' => 'lifecycle',
                 'state' => $state,
-                'notification_type' => $state === 'cancelled' ? 'event_cancellation' : 'event_lifecycle',
+                'notification_type' => match ($state) {
+                    'cancelled' => 'event_cancellation',
+                    'pending_review', 'rejected' => 'event_moderation',
+                    default => 'event_lifecycle',
+                },
                 'offer_secret' => false,
             ];
         }
@@ -750,10 +1076,47 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
                     })
                     ->where('status', 'active')
                     ->whereNull('deleted_at')
-                    ->pluck('id');
-                foreach ($admins as $adminId) {
-                    $add($plans, (int) $adminId, 'admin');
+                    ->get([
+                        'id',
+                        'role',
+                        'is_admin',
+                        'is_super_admin',
+                        'is_tenant_super_admin',
+                        'is_god',
+                    ]);
+                foreach ($admins as $admin) {
+                    if (AdminTier::allows($admin)) {
+                        $add($plans, (int) $admin->id, 'admin');
+                    }
                 }
+            } elseif ($descriptor['state'] === 'pending_review') {
+                $admins = DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where(static function ($admin): void {
+                        $admin->whereIn('role', ['super_admin', 'admin', 'tenant_admin', 'god'])
+                            ->orWhere('is_admin', 1)
+                            ->orWhere('is_super_admin', 1)
+                            ->orWhere('is_tenant_super_admin', 1)
+                            ->orWhere('is_god', 1);
+                    })
+                    ->where('status', 'active')
+                    ->whereNull('deleted_at')
+                    ->get([
+                        'id',
+                        'role',
+                        'is_admin',
+                        'is_super_admin',
+                        'is_tenant_super_admin',
+                        'is_god',
+                    ]);
+                foreach ($admins as $admin) {
+                    if (AdminTier::allows($admin)) {
+                        $add($plans, (int) $admin->id, 'admin');
+                    }
+                }
+            } elseif (in_array($descriptor['state'], ['rejected', 'restored_private'], true)) {
+                // These states are private. The organizer was added above;
+                // prior participants must not receive an inaccessible link.
             } else {
                 foreach ($this->participantIds($tenantId, $eventId) as $participantId) {
                     $add($plans, $participantId, 'member');
@@ -775,6 +1138,11 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             foreach ($this->participantIds($tenantId, $eventId) as $participantId) {
                 if ($participantId !== $organizerId) {
                     $add($plans, $participantId, 'member');
+                }
+            }
+            foreach ((array) ($payload['affected_recipient_user_ids'] ?? []) as $recipientId) {
+                if ((int) $recipientId !== $organizerId) {
+                    $add($plans, (int) $recipientId, 'member');
                 }
             }
             return $plans;
@@ -855,6 +1223,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
     ): array {
         $tenantId = (int) $outbox['tenant_id'];
         $eventId = (int) $outbox['event_id'];
+        $preferenceEventId = (int) $event->id;
         $userId = (int) $recipient->id;
         $rendered = $this->render($descriptor, $payload, $event, $recipient, $audience);
         $deliveryService = $this->deliveries ?? new EventReminderChannelDeliveryService();
@@ -862,6 +1231,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         $eligible = (string) ($recipient->status ?? '') === 'active'
             && ($recipient->deleted_at ?? null) === null;
         $recipientDescriptor = $descriptor;
+        $recipientDescriptor['preference_event_id'] = $preferenceEventId;
         $recipientDescriptor['offer_secret'] = $descriptor['offer_secret']
             && $audience === 'member'
             && $userId === (int) ($payload['user_id'] ?? 0);
@@ -933,9 +1303,10 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             if ($descriptor['kind'] !== 'reminder') {
                 $preferenceReason = $this->guardianStatusChannelSuppression(
                     $tenantId,
-                    $eventId,
+                    $preferenceEventId,
                     $userId,
                     $channel,
+                    false,
                 );
                 if ($preferenceReason !== null) {
                     $deliveryService->markSuppressed(
@@ -993,6 +1364,14 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             && $audience === 'admin') {
             return ['event.admin_publication.created', 1];
         }
+        if ($descriptor['kind'] === 'lifecycle'
+            && $descriptor['state'] === 'pending_review'
+            && $audience === 'admin') {
+            return [
+                'event.admin_moderation.submitted',
+                max(1, (int) $outbox['aggregate_version']),
+            ];
+        }
 
         return [(string) $outbox['action'], max(1, (int) $outbox['aggregate_version'])];
     }
@@ -1046,6 +1425,16 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
                     'is_online', 'online_link', 'allow_remote_attendance' => 'online_access',
                     'max_attendees' => 'capacity',
                     'venue_accessibility' => 'accessibility',
+                    'accessibility_step_free',
+                    'accessibility_toilet',
+                    'accessibility_hearing_loop',
+                    'accessibility_quiet_space',
+                    'accessibility_seating',
+                    'accessibility_parking',
+                    'accessibility_parking_details',
+                    'accessibility_transit_details',
+                    'accessibility_assistance_contact',
+                    'accessibility_notes' => 'accessibility',
                     'cancellation_policy' => 'cancellation_policy',
                     default => null,
                 };
@@ -1061,7 +1450,10 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
                 'title' => $title,
                 'changes' => implode(__('event_notifications.update.separator'), $labels),
             ]);
-            if ((string) ($payload['recurrence_scope'] ?? 'single') === 'all') {
+            if (in_array((string) ($payload['recurrence_scope'] ?? 'single'), [
+                'all',
+                'this_and_future',
+            ], true)) {
                 $message .= ' ' . __('event_notifications.update.series_scope');
             }
         } elseif ($audience === 'organizer') {
@@ -1081,14 +1473,26 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
             $status = $descriptor['state'] === 'granted' ? 'active' : 'withdrawn';
             $message = __("event_safety.govuk.guardian_status.{$status}");
         } else {
-            $message = __("event_notifications.{$descriptor['kind']}.{$descriptor['state']}", $params);
+            $messageState = $descriptor['state'] === 'restored_private'
+                ? 'restored'
+                : $descriptor['state'];
+            $message = __("event_notifications.{$descriptor['kind']}.{$messageState}", $params);
         }
 
-        if ($descriptor['state'] === 'cancelled' && trim((string) ($payload['reason'] ?? '')) !== '') {
+        if (in_array($descriptor['state'], ['cancelled', 'rejected'], true)
+            && trim((string) ($payload['reason'] ?? '')) !== '') {
             $message .= ' ' . __('event_notifications.reason', ['reason' => (string) $payload['reason']]);
         }
 
-        $path = '/events/' . (int) $event->id;
+        $path = match (true) {
+            $descriptor['kind'] === 'lifecycle'
+                && $descriptor['state'] === 'pending_review'
+                && $audience === 'admin' => '/admin/events?publication_state=pending_review',
+            $descriptor['kind'] === 'lifecycle'
+                && $descriptor['state'] === 'archived'
+                && $audience !== 'admin' => '/events',
+            default => '/events/' . (int) $event->id,
+        };
         $recipientName = $recipient->first_name ?? $recipient->name ?? __('emails.common.fallback_name');
         $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $path;
         $html = EmailTemplateBuilder::make()
@@ -1155,11 +1559,13 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         int $eventId,
         int $userId,
         string $channel,
+        bool $allowRecurringTemplate = false,
     ): ?string {
         $preferences = EventNotificationPreferenceResolver::resolveForEvent(
             $userId,
             $tenantId,
             $eventId,
+            $allowRecurringTemplate,
         );
         $channels = is_array($preferences['channels'] ?? null)
             ? $preferences['channels']
@@ -1447,6 +1853,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
     ): void {
         $tenantId = (int) $outbox['tenant_id'];
         $eventId = (int) $outbox['event_id'];
+        $preferenceEventId = max(1, (int) ($descriptor['preference_event_id'] ?? $eventId));
         $userId = (int) $recipient->id;
         $deliveryId = (int) $delivery['id'];
         if (! EventNotificationPreferenceResolver::allowsEmail($userId, $tenantId)) {
@@ -1459,7 +1866,7 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         $frequency = EventNotificationPreferenceResolver::resolveForEvent(
             $userId,
             $tenantId,
-            $eventId,
+            $preferenceEventId,
         )['cadence'];
         if ($frequency === 'off') {
             $service->markSuppressed($tenantId, $deliveryId, 'email_frequency_off', 'frequency');

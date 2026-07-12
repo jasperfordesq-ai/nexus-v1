@@ -25,7 +25,9 @@
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="MAIL_DRIVER" value="array"/>
-    <env name="LOG_CHANNEL" value="null"/>
+    <!-- Laravel normalizes an unquoted `null` environment value to PHP null.
+         Preserve the quotes so the configured no-op channel name is selected. -->
+    <env name="LOG_CHANNEL" value="&quot;null&quot;"/>
     <!-- Tests must NOT instantiate the real Pusher broadcaster. PUSHER_* are
          unset in CI/test, so BroadcastServiceProvider::boot() resolving the
          default ('pusher') connection makes Pusher::__construct() throw on a

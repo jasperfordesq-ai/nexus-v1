@@ -30,6 +30,24 @@ final class EventFederationPublisher
         Event $event,
         ?EventFederationTombstoneReason $forcedTombstone = null,
     ): array {
+        if ($forcedTombstone === null && (bool) $event->getAttribute('is_recurring_template')) {
+            $tenantId = (int) $event->getAttribute('tenant_id');
+            $eventId = (int) $event->getKey();
+            $latestDeliveredVersion = (int) DB::table('event_federation_deliveries')
+                ->where('tenant_id', $tenantId)
+                ->where('event_id', $eventId)
+                ->max('event_aggregate_version');
+            $currentVersion = (int) ($event->getAttribute('federation_version') ?? 0);
+            if ($latestDeliveredVersion > 0 && $currentVersion <= $latestDeliveredVersion) {
+                $nextVersion = $latestDeliveredVersion + 1;
+                $now = now();
+                DB::table('events')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $eventId)
+                    ->update(['federation_version' => $nextVersion, 'updated_at' => $now]);
+                $event->forceFill(['federation_version' => $nextVersion, 'updated_at' => $now]);
+            }
+        }
         $payload = $this->payloads->build($event, $forcedTombstone);
 
         return $this->enqueuePayload($payload);

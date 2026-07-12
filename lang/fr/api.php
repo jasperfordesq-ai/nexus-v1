@@ -675,6 +675,8 @@ return [
     'event_series_not_found' => 'Series not found',
     'event_series_id_required' => 'series_id is required',
     'event_scope_must_be_single_or_all' => 'scope must be "single" or "all"',
+    'event_recurrence_template_requires_all_scope' => 'Les modèles récurrents ne peuvent être modifiés qu’avec la portée « all ».',
+    'event_recurring_schedule_requires_revision' => 'Les changements d’horaire d’une série récurrente doivent utiliser le flux prévisualisé pour cette date et les suivantes.',
     'event_no_image_uploaded' => 'No image file uploaded or upload error',
     'event_image_upload_failed' => 'Failed to upload image',
     'ai_streaming_not_available' => 'Streaming chat is not yet available. Use the standard chat endpoint.',

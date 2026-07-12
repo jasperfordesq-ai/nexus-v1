@@ -68,7 +68,7 @@ export const userSchema = z.object({
   username: z.string().optional(),
   avatar: z.string().nullable().optional(),
   avatar_url: z.string().nullable().optional(),
-  bio: z.string().optional(),
+  bio: z.string().nullable().optional(),
   role: z.enum(['member', 'admin', 'moderator', 'tenant_admin', 'super_admin']).optional(),
   status: z.enum(['active', 'inactive', 'suspended', 'pending']).optional(),
   tenant_id: z.number().optional(),

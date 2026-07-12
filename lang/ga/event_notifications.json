@@ -15,6 +15,8 @@
     "expired": "imithe in \u00e9ag"
   },
   "lifecycle": {
+    "rejected": "N\u00edor ceada\u00edodh an t-imeacht \u201c:title\u201d agus cuireadh ar ais mar dhr\u00e9acht \u00e9.",
+    "pending_review": "Cuireadh an t-imeacht \u201c:title\u201d isteach le haghaidh athbhreithni\u00fa modhn\u00f3ireachta.",
     "published": "Foils\u00edodh an t-imeacht \u201c:title\u201d.",
     "postponed": "Cuireadh an t-imeacht \u201c:title\u201d siar.",
     "cancelled": "Cuireadh an t-imeacht \u201c:title\u201d ar ceal.",

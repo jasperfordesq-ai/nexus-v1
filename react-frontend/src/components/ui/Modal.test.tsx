@@ -63,6 +63,55 @@ describe("Modal — open/closed gate", () => {
       screen.getByRole("dialog", { name: "Media preview" }),
     ).toBeInTheDocument();
   });
+
+  it("layers the overlay above fixed navigation and keeps the dialog inside safe viewport insets", () => {
+    render(
+      <Modal isOpen>
+        <ModalContent aria-label="Layered modal">
+          <ModalBody>
+            <p>layered body</p>
+          </ModalBody>
+        </ModalContent>
+      </Modal>,
+    );
+
+    const backdrop = document.querySelector<HTMLElement>(
+      '[data-slot="modal-backdrop"]',
+    );
+    const container = document.querySelector<HTMLElement>(
+      '[data-slot="modal-container"]',
+    );
+
+    expect(backdrop).toHaveClass("z-[var(--z-modal-backdrop)]");
+    expect(container).toHaveClass(
+      "z-[var(--z-modal)]",
+      "box-border",
+      "pt-[calc(var(--safe-area-top)+1rem)]",
+      "pb-[calc(var(--safe-area-bottom)+1rem)]",
+      "sm:pt-[calc(var(--safe-area-top)+2.5rem)]",
+      "sm:pb-[calc(var(--safe-area-bottom)+2.5rem)]",
+    );
+  });
+
+  it("preserves HeroUI's edge-to-edge viewport contract for full-size dialogs", () => {
+    render(
+      <Modal isOpen size="full">
+        <ModalContent aria-label="Full viewport modal">
+          <ModalBody>
+            <p>full viewport body</p>
+          </ModalBody>
+        </ModalContent>
+      </Modal>,
+    );
+
+    const container = document.querySelector<HTMLElement>(
+      '[data-slot="modal-container"]',
+    );
+    expect(container).toHaveClass("z-[var(--z-modal)]");
+    expect(container).not.toHaveClass(
+      "pt-[calc(var(--safe-area-top)+1rem)]",
+    );
+  });
 });
 
 describe("Modal — compound sections", () => {

@@ -108,6 +108,7 @@
       "audit_error_title": "Impossible de charger l'historique d'audit",
       "audit_error_description": "L'historique du modèle immuable n'a pas pu être chargé.",
       "audit_empty": "Aucune entrée d'audit n'a été renvoyée.",
+      "audit_load_more": "Charger plus d’historique",
       "audit_actions": {
         "captured": "Modèle capturé",
         "revised": "Modèle révisé",

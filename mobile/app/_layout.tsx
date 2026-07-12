@@ -164,6 +164,7 @@ function RootNavigator() {
     'event_templates',
     'event_tickets',
     'event_communications',
+    'event_recurrence_blueprints',
     'exchanges',
     'federation',
     'gamification',
@@ -348,6 +349,14 @@ function RootNavigator() {
       <Stack.Screen
         name="(modals)/event-templates"
         options={{ ...modalOptions, headerShown: false, title: t('event_templates:templates.mobile.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-lifecycle-history"
+        options={{ ...modalOptions, headerShown: false, title: t('events:lifecycleHistory.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-recurrence-blueprints"
+        options={{ ...modalOptions, headerShown: false, title: t('event_recurrence_blueprints:title') }}
       />
       <Stack.Screen
         name="(modals)/event-tickets"

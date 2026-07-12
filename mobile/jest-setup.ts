@@ -17,6 +17,7 @@ import enExchanges from './locales/en/exchanges.json';
 import enEvents from './locales/en/events.json';
 import enEventTemplates from './locales/en/event_templates.json';
 import enEventTickets from './locales/en/event_tickets.json';
+import enEventRecurrenceBlueprints from './locales/en/event_recurrence_blueprints.json';
 import enNotifications from './locales/en/notifications.json';
 import enSettings from './locales/en/settings.json';
 import enWallet from './locales/en/wallet.json';
@@ -38,8 +39,10 @@ import { Uniwind } from 'uniwind';
 // useThemeColor returns real colours instead of the library's `invalid` sentinel.
 const heroUiTestTheme = {
   '--color-accent': '#6366f1',
+  '--color-accent-foreground': '#ffffff',
   '--color-accent-hover': '#4f46e5',
   '--color-default-hover': '#e5e7eb',
+  '--color-default-foreground': '#111827',
   '--color-danger': '#dc2626',
   '--color-danger-hover': '#b91c1c',
   '--color-danger-soft-hover': '#fee2e2',
@@ -64,6 +67,7 @@ i18n.use(initReactI18next).init({
       events: enEvents,
       event_templates: enEventTemplates,
       event_tickets: enEventTickets,
+      event_recurrence_blueprints: enEventRecurrenceBlueprints,
       notifications: enNotifications,
       settings: enSettings,
       wallet: enWallet,
@@ -93,6 +97,7 @@ i18n.use(initReactI18next).init({
     'events',
     'event_templates',
     'event_tickets',
+    'event_recurrence_blueprints',
     'notifications',
     'settings',
     'wallet',

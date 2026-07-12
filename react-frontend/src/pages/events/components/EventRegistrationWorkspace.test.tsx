@@ -109,6 +109,49 @@ function overviewFixture(): EventRegistrationOverview {
       notification_consent: false,
       attendance: null,
     }],
+    pagination: {
+      submissions: {
+        page: 1,
+        per_page: 50,
+        total: 1,
+        last_page: 1,
+        page_count: 1,
+        from: 1,
+        to: 1,
+        has_more: false,
+        previous_page: null,
+        next_page: null,
+      },
+      campaigns: {
+        page: 1,
+        per_page: 50,
+        total: 0,
+        last_page: 1,
+        page_count: 0,
+        from: null,
+        to: null,
+        has_more: false,
+        previous_page: null,
+        next_page: null,
+      },
+      guests: {
+        page: 1,
+        per_page: 50,
+        total: 1,
+        last_page: 1,
+        page_count: 1,
+        from: 1,
+        to: 1,
+        has_more: false,
+        previous_page: null,
+        next_page: null,
+      },
+    },
+    summary: {
+      submissions_total: 1,
+      campaigns_total: 0,
+      guests_total: 1,
+    },
     permissions: {
       view_roster: true,
       view_sensitive_answers: false,
@@ -250,6 +293,77 @@ describe('EventRegistrationWorkspace', () => {
     await user.click(screen.getByRole('tab', { name: 'Guests' }));
     await user.click(await screen.findByRole('button', { name: 'Check in' }));
     await waitFor(() => expect(attendance).toHaveBeenCalledWith(42, 81, 'check_in', 0));
+  });
+
+  it('loads every paginated registration collection without discarding earlier records', async () => {
+    const user = userEvent.setup();
+    const initial = overviewFixture();
+    initial.campaigns = [campaignFixture()];
+    initial.pagination = {
+      submissions: { ...initial.pagination!.submissions, per_page: 1, total: 2, last_page: 2, has_more: true, next_page: 2 },
+      campaigns: { ...initial.pagination!.campaigns, per_page: 1, total: 2, last_page: 2, page_count: 1, from: 1, to: 1, has_more: true, next_page: 2 },
+      guests: { ...initial.pagination!.guests, per_page: 1, total: 2, last_page: 2, has_more: true, next_page: 2 },
+    };
+    initial.summary = { submissions_total: 2, campaigns_total: 2, guests_total: 2 };
+    const secondSubmission = {
+      ...initial.submissions[0],
+      id: 72,
+      member_name: 'Jamie Member',
+    };
+    const secondCampaign = { ...campaignFixture(), id: 32 };
+    const secondGuest = { ...initial.guests[0], id: 82, display_name: 'Taylor Guest' };
+    const pageTwo = (collection: 'submissions' | 'campaigns' | 'guests'): EventRegistrationOverview => ({
+      ...initial,
+      submissions: collection === 'submissions' ? [secondSubmission] : initial.submissions,
+      campaigns: collection === 'campaigns' ? [secondCampaign] : initial.campaigns,
+      guests: collection === 'guests' ? [secondGuest] : initial.guests,
+      pagination: {
+        ...initial.pagination!,
+        [collection]: {
+          ...initial.pagination![collection],
+          page: 2,
+          from: 2,
+          to: 2,
+          has_more: false,
+          previous_page: 1,
+          next_page: null,
+        },
+      },
+    });
+    vi.mocked(eventRegistrationApi.organizerOverview)
+      .mockResolvedValueOnce({ success: true, data: initial })
+      .mockResolvedValueOnce({ success: true, data: pageTwo('submissions') })
+      .mockResolvedValueOnce({ success: true, data: pageTwo('campaigns') })
+      .mockResolvedValueOnce({ success: true, data: pageTwo('guests') });
+    renderEventRoute(<EventRegistrationWorkspace eventId={42} />, {
+      path: '/events/42/manage/registration',
+      route: '/events/42/manage/registration',
+    });
+
+    await user.click(await screen.findByRole('tab', { name: 'Submissions' }));
+    await user.click(await screen.findByRole('button', { name: 'Load more (1 remaining)' }));
+    expect(await screen.findByText('Jamie Member')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Invitations' }));
+    await user.click(await screen.findByRole('button', { name: 'Load more (1 remaining)' }));
+    expect(await screen.findAllByRole('button', { name: 'Cancel campaign' })).toHaveLength(2);
+
+    await user.click(screen.getByRole('tab', { name: 'Guests' }));
+    await user.click(await screen.findByRole('button', { name: 'Load more (1 remaining)' }));
+    expect(await screen.findByText('Taylor Guest')).toBeInTheDocument();
+
+    expect(eventRegistrationApi.organizerOverview).toHaveBeenNthCalledWith(2, 42, {
+      submissions_page: 2,
+      submissions_per_page: 1,
+    });
+    expect(eventRegistrationApi.organizerOverview).toHaveBeenNthCalledWith(3, 42, {
+      campaigns_page: 2,
+      campaigns_per_page: 1,
+    });
+    expect(eventRegistrationApi.organizerOverview).toHaveBeenNthCalledWith(4, 42, {
+      guests_page: 2,
+      guests_per_page: 1,
+    });
   });
 
   it('keeps a frozen retention preview until irreversible anonymisation is confirmed', async () => {

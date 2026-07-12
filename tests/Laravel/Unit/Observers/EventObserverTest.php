@@ -41,6 +41,11 @@ final class EventObserverTest extends TestCase
             DB::rollBack();
         }
         if ($this->eventIds !== []) {
+            DB::table('feed_activity')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('source_type', 'event')
+                ->whereIn('source_id', $this->eventIds)
+                ->delete();
             DB::table('events')->whereIn('id', $this->eventIds)->delete();
         }
         if ($this->userIds !== []) {
@@ -62,6 +67,15 @@ final class EventObserverTest extends TestCase
         DB::commit();
 
         $this->searchMock->shouldHaveReceived('synchronize')->once();
+        $activity = DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'event')
+            ->where('source_id', (int) $event->id)
+            ->first();
+        self::assertNotNull($activity);
+        self::assertSame(1, (int) $activity->is_visible);
+        self::assertSame((string) $event->title, (string) $activity->title);
+        self::assertSame('Observer venue', json_decode((string) $activity->metadata, true)['location'] ?? null);
     }
 
     public function test_rolled_back_create_never_touches_external_index(): void
@@ -74,6 +88,11 @@ final class EventObserverTest extends TestCase
 
         $this->searchMock->shouldNotHaveReceived('synchronize');
         $this->searchMock->shouldNotHaveReceived('remove');
+        self::assertFalse(DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'event')
+            ->where('source_id', (int) $event->id)
+            ->exists());
     }
 
     public function test_created_logs_search_failure_without_rethrowing(): void
@@ -113,9 +132,55 @@ final class EventObserverTest extends TestCase
         $this->searchMock->shouldHaveReceived('synchronize')->twice();
     }
 
+    public function test_updated_hides_a_retained_event_that_is_no_longer_discoverable(): void
+    {
+        $event = $this->event();
+        DB::table('feed_activity')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $event->user_id,
+            'source_type' => 'event',
+            'source_id' => (int) $event->id,
+            'title' => (string) $event->title,
+            'content' => (string) $event->description,
+            'metadata' => '{}',
+            'is_visible' => 1,
+            'created_at' => now(),
+        ]);
+        $event->forceFill([
+            'publication_status' => 'published',
+            'operational_status' => 'cancelled',
+            'status' => 'cancelled',
+        ]);
+        DB::table('events')->where('id', (int) $event->id)->update([
+            'publication_status' => 'published',
+            'operational_status' => 'cancelled',
+            'status' => 'cancelled',
+        ]);
+        $this->searchMock->shouldReceive('synchronize')->once();
+
+        (new EventObserver($this->searchMock))->updated($event);
+
+        self::assertSame(0, (int) DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'event')
+            ->where('source_id', (int) $event->id)
+            ->value('is_visible'));
+    }
+
     public function test_deleted_removes_event_only_after_commit(): void
     {
         $event = $this->event();
+        DB::table('feed_activity')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $event->user_id,
+            'source_type' => 'event',
+            'source_id' => (int) $event->id,
+            'title' => (string) $event->title,
+            'content' => (string) $event->description,
+            'metadata' => '{}',
+            'is_visible' => 1,
+            'created_at' => now(),
+        ]);
         $this->searchMock->shouldReceive('remove')->once()->with((int) $event->id);
 
         DB::beginTransaction();
@@ -124,6 +189,11 @@ final class EventObserverTest extends TestCase
         DB::commit();
 
         $this->searchMock->shouldHaveReceived('remove')->once();
+        self::assertFalse(DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'event')
+            ->where('source_id', (int) $event->id)
+            ->exists());
     }
 
     private function event(array $overrides = []): Event

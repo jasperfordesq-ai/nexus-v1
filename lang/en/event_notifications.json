@@ -15,6 +15,8 @@
     "expired": "expired"
   },
   "lifecycle": {
+    "rejected": "The event \u201c:title\u201d was not approved and has been returned to draft.",
+    "pending_review": "The event \u201c:title\u201d has been submitted for moderation review.",
     "published": "The event \u201c:title\u201d has been published.",
     "postponed": "The event \u201c:title\u201d has been postponed.",
     "cancelled": "The event \u201c:title\u201d has been cancelled.",

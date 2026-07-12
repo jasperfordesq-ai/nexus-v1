@@ -34,6 +34,9 @@ use App\Models\Listing;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\VolOpportunity;
+use App\Services\EventFederationDeliveryLedger;
+use App\Services\EventFederationPayloadBuilder;
+use App\Services\EventFederationPublisher;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
 use App\Services\FederationFeatureService;
@@ -62,6 +65,11 @@ class FederationListenersTest extends TestCase
 
     private function setFederationFeature(int $tenantId, bool $enabled): void
     {
+        $this->setTenantFeature($tenantId, 'federation', $enabled);
+    }
+
+    private function setTenantFeature(int $tenantId, string $feature, bool $enabled): void
+    {
         $row = DB::table('tenants')->where('id', $tenantId)->first();
         if (!$row) {
             $this->markTestSkipped("Tenant {$tenantId} does not exist.");
@@ -73,10 +81,44 @@ class FederationListenersTest extends TestCase
                 $features = $decoded;
             }
         }
-        $features['federation'] = $enabled;
+        $features[$feature] = $enabled;
         DB::table('tenants')->where('id', $tenantId)->update(['features' => json_encode($features)]);
         // Force TenantContext to re-read the features column
         TenantContext::setById($tenantId);
+    }
+
+    private function eventFederationPublisher(FederationFeatureService $features): EventFederationPublisher
+    {
+        return new EventFederationPublisher(
+            new EventFederationPayloadBuilder(),
+            new EventFederationDeliveryLedger(),
+            $features,
+        );
+    }
+
+    private function persistedFederatedEvent(): CommunityEventModel
+    {
+        $organizer = User::factory()->forTenant($this->testTenantId)->create();
+        $eventId = (int) DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $organizer->id,
+            'title' => 'Federated listener event ' . uniqid(),
+            'description' => 'Public federation listener fixture.',
+            'start_time' => now()->addDay(),
+            'end_time' => now()->addDay()->addHour(),
+            'timezone' => 'UTC',
+            'status' => 'active',
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 1,
+            'calendar_sequence' => 0,
+            'federation_version' => 1,
+            'federated_visibility' => 'listed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return CommunityEventModel::withoutGlobalScopes()->findOrFail($eventId);
     }
 
     public function test_all_federation_listeners_implement_should_queue(): void
@@ -173,58 +215,62 @@ class FederationListenersTest extends TestCase
 
     public function test_community_event_listener_skips_when_tenant_feature_disabled(): void
     {
-        $this->setFederationFeature($this->testTenantId, false);
-        $featureService = Mockery::mock(FederationFeatureService::class);
-        $featureService->shouldNotReceive('isTenantFederationEnabled');
-
+        $this->setTenantFeature($this->testTenantId, 'events', false);
         Http::fake();
 
-        $model = new CommunityEventModel();
-        $model->id = 800;
-        $model->federated_visibility = 'listed';
+        $model = $this->persistedFederatedEvent();
 
-        $listener = new PushCommunityEventToFederatedPartners($featureService);
+        $features = Mockery::mock(FederationFeatureService::class);
+        $features->shouldNotReceive('isOperationAllowed');
+
+        $listener = new PushCommunityEventToFederatedPartners(
+            $this->eventFederationPublisher($features),
+        );
         $listener->handle(new CommunityEventCreated($model, $this->testTenantId));
 
+        $this->assertDatabaseMissing('event_federation_deliveries', ['event_id' => $model->id]);
         Http::assertNothingSent();
     }
 
     public function test_community_event_listener_skips_when_system_federation_disabled(): void
     {
-        $this->setFederationFeature($this->testTenantId, true);
-        $featureService = Mockery::mock(FederationFeatureService::class);
-        $featureService->shouldReceive('isTenantFederationEnabled')->once()->andReturn(false);
-
+        $this->setTenantFeature($this->testTenantId, 'events', true);
         Http::fake();
 
-        $model = new CommunityEventModel();
-        $model->id = 801;
-        $model->federated_visibility = 'listed';
+        $model = $this->persistedFederatedEvent();
 
-        $listener = new PushCommunityEventToFederatedPartners($featureService);
+        $features = Mockery::mock(FederationFeatureService::class);
+        $features->shouldReceive('isOperationAllowed')
+            ->once()
+            ->with('events', $this->testTenantId)
+            ->andReturn(['allowed' => false]);
+
+        $listener = new PushCommunityEventToFederatedPartners(
+            $this->eventFederationPublisher($features),
+        );
         $listener->handle(new CommunityEventCreated($model, $this->testTenantId));
 
+        $this->assertDatabaseMissing('event_federation_deliveries', ['event_id' => $model->id]);
         Http::assertNothingSent();
     }
 
     public function test_community_event_listener_restores_tenant_context(): void
     {
-        $this->setFederationFeature($this->testTenantId, true);
+        $this->setTenantFeature($this->testTenantId, 'events', true);
+        $model = $this->persistedFederatedEvent();
         TenantContext::setById(999999);
-
-        $featureService = Mockery::mock(FederationFeatureService::class);
-        $featureService->shouldReceive('isTenantFederationEnabled')
-            ->with($this->testTenantId)
-            ->atLeast()->once()
-            ->andReturn(false);
 
         Http::fake();
 
-        $model = new CommunityEventModel();
-        $model->id = 802;
-        $model->federated_visibility = 'listed';
+        $features = Mockery::mock(FederationFeatureService::class);
+        $features->shouldReceive('isOperationAllowed')
+            ->once()
+            ->with('events', $this->testTenantId)
+            ->andReturn(['allowed' => true]);
 
-        $listener = new PushCommunityEventToFederatedPartners($featureService);
+        $listener = new PushCommunityEventToFederatedPartners(
+            $this->eventFederationPublisher($features),
+        );
         $listener->handle(new CommunityEventCreated($model, $this->testTenantId));
 
         $this->assertNull(TenantContext::currentId());
@@ -234,20 +280,26 @@ class FederationListenersTest extends TestCase
     public function test_community_event_listener_respects_allow_events_flag(): void
     {
         // No partners with allow_events=1 in fresh fixture — listener should noop.
-        $this->setFederationFeature($this->testTenantId, true);
-
-        $featureService = Mockery::mock(FederationFeatureService::class);
-        $featureService->shouldReceive('isTenantFederationEnabled')->andReturn(true);
-
+        $this->setTenantFeature($this->testTenantId, 'events', true);
+        DB::table('federation_external_partners')
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['allow_events' => 0]);
         Http::fake();
 
-        $model = new CommunityEventModel();
-        $model->id = 803;
-        $model->federated_visibility = 'listed';
+        $model = $this->persistedFederatedEvent();
 
-        $listener = new PushCommunityEventToFederatedPartners($featureService);
+        $features = Mockery::mock(FederationFeatureService::class);
+        $features->shouldReceive('isOperationAllowed')
+            ->once()
+            ->with('events', $this->testTenantId)
+            ->andReturn(['allowed' => true]);
+
+        $listener = new PushCommunityEventToFederatedPartners(
+            $this->eventFederationPublisher($features),
+        );
         $listener->handle(new CommunityEventCreated($model, $this->testTenantId));
 
+        $this->assertDatabaseMissing('event_federation_deliveries', ['event_id' => $model->id]);
         Http::assertNothingSent();
     }
 

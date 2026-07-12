@@ -17,6 +17,8 @@ return [
         'refresh' => 'Rafraîchir',
         'retry' => 'Essayer à nouveau',
         'save' => 'Sauvegarder',
+        'previous' => 'Précédent',
+        'next' => 'Suivant',
     ],
     'load_error' => [
         'title' => 'L\'espace de travail d\'inscription n\'a pas pu être chargé',

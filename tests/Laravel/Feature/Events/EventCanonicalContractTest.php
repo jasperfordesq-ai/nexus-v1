@@ -12,6 +12,7 @@ use App\Http\Resources\EventSeriesResource;
 use App\Http\Resources\EventRegistrationResource;
 use App\Http\Resources\EventRosterResource;
 use App\Models\User;
+use App\Services\EventService;
 use App\Services\TenantSettingsService;
 use App\Support\Events\EventContractMapper;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -214,6 +215,90 @@ final class EventCanonicalContractTest extends TestCase
             JSON_THROW_ON_ERROR
         );
         $this->assertSameShape($fixture, $response->json('data'));
+    }
+
+    public function test_v2_recurrence_projection_exposes_only_allowlisted_concrete_identity(): void
+    {
+        $base = [
+            'id' => 99,
+            'parent_event_id' => 42,
+            'recurrence_id' => '20300506T090000Z',
+            'recurrence_engine' => 'sabre-vobject',
+            'recurrence_engine_version' => '2',
+            'is_recurring_template' => false,
+        ];
+        $facts = ['recurrence' => [
+            'event_id' => 42,
+            'frequency' => 'weekly',
+            'interval_value' => 1,
+            'rrule' => 'FREQ=WEEKLY',
+            'internal_rule_secret' => 'must-not-leak',
+        ]];
+
+        $projection = EventContractMapper::event($base, $facts);
+        $recurrence = $projection['series']['recurrence'];
+        self::assertIsArray($recurrence);
+        $fixture = json_decode(
+            (string) file_get_contents(base_path('contracts/events/v2/event-recurrence-projection.json')),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        self::assertSame($fixture, $recurrence);
+        self::assertArrayNotHasKey('internal_rule_secret', $recurrence);
+
+        foreach ([
+            array_replace($base, ['is_recurring_template' => true]),
+            array_replace($base, [
+                'recurrence_engine' => 'legacy-rrule',
+                'recurrence_engine_version' => '1',
+            ]),
+            array_replace($base, ['recurrence_id' => 'not-an-identity']),
+        ] as $ineligible) {
+            $ineligibleRecurrence = EventContractMapper::event($ineligible, $facts)['series']['recurrence'];
+            self::assertIsArray($ineligibleRecurrence);
+            self::assertNull($ineligibleRecurrence['recurrence_id']);
+            self::assertNull($ineligibleRecurrence['engine']);
+            self::assertNull($ineligibleRecurrence['engine_version']);
+        }
+
+        self::assertNull(EventContractMapper::event(['id' => 7])['series']['recurrence']);
+    }
+
+    public function test_persisted_recurrence_identity_is_only_exposed_inside_the_v2_projection(): void
+    {
+        $organizer = $this->user();
+        $templateId = $this->event($organizer->id, [
+            'is_recurring_template' => 1,
+            'recurrence_engine' => 'sabre-vobject',
+            'recurrence_engine_version' => '2',
+        ]);
+        $recurrenceId = now()->addWeek()->utc()->format('Ymd\THis\Z');
+        $occurrenceId = $this->event($organizer->id, [
+            'parent_event_id' => $templateId,
+            'recurrence_id' => $recurrenceId,
+            'recurrence_engine' => 'sabre-vobject',
+            'recurrence_engine_version' => '2',
+        ]);
+        Sanctum::actingAs($organizer, ['*']);
+
+        $serviceRow = EventService::getById($occurrenceId, (int) $organizer->id);
+        self::assertIsArray($serviceRow);
+        self::assertArrayNotHasKey('recurrence_id', $serviceRow);
+
+        $legacy = $this->apiGet("/v2/events/{$occurrenceId}");
+        $legacy->assertOk()->assertHeader('X-Events-Contract', '1');
+        self::assertArrayNotHasKey('recurrence_id', $legacy->json('data'));
+
+        $canonical = $this->apiGet("/v2/events/{$occurrenceId}", ['X-Events-Contract' => '2']);
+        $canonical->assertOk()
+            ->assertHeader('X-Events-Contract', '2')
+            ->assertJsonPath('data.series.recurrence.recurrence_id', $recurrenceId)
+            ->assertJsonPath('data.series.recurrence.engine', 'sabre-vobject')
+            ->assertJsonPath('data.series.recurrence.engine_version', '2');
+        self::assertArrayNotHasKey('recurrence_id', $canonical->json('data'));
+        self::assertArrayNotHasKey('recurrence_engine', $canonical->json('data'));
+        self::assertArrayNotHasKey('recurrence_engine_version', $canonical->json('data'));
     }
 
     public function test_v2_relationship_and_capacity_are_canonical_first_during_legacy_dual_read(): void
@@ -467,6 +552,41 @@ final class EventCanonicalContractTest extends TestCase
         $this->assertSame('archived', $archived['schedule']['state']);
         $this->assertSame('archived', $archived['schedule']['publication_state']);
         $this->assertSame('completed', $archived['schedule']['operational_state']);
+    }
+
+    public function test_member_publication_permissions_and_routes_follow_tenant_moderation(): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'moderation.enabled'],
+            ['setting_value' => '1', 'updated_at' => now()],
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'moderation.require_event'],
+            ['setting_value' => '1', 'updated_at' => now()],
+        );
+        $organizer = $this->user();
+        $eventId = $this->event((int) $organizer->id, [
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+        Sanctum::actingAs($organizer, ['*']);
+
+        $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.permissions.submit_for_review', true)
+            ->assertJsonPath('data.permissions.publish', false);
+        $this->apiPost("/v2/events/{$eventId}/publish", [], ['X-Events-Contract' => '2'])
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'EVENT_REVIEW_REQUIRED');
+        $this->apiPost("/v2/events/{$eventId}/submit", [], ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.schedule.publication_state', 'pending_review')
+            ->assertJsonPath('data.permissions.submit_for_review', false)
+            ->assertJsonPath('data.permissions.publish', false)
+            ->assertJsonMissingPath('data.publication_transition');
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
     }
 
     public function test_series_resource_shared_fixture_includes_occurrences(): void

@@ -8,10 +8,12 @@ namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
 use App\Models\ContentModerationQueue;
+use App\Models\Tenant;
 use App\Models\User;
 use App\Services\ContentModerationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use Tests\Laravel\TestCase;
 
 /**
@@ -211,6 +213,161 @@ class ContentModerationServiceTest extends TestCase
         $this->assertSame('approved', $fresh->status);
         $this->assertSame((int) $admin->id, (int) $fresh->reviewer_id);
         $this->assertNotNull($fresh->reviewed_at);
+    }
+
+    public function test_event_review_uses_canonical_lifecycle_history_and_outbox(): void
+    {
+        Config::set('events.notification_delivery.mode', 'direct');
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'status' => 'active',
+        ]);
+        $eventId = (int) DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'title' => 'Moderated Event',
+            'description' => 'Canonical moderation coverage.',
+            'location' => 'Test venue',
+            'start_time' => now()->addWeek(),
+            'end_time' => now()->addWeek()->addHour(),
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $item = $this->makePendingItem((int) $author->id, 'event', $eventId);
+
+        TenantContext::setById($this->testTenantId);
+        $result = ContentModerationService::review(
+            (int) $item->id,
+            $this->testTenantId,
+            (int) $admin->id,
+            'approved',
+        );
+
+        $this->assertTrue($result['success']);
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'status' => 'active',
+            'lifecycle_version' => 2,
+        ]);
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->where('production_mode', 'outbox_authoritative')
+            ->count());
+    }
+
+    public function test_stale_opposite_event_decisions_cannot_reverse_a_terminal_queue_decision(): void
+    {
+        Config::set('events.notification_delivery.mode', 'outbox_authoritative');
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+
+        foreach ([
+            ['first' => 'rejected', 'second' => 'approved', 'terminal' => 'draft'],
+            ['first' => 'approved', 'second' => 'rejected', 'terminal' => 'published'],
+        ] as $case) {
+            $eventId = (int) DB::table('events')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $author->id,
+                'title' => 'Concurrent moderation decision fixture',
+                'description' => 'Only the first locked decision may win.',
+                'location' => 'Test venue',
+                'start_time' => now()->addWeek(),
+                'end_time' => now()->addWeek()->addHour(),
+                'status' => 'draft',
+                'publication_status' => 'pending_review',
+                'operational_status' => 'scheduled',
+                'lifecycle_version' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $item = $this->makePendingItem((int) $author->id, 'event', $eventId);
+            TenantContext::setById($this->testTenantId);
+
+            $first = ContentModerationService::review(
+                (int) $item->id,
+                $this->testTenantId,
+                (int) $admin->id,
+                $case['first'],
+                $case['first'] === 'rejected' ? 'Needs revision.' : null,
+            );
+            $second = ContentModerationService::review(
+                (int) $item->id,
+                $this->testTenantId,
+                (int) $admin->id,
+                $case['second'],
+                $case['second'] === 'rejected' ? 'Stale rejection.' : null,
+            );
+
+            self::assertTrue($first['success']);
+            self::assertFalse($second['success']);
+            self::assertSame('This item has already been reviewed.', $second['message']);
+            self::assertSame($case['terminal'], DB::table('events')->where('id', $eventId)->value('publication_status'));
+            self::assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
+            self::assertSame(1, DB::table('event_domain_outbox')->where('event_id', $eventId)->count());
+        }
+    }
+
+    public function test_event_review_cannot_cross_the_active_tenant_boundary(): void
+    {
+        $foreignTenant = Tenant::factory()->create();
+        $foreignAuthor = User::factory()->forTenant((int) $foreignTenant->id)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $foreignEventId = (int) DB::table('events')->insertGetId([
+            'tenant_id' => $foreignTenant->id,
+            'user_id' => $foreignAuthor->id,
+            'title' => 'Foreign moderated Event',
+            'description' => 'Must remain tenant isolated.',
+            'location' => 'Foreign venue',
+            'start_time' => now()->addWeek(),
+            'end_time' => now()->addWeek()->addHour(),
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $foreignItem = ContentModerationQueue::withoutGlobalScopes()->create([
+            'tenant_id' => $foreignTenant->id,
+            'content_type' => 'event',
+            'content_id' => $foreignEventId,
+            'author_id' => $foreignAuthor->id,
+            'title' => 'Foreign moderated Event',
+            'status' => 'pending',
+            'auto_flagged' => false,
+        ]);
+        $localAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'status' => 'active',
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $result = ContentModerationService::review(
+            (int) $foreignItem->id,
+            $this->testTenantId,
+            (int) $localAdmin->id,
+            'approved',
+        );
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('pending_review', DB::table('events')->where('id', $foreignEventId)->value('publication_status'));
+        $this->assertSame(0, DB::table('event_status_history')->where('event_id', $foreignEventId)->count());
+        $this->assertSame(0, DB::table('event_domain_outbox')->where('event_id', $foreignEventId)->count());
     }
 
     // --- getStats() ---

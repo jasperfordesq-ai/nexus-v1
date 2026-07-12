@@ -1,0 +1,141 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return array (
+  'tab' => 'Socrú amach anseo',
+  'title' => 'Socrú tarluithe amach anseo',
+  'description' => 'Roghnaigh na sainmhínithe imeachta a chuirfear i bhfeidhm nuair a chruthófar tarluithe nua.',
+  'definition_only_title' => 'Sainmhínithe amháin',
+  'definition_only_description' => 'Ní chóipeáiltear freastalaithe, clárúcháin, tinreamh, íocaíochtaí, meabhrúcháin, anailísíocht ná stair seachadta riamh, agus ní athraítear tarluithe atá ann cheana.',
+  'effective_from_label' => 'I bhfeidhm ón aitheantas atarlaithe',
+  'effective_from_help' => 'Baineann an t-aitheantas cobhsaí seo leis an tarlú roghnaithe. Ní athríomhtar é ó am tosaithe athraithe.',
+  'sections_title' => 'Sainmhínithe le tabhairt ar aghaidh',
+  'sections_description' => 'Roghnaítear gach rannán go follasach. Ní roghnaítear sannacháin foirne go huathoibríoch riamh.',
+  'sections' => 
+  array (
+    'agenda' => 
+    array (
+      'label' => 'Clár',
+      'description' => 'Seisiúin sceidealaithe, cainteoirí agus sainmhínithe acmhainní cosanta.',
+    ),
+    'ticket_types' => 
+    array (
+      'label' => 'Cineálacha ticéad',
+      'description' => 'Sainmhínithe ticéad saor in aisce nó dréachta agus a bhfuinneoga díola.',
+    ),
+    'registration' => 
+    array (
+      'label' => 'Clárú',
+      'description' => 'Socruithe clárúcháin agus an fhoirm atá foilsithe faoi láthair.',
+    ),
+    'safety' => 
+    array (
+      'label' => 'Riachtanais sábháilteachta',
+      'description' => 'Na riachtanais sábháilteachta agus incháilitheachta atá foilsithe faoi láthair.',
+    ),
+    'staff' => 
+    array (
+      'label' => 'Sannacháin foirne',
+      'description' => 'Rogha ardriosca: tabhair róil ghníomhacha ar aghaidh chuig tarluithe nua amach anseo.',
+    ),
+  ),
+  'section_not_permitted' => 'Ní cheadaíonn do ról imeachta duit an rannán seo a thabhairt ar aghaidh.',
+  'no_sections_title' => 'Roghnaigh rannán amháin ar a laghad',
+  'no_sections_description' => 'Tá réamhamharc riachtanach sula sábhálfar an socrú amach anseo.',
+  'preview_button' => 'Réamhamharc ar an socrú',
+  'previewing' => 'Réamhamharc á ullmhú',
+  'preview_title' => 'Réamhamharc sainmhínithe',
+  'preview_description' => 'Seiceáil na comhairimh theoranta agus na coinbhleachtaí roimh dheimhniú.',
+  'preview_expires' => 'Rachaidh an réamhamharc in éag :date',
+  'review_button' => 'Seiceáil agus deimhnigh',
+  'refresh_preview' => 'Athnuaigh an réamhamharc',
+  'conflicts_title' => 'Réitigh na coinbhleachtaí seo ar dtús',
+  'conflicts' => 
+  array (
+    'definition_limit_exceeded' => 'Sáraíonn :section teorainn shábháilte na sainmhínithe (fuarthas :count).',
+    'speaker_limit_exceeded' => 'Sáraíonn an clár teorainn shábháilte na gcainteoirí (fuarthas :count).',
+    'invalid_speaker_reference' => 'Tá :count tagairt neamhbhailí do chainteoir sa chlár.',
+    'resource_limit_exceeded' => 'Sáraíonn an clár teorainn shábháilte na n-acmhainní (fuarthas :count).',
+    'unsupported_active_time_credit_ticket' => 'Ní féidir :count chineál gníomhach ticéid ama a thabhairt ar aghaidh.',
+    'published_form_missing' => 'Níorbh fhéidir an fhoirm chlárúcháin fhoilsithe a dheimhniú.',
+    'question_limit_exceeded' => 'Sáraíonn an fhoirm fhoilsithe teorainn shábháilte na gceisteanna (fuarthas :count).',
+    'published_requirement_version_missing' => 'Níorbh fhéidir leagan foilsithe na riachtanas sábháilteachta a dheimhniú.',
+    'invalid_staff_reference' => 'Tagraíonn :count sannachán foirne do bhall nach bhfuil ar fáil.',
+    'nonportable_staff_expiry' => 'Rachaidh :count sannachán foirne in éag roimh an tarlú amach anseo agus ní féidir é a thabhairt ar aghaidh.',
+  ),
+  'counts' => 
+  array (
+    'none' => 'Níor aimsíodh aon sainmhíniú sna rannáin roghnaithe.',
+    'sessions' => 'Seisiúin',
+    'speakers' => 'Cainteoirí',
+    'resources' => 'Acmhainní',
+    'ticket_types' => 'Cineálacha ticéad',
+    'registration_settings' => 'Socruithe clárúcháin',
+    'published_forms' => 'Foirmeacha foilsithe',
+    'form_questions' => 'Ceisteanna foirme',
+    'safety_requirements' => 'Riachtanais sábháilteachta',
+    'staff_assignments' => 'Sannacháin foirne',
+  ),
+  'errors' => 
+  array (
+    'preview_error' => 
+    array (
+      'title' => 'Níorbh fhéidir an réamhamharc a ullmhú',
+      'description' => 'Seiceáil na sainmhínithe roghnaithe agus bain triail eile as.',
+    ),
+    'preview_expired' => 
+    array (
+      'title' => 'Réamhamharc imithe in éag',
+      'description' => 'Athnuaigh é roimh dheimhniú. Níor sábháladh aon rud.',
+    ),
+    'preview_stale' => 
+    array (
+      'title' => 'D’athraigh na sainmhínithe tar éis an réamhamhairc',
+      'description' => 'Ullmhaigh réamhamharc nua leis na sainmhínithe is déanaí.',
+    ),
+    'commit_conflict' => 
+    array (
+      'title' => 'Níor sábháladh an socrú amach anseo',
+      'description' => 'Sábháladh leagan eile nó iarratas contrártha ar dtús. Athnuaigh agus seiceáil arís.',
+    ),
+    'commit_error' => 
+    array (
+      'title' => 'Níorbh fhéidir an socrú a shábháil',
+      'description' => 'Coinníodh d’eochair athiarrachta chobhsaí. Deimhnigh arís nó athnuaigh réamhamharc atá imithe in éag.',
+    ),
+  ),
+  'success_created_title' => 'Socrú amach anseo sábháilte',
+  'success_created_description' => 'Ní chuirfear leagan do-athraithe :version i bhfeidhm ach ar tharluithe nua amach anseo.',
+  'success_replay_title' => 'Bhí an socrú sábháilte cheana',
+  'success_replay_description' => 'Meaitseálann leagan :version an athiarracht seo. Níor cruthaíodh dúblach.',
+  'history_title' => 'Stair do-athraithe leaganacha',
+  'history_description' => 'Coinnítear gach leagan le comhairimh theoranta agus a aitheantas atarlaithe éifeachtach.',
+  'history_loading' => 'Stair á lódáil',
+  'history_error_title' => 'Níorbh fhéidir an stair a lódáil',
+  'history_error_description' => 'Bain triail eile as chun na leaganacha do-athraithe a fháil.',
+  'history_empty_title' => 'Níl aon leagan amach anseo fós',
+  'history_empty_description' => 'Beidh leagan le feiceáil anseo tar éis réamhamharc a dheimhniú.',
+  'history_list_label' => 'Leaganacha socraithe tarluithe amach anseo',
+  'history_version' => 'Leagan :version',
+  'history_sections' => 'Sainmhínithe san áireamh',
+  'immutable' => 'Do-athraithe',
+  'history_load_more' => 'Lódáil tuilleadh leaganacha',
+  'history_loading_more' => 'Tuilleadh leaganacha á lódáil',
+  'load_more_error_title' => 'Níorbh fhéidir tuilleadh leaganacha a lódáil',
+  'load_more_error_description' => 'Déan iarracht an chéad leathanach eile a lódáil arís.',
+  'retry' => 'Bain triail eile as',
+  'time_unknown' => 'Am gan taifead',
+  'confirm_title' => 'Deimhnigh an socrú amach anseo',
+  'confirm_scope_title' => 'Tarluithe nua amháin',
+  'confirm_scope_description' => 'Téann an leagan seo i bhfeidhm ón aitheantas léirithe. Ní athraítear tarluithe ná sonraí rannpháirtithe atá ann cheana.',
+  'staff_risk_title' => 'Tá tabhairt foirne ar aghaidh roghnaithe',
+  'staff_risk_description' => 'Féadfaidh róil ghníomhacha rochtain oibríochtúil a thabhairt ar gach tarlú nua. Seiceáil an rogha seo go cúramach.',
+  'confirm_ack' => 'Deimhním an leagan sainmhínithe seo don todhchaí amháin',
+  'confirm_ack_description' => 'Sheiceáil mé na rannáin, comhairimh, coinbhleachtaí agus an t-aitheantas atarlaithe éifeachtach.',
+  'cancel' => 'Cealaigh',
+  'commit_button' => 'Sábháil leagan do-athraithe',
+  'committing' => 'Leagan á shábháil',
+);

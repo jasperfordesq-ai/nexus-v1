@@ -7,12 +7,45 @@
   "archived": "Archivado",
   "pendingReview": "Pendiente de revisión",
   "draft": "Borrador",
+  "create": {
+    "recurrenceTitle": "Programación repetida", "recurrenceToggle": "Hacer que este evento sea recurrente", "recurrenceFrequency": "Frecuencia",
+    "recurrenceFrequencies": { "daily": "Diario", "weekly": "Semanal", "biweekly": "Cada dos semanas", "monthly": "Mensual", "yearly": "Anual" },
+    "recurrenceDays": "Repetir el", "recurrenceWeekdays": { "MO": "Lun", "TU": "Mar", "WE": "Mié", "TH": "Jue", "FR": "Vie", "SA": "Sáb", "SU": "Dom" },
+    "recurrenceEnds": "Finaliza", "recurrenceEndTypes": { "after_count": "Después de varios eventos", "on_date": "En una fecha", "never": "Nunca" },
+    "recurrenceCount": "Número de eventos", "recurrenceCountPlaceholder": "De 2 a {{max}}", "recurrenceEndDate": "Fecha de fin de la serie",
+    "recurrenceNeverHint": "Las fechas futuras se añaden automáticamente dentro del período de planificación continuo de la comunidad.",
+    "recurrenceValidation": "Elige datos de recurrencia válidos: días de la semana cuando sean necesarios, de 2 a {{max}} eventos o una fecha final válida.",
+    "recurrenceEditScope": "Aplicar cambios a", "recurrenceScopeSingle": "Solo este evento", "recurrenceScopeFuture": "Este y futuros eventos",
+    "recurrenceScopeSingleHint": "Crea excepciones de campo solo para esta ocurrencia.", "recurrenceScopeFutureHint": "Previsualiza el impacto antes de cambiar esta y las ocurrencias posteriores.",
+    "revisionPreview": "Previsualizar cambios", "revisionImpactTitle": "Revisar cambios recurrentes", "revisionImpact": "Se cambiarán {{count}} eventos futuros.",
+    "revisionRecipients": "Se puede notificar a {{count}} participantes.", "revisionBlocked": "Resuelve {{count}} conflictos antes de aplicar estos cambios.", "revisionConfirm": "Aplicar cambios",
+    "revisionImageUnsupported": "La portada no se puede cambiar en la misma actualización de este y futuros eventos. Guárdala solo para este evento o actualiza la serie por separado.",
+    "revisionDateUnsupported": "No se pueden mover las fechas para este y futuros eventos. Elige solo este evento o mantén las fechas sin cambios.",
+    "revisionCommitFailed": "No se pudieron aplicar los cambios recurrentes. Previsualiza el impacto más reciente e inténtalo de nuevo.",
+    "revisionPreviewStale": "El formulario cambió después de la previsualización. Previsualiza el impacto actualizado antes de aplicar cambios.",
+    "revisionUnavailable": "La edición de este y futuros eventos aún no está disponible para esta comunidad. Todavía puedes editar solo este evento.",
+    "venueAccessibilityTitle": "Accesibilidad del lugar", "venueAccessibilityHint": "Comparte información confirmada para que las personas puedan planificar su visita.",
+    "venueAccessibilityFeatures": { "step_free_access": "Acceso sin escalones", "accessible_toilet": "Aseo accesible", "hearing_loop": "Bucle auditivo", "quiet_space": "Espacio tranquilo", "seating_available": "Asientos disponibles", "accessible_parking": "Aparcamiento accesible" },
+    "venueAccessibilityStatus": { "unknown": "No se sabe", "yes": "Sí", "no": "No" },
+    "venueAccessibilityParkingDetails": "Detalles del aparcamiento accesible", "venueAccessibilityParkingPlaceholder": "Plazas, ruta de acceso o instrucciones de reserva",
+    "venueAccessibilityTransitDetails": "Transporte público y llegada", "venueAccessibilityTransitPlaceholder": "Parada, estación o punto de bajada más cercano",
+    "venueAccessibilityAssistanceContact": "Contacto de accesibilidad", "venueAccessibilityAssistancePlaceholder": "Nombre, correo o teléfono para solicitar ayuda",
+    "venueAccessibilityNotes": "Otras notas de accesibilidad", "venueAccessibilityNotesPlaceholder": "Cualquier otra información útil",
+    "venueAccessibilityPrivacy": "Publica solo datos de contacto que sea seguro compartir con las personas autorizadas a ver el evento."
+  },
   "accessibilityFilter": {
     "label": "Acceso sin escalones del lugar",
     "hint": "Filtra según la información de acceso confirmada por la organización.",
     "options": { "any": "Cualquier lugar", "yes": "Acceso sin escalones confirmado", "no": "No tiene acceso sin escalones", "unknown": "No se sabe" }
   },
   "detail": {
+    "submitForReviewConfirm": "\u00bfEnviar este evento a la cola de moderaci\u00f3n? Los organizadores podr\u00e1n seguir edit\u00e1ndolo mientras espera la revisi\u00f3n.",
+    "publishEventConfirm": "\u00bfPublicar este evento ahora? Ser\u00e1 visible para los miembros autorizados y puede activar notificaciones y federaci\u00f3n.",
+    "submitForReview": "Enviar para revisión",
+    "publishEvent": "Publicar evento",
+    "submittedForReview": "Evento enviado para revisión",
+    "publishedSuccessfully": "Evento publicado",
+    "publicationFailed": "No se pudo actualizar el estado de publicación del evento.",
     "leaveWaitlistConfirmTitle": "¿Salir de la lista de espera?",
     "leaveWaitlistConfirmDescription": "Perderás tu posición actual y quizá tengas que volver a unirte al final de la cola.",
     "offerDeclineConfirmTitle": "¿Rechazar esta plaza reservada?",
@@ -276,6 +309,44 @@
       "completed_credit_claims": "Reclamaciones de crédito completadas",
       "failed_credit_claims": "Reclamaciones de crédito fallidas",
       "guardian_consents": "El tutor da su consentimiento"
+    }
+  },
+  "lifecycleHistory": {
+    "open": "Abrir el historial del ciclo de vida",
+    "title": "Historial del ciclo de vida",
+    "description": "Revisa el historial inmutable de publicación y operaciones de este evento.",
+    "loading": "Cargando el historial del ciclo de vida",
+    "loadFailedTitle": "Historial del ciclo de vida no disponible",
+    "loadFailedDescription": "No se pudo cargar el historial inmutable. Inténtalo de nuevo.",
+    "retry": "Intentar de nuevo",
+    "emptyTitle": "Aún no hay cambios del ciclo de vida",
+    "emptyDescription": "Los cambios aparecerán aquí cuando se actualice el ciclo de vida del evento.",
+    "listLabel": "Cambios del ciclo de vida del evento",
+    "entryAccessibility": "Versión {{version}}, registrada {{date}}",
+    "version": "Versión {{version}}",
+    "immutable": "Inmutable",
+    "timestampUnknown": "Hora no registrada",
+    "publicationTransition": "Publicación: de {{from}} a {{to}}",
+    "operationalTransition": "Estado operativo: de {{from}} a {{to}}",
+    "changedBy": "Modificado por {{name}}",
+    "unknownActor": "Miembro {{id}}",
+    "reason": "Motivo: {{reason}}",
+    "notificationsSuppressed": "Se suprimieron las notificaciones duplicadas para este cambio de serie.",
+    "loadMore": "Cargar más historial",
+    "loadingMore": "Cargando más historial",
+    "loadMoreFailed": "No se pudo cargar más historial. Inténtalo de nuevo.",
+    "states": {
+      "publication": { "draft": "Borrador", "pending_review": "Pendiente de revisión", "published": "Publicado", "archived": "Archivado" },
+      "operational": { "scheduled": "Programado", "postponed": "Aplazado", "cancelled": "Cancelado", "completed": "Completado" }
+    },
+    "cascade": {
+      "reminders_cancelled": "Programaciones de recordatorios canceladas: {{count}}",
+      "waitlist_cancelled": "Entradas de la lista de espera canceladas: {{count}}",
+      "registrations_cancelled": "Inscripciones canceladas: {{count}}"
+    },
+    "series": {
+      "template": "Plantilla recurrente {{id}}",
+      "occurrence": "Instancia de la plantilla recurrente {{id}}"
     }
   }
 }

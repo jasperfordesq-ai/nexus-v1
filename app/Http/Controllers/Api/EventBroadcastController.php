@@ -37,12 +37,17 @@ final class EventBroadcastController extends BaseApiController
 
     public function index(Request $request, int $eventId): JsonResponse
     {
+        $page = $this->positiveInteger($request->query('page', 1));
+        $perPage = $this->positiveInteger($request->query('per_page', 20));
+        if ($page === null || $perPage === null) {
+            return $this->paginationValidationError($page === null ? 'page' : 'per_page');
+        }
         try {
             $result = $this->queries->paginateForEvent(
                 $eventId,
                 $this->requireUserId(),
-                max(1, (int) $request->query('page', 1)),
-                max(1, min(100, (int) $request->query('per_page', 20))),
+                $page,
+                min(100, $perPage),
             );
         } catch (EventBroadcastException $exception) {
             return $this->broadcastError($exception);
@@ -58,10 +63,22 @@ final class EventBroadcastController extends BaseApiController
         ));
     }
 
-    public function show(int $broadcastId): JsonResponse
+    public function show(Request $request, int $broadcastId): JsonResponse
     {
+        $historyPage = $this->positiveInteger($request->query('history_page', 1));
+        $historyPerPage = $this->positiveInteger($request->query('history_per_page', 50));
+        if ($historyPage === null || $historyPerPage === null) {
+            return $this->paginationValidationError(
+                $historyPage === null ? 'history_page' : 'history_per_page',
+            );
+        }
         try {
-            $detail = $this->queries->detail($broadcastId, $this->requireUserId());
+            $detail = $this->queries->detail(
+                $broadcastId,
+                $this->requireUserId(),
+                $historyPage,
+                min(100, $historyPerPage),
+            );
         } catch (EventBroadcastException $exception) {
             return $this->broadcastError($exception);
         } catch (Throwable $exception) {
@@ -281,5 +298,22 @@ final class EventBroadcastController extends BaseApiController
         $response->headers->set('Pragma', 'no-cache');
         $response->setVary(['Authorization', 'Cookie', 'X-Tenant-ID'], false);
         return $response;
+    }
+
+    private function positiveInteger(mixed $value): ?int
+    {
+        $parsed = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+        return $parsed === false ? null : (int) $parsed;
+    }
+
+    private function paginationValidationError(string $field): JsonResponse
+    {
+        return $this->privateResponse($this->respondWithError(
+            'EVENT_BROADCAST_VALIDATION_FAILED',
+            __('api.validation_failed'),
+            $field,
+            422,
+        ));
     }
 }

@@ -17,6 +17,8 @@ return [
         'refresh' => 'Odświeżać',
         'retry' => 'Spróbuj ponownie',
         'save' => 'Ratować',
+        'previous' => 'Poprzednia',
+        'next' => 'Następna',
     ],
     'load_error' => [
         'title' => 'Nie można załadować obszaru roboczego rejestracji',

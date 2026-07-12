@@ -1222,8 +1222,9 @@ jobs:
             updated_at = NOW();
 
           -- Ephemeral CI-only actors for the authenticated member/admin browser
-          -- accessibility matrix. The bcrypt hash is the standard hash for the
-          -- CI-only password "password"; these rows exist only in nexus_test.
+          -- matrix and destructive Events lifecycle gate. The bcrypt hash is the
+          -- standard hash for the CI-only password "password"; these rows exist
+          -- only in the disposable nexus_test database.
           INSERT INTO users (
             id,
             tenant_id,
@@ -1287,6 +1288,27 @@ jobs:
               1,
               NOW(),
               NOW()
+            ),
+            (
+              900003,
+              2,
+              'E2E Roster Member',
+              'E2E',
+              'Roster Member',
+              'e2e-roster@example.test',
+              'e2e_roster_ci',
+              '$2y$10$VFWMDLbUqq./1RyaCRXQ2.2Brj9rgZZ4yeDWgBvbJb8tU1koIYl6W',
+              'member',
+              0,
+              1,
+              1,
+              NOW(),
+              'active',
+              1,
+              0,
+              1,
+              NOW(),
+              NOW()
             );
           SQL
 
@@ -1327,6 +1349,30 @@ jobs:
           E2E_USER_PASSWORD: password
           E2E_ADMIN_EMAIL: e2e-admin@example.test
           E2E_ADMIN_PASSWORD: password
+          E2E_REQUIRE_AUTH: 1
+          CI: true
+
+      - name: Run Destructive Events Enterprise Journey
+        run: |
+          npm run test:events:e2e:enterprise || {
+            echo "::group::App container logs"
+            docker compose -f compose.ci.yml logs --no-color app || true
+            echo "::endgroup::"
+            echo "::group::Frontend container logs"
+            docker compose -f compose.ci.yml logs --no-color frontend || true
+            echo "::endgroup::"
+            exit 1
+          }
+        env:
+          E2E_BASE_URL: http://localhost:3000
+          E2E_API_URL: http://localhost:3000
+          E2E_TENANT: hour-timebank
+          E2E_TENANT_ID: 2
+          E2E_USER_EMAIL: e2e-member@example.test
+          E2E_USER_PASSWORD: password
+          E2E_ADMIN_EMAIL: e2e-admin@example.test
+          E2E_ADMIN_PASSWORD: password
+          E2E_SKIP_DATA_SEED: 1
           E2E_REQUIRE_AUTH: 1
           CI: true
 

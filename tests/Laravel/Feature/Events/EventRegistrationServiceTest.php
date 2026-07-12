@@ -286,7 +286,7 @@ final class EventRegistrationServiceTest extends TestCase
         self::assertSame(0, DB::table('event_registration_history')->whereIn('event_id', $eventIds)->count());
     }
 
-    public function test_leaving_confirmed_cancels_pending_reminders_and_audits_the_count(): void
+    public function test_leaving_active_registration_cancels_canonical_and_legacy_reminders_and_audits_the_count(): void
     {
         $organizer = $this->member();
         $confirmed = $this->member();
@@ -305,6 +305,11 @@ final class EventRegistrationServiceTest extends TestCase
             $pending,
             'reminder-pending',
         );
+        self::assertSame(2, DB::table('event_reminder_schedules')
+            ->where('event_id', $eventId)
+            ->where('user_id', $confirmed->id)
+            ->where('status', 'pending')
+            ->count());
         foreach ([60, 1440] as $minutes) {
             DB::table('event_reminders')->insert([
                 'tenant_id' => $this->testTenantId,
@@ -340,7 +345,7 @@ final class EventRegistrationServiceTest extends TestCase
             null,
             'Registration not approved',
         );
-        self::assertSame('pending', DB::table('event_reminders')
+        self::assertSame('cancelled', DB::table('event_reminders')
             ->where('event_id', $eventId)
             ->where('user_id', $pending->id)
             ->value('status'));
@@ -349,7 +354,7 @@ final class EventRegistrationServiceTest extends TestCase
             ->where('user_id', $pending->id)
             ->where('action', 'declined')
             ->value('metadata'), true, 16, JSON_THROW_ON_ERROR);
-        self::assertSame(0, $pendingMetadata['cancelled_pending_reminders']);
+        self::assertSame(1, $pendingMetadata['cancelled_pending_reminders']);
 
         Config::set('events.registration.timed_waitlist_offers_enabled', true);
         $withdrawn = $this->service->withdraw(
@@ -370,8 +375,8 @@ final class EventRegistrationServiceTest extends TestCase
         $outboxPayload = json_decode((string) DB::table('event_domain_outbox')
             ->where('id', $withdrawn->outboxId)
             ->value('payload'), true, 16, JSON_THROW_ON_ERROR);
-        self::assertSame(2, $historyMetadata['cancelled_pending_reminders']);
-        self::assertSame(2, $outboxPayload['cancelled_pending_reminders']);
+        self::assertSame(4, $historyMetadata['cancelled_pending_reminders']);
+        self::assertSame(4, $outboxPayload['cancelled_pending_reminders']);
     }
 
     public function test_domain_authorization_reasons_and_manager_consent_cannot_be_bypassed(): void

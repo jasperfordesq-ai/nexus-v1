@@ -108,6 +108,7 @@
       "audit_error_title": "Impossibile caricare la cronologia dei controlli",
       "audit_error_description": "Impossibile caricare la cronologia del modello immutabile.",
       "audit_empty": "Non è stata restituita alcuna voce di controllo.",
+      "audit_load_more": "Carica altra cronologia",
       "audit_actions": {
         "captured": "Modello catturato",
         "revised": "Modello rivisto",

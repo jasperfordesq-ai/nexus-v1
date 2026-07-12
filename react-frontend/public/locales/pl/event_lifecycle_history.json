@@ -1,0 +1,49 @@
+{
+  "title": "Historia cyklu życia",
+  "description": "Niezmienny rejestr zmian publikacji i zmian operacyjnych tego wydarzenia.",
+  "loading": "Ładowanie historii cyklu życia",
+  "load_error_title": "Nie udało się załadować historii cyklu życia",
+  "load_error_description": "Spróbuj ponownie pobrać niezmienną historię.",
+  "retry": "Spróbuj ponownie",
+  "empty_title": "Brak zmian cyklu życia",
+  "empty_description": "Zmiany pojawią się tutaj po aktualizacji cyklu życia wydarzenia.",
+  "list_label": "Zmiany cyklu życia wydarzenia",
+  "version": "Wersja {{version}}",
+  "immutable": "Niezmienne",
+  "publication_label": "Publikacja",
+  "operational_label": "Stan operacyjny",
+  "transition": "Z {{from}} na {{to}}",
+  "actor_label": "Zmienione przez",
+  "reason_label": "Powód",
+  "unknown_actor": "Członek {{id}}",
+  "evidence_title": "Dowód operacyjny",
+  "notifications_suppressed": "Duplikaty powiadomień zostały pominięte dla tej zmiany serii.",
+  "load_more": "Załaduj więcej historii",
+  "loading_more": "Ładowanie dalszej historii",
+  "load_more_error_title": "Nie udało się załadować dalszej historii",
+  "load_more_error_description": "Spróbuj ponownie załadować następną stronę.",
+  "timestamp_unknown": "Nie zarejestrowano czasu",
+  "states": {
+    "publication": {
+      "draft": "Wersja robocza",
+      "pending_review": "Oczekuje na weryfikację",
+      "published": "Opublikowane",
+      "archived": "Zarchiwizowane"
+    },
+    "operational": {
+      "scheduled": "Zaplanowane",
+      "postponed": "Przełożone",
+      "cancelled": "Anulowane",
+      "completed": "Zakończone"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Anulowane harmonogramy przypomnień: {{count}}",
+    "waitlist_cancelled": "Anulowane wpisy na liście oczekujących: {{count}}",
+    "registrations_cancelled": "Anulowane rejestracje: {{count}}"
+  },
+  "series": {
+    "template": "Szablon cykliczny {{id}}",
+    "occurrence": "Wystąpienie szablonu cyklicznego {{id}}"
+  }
+}

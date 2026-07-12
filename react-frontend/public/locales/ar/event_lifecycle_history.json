@@ -1,0 +1,49 @@
+{
+  "title": "سجل دورة الحياة",
+  "description": "سجل غير قابل للتغيير لتغييرات النشر والتشغيل الخاصة بهذه الفعالية.",
+  "loading": "جارٍ تحميل سجل دورة الحياة",
+  "load_error_title": "تعذر تحميل سجل دورة الحياة",
+  "load_error_description": "حاول مرة أخرى لاسترداد السجل غير القابل للتغيير.",
+  "retry": "حاول مرة أخرى",
+  "empty_title": "لا توجد تغييرات في دورة الحياة بعد",
+  "empty_description": "ستظهر التغييرات هنا بعد تحديث دورة حياة الفعالية.",
+  "list_label": "تغييرات دورة حياة الفعالية",
+  "version": "الإصدار {{version}}",
+  "immutable": "غير قابل للتغيير",
+  "publication_label": "النشر",
+  "operational_label": "الحالة التشغيلية",
+  "transition": "من {{from}} إلى {{to}}",
+  "actor_label": "تم التغيير بواسطة",
+  "reason_label": "السبب",
+  "unknown_actor": "العضو {{id}}",
+  "evidence_title": "الدليل التشغيلي",
+  "notifications_suppressed": "تم منع الإشعارات المكررة لهذا التغيير في السلسلة.",
+  "load_more": "تحميل المزيد من السجل",
+  "loading_more": "جارٍ تحميل المزيد من السجل",
+  "load_more_error_title": "تعذر تحميل المزيد من السجل",
+  "load_more_error_description": "حاول تحميل الصفحة التالية مرة أخرى.",
+  "timestamp_unknown": "لم يتم تسجيل الوقت",
+  "states": {
+    "publication": {
+      "draft": "مسودة",
+      "pending_review": "بانتظار المراجعة",
+      "published": "منشور",
+      "archived": "مؤرشف"
+    },
+    "operational": {
+      "scheduled": "مجدول",
+      "postponed": "مؤجل",
+      "cancelled": "ملغى",
+      "completed": "مكتمل"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "جداول التذكير الملغاة: {{count}}",
+    "waitlist_cancelled": "إدخالات قائمة الانتظار الملغاة: {{count}}",
+    "registrations_cancelled": "التسجيلات الملغاة: {{count}}"
+  },
+  "series": {
+    "template": "قالب متكرر {{id}}",
+    "occurrence": "موعد من القالب المتكرر {{id}}"
+  }
+}

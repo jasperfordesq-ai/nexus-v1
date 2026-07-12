@@ -21,7 +21,7 @@ final class EventContractMapperPermissionsTest extends TestCase
 
         self::assertTrue($permissions['edit']);
         self::assertTrue($permissions['cancel']);
-        self::assertTrue($permissions['publish']);
+        self::assertFalse($permissions['publish']);
         self::assertTrue($permissions['manage_agenda']);
         self::assertFalse($permissions['manage_staff']);
         self::assertFalse($permissions['manage_registration']);

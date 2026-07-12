@@ -448,6 +448,13 @@ class NotificationQueueTenantIntegrityTest extends TestCase
             'preferred_language' => 'en',
         ]);
 
+        DB::table('notification_settings')->insert([
+            'user_id' => $user->id,
+            'context_type' => 'global',
+            'context_id' => 0,
+            'frequency' => 'instant',
+        ]);
+
         foreach (['new_message', 'connection_request', 'event_update', 'vol_application_approved'] as $activityType) {
             DB::table('notification_queue')->insert([
                 'tenant_id' => $this->testTenantId,

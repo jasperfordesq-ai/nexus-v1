@@ -1,0 +1,49 @@
+{
+  "title": "ライフサイクル履歴",
+  "description": "このイベントの公開状態と運用状態の変更を記録した変更不可の履歴です。",
+  "loading": "ライフサイクル履歴を読み込んでいます",
+  "load_error_title": "ライフサイクル履歴を読み込めませんでした",
+  "load_error_description": "変更不可の履歴を取得するには、もう一度お試しください。",
+  "retry": "もう一度試す",
+  "empty_title": "ライフサイクルの変更はまだありません",
+  "empty_description": "イベントのライフサイクルが更新されると、ここに変更が表示されます。",
+  "list_label": "イベントのライフサイクル変更",
+  "version": "バージョン {{version}}",
+  "immutable": "変更不可",
+  "publication_label": "公開状態",
+  "operational_label": "運用状態",
+  "transition": "{{from}} から {{to}}",
+  "actor_label": "変更者",
+  "reason_label": "理由",
+  "unknown_actor": "メンバー {{id}}",
+  "evidence_title": "運用上の証跡",
+  "notifications_suppressed": "このシリーズ変更では重複通知が抑制されました。",
+  "load_more": "履歴をさらに読み込む",
+  "loading_more": "履歴をさらに読み込んでいます",
+  "load_more_error_title": "追加の履歴を読み込めませんでした",
+  "load_more_error_description": "次のページをもう一度読み込んでください。",
+  "timestamp_unknown": "時刻は記録されていません",
+  "states": {
+    "publication": {
+      "draft": "下書き",
+      "pending_review": "審査待ち",
+      "published": "公開済み",
+      "archived": "アーカイブ済み"
+    },
+    "operational": {
+      "scheduled": "予定済み",
+      "postponed": "延期",
+      "cancelled": "中止",
+      "completed": "完了"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "中止されたリマインダー予定: {{count}}",
+    "waitlist_cancelled": "取り消された待機リスト登録: {{count}}",
+    "registrations_cancelled": "取り消された参加登録: {{count}}"
+  },
+  "series": {
+    "template": "定期開催テンプレート {{id}}",
+    "occurrence": "定期開催テンプレート {{id}} の開催回"
+  }
+}

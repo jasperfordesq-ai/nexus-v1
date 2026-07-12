@@ -7,12 +7,45 @@
   "archived": "Sa chartlann",
   "pendingReview": "Ag feitheamh ar athbhreithniú",
   "draft": "Dréacht",
+  "create": {
+    "recurrenceTitle": "Sceideal athfhillteach", "recurrenceToggle": "Déan imeacht athfhillteach de seo", "recurrenceFrequency": "Minicíocht",
+    "recurrenceFrequencies": { "daily": "Gach lá", "weekly": "Gach seachtain", "biweekly": "Gach coicís", "monthly": "Gach mí", "yearly": "Gach bliain" },
+    "recurrenceDays": "Déan arís ar", "recurrenceWeekdays": { "MO": "Luan", "TU": "Máirt", "WE": "Céad", "TH": "Déar", "FR": "Aoine", "SA": "Sath", "SU": "Domh" },
+    "recurrenceEnds": "Críoch", "recurrenceEndTypes": { "after_count": "Tar éis roinnt imeachtaí", "on_date": "Ar dháta", "never": "Riamh" },
+    "recurrenceCount": "Líon imeachtaí", "recurrenceCountPlaceholder": "2 go {{max}}", "recurrenceEndDate": "Dáta deiridh na sraithe",
+    "recurrenceNeverHint": "Cuirtear dátaí amach anseo leis go huathoibríoch laistigh d'fhuinneog phleanála rollach an phobail.",
+    "recurrenceValidation": "Roghnaigh sonraí bailí: laethanta seachtaine nuair is gá, 2 go {{max}} imeacht, nó dáta deiridh bailí.",
+    "recurrenceEditScope": "Cuir athruithe i bhfeidhm ar", "recurrenceScopeSingle": "An t-imeacht seo amháin", "recurrenceScopeFuture": "Seo agus imeachtaí amach anseo",
+    "recurrenceScopeSingleHint": "Cruthaíonn sé eisceachtaí don teagmhas seo amháin.", "recurrenceScopeFutureHint": "Féach ar an tionchar sula n-athraítear seo agus teagmhais níos déanaí.",
+    "revisionPreview": "Réamhamharc ar athruithe", "revisionImpactTitle": "Athruithe athfhillteacha a athbhreithniú", "revisionImpact": "Athrófar {{count}} imeacht amach anseo.",
+    "revisionRecipients": "D'fhéadfaí fógra a chur chuig {{count}} rannpháirtí.", "revisionBlocked": "Réitigh {{count}} coimhlint sula gcuirtear na hathruithe i bhfeidhm.", "revisionConfirm": "Cuir athruithe i bhfeidhm",
+    "revisionImageUnsupported": "Ní féidir an íomhá clúdaigh a athrú san uasdátú céanna don imeacht seo agus d'imeachtaí amach anseo. Sábháil í don imeacht seo amháin nó ar leithligh ón tsraith.",
+    "revisionDateUnsupported": "Ní féidir dátaí a bhogadh don imeacht seo agus d'imeachtaí amach anseo. Roghnaigh an t-imeacht seo amháin nó coinnigh na dátaí gan athrú.",
+    "revisionCommitFailed": "Níorbh fhéidir na hathruithe athfhillteacha a chur i bhfeidhm. Féach ar an réamhamharc is déanaí agus bain triail eile as.",
+    "revisionPreviewStale": "Athraíodh an fhoirm tar éis an réamhamhairc. Féach ar an tionchar is déanaí sula gcuirtear athruithe i bhfeidhm.",
+    "revisionUnavailable": "Níl eagarthóireacht don imeacht seo agus d'imeachtaí amach anseo ar fáil don phobal seo fós. Is féidir leat an t-imeacht seo amháin a chur in eagar.",
+    "venueAccessibilityTitle": "Inrochtaineacht an ionaid", "venueAccessibilityHint": "Roinn faisnéis dheimhnithe chun cabhrú le baill a gcuairt a phleanáil.",
+    "venueAccessibilityFeatures": { "step_free_access": "Rochtain gan chéimeanna", "accessible_toilet": "Leithreas inrochtana", "hearing_loop": "Lúb éisteachta", "quiet_space": "Spás ciúin", "seating_available": "Suíocháin ar fáil", "accessible_parking": "Páirceáil inrochtana" },
+    "venueAccessibilityStatus": { "unknown": "Ní fios", "yes": "Tá", "no": "Níl" },
+    "venueAccessibilityParkingDetails": "Sonraí páirceála inrochtana", "venueAccessibilityParkingPlaceholder": "Spásanna, bealach rochtana nó treoracha áirithinte",
+    "venueAccessibilityTransitDetails": "Iompar poiblí agus teacht", "venueAccessibilityTransitPlaceholder": "An stad, stáisiún nó pointe fágála is gaire",
+    "venueAccessibilityAssistanceContact": "Teagmhálaí inrochtaineachta", "venueAccessibilityAssistancePlaceholder": "Ainm, ríomhphost nó fón le haghaidh cúnaimh",
+    "venueAccessibilityNotes": "Nótaí eile inrochtaineachta", "venueAccessibilityNotesPlaceholder": "Aon rud eile ba chóir do bhaill a bheith ar eolas acu",
+    "venueAccessibilityPrivacy": "Ná foilsigh ach sonraí teagmhála atá sábháilte le roinnt le lucht féachana incháilithe an imeachta."
+  },
   "accessibilityFilter": {
     "label": "Rochtain gan chéimeanna ar an ionad",
     "hint": "Scag de réir na faisnéise rochtana ar an ionad atá deimhnithe ag an eagraí.",
     "options": { "any": "Aon ionad", "yes": "Rochtain gan chéimeanna deimhnithe", "no": "Níl rochtain gan chéimeanna ann", "unknown": "Ní fios" }
   },
   "detail": {
+    "submitForReviewConfirm": "An t-imeacht seo a chur chuig an scuaine modhn\u00f3ireachta? Is f\u00e9idir leis na heagraithe \u00e9 a chur in eagar fad at\u00e1 s\u00e9 faoi athbhreithni\u00fa.",
+    "publishEventConfirm": "An t-imeacht seo a fhoilsi\u00fa anois? Beidh s\u00e9 infheicthe ag baill inch\u00e1ilithe agus d\u2019fh\u00e9adfadh s\u00e9 f\u00f3gra\u00ed agus c\u00f3naidhm a spreagadh.",
+    "submitForReview": "Cuir isteach le haghaidh athbhreithnithe",
+    "publishEvent": "Foilsigh an t-imeacht",
+    "submittedForReview": "Cuireadh an t-imeacht isteach le haghaidh athbhreithnithe",
+    "publishedSuccessfully": "Foilsíodh an t-imeacht",
+    "publicationFailed": "Níorbh fhéidir stádas foilsithe an imeachta a nuashonrú.",
     "leaveWaitlistConfirmTitle": "Fág an liosta feithimh?",
     "leaveWaitlistConfirmDescription": "Caillfidh tú do shuíomh reatha agus b’fhéidir go mbeidh ort dul isteach arís ag deireadh na scuaine.",
     "offerDeclineConfirmTitle": "Diúltaigh don áit áirithinte seo?",
@@ -276,6 +309,44 @@
       "completed_credit_claims": "Éilimh chreidmheasa comhlánaithe",
       "failed_credit_claims": "Éilimh chreidmheasa theipthe",
       "guardian_consents": "Aontaíonn caomhnóir"
+    }
+  },
+  "lifecycleHistory": {
+    "open": "Oscail stair na saolré",
+    "title": "Stair na saolré",
+    "description": "Athbhreithnigh stair do-athraithe foilsithe agus oibríochtúil an imeachta seo.",
+    "loading": "Stair na saolré á lódáil",
+    "loadFailedTitle": "Níl stair na saolré ar fáil",
+    "loadFailedDescription": "Níorbh fhéidir an stair do-athraithe a lódáil. Bain triail eile as.",
+    "retry": "Bain triail eile as",
+    "emptyTitle": "Níl aon athrú saolré ann fós",
+    "emptyDescription": "Beidh athruithe le feiceáil anseo nuair a nuashonrófar saolré an imeachta.",
+    "listLabel": "Athruithe ar shaolré an imeachta",
+    "entryAccessibility": "Leagan {{version}}, taifeadta {{date}}",
+    "version": "Leagan {{version}}",
+    "immutable": "Do-athraithe",
+    "timestampUnknown": "Níor taifeadadh an t-am",
+    "publicationTransition": "Foilsiú: {{from}} go {{to}}",
+    "operationalTransition": "Stádas oibríochtúil: {{from}} go {{to}}",
+    "changedBy": "Athraithe ag {{name}}",
+    "unknownActor": "Ball {{id}}",
+    "reason": "Cúis: {{reason}}",
+    "notificationsSuppressed": "Cuireadh fógraí dúblacha faoi chois don athrú sraithe seo.",
+    "loadMore": "Lódáil tuilleadh staire",
+    "loadingMore": "Tuilleadh staire á lódáil",
+    "loadMoreFailed": "Níorbh fhéidir tuilleadh staire a lódáil. Bain triail eile as.",
+    "states": {
+      "publication": { "draft": "Dréacht", "pending_review": "Ag feitheamh ar athbhreithniú", "published": "Foilsithe", "archived": "Cartlannaithe" },
+      "operational": { "scheduled": "Sceidealaithe", "postponed": "Curtha ar athló", "cancelled": "Cealaithe", "completed": "Críochnaithe" }
+    },
+    "cascade": {
+      "reminders_cancelled": "Sceidil mheabhrúcháin cealaithe: {{count}}",
+      "waitlist_cancelled": "Iontrálacha liosta feithimh cealaithe: {{count}}",
+      "registrations_cancelled": "Clárúcháin cealaithe: {{count}}"
+    },
+    "series": {
+      "template": "Teimpléad athfhillteach {{id}}",
+      "occurrence": "Tarlú de theimpléad athfhillteach {{id}}"
     }
   }
 }

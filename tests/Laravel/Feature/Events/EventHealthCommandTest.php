@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\EventWaitlistEntry;
 use App\Services\EventDomainOutboxService;
 use App\Services\EventHealthService;
+use App\Services\EventRecurrenceService;
 use App\Services\EventWaitlistOfferEnvelopeService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
@@ -309,6 +310,51 @@ final class EventHealthCommandTest extends TestCase
 
         self::assertFalse($empty['healthy']);
         self::assertSame('empty', $empty['notifications']['channel_configuration']['reason']);
+    }
+
+    public function test_recurrence_health_reports_v2_identity_cutover_gaps_without_identifiers(): void
+    {
+        $tenant = Tenant::factory()->create();
+        $organizer = User::factory()->forTenant((int) $tenant->id)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $templateId = $this->event(
+            (int) $tenant->id,
+            (int) $organizer->id,
+            'Recurrence health template',
+        );
+        DB::table('events')->where('id', $templateId)->update([
+            'is_recurring_template' => 1,
+            'recurrence_engine' => EventRecurrenceService::ENGINE,
+            'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
+        ]);
+        $privateTitle = 'Private recurrence identity gap ' . bin2hex(random_bytes(8));
+        $occurrenceId = $this->event(
+            (int) $tenant->id,
+            (int) $organizer->id,
+            $privateTitle,
+        );
+        DB::table('events')->where('id', $occurrenceId)->update([
+            'parent_event_id' => $templateId,
+            'recurrence_engine' => EventRecurrenceService::ENGINE,
+            'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
+            'recurrence_id' => null,
+        ]);
+
+        $snapshot = app(EventHealthService::class)->snapshot((int) $tenant->id, 600);
+        $encoded = json_encode($snapshot, JSON_THROW_ON_ERROR);
+
+        self::assertFalse($snapshot['healthy']);
+        self::assertTrue($snapshot['recurrence']['unhealthy']);
+        self::assertSame(1, $snapshot['recurrence']['v2_missing_recurrence_id']);
+        self::assertSame(0, $snapshot['recurrence']['recurrence_identity_violations']);
+        self::assertSame(0, $snapshot['recurrence']['override_evidence_violations']);
+        self::assertStringNotContainsString($privateTitle, $encoded);
+        self::assertSame([], array_intersect(
+            ['event_id', 'recipient_user_id', 'user_id', 'sample_ids', 'payload'],
+            $this->recursiveKeys($snapshot),
+        ));
     }
 
     public function test_expired_offer_uses_overdue_grace_but_reports_total(): void

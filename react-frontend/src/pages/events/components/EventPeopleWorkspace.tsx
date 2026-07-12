@@ -43,6 +43,7 @@ import {
   type EventPeopleBulkAction,
   type EventPeopleFullPerson,
   type EventPeopleHistoryEntry,
+  type EventPeopleHistoryMeta,
   type EventPeopleMeta,
   type EventPeoplePerson,
   type EventPeopleQueryParams,
@@ -113,8 +114,13 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
   const [inviteState, setInviteState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [historyTarget, setHistoryTarget] = useState<EventPeopleFullPerson | null>(null);
   const [history, setHistory] = useState<EventPeopleHistoryEntry[]>([]);
+  const [historyMeta, setHistoryMeta] = useState<EventPeopleHistoryMeta | null>(null);
   const [historyState, setHistoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [isHistoryLoadingMore, setIsHistoryLoadingMore] = useState(false);
+  const [historyLoadMoreError, setHistoryLoadMoreError] = useState(false);
   const requestRef = useRef<AbortController | null>(null);
+  const historyTargetIdRef = useRef<number | null>(null);
+  const historyGenerationRef = useRef(0);
 
   const queryParams = useMemo<EventPeopleQueryParams>(() => {
     const [sortField, direction] = sort.split(':') as [
@@ -212,7 +218,10 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
   useEffect(() => {
     if (!historyTarget) {
       setHistory([]);
+      setHistoryMeta(null);
       setHistoryState('idle');
+      setIsHistoryLoadingMore(false);
+      setHistoryLoadMoreError(false);
       return;
     }
     const controller = new AbortController();
@@ -226,6 +235,7 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
         return;
       }
       setHistory(response.data);
+      setHistoryMeta(response.meta ?? null);
       setHistoryState('ready');
     }).catch((caught: unknown) => {
       if (controller.signal.aborted) return;
@@ -235,6 +245,37 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
 
     return () => controller.abort();
   }, [eventId, historyTarget]);
+
+  const loadMoreHistory = async () => {
+    if (!historyTarget || !historyMeta?.has_more || isHistoryLoadingMore) return;
+
+    const targetMemberId = historyTarget.member.id;
+    const generation = historyGenerationRef.current;
+    setIsHistoryLoadingMore(true);
+    setHistoryLoadMoreError(false);
+    try {
+      const response = await eventsApi.peopleHistory(
+        eventId,
+        targetMemberId,
+        historyMeta.current_page + 1,
+        historyMeta.per_page,
+      );
+      if (historyTargetIdRef.current !== targetMemberId
+        || historyGenerationRef.current !== generation) return;
+      const entries = response.data;
+      if (!response.success || !entries) {
+        setHistoryLoadMoreError(true);
+        return;
+      }
+      setHistory((current) => [...current, ...entries]);
+      setHistoryMeta(response.meta ?? null);
+    } catch (caught: unknown) {
+      logError('Failed to load more Event People history', caught);
+      setHistoryLoadMoreError(true);
+    } finally {
+      setIsHistoryLoadingMore(false);
+    }
+  };
 
   const fullPeople = people.filter(isFullPerson);
   const selectedPeople = fullPeople.filter((person) => selectedIds.has(person.member.id));
@@ -643,7 +684,15 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
                               {t(`manage.people.actions.${action}`)}
                             </Button>
                           ))}
-                          <Button size="sm" variant="ghost" onPress={() => setHistoryTarget(person)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onPress={() => {
+                              historyGenerationRef.current += 1;
+                              historyTargetIdRef.current = person.member.id;
+                              setHistoryTarget(person);
+                            }}
+                          >
                             <History className="h-4 w-4" aria-hidden="true" />
                             {t('manage.people.actions.history')}
                           </Button>
@@ -762,7 +811,16 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={historyTarget !== null} onClose={() => setHistoryTarget(null)} size="2xl" scrollBehavior="inside">
+      <Modal
+        isOpen={historyTarget !== null}
+        onClose={() => {
+          historyGenerationRef.current += 1;
+          historyTargetIdRef.current = null;
+          setHistoryTarget(null);
+        }}
+        size="2xl"
+        scrollBehavior="inside"
+      >
         <ModalContent>
           <ModalHeader>
             {t('manage.people.history_title', {
@@ -781,33 +839,60 @@ export function EventPeopleWorkspace({ eventId }: { eventId: number }) {
             ) : history.length === 0 ? (
               <p className="py-8 text-center text-theme-muted">{t('manage.people.history_empty')}</p>
             ) : (
-              <ol className="space-y-3">
-                {history.map((entry) => (
-                  <li key={`${entry.axis}-${entry.entry_id}`} className="rounded-xl border border-theme-default p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-theme-primary">
-                          {t(`manage.people.history_axes.${entry.axis}`)} · {t('manage.people.history_change', {
-                            from: entry.from_state
-                              ? t(`manage.people.states.${entry.axis}.${entry.from_state}`)
-                              : t('manage.people.states.none'),
-                            to: t(`manage.people.states.${entry.axis}.${entry.to_state}`),
-                          })}
-                        </p>
-                        <p className="mt-1 text-sm text-theme-muted">
-                          {entry.actor.display_name || t('manage.people.system_actor')} · {formatTimestamp(entry.created_at)}
-                        </p>
+              <div className="space-y-4">
+                <ol className="space-y-3">
+                  {history.map((entry) => (
+                    <li key={`${entry.axis}-${entry.entry_id}`} className="rounded-xl border border-theme-default p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-theme-primary">
+                            {t(`manage.people.history_axes.${entry.axis}`)} · {t('manage.people.history_change', {
+                              from: entry.from_state
+                                ? t(`manage.people.states.${entry.axis}.${entry.from_state}`)
+                                : t('manage.people.states.none'),
+                              to: t(`manage.people.states.${entry.axis}.${entry.to_state}`),
+                            })}
+                          </p>
+                          <p className="mt-1 text-sm text-theme-muted">
+                            {entry.actor.display_name || t('manage.people.system_actor')} · {formatTimestamp(entry.created_at)}
+                          </p>
+                        </div>
+                        <Chip size="sm" variant="flat">{t('manage.people.version', { version: entry.version })}</Chip>
                       </div>
-                      <Chip size="sm" variant="flat">{t('manage.people.version', { version: entry.version })}</Chip>
-                    </div>
-                    {entry.reason && <p className="mt-3 text-sm text-theme-primary">{entry.reason}</p>}
-                  </li>
-                ))}
-              </ol>
+                      {entry.reason && <p className="mt-3 text-sm text-theme-primary">{entry.reason}</p>}
+                    </li>
+                  ))}
+                </ol>
+                {historyLoadMoreError && (
+                  <p className="rounded-xl bg-danger/5 p-4 text-danger" role="alert">
+                    {t('manage.people.history_error')}
+                  </p>
+                )}
+                {historyMeta?.has_more && (
+                  <div className="flex justify-center">
+                    <Button
+                      variant="secondary"
+                      isLoading={isHistoryLoadingMore}
+                      onPress={() => void loadMoreHistory()}
+                    >
+                      {t('load_more_count', {
+                        remaining: Math.max(0, historyMeta.total - history.length),
+                      })}
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="tertiary" onPress={() => setHistoryTarget(null)}>
+            <Button
+              variant="tertiary"
+              onPress={() => {
+                historyGenerationRef.current += 1;
+                historyTargetIdRef.current = null;
+                setHistoryTarget(null);
+              }}
+            >
               {t('manage.people.close_history')}
             </Button>
           </ModalFooter>

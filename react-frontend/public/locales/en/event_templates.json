@@ -108,6 +108,7 @@
       "audit_error_title": "Unable to load audit history",
       "audit_error_description": "The immutable template history could not be loaded.",
       "audit_empty": "No audit entries were returned.",
+      "audit_load_more": "Load more history",
       "audit_actions": {
         "captured": "Template captured",
         "revised": "Template revised",

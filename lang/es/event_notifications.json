@@ -15,6 +15,8 @@
     "expired": "caducada"
   },
   "lifecycle": {
+    "rejected": "El evento \u00ab:title\u00bb no fue aprobado y se ha devuelto a borrador.",
+    "pending_review": "El evento \u00ab:title\u00bb se ha enviado para revisi\u00f3n de moderaci\u00f3n.",
     "published": "El evento «:title» se ha publicado.",
     "postponed": "El evento «:title» se ha pospuesto.",
     "cancelled": "El evento «:title» se ha cancelado.",

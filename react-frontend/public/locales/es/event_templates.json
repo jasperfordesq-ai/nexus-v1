@@ -108,6 +108,7 @@
       "audit_error_title": "No se puede cargar el historial de auditoría",
       "audit_error_description": "No se pudo cargar el historial de la plantilla inmutable.",
       "audit_empty": "No se devolvieron entradas de auditoría.",
+      "audit_load_more": "Cargar más historial",
       "audit_actions": {
         "captured": "Plantilla capturada",
         "revised": "Plantilla revisada",

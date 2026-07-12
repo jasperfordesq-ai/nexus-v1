@@ -119,6 +119,7 @@ final class EventWriterContractTest extends TestCase
             ['venue_accessibility' => true],
             EventService::getLastMeaningfulUpdateChanges(),
         );
+        self::assertSame(1, (int) DB::table('events')->where('id', $eventId)->value('calendar_sequence'));
 
         foreach ([
             ['venue_accessibility' => ['dietary_requirements' => 'Private answer']],
@@ -139,6 +140,46 @@ final class EventWriterContractTest extends TestCase
         $cleared->assertJsonPath('data.location.accessibility.provided', false)
             ->assertJsonPath('data.location.accessibility.step_free_access', null)
             ->assertJsonPath('data.location.accessibility.notes', null);
+        self::assertSame(2, (int) DB::table('events')->where('id', $eventId)->value('calendar_sequence'));
+        self::assertSame(
+            [1, 2],
+            DB::table('event_domain_outbox')
+                ->where('event_id', $eventId)
+                ->where('action', 'event.updated')
+                ->orderBy('aggregate_version')
+                ->pluck('aggregate_version')
+                ->map(static fn (mixed $version): int => (int) $version)
+                ->all(),
+        );
+    }
+
+    public function test_serialized_identical_update_retry_is_a_true_noop_after_locked_rebase(): void
+    {
+        $organizer = $this->activeUser();
+        Sanctum::actingAs($organizer, ['*']);
+        $created = $this->apiPost('/v2/events', $this->validPayload([
+            'title' => 'Locked retry source',
+        ]))->assertCreated();
+        $eventId = (int) $created->json('data.id');
+        DB::table('events')->where('id', $eventId)->update([
+            'status' => 'active',
+            'publication_status' => 'published',
+        ]);
+
+        $payload = ['title' => 'Locked retry applied once'];
+        $this->apiPut("/v2/events/{$eventId}", $payload)->assertOk();
+        $this->apiPut("/v2/events/{$eventId}", $payload)->assertOk();
+
+        $row = DB::table('events')->where('id', $eventId)->first();
+        self::assertNotNull($row);
+        self::assertSame('Locked retry applied once', $row->title);
+        self::assertSame(1, (int) $row->calendar_sequence);
+        self::assertSame(2, (int) $row->federation_version);
+        self::assertSame([], EventService::getLastMeaningfulUpdateChanges());
+        self::assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.updated')
+            ->count());
     }
 
     public function test_create_is_a_private_draft_with_server_owned_identity_and_no_fanout(): void

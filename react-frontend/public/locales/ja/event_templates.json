@@ -108,6 +108,7 @@
       "audit_error_title": "監査履歴をロードできません",
       "audit_error_description": "不変のテンプレート履歴をロードできませんでした。",
       "audit_empty": "監査エントリは返されませんでした。",
+      "audit_load_more": "履歴をさらに読み込む",
       "audit_actions": {
         "captured": "キャプチャされたテンプレート",
         "revised": "テンプレートの修正",

@@ -17,6 +17,8 @@ return [
         'refresh' => 'Refresh',
         'retry' => 'Try again',
         'save' => 'Save',
+        'previous' => 'Previous',
+        'next' => 'Next',
     ],
     'load_error' => [
         'title' => 'Registration workspace could not be loaded',

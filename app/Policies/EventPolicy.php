@@ -15,6 +15,7 @@ use App\Enums\EventStaffRole;
 use App\Enums\EventPublicationState;
 use App\Models\Event;
 use App\Models\User;
+use App\Support\Authorization\AdminTier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
@@ -32,14 +33,6 @@ use Throwable;
  */
 class EventPolicy
 {
-    /** @var list<string> */
-    private const TENANT_ADMIN_ROLES = [
-        'admin',
-        'tenant_admin',
-        'super_admin',
-        'god',
-    ];
-
     /** @var list<string> */
     private const CONFIRMED_RSVP_STATES = [
         'going',
@@ -476,11 +469,7 @@ class EventPolicy
 
     private function isTenantAdmin(User $user): bool
     {
-        return in_array((string) $user->getAttribute('role'), self::TENANT_ADMIN_ROLES, true)
-            || (bool) $user->getAttribute('is_admin')
-            || (bool) $user->getAttribute('is_super_admin')
-            || (bool) $user->getAttribute('is_tenant_super_admin')
-            || (bool) $user->getAttribute('is_god');
+        return AdminTier::allows($user);
     }
 
     private function hasConfirmedRegistration(User $user, Event $event): bool

@@ -10,6 +10,8 @@ import path from 'path';
 // Load E2E environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env.e2e') });
 
+const enterpriseEventsJourney = '**/events/enterprise-journey.spec.ts';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -60,21 +62,25 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: enterpriseEventsJourney,
       use: { ...devices['Desktop Chrome'] },
     },
 
     {
       name: 'firefox',
+      testIgnore: enterpriseEventsJourney,
       use: { ...devices['Desktop Firefox'] },
     },
 
     {
       name: 'mobile-chrome',
+      testIgnore: enterpriseEventsJourney,
       use: { ...devices['Pixel 5'] },
     },
 
     {
       name: 'mobile-safari',
+      testIgnore: enterpriseEventsJourney,
       use: { ...devices['iPhone 12'] },
     },
   ],

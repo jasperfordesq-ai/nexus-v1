@@ -10,6 +10,7 @@ namespace Tests\Laravel\Feature\Events;
 
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\AdminEventsController;
+use App\Http\Controllers\Api\EventRecurrenceCapabilityController;
 use App\Http\Controllers\Api\EventStaffController;
 use App\Http\Controllers\Api\EventsController;
 use App\Models\User;
@@ -71,6 +72,7 @@ final class EventFeatureBoundaryTest extends TestCase
         $controllers = [
             EventsController::class,
             AdminEventsController::class,
+            EventRecurrenceCapabilityController::class,
             EventStaffController::class,
         ];
         $eventRoutes = [];
@@ -82,7 +84,7 @@ final class EventFeatureBoundaryTest extends TestCase
             }
         }
 
-        $this->assertCount(41, $eventRoutes, 'The first-party Events API route inventory changed.');
+        $this->assertCount(45, $eventRoutes, 'The first-party Events API route inventory changed.');
 
         foreach ($eventRoutes as $route) {
             $this->assertContains(

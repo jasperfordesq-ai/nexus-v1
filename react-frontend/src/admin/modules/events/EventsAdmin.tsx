@@ -10,8 +10,9 @@
  */
 
 import { getFormattingLocale } from '@/lib/helpers';
-import { useState, useEffect, useCallback, type Key } from 'react';
+import { useState, useEffect, useCallback, useRef, type Key } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import Calendar from 'lucide-react/icons/calendar';
 import Eye from 'lucide-react/icons/eye';
@@ -27,6 +28,7 @@ import { DataTable, type Column } from '../../components/DataTable';
 import { EmptyState } from '../../components/EmptyState';
 import {
   Button,
+  Checkbox,
   Chip,
   Dropdown,
   DropdownItem,
@@ -47,6 +49,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 type PublicationState = 'draft' | 'pending_review' | 'published' | 'archived';
+const PUBLICATION_STATES: readonly PublicationState[] = ['draft', 'pending_review', 'published', 'archived'];
 type OperationalState = 'scheduled' | 'postponed' | 'cancelled' | 'completed';
 type LifecycleAction =
   | 'approve'
@@ -56,6 +59,16 @@ type LifecycleAction =
   | 'complete'
   | 'archive'
   | 'restore';
+
+const FUTURE_SERIES_ACTIONS: readonly LifecycleAction[] = [
+  'postpone',
+  'cancel',
+  'complete',
+  'archive',
+  'restore',
+];
+const PUBLICATION_SERIES_ACTIONS: readonly LifecycleAction[] = ['approve', 'reject'];
+const DESTRUCTIVE_SERIES_ACTIONS: readonly LifecycleAction[] = ['reject', 'cancel', 'archive'];
 
 interface AdminEvent {
   id: number;
@@ -71,6 +84,9 @@ interface AdminEvent {
   publication_state: PublicationState;
   operational_state: OperationalState;
   lifecycle_version: number;
+  is_recurring_template: boolean;
+  occurrence_count: number;
+  future_occurrence_count: number;
   attendees_count?: number;
   max_attendees?: number;
   waitlist_count: number;
@@ -93,6 +109,13 @@ interface RawAdminEvent {
   publication_state?: PublicationState;
   operational_state?: OperationalState;
   lifecycle_version?: number;
+  is_recurring_template?: boolean | number;
+  occurrence_count?: number;
+  future_occurrence_count?: number;
+  series?: {
+    occurrence_count?: number;
+    future_occurrence_count?: number;
+  };
   attendees_count?: number;
   max_attendees?: number;
   capacity?: {
@@ -143,6 +166,12 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
     operational_state: item.operational_state
       ?? (item.status === 'cancelled' ? 'cancelled' : item.status === 'completed' ? 'completed' : 'scheduled'),
     lifecycle_version: item.lifecycle_version ?? 0,
+    is_recurring_template: item.is_recurring_template === true || item.is_recurring_template === 1,
+    occurrence_count: Math.max(0, item.series?.occurrence_count ?? item.occurrence_count ?? 0),
+    future_occurrence_count: Math.max(
+      0,
+      item.series?.future_occurrence_count ?? item.future_occurrence_count ?? 0,
+    ),
     attendees_count: item.metrics?.confirmed_count ?? item.capacity?.confirmed ?? item.attendees_count,
     max_attendees: item.capacity?.limit ?? item.max_attendees,
     waitlist_count: item.metrics?.waitlist_count ?? 0,
@@ -179,12 +208,19 @@ export function EventsAdmin() {
   useAdminPageMeta({ title: t('events.events_admin_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const [searchParams] = useSearchParams();
+  const requestedPublicationState = (() => {
+    const requested = searchParams.get('publication_state');
+    return requested !== null && PUBLICATION_STATES.includes(requested as PublicationState)
+      ? requested as PublicationState
+      : 'all';
+  })();
 
   const [items, setItems] = useState<AdminEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [publicationState, setPublicationState] = useState<'all' | PublicationState>('all');
+  const [publicationState, setPublicationState] = useState<'all' | PublicationState>(requestedPublicationState);
   const [search, setSearch] = useState('');
 
   const [actionModal, setActionModal] = useState<{
@@ -193,10 +229,19 @@ export function EventsAdmin() {
   } | null>(null);
   const [actionReason, setActionReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [seriesActionAcknowledged, setSeriesActionAcknowledged] = useState(false);
+  const loadGenerationRef = useRef(0);
+
+  useEffect(() => {
+    setPublicationState(requestedPublicationState);
+    setPage(1);
+  }, [requestedPublicationState]);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const loadItems = useCallback(async () => {
+    const generation = loadGenerationRef.current + 1;
+    loadGenerationRef.current = generation;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -206,6 +251,7 @@ export function EventsAdmin() {
       if (search) params.set('search', search);
 
       const res = await api.get(`/v2/admin/events?${params.toString()}`);
+      if (generation !== loadGenerationRef.current) return;
       if (res.success && res.data) {
         const items = Array.isArray(res.data)
           ? (res.data as RawAdminEvent[]).map(normalizeAdminEvent)
@@ -214,9 +260,13 @@ export function EventsAdmin() {
         setTotal(res.meta?.total ?? 0);
       }
     } catch {
-      toast.error(t('events.failed_to_load_events'));
+      if (generation === loadGenerationRef.current) {
+        toast.error(t('events.failed_to_load_events'));
+      }
     } finally {
-      setLoading(false);
+      if (generation === loadGenerationRef.current) {
+        setLoading(false);
+      }
     }
   }, [page, publicationState, search, toast, t]);
 
@@ -225,16 +275,22 @@ export function EventsAdmin() {
     loadItems();
   }, [loadItems]);
 
+  useEffect(() => () => {
+    loadGenerationRef.current += 1;
+  }, []);
+
   // ── Delete ─────────────────────────────────────────────────────────────────
 
   const closeActionModal = () => {
     if (actionLoading) return;
     setActionModal(null);
     setActionReason('');
+    setSeriesActionAcknowledged(false);
   };
 
   const openActionModal = (event: AdminEvent, action: LifecycleAction) => {
     setActionReason('');
+    setSeriesActionAcknowledged(false);
     setActionModal({ event, action });
   };
 
@@ -245,6 +301,9 @@ export function EventsAdmin() {
     const reason = actionReason.trim();
     const requiresReason = actionModal.action === 'reject' || actionModal.action === 'cancel';
     if (requiresReason && !reason) return;
+    const requiresSeriesAcknowledgement = actionModal.event.is_recurring_template
+      && DESTRUCTIVE_SERIES_ACTIONS.includes(actionModal.action);
+    if (requiresSeriesAcknowledgement && !seriesActionAcknowledged) return;
 
     setActionLoading(true);
     try {
@@ -268,6 +327,7 @@ export function EventsAdmin() {
       setActionLoading(false);
       setActionModal(null);
       setActionReason('');
+      setSeriesActionAcknowledged(false);
     }
   };
 
@@ -449,6 +509,18 @@ export function EventsAdmin() {
     },
   ];
 
+  const seriesScope = actionModal?.event.is_recurring_template
+    ? PUBLICATION_SERIES_ACTIONS.includes(actionModal.action)
+      ? 'publication'
+      : FUTURE_SERIES_ACTIONS.includes(actionModal.action)
+        ? 'future'
+        : null
+    : null;
+  const requiresSeriesAcknowledgement = Boolean(
+    actionModal?.event.is_recurring_template
+      && DESTRUCTIVE_SERIES_ACTIONS.includes(actionModal.action),
+  );
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -519,6 +591,20 @@ export function EventsAdmin() {
                     title: actionModal.event.title,
                   })}
                 </p>
+                {seriesScope && (
+                  <div
+                    className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-foreground"
+                    role="note"
+                  >
+                    {seriesScope === 'publication'
+                      ? t('events.series_scope_publication_warning', {
+                        occurrenceCount: actionModal.event.occurrence_count,
+                      })
+                      : t('events.series_scope_future_warning', {
+                        futureCount: actionModal.event.future_occurrence_count,
+                      })}
+                  </div>
+                )}
                 {actionModal.action !== 'approve' && (
                   <Textarea
                     label={t('events.action_reason_label')}
@@ -530,6 +616,15 @@ export function EventsAdmin() {
                     maxRows={6}
                   />
                 )}
+                {requiresSeriesAcknowledgement && (
+                  <Checkbox
+                    isDisabled={actionLoading}
+                    isSelected={seriesActionAcknowledged}
+                    onChange={setSeriesActionAcknowledged}
+                  >
+                    {t('events.series_destructive_acknowledgement')}
+                  </Checkbox>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button variant="tertiary" onPress={closeActionModal} isDisabled={actionLoading}>
@@ -539,8 +634,11 @@ export function EventsAdmin() {
                   variant={['reject', 'cancel', 'archive'].includes(actionModal.action) ? 'danger' : 'secondary'}
                   isLoading={actionLoading}
                   isDisabled={
-                    (actionModal.action === 'reject' || actionModal.action === 'cancel')
-                    && !actionReason.trim()
+                    (
+                      (actionModal.action === 'reject' || actionModal.action === 'cancel')
+                      && !actionReason.trim()
+                    )
+                    || (requiresSeriesAcknowledgement && !seriesActionAcknowledged)
                   }
                   onPress={executeAction}
                 >

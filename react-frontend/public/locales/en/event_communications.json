@@ -63,6 +63,7 @@
   "load_history_error": "The audit history could not be loaded.",
   "history_title": "Message audit history",
   "loading_history": "Loading audit history",
+  "history_load_more": "Load more history",
   "history_entry_meta": "Version {{version}} · {{date}}",
   "variants": {
     "announcement": "Announcement",

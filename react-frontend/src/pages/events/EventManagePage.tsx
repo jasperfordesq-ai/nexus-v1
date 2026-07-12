@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Tabs } from '@heroui/react/tabs';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -13,6 +13,7 @@ import ClipboardList from 'lucide-react/icons/clipboard-list';
 import CopyPlus from 'lucide-react/icons/copy-plus';
 import Edit from 'lucide-react/icons/square-pen';
 import Eye from 'lucide-react/icons/eye';
+import Layers3 from 'lucide-react/icons/layers-3';
 import ListTree from 'lucide-react/icons/list-tree';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Network from 'lucide-react/icons/network';
@@ -27,14 +28,22 @@ import { PageMeta } from '@/components/seo/PageMeta';
 import { Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { eventsApi, type Event, type EventStaffAssignment } from '@/lib/events-api';
+import {
+  eventsApi,
+  type Event,
+  type EventRecurrenceCapabilities,
+  type EventRecurrenceDefinitionSections,
+  type EventStaffAssignment,
+} from '@/lib/events-api';
 import { logError } from '@/lib/logger';
 import { EventOfflineCheckinWorkspace } from './components/EventOfflineCheckinWorkspace';
 import { EventCommunicationsWorkspace } from './components/EventCommunicationsWorkspace';
 import { EventAgendaWorkspace } from './components/EventAgendaWorkspace';
 import { EventAnalyticsPanel } from './components/EventAnalyticsPanel';
 import { EventFederationStatusPanel } from './components/EventFederationStatusPanel';
+import { EventLifecycleHistoryPanel } from './components/EventLifecycleHistoryPanel';
 import { EventPeopleWorkspace } from './components/EventPeopleWorkspace';
+import { EventRecurrenceDefinitionBlueprintManager } from './components/EventRecurrenceDefinitionBlueprintManager';
 import { EventRegistrationWorkspace } from './components/EventRegistrationWorkspace';
 import { EventStaffWorkspace } from './components/EventStaffWorkspace';
 import { EventSafetyWorkspace } from './components/EventSafetyWorkspace';
@@ -54,6 +63,44 @@ function canUseImplementedManagement(event: Event): boolean {
     || event.permissions.broadcast;
 }
 
+function recurrenceDefinitionPermissions(event: Event): EventRecurrenceDefinitionSections {
+  return {
+    agenda: event.permissions.manage_agenda,
+    ticket_types: event.permissions.manage_finance,
+    registration: event.permissions.manage_registration,
+    safety: event.permissions.edit,
+    staff: event.permissions.manage_staff,
+  };
+}
+
+function hasConcreteV2RecurrenceIdentity(event: Event): boolean {
+  const recurrence = event.series.recurrence;
+  return recurrence !== null
+    && recurrence.is_template === false
+    && recurrence.parent_event_id !== null
+    && recurrence.recurrence_id !== null
+    && /^\d{8}T\d{6}Z$/.test(recurrence.recurrence_id)
+    && recurrence.engine === 'sabre-vobject'
+    && recurrence.engine_version === '2';
+}
+
+function canUseDefinitionBlueprints(
+  event: Event | null,
+  capabilities: EventRecurrenceCapabilities | null,
+  suppressed: boolean,
+): boolean {
+  if (!event || !capabilities || suppressed || !hasConcreteV2RecurrenceIdentity(event)) return false;
+  const permissions = recurrenceDefinitionPermissions(event);
+
+  return Object.values(permissions).some(Boolean)
+    && capabilities.engine === 'v2'
+    && capabilities.schema_ready
+    && capabilities.supports_definition_blueprints
+    && capabilities.rollout_state === 'v2_rolling';
+}
+
+const managementTabClassName = 'min-h-10 w-auto min-w-fit flex-none rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary';
+
 export function EventManagePage() {
   const { t } = useTranslation([
     'events',
@@ -64,6 +111,7 @@ export function EventManagePage() {
     'event_tickets',
     'event_communications',
     'event_registration',
+    'event_recurrence_blueprints',
   ]);
   const { id, section } = useParams<{ id: string; section?: string }>();
   const { tenantPath } = useTenant();
@@ -75,8 +123,11 @@ export function EventManagePage() {
   const [pageError, setPageError] = useState<string | null>(null);
   const [isLoadingStaff, setIsLoadingStaff] = useState(false);
   const [staffError, setStaffError] = useState<string | null>(null);
+  const [recurrenceCapabilities, setRecurrenceCapabilities] = useState<EventRecurrenceCapabilities | null>(null);
+  const [definitionBlueprintsSuppressed, setDefinitionBlueprintsSuppressed] = useState(false);
   const pageAbortRef = useRef<AbortController | null>(null);
   const staffAbortRef = useRef<AbortController | null>(null);
+  const managementWorkspaceRef = useRef<HTMLDivElement | null>(null);
   const tRef = useRef(t);
   tRef.current = t;
 
@@ -116,6 +167,8 @@ export function EventManagePage() {
     setIsLoading(true);
     setPageError(null);
     setStaffError(null);
+    setRecurrenceCapabilities(null);
+    setDefinitionBlueprintsSuppressed(false);
 
     try {
       const eventResponse = await eventsApi.get(id, { signal: controller.signal });
@@ -129,6 +182,23 @@ export function EventManagePage() {
       const loadedEvent = eventResponse.data;
       setEvent(loadedEvent);
       setAssignments([]);
+
+      const definitionPermissions = recurrenceDefinitionPermissions(loadedEvent);
+      if (hasConcreteV2RecurrenceIdentity(loadedEvent)
+        && Object.values(definitionPermissions).some(Boolean)) {
+        try {
+          const capabilityResponse = await eventsApi.recurrenceCapabilities({ signal: controller.signal });
+          if (controller.signal.aborted) return;
+          if (capabilityResponse.success && capabilityResponse.data) {
+            setRecurrenceCapabilities(capabilityResponse.data);
+          }
+        } catch (caught) {
+          if (controller.signal.aborted) return;
+          // The capability endpoint is a fail-closed enhancement. Keep the
+          // ordinary management workspace usable when it cannot be reached.
+          logError('Failed to load event recurrence capabilities', caught);
+        }
+      }
 
       // The event contract is authoritative. Staff data is requested only
       // after it confirms that this viewer can manage staff.
@@ -181,12 +251,59 @@ export function EventManagePage() {
     ...(event?.permissions.check_in ? ['check-in'] : []),
     ...(event?.permissions.manage_agenda ? ['agenda'] : []),
     ...(event?.permissions.manage_staff ? ['team'] : []),
-  ]), [event]);
+    ...(canUseDefinitionBlueprints(event, recurrenceCapabilities, definitionBlueprintsSuppressed)
+      ? ['series-definitions']
+      : []),
+  ]), [definitionBlueprintsSuppressed, event, recurrenceCapabilities]);
+
+  const suppressDefinitionBlueprints = useCallback(() => {
+    setDefinitionBlueprintsSuppressed(true);
+    setRecurrenceCapabilities(null);
+  }, []);
+
+  const selectedTab = section && allowedSections.has(section) ? section : 'overview';
 
   useEffect(() => {
     if (!event || !id || !section || allowedSections.has(section)) return;
     navigate(tenantPath(`/events/${id}/manage/overview`), { replace: true });
   }, [allowedSections, event, id, navigate, section, tenantPath]);
+
+  useLayoutEffect(() => {
+    if (!event || isLoading) return;
+    let cancelled = false;
+    let secondFrameId: number | null = null;
+    const revealSelectedTab = () => {
+      if (cancelled) return;
+      const selected = managementWorkspaceRef.current?.querySelector<HTMLElement>(
+        `[data-management-section="${selectedTab}"]`,
+      );
+      if (selected && typeof selected.scrollIntoView === 'function') {
+        selected.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+      }
+    };
+
+    // React Aria finalises the tab collection and its scrollable width after
+    // the parent commit. Try immediately, after two layout frames, and once
+    // more after the short layout-settling window used by the tab indicator.
+    revealSelectedTab();
+    const firstFrameId = window.requestAnimationFrame(() => {
+      secondFrameId = window.requestAnimationFrame(revealSelectedTab);
+    });
+    const fallbackId = window.setTimeout(revealSelectedTab, 250);
+    const tabList = managementWorkspaceRef.current?.querySelector<HTMLElement>('[role="tablist"]');
+    const observer = tabList && typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(revealSelectedTab)
+      : null;
+    if (tabList) observer?.observe(tabList);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(firstFrameId);
+      if (secondFrameId !== null) window.cancelAnimationFrame(secondFrameId);
+      window.clearTimeout(fallbackId);
+      observer?.disconnect();
+    };
+  }, [event, isLoading, selectedTab]);
 
   const refreshStaff = useCallback(async () => {
     staffAbortRef.current?.abort();
@@ -245,8 +362,6 @@ export function EventManagePage() {
     );
   }
 
-  const selectedTab = section && allowedSections.has(section) ? section : 'overview';
-
   const selectTab = (key: React.Key) => {
     const nextTab = String(key);
     if (!allowedSections.has(nextTab)) return;
@@ -254,7 +369,7 @@ export function EventManagePage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div ref={managementWorkspaceRef} className="mx-auto max-w-6xl space-y-6">
       <PageMeta
         title={t('manage.page_title', { title: event.title })}
         description={t('manage.meta_description', { title: event.title })}
@@ -290,11 +405,12 @@ export function EventManagePage() {
       </header>
 
       <Tabs className="w-full min-w-0" selectedKey={selectedTab} onSelectionChange={selectTab}>
-        <Tabs.ListContainer className="max-w-full overflow-x-auto rounded-xl border border-theme-default bg-theme-surface p-1">
-          <Tabs.List aria-label={t('manage.tabs_aria')} className="min-w-max gap-1">
+        <Tabs.ListContainer className="w-full min-w-0 max-w-full rounded-xl border border-theme-default bg-theme-surface p-1">
+          <Tabs.List aria-label={t('manage.tabs_aria')} className="w-full min-w-0 max-w-full gap-1 overflow-x-auto overscroll-x-contain">
             <Tabs.Tab
               id="overview"
-              className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+              data-management-section="overview"
+              className={managementTabClassName}
             >
               <CalendarCheck className="h-4 w-4" aria-hidden="true" />
               {t('manage.tab_overview')}
@@ -302,7 +418,8 @@ export function EventManagePage() {
             {event.permissions.manage_people && (
               <Tabs.Tab
                 id="people"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="people"
+                className={managementTabClassName}
               >
                 <Users className="h-4 w-4" aria-hidden="true" />
                 {t('manage.tab_people')}
@@ -311,7 +428,8 @@ export function EventManagePage() {
             {event.permissions.manage_registration && (
               <Tabs.Tab
                 id="registration"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="registration"
+                className={managementTabClassName}
               >
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 {t('event_registration:title')}
@@ -320,7 +438,8 @@ export function EventManagePage() {
             {event.permissions.edit && (
               <Tabs.Tab
                 id="safety"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="safety"
+                className={managementTabClassName}
               >
                 <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                 {t('event_safety:manage.tab')}
@@ -329,7 +448,8 @@ export function EventManagePage() {
             {event.permissions.edit && (
               <Tabs.Tab
                 id="federation"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="federation"
+                className={managementTabClassName}
               >
                 <Network className="h-4 w-4" aria-hidden="true" />
                 {t('event_federation:manage.federation.tab')}
@@ -338,7 +458,8 @@ export function EventManagePage() {
             {event.permissions.edit && (
               <Tabs.Tab
                 id="templates"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="templates"
+                className={managementTabClassName}
               >
                 <CopyPlus className="h-4 w-4" aria-hidden="true" />
                 {t('event_templates:tab')}
@@ -347,7 +468,8 @@ export function EventManagePage() {
             {event.permissions.edit && (
               <Tabs.Tab
                 id="analytics"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="analytics"
+                className={managementTabClassName}
               >
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />
                 {t('event_analytics:analytics.title')}
@@ -357,7 +479,8 @@ export function EventManagePage() {
               && event.schedule.start_at && (
                 <Tabs.Tab
                   id="tickets"
-                  className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                  data-management-section="tickets"
+                  className={managementTabClassName}
                 >
                   <Ticket className="h-4 w-4" aria-hidden="true" />
                   {t('event_tickets:tickets.title')}
@@ -366,7 +489,8 @@ export function EventManagePage() {
             {event.permissions.check_in && (
               <Tabs.Tab
                 id="check-in"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="check-in"
+                className={managementTabClassName}
               >
                 <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
                 {t('manage.tab_check_in')}
@@ -375,7 +499,8 @@ export function EventManagePage() {
             {event.permissions.broadcast && (
               <Tabs.Tab
                 id="communications"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="communications"
+                className={managementTabClassName}
               >
                 <Megaphone className="h-4 w-4" aria-hidden="true" />
                 {t('event_communications:title')}
@@ -384,7 +509,8 @@ export function EventManagePage() {
             {event.permissions.manage_agenda && (
               <Tabs.Tab
                 id="agenda"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="agenda"
+                className={managementTabClassName}
               >
                 <ListTree className="h-4 w-4" aria-hidden="true" />
                 {t('manage.tab_agenda')}
@@ -393,10 +519,21 @@ export function EventManagePage() {
             {event.permissions.manage_staff && (
               <Tabs.Tab
                 id="team"
-                className="min-h-10 min-w-fit rounded-lg px-4 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
+                data-management-section="team"
+                className={managementTabClassName}
               >
                 <Users className="h-4 w-4" aria-hidden="true" />
                 {t('manage.tab_team')}
+              </Tabs.Tab>
+            )}
+            {canUseDefinitionBlueprints(event, recurrenceCapabilities, definitionBlueprintsSuppressed) && (
+              <Tabs.Tab
+                id="series-definitions"
+                data-management-section="series-definitions"
+                className={managementTabClassName}
+              >
+                <Layers3 className="h-4 w-4" aria-hidden="true" />
+                {t('event_recurrence_blueprints:tab')}
               </Tabs.Tab>
             )}
           </Tabs.List>
@@ -482,6 +619,19 @@ export function EventManagePage() {
             )}
           </Tabs.Panel>
         )}
+        {canUseDefinitionBlueprints(event, recurrenceCapabilities, definitionBlueprintsSuppressed)
+          && event.series.recurrence?.recurrence_id && (
+            <Tabs.Panel id="series-definitions" className="pt-5 outline-none">
+              {selectedTab === 'series-definitions' && (
+                <EventRecurrenceDefinitionBlueprintManager
+                  eventId={event.id}
+                  recurrenceId={event.series.recurrence.recurrence_id}
+                  allowedSections={recurrenceDefinitionPermissions(event)}
+                  onUnavailable={suppressDefinitionBlueprints}
+                />
+              )}
+            </Tabs.Panel>
+          )}
       </Tabs>
     </div>
   );
@@ -603,6 +753,10 @@ function EventManagementOverview({ event }: { event: Event }) {
           </div>
         </CardBody>
       </Card>
+
+      <div className="lg:col-span-2">
+        <EventLifecycleHistoryPanel eventId={event.id} />
+      </div>
     </div>
   );
 }

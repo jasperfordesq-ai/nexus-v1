@@ -154,6 +154,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('events-process-federation');
 
+        $schedule->command('events:materialize-recurrences')
+            ->hourly()
+            ->withoutOverlapping(55)
+            ->onOneServer()
+            ->name('events-materialize-recurrences');
+
         // Surface federated transactions stuck in 'pending' (saga safety-net).
         $schedule->job(new \App\Jobs\ReconcileFederationPendingTxJob())
             ->everyFiveMinutes()

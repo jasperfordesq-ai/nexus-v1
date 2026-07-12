@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Observers\Concerns\IndexesEmbeddings;
 use App\Services\EventFederationPublisher;
 use App\Services\EventSearchIndexService;
+use App\Services\FeedActivityService;
 use App\Support\Events\EventSearchVisibility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,6 +30,7 @@ class EventObserver
 
     public function __construct(
         private readonly EventSearchIndexService $searchIndex = new EventSearchIndexService(),
+        private readonly FeedActivityService $feedActivity = new FeedActivityService(),
     ) {
     }
 
@@ -37,6 +39,9 @@ class EventObserver
         'title',
         'description',
         'location',
+        'image_url',
+        'cover_image',
+        'group_id',
         'status',
         'publication_status',
         'operational_status',
@@ -96,6 +101,20 @@ class EventObserver
                 ]);
             }
             $this->deleteEmbedding($identity, 'event');
+            try {
+                TenantContext::runForTenant(
+                    $tenantId,
+                    function () use ($eventId): void {
+                        $this->feedActivity->removeActivity('event', $eventId);
+                    },
+                );
+            } catch (\Throwable $exception) {
+                Log::error('EventObserver: failed to remove deleted event from feed', [
+                    'tenant_id' => $tenantId,
+                    'event_id' => $eventId,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         });
     }
 
@@ -123,6 +142,7 @@ class EventObserver
                             $this->logSynchronizationFailure($operation, $tenantId, $eventId, $exception);
                         }
                         $this->deleteEmbedding($this->identity($tenantId, $eventId), 'event');
+                        $this->feedActivity->removeActivity('event', $eventId);
                         return;
                     }
 
@@ -136,11 +156,55 @@ class EventObserver
                     } else {
                         $this->deleteEmbedding($current, 'event');
                     }
+                    $this->synchronizeFeedActivity($current, $operation);
                 });
             } catch (\Throwable $exception) {
                 $this->logSynchronizationFailure($operation, $tenantId, $eventId, $exception);
             }
         });
+    }
+
+    private function synchronizeFeedActivity(Event $event, string $operation): void
+    {
+        $tenantId = (int) $event->getAttribute('tenant_id');
+        $eventId = (int) $event->getKey();
+        try {
+            if (! EventSearchVisibility::isDiscoverable($event)) {
+                $this->feedActivity->hideActivity('event', $eventId);
+                return;
+            }
+
+            $this->feedActivity->recordActivity(
+                $tenantId,
+                (int) $event->getAttribute('user_id'),
+                'event',
+                $eventId,
+                [
+                    'title' => (string) $event->getAttribute('title'),
+                    'content' => (string) $event->getAttribute('description'),
+                    'image_url' => $event->getAttribute('cover_image')
+                        ?: $event->getAttribute('image_url'),
+                    'group_id' => $event->getAttribute('group_id'),
+                    'metadata' => [
+                        'start_date' => $event->getAttribute('start_time'),
+                        'location' => $event->getAttribute('location'),
+                    ],
+                    'created_at' => $event->getAttribute('publication_status_changed_at')
+                        ?: $event->getAttribute('created_at')
+                        ?: now(),
+                ],
+            );
+            // recordActivity deliberately preserves an existing visibility bit;
+            // an explicit show makes a restored/re-published event visible again.
+            $this->feedActivity->showActivity('event', $eventId);
+        } catch (\Throwable $exception) {
+            Log::error('EventObserver: failed to synchronize event feed activity', [
+                'operation' => $operation,
+                'tenant_id' => $tenantId,
+                'event_id' => $eventId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 
     private function logSynchronizationFailure(

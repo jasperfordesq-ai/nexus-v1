@@ -1,0 +1,49 @@
+{
+  "title": "Histórico do ciclo de vida",
+  "description": "Um registo imutável das alterações de publicação e operacionais deste evento.",
+  "loading": "A carregar o histórico do ciclo de vida",
+  "load_error_title": "Não foi possível carregar o histórico do ciclo de vida",
+  "load_error_description": "Tente novamente para obter o histórico imutável.",
+  "retry": "Tentar novamente",
+  "empty_title": "Ainda não existem alterações do ciclo de vida",
+  "empty_description": "As alterações aparecerão aqui após a atualização do ciclo de vida do evento.",
+  "list_label": "Alterações do ciclo de vida do evento",
+  "version": "Versão {{version}}",
+  "immutable": "Imutável",
+  "publication_label": "Publicação",
+  "operational_label": "Estado operacional",
+  "transition": "De {{from}} para {{to}}",
+  "actor_label": "Alterado por",
+  "reason_label": "Motivo",
+  "unknown_actor": "Membro {{id}}",
+  "evidence_title": "Evidência operacional",
+  "notifications_suppressed": "As notificações duplicadas foram suprimidas para esta alteração da série.",
+  "load_more": "Carregar mais histórico",
+  "loading_more": "A carregar mais histórico",
+  "load_more_error_title": "Não foi possível carregar mais histórico",
+  "load_more_error_description": "Tente carregar novamente a página seguinte.",
+  "timestamp_unknown": "Hora não registada",
+  "states": {
+    "publication": {
+      "draft": "Rascunho",
+      "pending_review": "A aguardar revisão",
+      "published": "Publicado",
+      "archived": "Arquivado"
+    },
+    "operational": {
+      "scheduled": "Agendado",
+      "postponed": "Adiado",
+      "cancelled": "Cancelado",
+      "completed": "Concluído"
+    }
+  },
+  "cascade": {
+    "reminders_cancelled": "Agendamentos de lembretes cancelados: {{count}}",
+    "waitlist_cancelled": "Entradas da lista de espera canceladas: {{count}}",
+    "registrations_cancelled": "Inscrições canceladas: {{count}}"
+  },
+  "series": {
+    "template": "Modelo recorrente {{id}}",
+    "occurrence": "Ocorrência do modelo recorrente {{id}}"
+  }
+}

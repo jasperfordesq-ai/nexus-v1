@@ -108,6 +108,7 @@
       "audit_error_title": "غير قادر على تحميل سجل التدقيق",
       "audit_error_description": "تعذر تحميل سجل القالب غير القابل للتغيير.",
       "audit_empty": "تم إرجاع أية إدخالات التدقيق.",
+      "audit_load_more": "تحميل المزيد من السجل",
       "audit_actions": {
         "captured": "تم التقاط القالب",
         "revised": "تم تنقيح القالب",

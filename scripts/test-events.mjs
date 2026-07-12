@@ -79,7 +79,7 @@ function assertPathsExist(paths, label) {
 }
 
 function prepareIsolatedTestDatabase(database) {
-  if (!/^nexus_test_events_[0-9]+$/.test(database)) {
+  if (!/^nexus_test_events_[0-9]+(?:_[0-9]+)?$/.test(database)) {
     throw new Error('Refusing to prepare an unexpected Events test database name.');
   }
 
@@ -110,7 +110,7 @@ function prepareIsolatedTestDatabase(database) {
 }
 
 function cleanupIsolatedTestDatabase(database) {
-  if (!/^nexus_test_events_[0-9]+$/.test(database)) {
+  if (!/^nexus_test_events_[0-9]+(?:_[0-9]+)?$/.test(database)) {
     return;
   }
 
@@ -154,6 +154,12 @@ for (const [signal, exitCode] of [['SIGINT', 130], ['SIGTERM', 143], ['SIGHUP', 
 
 const phpBatches = [
   'core',
+  'core-a',
+  'core-b',
+  'core-1',
+  'core-2',
+  'core-3',
+  'core-4',
   'contract',
   'lifecycle',
   'notifications',
@@ -174,6 +180,7 @@ const phpBatches = [
   'safety',
   'broadcasts',
   'performance',
+  'migrations',
 ];
 
 if (only && ![...only].every((arg) => ['--php-only', '--react-only', '--mobile-only'].includes(arg))) {
@@ -200,9 +207,11 @@ if (shouldRun('php')) {
     'tests/Laravel/Feature/GovukAlpha/EventsParityTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventCanonicalMutationTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventOperationsTest.php',
+    'tests/Laravel/Feature/GovukAlpha/AccessibleEventModerationTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventRegistrationProductTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventAgendaTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventAnalyticsTest.php',
+    'tests/Laravel/Feature/GovukAlpha/AccessibleEventLifecycleHistoryTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventSafetyTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventTemplatesTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventTicketsTest.php',
@@ -237,6 +246,7 @@ if (shouldRun('php')) {
     'tests/Laravel/Unit/Services/EventReminderServiceTest.php',
     'tests/Laravel/Unit/Services/EventServiceTest.php',
     'tests/Laravel/Unit/Services/EventRecurrenceServiceTest.php',
+    'tests/Laravel/Unit/Services/EventRecurrenceCapabilityServiceTest.php',
     'tests/Laravel/Unit/Services/NotificationServiceTest.php',
     'tests/Laravel/Unit/Helpers/IcsHelperTest.php',
     'tests/Laravel/Unit/Helpers/IcsEnterpriseContractTest.php',
@@ -280,6 +290,8 @@ if (shouldRun('php')) {
       'tests/Performance/Events/EventPeopleRosterPerformanceTest.php',
     ];
     assertPathsExist(candidates, 'Events performance harness');
+  } else if (phpBatch === 'migrations') {
+    candidates = candidates.filter((path) => /MigrationTest\.php$/.test(path));
   } else if (phpBatch === 'calendar') {
     const calendarTests = new Set([
       'tests/Laravel/Feature/Events/EventCalendarIntegrationTest.php',
@@ -287,7 +299,11 @@ if (shouldRun('php')) {
       'tests/Laravel/Feature/Events/EventIntegrityAuditTest.php',
       'tests/Laravel/Feature/Events/EventPolicyIntegrationTest.php',
       'tests/Laravel/Feature/Events/EventPolicyTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceDefinitionBlueprintIntegrationTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceCapabilityControllerTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceMaterializationTest.php',
       'tests/Laravel/Feature/Events/EventRecurrenceV2IntegrationTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceRevisionIntegrationTest.php',
       'tests/Laravel/Feature/GovukAlpha/EventsParityTest.php',
       'tests/Laravel/Feature/GovukAlpha/GovukAlphaCsrfMiddlewareTest.php',
       'tests/Laravel/Unit/Helpers/IcsHelperTest.php',
@@ -295,6 +311,7 @@ if (shouldRun('php')) {
       'tests/Laravel/Unit/Middleware/RedactEventCalendarFeedSecretTest.php',
       'tests/Laravel/Unit/Middleware/SecurityHeadersTest.php',
       'tests/Laravel/Unit/Services/EventRecurrenceServiceTest.php',
+      'tests/Laravel/Unit/Services/EventRecurrenceCapabilityServiceTest.php',
     ]);
     candidates = candidates.filter((path) => calendarTests.has(path));
   } else if (phpBatch === 'agenda') {
@@ -348,14 +365,19 @@ if (shouldRun('php')) {
       'tests/Laravel/Feature/Events/EventCanonicalContractTest.php',
       'tests/Laravel/Feature/Events/EventDiscoveryContractTest.php',
       'tests/Laravel/Feature/Events/EventFeatureBoundaryTest.php',
+      'tests/Laravel/Feature/Events/EventOpenApiCoverageTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceCapabilityControllerTest.php',
       'tests/Laravel/Feature/Events/EventPolicyIntegrationTest.php',
       'tests/Laravel/Feature/Events/EventPolicyTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceDefinitionBlueprintMigrationTest.php',
+      'tests/Laravel/Feature/Events/EventRecurrenceOverrideMigrationTest.php',
       'tests/Laravel/Feature/Events/EventTimeIdentityIntegrityTest.php',
       'tests/Laravel/Feature/Events/EventVenueAccessibilityMigrationTest.php',
       'tests/Laravel/Feature/Events/EventWriterContractTest.php',
       'tests/Laravel/Feature/GovukAlpha/AccessibleEventTimeIdentityTest.php',
       'tests/Laravel/Feature/GovukAlpha/AccessibleEventVenueAccessibilityTest.php',
       'tests/Laravel/Unit/Services/EventMigrationChainSafetyStaticTest.php',
+      'tests/Laravel/Unit/Services/EventRecurrenceCapabilityServiceTest.php',
       'tests/Laravel/Unit/Support/EventContractMapperPermissionsTest.php',
     ]);
     candidates = candidates.filter((path) => contractTests.has(path));
@@ -449,7 +471,10 @@ if (shouldRun('php')) {
       'tests/Laravel/Feature/Controllers/NotificationsControllerTest.php',
     ]);
     candidates = candidates.filter((path) => notificationTests.has(path));
-  } else if (phpBatch === 'core') {
+  } else if (phpBatch === 'core'
+    || phpBatch === 'core-a'
+    || phpBatch === 'core-b'
+    || /^core-[1-4]$/.test(phpBatch)) {
     const notificationTests = new Set([
       'tests/Laravel/Feature/Events/EventNotificationPreferenceComplianceTest.php',
       'tests/Laravel/Feature/Events/EventNotificationOutboxProcessorTest.php',
@@ -467,6 +492,29 @@ if (shouldRun('php')) {
       'tests/Laravel/Feature/Controllers/NotificationsControllerTest.php',
     ]);
     candidates = candidates.filter((path) => !notificationTests.has(path));
+    if (phpBatch === 'core-a' || phpBatch === 'core-b') {
+      // The complete residual core regularly exceeds CI/agent command limits.
+      // Split its already-sorted path list at one stable midpoint so the two
+      // isolated shards preserve exactly the same coverage as `core`.
+      const midpoint = Math.ceil(candidates.length / 2);
+      candidates = phpBatch === 'core-a'
+        ? candidates.slice(0, midpoint)
+        : candidates.slice(midpoint);
+    } else if (/^core-[1-4]$/.test(phpBatch)) {
+      // Quarter shards are the bounded CI form of the same residual list.
+      const shardNumber = Number.parseInt(phpBatch.slice('core-'.length), 10);
+      const shardSize = Math.ceil(candidates.length / 4);
+      const start = (shardNumber - 1) * shardSize;
+      candidates = candidates.slice(start, Math.min(start + shardSize, candidates.length));
+    }
+  }
+
+  // Schema round-trip tests mutate global indexes, constraints and triggers.
+  // MariaDB can rebind an earlier foreign key to a later equivalent index when
+  // those tests share one database, making later rollback checks order-dependent.
+  // The migrations batch below runs every such file in its own fresh database.
+  if (phpBatch !== null && phpBatch !== 'migrations') {
+    candidates = candidates.filter((path) => !/MigrationTest\.php$/.test(path));
   }
 
   const appDocker = spawnSync(
@@ -481,14 +529,24 @@ if (shouldRun('php')) {
   );
   if (appDocker.status === 0 && appDocker.stdout.trim() === 'true'
     && databaseDocker.status === 0 && databaseDocker.stdout.trim() === 'true') {
-    const database = `nexus_test_events_${process.pid}`;
-    process.stdout.write(`\n[events] Laravel Events tests (isolated database ${database})\n`);
+    const testSets = phpBatch === 'migrations'
+      ? candidates.map((path) => [path])
+      : [candidates];
+    for (const [setIndex, testSet] of testSets.entries()) {
+      const suffix = testSets.length === 1 ? '' : `_${setIndex + 1}`;
+      const database = `nexus_test_events_${process.pid}${suffix}`;
+      const setLabel = testSets.length === 1
+        ? ''
+        : ` (${setIndex + 1}/${testSets.length}: ${testSet[0]})`;
+      process.stdout.write(
+        `\n[events] Laravel Events tests${setLabel} (isolated database ${database})\n`,
+      );
 
-    let result;
-    activeIsolatedDatabase = database;
-    try {
-      prepareIsolatedTestDatabase(database);
-      result = spawnSync('docker', [
+      let result;
+      activeIsolatedDatabase = database;
+      try {
+        prepareIsolatedTestDatabase(database);
+        result = spawnSync('docker', [
         'exec',
         '-e', 'APP_ENV=testing',
         '-e', 'APP_KEY=base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=',
@@ -516,17 +574,18 @@ if (shouldRun('php')) {
         '--display-incomplete',
         '--display-skipped',
         ...(phpFilter === null ? [] : ['--filter', phpFilter]),
-        ...candidates,
-      ], { cwd: process.cwd(), stdio: 'inherit' });
-    } finally {
-      cleanupActiveIsolatedDatabase();
-    }
+          ...testSet,
+        ], { cwd: process.cwd(), stdio: 'inherit' });
+      } finally {
+        cleanupActiveIsolatedDatabase();
+      }
 
-    if (result?.error) {
-      throw result.error;
-    }
-    if (result?.status !== 0) {
-      process.exit(result?.status ?? 1);
+      if (result?.error) {
+        throw result.error;
+      }
+      if (result?.status !== 0) {
+        process.exit(result?.status ?? 1);
+      }
     }
   } else {
     process.stderr.write(
@@ -578,6 +637,7 @@ if (shouldRun('mobile')) {
     'app/(modals)/event-detail.test.tsx',
     'app/(modals)/event-attendance.test.tsx',
     'app/(modals)/event-communications.test.tsx',
+    'app/(modals)/event-recurrence-blueprints.test.tsx',
     'app/(modals)/event-templates.test.tsx',
     'app/(modals)/event-tickets.test.tsx',
     'app/(modals)/federation-groups-events.test.tsx',
@@ -600,6 +660,7 @@ if (shouldRun('mobile')) {
     'lib/events/eventRegistrationFormRules.test.ts',
     'lib/utils/eventDateTime.test.ts',
     'locales/event-communications-content.test.ts',
+    'locales/event-recurrence-blueprints-content.test.ts',
     'locales/event-templates-content.test.ts',
     'locales/event-tickets-content.test.ts',
     'locales/events-content.test.ts',

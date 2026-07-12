@@ -280,6 +280,16 @@
                         ->format('Y-m-d\TH:i');
                 };
                 $policyApproval = $policySettings?->approval_mode?->value ?? 'auto';
+                $registrationPageHref = static function (string $collection, int $page) use ($tenantSlug, $eventId): string {
+                    $pageKey = $collection . '_page';
+                    $query = request()->except($pageKey);
+
+                    return route('govuk-alpha.events.registration.index', array_merge($query, [
+                        'tenantSlug' => $tenantSlug,
+                        'id' => $eventId,
+                        $pageKey => $page,
+                    ])) . '#registration-' . $collection;
+                };
             @endphp
             <h3 class="govuk-heading-m">{{ __('event_registration.settings.title') }}</h3>
             <p class="govuk-body">{{ __('event_registration.settings.description') }}</p>
@@ -378,7 +388,7 @@
                 <p class="govuk-body">{{ __('event_registration.forms.empty') }}</p>
             @endforelse
 
-            <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ __('event_registration.submissions.title') }}</h3>
+            <h3 class="govuk-heading-m govuk-!-margin-top-7" id="registration-submissions">{{ __('event_registration.submissions.title') }}</h3>
             @forelse ($organizer['submissions'] as $submission)
                 <details class="govuk-details">
                     <summary class="govuk-details__summary">
@@ -407,6 +417,23 @@
             @empty
                 <p class="govuk-body">{{ __('event_registration.submissions.empty') }}</p>
             @endforelse
+            @php
+                $submissionPagination = data_get($organizer, 'pagination.submissions');
+            @endphp
+            @if (data_get($submissionPagination, 'previous_page') || data_get($submissionPagination, 'next_page'))
+                <nav class="govuk-pagination" aria-label="{{ __('event_registration.submissions.title') }}">
+                    @if (data_get($submissionPagination, 'previous_page'))
+                        <div class="govuk-pagination__prev">
+                            <a class="govuk-link govuk-pagination__link" rel="prev" href="{{ $registrationPageHref('submissions', (int) data_get($submissionPagination, 'previous_page')) }}">{{ __('event_registration.common.previous') }}</a>
+                        </div>
+                    @endif
+                    @if (data_get($submissionPagination, 'next_page'))
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" rel="next" href="{{ $registrationPageHref('submissions', (int) data_get($submissionPagination, 'next_page')) }}">{{ __('event_registration.common.next') }}</a>
+                        </div>
+                    @endif
+                </nav>
+            @endif
 
             @if (data_get($organizer, 'permissions.export_answers'))
                 <details class="govuk-details">
@@ -479,7 +506,7 @@
                 </form>
             @endif
 
-            <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ __('event_registration.invitations.history_title') }}</h3>
+            <h3 class="govuk-heading-m govuk-!-margin-top-7" id="registration-campaigns">{{ __('event_registration.invitations.history_title') }}</h3>
             @forelse ($organizer['campaigns'] as $campaign)
                 <div class="govuk-summary-card">
                     <div class="govuk-summary-card__title-wrapper">
@@ -503,8 +530,25 @@
             @empty
                 <p class="govuk-body">{{ __('event_registration.invitations.empty') }}</p>
             @endforelse
+            @php
+                $campaignPagination = data_get($organizer, 'pagination.campaigns');
+            @endphp
+            @if (data_get($campaignPagination, 'previous_page') || data_get($campaignPagination, 'next_page'))
+                <nav class="govuk-pagination" aria-label="{{ __('event_registration.invitations.history_title') }}">
+                    @if (data_get($campaignPagination, 'previous_page'))
+                        <div class="govuk-pagination__prev">
+                            <a class="govuk-link govuk-pagination__link" rel="prev" href="{{ $registrationPageHref('campaigns', (int) data_get($campaignPagination, 'previous_page')) }}">{{ __('event_registration.common.previous') }}</a>
+                        </div>
+                    @endif
+                    @if (data_get($campaignPagination, 'next_page'))
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" rel="next" href="{{ $registrationPageHref('campaigns', (int) data_get($campaignPagination, 'next_page')) }}">{{ __('event_registration.common.next') }}</a>
+                        </div>
+                    @endif
+                </nav>
+            @endif
 
-            <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ __('event_registration.guests.title') }}</h3>
+            <h3 class="govuk-heading-m govuk-!-margin-top-7" id="registration-guests">{{ __('event_registration.guests.title') }}</h3>
             @forelse ($organizer['guests'] as $guest)
                 @php
                     $attendance = data_get($guest, 'attendance');
@@ -536,6 +580,23 @@
             @empty
                 <p class="govuk-body">{{ __('event_registration.guests.empty') }}</p>
             @endforelse
+            @php
+                $guestPagination = data_get($organizer, 'pagination.guests');
+            @endphp
+            @if (data_get($guestPagination, 'previous_page') || data_get($guestPagination, 'next_page'))
+                <nav class="govuk-pagination" aria-label="{{ __('event_registration.guests.title') }}">
+                    @if (data_get($guestPagination, 'previous_page'))
+                        <div class="govuk-pagination__prev">
+                            <a class="govuk-link govuk-pagination__link" rel="prev" href="{{ $registrationPageHref('guests', (int) data_get($guestPagination, 'previous_page')) }}">{{ __('event_registration.common.previous') }}</a>
+                        </div>
+                    @endif
+                    @if (data_get($guestPagination, 'next_page'))
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" rel="next" href="{{ $registrationPageHref('guests', (int) data_get($guestPagination, 'next_page')) }}">{{ __('event_registration.common.next') }}</a>
+                        </div>
+                    @endif
+                </nav>
+            @endif
 
             @if (data_get($organizer, 'permissions.manage_retention'))
                 <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ __('event_registration.retention.title') }}</h3>

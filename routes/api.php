@@ -226,6 +226,10 @@ Route::get('/v2/presence/online-count', [\App\Http\Controllers\Api\PresenceContr
 // ============================================
 Route::middleware('feature:events')->group(function () {
     Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
+    Route::get('/v2/events/recurrence-capabilities', [
+        \App\Http\Controllers\Api\EventRecurrenceCapabilityController::class,
+        'show',
+    ]);
     Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby']);
     Route::get('/v2/events/calendar', [\App\Http\Controllers\Api\EventCalendarController::class, 'index']);
     Route::get('/v2/events/calendar/feed.ics', [\App\Http\Controllers\Api\EventCalendarController::class, 'tenantFeed']);
@@ -285,8 +289,22 @@ Route::middleware('feature:events')->group(function () {
         ->whereNumber('id')->whereNumber('ticketTypeId')->whereNumber('userId')->middleware('throttle:30,1');
     Route::post('/v2/events/{id}/ticket-entitlements/{entitlementId}/cancel', [\App\Http\Controllers\Api\EventTicketController::class, 'cancelEntitlement'])
         ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:30,1');
+    Route::get('/v2/events/{id}/lifecycle-history', [\App\Http\Controllers\Api\EventLifecycleHistoryController::class, 'index'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::post('/v2/events/{id}/recurrence-revisions/preview', [\App\Http\Controllers\Api\EventRecurrenceRevisionController::class, 'preview'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/recurrence-revisions/commit', [\App\Http\Controllers\Api\EventRecurrenceRevisionController::class, 'commit'])
+        ->whereNumber('id')->middleware('throttle:10,1');
+    Route::get('/v2/events/{id}/recurrence-definition-blueprints', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'history'])
+        ->whereNumber('id')->middleware('throttle:60,1');
+    Route::post('/v2/events/{id}/recurrence-definition-blueprints/preview', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'preview'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/recurrence-definition-blueprints/commit', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'commit'])
+        ->whereNumber('id')->middleware('throttle:10,1');
     Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show'])->whereNumber('id');
     Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update'])->whereNumber('id');
+    Route::post('/v2/events/{id}/submit', [\App\Http\Controllers\Api\EventsController::class, 'submitForReview'])->whereNumber('id');
+    Route::post('/v2/events/{id}/publish', [\App\Http\Controllers\Api\EventsController::class, 'publish'])->whereNumber('id');
     Route::delete('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'destroy'])->whereNumber('id');
     Route::post('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp'])->whereNumber('id');
     Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'removeRsvp'])->whereNumber('id');

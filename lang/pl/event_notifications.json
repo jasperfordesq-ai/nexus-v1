@@ -15,6 +15,8 @@
     "expired": "wygasła"
   },
   "lifecycle": {
+    "rejected": "Wydarzenie \u201e:title\u201d nie zosta\u0142o zatwierdzone i wr\u00f3ci\u0142o do wersji roboczej.",
+    "pending_review": "Wydarzenie \u201e:title\u201d zosta\u0142o przes\u0142ane do moderacji.",
     "published": "Wydarzenie „:title” zostało opublikowane.",
     "postponed": "Wydarzenie „:title” zostało przełożone.",
     "cancelled": "Wydarzenie „:title” zostało odwołane.",

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SafeguardingPolicyException;
+use App\Support\Authorization\AdminTier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -651,14 +652,10 @@ abstract class BaseApiController extends Controller
         $userId = $this->requireAuth();
         $user = $this->resolveUser();
 
-        $role = $user->role ?? 'member';
-
-        if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
-            if (!($user->is_super_admin ?? false) && !($user->is_tenant_super_admin ?? false)) {
-                throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                    $this->error(__('api.admin_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
-                );
-            }
+        if (! AdminTier::allows($user)) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->error(__('api.admin_access_required'), 403, 'AUTH_INSUFFICIENT_PERMISSIONS')
+            );
         }
 
         return $userId;
@@ -756,16 +753,7 @@ abstract class BaseApiController extends Controller
             return false;
         }
 
-        $role = $user->role ?? 'member';
-        if (in_array($role, ['broker', 'coordinator'], true)) {
-            return false;
-        }
-
-        return in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
-            || ($user->is_admin ?? false)
-            || ($user->is_super_admin ?? false)
-            || ($user->is_tenant_super_admin ?? false)
-            || ($user->is_god ?? false);
+        return AdminTier::allows($user);
     }
 
     /**

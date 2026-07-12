@@ -37,6 +37,9 @@
     @unless ($moduleDisabled)
         <p class="govuk-body">
             <a class="govuk-link" href="{{ route('govuk-alpha.events.browse', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_events.nav.browse_by_category') }}</a>
+            @if (!empty($canModerateEvents))
+                <br><a class="govuk-link" href="{{ route('govuk-alpha.events.moderation.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_events.moderation.queue_link') }}</a>
+            @endif
         </p>
     @endunless
 

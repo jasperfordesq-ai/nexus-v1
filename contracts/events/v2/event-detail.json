@@ -27,7 +27,21 @@
     "label": "Community Hall",
     "latitude": 53.3498,
     "longitude": -6.2603,
-    "mode": "hybrid"
+    "mode": "hybrid",
+    "accessibility": {
+      "schema_version": 1,
+      "step_free_access": null,
+      "accessible_toilet": null,
+      "hearing_loop": null,
+      "quiet_space": null,
+      "seating_available": null,
+      "accessible_parking": null,
+      "parking_details": null,
+      "transit_details": null,
+      "assistance_contact": null,
+      "notes": null,
+      "provided": false
+    }
   },
   "schedule": {
     "start_at": "2030-05-01T10:15:00+00:00",
@@ -91,6 +105,7 @@
     "message": false,
     "export": false,
     "publish": false,
+    "submit_for_review": false,
     "manage_agenda": false,
     "manage_staff": false,
     "manage_registration": false,
@@ -123,6 +138,20 @@
   "coordinates": {
     "lat": 53.3498,
     "lng": -6.2603
+  },
+  "venue_accessibility": {
+    "schema_version": 1,
+    "step_free_access": null,
+    "accessible_toilet": null,
+    "hearing_loop": null,
+    "quiet_space": null,
+    "seating_available": null,
+    "accessible_parking": null,
+    "parking_details": null,
+    "transit_details": null,
+    "assistance_contact": null,
+    "notes": null,
+    "provided": false
   },
   "start_time": "2030-05-01T10:15:00+00:00",
   "end_time": "2030-05-01T12:00:00+00:00",

@@ -108,6 +108,7 @@
       "audit_error_title": "Der Prüfverlauf konnte nicht geladen werden",
       "audit_error_description": "Der unveränderliche Vorlagenverlauf konnte nicht geladen werden.",
       "audit_empty": "Es wurden keine Prüfeinträge zurückgegeben.",
+      "audit_load_more": "Mehr Verlauf laden",
       "audit_actions": {
         "captured": "Vorlage erfasst",
         "revised": "Vorlage überarbeitet",

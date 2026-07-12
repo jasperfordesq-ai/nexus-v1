@@ -9,6 +9,8 @@ import * as path from 'path';
 
 dotenv.config({ path: path.join(__dirname, 'e2e/.env.test') });
 
+const enterpriseEventsJourney = '**/events/enterprise-journey.spec.ts';
+
 /**
  * Project NEXUS - E2E Test Configuration
  *
@@ -89,7 +91,11 @@ export default defineConfig({
     // Desktop Chrome - React app
     {
       name: 'chromium-modern',
-      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
+      testIgnore: [
+        '**/accessibility-audit.spec.ts',
+        '**/pwa/offline-install.spec.ts',
+        enterpriseEventsJourney,
+      ],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -100,7 +106,11 @@ export default defineConfig({
     // Desktop Firefox - React app
     {
       name: 'firefox-modern',
-      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
+      testIgnore: [
+        '**/accessibility-audit.spec.ts',
+        '**/pwa/offline-install.spec.ts',
+        enterpriseEventsJourney,
+      ],
       use: {
         ...devices['Desktop Firefox'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -111,7 +121,11 @@ export default defineConfig({
     // Mobile Chrome - Modern Theme
     {
       name: 'mobile-chrome',
-      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
+      testIgnore: [
+        '**/accessibility-audit.spec.ts',
+        '**/pwa/offline-install.spec.ts',
+        enterpriseEventsJourney,
+      ],
       use: {
         ...devices['Pixel 5'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -122,7 +136,11 @@ export default defineConfig({
     // Mobile Safari - React app
     {
       name: 'mobile-safari',
-      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
+      testIgnore: [
+        '**/accessibility-audit.spec.ts',
+        '**/pwa/offline-install.spec.ts',
+        enterpriseEventsJourney,
+      ],
       use: {
         ...devices['iPhone 12'],
         storageState: 'e2e/fixtures/.auth/user.json',

@@ -51,6 +51,7 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Settings from 'lucide-react/icons/settings';
 import Ticket from 'lucide-react/icons/ticket';
 import Download from 'lucide-react/icons/download';
+import Send from 'lucide-react/icons/send';
 import { Helmet } from 'react-helmet-async';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -148,6 +149,7 @@ export function EventDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [isWaitlisted, setIsWaitlisted] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
@@ -183,6 +185,8 @@ export function EventDetailPage() {
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
+  const rosterAbortRef = useRef<AbortController | null>(null);
+  const eventRequestGeneration = useRef(0);
   const rosterRequestGeneration = useRef(0);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
@@ -194,31 +198,76 @@ export function EventDetailPage() {
   const cancelMutationKeyRef = useRef<string | null>(null);
   const acceptOfferMutationKeyRef = useRef<string | null>(null);
 
+  const loadRosterPage = useCallback(async (cursor: string | null, append: boolean) => {
+    if (!id) return;
+
+    rosterAbortRef.current?.abort();
+    const controller = new AbortController();
+    rosterAbortRef.current = controller;
+    const requestGeneration = ++rosterRequestGeneration.current;
+    const isCurrentRosterRequest = () => (
+      requestGeneration === rosterRequestGeneration.current
+      && rosterAbortRef.current === controller
+      && !controller.signal.aborted
+    );
+
+    setIsRosterLoading(true);
+    setRosterLoadError(false);
+    try {
+      const response = await eventsApi.roster(id, {
+        per_page: 50,
+        status: 'all',
+        cursor: cursor ?? undefined,
+      }, { signal: controller.signal });
+      if (!isCurrentRosterRequest()) return;
+      if (!response.success || !response.data) {
+        setRosterLoadError(true);
+        return;
+      }
+      setAttendees((current) => {
+        if (!append) return response.data!;
+        const merged = new Map(current.map((attendee) => [attendee.member.id, attendee]));
+        response.data!.forEach((attendee) => merged.set(attendee.member.id, attendee));
+        return [...merged.values()];
+      });
+      setRosterCursor(response.meta?.cursor ?? response.meta?.next_cursor ?? null);
+      setRosterHasMore(response.meta?.has_more ?? false);
+    } catch (caught) {
+      if (!isCurrentRosterRequest()) return;
+      logError('Failed to load attendee roster page', caught);
+      setRosterLoadError(true);
+    } finally {
+      if (isCurrentRosterRequest()) {
+        rosterAbortRef.current = null;
+        setIsRosterLoading(false);
+      }
+    }
+  }, [id]);
+
   const loadEvent = useCallback(async () => {
     if (!id) return;
 
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
+    const requestGeneration = ++eventRequestGeneration.current;
+    const isCurrentRequest = () => (
+      requestGeneration === eventRequestGeneration.current
+      && abortRef.current === controller
+      && !controller.signal.aborted
+    );
 
     try {
       setIsLoading(true);
       setError(null);
-      rosterRequestGeneration.current += 1;
       setAttendees([]);
       setRosterCursor(null);
       setRosterHasMore(false);
       setRosterLoadError(false);
-      setIsRosterLoading(true);
-      const [eventRes, attendeesRes] = await Promise.all([
-        eventsApi.get(id, { signal: controller.signal }),
-        eventsApi.roster(id, { per_page: 50, status: 'all' }, { signal: controller.signal }).catch((err) => {
-          logError('Failed to load attendees', err);
-          return null;
-        }),
-      ]);
+      void loadRosterPage(null, false);
+      const eventRes = await eventsApi.get(id, { signal: controller.signal });
 
-      if (controller.signal.aborted) return;
+      if (!isCurrentRequest()) return;
 
       if (eventRes.success && eventRes.data) {
         setEvent(eventRes.data);
@@ -233,61 +282,31 @@ export function EventDetailPage() {
         setEvent(null);
         setError(tRef.current('detail.not_found_desc'));
       }
-      if (attendeesRes?.success && attendeesRes.data) {
-        setAttendees(attendeesRes.data);
-        setRosterCursor(attendeesRes.meta?.cursor ?? attendeesRes.meta?.next_cursor ?? null);
-        setRosterHasMore(attendeesRes.meta?.has_more ?? false);
-      } else {
-        setRosterLoadError(true);
-      }
     } catch (err) {
-      if (controller.signal.aborted) return;
+      if (!isCurrentRequest()) return;
       logError('Failed to load event', err);
       // Clear stale event data (see the else branch above) so a failed reload
       // shows the error screen instead of the previously-loaded event.
       setEvent(null);
       setError(tRef.current('detail.unable_to_load'));
     } finally {
-      setIsLoading(false);
-      setIsRosterLoading(false);
-    }
-  }, [id]);
-
-  const loadRosterPage = useCallback(async (cursor: string | null, append: boolean) => {
-    if (!id) return;
-    const requestGeneration = ++rosterRequestGeneration.current;
-    setIsRosterLoading(true);
-    setRosterLoadError(false);
-    try {
-      const response = await eventsApi.roster(id, {
-        per_page: 50,
-        status: 'all',
-        cursor: cursor ?? undefined,
-      });
-      if (requestGeneration !== rosterRequestGeneration.current) return;
-      if (!response.success || !response.data) {
-        setRosterLoadError(true);
-        return;
+      if (isCurrentRequest()) {
+        abortRef.current = null;
+        setIsLoading(false);
       }
-      setAttendees((current) => {
-        if (!append) return response.data!;
-        const merged = new Map(current.map((attendee) => [attendee.member.id, attendee]));
-        response.data!.forEach((attendee) => merged.set(attendee.member.id, attendee));
-        return [...merged.values()];
-      });
-      setRosterCursor(response.meta?.cursor ?? response.meta?.next_cursor ?? null);
-      setRosterHasMore(response.meta?.has_more ?? false);
-    } catch (caught) {
-      if (requestGeneration !== rosterRequestGeneration.current) return;
-      logError('Failed to load attendee roster page', caught);
-      setRosterLoadError(true);
-    } finally {
-      if (requestGeneration === rosterRequestGeneration.current) setIsRosterLoading(false);
     }
-  }, [id]);
+  }, [id, loadRosterPage]);
 
   useEffect(() => {
     loadEvent();
+    return () => {
+      eventRequestGeneration.current += 1;
+      abortRef.current?.abort();
+      abortRef.current = null;
+      rosterRequestGeneration.current += 1;
+      rosterAbortRef.current?.abort();
+      rosterAbortRef.current = null;
+    };
   }, [loadEvent]);
 
   useEffect(() => {
@@ -399,10 +418,16 @@ export function EventDetailPage() {
       : newStatus === 'interested'
         ? engagement.can_change
         : registration.can_withdraw || engagement.can_change;
+    const isClearingCurrentStatus = rsvpStatus === newStatus;
 
-    // If already this status, cancel (remove RSVP)
-    if (rsvpStatus === newStatus) {
-      if (!canClearCurrentStatus) return;
+    if (isClearingCurrentStatus ? !canClearCurrentStatus : !canSetStatus) return;
+
+    const isLeavingActiveRsvp = rsvpStatus === 'going'
+      ? newStatus !== 'going' || isClearingCurrentStatus
+      : rsvpStatus === 'interested'
+        ? newStatus !== 'going' || isClearingCurrentStatus
+        : false;
+    if (isLeavingActiveRsvp) {
       const accepted = await confirm({
         title: tRef.current('detail.rsvp_panel_title'),
         body: rsvpStatus === 'going'
@@ -410,11 +435,19 @@ export function EventDetailPage() {
           : rsvpStatus === 'interested'
             ? tRef.current('detail.rsvp_interested')
             : tRef.current('detail.rsvp_not_going'),
-        confirmLabel: tRef.current('detail.not_going_btn'),
+        confirmLabel: isClearingCurrentStatus
+          ? tRef.current('detail.not_going_btn')
+          : newStatus === 'interested'
+            ? tRef.current('detail.interested_btn')
+            : tRef.current('detail.not_going_btn'),
         cancelLabel: tRef.current('detail.cancel'),
         status: 'warning',
       });
       if (!accepted) return;
+    }
+
+    // If already this status, cancel (remove RSVP).
+    if (isClearingCurrentStatus) {
       try {
         setIsSubmitting(true);
         const response = await eventsApi.removeRsvp(event.id);
@@ -432,8 +465,6 @@ export function EventDetailPage() {
       }
       return;
     }
-
-    if (!canSetStatus) return;
 
     try {
       setIsSubmitting(true);
@@ -541,6 +572,43 @@ export function EventDetailPage() {
       toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsCancelling(false);
+    }
+  }
+
+  async function handlePublication(action: 'submit_for_review' | 'publish') {
+    if (!event || isPublishing) return;
+    const label = action === 'submit_for_review'
+      ? tRef.current('detail.submit_for_review')
+      : tRef.current('detail.publish_event');
+    const accepted = await confirm({
+      title: label,
+      body: tRef.current(action === 'submit_for_review'
+        ? 'detail.submit_for_review_confirm'
+        : 'detail.publish_event_confirm'),
+      confirmLabel: label,
+      cancelLabel: tRef.current('detail.cancel'),
+      status: action === 'publish' ? 'warning' : 'accent',
+    });
+    if (!accepted) return;
+
+    setIsPublishing(true);
+    try {
+      const response = action === 'submit_for_review'
+        ? await eventsApi.submitForReview(event.id)
+        : await eventsApi.publish(event.id);
+      if (!response.success || !response.data) {
+        toast.error(t('detail.publication_failed'));
+        return;
+      }
+      setEvent(response.data);
+      toast.success(action === 'submit_for_review'
+        ? t('detail.submitted_for_review')
+        : t('detail.published_successfully'));
+    } catch (publicationError) {
+      logError('Failed to transition Event publication', publicationError);
+      toast.error(t('detail.publication_failed'));
+    } finally {
+      setIsPublishing(false);
     }
   }
 
@@ -907,9 +975,29 @@ export function EventDetailPage() {
             </div>
 
             {(canOpenManagement
+              || event.permissions.submit_for_review
+              || event.permissions.publish
               || (event.permissions.edit && !isArchived)
               || (event.permissions.cancel && !isCancelled)) && (
               <div className="flex flex-wrap gap-2 sm:justify-end">
+                {event.permissions.submit_for_review && <Button
+                  size="sm"
+                  isLoading={isPublishing}
+                  onPress={() => void handlePublication('submit_for_review')}
+                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.submit_for_review_aria', { title: event.title })}
+                >
+                  {t('detail.submit_for_review')}
+                </Button>}
+                {event.permissions.publish && <Button
+                  size="sm"
+                  isLoading={isPublishing}
+                  onPress={() => void handlePublication('publish')}
+                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.publish_event_aria', { title: event.title })}
+                >
+                  {t('detail.publish_event')}
+                </Button>}
                 {canOpenManagement && <Button
                   as={Link}
                   to={tenantPath(`/events/${event.id}/manage`)}

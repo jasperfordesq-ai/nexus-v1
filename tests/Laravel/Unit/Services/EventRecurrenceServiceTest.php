@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Exceptions\EventRecurrenceTraversalLimitException;
 use App\Services\EventRecurrenceService;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -253,6 +254,136 @@ final class EventRecurrenceServiceTest extends TestCase
         $this->assertLessThanOrEqual(191, strlen($first));
         $this->assertSame('sabre-vobject', EventRecurrenceService::ENGINE);
         $this->assertSame('2', EventRecurrenceService::ENGINE_VERSION);
+    }
+
+    public function test_window_expansion_extends_yearly_never_rule_beyond_old_twenty_year_horizon(): void
+    {
+        $start = $this->utcFromLocal('2000-02-29 09:00:00', 'UTC');
+        $window = $this->service->expandWindow(
+            $start,
+            null,
+            'UTC',
+            'FREQ=YEARLY;BYMONTHDAY=29;BYMONTH=2',
+            new DateTimeImmutable('2024-01-01 00:00:00', new DateTimeZone('UTC')),
+            new DateTimeImmutable('2040-12-31 23:59:59', new DateTimeZone('UTC')),
+            [],
+            [],
+            50,
+            200,
+        );
+
+        $this->assertTrue($window['fully_evaluated']);
+        $this->assertFalse($window['truncated']);
+        $this->assertSame([
+            '2024-02-29',
+            '2028-02-29',
+            '2032-02-29',
+            '2036-02-29',
+            '2040-02-29',
+        ], array_column($window['occurrences'], 'occurrence_date'));
+    }
+
+    public function test_phase_preserving_window_matches_original_iterator_for_implicit_and_explicit_rules(): void
+    {
+        config()->set('events.recurrence.max_occurrences', 5000);
+        config()->set('events.recurrence.max_horizon_years', 100);
+        $cases = [
+            ['UTC', '2024-01-31 18:00:00', 'FREQ=MONTHLY', '2035-01-01', '2037-12-31 23:59:59'],
+            ['UTC', '2024-02-29 09:00:00', 'FREQ=YEARLY', '2048-01-01', '2060-12-31 23:59:59'],
+            ['UTC', '2024-03-15 09:00:00', 'FREQ=YEARLY;BYMONTH=6', '2048-01-01', '2060-12-31 23:59:59'],
+            ['UTC', '2024-01-31 09:00:00', 'FREQ=MONTHLY;BYMONTHDAY=-1', '2035-01-01', '2037-12-31 23:59:59'],
+            ['UTC', '2024-01-01 09:00:00', 'FREQ=MONTHLY;BYDAY=MO', '2035-01-01', '2036-12-31 23:59:59'],
+            ['Europe/Dublin', '2024-01-01 09:00:00', 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE', '2035-01-01', '2036-12-31 23:59:59'],
+            ['Europe/Dublin', '2024-03-24 01:30:00', 'FREQ=WEEKLY', '2035-01-01', '2036-12-31 23:59:59'],
+        ];
+
+        foreach ($cases as [$timezone, $localStart, $rrule, $from, $through]) {
+            $start = $this->utcFromLocal($localStart, $timezone);
+            $windowStart = new DateTimeImmutable($from . ' UTC');
+            $windowEnd = new DateTimeImmutable($through . ' UTC');
+            $full = $this->service->expand($start, null, $timezone, $rrule);
+            $expected = array_values(array_filter(
+                $full,
+                static fn (array $occurrence): bool => $occurrence['start_utc'] >= $windowStart->format('Y-m-d H:i:s')
+                    && $occurrence['start_utc'] <= $windowEnd->format('Y-m-d H:i:s'),
+            ));
+            $actual = $this->service->expandWindow(
+                $start,
+                null,
+                $timezone,
+                $rrule,
+                $windowStart,
+                $windowEnd,
+                [],
+                [],
+                2000,
+                5000,
+            );
+
+            $this->assertSame(
+                array_column($expected, 'recurrence_id'),
+                array_column($actual['occurrences'], 'recurrence_id'),
+                $rrule,
+            );
+            $this->assertTrue($actual['fully_evaluated'], $rrule);
+        }
+    }
+
+    public function test_old_infinite_template_seek_is_bounded_and_dense_window_resumes(): void
+    {
+        $start = $this->utcFromLocal('1900-01-01 09:00:00', 'UTC');
+        $first = $this->service->expandWindow(
+            $start,
+            null,
+            'UTC',
+            'FREQ=DAILY',
+            new DateTimeImmutable('2026-07-01 00:00:00 UTC'),
+            new DateTimeImmutable('2026-07-10 23:59:59 UTC'),
+            [],
+            [],
+            3,
+            20,
+        );
+        $this->assertTrue($first['truncated']);
+        $this->assertLessThan(20, $first['scanned']);
+        $this->assertSame(3, count($first['occurrences']));
+
+        $second = $this->service->expandWindow(
+            $start,
+            null,
+            'UTC',
+            'FREQ=DAILY',
+            new DateTimeImmutable((string) $first['resume_at_utc'], new DateTimeZone('UTC')),
+            new DateTimeImmutable('2026-07-10 23:59:59 UTC'),
+            [],
+            [],
+            20,
+            40,
+        );
+        $this->assertSame('20260704T090000Z', $second['occurrences'][0]['recurrence_id']);
+        $this->assertSame([], array_intersect(
+            array_column($first['occurrences'], 'recurrence_id'),
+            array_column($second['occurrences'], 'recurrence_id'),
+        ));
+    }
+
+    public function test_old_finite_rule_fails_closed_when_seek_exceeds_budget(): void
+    {
+        config()->set('events.recurrence.max_occurrences', 5000);
+        $this->expectException(EventRecurrenceTraversalLimitException::class);
+        $start = $this->utcFromLocal('2000-01-01 09:00:00', 'UTC');
+        $this->service->expandWindow(
+            $start,
+            null,
+            'UTC',
+            'FREQ=DAILY;COUNT=5000',
+            new DateTimeImmutable('2010-01-01 00:00:00 UTC'),
+            new DateTimeImmutable('2010-01-31 23:59:59 UTC'),
+            [],
+            [],
+            10,
+            100,
+        );
     }
 
     private function utcFromLocal(string $value, string $timezone): DateTimeImmutable

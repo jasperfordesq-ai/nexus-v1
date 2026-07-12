@@ -26,9 +26,12 @@ final class EventPolicyTest extends TestCase
     private const ABILITIES = [
         'view',
         'viewMeetingLink',
+        'viewRegisteredAgenda',
+        'viewStaffAgenda',
         'viewRoster',
         'viewWaitlist',
         'manage',
+        'manageAgenda',
         'manageStaff',
         'manageAttendance',
         'messagePeople',
@@ -201,9 +204,12 @@ final class EventPolicyTest extends TestCase
         return [
             'view' => $policy->view($user, $event),
             'viewMeetingLink' => $policy->viewMeetingLink($user, $event),
+            'viewRegisteredAgenda' => $policy->viewRegisteredAgenda($user, $event),
+            'viewStaffAgenda' => $policy->viewStaffAgenda($user, $event),
             'viewRoster' => $policy->viewRoster($user, $event),
             'viewWaitlist' => $policy->viewWaitlist($user, $event),
             'manage' => $policy->manage($user, $event),
+            'manageAgenda' => $policy->manageAgenda($user, $event),
             'manageStaff' => $policy->manageStaff($user, $event),
             'manageAttendance' => $policy->manageAttendance($user, $event),
             'messagePeople' => $policy->messagePeople($user, $event),
@@ -277,14 +283,14 @@ final class EventPolicyTest extends TestCase
         $this->assertOnlyAbilities(['view'], $this->policy, $unrelated, $event, 'unrelated member');
         $this->assertOnlyAbilities(['view'], $this->policy, $interested, $event, 'interested member');
         $this->assertOnlyAbilities(
-            ['view', 'viewMeetingLink'],
+            ['view', 'viewMeetingLink', 'viewRegisteredAgenda'],
             $this->policy,
             $confirmed,
             $event,
             'confirmed attendee'
         );
         $this->assertOnlyAbilities(
-            ['view', 'viewMeetingLink'],
+            ['view', 'viewMeetingLink', 'viewRegisteredAgenda'],
             $this->policy,
             $attended,
             $event,
@@ -393,7 +399,7 @@ final class EventPolicyTest extends TestCase
         $this->rsvp($event, $outsider, 'going');
 
         $this->assertOnlyAbilities(
-            ['view', 'viewMeetingLink'],
+            ['view', 'viewMeetingLink', 'viewRegisteredAgenda'],
             $this->policy,
             $member,
             $event,
@@ -531,9 +537,12 @@ final class EventPolicyTest extends TestCase
         $this->assertOnlyAbilities([
             'view',
             'viewMeetingLink',
+            'viewRegisteredAgenda',
+            'viewStaffAgenda',
             'viewRoster',
             'viewWaitlist',
             'manage',
+            'manageAgenda',
             'manageStaff',
             'manageAttendance',
             'messagePeople',
@@ -544,20 +553,22 @@ final class EventPolicyTest extends TestCase
         ], $this->policy, $coOrganizer, $event, 'co-organizer');
         $this->assertOnlyAbilities([
             'view',
+            'viewRegisteredAgenda',
+            'viewStaffAgenda',
             'viewRoster',
             'viewWaitlist',
             'exportPeople',
             'manageRegistration',
         ], new EventPolicy(), $registration, $event, 'registration manager');
         $this->assertOnlyAbilities(
-            ['view', 'messagePeople', 'broadcast'],
+            ['view', 'viewRegisteredAgenda', 'viewStaffAgenda', 'messagePeople', 'broadcast'],
             new EventPolicy(),
             $communications,
             $event,
             'communications manager',
         );
         $this->assertOnlyAbilities(
-            ['view', 'viewRoster', 'manageAttendance'],
+            ['view', 'viewRegisteredAgenda', 'viewStaffAgenda', 'viewRoster', 'manageAttendance'],
             new EventPolicy(),
             $checkIn,
             $event,
@@ -565,6 +576,8 @@ final class EventPolicyTest extends TestCase
         );
         $this->assertOnlyAbilities([
             'view',
+            'viewRegisteredAgenda',
+            'viewStaffAgenda',
             'manageFinance',
             'reconcileCredits',
             'reconcileTickets',
@@ -674,9 +687,14 @@ final class EventPolicyTest extends TestCase
             $batch[(int) $waitlistedEvent->getKey()]
         );
         $this->assertTrue($batch[(int) $confirmedEvent->getKey()]['viewMeetingLink']);
+        $this->assertTrue($batch[(int) $confirmedEvent->getKey()]['viewRegisteredAgenda']);
+        $this->assertTrue($batch[(int) $confirmedEvent->getKey()]['viewStaffAgenda']);
         $this->assertTrue($batch[(int) $confirmedEvent->getKey()]['manageAttendance']);
         $this->assertFalse($batch[(int) $confirmedEvent->getKey()]['manage']);
+        $this->assertFalse($batch[(int) $confirmedEvent->getKey()]['manageAgenda']);
         $this->assertFalse($batch[(int) $waitlistedEvent->getKey()]['viewMeetingLink']);
+        $this->assertFalse($batch[(int) $waitlistedEvent->getKey()]['viewRegisteredAgenda']);
+        $this->assertFalse($batch[(int) $waitlistedEvent->getKey()]['viewStaffAgenda']);
         $this->assertTrue($batch[(int) $confirmedEvent->getKey()]['viewRoster']);
     }
 

@@ -17,12 +17,13 @@ use App\Exceptions\EventLifecycleTransitionException;
 use App\Http\Resources\AdminEventResource;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Models\Event;
 use App\Models\User;
-use App\Services\EventLifecycleService;
 use App\Services\EventNotificationService;
+use App\Services\EventPublicationWorkflowService;
+use App\Services\EventService;
 use App\Services\NotificationDispatcher;
 use App\Support\Events\EventLifecycleCompatibility;
-use App\Support\Events\EventLifecycleTransitionGuard;
 use App\Support\Events\EventLifecycleTransitionResult;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
@@ -35,8 +36,8 @@ class AdminEventsController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
-        private readonly EventLifecycleService $lifecycle,
         private readonly EventNotificationService $notifications,
+        private readonly EventPublicationWorkflowService $publicationWorkflow,
     ) {
     }
 
@@ -69,6 +70,14 @@ class AdminEventsController extends BaseApiController
                 );
             }
             $this->applyPublicationFilter($query, $publication);
+            if ($publication === EventPublicationState::PendingReview) {
+                // Moderation is one decision per canonical Event root. Listing
+                // every occurrence would starve unrelated submissions and
+                // disagree with the single root queue row.
+                $query->where(static fn (Builder $root) => $root
+                    ->whereNull('e.parent_event_id')
+                    ->orWhere('e.parent_event_id', 0));
+            }
         }
 
         $operationalValue = $this->scalarQuery('operational_state')
@@ -175,26 +184,18 @@ class AdminEventsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
-        $result = $this->performTransition(
-            $id,
-            $actor,
-            EventPublicationState::Published,
-            null,
-            null,
-            new EventLifecycleTransitionGuard([
-                EventPublicationState::Draft,
-                EventPublicationState::PendingReview,
-                EventPublicationState::Published,
-            ]),
+        $operation = $this->performPublicationTransition(
+            fn (): array => $this->publicationWorkflow->approve($id, $actor),
         );
-        if ($result instanceof JsonResponse) {
-            return $result;
+        if ($operation instanceof JsonResponse) {
+            return $operation;
         }
+        $result = $operation['result'];
         if ($result->changed && $this->directSideEffectsEnabled($result)) {
             $this->notifyOrganizerApproved($snapshot, (int) $actor->id);
         }
 
-        return $this->transitionResponse($id, $result, 'approve');
+        return $this->transitionResponse($id, $result, 'approve', $operation['series']);
     }
 
     public function reject(int $id): JsonResponse
@@ -208,21 +209,18 @@ class AdminEventsController extends BaseApiController
             return $reason;
         }
 
-        $result = $this->performTransition(
-            $id,
-            $actor,
-            EventPublicationState::Draft,
-            null,
-            $reason,
-            new EventLifecycleTransitionGuard([
-                EventPublicationState::PendingReview,
-                EventPublicationState::Draft,
-            ]),
+        $operation = $this->performPublicationTransition(
+            fn (): array => $this->publicationWorkflow->reject($id, $actor, $reason),
         );
 
-        return $result instanceof JsonResponse
-            ? $result
-            : $this->transitionResponse($id, $result, 'reject');
+        return $operation instanceof JsonResponse
+            ? $operation
+            : $this->transitionResponse(
+                $id,
+                $operation['result'],
+                'reject',
+                $operation['series'],
+            );
     }
 
     public function postpone(int $id): JsonResponse
@@ -231,25 +229,21 @@ class AdminEventsController extends BaseApiController
         if ($snapshot === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
-        $result = $this->performTransition(
-            $id,
+        $operation = $this->performSeriesLifecycleTransition(
+            $snapshot,
             $actor,
-            null,
-            EventOperationalState::Postponed,
+            'postpone',
             $this->optionalReason(),
-            new EventLifecycleTransitionGuard(null, [
-                EventOperationalState::Scheduled,
-                EventOperationalState::Postponed,
-            ]),
         );
-        if ($result instanceof JsonResponse) {
-            return $result;
+        if ($operation instanceof JsonResponse) {
+            return $operation;
         }
+        $result = $operation['result'];
         if ($result->changed && $this->directSideEffectsEnabled($result)) {
             $this->notifyScheduleChanged($snapshot, (int) $actor->id);
         }
 
-        return $this->transitionResponse($id, $result, 'postpone');
+        return $this->transitionResponse($id, $result, 'postpone', $operation['series']);
     }
 
     public function cancel(int $id): JsonResponse
@@ -262,26 +256,21 @@ class AdminEventsController extends BaseApiController
         if ($reason instanceof JsonResponse) {
             return $reason;
         }
-        $result = $this->performTransition(
-            $id,
+        $operation = $this->performSeriesLifecycleTransition(
+            $snapshot,
             $actor,
-            null,
-            EventOperationalState::Cancelled,
+            'cancel',
             $reason,
-            new EventLifecycleTransitionGuard(null, [
-                EventOperationalState::Scheduled,
-                EventOperationalState::Postponed,
-                EventOperationalState::Cancelled,
-            ]),
         );
-        if ($result instanceof JsonResponse) {
-            return $result;
+        if ($operation instanceof JsonResponse) {
+            return $operation;
         }
+        $result = $operation['result'];
         if ($result->changed && $this->directSideEffectsEnabled($result)) {
             $this->notifyCancellation($result, $snapshot, (int) $actor->id, $reason);
         }
 
-        return $this->transitionResponse($id, $result, 'cancel');
+        return $this->transitionResponse($id, $result, 'cancel', $operation['series']);
     }
 
     public function complete(int $id): JsonResponse
@@ -290,21 +279,21 @@ class AdminEventsController extends BaseApiController
         if ($snapshot === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
-        $result = $this->performTransition(
-            $id,
+        $operation = $this->performSeriesLifecycleTransition(
+            $snapshot,
             $actor,
-            null,
-            EventOperationalState::Completed,
+            'complete',
             $this->optionalReason(),
-            new EventLifecycleTransitionGuard(null, [
-                EventOperationalState::Scheduled,
-                EventOperationalState::Completed,
-            ]),
         );
 
-        return $result instanceof JsonResponse
-            ? $result
-            : $this->transitionResponse($id, $result, 'complete');
+        return $operation instanceof JsonResponse
+            ? $operation
+            : $this->transitionResponse(
+                $id,
+                $operation['result'],
+                'complete',
+                $operation['series'],
+            );
     }
 
     public function archive(int $id): JsonResponse
@@ -319,16 +308,16 @@ class AdminEventsController extends BaseApiController
             EventOperationalState::Scheduled,
             EventOperationalState::Postponed,
         ], true);
-        $result = $this->performTransition(
-            $id,
+        $operation = $this->performSeriesLifecycleTransition(
+            $snapshot,
             $actor,
-            EventPublicationState::Archived,
-            $cancelOperationally ? EventOperationalState::Cancelled : null,
+            'archive',
             $reason,
         );
-        if ($result instanceof JsonResponse) {
-            return $result;
+        if ($operation instanceof JsonResponse) {
+            return $operation;
         }
+        $result = $operation['result'];
         if ($result->changed
             && $cancelOperationally
             && $this->directSideEffectsEnabled($result)) {
@@ -340,7 +329,7 @@ class AdminEventsController extends BaseApiController
             );
         }
 
-        return $this->transitionResponse($id, $result, 'archive');
+        return $this->transitionResponse($id, $result, 'archive', $operation['series']);
     }
 
     public function restore(int $id): JsonResponse
@@ -349,34 +338,21 @@ class AdminEventsController extends BaseApiController
         if ($snapshot === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
-        $current = $this->snapshotLifecycle($snapshot);
-        $publication = $current['publication'] === EventPublicationState::Archived
-            ? EventPublicationState::Draft
-            : $current['publication'];
-        $operational = in_array($current['operational'], [
-            EventOperationalState::Postponed,
-            EventOperationalState::Cancelled,
-        ], true) ? EventOperationalState::Scheduled : $current['operational'];
-        $result = $this->performTransition(
-            $id,
+        $operation = $this->performSeriesLifecycleTransition(
+            $snapshot,
             $actor,
-            $publication,
-            $operational,
+            'restore',
             $this->optionalReason(),
-            new EventLifecycleTransitionGuard(null, [
-                EventOperationalState::Scheduled,
-                EventOperationalState::Postponed,
-                EventOperationalState::Cancelled,
-            ]),
         );
-        if ($result instanceof JsonResponse) {
-            return $result;
+        if ($operation instanceof JsonResponse) {
+            return $operation;
         }
+        $result = $operation['result'];
         if ($result->changed && $this->directSideEffectsEnabled($result)) {
             $this->notifyScheduleChanged($snapshot, (int) $actor->id);
         }
 
-        return $this->transitionResponse($id, $result, 'restore');
+        return $this->transitionResponse($id, $result, 'restore', $operation['series']);
     }
 
     public function reschedule(int $id): JsonResponse
@@ -505,6 +481,8 @@ class AdminEventsController extends BaseApiController
             ->select([
                 'e.id',
                 'e.user_id',
+                'e.parent_event_id',
+                'e.is_recurring_template',
                 'e.group_id',
                 'e.category_id',
                 'e.title',
@@ -536,7 +514,18 @@ class AdminEventsController extends BaseApiController
             ->selectRaw('COALESCE(ec.interested_count, 0) AS interested_count')
             ->selectRaw('COALESCE(ec.legacy_attended_count, 0) AS legacy_attended_count')
             ->selectRaw('COALESCE(wc.waitlist_count, 0) AS waitlist_count')
-            ->selectRaw('COALESCE(ac.attendance_count, 0) AS attendance_count');
+            ->selectRaw('COALESCE(ac.attendance_count, 0) AS attendance_count')
+            ->selectRaw(
+                '(SELECT COUNT(*) FROM events series_occurrence'
+                . ' WHERE series_occurrence.tenant_id = e.tenant_id'
+                . ' AND series_occurrence.parent_event_id = e.id) AS occurrence_count'
+            )
+            ->selectRaw(
+                '(SELECT COUNT(*) FROM events future_series_occurrence'
+                . ' WHERE future_series_occurrence.tenant_id = e.tenant_id'
+                . ' AND future_series_occurrence.parent_event_id = e.id'
+                . ' AND future_series_occurrence.start_time >= NOW()) AS future_occurrence_count'
+            );
     }
 
     private function adminConfirmedSubjects(int $tenantId, string $defaultPool): Builder
@@ -640,12 +629,13 @@ class AdminEventsController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->whereKey($adminId)
             ->firstOrFail();
-        $snapshot = DB::table('events')
+        $snapshot = Event::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
-            ->where('id', $eventId)
+            ->whereKey($eventId)
             ->select([
                 'id', 'tenant_id', 'user_id', 'title', 'start_time', 'location', 'status',
-                'publication_status', 'operational_status', 'lifecycle_version',
+                'publication_status', 'operational_status', 'lifecycle_version', 'parent_event_id',
+                'is_recurring_template',
             ])
             ->first();
 
@@ -662,23 +652,55 @@ class AdminEventsController extends BaseApiController
         );
     }
 
-    private function performTransition(
-        int $eventId,
+    /**
+     * @return array{result:EventLifecycleTransitionResult,series:array<string,mixed>}|JsonResponse
+     */
+    private function performSeriesLifecycleTransition(
+        Event $event,
         User $actor,
-        ?EventPublicationState $publication,
-        ?EventOperationalState $operational,
+        string $action,
         ?string $reason,
-        ?EventLifecycleTransitionGuard $guard = null,
-    ): EventLifecycleTransitionResult|JsonResponse {
+    ): array|JsonResponse {
         try {
-            return $this->lifecycle->transition(
-                $eventId,
-                $actor,
-                $publication,
-                $operational,
-                $reason,
-                $guard,
-            );
+            return EventService::transitionLifecycleTargets($event, $actor, $action, $reason);
+        } catch (EventLifecycleTransitionException $exception) {
+            return match ($exception->reasonCode) {
+                'event_lifecycle_event_not_found' => $this->respondWithError(
+                    'NOT_FOUND',
+                    __('api.event_not_found'),
+                    null,
+                    404,
+                ),
+                'event_lifecycle_authorization_denied' => $this->respondWithError(
+                    'FORBIDDEN',
+                    __('api.admin_access_required'),
+                    null,
+                    403,
+                ),
+                'event_lifecycle_reason_too_long' => $this->respondWithError(
+                    'VALIDATION_INVALID_REASON',
+                    __('api.invalid_status'),
+                    'reason',
+                    422,
+                ),
+                default => $this->respondWithError(
+                    'EVENT_LIFECYCLE_CONFLICT',
+                    __('api.invalid_status'),
+                    null,
+                    409,
+                ),
+            };
+        }
+    }
+
+    /**
+     * @param callable():array{result:EventLifecycleTransitionResult,series:array<string,mixed>} $transition
+     * @return array{result:EventLifecycleTransitionResult,series:array<string,mixed>}|JsonResponse
+     */
+    private function performPublicationTransition(callable $transition): array|JsonResponse
+    {
+        try {
+            return $transition();
         } catch (EventLifecycleTransitionException $exception) {
             return match ($exception->reasonCode) {
                 'event_lifecycle_event_not_found' => $this->respondWithError(
@@ -713,6 +735,7 @@ class AdminEventsController extends BaseApiController
         int $eventId,
         EventLifecycleTransitionResult $result,
         string $action,
+        ?array $series = null,
     ): JsonResponse {
         $tenantId = (int) $result->event->getAttribute('tenant_id');
         $resource = $this->adminEventResource($eventId, $tenantId);
@@ -726,6 +749,9 @@ class AdminEventsController extends BaseApiController
             'outbox_id' => $result->outboxId,
             'cascade' => $result->cascade,
         ];
+        if ($series !== null) {
+            $resource['transition']['series'] = $series;
+        }
 
         return $this->respondWithData($resource);
     }

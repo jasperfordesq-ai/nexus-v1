@@ -7,12 +7,45 @@
   "archived": "Archiviert",
   "pendingReview": "Prüfung ausstehend",
   "draft": "Entwurf",
+  "create": {
+    "recurrenceTitle": "Wiederkehrender Zeitplan", "recurrenceToggle": "Dieses Ereignis wiederholen", "recurrenceFrequency": "Häufigkeit",
+    "recurrenceFrequencies": { "daily": "Täglich", "weekly": "Wöchentlich", "biweekly": "Alle zwei Wochen", "monthly": "Monatlich", "yearly": "Jährlich" },
+    "recurrenceDays": "Wiederholen am", "recurrenceWeekdays": { "MO": "Mo", "TU": "Di", "WE": "Mi", "TH": "Do", "FR": "Fr", "SA": "Sa", "SU": "So" },
+    "recurrenceEnds": "Endet", "recurrenceEndTypes": { "after_count": "Nach einer Anzahl von Terminen", "on_date": "An einem Datum", "never": "Nie" },
+    "recurrenceCount": "Anzahl der Termine", "recurrenceCountPlaceholder": "2 bis {{max}}", "recurrenceEndDate": "Enddatum der Serie",
+    "recurrenceNeverHint": "Zukünftige Termine werden automatisch innerhalb des rollierenden Planungsfensters der Community hinzugefügt.",
+    "recurrenceValidation": "Wählen Sie gültige Wiederholungsdetails: bei Bedarf Wochentage, 2 bis {{max}} Termine oder ein gültiges Enddatum.",
+    "recurrenceEditScope": "Änderungen anwenden auf", "recurrenceScopeSingle": "Nur diesen Termin", "recurrenceScopeFuture": "Diesen und zukünftige Termine",
+    "recurrenceScopeSingleHint": "Erstellt Ausnahmen nur für diesen Termin.", "recurrenceScopeFutureHint": "Prüfen Sie die Auswirkungen, bevor dieser und spätere Termine geändert werden.",
+    "revisionPreview": "Änderungen prüfen", "revisionImpactTitle": "Wiederkehrende Änderungen prüfen", "revisionImpact": "{{count}} zukünftige(r) Termin(e) werden geändert.",
+    "revisionRecipients": "{{count}} Teilnehmende können benachrichtigt werden.", "revisionBlocked": "Lösen Sie {{count}} Konflikt(e), bevor Sie die Änderungen anwenden.", "revisionConfirm": "Änderungen anwenden",
+    "revisionImageUnsupported": "Ein Titelbild kann nicht in derselben Änderung für diesen und zukünftige Termine geändert werden. Speichern Sie es nur für diesen Termin oder getrennt von der Serie.",
+    "revisionDateUnsupported": "Kalenderdaten können nicht für diesen und zukünftige Termine verschoben werden. Wählen Sie nur diesen Termin oder lassen Sie die Daten unverändert.",
+    "revisionCommitFailed": "Die wiederkehrenden Änderungen konnten nicht angewendet werden. Prüfen Sie die aktuelle Vorschau und versuchen Sie es erneut.",
+    "revisionPreviewStale": "Das Formular wurde nach der Vorschau geändert. Prüfen Sie die aktuellen Auswirkungen erneut.",
+    "revisionUnavailable": "Die Bearbeitung dieses und zukünftiger Termine ist für diese Community noch nicht verfügbar. Sie können weiterhin nur diesen Termin bearbeiten.",
+    "venueAccessibilityTitle": "Barrierefreiheit des Veranstaltungsorts", "venueAccessibilityHint": "Teilen Sie bestätigte Informationen, damit Mitglieder ihren Besuch planen können.",
+    "venueAccessibilityFeatures": { "step_free_access": "Stufenloser Zugang", "accessible_toilet": "Barrierefreie Toilette", "hearing_loop": "Induktionsschleife", "quiet_space": "Ruheraum", "seating_available": "Sitzplätze verfügbar", "accessible_parking": "Barrierefreie Parkplätze" },
+    "venueAccessibilityStatus": { "unknown": "Nicht bekannt", "yes": "Ja", "no": "Nein" },
+    "venueAccessibilityParkingDetails": "Details zu barrierefreien Parkplätzen", "venueAccessibilityParkingPlaceholder": "Stellplätze, Zugangsweg oder Buchungshinweise",
+    "venueAccessibilityTransitDetails": "Öffentlicher Verkehr und Anreise", "venueAccessibilityTransitPlaceholder": "Nächste Haltestelle, Bahnhof oder Ausstieg",
+    "venueAccessibilityAssistanceContact": "Kontakt für Barrierefreiheit", "venueAccessibilityAssistancePlaceholder": "Name, E-Mail oder Telefon für Hilfe",
+    "venueAccessibilityNotes": "Weitere Hinweise zur Barrierefreiheit", "venueAccessibilityNotesPlaceholder": "Was Mitglieder sonst wissen sollten",
+    "venueAccessibilityPrivacy": "Veröffentlichen Sie nur Kontaktdaten, die sicher mit berechtigten Veranstaltungsbesuchern geteilt werden können."
+  },
   "accessibilityFilter": {
     "label": "Stufenloser Zugang am Veranstaltungsort",
     "hint": "Nach den vom Veranstalter bestätigten Zugangsinformationen filtern.",
     "options": { "any": "Alle Veranstaltungsorte", "yes": "Stufenloser Zugang bestätigt", "no": "Nicht stufenlos", "unknown": "Nicht bekannt" }
   },
   "detail": {
+    "submitForReviewConfirm": "Dieses Event zur Moderation einreichen? Organisatoren k\u00f6nnen es w\u00e4hrend der Pr\u00fcfung weiterhin bearbeiten.",
+    "publishEventConfirm": "Dieses Event jetzt ver\u00f6ffentlichen? Es wird f\u00fcr berechtigte Mitglieder sichtbar und kann Benachrichtigungen sowie F\u00f6deration ausl\u00f6sen.",
+    "submitForReview": "Zur Prüfung einreichen",
+    "publishEvent": "Veranstaltung veröffentlichen",
+    "submittedForReview": "Veranstaltung zur Prüfung eingereicht",
+    "publishedSuccessfully": "Veranstaltung veröffentlicht",
+    "publicationFailed": "Der Veröffentlichungsstatus konnte nicht aktualisiert werden.",
     "leaveWaitlistConfirmTitle": "Warteliste verlassen?",
     "leaveWaitlistConfirmDescription": "Sie verlieren Ihre aktuelle Position und müssen sich möglicherweise am Ende der Warteschlange erneut eintragen.",
     "offerDeclineConfirmTitle": "Diesen reservierten Platz ablehnen?",
@@ -276,6 +309,44 @@
       "completed_credit_claims": "Abgeschlossene Kreditforderungen",
       "failed_credit_claims": "Fehlgeschlagene Kreditforderungen",
       "guardian_consents": "Der Erziehungsberechtigte stimmt zu"
+    }
+  },
+  "lifecycleHistory": {
+    "open": "Lebenszyklusverlauf öffnen",
+    "title": "Lebenszyklusverlauf",
+    "description": "Prüfen Sie den unveränderlichen Veröffentlichungs- und Betriebsverlauf dieser Veranstaltung.",
+    "loading": "Lebenszyklusverlauf wird geladen",
+    "loadFailedTitle": "Lebenszyklusverlauf nicht verfügbar",
+    "loadFailedDescription": "Das unveränderliche Protokoll konnte nicht geladen werden. Versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
+    "emptyTitle": "Noch keine Lebenszyklusänderungen",
+    "emptyDescription": "Änderungen erscheinen hier, sobald der Veranstaltungslebenszyklus aktualisiert wird.",
+    "listLabel": "Lebenszyklusänderungen der Veranstaltung",
+    "entryAccessibility": "Version {{version}}, erfasst {{date}}",
+    "version": "Version {{version}}",
+    "immutable": "Unveränderlich",
+    "timestampUnknown": "Zeitpunkt nicht erfasst",
+    "publicationTransition": "Veröffentlichung: {{from}} zu {{to}}",
+    "operationalTransition": "Betriebsstatus: {{from}} zu {{to}}",
+    "changedBy": "Geändert von {{name}}",
+    "unknownActor": "Mitglied {{id}}",
+    "reason": "Grund: {{reason}}",
+    "notificationsSuppressed": "Doppelte Benachrichtigungen wurden für diese Serienänderung unterdrückt.",
+    "loadMore": "Mehr Verlauf laden",
+    "loadingMore": "Mehr Verlauf wird geladen",
+    "loadMoreFailed": "Weiterer Verlauf konnte nicht geladen werden. Versuchen Sie es erneut.",
+    "states": {
+      "publication": { "draft": "Entwurf", "pending_review": "Prüfung ausstehend", "published": "Veröffentlicht", "archived": "Archiviert" },
+      "operational": { "scheduled": "Geplant", "postponed": "Verschoben", "cancelled": "Abgesagt", "completed": "Abgeschlossen" }
+    },
+    "cascade": {
+      "reminders_cancelled": "Stornierte Erinnerungspläne: {{count}}",
+      "waitlist_cancelled": "Stornierte Wartelisteneinträge: {{count}}",
+      "registrations_cancelled": "Stornierte Anmeldungen: {{count}}"
+    },
+    "series": {
+      "template": "Wiederkehrende Vorlage {{id}}",
+      "occurrence": "Termin der wiederkehrenden Vorlage {{id}}"
     }
   }
 }

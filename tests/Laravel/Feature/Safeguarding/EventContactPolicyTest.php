@@ -39,7 +39,7 @@ class EventContactPolicyTest extends TestCase
         $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
         $policy->shouldReceive('assertLocalContactAllowed')
             ->once()
-            ->with($attendee->id, $organizer->id, $this->testTenantId, 'event_rsvp')
+            ->with($attendee->id, $organizer->id, $this->testTenantId, 'event_registration')
             ->andThrow($this->denial());
         $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
 

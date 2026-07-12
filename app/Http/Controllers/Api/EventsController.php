@@ -25,6 +25,7 @@ use App\Services\EventNotificationDeliveryModeResolver;
 use App\Services\EventRegistrationService;
 use App\Services\EventService;
 use App\Services\EventNotificationService;
+use App\Services\EventPublicationWorkflowService;
 use App\Services\EventWaitlistService;
 use App\Services\EventReminderPreferenceService;
 use App\Services\EventReminderScheduleService;
@@ -56,6 +57,7 @@ class EventsController extends BaseApiController
         private readonly EventPolicy $eventPolicy,
         private readonly EventReminderPreferenceService $eventReminderPreferences,
         private readonly EventReminderScheduleService $eventReminderSchedules,
+        private readonly EventPublicationWorkflowService $eventPublicationWorkflow,
     ) {}
 
     private function eventContractVersion(): int
@@ -971,6 +973,87 @@ class EventsController extends BaseApiController
                 ? $this->serializeDetailEvent($event, $facts[$id] ?? [])
                 : null
         );
+    }
+
+    /** POST /api/v2/events/{id}/submit */
+    public function submitForReview(int $id): JsonResponse
+    {
+        return $this->publicationTransition($id, 'submit_for_review');
+    }
+
+    /** POST /api/v2/events/{id}/publish */
+    public function publish(int $id): JsonResponse
+    {
+        return $this->publicationTransition($id, 'publish');
+    }
+
+    private function publicationTransition(int $id, string $action): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('events_publish', 10, 60);
+        $tenantId = (int) TenantContext::getId();
+        /** @var User|null $actor */
+        $actor = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($userId)
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->first();
+        if ($actor === null) {
+            return $this->respondWithError('FORBIDDEN', __('api.event_edit_forbidden'), null, 403);
+        }
+
+        try {
+            if ($action === 'submit_for_review') {
+                $this->eventPublicationWorkflow->submit($id, $actor);
+            } else {
+                $this->eventPublicationWorkflow->publish($id, $actor);
+            }
+        } catch (\App\Exceptions\EventLifecycleTransitionException $exception) {
+            return match ($exception->reasonCode) {
+                'event_lifecycle_event_not_found' => $this->respondWithError(
+                    'NOT_FOUND',
+                    __('api.event_not_found'),
+                    null,
+                    404,
+                ),
+                'event_lifecycle_authorization_denied',
+                'event_lifecycle_subject_invalid' => $this->respondWithError(
+                    'FORBIDDEN',
+                    __('api.event_edit_forbidden'),
+                    null,
+                    403,
+                ),
+                'event_publication_review_required' => $this->respondWithError(
+                    'EVENT_REVIEW_REQUIRED',
+                    __('api.invalid_status'),
+                    null,
+                    409,
+                ),
+                'event_publication_review_not_required' => $this->respondWithError(
+                    'EVENT_REVIEW_NOT_REQUIRED',
+                    __('api.invalid_status'),
+                    null,
+                    409,
+                ),
+                default => $this->respondWithError(
+                    'EVENT_LIFECYCLE_CONFLICT',
+                    __('api.invalid_status'),
+                    null,
+                    409,
+                ),
+            };
+        }
+
+        $event = $this->eventService->getById($id, $userId);
+        if ($event === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
+        }
+        $facts = $this->usesCanonicalEventContract()
+            ? $this->contractFacts([$event], $userId)
+            : [];
+
+        return $this->respondWithData($this->serializeDetailEvent($event, $facts[$id] ?? []));
     }
 
     /**
@@ -1985,6 +2068,10 @@ class EventsController extends BaseApiController
                     $status = 403;
                     break;
                 }
+                if ($error['code'] === 'EVENT_RECURRENCE_UNAVAILABLE') {
+                    $status = 503;
+                    break;
+                }
             }
             return $this->respondWithErrors($errors, $status);
         }
@@ -2018,7 +2105,7 @@ class EventsController extends BaseApiController
         $scope = $data['scope'] ?? 'single';
 
         if (!in_array($scope, ['single', 'all'])) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.event_scope_must_be_single_or_all'), 'scope', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_scope_must_be_single_or_all'), 'scope', 422);
         }
 
         $success = $this->eventService->updateRecurring($id, $userId, $data, $scope);
@@ -2063,21 +2150,25 @@ class EventsController extends BaseApiController
     {
         $id = (int) $id;
         $userId = $this->requireAuth();
+        $rawScope = request()->input('scope');
+        $scope = is_string($rawScope) && trim($rawScope) !== '' ? trim($rawScope) : null;
         $this->rateLimit('events_image_upload', 10, 60);
 
         // Authorize before touching the uploaded temporary file or creating a
         // tenant upload. This prevents guessed event IDs leaving orphan files.
-        if (!$this->eventService->canUpdateImage($id, $userId)) {
+        if (!$this->eventService->canUpdateImage($id, $userId, $scope)) {
             $errors = $this->eventService->getErrors();
             $status = collect($errors)->contains(fn (array $error): bool => ($error['code'] ?? null) === 'NOT_FOUND')
                 ? 404
-                : 403;
+                : (collect($errors)->contains(fn (array $error): bool => ($error['code'] ?? null) === 'FORBIDDEN')
+                    ? 403
+                    : 422);
             return $this->respondWithErrors($errors, $status);
         }
 
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.event_no_image_uploaded'), 'image', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_no_image_uploaded'), 'image', 422);
         }
 
         $imageUrl = null;
@@ -2093,12 +2184,12 @@ class EventsController extends BaseApiController
 
             $imageUrl = \App\Core\ImageUploader::upload($fileArray, 'events');
 
-            $success = $this->eventService->updateImage($id, $userId, $imageUrl);
+            $success = $this->eventService->updateImage($id, $userId, $imageUrl, $scope);
 
             if (!$success) {
                 \App\Core\ImageUploader::deleteTenantUpload($imageUrl, 'events');
                 $errors = $this->eventService->getErrors();
-                $status = 400;
+                $status = 422;
                 foreach ($errors as $error) {
                     if ($error['code'] === 'NOT_FOUND') {
                         $status = 404;

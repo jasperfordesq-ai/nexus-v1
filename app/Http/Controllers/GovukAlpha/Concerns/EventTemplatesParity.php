@@ -10,6 +10,7 @@ namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
 use App\Exceptions\EventTemplateException;
+use App\Http\Resources\EventTemplateAuditResource;
 use App\Http\Resources\EventTemplatePreviewResource;
 use App\Http\Resources\EventTemplateResource;
 use App\Models\User;
@@ -62,9 +63,70 @@ trait EventTemplatesParity
                 ),
                 'pagination' => $result['meta'],
                 'filter' => $status,
+                'cursor' => $cursor,
                 'status' => is_string($request->query('status'))
                     ? trim((string) $request->query('status'))
                     : null,
+            ],
+        ));
+    }
+
+    public function eventsTemplateHistory(
+        Request $request,
+        string $tenantSlug,
+        int $templateId,
+    ): Response|RedirectResponse {
+        $actor = $this->eventsTemplateActor($tenantSlug);
+        if ($actor instanceof RedirectResponse) {
+            return $actor;
+        }
+
+        $cursor = $this->eventsTemplateNullablePositiveInteger($request->query('cursor'));
+        $libraryCursor = $this->eventsTemplateNullablePositiveInteger(
+            $request->query('library_cursor'),
+        );
+        if (($request->query->has('cursor') && $cursor === null)
+            || ($request->query->has('library_cursor') && $libraryCursor === null)) {
+            abort(422);
+        }
+
+        $filterInput = $request->query('filter');
+        if ($filterInput !== null
+            && (! is_string($filterInput)
+                || ! in_array($filterInput, ['active', 'archived', 'all'], true))) {
+            abort(422);
+        }
+        $filter = is_string($filterInput) ? $filterInput : 'active';
+
+        try {
+            $template = EventTemplateResource::fromRecord(
+                app(EventTemplateQueryService::class)->show($templateId, $actor),
+            );
+            abort_unless((bool) ($template['capabilities']['view_audit'] ?? false), 403);
+            $result = app(EventTemplateQueryService::class)->history(
+                $templateId,
+                $actor,
+                $cursor,
+                20,
+            );
+        } catch (EventTemplateException $exception) {
+            return $this->eventsTemplateFailure($exception, $tenantSlug);
+        }
+
+        return $this->eventsTemplatePrivateResponse($this->view(
+            'accessible-frontend::event-template-history',
+            [
+                'title' => __('event_templates.audit_title'),
+                'tenantSlug' => $tenantSlug,
+                'activeNav' => 'events',
+                'template' => $template,
+                'audits' => array_map(
+                    EventTemplateAuditResource::fromModel(...),
+                    $result['audits'],
+                ),
+                'pagination' => $result['meta'],
+                'filter' => $filter,
+                'libraryCursor' => $libraryCursor,
             ],
         ));
     }

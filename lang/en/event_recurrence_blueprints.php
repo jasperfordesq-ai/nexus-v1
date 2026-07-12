@@ -1,0 +1,141 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return array (
+  'tab' => 'Future setup',
+  'title' => 'Future occurrence setup',
+  'description' => 'Choose which event definitions should be applied when new occurrences are created.',
+  'definition_only_title' => 'Definitions only',
+  'definition_only_description' => 'This never copies attendees, registrations, attendance, payments, reminders, analytics or delivery history, and it never changes existing occurrences.',
+  'effective_from_label' => 'Effective from recurrence identity',
+  'effective_from_help' => 'This stable identity belongs to the selected occurrence. It is not recalculated from a changed start time.',
+  'sections_title' => 'Definitions to carry forward',
+  'sections_description' => 'Every section is explicit. Staff assignments are never selected automatically.',
+  'sections' => 
+  array (
+    'agenda' => 
+    array (
+      'label' => 'Agenda',
+      'description' => 'Scheduled sessions, speakers and protected resource definitions.',
+    ),
+    'ticket_types' => 
+    array (
+      'label' => 'Ticket types',
+      'description' => 'Free or draft ticket-type definitions and their sales windows.',
+    ),
+    'registration' => 
+    array (
+      'label' => 'Registration',
+      'description' => 'Registration settings and the currently published form.',
+    ),
+    'safety' => 
+    array (
+      'label' => 'Safety requirements',
+      'description' => 'The currently published safety and eligibility requirements.',
+    ),
+    'staff' => 
+    array (
+      'label' => 'Staff assignments',
+      'description' => 'High-risk opt-in: carry active staff roles into future new occurrences.',
+    ),
+  ),
+  'section_not_permitted' => 'Your event role cannot carry this section forward.',
+  'no_sections_title' => 'Select at least one section',
+  'no_sections_description' => 'A preview is required before any future setup can be saved.',
+  'preview_button' => 'Preview future setup',
+  'previewing' => 'Preparing preview',
+  'preview_title' => 'Definition preview',
+  'preview_description' => 'Review the bounded counts and conflicts before opening the confirmation step.',
+  'preview_expires' => 'Preview expires :date',
+  'review_button' => 'Review and confirm',
+  'refresh_preview' => 'Refresh preview',
+  'conflicts_title' => 'Resolve these conflicts first',
+  'conflicts' => 
+  array (
+    'definition_limit_exceeded' => ':section exceeds the safe definition limit (:count found).',
+    'speaker_limit_exceeded' => 'The agenda exceeds the safe speaker limit (:count found).',
+    'invalid_speaker_reference' => 'The agenda contains :count invalid speaker reference.',
+    'resource_limit_exceeded' => 'The agenda exceeds the safe resource limit (:count found).',
+    'unsupported_active_time_credit_ticket' => ':count active time-credit ticket type cannot be carried forward.',
+    'published_form_missing' => 'The published registration form could not be verified.',
+    'question_limit_exceeded' => 'The published form exceeds the safe question limit (:count found).',
+    'published_requirement_version_missing' => 'The published safety requirement version could not be verified.',
+    'invalid_staff_reference' => ':count staff assignment refers to an unavailable member.',
+    'nonportable_staff_expiry' => ':count staff assignment expires before the future occurrence and cannot be carried forward.',
+  ),
+  'counts' => 
+  array (
+    'none' => 'No definitions were found in the selected sections.',
+    'sessions' => 'Sessions',
+    'speakers' => 'Speakers',
+    'resources' => 'Resources',
+    'ticket_types' => 'Ticket types',
+    'registration_settings' => 'Registration settings',
+    'published_forms' => 'Published forms',
+    'form_questions' => 'Form questions',
+    'safety_requirements' => 'Safety requirements',
+    'staff_assignments' => 'Staff assignments',
+  ),
+  'errors' => 
+  array (
+    'preview_error' => 
+    array (
+      'title' => 'Preview could not be prepared',
+      'description' => 'Check the selected definitions and try again.',
+    ),
+    'preview_expired' => 
+    array (
+      'title' => 'Preview expired',
+      'description' => 'Refresh the preview before confirming. Nothing has been saved.',
+    ),
+    'preview_stale' => 
+    array (
+      'title' => 'Definitions changed after preview',
+      'description' => 'Prepare a new preview so the confirmation reflects the latest definitions.',
+    ),
+    'commit_conflict' => 
+    array (
+      'title' => 'Future setup was not saved',
+      'description' => 'Another version or a conflicting request was saved first. Refresh the preview and review it again.',
+    ),
+    'commit_error' => 
+    array (
+      'title' => 'Future setup could not be saved',
+      'description' => 'Your stable retry key has been kept. Try confirming again, or refresh the preview if it has expired.',
+    ),
+  ),
+  'success_created_title' => 'Future setup saved',
+  'success_created_description' => 'Immutable definition version :version will apply only to newly created future occurrences.',
+  'success_replay_title' => 'Future setup was already saved',
+  'success_replay_description' => 'Version :version matches this retry. No duplicate version was created.',
+  'history_title' => 'Immutable version history',
+  'history_description' => 'Each saved definition version is retained with bounded counts and its effective recurrence identity.',
+  'history_loading' => 'Loading future setup history',
+  'history_error_title' => 'History could not be loaded',
+  'history_error_description' => 'Try again to retrieve the immutable versions.',
+  'history_empty_title' => 'No future setup versions yet',
+  'history_empty_description' => 'A version will appear here after a preview is confirmed.',
+  'history_list_label' => 'Future occurrence setup versions',
+  'history_version' => 'Version :version',
+  'history_sections' => 'Included definitions',
+  'immutable' => 'Immutable',
+  'history_load_more' => 'Load more versions',
+  'history_loading_more' => 'Loading more versions',
+  'load_more_error_title' => 'More versions could not be loaded',
+  'load_more_error_description' => 'Try loading the next page again.',
+  'retry' => 'Try again',
+  'time_unknown' => 'Time not recorded',
+  'confirm_title' => 'Confirm future occurrence setup',
+  'confirm_scope_title' => 'New occurrences only',
+  'confirm_scope_description' => 'This version takes effect from the displayed recurrence identity. Existing occurrences and participant records are not changed.',
+  'staff_risk_title' => 'Staff propagation is selected',
+  'staff_risk_description' => 'Active staff roles may grant operational access on every newly created occurrence. Review this opt-in carefully.',
+  'confirm_ack' => 'I confirm this future-only definition version',
+  'confirm_ack_description' => 'I reviewed the selected sections, counts, conflicts and effective recurrence identity.',
+  'cancel' => 'Cancel',
+  'commit_button' => 'Save immutable version',
+  'committing' => 'Saving version',
+);

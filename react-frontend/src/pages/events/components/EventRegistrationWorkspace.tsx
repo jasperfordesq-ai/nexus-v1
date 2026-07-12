@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Tabs } from '@heroui/react/tabs';
 import ArrowDown from 'lucide-react/icons/arrow-down';
 import ArrowUp from 'lucide-react/icons/arrow-up';
@@ -57,6 +57,7 @@ import {
   type RegistrationSubmission,
 } from '@/lib/event-registration-api';
 import { logError } from '@/lib/logger';
+import { getFormattingLocale } from '@/lib/helpers';
 
 interface EventRegistrationWorkspaceProps {
   eventId: number;
@@ -80,6 +81,8 @@ interface SettingsDraft {
   maxGuests: string;
   guestRetentionDays: string;
 }
+
+type OverviewCollection = 'submissions' | 'campaigns' | 'guests';
 
 const QUESTION_TYPES: RegistrationQuestionType[] = [
   'short_text',
@@ -172,13 +175,28 @@ function reviewCorrelationId(): string {
   return `review-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function appendUniqueById<T extends { id: number }>(current: T[], incoming: T[]): T[] {
+  const seen = new Set(current.map((item) => item.id));
+  const additions: T[] = [];
+  incoming.forEach((item) => {
+    if (seen.has(item.id)) return;
+    seen.add(item.id);
+    additions.push(item);
+  });
+
+  return [...current, ...additions];
+}
+
 export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspaceProps) {
-  const { t, i18n } = useTranslation('event_registration');
+  const { t, i18n } = useTranslation(['event_registration', 'events']);
   const toast = useToast();
   const confirm = useConfirm();
+  const overviewGeneration = useRef(0);
+  const loadMoreGeneration = useRef(0);
   const [overview, setOverview] = useState<EventRegistrationOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [loadingMore, setLoadingMore] = useState<OverviewCollection | null>(null);
   const [activeTab, setActiveTab] = useState('forms');
 
   const [formDraft, setFormDraft] = useState<FormDraft | null>(null);
@@ -212,10 +230,14 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
   const [isRetentionBusy, setIsRetentionBusy] = useState(false);
 
   const loadOverview = useCallback(async () => {
+    const requestGeneration = ++overviewGeneration.current;
+    loadMoreGeneration.current += 1;
     setIsLoading(true);
     setLoadError(false);
+    setLoadingMore(null);
     try {
       const response = await eventRegistrationApi.organizerOverview(eventId);
+      if (requestGeneration !== overviewGeneration.current) return;
       if (!response.success || !response.data) {
         setLoadError(true);
         return;
@@ -223,16 +245,81 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
       setOverview(response.data);
       setRegistrationSettings(settingsDraft(response.data.settings));
     } catch (error) {
+      if (requestGeneration !== overviewGeneration.current) return;
       logError('Failed to load event registration workspace', error);
       setLoadError(true);
     } finally {
-      setIsLoading(false);
+      if (requestGeneration === overviewGeneration.current) setIsLoading(false);
     }
   }, [eventId]);
 
   useEffect(() => {
     void loadOverview();
+
+    return () => {
+      overviewGeneration.current += 1;
+      loadMoreGeneration.current += 1;
+    };
   }, [loadOverview]);
+
+  async function loadMore(collection: OverviewCollection) {
+    const page = overview?.pagination?.[collection];
+    if (!page?.next_page || loadingMore !== null) return;
+
+    const query = collection === 'submissions'
+      ? { submissions_page: page.next_page, submissions_per_page: page.per_page }
+      : collection === 'campaigns'
+        ? { campaigns_page: page.next_page, campaigns_per_page: page.per_page }
+        : { guests_page: page.next_page, guests_per_page: page.per_page };
+    const requestOverviewGeneration = overviewGeneration.current;
+    const requestLoadMoreGeneration = ++loadMoreGeneration.current;
+    setLoadingMore(collection);
+    try {
+      const response = await eventRegistrationApi.organizerOverview(eventId, query);
+      if (requestOverviewGeneration !== overviewGeneration.current
+        || requestLoadMoreGeneration !== loadMoreGeneration.current) return;
+      if (!response.success || !response.data?.pagination) {
+        throw new Error(response.message);
+      }
+      const next = response.data;
+      setOverview((current) => {
+        if (!current) return current;
+        if (collection === 'submissions') {
+          return {
+            ...current,
+            submissions: appendUniqueById(current.submissions, next.submissions),
+            pagination: { ...current.pagination!, submissions: next.pagination!.submissions },
+            summary: next.summary ?? current.summary,
+          };
+        }
+        if (collection === 'campaigns') {
+          return {
+            ...current,
+            campaigns: appendUniqueById(current.campaigns, next.campaigns),
+            pagination: { ...current.pagination!, campaigns: next.pagination!.campaigns },
+            summary: next.summary ?? current.summary,
+          };
+        }
+
+        return {
+          ...current,
+          guests: appendUniqueById(current.guests, next.guests),
+          pagination: { ...current.pagination!, guests: next.pagination!.guests },
+          summary: next.summary ?? current.summary,
+        };
+      });
+    } catch (error) {
+      if (requestOverviewGeneration !== overviewGeneration.current
+        || requestLoadMoreGeneration !== loadMoreGeneration.current) return;
+      logError(`Failed to load more event registration ${collection}`, error);
+      toast.error(t('load_error.title'));
+    } finally {
+      if (requestOverviewGeneration === overviewGeneration.current
+        && requestLoadMoreGeneration === loadMoreGeneration.current) {
+        setLoadingMore(null);
+      }
+    }
+  }
 
   const publishedForm = useMemo(
     () => overview?.forms.find((form) => form.status === 'published') ?? null,
@@ -940,6 +1027,22 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
                   </CardBody>
                 </Card>
               ))}
+              {overview.pagination?.submissions.has_more && (
+                <div className="flex justify-center pt-1">
+                  <Button
+                    variant="secondary"
+                    isPending={loadingMore === 'submissions'}
+                    onPress={() => void loadMore('submissions')}
+                  >
+                    {t('events:load_more_count', {
+                      remaining: Math.max(
+                        0,
+                        overview.pagination.submissions.total - overview.submissions.length,
+                      ).toLocaleString(getFormattingLocale()),
+                    })}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Tabs.Panel>
@@ -1076,6 +1179,22 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
                   </CardBody>
                 </Card>
               ))}
+              {overview.pagination?.campaigns.has_more && (
+                <div className="flex justify-center pt-1">
+                  <Button
+                    variant="secondary"
+                    isPending={loadingMore === 'campaigns'}
+                    onPress={() => void loadMore('campaigns')}
+                  >
+                    {t('events:load_more_count', {
+                      remaining: Math.max(
+                        0,
+                        overview.pagination.campaigns.total - overview.campaigns.length,
+                      ).toLocaleString(getFormattingLocale()),
+                    })}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </Tabs.Panel>
@@ -1141,6 +1260,22 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
                   </Card>
                 );
               })}
+              {overview.pagination?.guests.has_more && (
+                <div className="flex items-center justify-center lg:col-span-2">
+                  <Button
+                    variant="secondary"
+                    isPending={loadingMore === 'guests'}
+                    onPress={() => void loadMore('guests')}
+                  >
+                    {t('events:load_more_count', {
+                      remaining: Math.max(
+                        0,
+                        overview.pagination.guests.total - overview.guests.length,
+                      ).toLocaleString(getFormattingLocale()),
+                    })}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Tabs.Panel>

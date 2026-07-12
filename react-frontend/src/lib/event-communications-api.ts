@@ -62,9 +62,18 @@ export const eventBroadcastHistorySchema = z.object({
   created_at: timestamp,
 }).strict();
 
+const paginationMetaSchema = z.object({
+  current_page: z.number().int().positive(),
+  per_page: z.number().int().positive().max(100),
+  total: z.number().int().nonnegative(),
+  total_pages: z.number().int().nonnegative(),
+  has_more: z.boolean(),
+}).passthrough();
+
 export const eventBroadcastDetailSchema = z.object({
   broadcast: eventBroadcastSchema,
   history: z.array(eventBroadcastHistorySchema),
+  history_meta: paginationMetaSchema,
 }).strict();
 
 export const eventBroadcastPreviewSchema = z.object({
@@ -83,14 +92,6 @@ const eventBroadcastMutationSchema = eventBroadcastDetailSchema.extend({
   changed: z.boolean(),
   idempotent_replay: z.boolean(),
 }).strict();
-
-const paginationMetaSchema = z.object({
-  current_page: z.number().int().positive(),
-  per_page: z.number().int().positive(),
-  total: z.number().int().nonnegative(),
-  total_pages: z.number().int().nonnegative(),
-  has_more: z.boolean(),
-}).passthrough();
 
 export type EventBroadcast = z.infer<typeof eventBroadcastSchema>;
 export type EventBroadcastHistory = z.infer<typeof eventBroadcastHistorySchema>;
@@ -158,8 +159,15 @@ export const eventCommunicationsApi = {
     return { ...parsed, success: false, data: undefined, code: 'EVENTS_CONTRACT_DRIFT', meta: undefined };
   },
 
-  async get(broadcastId: number): Promise<ApiResponse<EventBroadcastDetail>> {
-    const endpoint = `/v2/event-broadcasts/${broadcastId}`;
+  async get(
+    broadcastId: number,
+    historyPage = 1,
+    historyPerPage = 50,
+  ): Promise<ApiResponse<EventBroadcastDetail>> {
+    const endpoint = `/v2/event-broadcasts/${broadcastId}${queryString({
+      history_page: historyPage,
+      history_per_page: historyPerPage,
+    })}`;
     return parseResponse(endpoint, await api.get(endpoint), eventBroadcastDetailSchema);
   },
 

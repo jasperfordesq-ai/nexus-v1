@@ -17,6 +17,8 @@ return [
         'refresh' => 'Athnuaigh',
         'retry' => 'Bain triail eile as',
         'save' => 'Sábháil',
+        'previous' => 'Roimhe seo',
+        'next' => 'Ar aghaidh',
     ],
     'load_error' => [
         'title' => 'Níorbh fhéidir spás oibre clárúcháin a lódáil',

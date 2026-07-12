@@ -137,6 +137,7 @@ final class EventIntegrityAuditService
         );
 
         $this->auditTimeAndOccurrenceIdentity($issues, $tenantId, $sampleLimit);
+        $this->auditRecurrenceRules($issues, $tenantId, $sampleLimit);
 
         foreach (['online_link', 'video_url'] as $urlColumn) {
             if (!Schema::hasColumn('events', $urlColumn)) {
@@ -316,6 +317,381 @@ final class EventIntegrityAuditService
     {
         return DB::table('events as e')
             ->when($tenantId !== null, fn (Builder $query) => $query->where('e.tenant_id', $tenantId));
+    }
+
+    /** @param list<array<string,mixed>> $issues */
+    private function auditRecurrenceRules(
+        array &$issues,
+        ?int $tenantId,
+        int $sampleLimit,
+    ): void {
+        if (! Schema::hasTable('event_recurrence_rules')
+            || ! Schema::hasColumn('events', 'is_recurring_template')
+            || ! Schema::hasColumn('events', 'parent_event_id')) {
+            return;
+        }
+
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_rule_root_invalid',
+            'critical',
+            DB::table('event_recurrence_rules as recurrence_rule')
+                ->leftJoin('events as recurrence_root', 'recurrence_root.id', '=', 'recurrence_rule.event_id')
+                ->when($tenantId !== null, fn (Builder $query) => $query->where('recurrence_rule.tenant_id', $tenantId))
+                ->where(fn (Builder $invalid) => $invalid
+                    ->whereNull('recurrence_root.id')
+                    ->orWhereColumn('recurrence_root.tenant_id', '!=', 'recurrence_rule.tenant_id')
+                    ->orWhere('recurrence_root.is_recurring_template', '!=', 1)),
+            'recurrence_rule.id',
+            $sampleLimit,
+        );
+
+        $duplicateRules = DB::table('event_recurrence_rules as recurrence_rule')
+            ->when($tenantId !== null, fn (Builder $query) => $query->where('recurrence_rule.tenant_id', $tenantId))
+            ->groupBy('recurrence_rule.tenant_id', 'recurrence_rule.event_id')
+            ->havingRaw('COUNT(*) > 1');
+        $duplicateCount = DB::query()
+            ->fromSub((clone $duplicateRules)->select(['recurrence_rule.tenant_id', 'recurrence_rule.event_id']), 'duplicate_recurrence_rules')
+            ->count();
+        if ($duplicateCount > 0) {
+            $issues[] = [
+                'code' => 'event_recurrence_rule_cardinality_duplicate',
+                'severity' => 'critical',
+                'count' => $duplicateCount,
+                'sample_ids' => (clone $duplicateRules)
+                    ->limit($sampleLimit)
+                    ->pluck('recurrence_rule.event_id')
+                    ->map(static fn (mixed $id): int => (int) $id)
+                    ->all(),
+            ];
+        }
+
+        $missingOrMultiple = $this->events($tenantId)
+            ->leftJoin('event_recurrence_rules as template_rule', function ($join): void {
+                $join->on('template_rule.event_id', '=', 'e.id')
+                    ->on('template_rule.tenant_id', '=', 'e.tenant_id');
+            })
+            ->where('e.is_recurring_template', 1)
+            ->groupBy('e.id', 'e.tenant_id')
+            ->havingRaw('COUNT(template_rule.id) <> 1');
+        $missingCount = DB::query()
+            ->fromSub((clone $missingOrMultiple)->select(['e.id', 'e.tenant_id']), 'invalid_template_rule_cardinality')
+            ->count();
+        if ($missingCount > 0) {
+            $issues[] = [
+                'code' => 'event_recurrence_template_rule_cardinality_invalid',
+                'severity' => 'critical',
+                'count' => $missingCount,
+                'sample_ids' => (clone $missingOrMultiple)
+                    ->limit($sampleLimit)
+                    ->pluck('e.id')
+                    ->map(static fn (mixed $id): int => (int) $id)
+                    ->all(),
+            ];
+        }
+
+        $children = $this->events($tenantId)
+            ->leftJoin('events as recurrence_parent', function ($join): void {
+                $join->on('recurrence_parent.id', '=', 'e.parent_event_id')
+                    ->on('recurrence_parent.tenant_id', '=', 'e.tenant_id');
+            })
+            ->whereNotNull('e.parent_event_id');
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_child_parent_not_template',
+            'critical',
+            (clone $children)->where(fn (Builder $invalid) => $invalid
+                ->whereNull('recurrence_parent.id')
+                ->orWhere('recurrence_parent.is_recurring_template', '!=', 1)),
+            'e.id',
+            $sampleLimit,
+        );
+        if (Schema::hasColumn('events', 'publication_status')
+            && Schema::hasColumn('events', 'operational_status')) {
+            $this->addQueryIssue(
+                $issues,
+                'event_recurrence_child_lifecycle_divergence',
+                'critical',
+                (clone $children)->whereNotNull('recurrence_parent.id')->where(function (Builder $different): void {
+                    $different->whereNull('e.publication_status')
+                        ->orWhereNull('e.operational_status')
+                        ->orWhere(function (Builder $publication): void {
+                            $publication->where('recurrence_parent.publication_status', 'draft')
+                                ->where('e.publication_status', 'published');
+                        })
+                        ->orWhere(function (Builder $publication): void {
+                            $publication->where('recurrence_parent.publication_status', 'pending_review')
+                                ->whereNotIn('e.publication_status', ['pending_review', 'archived']);
+                        })
+                        ->orWhere(function (Builder $publication): void {
+                            $publication->where('recurrence_parent.publication_status', 'published')
+                                ->whereIn('e.publication_status', ['draft', 'pending_review']);
+                        })
+                        ->orWhere(function (Builder $publication): void {
+                            $publication->where('recurrence_parent.publication_status', 'archived')
+                                ->where('e.publication_status', '!=', 'archived');
+                        })
+                        ->orWhere(function (Builder $operational): void {
+                            $operational->whereIn('recurrence_parent.operational_status', ['cancelled', 'completed'])
+                                ->whereIn('e.operational_status', ['scheduled', 'postponed']);
+                        });
+                }),
+                'e.id',
+                $sampleLimit,
+            );
+        }
+        if (Schema::hasColumn('events', 'recurrence_engine')
+            && Schema::hasColumn('events', 'recurrence_engine_version')) {
+            $this->addQueryIssue(
+                $issues,
+                'event_recurrence_child_engine_divergence',
+                'critical',
+                (clone $children)->whereNotNull('recurrence_parent.id')->where(function (Builder $different): void {
+                    $different->whereColumn('e.recurrence_engine', '!=', 'recurrence_parent.recurrence_engine')
+                        ->orWhereColumn('e.recurrence_engine_version', '!=', 'recurrence_parent.recurrence_engine_version')
+                        ->orWhereNull('e.recurrence_engine')
+                        ->orWhereNull('e.recurrence_engine_version');
+                }),
+                'e.id',
+                $sampleLimit,
+            );
+        }
+
+        if (! Schema::hasColumn('event_recurrence_rules', 'recurrence_engine')
+            || ! Schema::hasColumn('event_recurrence_rules', 'recurrence_engine_version')) {
+            return;
+        }
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_rule_engine_divergence',
+            'critical',
+            DB::table('event_recurrence_rules as recurrence_rule')
+                ->join('events as recurrence_root', function ($join): void {
+                    $join->on('recurrence_root.id', '=', 'recurrence_rule.event_id')
+                        ->on('recurrence_root.tenant_id', '=', 'recurrence_rule.tenant_id');
+                })
+                ->when($tenantId !== null, fn (Builder $query) => $query->where('recurrence_rule.tenant_id', $tenantId))
+                ->where(function (Builder $different): void {
+                    $different->whereColumn('recurrence_rule.recurrence_engine', '!=', 'recurrence_root.recurrence_engine')
+                        ->orWhereColumn('recurrence_rule.recurrence_engine_version', '!=', 'recurrence_root.recurrence_engine_version')
+                        ->orWhereNull('recurrence_rule.recurrence_engine')
+                        ->orWhereNull('recurrence_rule.recurrence_engine_version');
+                }),
+            'recurrence_rule.id',
+            $sampleLimit,
+        );
+
+        if (Schema::hasColumn('events', 'recurrence_id')) {
+            $v2Children = $this->events($tenantId)
+                ->whereNotNull('e.parent_event_id')
+                ->where('e.recurrence_engine', EventRecurrenceService::ENGINE)
+                ->where('e.recurrence_engine_version', EventRecurrenceService::ENGINE_VERSION);
+            $this->addQueryIssue(
+                $issues,
+                'event_recurrence_occurrence_identity_missing',
+                'critical',
+                (clone $v2Children)->where(function (Builder $missing): void {
+                    $missing->whereNull('e.recurrence_id')
+                        ->orWhereRaw("e.recurrence_id NOT REGEXP '^[0-9]{8}T[0-9]{6}Z$'");
+                }),
+                'e.id',
+                $sampleLimit,
+            );
+
+            if (Schema::hasTable('event_recurrence_occurrence_ledger')) {
+                $this->addQueryIssue(
+                    $issues,
+                    'event_recurrence_occurrence_ledger_missing',
+                    'critical',
+                    (clone $v2Children)
+                        ->leftJoin('event_recurrence_occurrence_ledger as recurrence_ledger', function ($join): void {
+                            $join->on('recurrence_ledger.tenant_id', '=', 'e.tenant_id')
+                                ->on('recurrence_ledger.root_event_id', '=', 'e.parent_event_id')
+                                ->on('recurrence_ledger.event_id', '=', 'e.id')
+                                ->on('recurrence_ledger.recurrence_id', '=', 'e.recurrence_id');
+                        })
+                        ->whereNull('recurrence_ledger.id'),
+                    'e.id',
+                    $sampleLimit,
+                );
+                $this->addQueryIssue(
+                    $issues,
+                    'event_recurrence_occurrence_ledger_fact_mismatch',
+                    'critical',
+                    DB::table('event_recurrence_occurrence_ledger as recurrence_ledger')
+                        ->leftJoin('events as ledger_event', 'ledger_event.id', '=', 'recurrence_ledger.event_id')
+                        ->leftJoin('events as ledger_root', 'ledger_root.id', '=', 'recurrence_ledger.root_event_id')
+                        ->when($tenantId !== null, fn (Builder $query) => $query->where('recurrence_ledger.tenant_id', $tenantId))
+                        ->where(function (Builder $mismatch): void {
+                            $mismatch->whereNull('ledger_event.id')
+                                ->orWhereNull('ledger_root.id')
+                                ->orWhereColumn('ledger_event.tenant_id', '!=', 'recurrence_ledger.tenant_id')
+                                ->orWhereColumn('ledger_event.parent_event_id', '!=', 'recurrence_ledger.root_event_id')
+                                ->orWhereColumn('ledger_event.recurrence_id', '!=', 'recurrence_ledger.recurrence_id')
+                                ->orWhereColumn('ledger_event.occurrence_key', '!=', 'recurrence_ledger.occurrence_key')
+                                ->orWhereColumn('ledger_root.tenant_id', '!=', 'recurrence_ledger.tenant_id')
+                                ->orWhere('ledger_root.is_recurring_template', '!=', 1);
+                        }),
+                    'recurrence_ledger.id',
+                    $sampleLimit,
+                );
+
+                $latestLedgerVersions = DB::table('event_recurrence_occurrence_ledger')
+                    ->select(['tenant_id', 'root_event_id', 'event_id'])
+                    ->selectRaw('MAX(state_version) AS state_version')
+                    ->groupBy('tenant_id', 'root_event_id', 'event_id');
+                $staleLedger = (clone $v2Children)
+                    ->joinSub($latestLedgerVersions, 'latest_ledger_version', function ($join): void {
+                        $join->on('latest_ledger_version.tenant_id', '=', 'e.tenant_id')
+                            ->on('latest_ledger_version.root_event_id', '=', 'e.parent_event_id')
+                            ->on('latest_ledger_version.event_id', '=', 'e.id');
+                    })
+                    ->join('event_recurrence_occurrence_ledger as latest_recurrence_ledger', function ($join): void {
+                        $join->on('latest_recurrence_ledger.tenant_id', '=', 'latest_ledger_version.tenant_id')
+                            ->on('latest_recurrence_ledger.root_event_id', '=', 'latest_ledger_version.root_event_id')
+                            ->on('latest_recurrence_ledger.event_id', '=', 'latest_ledger_version.event_id')
+                            ->on('latest_recurrence_ledger.state_version', '=', 'latest_ledger_version.state_version');
+                    })
+                    ->where(function (Builder $stale): void {
+                        $stale->whereRaw('NOT (latest_recurrence_ledger.start_time_utc <=> e.start_time)')
+                            ->orWhereRaw('NOT (latest_recurrence_ledger.end_time_utc <=> e.end_time)')
+                            ->orWhere(function (Builder $state): void {
+                                $state->where(function (Builder $customized): void {
+                                    $customized->where(function (Builder $evidence): void {
+                                        $evidence->where('e.is_recurrence_exception', 1)
+                                            ->orWhere('e.recurrence_override_version', '>', 0);
+                                    })->where('latest_recurrence_ledger.state', '!=', 'customized');
+                                })->orWhere(function (Builder $materialized): void {
+                                    $materialized->where('e.is_recurrence_exception', 0)
+                                        ->where('e.recurrence_override_version', 0)
+                                        ->where('latest_recurrence_ledger.state', '!=', 'materialized');
+                                });
+                            });
+                    });
+                $this->addQueryIssue(
+                    $issues,
+                    'event_recurrence_occurrence_ledger_stale',
+                    'critical',
+                    $staleLedger,
+                    'e.id',
+                    $sampleLimit,
+                );
+            }
+        }
+
+        if (Schema::hasTable('event_recurrence_revisions')
+            && Schema::hasColumn('event_recurrence_rules', 'effective_revision_version')) {
+            $latestRevision = DB::table('event_recurrence_revisions')
+                ->select(['tenant_id', 'root_event_id'])
+                ->selectRaw('MAX(revision_version) AS revision_version')
+                ->groupBy('tenant_id', 'root_event_id');
+            $this->addQueryIssue(
+                $issues,
+                'event_recurrence_revision_version_drift',
+                'critical',
+                DB::table('event_recurrence_rules as versioned_rule')
+                    ->leftJoinSub($latestRevision, 'latest_recurrence_revision', function ($join): void {
+                        $join->on('latest_recurrence_revision.tenant_id', '=', 'versioned_rule.tenant_id')
+                            ->on('latest_recurrence_revision.root_event_id', '=', 'versioned_rule.event_id');
+                    })
+                    ->when($tenantId !== null, fn (Builder $query) => $query->where('versioned_rule.tenant_id', $tenantId))
+                    ->whereRaw(
+                        'versioned_rule.effective_revision_version '
+                        . '<> COALESCE(latest_recurrence_revision.revision_version, 0)',
+                    ),
+                'versioned_rule.id',
+                $sampleLimit,
+            );
+        }
+
+        $activeNever = DB::table('event_recurrence_rules as recurrence_rule')
+            ->join('events as recurrence_root', function ($join): void {
+                $join->on('recurrence_root.id', '=', 'recurrence_rule.event_id')
+                    ->on('recurrence_root.tenant_id', '=', 'recurrence_rule.tenant_id');
+            })
+            ->when($tenantId !== null, fn (Builder $query) => $query->where('recurrence_rule.tenant_id', $tenantId))
+            ->where('recurrence_rule.ends_type', 'never')
+            ->where('recurrence_root.is_recurring_template', 1)
+            ->where('recurrence_root.publication_status', '!=', 'archived')
+            ->whereNotIn('recurrence_root.operational_status', ['cancelled', 'completed']);
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_active_legacy_never_blocker',
+            (bool) config('events.recurrence.engine_v2_enabled', false)
+                && (bool) config('events.recurrence.materialization.enabled', false)
+                ? 'critical'
+                : 'warning',
+            (clone $activeNever)->where(function (Builder $legacy): void {
+                $legacy->whereNull('recurrence_rule.recurrence_engine')
+                    ->orWhere('recurrence_rule.recurrence_engine', '!=', EventRecurrenceService::ENGINE)
+                    ->orWhereNull('recurrence_rule.recurrence_engine_version')
+                    ->orWhere('recurrence_rule.recurrence_engine_version', '!=', EventRecurrenceService::ENGINE_VERSION)
+                    ->orWhereNull('recurrence_root.recurrence_engine')
+                    ->orWhere('recurrence_root.recurrence_engine', '!=', EventRecurrenceService::ENGINE)
+                    ->orWhereNull('recurrence_root.recurrence_engine_version')
+                    ->orWhere('recurrence_root.recurrence_engine_version', '!=', EventRecurrenceService::ENGINE_VERSION);
+            }),
+            'recurrence_rule.id',
+            $sampleLimit,
+        );
+
+        if (! Schema::hasColumn('event_recurrence_rules', 'materialized_through_at')
+            || ! Schema::hasColumn('event_recurrence_rules', 'materialization_error_code')) {
+            return;
+        }
+        $configuration = app(EventRecurrenceMaterializationService::class)->configuration();
+        if (! $configuration['valid']) {
+            return;
+        }
+        $activeV2 = (clone $activeNever)
+            ->where('recurrence_rule.recurrence_engine', EventRecurrenceService::ENGINE)
+            ->where('recurrence_rule.recurrence_engine_version', EventRecurrenceService::ENGINE_VERSION)
+            ->where('recurrence_root.recurrence_engine', EventRecurrenceService::ENGINE)
+            ->where('recurrence_root.recurrence_engine_version', EventRecurrenceService::ENGINE_VERSION);
+        if (! $configuration['enabled'] || ! $configuration['engine_v2_writer_enabled']) {
+            return;
+        }
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_materialization_failed',
+            'critical',
+            (clone $activeV2)->whereNotNull('recurrence_rule.materialization_error_code'),
+            'recurrence_rule.id',
+            $sampleLimit,
+        );
+
+        $dueBefore = now()
+            ->addDays($configuration['lookahead_days'])
+            ->subDays($configuration['refresh_margin_days']);
+        $heartbeatBefore = now()->subHours($configuration['overdue_grace_hours']);
+        $overdue = (clone $activeV2)
+            ->whereIn('recurrence_root.publication_status', ['draft', 'published'])
+            ->where('recurrence_root.operational_status', 'scheduled')
+            ->where(function (Builder $coverage) use ($dueBefore): void {
+                $coverage->whereNotNull('recurrence_rule.materialization_resume_at')
+                    ->orWhereNull('recurrence_rule.materialized_through_at')
+                    ->orWhere('recurrence_rule.materialized_through_at', '<', $dueBefore);
+            })
+            ->where(function (Builder $heartbeat) use ($heartbeatBefore): void {
+                $heartbeat->where(function (Builder $attempted) use ($heartbeatBefore): void {
+                    $attempted->whereNotNull('recurrence_rule.materialization_last_attempted_at')
+                        ->where('recurrence_rule.materialization_last_attempted_at', '<=', $heartbeatBefore);
+                })->orWhere(function (Builder $neverAttempted) use ($heartbeatBefore): void {
+                    $neverAttempted->whereNull('recurrence_rule.materialization_last_attempted_at')
+                        ->where(function (Builder $created) use ($heartbeatBefore): void {
+                            $created->whereNull('recurrence_rule.created_at')
+                                ->orWhere('recurrence_rule.created_at', '<=', $heartbeatBefore);
+                        });
+                });
+            });
+        $this->addQueryIssue(
+            $issues,
+            'event_recurrence_materialization_overdue',
+            'critical',
+            $overdue,
+            'recurrence_rule.id',
+            $sampleLimit,
+        );
     }
 
     /** @param list<array<string,mixed>> $issues */

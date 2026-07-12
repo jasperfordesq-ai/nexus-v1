@@ -1154,6 +1154,8 @@ return [
     'event_series_not_found'               => 'Series not found',
     'event_series_id_required'             => 'series_id is required',
     'event_scope_must_be_single_or_all'    => 'scope must be "single" or "all"',
+    'event_recurrence_template_requires_all_scope' => 'Recurring templates can only be changed with the "all" scope.',
+    'event_recurring_schedule_requires_revision' => 'Schedule changes for a recurring series must use the previewed this-and-future revision workflow.',
     'event_no_image_uploaded'              => 'No image file uploaded or upload error',
     'event_image_upload_failed'            => 'Failed to upload image',
 

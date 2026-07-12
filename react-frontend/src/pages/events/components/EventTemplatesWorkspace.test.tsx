@@ -29,6 +29,11 @@ vi.mock('react-i18next', () => {
     'manage.templates.safety_title': 'Templates copy configuration only',
     'manage.templates.use_template': 'Use template',
     'manage.templates.audit': 'Audit history',
+    'manage.templates.audit_title': 'Template audit history',
+    'manage.templates.audit_load_more': 'Load more history',
+    'manage.templates.audit_actions.captured': 'Template captured',
+    'manage.templates.audit_actions.revised': 'Template revised',
+    'manage.templates.version_value': 'Version {{version}}',
     'manage.templates.capture_from_event': 'Save {{title}} as a template',
     'manage.templates.capture.review_title': 'Review template capture',
     'manage.templates.capture.safe_title': 'Safe to capture',
@@ -165,6 +170,7 @@ function materializationPreviewFixture(): EventTemplateMaterializationPreview {
       operational_status: 'scheduled',
       recurring: false,
       publish: false,
+      submit_for_review: false,
       register: false,
       notify: false,
       federate: false,
@@ -193,6 +199,53 @@ describe('EventTemplatesWorkspace', () => {
     expect(screen.getByRole('button', { name: 'Use template' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Audit history' })).toBeEnabled();
     expect(screen.getByText('2 uses')).toBeInTheDocument();
+  });
+
+  it('loads every page of immutable template audit history on demand', async () => {
+    const history = vi.spyOn(eventTemplatesApi, 'history')
+      .mockResolvedValueOnce({
+        success: true,
+        data: [{
+          id: 31,
+          action: 'captured',
+          template_version: 1,
+          source_event_id: 9,
+          materialized_event_id: null,
+          evidence: {},
+          created_at: '2026-07-01T10:00:00Z',
+          immutable: true,
+        }],
+        meta: { per_page: 50, next_cursor: '31', has_more: true },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: [{
+          id: 30,
+          action: 'revised',
+          template_version: 2,
+          source_event_id: 9,
+          materialized_event_id: null,
+          evidence: {},
+          created_at: '2026-07-02T10:00:00Z',
+          immutable: true,
+        }],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    const user = userEvent.setup();
+    renderEventRoute(
+      <EventTemplatesWorkspace sourceEventId={9} sourceEventTitle="Source event" />,
+      { path: '/events/9/templates', route: '/events/9/templates' },
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Audit history' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(await within(dialog).findByText('Template captured')).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Load more history' }));
+    expect(await within(dialog).findByText('Template revised')).toBeInTheDocument();
+    expect(history).toHaveBeenNthCalledWith(1, 4);
+    expect(history).toHaveBeenNthCalledWith(2, 4, '31');
+    expect(within(dialog).queryByRole('button', { name: 'Load more history' })).not.toBeInTheDocument();
   });
 
   it('requires a server preview before capturing a reusable template', async () => {

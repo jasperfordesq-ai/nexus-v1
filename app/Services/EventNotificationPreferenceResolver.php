@@ -154,18 +154,25 @@ final class EventNotificationPreferenceResolver
      *   reminders_source:string
      * }
      */
-    public static function resolveForEvent(int $userId, int $tenantId, int $eventId): array
+    public static function resolveForEvent(
+        int $userId,
+        int $tenantId,
+        int $eventId,
+        bool $allowRecurringTemplate = false,
+    ): array
     {
         if ($userId <= 0 || $tenantId <= 0 || $eventId <= 0) {
             return self::failClosedResolution('invalid_identity');
         }
 
         try {
-            $event = DB::table('events')
+            $eventQuery = DB::table('events')
                 ->where('tenant_id', $tenantId)
-                ->where('id', $eventId)
-                ->where('is_recurring_template', false)
-                ->first(['id', 'category_id']);
+                ->where('id', $eventId);
+            if (! $allowRecurringTemplate) {
+                $eventQuery->where('is_recurring_template', false);
+            }
+            $event = $eventQuery->first(['id', 'category_id']);
             $user = DB::table('users')
                 ->where('tenant_id', $tenantId)
                 ->where('id', $userId)

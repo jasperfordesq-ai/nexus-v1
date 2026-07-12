@@ -12,14 +12,14 @@ Project NEXUS Events is an authenticated, tenant-scoped event-management module.
 - Attendance is recorded independently from money or time credits. Automatic attendance-credit transfers are disabled. A future credit effect must use `EventCreditService`, an explicit funding source, an immutable claim, and a reviewed reversal policy.
 - Free and time-credit ticket definitions are supported, but confirmed entitlements are deliberately free-only. Time-credit activation, holds, settlement and refunds remain fail-closed until an approved wallet policy and adapter are enabled. Cash payment processing is not provided by Events.
 - Registration answers, guest contact details, meeting links, staff resources, notification evidence, and offline credentials are field-level protected data. They are never part of a general event projection.
-- No maintained identity-bearing Events endpoint is anonymous. A future public catalogue would require a separate, identity-free contract and approval.
+- No maintained catalogue, detail, roster, organiser, or admin Events endpoint is anonymous. The only public exceptions are narrow capability-token operations such as a secret personal calendar feed and one-use guardian-consent grant; invalid guardian inputs are deliberately non-enumerable. A future public catalogue would require a separate, identity-free contract and approval.
 
 ## Capability map
 
 | Area | Maintained behaviour |
 | --- | --- |
 | Discovery | Chronological/keyset listing, search and category/series/proximity filters, lifecycle and group-visibility enforcement, venue-accessibility filters |
-| Lifecycle | Draft, review, publish, postpone, cancel, complete and archive transitions with optimistic versions, idempotency, history and admin moderation |
+| Lifecycle | Draft, review, publish, postpone, cancel, complete and archive transitions with row-locked versions, target-state replay safety, immutable history and admin moderation |
 | Registration | Independent engagement, canonical registration, attendance and waitlist axes; capacity locking; timed single-use waitlist offers |
 | Registration product | Versioned forms, conditional questions, encrypted answers, approval settings, invitations/campaigns, guests, audited export and retention runs |
 | People and staff | Server-paginated roster, capability-scoped staff roles, bulk operations, check-in/out/no-show and formula-safe export |
@@ -56,7 +56,7 @@ Keep these axes separate. A legacy RSVP must not be treated as canonical registr
 | Responsibility | Primary implementation |
 | --- | --- |
 | Legacy compatibility and discovery facade | `app/Services/EventService.php` |
-| Lifecycle and immutable transitions | `app/Services/EventLifecycleService.php` |
+| Lifecycle, publication and immutable history | `EventLifecycleService.php`, `EventPublicationWorkflowService.php`, `EventLifecycleHistoryQueryService.php` |
 | Policy and field-level capabilities | `app/Policies/EventPolicy.php`, `EventRegistrationPolicy.php`, `EventTemplatePolicy.php` |
 | Registration and waitlist | `EventRegistrationService.php`, `EventWaitlistService.php` |
 | Registration forms/invitations/guests | `EventRegistration*Service.php`, `EventInvitation*Service.php` |
@@ -74,7 +74,7 @@ Controllers authenticate, validate and delegate. Cross-aggregate side effects us
 
 ## Lifecycle, registration and capacity
 
-Publication and operation are separate state machines. Lifecycle mutations require an expected version and idempotency key, write history in the transaction, and reconcile search, reminders, communications, calendar and federation projections through durable work.
+Publication and operation are separate state machines. Lifecycle mutations lock the current event row, increment its lifecycle version only for a real transition, and treat an already-reached target as a no-op. Recurring-series operations coordinate through the canonical template lock before enumerating occurrences; child facts retain audit/federation evidence while one root notification carries the deduplicated affected audience. They write history in the transaction and reconcile search, reminders, communications, calendar and federation projections through durable work. The private manager history API and its React, accessible, and native views page through that immutable evidence with an event-bound cursor. Caller-supplied expected versions are used by bounded subdomains such as agenda and reminders, but are not part of the top-level publication lifecycle contract.
 
 Registration has independent states such as invited, pending, confirmed, declined and cancelled. Interest is not registration. Capacity and waitlist actions lock their authoritative rows, and a full event issues a bounded offer rather than silently overbooking. Offer acceptance is available to the authenticated member even when email is disabled; email is an optional delivery channel, not the authority.
 
@@ -108,7 +108,17 @@ Organiser broadcasts use an authorised, frozen audience snapshot, preview counts
 
 ## Recurrence, calendars and federation
 
-Recurrence uses `sabre/vobject` through the Events recurrence service. Store UTC timestamps with an explicit IANA timezone and stable occurrence key. Reject invalid zones, DST gaps and ambiguous fall-back wall times; test month-end and DST boundaries. Named series and recurrence templates remain explicit concepts.
+Recurrence uses `sabre/vobject` through the Events recurrence service. Store UTC timestamps with an explicit IANA timezone, stable occurrence key and immutable canonical UTC recurrence identity. Reject invalid zones, DST gaps and ambiguous fall-back wall times; test month-end and DST boundaries. Named series and recurrence templates remain explicit concepts.
+
+The maintained “this and future” contract is preview-first: `POST /v2/events/{occurrenceId}/recurrence-revisions/preview` returns a bounded, participant-redacted impact projection and short-lived confidential token, and `/commit` requires that token plus `Idempotency-Key`. Commit rechecks the root, rule, revision and materialized-set versions/checksum under deterministic locks, appends immutable effective-dated revision and occurrence evidence, preserves occurrence/event identities, skips fields customized on individual occurrences, and emits at most one aggregate root update notification. Rolling materialization cumulatively applies the latest effective blueprint so later children inherit the revision. Rule-shape changes that cannot preserve ordinal mapping fail with an explicit reconciliation-required conflict; unmatched rows are never hard-deleted. Single-occurrence writers append `customized` evidence through `EventRecurrenceRevisionService::recordOccurrenceState()` in the same transaction; replay is a no-op and an existing member does not advance the materialized-set version. Revision and occurrence ledgers retain the numeric actor ID as an immutable pseudonymous audit reference without a user foreign key, so account erasure cannot delete evidence or be blocked by it.
+
+Maintained clients discover recurrence support through authenticated `GET /v2/events/recurrence-capabilities` inside the tenant Events feature boundary. Its versioned, allowlisted payload reports the active engine, structured-input support, the four supported frequencies, the bounded occurrence cap, supported end types and separate rolling-never, effective-revision and definition-blueprint booleans. It fails closed under partial rollout: advanced flags default false, `never` disappears without a healthy rolling materializer, and `schema_ready` plus `rollout_state` communicate only the safe client behavior rather than internal diagnostics. Clients must use this contract instead of inferring capability from deployment version or endpoint presence.
+
+Definition propagation is a separate, disabled-by-default canary boundary (`EVENTS_RECURRENCE_DEFINITION_BLUEPRINTS_ENABLED=false`) and also requires both the V2 writer and rolling materializer flags. A manager explicitly previews and commits a versioned manifest from one concrete V2 occurrence through `/v2/events/{occurrenceId}/recurrence-definition-blueprints/{preview,commit}`. The manager-authorized `GET /v2/events/{occurrenceId}/recurrence-definition-blueprints` endpoint provides bounded version-cursor history with sections, counts, hashes and pseudonymous actor evidence, but never returns manifest values or staff identities. Only selected agenda definitions, ticket-type definitions, registration settings plus a published form, published safety requirements, and explicitly opted-in active staff assignments are eligible. Session times, sales/registration windows, staff expiry and cutoffs are stored as offsets from the source occurrence and projected from each new occurrence's UTC start, preserving local recurrence behavior across DST. Protected resource URLs remain ciphertext in the at-rest manifest and API projections return counts/conflict codes, never manifest values or staff identities.
+
+Blueprints apply transactionally and idempotently only when a concrete occurrence is newly inserted, with immutable application hash/version evidence. They never silently backfill existing occurrences. Registrations, waitlists, entitlements, inventory claims, submissions, answers, guests, invitations, attendance/check-in, broadcasts, reminder preferences, notifications/outbox/deliveries, analytics, federation delivery, financial settlement and prior audit rows are prohibited families. Active time-credit ticket definitions fail closed because wallet settlement is not part of this propagation contract; paused ticket state is operational and is captured as a draft definition. There is intentionally no client UI in the initial server/API slice.
+
+The older `PUT /v2/events/{id}/recurring` `scope=all` compatibility path means “all remaining occurrences from the current time”, not “from the selected occurrence”. Maintained clients must use recurrence revision preview/commit for an explicit selected boundary. V2 recurrence rollout remains disabled by default until those clients adopt the contract.
 
 Calendar feeds use revocable tokens, bounded ranges and policy-filtered projections. ICS output uses stable UIDs and standards-compliant escaping/serialization. Protected meeting links and private resources do not enter a calendar projection.
 

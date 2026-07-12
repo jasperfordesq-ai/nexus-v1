@@ -21,9 +21,11 @@ use App\Models\EventSeries;
 use App\Models\User;
 use App\Policies\EventPolicy;
 use App\Support\Events\EventContractMapper;
+use App\Support\Authorization\AdminTier;
 use App\Support\Events\EventDiscoveryCursor;
 use App\Support\Events\EventAttendanceResult;
 use App\Support\Events\EventLifecycleCompatibility;
+use App\Support\Events\EventLifecycleTransitionContext;
 use App\Support\Events\EventLifecycleTransitionGuard;
 use App\Support\Events\EventLifecycleTransitionResult;
 use App\Support\Events\EventRegistrationAvailability;
@@ -43,6 +45,63 @@ use Illuminate\Validation\ValidationException;
 class EventService
 {
     public const MAX_BULK_ATTENDANCE = 100;
+
+    public const RECURRENCE_OVERRIDE_FIELD_ALLOWLIST = [
+        'title',
+        'description',
+        'location',
+        'latitude',
+        'longitude',
+        'start_time',
+        'end_time',
+        'timezone',
+        'timezone_source',
+        'all_day',
+        'category_id',
+        'group_id',
+        'series_id',
+        'max_attendees',
+        'is_online',
+        'allow_remote_attendance',
+        'online_link',
+        'video_url',
+        'image_url',
+        'cover_image',
+        'federated_visibility',
+        'accessibility_step_free',
+        'accessibility_toilet',
+        'accessibility_hearing_loop',
+        'accessibility_quiet_space',
+        'accessibility_seating',
+        'accessibility_parking',
+        'accessibility_parking_details',
+        'accessibility_transit_details',
+        'accessibility_assistance_contact',
+        'accessibility_notes',
+    ];
+
+    private const EVENT_NOTIFICATION_RELEVANT_FIELDS = [
+        'title',
+        'start_time',
+        'end_time',
+        'timezone',
+        'all_day',
+        'location',
+        'is_online',
+        'online_link',
+        'allow_remote_attendance',
+        'max_attendees',
+        'accessibility_step_free',
+        'accessibility_toilet',
+        'accessibility_hearing_loop',
+        'accessibility_quiet_space',
+        'accessibility_seating',
+        'accessibility_parking',
+        'accessibility_parking_details',
+        'accessibility_transit_details',
+        'accessibility_assistance_contact',
+        'accessibility_notes',
+    ];
 
     private const MAX_EVENT_DESCRIPTION_LENGTH = 10000;
     private const MAX_EVENT_CAPACITY = 100000;
@@ -74,6 +133,9 @@ class EventService
 
     /** @var array<string,mixed> */
     private static array $lastMeaningfulUpdateChanges = [];
+
+    /** @var list<string> */
+    private static array $lastCanonicalUpdateFields = [];
 
     /** @var array<int> */
     private static array $lastCancellationRecipientIds = [];
@@ -830,12 +892,12 @@ class EventService
                 $viewer,
                 $policy,
             );
-            $visibleOccurrences = $occurrenceModels
+            $allVisibleOccurrences = $occurrenceModels
                 ->filter(static fn (Event $occurrence): bool => isset(
                     $visibleOccurrenceIds[(int) $occurrence->getKey()],
                 ))
-                ->take(50)
                 ->values();
+            $visibleOccurrences = $allVisibleOccurrences->take(50)->values();
             $data['series_occurrences'] = $visibleOccurrences
                 ->map(static fn (Event $occurrence): array => [
                     'id' => (int) $occurrence->getKey(),
@@ -843,7 +905,10 @@ class EventService
                     'date' => $occurrence->getRawOriginal('occurrence_date'),
                 ])
                 ->all();
-            $data['series_count'] = $visibleOccurrences->count();
+            // Keep the preview bounded without understating the actual visible
+            // series size. Clients use series_count/occurrence_count to decide
+            // whether a complete series view is needed.
+            $data['series_count'] = $allVisibleOccurrences->count();
         }
 
         return self::redactOnlineAccessForEvents([$data], $currentUserId)[0];
@@ -948,8 +1013,20 @@ class EventService
      */
     public static function update(int $id, int $userId, array $data): bool
     {
+        return self::updateCanonical($id, $userId, $data, false);
+    }
+
+    /** Scoped recurrence writer used only after updateRecurring locks membership. */
+    private static function updateCanonical(
+        int $id,
+        int $userId,
+        array $data,
+        bool $recurrenceScopeAuthorized,
+    ): bool
+    {
         self::$errors = [];
         self::$lastMeaningfulUpdateChanges = [];
+        self::$lastCanonicalUpdateFields = [];
         $tenantId = (int) TenantContext::getId();
 
         /** @var Event|null $event */
@@ -978,12 +1055,6 @@ class EventService
         if (array_key_exists('group_id', $data)) {
             $normalized['group_id'] = self::resolveGroupId($normalized['group_id'], $userId);
         }
-        $accessibilityColumns = array_merge(
-            array_values(self::VENUE_ACCESSIBILITY_BOOLEAN_FIELDS),
-            array_column(self::VENUE_ACCESSIBILITY_TEXT_FIELDS, 'column'),
-        );
-        $accessibilityTouched = array_key_exists('venue_accessibility', $data);
-
         $meaningfulKeys = [
             'title',
             'start_time',
@@ -1009,13 +1080,8 @@ class EventService
             'online_link',
             'allow_remote_attendance',
             'max_attendees',
+            'cover_image',
         ];
-        $original = [];
-        foreach ($meaningfulKeys as $key) {
-            $original[$key] = $event->getAttribute($key);
-        }
-
-        $event->forceFill($normalized);
         $federationVisibleFields = [
             'title',
             'start_time',
@@ -1026,82 +1092,178 @@ class EventService
             'latitude',
             'longitude',
             'is_online',
+            'cover_image',
             'federated_visibility',
         ];
-        // validateAndNormalizeWriterData() returns only caller-touched fields
-        // (plus their coupled time fields). Restrict the pre-save dirty check to
-        // that exact set so legacy/cast representation differences on untouched
-        // columns cannot advance federation versions or enqueue duplicate facts.
-        $federationTouchedFields = array_values(array_intersect(
-            $federationVisibleFields,
-            array_keys($normalized),
-        ));
-        $federationVisibleMutation = Schema::hasColumn('events', 'federation_version')
-            && $federationTouchedFields !== []
-            && $event->isDirty($federationTouchedFields);
-        if ($event->isDirty($calendarKeys)) {
-            $event->forceFill([
-                'calendar_sequence' => max(
-                    0,
-                    (int) $event->getRawOriginal('calendar_sequence'),
-                ) + 1,
-            ]);
-        }
-        foreach ($meaningfulKeys as $key) {
-            if (!array_key_exists($key, $normalized)) {
-                continue;
-            }
+        $accessibilityColumns = array_merge(
+            array_values(self::VENUE_ACCESSIBILITY_BOOLEAN_FIELDS),
+            array_column(self::VENUE_ACCESSIBILITY_TEXT_FIELDS, 'column'),
+        );
 
-            $before = self::normalizeEventChangeValue($key, $original[$key] ?? null);
-            $after = self::normalizeEventChangeValue($key, $event->getAttribute($key));
-            if ($before !== $after) {
-                // The online URL is deliberately represented only by a change
-                // marker. Notification payloads must never become a side door
-                // around the event-detail reveal window and entitlement policy.
-                self::$lastMeaningfulUpdateChanges[$key] = $key === 'online_link'
-                    ? true
-                    : $event->getAttribute($key);
-            }
-        }
-        if ($accessibilityTouched && $event->isDirty($accessibilityColumns)) {
-            self::$lastMeaningfulUpdateChanges['venue_accessibility'] = true;
-        }
-
+        $coordinationRootId = max(0, (int) $event->getRawOriginal('parent_event_id')) ?: $id;
+        $editBlockedByReview = false;
+        $recurrenceScopeBlocked = false;
+        $authorizationBlocked = false;
         DB::transaction(function () use (
-            $event,
+            &$event,
             $tenantId,
             $id,
+            $coordinationRootId,
             $userId,
             $data,
-            $federationVisibleMutation,
+            $normalized,
+            $meaningfulKeys,
+            $calendarKeys,
+            $federationVisibleFields,
+            $accessibilityColumns,
+            $recurrenceScopeAuthorized,
+            &$editBlockedByReview,
+            &$recurrenceScopeBlocked,
+            &$authorizationBlocked,
         ): void {
-            if ($federationVisibleMutation) {
-                $currentFederationVersion = DB::table('events')
+            /** @var Event|null $root */
+            $root = Event::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($coordinationRootId)
+                ->lockForUpdate()
+                ->first();
+            /** @var Event|null $current */
+            $current = $coordinationRootId === $id
+                ? $root
+                : Event::withoutGlobalScopes()
                     ->where('tenant_id', $tenantId)
-                    ->where('id', $id)
+                    ->whereKey($id)
                     ->lockForUpdate()
-                    ->value('federation_version');
-                $event->forceFill([
-                    'federation_version' => max(1, (int) ($currentFederationVersion ?? 1)) + 1,
+                    ->first();
+            $currentRootId = $current === null
+                ? 0
+                : (max(0, (int) $current->getRawOriginal('parent_event_id')) ?: (int) $current->getKey());
+            if ($root === null || $current === null || $currentRootId !== $coordinationRootId) {
+                throw new \RuntimeException('event_recurring_concurrent_root_changed');
+            }
+            if (! self::policyAllows($current, $userId, 'manage')) {
+                $authorizationBlocked = true;
+                $event = $current;
+                return;
+            }
+            if (! $recurrenceScopeAuthorized
+                && ((bool) $current->getRawOriginal('is_recurring_template')
+                    || max(0, (int) $current->getRawOriginal('parent_event_id')) > 0)) {
+                $recurrenceScopeBlocked = true;
+                $event = $current;
+                return;
+            }
+            if ((string) $root->getRawOriginal('publication_status') === EventPublicationState::PendingReview->value
+                || (string) $current->getRawOriginal('publication_status') === EventPublicationState::PendingReview->value) {
+                $editBlockedByReview = true;
+                $event = $current;
+                return;
+            }
+
+            // Re-run normalization against the locked row. The first writer may
+            // already have applied this exact request while this writer waited.
+            // Reusing pre-lock dirty flags would advance versions and outbox
+            // state for a mutation that no longer exists.
+            $rebased = self::validateAndNormalizeWriterData($data, $current);
+            foreach (['category_id', 'series_id', 'group_id'] as $resolvedKey) {
+                if (array_key_exists($resolvedKey, $normalized)) {
+                    $rebased[$resolvedKey] = $normalized[$resolvedKey];
+                }
+            }
+            $original = [];
+            foreach ($meaningfulKeys as $key) {
+                $original[$key] = $current->getAttribute($key);
+            }
+            $current->forceFill($rebased);
+            self::$lastCanonicalUpdateFields = array_values(array_intersect(
+                self::RECURRENCE_OVERRIDE_FIELD_ALLOWLIST,
+                array_keys($current->getDirty()),
+            ));
+            sort(self::$lastCanonicalUpdateFields);
+            $federationTouchedFields = array_values(array_intersect(
+                $federationVisibleFields,
+                array_keys($rebased),
+            ));
+            $federationVisibleMutation = Schema::hasColumn('events', 'federation_version')
+                && $federationTouchedFields !== []
+                && $current->isDirty($federationTouchedFields);
+            $calendarMutation = $current->isDirty($calendarKeys)
+                || self::$lastCanonicalUpdateFields !== [];
+            foreach ($meaningfulKeys as $key) {
+                if (! array_key_exists($key, $rebased)) {
+                    continue;
+                }
+                $before = self::normalizeEventChangeValue($key, $original[$key] ?? null);
+                $after = self::normalizeEventChangeValue($key, $current->getAttribute($key));
+                if ($before !== $after) {
+                    self::$lastMeaningfulUpdateChanges[$key] = $key === 'online_link'
+                        ? true
+                        : $current->getAttribute($key);
+                }
+            }
+            $accessibilityMutation = array_key_exists('venue_accessibility', $data)
+                && $current->isDirty($accessibilityColumns);
+            if ($accessibilityMutation) {
+                self::$lastMeaningfulUpdateChanges['venue_accessibility'] = true;
+            }
+            $calendarMutation = $calendarMutation || $accessibilityMutation;
+
+            if (! $current->isDirty()) {
+                self::$lastMeaningfulUpdateChanges = [];
+                self::$lastCanonicalUpdateFields = [];
+                $event = $current;
+                return;
+            }
+            if ($calendarMutation) {
+                $current->forceFill([
+                    'calendar_sequence' => max(0, (int) $current->getRawOriginal('calendar_sequence')) + 1,
                 ]);
             }
-            $event->save();
+            if ($federationVisibleMutation) {
+                $current->forceFill([
+                    'federation_version' => max(1, (int) $current->getRawOriginal('federation_version')) + 1,
+                ]);
+            }
+            $current->save();
+            $event = $current;
 
             if ($federationVisibleMutation
                 && Schema::hasTable('event_federation_deliveries')
                 && Schema::hasTable('federation_external_partners')) {
-                app(EventFederationPublisher::class)->publish($event);
+                app(EventFederationPublisher::class)->publish($current);
             }
-            if (self::$lastMeaningfulUpdateChanges === [] || ! self::isPublishedEvent($event)) {
+            if (self::$lastCanonicalUpdateFields === [] || ! self::isPublishedEvent($current)) {
                 return;
             }
 
-            $changedFields = array_values(array_keys(self::$lastMeaningfulUpdateChanges));
-            sort($changedFields);
-            $sequence = max(1, (int) $event->getAttribute('calendar_sequence'));
+            $changedFields = self::$lastCanonicalUpdateFields;
+            $sequence = max(1, (int) $current->getAttribute('calendar_sequence'));
             $scope = (string) ($data['recurrence_scope'] ?? $data['scope'] ?? 'single');
             if (! in_array($scope, ['single', 'all'], true)) {
                 $scope = 'single';
+            }
+            $seriesRootId = max(0, (int) ($data['_series_notification_root_id'] ?? 0));
+            $notificationRelevant = array_intersect(
+                $changedFields,
+                self::EVENT_NOTIFICATION_RELEVANT_FIELDS,
+            ) !== [];
+            $coverImageAuditOnly = $changedFields === ['cover_image'];
+            $seriesNotificationSuppressed = (bool) ($data['_series_notifications_suppressed'] ?? false)
+                || ! $notificationRelevant;
+            $metadata = [];
+            if ($seriesNotificationSuppressed) {
+                $metadata['notifications_suppressed'] = true;
+            }
+            if ($coverImageAuditOnly) {
+                $metadata['notification_policy'] = 'cover_image_audit_only';
+            } elseif (! $notificationRelevant) {
+                $metadata['notification_policy'] = 'non_notifiable_event_update_audit';
+            }
+            if ($seriesRootId > 0) {
+                $metadata['series'] = [
+                    'root_event_id' => $seriesRootId,
+                    'member_type' => $id === $seriesRootId ? 'template' : 'occurrence',
+                ];
             }
             app(EventDomainOutboxService::class)->record(
                 $tenantId,
@@ -1114,14 +1276,47 @@ class EventService
                     'tenant_id' => $tenantId,
                     'event_id' => $id,
                     'actor_user_id' => $userId,
-                    'organizer_user_id' => (int) $event->getAttribute('user_id'),
+                    'organizer_user_id' => (int) $current->getAttribute('user_id'),
                     'calendar_sequence' => $sequence,
                     'changed_fields' => $changedFields,
                     'recurrence_scope' => $scope,
+                    'affected_recipient_user_ids' => [],
+                    'metadata' => $metadata,
                     'occurred_at' => now()->toIso8601String(),
                 ],
+                $scope === 'all' ? EventNotificationDeliveryMode::OutboxAuthoritative : null,
             );
         }, 3);
+
+        if ($authorizationBlocked) {
+            self::$lastMeaningfulUpdateChanges = [];
+            self::$lastCanonicalUpdateFields = [];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_edit_forbidden')];
+            TenantContext::setById($tenantId);
+            return false;
+        }
+
+        if ($recurrenceScopeBlocked) {
+            self::$lastMeaningfulUpdateChanges = [];
+            self::$lastCanonicalUpdateFields = [];
+            self::$errors[] = [
+                'code' => 'EVENT_RECURRENCE_SCOPE_REQUIRED',
+                'message' => __('api.event_scope_must_be_single_or_all'),
+            ];
+            TenantContext::setById($tenantId);
+            return false;
+        }
+
+        if ($editBlockedByReview) {
+            self::$lastMeaningfulUpdateChanges = [];
+            self::$lastCanonicalUpdateFields = [];
+            self::$errors[] = [
+                'code' => 'EVENT_REVIEW_PENDING',
+                'message' => __('api.invalid_status'),
+            ];
+            TenantContext::setById($tenantId);
+            return false;
+        }
 
         if (! self::isPublishedEvent($event)) {
             self::$lastMeaningfulUpdateChanges = [];
@@ -2050,6 +2245,9 @@ class EventService
                 'publication_status',
                 'operational_status',
                 'is_recurring_template',
+                'recurrence_id',
+                'recurrence_engine',
+                'recurrence_engine_version',
                 'start_time',
             ])
             ->keyBy('id');
@@ -2058,6 +2256,10 @@ class EventService
         $policyAbilities = $viewer === null
             ? []
             : $eventPolicy->abilitiesForEvents($viewer, $eventModels->values());
+        $moderationSettings = ContentModerationService::getModerationSettings($tenantId);
+        $eventModerationRequired = ($moderationSettings['enabled'] ?? false) === true
+            && ($moderationSettings['require_event'] ?? false) === true;
+        $viewerIsTenantAdmin = self::isTenantAdmin($viewerId, $tenantId);
         $rsvpMap = $viewerId !== null ? self::getUserRsvpsBatch($eventIds, $viewerId) : [];
 
         $canonicalRegistrations = collect();
@@ -2433,6 +2635,29 @@ class EventService
                 : null;
             $isFull = $maxAttendees !== null && $capacityOccupiedCount >= $maxAttendees;
             $eventModel = $eventModels->get($eventId);
+            $publicationState = null;
+            if ($eventModel instanceof Event) {
+                try {
+                    $publicationState = EventLifecycleCompatibility::resolve(
+                        self::nullableLifecycleValue($eventModel->getRawOriginal('publication_status')),
+                        self::nullableLifecycleValue($eventModel->getRawOriginal('operational_status')),
+                        self::nullableLifecycleValue($eventModel->getRawOriginal('status')),
+                    )['publication'];
+                } catch (\Throwable) {
+                    // Corrupt lifecycle facts fail closed for publication actions.
+                }
+            }
+            $canManagePublication = ($abilities['manage'] ?? false) === true;
+            $canSubmitForReview = $canManagePublication
+                && $publicationState === EventPublicationState::Draft
+                && $eventModerationRequired
+                && ! $viewerIsTenantAdmin;
+            $canPublish = $canManagePublication
+                && in_array($publicationState, [
+                    EventPublicationState::Draft,
+                    EventPublicationState::PendingReview,
+                ], true)
+                && (! $eventModerationRequired || $viewerIsTenantAdmin);
             $registrable = $eventModel instanceof Event
                 && EventRegistrationAvailability::isRegistrable($eventModel);
             $canParticipate = $viewerId !== null
@@ -2469,6 +2694,11 @@ class EventService
                 'attendance' => $attendanceMap[$eventId] ?? [],
                 'is_organizer' => $isOrganizer,
                 'policy_abilities' => $abilities,
+                'can_edit' => $canManagePublication
+                    && $publicationState !== EventPublicationState::PendingReview,
+                'can_publish' => $canPublish,
+                'can_submit_for_review' => $canSubmitForReview,
+                'event_moderation_required' => $eventModerationRequired,
                 'can_message_organizer' => false,
                 'allowed_actions' => [
                     'set_interest' => $canParticipate,
@@ -2484,6 +2714,14 @@ class EventService
                     ? ($namedSeriesMap[(int) $event['series_id']] ?? null)
                     : null,
                 'recurrence' => $recurrenceMap[$rootId] ?? null,
+                // Keep the hidden recurrence identity inside mapper-only facts.
+                // EventService's legacy/public row must never expose these raw
+                // columns at its top level.
+                'recurrence_identity' => $eventModel instanceof Event ? [
+                    'recurrence_id' => $eventModel->getRawOriginal('recurrence_id'),
+                    'engine' => $eventModel->getRawOriginal('recurrence_engine'),
+                    'engine_version' => $eventModel->getRawOriginal('recurrence_engine_version'),
+                ] : null,
                 'online_access' => is_array($event['online_access'] ?? null)
                     ? $event['online_access']
                     : EventContractMapper::onlineAccess(
@@ -2916,7 +3154,7 @@ class EventService
     /**
      * Authorize an event image mutation before any file is written.
      */
-    public static function canUpdateImage(int $eventId, int $userId): bool
+    public static function canUpdateImage(int $eventId, int $userId, ?string $scope = null): bool
     {
         self::$errors = [];
         $event = Event::query()->find($eventId);
@@ -2929,46 +3167,61 @@ class EventService
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_modify_forbidden')];
             return false;
         }
+        $isTemplate = (bool) $event->getRawOriginal('is_recurring_template');
+        $isOccurrence = max(0, (int) $event->getRawOriginal('parent_event_id')) > 0;
+        if ($isTemplate || $isOccurrence) {
+            if (! in_array($scope, ['single', 'all'], true)) {
+                self::$errors[] = [
+                    'code' => 'EVENT_RECURRENCE_SCOPE_REQUIRED',
+                    'message' => __('api.event_scope_must_be_single_or_all'),
+                ];
+                return false;
+            }
+            if ($isTemplate && $scope === 'single') {
+                self::$errors[] = [
+                    'code' => 'EVENT_RECURRENCE_TEMPLATE_ALL_SCOPE_REQUIRED',
+                    'message' => __('api.event_recurrence_template_requires_all_scope'),
+                ];
+                return false;
+            }
+        }
+        $rootId = max(0, (int) $event->getRawOriginal('parent_event_id')) ?: $eventId;
+        $rootPublication = Event::withoutGlobalScopes()
+            ->where('tenant_id', (int) TenantContext::getId())
+            ->whereKey($rootId)
+            ->value('publication_status');
+        if ((string) $rootPublication === EventPublicationState::PendingReview->value
+            || (string) $event->getRawOriginal('publication_status') === EventPublicationState::PendingReview->value) {
+            self::$errors[] = ['code' => 'EVENT_REVIEW_PENDING', 'message' => __('api.invalid_status')];
+            return false;
+        }
 
         return true;
     }
 
-    public static function updateImage(int $eventId, int $userId, string $imageUrl): bool
+    public static function updateImage(
+        int $eventId,
+        int $userId,
+        string $imageUrl,
+        ?string $scope = null,
+    ): bool
     {
-        if (!self::canUpdateImage($eventId, $userId)) {
+        if (!self::canUpdateImage($eventId, $userId, $scope)) {
             return false;
         }
 
-        $tenantId = \App\Core\TenantContext::getId();
-        $event = DB::selectOne(
-            "SELECT id, is_recurring_template, parent_event_id FROM events WHERE id = ? AND tenant_id = ?",
-            [$eventId, $tenantId]
-        );
+        $event = Event::query()->find($eventId);
         if (!$event) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
 
-        try {
-            DB::update("UPDATE events SET cover_image = ? WHERE id = ? AND tenant_id = ?", [$imageUrl, $eventId, $tenantId]);
-
-            // Recurring series: the image is uploaded to the template AFTER its
-            // occurrences are generated, so without this the cover only lands on
-            // the one row the upload targeted (which sorts last in the DESC list).
-            // Propagate it to the whole series so every occurrence shows it.
-            if (!empty($event->is_recurring_template) || !empty($event->parent_event_id)) {
-                $rootId = !empty($event->parent_event_id) ? (int) $event->parent_event_id : (int) $event->id;
-                DB::update(
-                    "UPDATE events SET cover_image = ? WHERE tenant_id = ? AND (id = ? OR parent_event_id = ?)",
-                    [$imageUrl, $tenantId, $rootId, $rootId]
-                );
-            }
-            return true;
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("EventService::updateImage error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_image_update_failed')];
-            return false;
+        if ((bool) $event->getRawOriginal('is_recurring_template')
+            || max(0, (int) $event->getRawOriginal('parent_event_id')) > 0) {
+            return self::updateRecurring($eventId, $userId, ['cover_image' => $imageUrl], (string) $scope);
         }
+
+        return self::update($eventId, $userId, ['cover_image' => $imageUrl]);
     }
 
     /**
@@ -3123,7 +3376,7 @@ class EventService
      *   }
      * }
      */
-    private static function transitionLifecycleTargets(
+    public static function transitionLifecycleTargets(
         Event $root,
         User $actor,
         string $action,
@@ -3131,16 +3384,42 @@ class EventService
     ): array {
         $tenantId = (int) $root->getAttribute('tenant_id');
         $rootId = (int) $root->getKey();
-        $isSeries = (bool) $root->getAttribute('is_recurring_template');
+        $expectedParentId = max(0, (int) $root->getRawOriginal('parent_event_id'));
+        $coordinationRootId = $expectedParentId > 0 ? $expectedParentId : $rootId;
 
         return DB::transaction(function () use (
             $tenantId,
             $rootId,
-            $isSeries,
+            $coordinationRootId,
             $actor,
             $action,
             $reason,
         ): array {
+            /** @var Event|null $coordinationRoot */
+            $coordinationRoot = Event::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($coordinationRootId)
+                ->lockForUpdate()
+                ->first();
+            /** @var Event|null $lockedRoot */
+            $lockedRoot = $coordinationRootId === $rootId
+                ? $coordinationRoot
+                : Event::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($rootId)
+                    ->lockForUpdate()
+                    ->first();
+            $currentCoordinationRootId = $lockedRoot === null
+                ? 0
+                : (max(0, (int) $lockedRoot->getRawOriginal('parent_event_id'))
+                    ?: (int) $lockedRoot->getKey());
+            if ($coordinationRoot === null
+                || $lockedRoot === null
+                || $currentCoordinationRootId !== $coordinationRootId) {
+                throw new EventLifecycleTransitionException('event_lifecycle_event_not_found');
+            }
+
+            $isSeries = (bool) $lockedRoot->getRawOriginal('is_recurring_template');
             $targetIds = [$rootId];
             if ($isSeries) {
                 $occurrenceIds = Event::withoutGlobalScopes()
@@ -3159,6 +3438,10 @@ class EventService
             /** @var array<int,EventLifecycleTransitionResult> $results */
             $results = [];
             foreach ($targetIds as $targetId) {
+                $context = new EventLifecycleTransitionContext(
+                    $isSeries ? $rootId : null,
+                    $isSeries && $targetId !== $rootId,
+                );
                 if ($action === 'cancel') {
                     $results[$targetId] = $lifecycle->transition(
                         $targetId,
@@ -3171,11 +3454,39 @@ class EventService
                             EventOperationalState::Postponed,
                             EventOperationalState::Cancelled,
                         ]),
+                        $context,
                     );
                     continue;
                 }
-                if ($action !== 'archive') {
-                    throw new \LogicException('Unsupported event lifecycle compatibility action.');
+                if ($action === 'postpone') {
+                    $results[$targetId] = $lifecycle->transition(
+                        $targetId,
+                        $actor,
+                        null,
+                        EventOperationalState::Postponed,
+                        $reason,
+                        new EventLifecycleTransitionGuard(null, [
+                            EventOperationalState::Scheduled,
+                            EventOperationalState::Postponed,
+                        ]),
+                        $context,
+                    );
+                    continue;
+                }
+                if ($action === 'complete') {
+                    $results[$targetId] = $lifecycle->transition(
+                        $targetId,
+                        $actor,
+                        null,
+                        EventOperationalState::Completed,
+                        $reason,
+                        new EventLifecycleTransitionGuard(null, [
+                            EventOperationalState::Scheduled,
+                            EventOperationalState::Completed,
+                        ]),
+                        $context,
+                    );
+                    continue;
                 }
 
                 /** @var Event|null $target */
@@ -3195,17 +3506,382 @@ class EventService
                     EventOperationalState::Scheduled,
                     EventOperationalState::Postponed,
                 ], true);
-                $results[$targetId] = $lifecycle->transition(
-                    $targetId,
+                if ($action === 'archive') {
+                    $results[$targetId] = $lifecycle->transition(
+                        $targetId,
+                        $actor,
+                        EventPublicationState::Archived,
+                        $cancelOperationally ? EventOperationalState::Cancelled : null,
+                        $reason,
+                        null,
+                        $context,
+                    );
+                    continue;
+                }
+                if ($action === 'restore') {
+                    $publication = $current['publication'] === EventPublicationState::Archived
+                        ? EventPublicationState::Draft
+                        : $current['publication'];
+                    $operational = in_array($current['operational'], [
+                        EventOperationalState::Postponed,
+                        EventOperationalState::Cancelled,
+                    ], true) ? EventOperationalState::Scheduled : $current['operational'];
+                    $results[$targetId] = $lifecycle->transition(
+                        $targetId,
+                        $actor,
+                        $publication,
+                        $operational,
+                        $reason,
+                        new EventLifecycleTransitionGuard(null, [
+                            EventOperationalState::Scheduled,
+                            EventOperationalState::Postponed,
+                            EventOperationalState::Cancelled,
+                        ]),
+                        $context,
+                    );
+                    continue;
+                }
+
+                throw new \LogicException('Unsupported event lifecycle compatibility action.');
+            }
+
+            if ($isSeries) {
+                $results = self::consolidateSeriesLifecycleResults(
+                    $lockedRoot,
                     $actor,
-                    EventPublicationState::Archived,
-                    $cancelOperationally ? EventOperationalState::Cancelled : null,
+                    $action,
                     $reason,
+                    $results,
                 );
             }
 
             return self::aggregateLifecycleResults($rootId, $isSeries, $results);
         }, 3);
+    }
+
+    /**
+     * Consolidate any series lifecycle mutation into one authoritative root
+     * notification fact while retaining suppressed per-occurrence audit facts.
+     * Publication and operational workflows share this boundary.
+     *
+     * @param array<int,EventLifecycleTransitionResult> $results
+     * @return array<int,EventLifecycleTransitionResult>
+     */
+    public static function consolidateSeriesLifecycleResults(
+        Event $lockedRoot,
+        User $actor,
+        string $action,
+        ?string $reason,
+        array $results,
+    ): array {
+        $results = self::ensureSeriesLifecycleRootAggregate(
+            $lockedRoot,
+            $actor,
+            $action,
+            $reason,
+            $results,
+        );
+        self::mergeSeriesRecipientsIntoRootOutbox(
+            (int) $lockedRoot->getKey(),
+            $action,
+            $results,
+        );
+
+        return $results;
+    }
+
+    /**
+     * A series operation has exactly one claimable notification fact. When the
+     * template is already in the requested state but one or more occurrences
+     * drifted, create a same-state lifecycle revision on the template so the
+     * child audit facts can remain permanently notification-suppressed.
+     *
+     * @param array<int,EventLifecycleTransitionResult> $results
+     * @return array<int,EventLifecycleTransitionResult>
+     */
+    private static function ensureSeriesLifecycleRootAggregate(
+        Event $lockedRoot,
+        User $actor,
+        string $action,
+        ?string $reason,
+        array $results,
+    ): array {
+        $tenantId = (int) $lockedRoot->getAttribute('tenant_id');
+        $rootId = (int) $lockedRoot->getKey();
+        $rootResult = $results[$rootId] ?? null;
+        if (! $rootResult instanceof EventLifecycleTransitionResult) {
+            throw new \LogicException('Root event lifecycle result is missing.');
+        }
+
+        $hasChangedOccurrence = false;
+        foreach ($results as $eventId => $result) {
+            if ((int) $eventId !== $rootId && $result->changed) {
+                $hasChangedOccurrence = true;
+                break;
+            }
+        }
+
+        if (! $rootResult->changed && ! $hasChangedOccurrence) {
+            return $results;
+        }
+
+        if ($rootResult->changed) {
+            if ($rootResult->outboxId === null) {
+                throw new \LogicException('Changed series root lifecycle result has no outbox fact.');
+            }
+            if ($rootResult->deliveryMode !== EventNotificationDeliveryMode::OutboxAuthoritative->value) {
+                self::promoteSeriesLifecycleOutbox($tenantId, $rootResult->outboxId);
+            }
+            $results[$rootId] = new EventLifecycleTransitionResult(
+                $rootResult->event,
+                true,
+                $rootResult->historyId,
+                $rootResult->outboxId,
+                $rootResult->affectedRecipientUserIds,
+                $rootResult->cascade,
+                $rootResult->publicationBecamePublished,
+                EventNotificationDeliveryMode::OutboxAuthoritative->value,
+            );
+
+            return $results;
+        }
+
+        $current = EventLifecycleCompatibility::resolve(
+            self::nullableLifecycleValue($lockedRoot->getRawOriginal('publication_status')),
+            self::nullableLifecycleValue($lockedRoot->getRawOriginal('operational_status')),
+            self::nullableLifecycleValue($lockedRoot->getRawOriginal('status')),
+        );
+        $currentVersion = max(0, (int) $lockedRoot->getRawOriginal('lifecycle_version'));
+        $nextVersion = $currentVersion + 1;
+        $actorId = (int) $actor->getKey();
+        $now = now();
+        $legacyStatus = strtolower(trim((string) ($lockedRoot->getRawOriginal('status') ?? 'active')));
+        $changedOccurrenceIds = array_values(array_map(
+            static fn (int|string $eventId): int => (int) $eventId,
+            array_keys(array_filter(
+                $results,
+                static fn (EventLifecycleTransitionResult $result, int|string $eventId): bool =>
+                    (int) $eventId !== $rootId && $result->changed,
+                ARRAY_FILTER_USE_BOTH,
+            )),
+        ));
+        sort($changedOccurrenceIds, SORT_NUMERIC);
+        $metadata = [
+            'schema_version' => 1,
+            'source' => 'event_lifecycle_series_aggregate',
+            'axes_changed' => [],
+            'cascade' => [
+                'reminders_cancelled' => 0,
+                'waitlist_cancelled' => 0,
+                'registrations_cancelled' => 0,
+            ],
+            'series' => [
+                'root_event_id' => $rootId,
+                'member_type' => 'template',
+                'action' => $action,
+                'changed_occurrence_ids' => $changedOccurrenceIds,
+                'synthetic_root_revision' => true,
+            ],
+        ];
+
+        $lockedRoot->forceFill([
+            'lifecycle_version' => $nextVersion,
+            'lifecycle_reason' => $reason,
+            'updated_at' => $now,
+        ])->save();
+        $historyId = (int) DB::table('event_status_history')->insertGetId([
+            'tenant_id' => $tenantId,
+            'event_id' => $rootId,
+            'actor_user_id' => $actorId,
+            'lifecycle_version' => $nextVersion,
+            'from_publication_status' => $current['publication']->value,
+            'to_publication_status' => $current['publication']->value,
+            'from_operational_status' => $current['operational']->value,
+            'to_operational_status' => $current['operational']->value,
+            'from_legacy_status' => $legacyStatus,
+            'to_legacy_status' => $legacyStatus,
+            'reason' => $reason,
+            'metadata' => json_encode($metadata, JSON_THROW_ON_ERROR),
+            'created_at' => $now,
+        ]);
+        $outbox = app(EventDomainOutboxService::class)->record(
+            $tenantId,
+            $rootId,
+            $nextVersion,
+            'event.lifecycle.transitioned',
+            "event:{$tenantId}:{$rootId}:lifecycle:v{$nextVersion}",
+            [
+                'schema_version' => 1,
+                'tenant_id' => $tenantId,
+                'event_id' => $rootId,
+                'actor_user_id' => $actorId,
+                'organizer_user_id' => (int) $lockedRoot->getAttribute('user_id'),
+                'affected_recipient_user_ids' => [],
+                'lifecycle_version' => $nextVersion,
+                'publication' => [
+                    'from' => $current['publication']->value,
+                    'to' => $current['publication']->value,
+                ],
+                'operational' => [
+                    'from' => $current['operational']->value,
+                    'to' => $current['operational']->value,
+                ],
+                'legacy_status' => $legacyStatus,
+                'publication_became_published' => false,
+                'reason' => $reason,
+                'metadata' => $metadata,
+                'occurred_at' => $now->toIso8601String(),
+            ],
+            EventNotificationDeliveryMode::OutboxAuthoritative,
+        );
+
+        $results[$rootId] = new EventLifecycleTransitionResult(
+            $lockedRoot,
+            true,
+            $historyId,
+            (int) $outbox['id'],
+            [],
+            [
+                'reminders_cancelled' => 0,
+                'waitlist_cancelled' => 0,
+                'registrations_cancelled' => 0,
+            ],
+            false,
+            EventNotificationDeliveryMode::OutboxAuthoritative->value,
+        );
+
+        return $results;
+    }
+
+    private static function promoteSeriesLifecycleOutbox(int $tenantId, int $outboxId): void
+    {
+        $updated = DB::table('event_domain_outbox')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $outboxId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->update([
+                'production_mode' => EventNotificationDeliveryMode::OutboxAuthoritative->value,
+                'status' => EventNotificationDeliveryMode::OutboxAuthoritative->initialOutboxStatus(),
+                'available_at' => now(),
+                'claim_token' => null,
+                'claimed_at' => null,
+                'attempts' => 0,
+                'next_attempt_at' => null,
+                'processed_at' => null,
+                'dead_lettered_at' => null,
+                'last_error' => null,
+                'updated_at' => now(),
+            ]);
+        if ($updated !== 1) {
+            throw new \LogicException('Series root lifecycle outbox fact could not be promoted.');
+        }
+    }
+
+    /**
+     * Child lifecycle facts are retained for audit/federation but their
+     * notifications are suppressed when the root changed. Carry the union of
+     * participant identities on that root fact before any worker can claim it.
+     *
+     * @param array<int,EventLifecycleTransitionResult> $results
+     */
+    private static function mergeSeriesRecipientsIntoRootOutbox(
+        int $rootId,
+        string $action,
+        array $results,
+    ): void
+    {
+        $rootResult = $results[$rootId] ?? null;
+        if (! $rootResult instanceof EventLifecycleTransitionResult
+            || ! $rootResult->changed
+            || $rootResult->outboxId === null) {
+            return;
+        }
+
+        $recipientIds = [];
+        $affectedEventIds = [];
+        $recipientEventCandidates = [];
+        foreach ($results as $eventId => $result) {
+            if ($result->changed) {
+                $affectedEventIds[] = (int) $eventId;
+            }
+            $recipientIds = array_merge($recipientIds, $result->affectedRecipientUserIds);
+            if ((int) $eventId !== $rootId) {
+                foreach ($result->affectedRecipientUserIds as $recipientId) {
+                    $recipientId = (int) $recipientId;
+                    if ($recipientId > 0) {
+                        $recipientEventCandidates[$recipientId][(int) $eventId] = true;
+                    }
+                }
+            }
+        }
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn (mixed $id): int => (int) $id, $recipientIds),
+            static fn (int $id): bool => $id > 0,
+        )));
+        sort($recipientIds, SORT_NUMERIC);
+        sort($affectedEventIds, SORT_NUMERIC);
+        $orderedConcreteEventIds = DB::table('events')
+            ->where('tenant_id', (int) $rootResult->event->getAttribute('tenant_id'))
+            ->where('parent_event_id', $rootId)
+            ->whereIn('id', array_values(array_filter(
+                $affectedEventIds,
+                static fn (int $id): bool => $id !== $rootId,
+            )))
+            ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
+            ->orderBy('start_time')
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+        $presentationEventId = $orderedConcreteEventIds[0] ?? 0;
+        $recipientEventIds = [];
+        foreach ($recipientEventCandidates as $recipientId => $candidateSet) {
+            foreach ($orderedConcreteEventIds as $candidateId) {
+                if (isset($candidateSet[$candidateId])) {
+                    $recipientEventIds[(int) $recipientId] = $candidateId;
+                    break;
+                }
+            }
+        }
+        ksort($recipientEventIds, SORT_NUMERIC);
+
+        $outbox = DB::table('event_domain_outbox')
+            ->where('tenant_id', (int) $rootResult->event->getAttribute('tenant_id'))
+            ->where('event_id', $rootId)
+            ->where('id', $rootResult->outboxId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->lockForUpdate()
+            ->first(['id', 'payload']);
+        if ($outbox === null) {
+            throw new \LogicException('Root Event lifecycle outbox fact is missing.');
+        }
+
+        $payload = json_decode((string) $outbox->payload, true, 512, JSON_THROW_ON_ERROR);
+        if (! is_array($payload)) {
+            throw new \LogicException('Root Event lifecycle outbox payload is invalid.');
+        }
+        $payload['affected_recipient_user_ids'] = $recipientIds;
+        if ($presentationEventId > 0) {
+            $payload['presentation_event_id'] = $presentationEventId;
+        }
+        $metadata = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
+        $series = is_array($metadata['series'] ?? null) ? $metadata['series'] : [];
+        $series['root_event_id'] = $rootId;
+        $series['action'] = $action;
+        $series['affected_event_ids'] = $affectedEventIds;
+        $series['presentation_event_id'] = $presentationEventId > 0 ? $presentationEventId : null;
+        $series['recipient_event_ids'] = $recipientEventIds;
+        $series['recipient_count'] = count($recipientIds);
+        $metadata['series'] = $series;
+        $payload['metadata'] = $metadata;
+
+        DB::table('event_domain_outbox')
+            ->where('tenant_id', (int) $rootResult->event->getAttribute('tenant_id'))
+            ->where('id', (int) $outbox->id)
+            ->update([
+                'payload' => json_encode($payload, JSON_THROW_ON_ERROR),
+                'updated_at' => now(),
+            ]);
     }
 
     /**
@@ -3346,11 +4022,23 @@ class EventService
         EventLifecycleTransitionResult $result,
         ?string $reason,
     ): void {
-        if ($result->affectedRecipientUserIds === []
-            || ! in_array($result->deliveryMode, [
+        if (! in_array($result->deliveryMode, [
                 EventNotificationDeliveryMode::Direct->value,
                 EventNotificationDeliveryMode::ShadowOutbox->value,
             ], true)) {
+            return;
+        }
+
+        $recipientIds = $result->affectedRecipientUserIds;
+        $organizerId = (int) $result->event->getAttribute('user_id');
+        if ($organizerId > 0) {
+            $recipientIds[] = $organizerId;
+        }
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn (mixed $id): int => (int) $id, $recipientIds),
+            static fn (int $id): bool => $id > 0,
+        )));
+        if ($recipientIds === []) {
             return;
         }
 
@@ -3359,7 +4047,7 @@ class EventService
                 (int) $result->event->getAttribute('tenant_id'),
                 (int) $result->event->getKey(),
                 $reason,
-                $result->affectedRecipientUserIds,
+                $recipientIds,
             );
         } catch (\Throwable $exception) {
             Log::warning('Event lifecycle cancellation notification failed', [
@@ -3797,13 +4485,7 @@ class EventService
             ])
             ->first();
 
-        return $user !== null && (
-            in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
-            || !empty($user->is_admin)
-            || !empty($user->is_super_admin)
-            || !empty($user->is_tenant_super_admin)
-            || !empty($user->is_god)
-        );
+        return AdminTier::allows($user);
     }
 
     /**
@@ -4450,6 +5132,14 @@ class EventService
         self::$errors = [];
 
         if ((bool) config('events.recurrence.engine_v2_enabled', false)) {
+            if (! app(EventRecurrenceMaterializationService::class)->schemaAvailable()) {
+                self::$errors[] = [
+                    'code' => 'EVENT_RECURRENCE_UNAVAILABLE',
+                    'message' => __('api.service_unavailable'),
+                ];
+
+                return null;
+            }
             return self::createRecurringV2($userId, $data);
         }
 
@@ -4537,15 +5227,25 @@ class EventService
      */
     private static function generateOccurrences(int $templateId, array $data): int
     {
-        $tenantId = \App\Core\TenantContext::getId();
+        $tenantId = (int) \App\Core\TenantContext::getId();
 
-        $rule = DB::selectOne("SELECT * FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?", [$templateId, $tenantId]);
-        if (!$rule) {
+        $template = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $templateId)
+            ->where('is_recurring_template', 1)
+            ->lockForUpdate()
+            ->first();
+        if ($template === null) {
             return 0;
         }
+        self::assertDraftRecurrenceRoot($template);
 
-        $template = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$templateId, $tenantId]);
-        if (!$template) {
+        $rule = DB::table('event_recurrence_rules')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $templateId)
+            ->lockForUpdate()
+            ->first();
+        if ($rule === null) {
             return 0;
         }
 
@@ -4726,6 +5426,14 @@ class EventService
             ];
             return null;
         }
+        if (! app(EventRecurrenceMaterializationService::class)->schemaAvailable()) {
+            self::$errors[] = [
+                'code' => 'EVENT_RECURRENCE_UNAVAILABLE',
+                'message' => __('api.service_unavailable'),
+            ];
+
+            return null;
+        }
 
         try {
             return DB::transaction(
@@ -4817,13 +5525,22 @@ class EventService
             ->where('is_recurring_template', 1)
             ->lockForUpdate()
             ->first();
+        if ($template === null) {
+            throw ValidationException::withMessages([
+                'recurrence_engine' => [__('api.invalid_input')],
+            ]);
+        }
+        // This is deliberately after FOR UPDATE. A regeneration worker that
+        // waited for publication must observe Published and fail closed.
+        self::assertDraftRecurrenceRoot($template);
+
         $rule = DB::table('event_recurrence_rules')
             ->where('tenant_id', $tenantId)
             ->where('event_id', $templateId)
             ->lockForUpdate()
             ->first();
 
-        if ($template === null || $rule === null
+        if ($rule === null
             || (string) ($rule->recurrence_engine ?? '') !== EventRecurrenceService::ENGINE
             || (string) ($rule->recurrence_engine_version ?? '') !== EventRecurrenceService::ENGINE_VERSION) {
             throw ValidationException::withMessages([
@@ -4846,86 +5563,29 @@ class EventService
             self::decodeRecurrenceDates($rule->rdates ?? null),
         );
 
+        $writer = app(EventRecurrenceOccurrenceWriter::class);
         $inserted = 0;
         foreach ($occurrences as $occurrence) {
-            $occurrenceKey = $recurrence->occurrenceKey(
-                $tenantId,
-                $templateId,
-                $occurrence['recurrence_id'],
+            $write = $writer->insert(
+                $template,
+                $occurrence,
+                (int) ($rule->effective_revision_version ?? 0) ?: null,
             );
-            $now = now();
-            $didInsert = DB::table('events')->insertOrIgnore([
-                'tenant_id' => $tenantId,
-                'user_id' => (int) $template->user_id,
-                'title' => $template->title,
-                'description' => $template->description ?? '',
-                'location' => $template->location,
-                'start_time' => $occurrence['start_utc'],
-                'end_time' => $occurrence['end_utc'],
-                'timezone' => $template->timezone ?? 'UTC',
-                'timezone_source' => $template->timezone_source ?? 'preexisting_unverified',
-                'all_day' => (int) ($template->all_day ?? 0),
-                'group_id' => $template->group_id,
-                'category_id' => $template->category_id,
-                'latitude' => $template->latitude,
-                'longitude' => $template->longitude,
-                'accessibility_step_free' => $template->accessibility_step_free,
-                'accessibility_toilet' => $template->accessibility_toilet,
-                'accessibility_hearing_loop' => $template->accessibility_hearing_loop,
-                'accessibility_quiet_space' => $template->accessibility_quiet_space,
-                'accessibility_seating' => $template->accessibility_seating,
-                'accessibility_parking' => $template->accessibility_parking,
-                'accessibility_parking_details' => $template->accessibility_parking_details,
-                'accessibility_transit_details' => $template->accessibility_transit_details,
-                'accessibility_assistance_contact' => $template->accessibility_assistance_contact,
-                'accessibility_notes' => $template->accessibility_notes,
-                'federated_visibility' => $template->federated_visibility ?? 'none',
-                'parent_event_id' => $templateId,
-                'occurrence_date' => $occurrence['occurrence_date'],
-                'occurrence_key' => $occurrenceKey,
-                'recurrence_engine' => EventRecurrenceService::ENGINE,
-                'recurrence_engine_version' => EventRecurrenceService::ENGINE_VERSION,
-                'is_recurring_template' => 0,
-                'max_attendees' => $template->max_attendees,
-                'series_id' => $template->series_id,
-                'cover_image' => $template->cover_image,
-                'image_url' => $template->image_url,
-                'is_online' => (int) ($template->is_online ?? 0),
-                'online_link' => $template->online_link,
-                'allow_remote_attendance' => (int) ($template->allow_remote_attendance ?? 0),
-                'video_url' => $template->video_url,
-                'status' => 'draft',
-                'publication_status' => EventPublicationState::Draft->value,
-                'operational_status' => EventOperationalState::Scheduled->value,
-                'lifecycle_version' => 0,
-                'calendar_sequence' => 0,
-                'publication_status_changed_at' => $now,
-                'publication_status_changed_by' => (int) $template->user_id,
-                'operational_status_changed_at' => $now,
-                'operational_status_changed_by' => (int) $template->user_id,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
-
-            if ($didInsert === 1) {
+            if ($write['inserted']) {
                 $inserted++;
-                continue;
-            }
-
-            $existing = DB::table('events')
-                ->where('tenant_id', $tenantId)
-                ->where('occurrence_key', $occurrenceKey)
-                ->first(['parent_event_id', 'start_time', 'recurrence_engine', 'recurrence_engine_version']);
-            if ($existing === null
-                || (int) $existing->parent_event_id !== $templateId
-                || (string) $existing->start_time !== $occurrence['start_utc']
-                || (string) $existing->recurrence_engine !== EventRecurrenceService::ENGINE
-                || (string) $existing->recurrence_engine_version !== EventRecurrenceService::ENGINE_VERSION) {
-                throw new \LogicException('Deterministic event occurrence identity collision');
             }
         }
 
         return $inserted;
+    }
+
+    private static function assertDraftRecurrenceRoot(object $template): void
+    {
+        if ((string) ($template->publication_status ?? '') !== EventPublicationState::Draft->value) {
+            throw ValidationException::withMessages([
+                'publication_status' => [__('api.invalid_status')],
+            ]);
+        }
     }
 
     /** @return list<string> */
@@ -4963,6 +5623,324 @@ class EventService
     }
 
     /**
+     * Finalize the one claimable series-update fact with a deduplicated
+     * audience. Occurrence facts remain durable but notification-suppressed.
+     *
+     * @param list<int> $eventIds
+     */
+    private static function finalizeSeriesUpdateNotification(
+        int $tenantId,
+        int $rootId,
+        array $eventIds,
+    ): void {
+        $sequence = (int) DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $rootId)
+            ->value('calendar_sequence');
+        $outbox = DB::table('event_domain_outbox')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $rootId)
+            ->where('action', 'event.updated')
+            ->where('aggregate_version', $sequence)
+            ->lockForUpdate()
+            ->first(['id', 'payload']);
+        if ($outbox === null) {
+            return;
+        }
+
+        $ids = collect();
+        if (Schema::hasTable('event_registrations')) {
+            $ids = $ids->merge(DB::table('event_registrations')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('registration_state', ['invited', 'pending', 'confirmed'])
+                ->pluck('user_id'));
+        }
+        if (Schema::hasTable('event_waitlist_entries')) {
+            $ids = $ids->merge(DB::table('event_waitlist_entries')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('queue_state', ['waiting', 'offered'])
+                ->pluck('user_id'));
+        }
+        if (Schema::hasTable('event_rsvps')) {
+            $ids = $ids->merge(DB::table('event_rsvps')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('status', ['going', 'interested', 'maybe', 'invited', 'waitlisted'])
+                ->pluck('user_id'));
+        }
+        if (Schema::hasTable('event_staff_assignments')) {
+            $ids = $ids->merge(DB::table('event_staff_assignments')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->where('status', 'active')
+                ->where(static fn ($expiry) => $expiry
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now()))
+                ->pluck('user_id'));
+        }
+        if (Schema::hasTable('event_waitlist')) {
+            $ids = $ids->merge(DB::table('event_waitlist')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->where('status', 'waiting')
+                ->pluck('user_id'));
+        }
+        $recipientEventCandidates = [];
+        $recordPairs = static function ($rows) use (&$recipientEventCandidates, $rootId): void {
+            foreach ($rows as $row) {
+                $eventId = (int) $row->event_id;
+                $userId = (int) $row->user_id;
+                if ($eventId !== $rootId && $eventId > 0 && $userId > 0) {
+                    $recipientEventCandidates[$userId][$eventId] = true;
+                }
+            }
+        };
+        if (Schema::hasTable('event_registrations')) {
+            $recordPairs(DB::table('event_registrations')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('registration_state', ['invited', 'pending', 'confirmed'])
+                ->get(['event_id', 'user_id']));
+        }
+        if (Schema::hasTable('event_waitlist_entries')) {
+            $recordPairs(DB::table('event_waitlist_entries')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('queue_state', ['waiting', 'offered'])
+                ->get(['event_id', 'user_id']));
+        }
+        if (Schema::hasTable('event_rsvps')) {
+            $recordPairs(DB::table('event_rsvps')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->whereIn('status', ['going', 'interested', 'maybe', 'invited', 'waitlisted'])
+                ->get(['event_id', 'user_id']));
+        }
+        if (Schema::hasTable('event_staff_assignments')) {
+            $recordPairs(DB::table('event_staff_assignments')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->where('status', 'active')
+                ->where(static fn ($expiry) => $expiry
+                    ->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now()))
+                ->get(['event_id', 'user_id']));
+        }
+        if (Schema::hasTable('event_waitlist')) {
+            $recordPairs(DB::table('event_waitlist')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('event_id', $eventIds)
+                ->where('status', 'waiting')
+                ->get(['event_id', 'user_id']));
+        }
+        $recipientIds = $ids
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+        sort($recipientIds, SORT_NUMERIC);
+        sort($eventIds, SORT_NUMERIC);
+        $orderedConcreteEventIds = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('parent_event_id', $rootId)
+            ->whereIn('id', array_values(array_filter(
+                $eventIds,
+                static fn (int $id): bool => $id !== $rootId,
+            )))
+            ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
+            ->orderBy('start_time')
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->all();
+        $presentationEventId = $orderedConcreteEventIds[0] ?? 0;
+        $recipientEventIds = [];
+        foreach ($recipientEventCandidates as $recipientId => $candidateSet) {
+            foreach ($orderedConcreteEventIds as $candidateId) {
+                if (isset($candidateSet[$candidateId])) {
+                    $recipientEventIds[(int) $recipientId] = $candidateId;
+                    break;
+                }
+            }
+        }
+        ksort($recipientEventIds, SORT_NUMERIC);
+
+        $payload = json_decode((string) $outbox->payload, true, 512, JSON_THROW_ON_ERROR);
+        if (! is_array($payload)) {
+            throw new \LogicException('Root Event update outbox payload is invalid.');
+        }
+        $payload['affected_recipient_user_ids'] = $recipientIds;
+        if ($presentationEventId > 0) {
+            $payload['presentation_event_id'] = $presentationEventId;
+        }
+        $metadata = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
+        if (($metadata['notifications_suppressed'] ?? false) === true) {
+            $recipientIds = [];
+            $recipientEventIds = [];
+            $payload['affected_recipient_user_ids'] = [];
+        }
+        $series = is_array($metadata['series'] ?? null) ? $metadata['series'] : [];
+        $series['root_event_id'] = $rootId;
+        $series['affected_event_ids'] = $eventIds;
+        $series['presentation_event_id'] = $presentationEventId > 0 ? $presentationEventId : null;
+        $series['recipient_event_ids'] = $recipientEventIds;
+        $series['recipient_count'] = count($recipientIds);
+        $metadata['series'] = $series;
+        $payload['metadata'] = $metadata;
+
+        DB::table('event_domain_outbox')
+            ->where('tenant_id', $tenantId)
+            ->where('id', (int) $outbox->id)
+            ->update([
+                'payload' => json_encode($payload, JSON_THROW_ON_ERROR),
+                'updated_at' => now(),
+            ]);
+    }
+
+    /** @param list<string> $changedFields */
+    private static function ensureSeriesUpdateRootFact(
+        int $tenantId,
+        int $rootId,
+        int $actorUserId,
+        array $changedFields,
+    ): void {
+        sort($changedFields);
+        $root = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $rootId)
+            ->lockForUpdate()
+            ->first(['user_id', 'calendar_sequence']);
+        if ($root === null) {
+            throw new \LogicException('Series update root disappeared while locked.');
+        }
+        $sequence = max(0, (int) $root->calendar_sequence);
+        $nextSequence = $sequence + 1;
+        $updated = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $rootId)
+            ->where('calendar_sequence', $sequence)
+            ->update([
+                'calendar_sequence' => $nextSequence,
+                'updated_at' => now(),
+            ]);
+        if ($updated !== 1) {
+            throw new \LogicException('Series update root sequence changed while locked.');
+        }
+        $notificationRelevant = array_intersect(
+            $changedFields,
+            self::EVENT_NOTIFICATION_RELEVANT_FIELDS,
+        ) !== [];
+        $coverImageAuditOnly = $changedFields === ['cover_image'];
+        $metadata = [
+            'series' => [
+                'root_event_id' => $rootId,
+                'member_type' => 'template',
+            ],
+        ];
+        if (! $notificationRelevant) {
+            $metadata['notifications_suppressed'] = true;
+        }
+        if ($coverImageAuditOnly) {
+            $metadata['notification_policy'] = 'cover_image_audit_only';
+        } elseif (! $notificationRelevant) {
+            $metadata['notification_policy'] = 'non_notifiable_event_update_audit';
+        }
+        app(EventDomainOutboxService::class)->record(
+            $tenantId,
+            $rootId,
+            $nextSequence,
+            'event.updated',
+            "event-update:{$tenantId}:{$rootId}:calendar:{$nextSequence}",
+            [
+                'schema_version' => 1,
+                'tenant_id' => $tenantId,
+                'event_id' => $rootId,
+                'actor_user_id' => $actorUserId,
+                'organizer_user_id' => (int) $root->user_id,
+                'calendar_sequence' => $nextSequence,
+                'changed_fields' => $changedFields,
+                'recurrence_scope' => 'all',
+                'affected_recipient_user_ids' => [],
+                'metadata' => $metadata,
+                'occurred_at' => now()->toIso8601String(),
+            ],
+            EventNotificationDeliveryMode::OutboxAuthoritative,
+        );
+    }
+
+    /** @param list<string> $overrides @return array<string,mixed> */
+    private static function withoutRecurrenceOverrides(
+        array $data,
+        array $overrides,
+        Event $event,
+    ): array
+    {
+        if ($overrides === []) {
+            return $data;
+        }
+
+        foreach (array_keys($data) as $key) {
+            if (! is_string($key) || str_starts_with($key, '_')) {
+                continue;
+            }
+            if ($key === 'venue_accessibility') {
+                $profile = is_array($data[$key] ?? null) ? $data[$key] : [];
+                foreach (self::VENUE_ACCESSIBILITY_BOOLEAN_FIELDS as $inputKey => $column) {
+                    if (in_array($column, $overrides, true)) {
+                        $profile[$inputKey] = $event->getRawOriginal($column);
+                    }
+                }
+                foreach (self::VENUE_ACCESSIBILITY_TEXT_FIELDS as $inputKey => $definition) {
+                    $column = $definition['column'];
+                    if (in_array($column, $overrides, true)) {
+                        $profile[$inputKey] = $event->getRawOriginal($column);
+                    }
+                }
+                $data[$key] = $profile;
+                continue;
+            }
+            $canonical = $key === 'category_name' ? 'category_id' : $key;
+            if (in_array($canonical, $overrides, true)) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    /** @return list<string> */
+    private static function decodeRecurrenceOverrideFields(mixed $value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        if (is_string($value)) {
+            $value = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        }
+        if (! is_array($value)) {
+            throw new \LogicException('Event recurrence override metadata is invalid.');
+        }
+
+        $fields = [];
+        foreach ($value as $field) {
+            if (! is_string($field) || trim($field) === '') {
+                throw new \LogicException('Event recurrence override field is invalid.');
+            }
+            $field = trim($field);
+            if (! in_array($field, self::RECURRENCE_OVERRIDE_FIELD_ALLOWLIST, true)) {
+                throw new \LogicException('Event recurrence override field is not allowlisted.');
+            }
+            $fields[] = $field;
+        }
+        sort($fields);
+
+        return array_values(array_unique($fields));
+    }
+
+    /**
      * Update recurring event(s).
      *
      * @param string $scope 'single' to update only this occurrence, 'all' for all future occurrences
@@ -4970,58 +5948,213 @@ class EventService
     public static function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
     {
         self::$errors = [];
-        $tenantId = \App\Core\TenantContext::getId();
-
-        if ($scope === 'single') {
-            $event = Event::query()->find($eventId);
-            if (!$event) {
-                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
-                return false;
-            }
-            if (! self::policyAllows($event, $userId, 'manage')) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_edit_forbidden')];
-                return false;
-            }
-
-            // Detach from parent (make independent) and update
-            DB::update("UPDATE events SET parent_event_id = NULL WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
-            return self::update($eventId, $userId, $data);
+        $tenantId = (int) \App\Core\TenantContext::getId();
+        if (! in_array($scope, ['single', 'all'], true)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_scope_must_be_single_or_all')];
+            return false;
+        }
+        if ($scope === 'all'
+            && array_intersect(['start_time', 'end_time', 'timezone', 'all_day'], array_keys($data)) !== []) {
+            self::$errors[] = [
+                'code' => 'EVENT_RECURRENCE_SCHEDULE_REVISION_REQUIRED',
+                'message' => __('api.event_recurring_schedule_requires_revision'),
+                'field' => 'scope',
+            ];
+            return false;
         }
 
-        // scope === 'all': update all future occurrences
-        $event = Event::query()->find($eventId);
-        if (!$event) {
+        /** @var Event|null $snapshot */
+        $snapshot = Event::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($eventId)
+            ->first(['id', 'parent_event_id']);
+        if ($snapshot === null) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
-        if (! self::policyAllows($event, $userId, 'manage')) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_edit_forbidden')];
-            return false;
-        }
+        $rootId = max(0, (int) $snapshot->getRawOriginal('parent_event_id')) ?: $eventId;
 
         // Time fields are per-occurrence — applying one start_time to every
         // future occurrence would collapse the whole series onto a single
         // timestamp. Series-wide edits cover content fields only.
-        unset($data['start_time'], $data['end_time']);
+        try {
+            return DB::transaction(function () use (
+                $tenantId,
+                $rootId,
+                $eventId,
+                $userId,
+                $data,
+                $scope,
+            ): bool {
+                /** @var Event|null $root */
+                $root = Event::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($rootId)
+                    ->lockForUpdate()
+                    ->first();
+                /** @var Event|null $event */
+                $event = $rootId === $eventId
+                    ? $root
+                    : Event::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($eventId)
+                        ->lockForUpdate()
+                        ->first();
+                $currentRootId = $event === null
+                    ? 0
+                    : (max(0, (int) $event->getRawOriginal('parent_event_id')) ?: (int) $event->getKey());
+                if ($root === null || $event === null || $currentRootId !== $rootId) {
+                    throw new \RuntimeException('event_recurring_concurrent_root_changed');
+                }
+                if (! self::policyAllows($event, $userId, 'manage')) {
+                    self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_edit_forbidden')];
+                    return false;
+                }
 
-        $parentId = $event->parent_event_id ?? $eventId;
+                $data['recurrence_scope'] = $scope;
+                if ($scope === 'single') {
+                    if ($eventId === $rootId && (bool) $root->getRawOriginal('is_recurring_template')) {
+                        self::$errors[] = [
+                            'code' => 'EVENT_RECURRENCE_TEMPLATE_ALL_SCOPE_REQUIRED',
+                            'message' => __('api.event_recurrence_template_requires_all_scope'),
+                        ];
+                        return false;
+                    }
+                    if ($eventId !== $rootId) {
+                        $data['_series_notification_root_id'] = $rootId;
+                    }
+                    if (! self::updateCanonical($eventId, $userId, $data, true)) {
+                        throw new \RuntimeException('event_recurring_update_failed');
+                    }
+                    $actualChangedFields = self::$lastCanonicalUpdateFields;
+                    if ($eventId !== $rootId && $actualChangedFields !== []) {
+                        $storedOverrides = DB::table('events')
+                            ->where('tenant_id', $tenantId)
+                            ->where('id', $eventId)
+                            ->where('parent_event_id', $rootId)
+                            ->first(['recurrence_override_fields', 'recurrence_override_version']);
+                        if ($storedOverrides === null) {
+                            throw new \RuntimeException('event_recurring_membership_changed');
+                        }
+                        $overrideFields = array_values(array_unique(array_merge(
+                            self::decodeRecurrenceOverrideFields($storedOverrides->recurrence_override_fields),
+                            $actualChangedFields,
+                        )));
+                        sort($overrideFields);
+                        DB::table('events')
+                            ->where('tenant_id', $tenantId)
+                            ->where('id', $eventId)
+                            ->where('parent_event_id', $rootId)
+                            ->update([
+                                'is_recurrence_exception' => 1,
+                                'recurrence_override_fields' => json_encode($overrideFields, JSON_THROW_ON_ERROR),
+                                'recurrence_override_version' => max(
+                                    0,
+                                    (int) ($storedOverrides->recurrence_override_version ?? 0),
+                                ) + 1,
+                                'recurrence_override_updated_at' => now(),
+                                'recurrence_override_updated_by' => $userId,
+                                'updated_at' => now(),
+                            ]);
+                        $recurrenceId = trim((string) $event->getRawOriginal('recurrence_id'));
+                        $occurrenceKey = trim((string) $event->getRawOriginal('occurrence_key'));
+                        if ($recurrenceId !== '' && $occurrenceKey !== '') {
+                            app(EventRecurrenceRevisionService::class)->recordOccurrenceState(
+                                $tenantId,
+                                $rootId,
+                                $eventId,
+                                $recurrenceId,
+                                $occurrenceKey,
+                                'customized',
+                                null,
+                                $userId,
+                                [
+                                    'source' => 'single_occurrence_override',
+                                    'override_fields' => $overrideFields,
+                                ],
+                            );
+                        }
+                    }
 
-        $ids = DB::select(
-            "SELECT id FROM events WHERE (parent_event_id = ? OR id = ?) AND tenant_id = ? AND start_time >= NOW()",
-            [$parentId, $parentId, $tenantId]
-        );
+                    return true;
+                }
 
-        $updated = 0;
-        foreach ($ids as $row) {
-            try {
-                if (self::update((int) $row->id, $userId, $data)) {
+                unset($data['start_time'], $data['end_time']);
+                $seriesRows = Event::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->where(static function (Builder $series) use ($rootId): void {
+                        $series->where('id', $rootId)
+                            ->orWhere(static function (Builder $future) use ($rootId): void {
+                                $future->where('parent_event_id', $rootId)
+                                    ->where('start_time', '>=', now());
+                            });
+                    })
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get();
+                $updated = 0;
+                $effectivelyAffectedIds = [];
+                $seriesChangedFields = [];
+                foreach ($seriesRows as $seriesRow) {
+                    $id = (int) $seriesRow->getKey();
+                    $rowData = $id === $rootId
+                        ? $data
+                        : self::withoutRecurrenceOverrides(
+                            $data,
+                            self::decodeRecurrenceOverrideFields(
+                                $seriesRow->getRawOriginal('recurrence_override_fields'),
+                            ),
+                            $seriesRow,
+                        );
+                    $rowData['_series_notification_root_id'] = $rootId;
+                    $rowData['_series_notifications_suppressed'] = $id !== $rootId;
+                    if (! self::updateCanonical($id, $userId, $rowData, true)) {
+                        throw new \RuntimeException('event_recurring_update_failed');
+                    }
+                    if (self::$lastCanonicalUpdateFields !== []) {
+                        $effectivelyAffectedIds[] = $id;
+                        $seriesChangedFields = array_values(array_unique(array_merge(
+                            $seriesChangedFields,
+                            self::$lastCanonicalUpdateFields,
+                        )));
+                    }
                     $updated++;
                 }
-            } catch (\Exception $e) {
-                Log::error("EventService::updateRecurring failed for event {$row->id}: " . $e->getMessage());
-            }
-        }
 
-        return $updated > 0;
+                if ($effectivelyAffectedIds !== []) {
+                    if (! in_array($rootId, $effectivelyAffectedIds, true)) {
+                        self::ensureSeriesUpdateRootFact(
+                            $tenantId,
+                            $rootId,
+                            $userId,
+                            $seriesChangedFields,
+                        );
+                    }
+                    self::finalizeSeriesUpdateNotification($tenantId, $rootId, $effectivelyAffectedIds);
+                }
+                if ($updated > 0) {
+                    // The canonical outbox now owns this audience in every
+                    // tenant delivery mode; controller legacy fanout must not
+                    // send a second, requested-row-only notification.
+                    self::$lastMeaningfulUpdateChanges = [];
+                }
+
+                return $updated > 0;
+            }, 3);
+        } catch (ValidationException | AuthorizationException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            Log::error('EventService::updateRecurring failed', [
+                'tenant_id' => $tenantId,
+                'event_id' => $eventId,
+                'scope' => $scope,
+                'error' => $exception->getMessage(),
+            ]);
+            if (self::$errors === []) {
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.invalid_status')];
+            }
+
+            return false;
+        }
     }
 }

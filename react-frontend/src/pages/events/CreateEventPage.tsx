@@ -45,7 +45,13 @@ import { useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
-import { eventsApi, type EventCategory } from '@/lib/events-api';
+import {
+  eventsApi,
+  type EventCategory,
+  type EventRecurrenceCapabilities,
+  type EventRecurrenceRevisionPatch,
+  type EventRecurrenceRevisionPreview,
+} from '@/lib/events-api';
 import { eventIsoToLocalInput, eventLocalInputToIso } from '@/lib/eventLocalDateTime';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
@@ -58,8 +64,22 @@ import {
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly';
-type RecurrenceEndType = 'after_count' | 'on_date';
+type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
+type RecurrenceEndType = 'after_count' | 'on_date' | 'never';
+
+const SAFE_RECURRENCE_CAPABILITIES: EventRecurrenceCapabilities = {
+  contract_version: 1,
+  engine: 'legacy',
+  structured_input: true,
+  supported_frequencies: ['daily', 'weekly', 'monthly', 'yearly'],
+  max_occurrences: 52,
+  supported_end_types: ['after_count', 'on_date'],
+  supports_rolling_never: false,
+  supports_effective_revisions: false,
+  supports_definition_blueprints: false,
+  schema_ready: false,
+  rollout_state: 'legacy',
+};
 
 interface FormData {
   title: string;
@@ -156,9 +176,10 @@ function buildRecurrenceRule(data: FormData): string | null {
       parts.push(`COUNT=${count}`);
     }
   } else if (data.recurrenceEndType === 'on_date' && data.recurrenceEndDate) {
-    // Format as YYYYMMDD for RRULE UNTIL
+    // Keep the preview date-only so it does not imply a UTC boundary that the
+    // server-owned recurrence contract did not receive.
     const dateStr = data.recurrenceEndDate.toString().replace(/-/g, '');
-    parts.push(`UNTIL=${dateStr}T235959Z`);
+    parts.push(`UNTIL=${dateStr}`);
   }
 
   return `RRULE:${parts.join(';')}`;
@@ -190,6 +211,9 @@ export function CreateEventPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<EventCategory[]>([]);
+  const [recurrenceCapabilities, setRecurrenceCapabilities] = useState<EventRecurrenceCapabilities>(
+    SAFE_RECURRENCE_CAPABILITIES,
+  );
 
   // Image upload state
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -209,12 +233,26 @@ export function CreateEventPage() {
   // Poll attachment state
   const [availablePolls, setAvailablePolls] = useState<{ id: number; question: string }[]>([]);
   const [selectedPollIds, setSelectedPollIds] = useState<Set<string>>(new Set());
+  const loadedPollIdsRef = useRef<string[]>([]);
   const [isLoadingPolls, setIsLoadingPolls] = useState(false);
 
   // Recurring-series edit scope ("only this event" vs "all future events")
   const [seriesLinked, setSeriesLinked] = useState(false);
   const [showScopeModal, setShowScopeModal] = useState(false);
+  const [showImpactModal, setShowImpactModal] = useState(false);
+  const [revisionPreview, setRevisionPreview] = useState<EventRecurrenceRevisionPreview | null>(null);
+  const [isPreviewingRevision, setIsPreviewingRevision] = useState(false);
   const pendingPayloadRef = useRef<Record<string, unknown> | null>(null);
+  const pendingRevisionPatchRef = useRef<EventRecurrenceRevisionPatch | null>(null);
+  const revisionCommitKeyRef = useRef<string | null>(null);
+  const loadedScheduleRef = useRef<{
+    timezone: string;
+    allDay: boolean;
+    startDate: string;
+    endDate: string | null;
+    startClock: string | null;
+    endClock: string | null;
+  } | null>(null);
 
   const loadEvent = useCallback(async () => {
     if (!id) return;
@@ -233,6 +271,14 @@ export function CreateEventPage() {
         const visibleEndDate = event.schedule.all_day && endBoundaryLocal
           ? shiftCalendarDate(endBoundaryLocal.slice(0, 10), -1)
           : endBoundaryLocal.slice(0, 10);
+        loadedScheduleRef.current = {
+          timezone,
+          allDay: event.schedule.all_day,
+          startDate: startDateValue,
+          endDate: visibleEndDate || null,
+          startClock: event.schedule.all_day ? null : startLocal.slice(11, 16),
+          endClock: event.schedule.all_day || !endBoundaryLocal ? null : endBoundaryLocal.slice(11, 16),
+        };
         geocodedAddressRef.current = event.location.latitude !== null && event.location.longitude !== null
           ? event.location.label
           : null;
@@ -306,6 +352,43 @@ export function CreateEventPage() {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    eventsApi.recurrenceCapabilities({ signal: controller.signal }).then((response) => {
+      if (controller.signal.aborted || !response.success || !response.data) return;
+      const capabilities = response.data;
+      setRecurrenceCapabilities(capabilities);
+      setFormData((current) => {
+        const serverFrequency = current.recurrenceFrequency === 'biweekly'
+          ? 'weekly'
+          : current.recurrenceFrequency;
+        const recurrenceFrequency = capabilities.supported_frequencies.includes(serverFrequency)
+          ? current.recurrenceFrequency
+          : (capabilities.supported_frequencies[0] ?? 'weekly');
+        const recurrenceEndType = capabilities.supported_end_types.includes(current.recurrenceEndType)
+          && (current.recurrenceEndType !== 'never' || capabilities.supports_rolling_never)
+          && (current.recurrenceEndType !== 'after_count' || capabilities.max_occurrences >= 2)
+          ? current.recurrenceEndType
+          : (capabilities.max_occurrences >= 2 && capabilities.supported_end_types.includes('after_count')
+              ? 'after_count'
+              : capabilities.supported_end_types.includes('on_date')
+                ? 'on_date'
+                : 'never');
+        const count = Number(current.recurrenceCount);
+        const recurrenceCount = Number.isInteger(count) && count > capabilities.max_occurrences
+          ? String(capabilities.max_occurrences)
+          : current.recurrenceCount;
+
+        return { ...current, recurrenceFrequency, recurrenceEndType, recurrenceCount };
+      });
+    }).catch((error) => {
+      if (!controller.signal.aborted) {
+        logError('Failed to negotiate event recurrence capabilities', error);
+      }
+    });
+    return () => controller.abort();
+  }, []);
+
   // Load available polls for attachment
   useEffect(() => {
     let cancelled = false;
@@ -322,6 +405,7 @@ export function CreateEventPage() {
           // If editing, pre-select polls linked to this event
           if (isEditing && id) {
             const linked = items.filter((p) => p.event_id === Number(id));
+            loadedPollIdsRef.current = linked.map((p) => String(p.id)).sort();
             if (linked.length > 0) {
               setSelectedPollIds(new Set(linked.map((p) => String(p.id))));
             }
@@ -448,6 +532,17 @@ export function CreateEventPage() {
 
     // Recurrence validation
     if (formData.isRecurring) {
+      const serverFrequency = formData.recurrenceFrequency === 'biweekly'
+        ? 'weekly'
+        : formData.recurrenceFrequency;
+      if (!recurrenceCapabilities.supported_frequencies.includes(serverFrequency)) {
+        newErrors.recurrenceFrequency = t('form.validation.recurrence_unavailable');
+      }
+      if (!recurrenceCapabilities.supported_end_types.includes(formData.recurrenceEndType)
+        || (formData.recurrenceEndType === 'never' && !recurrenceCapabilities.supports_rolling_never)
+        || (formData.recurrenceEndType === 'after_count' && recurrenceCapabilities.max_occurrences < 2)) {
+        newErrors.recurrenceEndType = t('form.validation.recurrence_unavailable');
+      }
       if (
         (formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') &&
         formData.recurrenceDays.length === 0
@@ -457,8 +552,10 @@ export function CreateEventPage() {
 
       if (formData.recurrenceEndType === 'after_count') {
         const count = parseInt(formData.recurrenceCount);
-        if (isNaN(count) || count < 2 || count > 52) {
-          newErrors.recurrenceCount = t('form.validation.occurrences_range');
+        if (isNaN(count) || count < 2 || count > recurrenceCapabilities.max_occurrences) {
+          newErrors.recurrenceCount = t('form.validation.occurrences_range', {
+            max: recurrenceCapabilities.max_occurrences,
+          });
         }
       }
 
@@ -471,12 +568,12 @@ export function CreateEventPage() {
     return Object.keys(newErrors).length === 0;
   }
 
-  async function uploadImage(eventId: number): Promise<void> {
+  async function uploadImage(eventId: number, scope?: 'single' | 'all'): Promise<void> {
     if (!imageFile) return;
 
     try {
       setIsUploadingImage(true);
-      const response = await eventsApi.uploadCover(eventId, imageFile);
+      const response = await eventsApi.uploadCover(eventId, imageFile, scope);
       if (!response.success) {
         toast.error(t('form.toast.image_failed'));
       }
@@ -593,19 +690,56 @@ export function CreateEventPage() {
         payload.poll_ids = [];
       }
 
-      // Recurrence
+      const revisionPatch: EventRecurrenceRevisionPatch = {
+        title: formData.title,
+        description: formData.description,
+        location: formData.location || null,
+        latitude: formData.latitude ?? null,
+        longitude: formData.longitude ?? null,
+        max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
+        is_online: formData.allowRemoteAttendance,
+        allow_remote_attendance: formData.allowRemoteAttendance,
+        video_url: formData.allowRemoteAttendance && formData.videoUrl.trim()
+          ? formData.videoUrl.trim()
+          : null,
+        category_id: formData.category ? Number(formData.category) : null,
+        accessibility_step_free: formData.venueAccessibility.step_free_access,
+        accessibility_toilet: formData.venueAccessibility.accessible_toilet,
+        accessibility_hearing_loop: formData.venueAccessibility.hearing_loop,
+        accessibility_quiet_space: formData.venueAccessibility.quiet_space,
+        accessibility_seating: formData.venueAccessibility.seating_available,
+        accessibility_parking: formData.venueAccessibility.accessible_parking,
+        accessibility_parking_details: formData.venueAccessibility.parking_details.trim() || null,
+        accessibility_transit_details: formData.venueAccessibility.transit_details.trim() || null,
+        accessibility_assistance_contact: formData.venueAccessibility.assistance_contact.trim() || null,
+        accessibility_notes: formData.venueAccessibility.notes.trim() || null,
+      };
+      const baselineSchedule = loadedScheduleRef.current;
+      const currentStartClock = formData.allDay
+        ? null
+        : `${String(formData.startTime?.hour ?? 0).padStart(2, '0')}:${String(formData.startTime?.minute ?? 0).padStart(2, '0')}`;
+      const currentEndClock = formData.allDay || !formData.endTime
+        ? null
+        : `${String(formData.endTime.hour).padStart(2, '0')}:${String(formData.endTime.minute).padStart(2, '0')}`;
+      if (!baselineSchedule || baselineSchedule.timezone !== timezone) revisionPatch.timezone = timezone;
+      if (!baselineSchedule || baselineSchedule.allDay !== formData.allDay) revisionPatch.all_day = formData.allDay;
+      if (!formData.allDay && (!baselineSchedule || baselineSchedule.startClock !== currentStartClock)) {
+        revisionPatch.local_start_time = currentStartClock;
+      }
+      if (!formData.allDay && (!baselineSchedule || baselineSchedule.endClock !== currentEndClock)) {
+        revisionPatch.local_end_time = currentEndClock;
+      }
+
+      // Recurrence uses only the server-owned structured contract. The RRULE
+      // below is a human-readable preview and is deliberately not submitted.
       const recurrenceRule = buildRecurrenceRule(formData);
       if (recurrenceRule) {
-        payload.recurrence_rule = recurrenceRule;
-        // Backend (EventService::createRecurring) reads the rrule string
-        // from `recurrence_rrule`
-        payload.recurrence_rrule = recurrenceRule;
-        // Also send structured fields for backend flexibility
         payload.recurrence_frequency = formData.recurrenceFrequency === 'biweekly' ? 'weekly' : formData.recurrenceFrequency;
-        if (formData.recurrenceFrequency === 'biweekly') {
-          payload.recurrence_interval = 2;
-        }
-        if (formData.recurrenceDays.length > 0) {
+        payload.recurrence_interval = formData.recurrenceFrequency === 'biweekly' ? 2 : 1;
+        if (
+          (formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly')
+          && formData.recurrenceDays.length > 0
+        ) {
           payload.recurrence_days = formData.recurrenceDays.join(',');
         }
         payload.recurrence_ends_type = formData.recurrenceEndType;
@@ -622,6 +756,7 @@ export function CreateEventPage() {
           // Part of a recurring series — ask the organiser whether the edit
           // applies to just this event or the whole series (saveWithScope).
           pendingPayloadRef.current = payload;
+          pendingRevisionPatchRef.current = revisionPatch;
           setShowScopeModal(true);
           return; // finally{} clears isSubmitting
         }
@@ -641,11 +776,11 @@ export function CreateEventPage() {
           : (responseData?.template?.id ?? responseData?.id);
 
         if (imageFile && eventId) {
-          await uploadImage(eventId);
+          await uploadImage(eventId, recurrenceRule ? 'all' : undefined);
         }
 
         toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
-        navigate(tenantPath('/events'));
+        navigate(tenantPath(!isEditing && eventId && !recurrenceRule ? `/events/${eventId}` : '/events'));
       } else {
         toast.error(response.error || t('form.toast.error'));
       }
@@ -662,27 +797,64 @@ export function CreateEventPage() {
   async function saveWithScope(scope: 'single' | 'all') {
     const payload = pendingPayloadRef.current;
     if (!payload || !id) return;
+
+    if (scope === 'all') {
+      if (!recurrenceCapabilities.supports_effective_revisions) {
+        toast.error(t('form.revision_unavailable'));
+        return;
+      }
+      const patch = pendingRevisionPatchRef.current;
+      if (!patch) return;
+      if (imageFile || coverRemovalRequested) {
+        toast.error(t('form.revision_image_scope_unsupported'));
+        return;
+      }
+      const currentPollIds = Array.from(selectedPollIds).sort();
+      if (JSON.stringify(currentPollIds) !== JSON.stringify(loadedPollIdsRef.current)) {
+        toast.error(t('form.revision_association_scope_unsupported'));
+        return;
+      }
+      const baseline = loadedScheduleRef.current;
+      if (baseline && (
+        baseline.startDate !== formData.startDate?.toString()
+        || baseline.endDate !== (formData.endDate?.toString() ?? null)
+      )) {
+        toast.error(t('form.revision_date_scope_unsupported'));
+        return;
+      }
+      setIsPreviewingRevision(true);
+      try {
+        const response = await eventsApi.previewRecurrenceRevision(id, patch);
+        if (!response.success || !response.data) {
+          toast.error(
+            response.code === 'EVENT_RECURRENCE_REVISION_UNAVAILABLE'
+              ? t('form.revision_unavailable')
+              : response.error || t('form.toast.error'),
+          );
+          return;
+        }
+        setRevisionPreview(response.data);
+        revisionCommitKeyRef.current = null;
+        setShowScopeModal(false);
+        setShowImpactModal(true);
+      } catch (error) {
+        logError('Failed to preview recurrence revision', error);
+        toast.error(t('form.revision_unavailable'));
+      } finally {
+        setIsPreviewingRevision(false);
+      }
+      return;
+    }
+
     setShowScopeModal(false);
 
     try {
       setIsSubmitting(true);
-      let response;
-      if (scope === 'all') {
-        // Series-wide edits cover content fields only — time changes are
-        // per-occurrence (the backend strips them defensively too).
-        const seriesPayload: Record<string, unknown> = { ...payload, scope: 'all' };
-        delete seriesPayload.start_time;
-        delete seriesPayload.end_time;
-        response = await eventsApi.updateRecurring(id, seriesPayload);
-      } else {
-        // scope 'single' via the recurring endpoint DETACHES the occurrence
-        // from the series, so later series-wide edits won't overwrite it.
-        response = await eventsApi.updateRecurring(id, { ...payload, scope: 'single' });
-      }
+      const response = await eventsApi.updateRecurring(id, { ...payload, scope: 'single' });
 
       if (response.success) {
         if (imageFile) {
-          await uploadImage(Number(id));
+          await uploadImage(Number(id), 'single');
         }
         toast.success(t('form.toast.updated'));
         navigate(tenantPath('/events'));
@@ -692,6 +864,38 @@ export function CreateEventPage() {
     } catch (error) {
       logError('Failed to save event', error);
       toast.error(t('form.toast.error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function commitRevision() {
+    const patch = pendingRevisionPatchRef.current;
+    if (!id || !patch || !revisionPreview || !revisionPreview.can_commit) return;
+
+    try {
+      setIsSubmitting(true);
+      const idempotencyKey = revisionCommitKeyRef.current
+        ?? (typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `event-revision-${id}-${Date.now()}`);
+      revisionCommitKeyRef.current = idempotencyKey;
+      const response = await eventsApi.commitRecurrenceRevision(
+        id,
+        patch,
+        revisionPreview.preview_token,
+        idempotencyKey,
+      );
+      if (!response.success) {
+        toast.error(response.error || t('form.revision_commit_failed'));
+        return;
+      }
+      setShowImpactModal(false);
+      toast.success(t('form.toast.updated'));
+      navigate(tenantPath('/events'));
+    } catch (error) {
+      logError('Failed to commit recurrence revision', error);
+      toast.error(t('form.revision_commit_failed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -739,6 +943,12 @@ export function CreateEventPage() {
   const selectedCategoryLabel = formData.category
     ? categories.find((category) => String(category.id) === formData.category)?.name ?? t('form.summary_not_set')
     : t('form.summary_not_set');
+  const supportedRecurrenceFrequencies = recurrenceCapabilities.supported_frequencies
+    .flatMap<RecurrenceFrequency>((frequency) => frequency === 'weekly' ? ['weekly', 'biweekly'] : [frequency]);
+  const supportedRecurrenceEndTypes = recurrenceCapabilities.supported_end_types.filter(
+    (endType) => (endType !== 'never' || recurrenceCapabilities.supports_rolling_never)
+      && (endType !== 'after_count' || recurrenceCapabilities.max_occurrences >= 2),
+  );
 
   return (
     <motion.div
@@ -1084,17 +1294,21 @@ export function CreateEventPage() {
                   label={t('form.recurrence_frequency')}
                   aria-label={t('form.recurrence_frequency_aria')}
                   selectedKeys={[formData.recurrenceFrequency]}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceFrequency: e.target.value as RecurrenceFrequency }))}
+                  onChange={(e) => {
+                    setFormData((prev) => ({ ...prev, recurrenceFrequency: e.target.value as RecurrenceFrequency }));
+                    if (errors.recurrenceFrequency) setErrors((prev) => ({ ...prev, recurrenceFrequency: '' }));
+                  }}
+                  isInvalid={!!errors.recurrenceFrequency}
+                  errorMessage={errors.recurrenceFrequency}
                   classNames={{
                     trigger: 'bg-theme-elevated border-theme-default',
                     value: 'text-theme-primary',
                     label: 'text-theme-muted',
                   }}
                 >
-                  <SelectItem key="daily" id="daily">{t('form.freq_daily')}</SelectItem>
-                  <SelectItem key="weekly" id="weekly">{t('form.freq_weekly')}</SelectItem>
-                  <SelectItem key="biweekly" id="biweekly">{t('form.freq_biweekly')}</SelectItem>
-                  <SelectItem key="monthly" id="monthly">{t('form.freq_monthly')}</SelectItem>
+                  {supportedRecurrenceFrequencies.map((frequency) => (
+                    <SelectItem key={frequency} id={frequency}>{t(`form.freq_${frequency}`)}</SelectItem>
+                  ))}
                 </Select>
 
                 {/* Days of Week (for weekly/biweekly) */}
@@ -1137,15 +1351,21 @@ export function CreateEventPage() {
                     label={t('form.recurrence_end_type')}
                     aria-label={t('form.recurrence_end_type_aria')}
                     selectedKeys={[formData.recurrenceEndType]}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, recurrenceEndType: e.target.value as RecurrenceEndType }))}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, recurrenceEndType: e.target.value as RecurrenceEndType }));
+                      if (errors.recurrenceEndType) setErrors((prev) => ({ ...prev, recurrenceEndType: '' }));
+                    }}
+                    isInvalid={!!errors.recurrenceEndType}
+                    errorMessage={errors.recurrenceEndType}
                     classNames={{
                       trigger: 'bg-theme-elevated border-theme-default',
                       value: 'text-theme-primary',
                       label: 'text-theme-muted',
                     }}
                   >
-                    <SelectItem key="after_count" id="after_count">{t('form.end_after_count')}</SelectItem>
-                    <SelectItem key="on_date" id="on_date">{t('form.end_on_date')}</SelectItem>
+                    {supportedRecurrenceEndTypes.map((endType) => (
+                      <SelectItem key={endType} id={endType}>{t(`form.end_${endType}`)}</SelectItem>
+                    ))}
                   </Select>
 
                   {formData.recurrenceEndType === 'after_count' ? (
@@ -1160,7 +1380,7 @@ export function CreateEventPage() {
                           if (errors.recurrenceCount) setErrors((prev) => ({ ...prev, recurrenceCount: '' }));
                         }}
                         min={2}
-                        max={52}
+                        max={recurrenceCapabilities.max_occurrences}
                         isInvalid={!!errors.recurrenceCount}
                         errorMessage={errors.recurrenceCount}
                         classNames={{
@@ -1170,10 +1390,12 @@ export function CreateEventPage() {
                         }}
                       />
                       {!errors.recurrenceCount && (
-                        <p className="text-xs text-theme-subtle mt-1">{t('form.recurrence_count_hint')}</p>
+                        <p className="text-xs text-theme-subtle mt-1">
+                          {t('form.recurrence_count_hint', { max: recurrenceCapabilities.max_occurrences })}
+                        </p>
                       )}
                     </div>
-                  ) : (
+                  ) : formData.recurrenceEndType === 'on_date' ? (
                     <DatePicker
                       label={t('form.recurrence_end_date')}
                       value={formData.recurrenceEndDate}
@@ -1189,6 +1411,8 @@ export function CreateEventPage() {
                         label: 'text-theme-muted',
                       }}
                     />
+                  ) : (
+                    <p className="text-sm text-theme-muted self-center">{t('form.end_never_hint')}</p>
                   )}
                 </div>
 
@@ -1401,7 +1625,11 @@ export function CreateEventPage() {
           <ModalHeader className="text-theme-primary">{t('form.edit_scope_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">{t('form.edit_scope_message')}</p>
-            <p className="text-sm text-theme-muted">{t('form.edit_scope_all_note')}</p>
+            <p className="text-sm text-theme-muted">
+              {t(recurrenceCapabilities.supports_effective_revisions
+                ? 'form.edit_scope_all_note'
+                : 'form.revision_unavailable')}
+            </p>
           </ModalBody>
           <ModalFooter>
             <Button
@@ -1412,12 +1640,50 @@ export function CreateEventPage() {
             >
               {t('form.edit_scope_single')}
             </Button>
+            {recurrenceCapabilities.supports_effective_revisions && (
+              <Button
+                color="primary"
+                onPress={() => void saveWithScope('all')}
+                isLoading={isPreviewingRevision}
+              >
+                {t('form.edit_scope_all')}
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={showImpactModal} onClose={() => !isSubmitting && setShowImpactModal(false)}>
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('form.revision_impact_title')}</ModalHeader>
+          <ModalBody>
+            {revisionPreview && (
+              <div className="space-y-3 text-sm text-theme-muted">
+                <p>{t('form.revision_impact_message', { count: revisionPreview.impact.changed_count })}</p>
+                <ul className="list-disc space-y-1 ps-5">
+                  <li>{t('form.revision_impact_recipients', { count: revisionPreview.impact.unique_recipient_count })}</li>
+                  <li>{t('form.revision_impact_registrations', { count: revisionPreview.impact.registrations_count })}</li>
+                  <li>{t('form.revision_impact_customized', { count: revisionPreview.impact.customized_exception_conflicts.length })}</li>
+                </ul>
+                {revisionPreview.impact.blocking_conflicts.length > 0 && (
+                  <div role="alert" className="rounded-lg border border-danger/30 bg-danger/10 p-3 text-danger">
+                    {t('form.revision_blocked', { count: revisionPreview.impact.blocking_conflicts.length })}
+                  </div>
+                )}
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => setShowImpactModal(false)} isDisabled={isSubmitting}>
+              {t('form.cancel')}
+            </Button>
             <Button
               color="primary"
-              onPress={() => void saveWithScope('all')}
+              onPress={() => void commitRevision()}
               isLoading={isSubmitting}
+              isDisabled={!revisionPreview?.can_commit}
             >
-              {t('form.edit_scope_all')}
+              {t('form.revision_confirm')}
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -15,6 +15,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Services\EventFederationPublisher;
 use App\Services\EventLifecycleService;
+use App\Services\EventPublicationWorkflowService;
 use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +74,87 @@ final class EventFederationLifecycleIntegrationTest extends TestCase
         self::assertSame('cancelled', $tombstone['tombstone_reason']);
         self::assertArrayNotHasKey('online_link', $tombstone);
         self::assertSame(3, (int) DB::table('events')->where('id', $event->id)->value('federation_version'));
+    }
+
+    public function test_recurring_publication_suppresses_template_federation_but_upserts_occurrences(): void
+    {
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->whereIn('setting_key', ['moderation.enabled', 'moderation.require_event'])
+            ->delete();
+        $organizer = $this->organizer();
+        $template = $this->event($organizer, [
+            'title' => 'Federated recurring template',
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'lifecycle_version' => 0,
+            'federation_version' => 1,
+            'is_recurring_template' => true,
+        ]);
+        $occurrence = $this->event($organizer, [
+            'title' => 'Federated recurring occurrence',
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'lifecycle_version' => 0,
+            'federation_version' => 1,
+            'parent_event_id' => $template->id,
+            'is_recurring_template' => false,
+        ]);
+        $partnerId = $this->partner('recurring-publication');
+
+        app(EventPublicationWorkflowService::class)->publish((int) $occurrence->id, $organizer);
+
+        self::assertSame(0, DB::table('event_federation_deliveries')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $template->id)
+            ->count());
+        $delivery = DB::table('event_federation_deliveries')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $occurrence->id)
+            ->where('external_partner_id', $partnerId)
+            ->first();
+        self::assertNotNull($delivery);
+        self::assertSame('upsert', $delivery->action);
+    }
+
+    public function test_direct_publisher_retracts_historical_template_leaks(): void
+    {
+        $organizer = $this->organizer();
+        $event = $this->event($organizer);
+        $partnerId = $this->partner('template-retraction');
+        $publisher = app(EventFederationPublisher::class);
+        $publisher->publish($event);
+        DB::table('events')->where('id', $event->id)->update(['is_recurring_template' => 1]);
+        $event->refresh();
+
+        $publisher->publish($event);
+
+        $deliveries = DB::table('event_federation_deliveries')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $event->id)
+            ->where('external_partner_id', $partnerId)
+            ->orderBy('id')
+            ->get();
+        self::assertSame(['upsert', 'tombstone'], $deliveries->pluck('action')->all());
+        $payload = json_decode((string) $deliveries->last()->payload, true, 64, JSON_THROW_ON_ERROR);
+        self::assertSame('unpublished', $payload['tombstone_reason']);
+    }
+
+    public function test_event_update_never_upserts_a_recurring_template_without_prior_evidence(): void
+    {
+        $organizer = $this->organizer();
+        $template = $this->event($organizer, ['is_recurring_template' => true]);
+        $this->partner('template-update');
+
+        self::assertFalse(EventService::update((int) $template->id, (int) $organizer->id, [
+            'federated_visibility' => 'joinable',
+        ]));
+        self::assertSame('EVENT_RECURRENCE_SCOPE_REQUIRED', EventService::getErrors()[0]['code']);
+
+        self::assertSame(0, DB::table('event_federation_deliveries')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $template->id)
+            ->count());
     }
 
     public function test_visibility_withdrawal_advances_version_and_enqueues_retraction(): void

@@ -39,7 +39,11 @@ final class EventFederationPayloadBuilder
         if (! in_array($visibility, ['none', 'listed', 'joinable'], true)) {
             $visibility = 'none';
         }
-        $reason = $forcedTombstone ?? $this->tombstoneReason($publication, $operational, $visibility);
+        $isRecurringTemplate = (bool) $event->getAttribute('is_recurring_template');
+        $reason = $forcedTombstone
+            ?? ($isRecurringTemplate
+                ? EventFederationTombstoneReason::Unpublished
+                : $this->tombstoneReason($publication, $operational, $visibility));
         $federationVersion = (int) ($event->getAttribute('federation_version') ?? 0);
         $aggregateVersion = $federationVersion > 0
             ? $federationVersion

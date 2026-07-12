@@ -54,6 +54,8 @@ final class AccessibleEventCommunicationsStaticTest extends TestCase
         self::assertStringNotContainsString('event_rsvps', $trait);
         self::assertStringNotContainsString('withInput(', $trait);
         self::assertStringNotContainsString('$request->all()', $trait);
+        self::assertStringContainsString("query('history_page')", $trait);
+        self::assertStringContainsString('$historyPage,', $trait);
     }
 
     public function test_html_first_view_has_csrf_preview_audit_and_no_identity_fields(): void
@@ -66,6 +68,10 @@ final class AccessibleEventCommunicationsStaticTest extends TestCase
         self::assertStringContainsString('events.communications.schedule', $view);
         self::assertStringContainsString('events.communications.cancel', $view);
         self::assertStringContainsString("'history_actions.'", $view);
+        self::assertStringContainsString("\$detail['history_meta']", $view);
+        self::assertStringContainsString("'history_page' => \$targetPage", $view);
+        self::assertStringContainsString('govuk-pagination__prev', $view);
+        self::assertStringContainsString('govuk-pagination__next', $view);
         self::assertStringNotContainsString('recipient_user_id', $view);
         self::assertStringNotContainsString('email_address', $view);
         self::assertStringNotContainsString('claim_token', $view);

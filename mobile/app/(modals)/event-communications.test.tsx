@@ -179,6 +179,13 @@ beforeEach(() => {
       metadata: { recipient_count: 12 },
       created_at: '2026-07-11T10:00:00+00:00',
     }],
+    history_meta: {
+      current_page: 1,
+      per_page: 50,
+      total: 1,
+      total_pages: 1,
+      has_more: false,
+    },
   });
   mockRevise.mockResolvedValue(broadcast({ body: 'Revised organizer prose.', version: 2 }));
   mockSchedule.mockResolvedValue(broadcast({
@@ -266,8 +273,58 @@ describe('EventCommunicationsScreen', () => {
     expect(screen.getByText('History cannot be changed')).toBeTruthy();
     expect(screen.getByText('Draft created')).toBeTruthy();
     expect(screen.getByText('Initial status: Draft')).toBeTruthy();
-    expect(mockGetDetail).toHaveBeenCalledWith(8);
+    expect(mockGetDetail).toHaveBeenCalledWith(8, 1, 50);
     expect(screen.queryByText(/@/)).toBeNull();
+  });
+
+  it('loads every bounded page of an individual communication history', async () => {
+    mockGetDetail
+      .mockResolvedValueOnce({
+        broadcast: broadcast({ body: 'Original draft body' }),
+        history: [{
+          id: 31,
+          version: 1,
+          action: 'created',
+          from_status: null,
+          to_status: 'draft',
+          metadata: {},
+          created_at: '2026-07-11T10:00:00+00:00',
+        }],
+        history_meta: {
+          current_page: 1,
+          per_page: 50,
+          total: 51,
+          total_pages: 2,
+          has_more: true,
+        },
+      })
+      .mockResolvedValueOnce({
+        broadcast: broadcast({ body: 'Original draft body', version: 51 }),
+        history: [{
+          id: 81,
+          version: 51,
+          action: 'revised',
+          from_status: 'draft',
+          to_status: 'draft',
+          metadata: {},
+          created_at: '2026-07-12T10:00:00+00:00',
+        }],
+        history_meta: {
+          current_page: 2,
+          per_page: 50,
+          total: 51,
+          total_pages: 2,
+          has_more: false,
+        },
+      });
+    const screen = render(<EventCommunicationsScreen />);
+    await screen.findByText('Announcement');
+
+    fireEvent.press(screen.getByText('Audit history'));
+    fireEvent.press(await screen.findByText('Load more'));
+
+    await waitFor(() => expect(mockGetDetail).toHaveBeenLastCalledWith(8, 2, 50));
+    expect(await screen.findByText('Draft revised')).toBeTruthy();
   });
 
   it('loads every page of the communication ledger', async () => {

@@ -20,7 +20,7 @@ use Tests\Laravel\TestCase;
  *
  *   - Komunitin DELETE /currency and /accounts/{id}
  *   - Credit Commons POST /transactions/propose|validate|commit
- *   - Nexus Native V2 POST ingest for reviews, listings, events, groups,
+ *   - Nexus Native V2 POST ingest for reviews, listings, groups,
  *     connections, volunteering, members/sync
  *
  * Auth: all routes require a valid federation_api_keys row with '*' permissions.
@@ -342,7 +342,8 @@ class FederationProtocolEndpointsTest extends TestCase
         return [
             'reviews'       => ['/v2/federation/ingest/reviews'],
             'listings'      => ['/v2/federation/ingest/listings'],
-            'events'        => ['/v2/federation/ingest/events'],
+            // Event ingest has a stricter HMAC-only, versioned receipt contract;
+            // EventFederationApiIntegrationTest owns that security boundary.
             'groups'        => ['/v2/federation/ingest/groups'],
             'connections'   => ['/v2/federation/ingest/connections'],
             'volunteering'  => ['/v2/federation/ingest/volunteering'],

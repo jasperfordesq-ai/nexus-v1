@@ -835,7 +835,11 @@ trait EventRegistrationParity
         $attendee = $queries->attendeeState($eventId, $actor);
         $organizer = null;
         try {
-            $organizer = $queries->organizerOverview($eventId, $actor);
+            $organizer = $queries->organizerOverview(
+                $eventId,
+                $actor,
+                $this->eventsRegistrationOverviewPagination($request),
+            );
         } catch (EventRegistrationFoundationException $exception) {
             if (! str_contains($exception->getMessage(), 'denied')) {
                 throw $exception;
@@ -875,6 +879,27 @@ trait EventRegistrationParity
         }
 
         return $this->accessibleEventActor($userId);
+    }
+
+    /** @return array<string,int> */
+    private function eventsRegistrationOverviewPagination(Request $request): array
+    {
+        $pagination = [];
+        foreach (['submissions', 'campaigns', 'guests'] as $collection) {
+            foreach (['page', 'per_page'] as $parameter) {
+                $key = $collection . '_' . $parameter;
+                $value = $request->query($key);
+                if (! is_string($value) && ! is_int($value)) {
+                    continue;
+                }
+                $parsed = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                if ($parsed !== false) {
+                    $pagination[$key] = (int) $parsed;
+                }
+            }
+        }
+
+        return $pagination;
     }
 
     /** @return list<array<string,mixed>> */

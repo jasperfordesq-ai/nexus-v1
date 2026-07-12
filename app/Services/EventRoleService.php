@@ -15,6 +15,7 @@ use App\Enums\EventStaffRole;
 use App\Exceptions\EventRoleAssignmentException;
 use App\Models\EventStaffAssignment;
 use App\Models\User;
+use App\Support\Authorization\AdminTier;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
@@ -24,9 +25,6 @@ use Illuminate\Support\Facades\Schema;
 /** Transactional write and capability boundary for delegated event staff. */
 final class EventRoleService
 {
-    /** @var list<string> */
-    private const TENANT_ADMIN_ROLES = ['admin', 'tenant_admin', 'super_admin', 'god'];
-
     /** @var list<EventStaffRole> */
     private const DELEGATABLE_BY_STAFF_MANAGER = [
         EventStaffRole::RegistrationManager,
@@ -565,11 +563,7 @@ final class EventRoleService
 
     private function isTenantAdmin(object $actor): bool
     {
-        return in_array((string) ($actor->role ?? ''), self::TENANT_ADMIN_ROLES, true)
-            || (bool) ($actor->is_admin ?? false)
-            || (bool) ($actor->is_super_admin ?? false)
-            || (bool) ($actor->is_tenant_super_admin ?? false)
-            || (bool) ($actor->is_god ?? false);
+        return AdminTier::allows($actor);
     }
 
     /**

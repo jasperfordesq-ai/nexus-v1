@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -78,6 +78,8 @@ function EventTemplatesScreenInner() {
   const [isAuditLoading, setIsAuditLoading] = useState(false);
   const [isAuditLoadingMore, setIsAuditLoadingMore] = useState(false);
   const [auditLoadFailed, setAuditLoadFailed] = useState(false);
+  const auditGenerationRef = useRef(0);
+  const auditTargetIdRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -96,6 +98,11 @@ function EventTemplatesScreenInner() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => () => {
+    auditGenerationRef.current += 1;
+    auditTargetIdRef.current = null;
+  }, []);
 
   async function loadMore() {
     if (!nextCursor || isLoadingMore) return;
@@ -120,27 +127,42 @@ function EventTemplatesScreenInner() {
   }
 
   async function openAudit(template: MobileEventTemplate) {
+    const targetId = template.id;
+    const generation = auditGenerationRef.current + 1;
+    auditGenerationRef.current = generation;
+    auditTargetIdRef.current = targetId;
     setAuditTarget(template);
     setAudits([]);
     setAuditNextCursor(null);
     setAuditLoadFailed(false);
+    setIsAuditLoadingMore(false);
     setIsAuditLoading(true);
     try {
-      const response = await getEventTemplateHistory(template.id);
+      const response = await getEventTemplateHistory(targetId);
+      if (generation !== auditGenerationRef.current || auditTargetIdRef.current !== targetId) return;
       setAudits(response.data);
       setAuditNextCursor(response.meta.has_more ? response.meta.next_cursor : null);
     } catch {
+      if (generation !== auditGenerationRef.current || auditTargetIdRef.current !== targetId) return;
       setAuditLoadFailed(true);
     } finally {
-      setIsAuditLoading(false);
+      if (generation === auditGenerationRef.current && auditTargetIdRef.current === targetId) {
+        setIsAuditLoading(false);
+      }
     }
   }
 
   async function loadMoreAudit() {
     if (!auditTarget || !auditNextCursor || isAuditLoadingMore) return;
+    const targetId = auditTarget.id;
+    const cursor = auditNextCursor;
+    const generation = auditGenerationRef.current + 1;
+    auditGenerationRef.current = generation;
+    auditTargetIdRef.current = targetId;
     setIsAuditLoadingMore(true);
     try {
-      const response = await getEventTemplateHistory(auditTarget.id, auditNextCursor);
+      const response = await getEventTemplateHistory(targetId, cursor);
+      if (generation !== auditGenerationRef.current || auditTargetIdRef.current !== targetId) return;
       setAudits((current) => {
         const byId = new Map(current.map((audit) => [audit.id, audit]));
         response.data.forEach((audit) => byId.set(audit.id, audit));
@@ -148,20 +170,32 @@ function EventTemplatesScreenInner() {
       });
       setAuditNextCursor(response.meta.has_more ? response.meta.next_cursor : null);
     } catch {
+      if (generation !== auditGenerationRef.current || auditTargetIdRef.current !== targetId) return;
       showToast({
         title: t('templates.mobile.auditLoadFailedTitle'),
         description: t('templates.mobile.auditLoadFailedDescription'),
         variant: 'danger',
       });
     } finally {
-      setIsAuditLoadingMore(false);
+      if (generation === auditGenerationRef.current && auditTargetIdRef.current === targetId) {
+        setIsAuditLoadingMore(false);
+      }
     }
   }
 
-  function selectTemplate(template: MobileEventTemplate) {
+  function closeAudit() {
+    auditGenerationRef.current += 1;
+    auditTargetIdRef.current = null;
     setAuditTarget(null);
     setAudits([]);
     setAuditNextCursor(null);
+    setAuditLoadFailed(false);
+    setIsAuditLoading(false);
+    setIsAuditLoadingMore(false);
+  }
+
+  function selectTemplate(template: MobileEventTemplate) {
+    closeAudit();
     setSelected(template);
     setTitle(template.version.configuration.title);
     setTimezone(template.version.configuration.timezone);
@@ -327,12 +361,7 @@ function EventTemplatesScreenInner() {
               )}
             </Card.Body>
             <Card.Footer className="flex-row flex-wrap gap-3">
-              <Button variant="secondary" onPress={() => {
-                setAuditTarget(null);
-                setAudits([]);
-                setAuditNextCursor(null);
-                setAuditLoadFailed(false);
-              }}>
+              <Button variant="secondary" onPress={closeAudit}>
                 {t('common:buttons.done')}
               </Button>
               {auditNextCursor ? (
@@ -385,6 +414,7 @@ function EventTemplatesScreenInner() {
               <Card.Footer className="flex-row flex-wrap gap-3">
                 {template.capabilities.view_audit ? (
                   <Button
+                    testID={`event-template-audit-button-${template.id}`}
                     variant="secondary"
                     isDisabled={isAuditLoading && auditTarget?.id === template.id}
                     onPress={() => void openAudit(template)}

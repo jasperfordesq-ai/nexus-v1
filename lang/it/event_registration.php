@@ -17,6 +17,8 @@ return [
         'refresh' => 'Aggiorna',
         'retry' => 'Riprova',
         'save' => 'Salva',
+        'previous' => 'Precedente',
+        'next' => 'Successivo',
     ],
     'load_error' => [
         'title' => 'Impossibile caricare l\'area di lavoro di registrazione',

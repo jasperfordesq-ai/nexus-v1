@@ -17,6 +17,8 @@ return [
         'refresh' => 'Aktualisieren',
         'retry' => 'Versuchen Sie es erneut',
         'save' => 'Speichern',
+        'previous' => 'Zurück',
+        'next' => 'Weiter',
     ],
     'load_error' => [
         'title' => 'Der Registrierungsarbeitsbereich konnte nicht geladen werden',
