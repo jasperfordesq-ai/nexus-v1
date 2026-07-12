@@ -33,16 +33,29 @@ function processAuthoritativeEventOutbox(): void {
   const container = process.env.E2E_EVENT_OUTBOX_CONTAINER?.trim();
   if (!container) return;
 
-  execFileSync('docker', [
-    'exec',
-    container,
-    'php',
-    'artisan',
-    'events:process-notification-outbox',
-    `--tenant=${process.env.E2E_TENANT_ID || '2'}`,
-    '--limit=100',
-    '--json',
-  ], { stdio: 'inherit' });
+  for (let batch = 0; batch < 20; batch += 1) {
+    const output = execFileSync('docker', [
+      'exec',
+      container,
+      'php',
+      'artisan',
+      'events:process-notification-outbox',
+      `--tenant=${process.env.E2E_TENANT_ID || '2'}`,
+      '--limit=100',
+      '--json',
+    ], { encoding: 'utf8' });
+    const summary = JSON.parse(output.trim().split(/\r?\n/).at(-1) || '{}') as {
+      claimed?: number;
+      retrying?: number;
+      dead_lettered?: number;
+    };
+    if ((summary.retrying ?? 0) > 0 || (summary.dead_lettered ?? 0) > 0) {
+      throw new Error(`Event notification outbox delivery failed: ${JSON.stringify(summary)}`);
+    }
+    if ((summary.claimed ?? 0) === 0) return;
+  }
+
+  throw new Error('Event notification outbox did not drain within 20 batches.');
 }
 
 interface ActorSession {
