@@ -16,7 +16,7 @@
  *  7. Linked Accounts - sub-account management
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Key } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
@@ -82,6 +82,44 @@ const SETTINGS_TABS = [
 
 type SettingsTabKey = (typeof SETTINGS_TABS)[number];
 
+interface NotificationSettingsSnapshot {
+  notifications: NotificationSettings;
+  matchDigestFrequency: string;
+  notifyHotMatches: boolean;
+  notifyMutualMatches: boolean;
+  digestFrequency: string;
+}
+
+interface AtomicNotificationSettingsResponse {
+  notifications: NotificationSettings;
+  match_preferences: {
+    notification_frequency: string;
+    notify_hot_matches: boolean;
+    notify_mutual_matches: boolean;
+  };
+  digest_frequency: string;
+}
+
+const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  email_messages: true,
+  email_listings: true,
+  email_digest: false,
+  email_connections: true,
+  email_transactions: true,
+  email_reviews: true,
+  email_events: true,
+  email_gamification_digest: true,
+  email_gamification_milestones: true,
+  email_org_payments: true,
+  email_org_transfers: true,
+  email_org_membership: true,
+  email_org_admin: true,
+  caring_smart_nudges: true,
+  federation_notifications_enabled: true,
+  push_enabled: true,
+  push_campaigns_opted_in: false,
+};
+
 function isSettingsTabKey(value: string | null): value is SettingsTabKey {
   return !!value && SETTINGS_TABS.includes(value as SettingsTabKey);
 }
@@ -120,8 +158,18 @@ export function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTabKey>(initialTab);
   const [pendingTab, setPendingTab] = useState<SettingsTabKey | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const dirtyTab = useRef<SettingsTabKey | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const profileSnapshot = useRef<ProfileFormData | null>(null);
+  const notificationSnapshot = useRef<NotificationSettingsSnapshot | null>(null);
+  const privacySnapshot = useRef<PrivacySettings | null>(null);
+  const loadedTabs = useRef<Set<SettingsTabKey>>(new Set());
+  const insuranceLoaded = useRef(false);
+  const markDirty = useCallback((tab: SettingsTabKey) => {
+    dirtyTab.current = tab;
+    setIsDirty(true);
+  }, []);
 
   // Warn on browser close/refresh when form is dirty
   useEffect(() => {
@@ -162,6 +210,7 @@ export function SettingsPage() {
 
   // Error state for notification settings
   const [notificationError, setNotificationError] = useState<string | null>(null);
+  const [notificationLoading, setNotificationLoading] = useState(false);
 
   // Identity verification status — lock name fields if verified
   interface IdentityStatusResponse {
@@ -169,13 +218,13 @@ export function SettingsPage() {
   }
   const [isIdVerified, setIsIdVerified] = useState(false);
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || activeTab !== 'profile') return;
     let cancelled = false;
     api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
       if (!cancelled && res?.data?.has_id_verified_badge) setIsIdVerified(true);
     }).catch(() => {});
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, [activeTab, user?.id]);
 
   // Profile form
   const [profileData, setProfileData] = useState<ProfileFormData>({
@@ -195,25 +244,7 @@ export function SettingsPage() {
   });
 
   // Notification settings
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    email_messages: true,
-    email_listings: true,
-    email_digest: false,
-    email_connections: true,
-    email_transactions: true,
-    email_reviews: true,
-    email_events: true,
-    email_gamification_digest: true,
-    email_gamification_milestones: true,
-    email_org_payments: true,
-    email_org_transfers: true,
-    email_org_membership: true,
-    email_org_admin: true,
-    caring_smart_nudges: true,
-    federation_notifications_enabled: true,
-    push_enabled: true,
-    push_campaigns_opted_in: false,
-  });
+  const [notifications, setNotifications] = useState<NotificationSettings>({ ...DEFAULT_NOTIFICATION_SETTINGS });
 
   // Match digest frequency & preferences
   const [matchDigestFrequency, setMatchDigestFrequency] = useState<string>('monthly');
@@ -236,6 +267,8 @@ export function SettingsPage() {
     search_indexing: true,
   });
   const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
+  const [privacyLoading, setPrivacyLoading] = useState(false);
+  const [privacyError, setPrivacyError] = useState<string | null>(null);
 
   // 2FA state
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -264,8 +297,7 @@ export function SettingsPage() {
   const [insuranceType, setInsuranceType] = useState('public_liability');
   const activeTabLabel = t(`tabs.${activeTab === 'linked-accounts' ? 'linked' : activeTab === 'connected-accounts' ? 'connected_accounts' : activeTab}`);
 
-  const applyTabSelection = useCallback((tab: SettingsTabKey) => {
-    setActiveTab(tab);
+  const setTabSearchParam = useCallback((tab: SettingsTabKey) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
       if (tab === 'profile') {
@@ -276,6 +308,29 @@ export function SettingsPage() {
       return next;
     }, { replace: true });
   }, [setSearchParams]);
+
+  const applyTabSelection = useCallback((tab: SettingsTabKey) => {
+    setActiveTab(tab);
+    setTabSearchParam(tab);
+  }, [setTabSearchParam]);
+
+  // Keep controlled tab state aligned with deep links and browser history.
+  // When history navigation occurs with unsaved edits, restore the current URL
+  // until the member explicitly chooses whether to leave the edited section.
+  useEffect(() => {
+    const requestedTab: SettingsTabKey = isSettingsTabKey(tabParam) ? tabParam : 'profile';
+    if (!isSettingsTabKey(tabParam) && tabParam !== null) {
+      setTabSearchParam('profile');
+    }
+    if (requestedTab === activeTab) return;
+    if (isDirty) {
+      setPendingTab(requestedTab);
+      setTabSearchParam(activeTab);
+      unsavedChangesModal.onOpen();
+      return;
+    }
+    setActiveTab(requestedTab);
+  }, [activeTab, isDirty, setTabSearchParam, tabParam, unsavedChangesModal]);
 
   const handleTabSelection = useCallback((key: Key) => {
     const nextTab = String(key);
@@ -288,14 +343,31 @@ export function SettingsPage() {
     applyTabSelection(nextTab);
   }, [activeTab, applyTabSelection, isDirty, unsavedChangesModal]);
 
+  const restoreActiveTab = useCallback(() => {
+    if (activeTab === 'profile' && profileSnapshot.current) {
+      setProfileData({ ...profileSnapshot.current });
+    } else if (activeTab === 'notifications' && notificationSnapshot.current) {
+      const snapshot = notificationSnapshot.current;
+      setNotifications({ ...snapshot.notifications });
+      setMatchDigestFrequency(snapshot.matchDigestFrequency);
+      setNotifyHotMatches(snapshot.notifyHotMatches);
+      setNotifyMutualMatches(snapshot.notifyMutualMatches);
+      setDigestFrequency(snapshot.digestFrequency);
+    } else if (activeTab === 'privacy' && privacySnapshot.current) {
+      setPrivacy({ ...privacySnapshot.current });
+    }
+  }, [activeTab]);
+
   const discardChangesAndSwitchTab = useCallback(() => {
     if (pendingTab) {
+      restoreActiveTab();
+      dirtyTab.current = null;
       setIsDirty(false);
       applyTabSelection(pendingTab);
     }
     setPendingTab(null);
     unsavedChangesModal.onClose();
-  }, [applyTabSelection, pendingTab, unsavedChangesModal]);
+  }, [applyTabSelection, pendingTab, restoreActiveTab, unsavedChangesModal]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Data Loading
@@ -303,73 +375,84 @@ export function SettingsPage() {
 
   const loadNotificationSettings = useCallback(async () => {
     try {
+      setNotificationLoading(true);
       setNotificationError(null);
-      const response = await api.get<NotificationSettings>('/v2/users/me/notifications');
-      if (response.success && response.data) {
-        setNotifications((prev) => ({ ...prev, ...response.data }));
-      } else {
+      const [notificationResponse, matchResponse, digestResponse, consentResponse] = await Promise.all([
+        api.get<NotificationSettings>('/v2/users/me/notifications'),
+        api.get<{ notification_frequency: string; notify_hot_matches: boolean; notify_mutual_matches: boolean }>('/v2/users/me/match-preferences'),
+        api.get<{ global_frequency: string }>('/v2/notifications/settings'),
+        api.get<Array<{ consent_type_slug: string; given: boolean }>>('/v2/users/me/consent'),
+      ]);
+
+      if (
+        !notificationResponse.success || !notificationResponse.data
+        || !matchResponse.success || !matchResponse.data
+        || !digestResponse.success || !digestResponse.data
+        || !consentResponse.success || !Array.isArray(consentResponse.data)
+      ) {
         setNotificationError(t('notification_load_failed'));
+        loadedTabs.current.delete('notifications');
+        return;
       }
+
+      const nextNotifications = { ...DEFAULT_NOTIFICATION_SETTINGS, ...notificationResponse.data };
+      const nextMatchFrequency = matchResponse.data.notification_frequency === 'weekly'
+        ? 'monthly'
+        : matchResponse.data.notification_frequency || 'monthly';
+      const nextDigestFrequency = digestResponse.data.global_frequency === 'weekly'
+        ? 'monthly'
+        : digestResponse.data.global_frequency || 'off';
+      const marketing = consentResponse.data.find((consent) => consent.consent_type_slug === 'marketing_email');
+
+      setNotifications(nextNotifications);
+      setMatchDigestFrequency(nextMatchFrequency);
+      setNotifyHotMatches(matchResponse.data.notify_hot_matches ?? true);
+      setNotifyMutualMatches(matchResponse.data.notify_mutual_matches ?? true);
+      setDigestFrequency(nextDigestFrequency);
+      setMarketingConsent(marketing?.given ?? false);
+      notificationSnapshot.current = {
+        notifications: { ...nextNotifications },
+        matchDigestFrequency: nextMatchFrequency,
+        notifyHotMatches: matchResponse.data.notify_hot_matches ?? true,
+        notifyMutualMatches: matchResponse.data.notify_mutual_matches ?? true,
+        digestFrequency: nextDigestFrequency,
+      };
+      loadedTabs.current.add('notifications');
     } catch (error) {
       logError('Failed to load notification settings', error);
       setNotificationError(t('notification_load_failed'));
+      loadedTabs.current.delete('notifications');
+    } finally {
+      setNotificationLoading(false);
     }
   }, [t]);
 
-  const loadMatchPreferences = useCallback(async () => {
-    try {
-      const response = await api.get<{ notification_frequency: string; notify_hot_matches: boolean; notify_mutual_matches: boolean }>('/v2/users/me/match-preferences');
-      if (response.success && response.data) {
-        const nextMatchFrequency = response.data.notification_frequency === 'weekly' ? 'monthly' : response.data.notification_frequency;
-        setMatchDigestFrequency(nextMatchFrequency || 'monthly');
-        setNotifyHotMatches(response.data.notify_hot_matches ?? true);
-        setNotifyMutualMatches(response.data.notify_mutual_matches ?? true);
-      }
-    } catch (error) {
-      logError('Failed to load match preferences', error);
-    }
-  }, []);
-
-  const loadDigestFrequency = useCallback(async () => {
-    try {
-      const response = await api.get<{ global_frequency: string }>('/v2/notifications/settings');
-      if (response.success && response.data) {
-        const nextFrequency = response.data.global_frequency === 'weekly' ? 'monthly' : response.data.global_frequency;
-        setDigestFrequency(nextFrequency || 'off');
-      }
-    } catch (error) {
-      logError('Failed to load digest frequency', error);
-    }
-  }, []);
-
-  const loadMarketingConsent = useCallback(async () => {
-    try {
-      const response = await api.get<Array<{ consent_type_slug: string; given: boolean }>>('/v2/users/me/consent');
-      if (response.success && Array.isArray(response.data)) {
-        const marketing = response.data.find((c) => c.consent_type_slug === 'marketing_email');
-        if (marketing) {
-          setMarketingConsent(marketing.given);
-        }
-      }
-    } catch (error) {
-      logError('Failed to load marketing consent', error);
-    }
-  }, []);
-
   const loadPrivacySettings = useCallback(async () => {
     try {
+      setPrivacyLoading(true);
+      setPrivacyError(null);
       const response = await api.get<{ privacy: { privacy_profile: string; privacy_search: boolean } }>('/v2/users/me/preferences');
       if (response.success && response.data?.privacy) {
         const p = response.data.privacy;
-        setPrivacy({
+        const nextPrivacy: PrivacySettings = {
           profile_visibility: (p.privacy_profile as 'public' | 'members' | 'connections') || 'members',
           search_indexing: p.privacy_search ?? true,
-        });
+        };
+        setPrivacy(nextPrivacy);
+        privacySnapshot.current = { ...nextPrivacy };
+        loadedTabs.current.add('privacy');
+      } else {
+        setPrivacyError(t('privacy_load_failed'));
+        loadedTabs.current.delete('privacy');
       }
     } catch (error) {
       logError('Failed to load privacy settings', error);
+      setPrivacyError(t('privacy_load_failed'));
+      loadedTabs.current.delete('privacy');
+    } finally {
+      setPrivacyLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const loadTwoFactorStatus = useCallback(async () => {
     try {
@@ -411,7 +494,7 @@ export function SettingsPage() {
 
   useEffect(() => {
     if (user) {
-      setProfileData({
+      const nextProfileData: ProfileFormData = {
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         name: user.name || '',
@@ -425,24 +508,15 @@ export function SettingsPage() {
         avatar: user.avatar_url || user.avatar || null,
         profile_type: user.profile_type || 'individual',
         organization_name: user.organization_name || '',
-      });
+      };
+      if (dirtyTab.current !== 'profile') {
+        setProfileData(nextProfileData);
+        profileSnapshot.current = { ...nextProfileData };
+      }
+      loadedTabs.current.add('profile');
       setTwoFactorEnabled(user.has_2fa_enabled || false);
     }
-    loadNotificationSettings();
-    loadMatchPreferences();
-    loadDigestFrequency();
-    loadMarketingConsent();
-    loadPrivacySettings();
-    loadTwoFactorStatus();
-    loadSessions();
-  }, [user, loadNotificationSettings, loadMatchPreferences, loadDigestFrequency, loadMarketingConsent, loadPrivacySettings, loadTwoFactorStatus, loadSessions]);
-
-  // Re-fetch privacy settings when the privacy tab becomes active
-  useEffect(() => {
-    if (activeTab === 'privacy') {
-      loadPrivacySettings();
-    }
-  }, [activeTab, loadPrivacySettings]);
+  }, [user]);
 
   // Load insurance certificates when insurance is enabled
   const loadInsuranceCerts = useCallback(async () => {
@@ -452,17 +526,39 @@ export function SettingsPage() {
       const res = await api.get<UserInsuranceCert[]>('/v2/users/me/insurance');
       if (res.success && Array.isArray(res.data)) {
         setInsuranceCerts(res.data);
+        insuranceLoaded.current = true;
+      } else {
+        insuranceLoaded.current = false;
       }
     } catch {
       // Insurance table may not exist
+      insuranceLoaded.current = false;
     } finally {
       setInsuranceLoading(false);
     }
   }, [tenant?.compliance?.insurance_enabled]);
 
+  // Load only the data needed by the first visit to each tab. Tab components
+  // with their own data contracts continue to load when they mount.
   useEffect(() => {
-    loadInsuranceCerts();
-  }, [loadInsuranceCerts]);
+    if (!user) return;
+
+    if (activeTab === 'notifications' && !loadedTabs.current.has('notifications')) {
+      loadedTabs.current.add('notifications');
+      void loadNotificationSettings();
+    } else if (activeTab === 'privacy' && !loadedTabs.current.has('privacy')) {
+      loadedTabs.current.add('privacy');
+      void loadPrivacySettings();
+    } else if (activeTab === 'security' && !loadedTabs.current.has('security')) {
+      loadedTabs.current.add('security');
+      void Promise.all([loadTwoFactorStatus(), loadSessions()]);
+    }
+
+    if (activeTab === 'privacy' && tenant?.compliance?.insurance_enabled && !insuranceLoaded.current) {
+      insuranceLoaded.current = true;
+      void loadInsuranceCerts();
+    }
+  }, [activeTab, loadInsuranceCerts, loadNotificationSettings, loadPrivacySettings, loadSessions, loadTwoFactorStatus, tenant?.compliance?.insurance_enabled, user]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Save Handlers
@@ -494,6 +590,15 @@ export function SettingsPage() {
       }
       const response = await api.put('/v2/users/me', payload);
       if (response.success) {
+        const savedProfile = {
+          ...profileData,
+          bio: sanitizedBio,
+          name: payload.name as string,
+          organization_name: payload.organization_name as string,
+        };
+        setProfileData(savedProfile);
+        profileSnapshot.current = { ...savedProfile };
+        dirtyTab.current = null;
         setIsDirty(false);
         toast.success(t('toasts.profile_updated'));
         if (refreshUser) await refreshUser();
@@ -511,32 +616,46 @@ export function SettingsPage() {
   const saveNotifications = useCallback(async () => {
     try {
       setIsSaving(true);
-      // Save general notification settings, match digest preferences, AND
-      // the global activity-digest frequency in parallel. The digest
-      // endpoint upserts a single row in notification_settings keyed on
-      // (user_id, context_type='global', context_id=0).
-      const [notifResponse, matchResponse, digestResponse] = await Promise.all([
-        api.put('/v2/users/me/notifications', notifications),
-        api.put('/v2/users/me/match-preferences', {
+      const response = await api.put<AtomicNotificationSettingsResponse>('/v2/users/me/notification-settings', {
+        notifications,
+        match_preferences: {
           notification_frequency: matchDigestFrequency,
           notify_hot_matches: notifyHotMatches,
           notify_mutual_matches: notifyMutualMatches,
-        }),
-        api.post('/v2/notifications/settings', {
-          context_type: 'global',
-          frequency: digestFrequency,
-        }),
-      ]);
-      if (notifResponse.success && matchResponse.success && digestResponse.success) {
+        },
+        digest_frequency: digestFrequency,
+      });
+      if (response.success) {
+        const canonical = response.data;
+        const savedNotifications = canonical?.notifications
+          ? { ...DEFAULT_NOTIFICATION_SETTINGS, ...canonical.notifications }
+          : { ...notifications };
+        const savedMatchFrequency = canonical?.match_preferences?.notification_frequency === 'weekly'
+          ? 'monthly'
+          : canonical?.match_preferences?.notification_frequency || matchDigestFrequency;
+        const savedNotifyHotMatches = canonical?.match_preferences?.notify_hot_matches ?? notifyHotMatches;
+        const savedNotifyMutualMatches = canonical?.match_preferences?.notify_mutual_matches ?? notifyMutualMatches;
+        const savedDigestFrequency = canonical?.digest_frequency === 'weekly'
+          ? 'monthly'
+          : canonical?.digest_frequency || digestFrequency;
+
+        setNotifications(savedNotifications);
+        setMatchDigestFrequency(savedMatchFrequency);
+        setNotifyHotMatches(savedNotifyHotMatches);
+        setNotifyMutualMatches(savedNotifyMutualMatches);
+        setDigestFrequency(savedDigestFrequency);
+        notificationSnapshot.current = {
+          notifications: { ...savedNotifications },
+          matchDigestFrequency: savedMatchFrequency,
+          notifyHotMatches: savedNotifyHotMatches,
+          notifyMutualMatches: savedNotifyMutualMatches,
+          digestFrequency: savedDigestFrequency,
+        };
+        dirtyTab.current = null;
         setIsDirty(false);
         toast.success(t('toasts.notifications_saved'));
       } else {
-        toast.error(
-          notifResponse.error
-          || matchResponse.error
-          || digestResponse.error
-          || t('toasts.notifications_save_failed')
-        );
+        toast.error(response.error || t('toasts.notifications_save_failed'));
       }
     } catch (error) {
       logError('Failed to save notifications', error);
@@ -547,6 +666,7 @@ export function SettingsPage() {
   }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, digestFrequency, toast, t]);
 
   const savePrivacy = useCallback(async () => {
+    if (!privacySnapshot.current || privacyLoading || privacyError) return;
     try {
       setIsSavingPrivacy(true);
       // Map React field names to PHP field names
@@ -557,6 +677,8 @@ export function SettingsPage() {
         },
       });
       if (response.success) {
+        privacySnapshot.current = { ...privacy };
+        dirtyTab.current = null;
         setIsDirty(false);
         toast.success(t('toasts.privacy_saved'));
       } else {
@@ -568,7 +690,7 @@ export function SettingsPage() {
     } finally {
       setIsSavingPrivacy(false);
     }
-  }, [privacy, toast, t]);
+  }, [privacy, privacyError, privacyLoading, toast, t]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Auth Handlers
@@ -606,6 +728,9 @@ export function SettingsPage() {
 
       if (response.success && response.data) {
         setProfileData((prev) => ({ ...prev, avatar: response.data!.avatar_url }));
+        if (profileSnapshot.current) {
+          profileSnapshot.current = { ...profileSnapshot.current, avatar: response.data.avatar_url };
+        }
         if (refreshUser) await refreshUser();
         toast.success(t('toasts.avatar_updated'), t('toasts.avatar_updated_desc'));
       } else {
@@ -1073,7 +1198,7 @@ export function SettingsPage() {
               isDirty={isDirty}
               onProfileDataChange={(updater) => {
                 setProfileData(updater);
-                setIsDirty(true);
+                markDirty('profile');
               }}
               onSave={saveProfile}
               onAvatarUpload={handleAvatarUpload}
@@ -1094,6 +1219,7 @@ export function SettingsPage() {
           <NotificationsTab
             notifications={notifications}
             notificationError={notificationError}
+            notificationLoading={notificationLoading}
             isSaving={isSaving}
             matchDigestFrequency={matchDigestFrequency}
             notifyHotMatches={notifyHotMatches}
@@ -1102,12 +1228,12 @@ export function SettingsPage() {
             marketingConsentLoading={marketingConsentLoading}
             isOrganisation={profileData.profile_type === 'organisation'}
             digestFrequency={digestFrequency}
-            onNotificationsChange={(updater) => { setNotifications(updater); setIsDirty(true); }}
-            onMatchDigestFrequencyChange={(v) => { setMatchDigestFrequency(v); setIsDirty(true); }}
-            onNotifyHotMatchesChange={(v) => { setNotifyHotMatches(v); setIsDirty(true); }}
-            onNotifyMutualMatchesChange={(v) => { setNotifyMutualMatches(v); setIsDirty(true); }}
+            onNotificationsChange={(updater) => { setNotifications(updater); markDirty('notifications'); }}
+            onMatchDigestFrequencyChange={(v) => { setMatchDigestFrequency(v); markDirty('notifications'); }}
+            onNotifyHotMatchesChange={(v) => { setNotifyHotMatches(v); markDirty('notifications'); }}
+            onNotifyMutualMatchesChange={(v) => { setNotifyMutualMatches(v); markDirty('notifications'); }}
             onMarketingConsentToggle={handleMarketingConsentToggle}
-            onDigestFrequencyChange={(v) => { setDigestFrequency(v); setIsDirty(true); }}
+            onDigestFrequencyChange={(v) => { setDigestFrequency(v); markDirty('notifications'); }}
             onSave={saveNotifications}
             onRetry={loadNotificationSettings}
           />
@@ -1118,14 +1244,17 @@ export function SettingsPage() {
           <PrivacyTab
             privacy={privacy}
             isSavingPrivacy={isSavingPrivacy}
+            privacyLoading={privacyLoading}
+            privacyError={privacyError}
             insuranceCerts={insuranceCerts}
             insuranceLoading={insuranceLoading}
             insuranceUploading={insuranceUploading}
             insuranceType={insuranceType}
             insuranceEnabled={!!tenant?.compliance?.insurance_enabled}
             federationEnabled={!!hasFeature?.('federation')}
-            onPrivacyChange={(updater) => { setPrivacy(updater); setIsDirty(true); }}
+            onPrivacyChange={(updater) => { setPrivacy(updater); markDirty('privacy'); }}
             onSavePrivacy={savePrivacy}
+            onRetryPrivacy={loadPrivacySettings}
             onInsuranceUpload={handleInsuranceUpload}
             onInsuranceTypeChange={setInsuranceType}
             onOpenGdprModal={openGdprModal}

@@ -40,6 +40,8 @@ const defaultPrivacy: PrivacySettings = {
 const defaultProps = {
   privacy: defaultPrivacy,
   isSavingPrivacy: false,
+  privacyLoading: false,
+  privacyError: null,
   insuranceCerts: [],
   insuranceLoading: false,
   insuranceUploading: false,
@@ -48,6 +50,7 @@ const defaultProps = {
   federationEnabled: false,
   onPrivacyChange: vi.fn(),
   onSavePrivacy: vi.fn(),
+  onRetryPrivacy: vi.fn(),
   onInsuranceUpload: vi.fn(),
   onInsuranceTypeChange: vi.fn(),
   onOpenGdprModal: vi.fn(),
@@ -104,6 +107,23 @@ describe('PrivacyTab', () => {
   it('renders Save Privacy Settings button', () => {
     render(<PrivacyTab {...defaultProps} />);
     expect(screen.getByText('Save Privacy Settings')).toBeDefined();
+  });
+
+  it('does not expose default privacy controls while settings load', () => {
+    render(<PrivacyTab {...defaultProps} privacyLoading />);
+    expect(screen.getByText('Loading privacy settings...')).toBeDefined();
+    expect(screen.queryByText('Save Privacy Settings')).toBeNull();
+  });
+
+  it('shows a retry action and no save button when privacy loading fails', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+    render(<PrivacyTab {...defaultProps} privacyError="Failed to load privacy settings" />);
+
+    expect(screen.getByText('Failed to load privacy settings')).toBeDefined();
+    expect(screen.queryByText('Save Privacy Settings')).toBeNull();
+    await user.click(screen.getByText('Try Again'));
+    expect(defaultProps.onRetryPrivacy).toHaveBeenCalled();
   });
 
   it('calls onSavePrivacy when save button clicked', async () => {

@@ -65,6 +65,9 @@
   "save": "Save Settings",
   "saved": "Settings saved",
   "notification_load_failed": "Failed to load notification settings",
+  "notifications_loading": "Loading notification settings...",
+  "privacy_load_failed": "Failed to load privacy settings",
+  "privacy_loading": "Loading privacy settings...",
   "language_preference": "Language Preference",
   "select_language": "Choose your preferred language for the interface",
   "theme": {

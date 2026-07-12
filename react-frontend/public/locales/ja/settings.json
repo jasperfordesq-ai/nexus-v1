@@ -65,6 +65,9 @@
   "save": "設定を保存",
   "saved": "設定が保存されました",
   "notification_load_failed": "通知設定の読み込みに失敗しました",
+  "notifications_loading": "通知設定を読み込んでいます...",
+  "privacy_load_failed": "プライバシー設定の読み込みに失敗しました",
+  "privacy_loading": "プライバシー設定を読み込んでいます...",
   "language_preference": "言語設定",
   "select_language": "インターフェースの希望する言語を選択してください",
   "theme": {

@@ -65,6 +65,9 @@
   "save": "Sábháil Socruithe",
   "saved": "Socruithe sábháilte",
   "notification_load_failed": "Theip ar lódáil na socruithe fógra",
+  "notifications_loading": "Socruithe fógra á lódáil...",
+  "privacy_load_failed": "Theip ar lódáil na socruithe príobháideachais",
+  "privacy_loading": "Socruithe príobháideachais á lódáil...",
   "language_preference": "Rogha Teanga",
   "select_language": "Roghnaigh do theanga roghnaithe don chomhéadan",
   "theme": {

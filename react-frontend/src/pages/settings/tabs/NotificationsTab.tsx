@@ -19,6 +19,7 @@ import Trophy from 'lucide-react/icons/trophy';
 import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
 import ArrowRight from 'lucide-react/icons/arrow-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useWebPush } from '@/hooks/useWebPush';
 import { useTenant } from '@/contexts';
 
@@ -49,6 +50,7 @@ export interface NotificationSettings {
 interface NotificationsTabProps {
   notifications: NotificationSettings;
   notificationError: string | null;
+  notificationLoading: boolean;
   isSaving: boolean;
   matchDigestFrequency: string;
   notifyHotMatches: boolean;
@@ -112,6 +114,7 @@ function SettingToggle({ label, description, checked, onChange, disabled }: Sett
 export function NotificationsTab({
   notifications,
   notificationError,
+  notificationLoading,
   isSaving,
   matchDigestFrequency,
   notifyHotMatches,
@@ -164,7 +167,12 @@ export function NotificationsTab({
     <GlassCard className="p-6">
       <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('notifications')}</h2>
 
-      {notificationError ? (
+      {notificationLoading ? (
+        <div role="status" className="flex items-center justify-center gap-2 py-8 text-theme-muted">
+          <RefreshCw className="h-5 w-5 animate-spin" aria-hidden="true" />
+          <span>{t('notifications_loading')}</span>
+        </div>
+      ) : notificationError ? (
         <div role="alert" className="text-center py-8">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{notificationError}</p>

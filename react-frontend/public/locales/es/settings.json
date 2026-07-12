@@ -65,6 +65,9 @@
   "save": "Guardar Configuración",
   "saved": "Configuración guardada",
   "notification_load_failed": "No se pudo cargar la configuración de notificaciones",
+  "notifications_loading": "Cargando la configuración de notificaciones...",
+  "privacy_load_failed": "No se pudo cargar la configuración de privacidad",
+  "privacy_loading": "Cargando la configuración de privacidad...",
   "language_preference": "Preferencia de Idioma",
   "select_language": "Elige tu idioma preferido para la interfaz",
   "theme": {

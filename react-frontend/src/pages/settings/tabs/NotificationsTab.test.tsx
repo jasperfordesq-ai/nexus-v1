@@ -56,6 +56,7 @@ const defaultNotifications: NotificationSettings = {
 const defaultProps = {
   notifications: defaultNotifications,
   notificationError: null,
+  notificationLoading: false,
   isSaving: false,
   matchDigestFrequency: 'weekly',
   notifyHotMatches: false,
@@ -93,6 +94,12 @@ describe('NotificationsTab', () => {
     render(<NotificationsTab {...defaultProps} notificationError="Failed to load settings" />);
     expect(screen.getByText('Failed to load settings')).toBeDefined();
     expect(screen.getByText('try_again')).toBeDefined();
+  });
+
+  it('shows a loading state without editable controls while settings load', () => {
+    render(<NotificationsTab {...defaultProps} notificationLoading />);
+    expect(screen.getByText('notifications_loading')).toBeDefined();
+    expect(screen.queryByText('save_preferences')).toBeNull();
   });
 
   it('calls onRetry when Try Again is clicked', async () => {

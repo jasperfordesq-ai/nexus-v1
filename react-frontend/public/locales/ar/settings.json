@@ -65,6 +65,9 @@
   "save": "احفظ الإعدادات",
   "saved": "تم حفظ الإعدادات",
   "notification_load_failed": "فشل تحميل إعدادات الإشعارات",
+  "notifications_loading": "جارٍ تحميل إعدادات الإشعارات...",
+  "privacy_load_failed": "فشل تحميل إعدادات الخصوصية",
+  "privacy_loading": "جارٍ تحميل إعدادات الخصوصية...",
   "language_preference": "تفضيل اللغة",
   "select_language": "اختر لغتك المفضلة للواجهة",
   "theme": {

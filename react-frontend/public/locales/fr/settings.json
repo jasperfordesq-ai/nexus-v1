@@ -65,6 +65,9 @@
   "save": "Enregistrer les paramètres",
   "saved": "Paramètres enregistrés",
   "notification_load_failed": "Échec du chargement des paramètres de notification",
+  "notifications_loading": "Chargement des paramètres de notification...",
+  "privacy_load_failed": "Échec du chargement des paramètres de confidentialité",
+  "privacy_loading": "Chargement des paramètres de confidentialité...",
   "language_preference": "Préférence de langue",
   "select_language": "Choisissez votre langue préférée pour l'interface",
   "theme": {

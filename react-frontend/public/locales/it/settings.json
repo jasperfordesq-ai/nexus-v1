@@ -65,6 +65,9 @@
   "save": "Salva Impostazioni",
   "saved": "Impostazioni salvate",
   "notification_load_failed": "Impossibile caricare le impostazioni di notifica",
+  "notifications_loading": "Caricamento delle impostazioni di notifica...",
+  "privacy_load_failed": "Impossibile caricare le impostazioni sulla privacy",
+  "privacy_loading": "Caricamento delle impostazioni sulla privacy...",
   "language_preference": "Preferenza Lingua",
   "select_language": "Scelga la lingua preferita per l'interfaccia",
   "theme": {

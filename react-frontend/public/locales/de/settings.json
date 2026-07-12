@@ -65,6 +65,9 @@
   "save": "Einstellungen speichern",
   "saved": "Einstellungen gespeichert",
   "notification_load_failed": "Die Benachrichtigungseinstellungen konnten nicht geladen werden",
+  "notifications_loading": "Benachrichtigungseinstellungen werden geladen...",
+  "privacy_load_failed": "Die Datenschutzeinstellungen konnten nicht geladen werden",
+  "privacy_loading": "Datenschutzeinstellungen werden geladen...",
   "language_preference": "Spracheinstellung",
   "select_language": "Wählen Sie Ihre bevorzugte Sprache für die Oberfläche",
   "theme": {

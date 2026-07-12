@@ -65,6 +65,9 @@
   "save": "Zapisz ustawienia",
   "saved": "Ustawienia zapisane",
   "notification_load_failed": "Nie udało się wczytać ustawień powiadomień",
+  "notifications_loading": "Wczytywanie ustawień powiadomień...",
+  "privacy_load_failed": "Nie udało się wczytać ustawień prywatności",
+  "privacy_loading": "Wczytywanie ustawień prywatności...",
   "language_preference": "Preferencje językowe",
   "select_language": "Wybierz preferowany język interfejsu",
   "theme": {

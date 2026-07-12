@@ -13,14 +13,21 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 // ── Mock @/components/ui before any imports ────────────────────────────────────
 vi.mock('@/components/ui', async () => {
   const R = await import('react');
   const noop = () => R.createElement(R.Fragment, null);
-  const useDisclosureMock = () => ({ isOpen: false, onOpen: vi.fn(), onClose: vi.fn(), onOpenChange: vi.fn() });
+  const useDisclosureMock = () => {
+    const [isOpen, setIsOpen] = R.useState(false);
+    const onOpen = R.useCallback(() => setIsOpen(true), []);
+    const onClose = R.useCallback(() => setIsOpen(false), []);
+    const onOpenChange = R.useCallback((open: boolean) => setIsOpen(open), []);
+    return { isOpen, onOpen, onClose, onOpenChange };
+  };
   return {
     GlassCard: ({ children, className }: { children: ReactNode; className?: string }) =>
       R.createElement('div', { 'data-testid': 'glass-card', className }, children),
@@ -60,9 +67,18 @@ vi.mock('@/components/ui', async () => {
         children as ReactNode,
       ),
     Avatar: noop,
-    Tabs: ({ children }: { children: ReactNode }) => R.createElement('div', { role: 'tablist' }, children),
-    Tab: ({ children, title }: Record<string, unknown>) =>
-      R.createElement('div', { role: 'tab' },
+    Tabs: ({ children, selectedKey, onSelectionChange }: Record<string, unknown>) =>
+      R.createElement('div', { role: 'tablist' },
+        R.Children.map(children as ReactNode, (child) => {
+          if (!R.isValidElement(child)) return child;
+          return R.cloneElement(child, {
+            onSelect: () => (onSelectionChange as ((key: React.Key) => void) | undefined)?.(child.key ?? ''),
+            isSelected: child.key === selectedKey,
+          } as Record<string, unknown>);
+        }),
+      ),
+    Tab: ({ children, title, onSelect, isSelected }: Record<string, unknown>) =>
+      R.createElement('button', { role: 'tab', onClick: onSelect, 'aria-selected': Boolean(isSelected) },
         R.createElement('span', null, title as ReactNode),
         children as ReactNode,
       ),
@@ -172,12 +188,33 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: vi.fn((url: string) => url || '/default-avatar.png'),
-  formatRelativeTime: vi.fn(() => '2 hours ago'),
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: vi.fn((url: string) => url || '/default-avatar.png'),
+    formatRelativeTime: vi.fn(() => '2 hours ago'),
+  };
+});
 
 vi.mock('@/components/location', () => ({
+  PlaceAutocompleteInput: ({ label, placeholder, value, onChange }: {
+    label: string;
+    placeholder: string;
+    value: string;
+    onChange: (val: string) => void;
+  }) => (
+    <input
+      data-testid="place-autocomplete"
+      aria-label={label}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  ),
+}));
+
+vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
   PlaceAutocompleteInput: ({ label, placeholder, value, onChange }: {
     label: string;
     placeholder: string;
@@ -204,10 +241,22 @@ vi.mock('react-i18next', () => {
     'tabs.notifications': 'Notifications',
     'tabs.privacy': 'Privacy',
     'tabs.security': 'Security',
+    'tabs.skills': 'Skills',
+    'tabs.availability': 'Availability',
+    'tabs.linked': 'Linked Accounts',
+    'tabs.connected_accounts': 'Connected Accounts',
+    'tabs.safeguarding': 'Safeguarding',
+    'tabs.translation': 'Translation',
     'profile.section_title': 'Profile Information',
     'profile.first_name': 'First Name',
     'profile.last_name': 'Last Name',
     'save_changes': 'Save Changes',
+    'unsaved_changes.title': 'Unsaved Changes',
+    'unsaved_changes.message': 'Unsaved changes will be lost.',
+    'unsaved_changes.leave': 'Leave Anyway',
+    'unsaved_changes.stay': 'Stay',
+    'privacy_sections.title': 'Privacy Settings',
+    'privacy_load_failed': 'Failed to load privacy settings',
   };
   const stableTFn = (key: string, opts?: Record<string, unknown> | string): string => {
     if (typeof opts === 'object' && opts !== null && 'fallbackValue' in opts) {
@@ -217,6 +266,7 @@ vi.mock('react-i18next', () => {
   };
   const stableI18n = { language: 'en', changeLanguage: () => Promise.resolve() };
   return {
+    initReactI18next: { type: '3rdParty', init: vi.fn() },
     useTranslation: () => ({ t: stableTFn, i18n: stableI18n }),
   };
 });
@@ -303,11 +353,24 @@ describe('SettingsPage', () => {
           success: true,
           data: {
             privacy: {
-              profile_visibility: 'members',
-              search_indexing: true,
+              privacy_profile: 'members',
+              privacy_search: true,
             },
           },
         });
+      }
+      if (url.includes('/v2/users/me/match-preferences')) {
+        return Promise.resolve({
+          success: true,
+          data: {
+            notification_frequency: 'monthly',
+            notify_hot_matches: true,
+            notify_mutual_matches: true,
+          },
+        });
+      }
+      if (url.includes('/v2/users/me/consent')) {
+        return Promise.resolve({ success: true, data: [] });
       }
       if (url.includes('/v2/auth/2fa/status')) {
         return Promise.resolve({
@@ -364,5 +427,75 @@ describe('SettingsPage', () => {
     expect(firstNameInput.value).toBe('Test');
     const lastNameInput = screen.getByLabelText('Last Name') as HTMLInputElement;
     expect(lastNameInput.value).toBe('User');
+  });
+
+  it('loads tab-specific APIs only when that tab is opened', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPage />, { wrapper: Wrapper });
+
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/users/me/notifications'))).toBe(false);
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/users/me/preferences'))).toBe(false);
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/users/me/sessions'))).toBe(false);
+
+    await user.click(screen.getByRole('tab', { name: 'Notifications' }));
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith('/v2/users/me/notifications'));
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/users/me/preferences'))).toBe(false);
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/users/me/sessions'))).toBe(false);
+  });
+
+  it('restores the server-backed profile snapshot when changes are discarded', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPage />, { wrapper: Wrapper });
+
+    const firstName = screen.getByLabelText('First Name') as HTMLInputElement;
+    await user.clear(firstName);
+    await user.type(firstName, 'Changed');
+    expect(firstName.value).toBe('Changed');
+
+    await user.click(screen.getByRole('tab', { name: 'Notifications' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.click(screen.getByText('Leave Anyway'));
+    await user.click(screen.getByRole('tab', { name: 'Profile' }));
+
+    expect((screen.getByLabelText('First Name') as HTMLInputElement).value).toBe('Test');
+  });
+
+  it('saves all notification groups through the atomic endpoint', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPage />, { wrapper: Wrapper });
+
+    await user.click(screen.getByRole('tab', { name: 'Notifications' }));
+    await waitFor(() => expect(screen.getByText('save_preferences')).toBeInTheDocument());
+    await user.click(screen.getByText('save_preferences'));
+
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith(
+      '/v2/users/me/notification-settings',
+      expect.objectContaining({
+        notifications: expect.any(Object),
+        match_preferences: expect.objectContaining({ notification_frequency: 'monthly' }),
+        digest_frequency: 'off',
+      }),
+    ));
+  });
+
+  it('keeps the visible tab synchronized with browser history', async () => {
+    const user = userEvent.setup();
+    function BackButton() {
+      const go = useNavigate();
+      return <button onClick={() => go(-1)}>Go back</button>;
+    }
+
+    render(
+      <MemoryRouter
+        initialEntries={['/settings?tab=privacy', '/settings?tab=security']}
+        initialIndex={1}
+      >
+        <BackButton />
+        <SettingsPage />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByText('Go back'));
+    await waitFor(() => expect(screen.getByText('Privacy Settings')).toBeInTheDocument());
   });
 });

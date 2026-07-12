@@ -65,6 +65,9 @@
   "save": "Instellingen Opslaan",
   "saved": "Instellingen opgeslagen",
   "notification_load_failed": "Kan meldingsinstellingen niet laden",
+  "notifications_loading": "Meldingsinstellingen laden...",
+  "privacy_load_failed": "Kan privacy-instellingen niet laden",
+  "privacy_loading": "Privacy-instellingen laden...",
   "language_preference": "Taalvoorkeur",
   "select_language": "Kies je voorkeurstaal voor de interface",
   "theme": {

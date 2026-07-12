@@ -24,6 +24,7 @@ import FileCheck from 'lucide-react/icons/file-check';
 import Upload from 'lucide-react/icons/upload';
 import Globe from 'lucide-react/icons/globe';
 import ChevronRight from 'lucide-react/icons/chevron-right';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -66,6 +67,8 @@ export interface UserInsuranceCert {
 interface PrivacyTabProps {
   privacy: PrivacySettings;
   isSavingPrivacy: boolean;
+  privacyLoading: boolean;
+  privacyError: string | null;
   insuranceCerts: UserInsuranceCert[];
   insuranceLoading: boolean;
   insuranceUploading: boolean;
@@ -74,6 +77,7 @@ interface PrivacyTabProps {
   federationEnabled: boolean;
   onPrivacyChange: (updater: (prev: PrivacySettings) => PrivacySettings) => void;
   onSavePrivacy: () => void;
+  onRetryPrivacy: () => void;
   onInsuranceUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onInsuranceTypeChange: (value: string) => void;
   onOpenGdprModal: (type: string) => void;
@@ -118,6 +122,8 @@ function SettingToggle({ label, description, checked, onChange }: SettingToggleP
 export function PrivacyTab({
   privacy,
   isSavingPrivacy,
+  privacyLoading,
+  privacyError,
   insuranceCerts,
   insuranceLoading,
   insuranceUploading,
@@ -126,6 +132,7 @@ export function PrivacyTab({
   federationEnabled,
   onPrivacyChange,
   onSavePrivacy,
+  onRetryPrivacy,
   onInsuranceUpload,
   onInsuranceTypeChange,
   onOpenGdprModal,
@@ -156,6 +163,20 @@ export function PrivacyTab({
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('privacy_sections.title')}</h2>
 
+        {privacyLoading ? (
+          <div role="status" className="flex items-center justify-center gap-2 py-8 text-theme-muted">
+            <RefreshCw className="h-5 w-5 animate-spin" aria-hidden="true" />
+            <span>{t('privacy_loading')}</span>
+          </div>
+        ) : privacyError ? (
+          <div role="alert" className="py-8 text-center">
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-[var(--color-warning)]" aria-hidden="true" />
+            <p className="mb-4 text-theme-muted">{privacyError}</p>
+            <Button variant="primary" onPress={onRetryPrivacy}>
+              {t('try_again')}
+            </Button>
+          </div>
+        ) : (
         <div className="space-y-6">
           {/* Profile Visibility */}
           <div className="space-y-4">
@@ -208,6 +229,7 @@ export function PrivacyTab({
             {t('save_privacy')}
           </Button>
         </div>
+        )}
       </GlassCard>
 
       {/* Federation Settings Link */}
