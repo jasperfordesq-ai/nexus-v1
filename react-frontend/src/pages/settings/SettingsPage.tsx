@@ -47,6 +47,7 @@ import { api, tokenManager } from '@/lib/api';
 import { isAvatarFileTooLarge, isSupportedAvatarFile } from '@/lib/avatarUpload';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
+import { useWebPush } from '@/hooks/useWebPush';
 import { PageMeta } from '@/components/seo';
 import { useTranslation } from 'react-i18next';
 
@@ -153,6 +154,7 @@ export function SettingsPage() {
   const { user, logout, refreshUser } = useAuth();
   const { tenantPath, tenant, hasFeature } = useTenant();
   const toast = useToast();
+  const { subscribe: subscribeWebPush, unsubscribe: unsubscribeWebPush } = useWebPush();
   const tabParam = searchParams.get('tab');
   const initialTab: SettingsTabKey = isSettingsTabKey(tabParam) ? tabParam : 'profile';
   const [activeTab, setActiveTab] = useState<SettingsTabKey>(initialTab);
@@ -348,6 +350,12 @@ export function SettingsPage() {
       setProfileData({ ...profileSnapshot.current });
     } else if (activeTab === 'notifications' && notificationSnapshot.current) {
       const snapshot = notificationSnapshot.current;
+      if (notifications.push_enabled !== snapshot.notifications.push_enabled) {
+        // The browser subscription is changed immediately by the push toggle.
+        // Reconcile that external side effect as well as React state when the
+        // member discards the notification form.
+        void (snapshot.notifications.push_enabled ? subscribeWebPush() : unsubscribeWebPush());
+      }
       setNotifications({ ...snapshot.notifications });
       setMatchDigestFrequency(snapshot.matchDigestFrequency);
       setNotifyHotMatches(snapshot.notifyHotMatches);
@@ -356,7 +364,7 @@ export function SettingsPage() {
     } else if (activeTab === 'privacy' && privacySnapshot.current) {
       setPrivacy({ ...privacySnapshot.current });
     }
-  }, [activeTab]);
+  }, [activeTab, notifications.push_enabled, subscribeWebPush, unsubscribeWebPush]);
 
   const discardChangesAndSwitchTab = useCallback(() => {
     if (pendingTab) {

@@ -17,6 +17,23 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
+const webPushMocks = vi.hoisted(() => ({
+  subscribe: vi.fn().mockResolvedValue(true),
+  unsubscribe: vi.fn().mockResolvedValue(true),
+  refresh: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/hooks/useWebPush', () => ({
+  useWebPush: () => ({
+    isSupported: true,
+    permission: 'granted',
+    isSubscribed: true,
+    isPending: false,
+    error: null,
+    ...webPushMocks,
+  }),
+}));
+
 // ── Mock @/components/ui before any imports ────────────────────────────────────
 vi.mock('@/components/ui', async () => {
   const R = await import('react');
@@ -458,6 +475,21 @@ describe('SettingsPage', () => {
     await user.click(screen.getByRole('tab', { name: 'Profile' }));
 
     expect((screen.getByLabelText('First Name') as HTMLInputElement).value).toBe('Test');
+  });
+
+  it('reconciles the browser push subscription when notification changes are discarded', async () => {
+    const user = userEvent.setup();
+    render(<SettingsPage />, { wrapper: Wrapper });
+
+    await user.click(screen.getByRole('tab', { name: 'Notifications' }));
+    const pushToggle = await screen.findByRole('switch', { name: 'notification_prefs.enable_push' });
+    await user.click(pushToggle);
+    await waitFor(() => expect(webPushMocks.unsubscribe).toHaveBeenCalled());
+
+    await user.click(screen.getByRole('tab', { name: 'Profile' }));
+    await user.click(screen.getByText('Leave Anyway'));
+
+    await waitFor(() => expect(webPushMocks.subscribe).toHaveBeenCalled());
   });
 
   it('saves all notification groups through the atomic endpoint', async () => {
