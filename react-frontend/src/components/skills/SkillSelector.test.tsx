@@ -288,12 +288,14 @@ describe('SkillSelector', () => {
     const input = document.querySelector('input') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Cooking' } });
 
-    // Wait for result to appear and click it (sets selectedSkill)
-    await waitFor(() => screen.getByText('Cooking'));
-    const resultBtn = screen.getAllByRole('button').find(
-      (b) => b.textContent?.includes('Cooking') && b.closest('[data-testid="modal-body"]')
-    );
-    if (resultBtn) fireEvent.click(resultBtn);
+    // Results follow the ARIA combobox pattern: select the option itself rather
+    // than looking for a nested button that the component does not render.
+    const resultOption = await screen.findByRole('option', { name: /Cooking/i });
+    fireEvent.mouseDown(resultOption);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /Cooking/i })).not.toBeInTheDocument();
+    });
 
     // Now submit via the modal footer button
     await waitFor(() => {

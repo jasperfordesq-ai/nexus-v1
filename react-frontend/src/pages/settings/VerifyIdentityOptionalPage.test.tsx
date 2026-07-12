@@ -69,6 +69,31 @@ vi.mock('@/contexts', () =>
   })
 );
 
+// VerifyIdentityOptionalPage imports these hooks from their concrete modules,
+// so mirror the barrel mocks at the paths the page actually resolves.
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 1, name: 'Alice' },
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshUser: vi.fn(),
+    status: 'idle' as const,
+    error: null,
+  }),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  }),
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
