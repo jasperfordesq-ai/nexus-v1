@@ -64,6 +64,9 @@ final class EventWaitlistService
         ?string $allocationKey = null,
     ): EventWaitlistTransitionResult {
         $tenantId = $this->tenantId();
+        if (! (bool) app(EventConfigurationService::class)->value('waitlist_enabled', true, $tenantId)) {
+            throw new EventWaitlistException('event_waitlist_tenant_disabled');
+        }
         $pool = $this->capacityPool($capacityPoolKey);
         $allocation = $this->allocationKey($allocationKey);
         $key = $this->idempotencyKey(
@@ -1460,6 +1463,13 @@ final class EventWaitlistService
     public function timedOffersEnabled(): bool
     {
         if (! (bool) config('events.registration.timed_waitlist_offers_enabled', false)) {
+            return false;
+        }
+        if (! (bool) app(EventConfigurationService::class)->value(
+            'timed_waitlist_offers_enabled',
+            false,
+            $this->tenantId(),
+        )) {
             return false;
         }
 

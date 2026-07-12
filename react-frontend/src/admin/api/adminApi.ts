@@ -285,6 +285,71 @@ export interface BulkActionResult {
 // Config (Features & Modules) — V2 API already exists
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface EventConfiguration {
+  creation_role: 'members' | 'staff' | 'admins';
+  moderation_required: boolean;
+  registration_enabled: boolean;
+  default_capacity: number;
+  guest_registration_enabled: boolean;
+  waitlist_enabled: boolean;
+  timed_waitlist_offers_enabled: boolean;
+  recurrence_enabled: boolean;
+  reminders_enabled: boolean;
+  organizer_broadcasts_enabled: boolean;
+  offline_checkin_enabled: boolean;
+  calendar_feeds_enabled: boolean;
+  federation_sharing_enabled: boolean;
+  safety_enforcement_mode: 'off' | 'shadow' | 'enforce' | null;
+  notification_delivery_mode: 'direct' | 'shadow_outbox' | 'outbox_authoritative' | null;
+}
+
+export interface EventConfigurationCapabilities {
+  recurrence_v2: boolean;
+  rolling_recurrence: boolean;
+  recurrence_definition_blueprints: boolean;
+  timed_waitlist_offers: boolean;
+  attendance_credits: boolean;
+  optional_analytics_capture: boolean;
+  registration_forms: boolean;
+  invitation_campaigns: boolean;
+  ticketing: boolean;
+  agenda: boolean;
+  offline_sync: boolean;
+  broadcast_delivery: boolean;
+  safety_evidence: boolean;
+  federation_delivery: boolean;
+  notification_consumer: boolean;
+  notification_delivery: { resolved_mode: string; source: string; global_configuration_valid: boolean; tenant_configuration_valid: boolean | null };
+  safety: { resolved_mode: string; source: string; configuration_valid: boolean; tenant_configuration_valid: boolean | null };
+}
+
+export interface EventConfigurationResponse {
+  config: EventConfiguration;
+  defaults: EventConfiguration;
+  version: number;
+  capabilities: EventConfigurationCapabilities;
+  impact: {
+    active_registrations: number;
+    active_waitlist_entries: number;
+    pending_reminders: number;
+    active_calendar_tokens: number;
+    shared_events: number;
+    scheduled_broadcasts: number;
+  };
+  changes?: Record<string, { from: unknown; to: unknown }>;
+}
+
+export interface EventConfigurationAuditEntry {
+  id: number;
+  action: 'events_configuration_updated' | 'events_configuration_defaults_restored';
+  actor_id: number | null;
+  actor_name: string | null;
+  reason: string | null;
+  version: number;
+  changes: Record<string, { from: unknown; to: unknown }>;
+  created_at: string;
+}
+
 export const adminConfig = {
   get: () =>
     api.get<TenantConfig>('/v2/admin/config'),
@@ -298,6 +363,18 @@ export const adminConfig = {
 
   updateModule: (module: string, enabled: boolean) =>
     api.put<{ success: boolean }>('/v2/admin/config/modules', { module, enabled }),
+
+  getEventConfig: () =>
+    api.get<EventConfigurationResponse>('/v2/admin/config/events'),
+
+  getEventConfigAuditLog: () =>
+    api.get<EventConfigurationAuditEntry[]>('/v2/admin/config/events/audit-log'),
+
+  updateEventConfig: (version: number, settings: EventConfiguration, reason: string, confirmDisruptive = false) =>
+    api.put<EventConfigurationResponse>('/v2/admin/config/events', { version, settings, reason, confirm_disruptive: confirmDisruptive }),
+
+  restoreEventConfigDefaults: (version: number, reason: string, keys?: Array<keyof EventConfiguration>) =>
+    api.post<EventConfigurationResponse>('/v2/admin/config/events/restore-defaults', { version, reason, ...(keys ? { keys } : {}) }),
 
   getCacheStats: () =>
     api.get<CacheStats>('/v2/admin/cache/stats'),

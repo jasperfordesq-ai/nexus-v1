@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Models\Event;
 use App\Services\AuthenticationConfigurationService;
 use App\Services\PrerenderContentInvalidator;
 use App\Services\RedisCache;
@@ -89,6 +90,160 @@ class AdminConfigControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/config');
 
         $response->assertStatus(401);
+    }
+
+    public function test_events_configuration_is_tenant_scoped_versioned_and_audited(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode(['branding' => ['theme' => 'preserved']]),
+        ]);
+
+        $this->apiGet('/v2/admin/config/events')
+            ->assertOk()
+            ->assertJsonPath('data.version', 0)
+            ->assertJsonPath('data.config.creation_role', 'members')
+            ->assertJsonPath('data.config.waitlist_enabled', true)
+            ->assertJsonStructure(['data' => ['capabilities' => ['recurrence_v2', 'notification_delivery', 'safety']]]);
+
+        $this->apiPut('/v2/admin/config/events', [
+            'version' => 0,
+            'reason' => 'Require staff ownership for the pilot.',
+            'settings' => [
+                'creation_role' => 'staff',
+                'default_capacity' => 75,
+                'waitlist_enabled' => false,
+            ],
+        ])->assertOk()
+            ->assertJsonPath('data.version', 1)
+            ->assertJsonPath('data.config.creation_role', 'staff')
+            ->assertJsonPath('data.config.default_capacity', 75)
+            ->assertJsonPath('data.config.waitlist_enabled', false);
+
+        $stored = json_decode((string) DB::table('tenants')->where('id', $this->testTenantId)->value('configuration'), true);
+        self::assertSame('preserved', $stored['branding']['theme']);
+        self::assertSame(1, $stored['events']['config_version']);
+        self::assertSame('staff', $stored['events']['creation_role']);
+
+        $audit = DB::table('org_audit_log')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('action', 'events_configuration_updated')
+            ->latest('id')
+            ->first();
+        self::assertNotNull($audit);
+        self::assertSame($admin->id, (int) $audit->user_id);
+    }
+
+    public function test_events_configuration_rejects_stale_or_unauthorized_updates(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($member);
+        $this->apiGet('/v2/admin/config/events')->assertForbidden();
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode(['events' => ['config_version' => 3]]),
+        ]);
+
+        $this->apiPut('/v2/admin/config/events', [
+            'version' => 2,
+            'reason' => 'Stale browser tab.',
+            'settings' => ['waitlist_enabled' => false],
+        ])->assertUnprocessable();
+    }
+
+    public function test_events_configuration_rejects_unsafe_dependencies(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/config/events', [
+            'version' => 0,
+            'reason' => 'Invalid waitlist combination.',
+            'settings' => [
+                'waitlist_enabled' => false,
+                'timed_waitlist_offers_enabled' => true,
+            ],
+        ])->assertUnprocessable();
+    }
+
+    public function test_events_restore_removes_only_event_overrides_and_exposes_audit_history(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode([
+                'branding' => ['theme' => 'preserved'],
+                'events' => [
+                    'config_version' => 4,
+                    'creation_role' => 'admins',
+                    'default_capacity' => 80,
+                ],
+            ]),
+        ]);
+
+        $this->apiPost('/v2/admin/config/events/restore-defaults', [
+            'version' => 4,
+            'reason' => 'Restore creation policy only.',
+            'keys' => ['creation_role'],
+        ])->assertOk()
+            ->assertJsonPath('data.version', 5)
+            ->assertJsonPath('data.config.creation_role', 'members')
+            ->assertJsonPath('data.config.default_capacity', 80);
+
+        $stored = json_decode((string) DB::table('tenants')->where('id', $this->testTenantId)->value('configuration'), true);
+        self::assertSame('preserved', $stored['branding']['theme']);
+        self::assertArrayNotHasKey('creation_role', $stored['events']);
+        self::assertSame(80, $stored['events']['default_capacity']);
+        self::assertSame(5, $stored['events']['config_version']);
+
+        $this->apiPost('/v2/admin/config/events/restore-defaults', [
+            'version' => 5,
+            'reason' => 'Return all remaining settings to inherited policy.',
+        ])->assertOk()
+            ->assertJsonPath('data.version', 6)
+            ->assertJsonPath('data.config.default_capacity', 0);
+
+        $this->apiGet('/v2/admin/config/events/audit-log')
+            ->assertOk()
+            ->assertJsonPath('data.0.action', 'events_configuration_defaults_restored')
+            ->assertJsonPath('data.0.actor_id', $admin->id)
+            ->assertJsonPath('data.0.reason', 'Return all remaining settings to inherited policy.')
+            ->assertJsonPath('data.0.version', 6);
+
+        $this->apiPost('/v2/admin/config/events/restore-defaults', [
+            'version' => 6,
+            'reason' => 'Idempotent repeat.',
+        ])->assertOk()->assertJsonPath('data.version', 6);
+    }
+
+    public function test_events_configuration_requires_server_side_confirmation_for_live_impact(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Event::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $admin->id,
+            'federated_visibility' => 'listed',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $payload = [
+            'version' => 0,
+            'reason' => 'Pause federation sharing.',
+            'settings' => ['federation_sharing_enabled' => false],
+        ];
+        $this->apiPut('/v2/admin/config/events', $payload)
+            ->assertUnprocessable();
+
+        $this->apiPut('/v2/admin/config/events', [
+            ...$payload,
+            'confirm_disruptive' => true,
+        ])->assertOk()
+            ->assertJsonPath('data.version', 1)
+            ->assertJsonPath('data.config.federation_sharing_enabled', false)
+            ->assertJsonPath('data.impact.shared_events', 0);
+        self::assertSame('none', Event::withoutGlobalScopes()->where('tenant_id', $this->testTenantId)->value('federated_visibility'));
     }
 
     public function test_bulk_volunteering_config_rejects_missing_settings_with_translated_error(): void

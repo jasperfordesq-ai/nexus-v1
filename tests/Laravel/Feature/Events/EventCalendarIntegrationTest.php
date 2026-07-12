@@ -274,6 +274,26 @@ final class EventCalendarIntegrationTest extends TestCase
         $this->get($path)->assertNotFound();
     }
 
+    public function test_tenant_calendar_policy_stops_feeds_but_preserves_token_revocation(): void
+    {
+        $member = $this->user();
+        Sanctum::actingAs($member, ['*']);
+        $created = $this->apiPost('/v2/events/calendar/feed-tokens', ['label' => 'Policy test'])
+            ->assertCreated();
+        $tokenId = (int) $created->json('data.id');
+        $path = (string) parse_url((string) $created->json('data.feed_url'), PHP_URL_PATH);
+
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode(['events' => ['calendar_feeds_enabled' => false]]),
+        ]);
+
+        $this->apiGet('/v2/events/calendar')->assertForbidden();
+        $this->get($path)->assertNotFound();
+        $this->apiGet('/v2/events/calendar/feed-tokens')->assertOk();
+        $this->apiDelete("/v2/events/calendar/feed-tokens/{$tokenId}")->assertOk();
+        self::assertNotNull(DB::table('event_calendar_feed_tokens')->where('id', $tokenId)->value('revoked_at'));
+    }
+
     private function user(array $overrides = []): User
     {
         return User::factory()->forTenant($this->testTenantId)->create(array_merge([

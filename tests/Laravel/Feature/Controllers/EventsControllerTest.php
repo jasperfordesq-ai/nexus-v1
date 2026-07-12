@@ -79,6 +79,17 @@ class EventsControllerTest extends TestCase
         return 10;
     }
 
+    /** @param array<string,mixed> $settings */
+    private function setEventConfig(array $settings): void
+    {
+        $raw = DB::table('tenants')->where('id', $this->testTenantId)->value('configuration');
+        $configuration = is_string($raw) ? (json_decode($raw, true) ?: []) : [];
+        $configuration['events'] = array_merge($configuration['events'] ?? [], $settings);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode($configuration),
+        ]);
+    }
+
     /**
      * Create an event directly in the database for testing.
      */
@@ -351,6 +362,46 @@ class EventsControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
+    }
+
+    public function test_store_enforces_creation_role_and_applies_tenant_default_capacity(): void
+    {
+        $categoryId = $this->seedCategory();
+        $this->setEventConfig(['creation_role' => 'admins', 'default_capacity' => 42]);
+        $payload = [
+            'title' => 'Configured Event',
+            'description' => 'An Event governed by the tenant policy.',
+            'location' => 'Community Hall',
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(14)->addHours(2)->format('Y-m-d H:i:s'),
+            'category_id' => $categoryId,
+        ];
+
+        $this->authenticatedUser();
+        $this->apiPost('/v2/events', $payload)->assertForbidden();
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['status' => 'active']);
+        Sanctum::actingAs($admin, ['*']);
+        $response = $this->apiPost('/v2/events', $payload)->assertCreated();
+        $eventId = (int) $response->json('data.id');
+        self::assertSame(42, (int) DB::table('events')->where('id', $eventId)->value('max_attendees'));
+    }
+
+    public function test_waitlist_and_recurrence_tenant_kill_switches_fail_closed(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = $this->createEvent($user->id, ['max_attendees' => 1]);
+        $this->setEventConfig(['waitlist_enabled' => false, 'recurrence_enabled' => false]);
+
+        $this->apiPost("/v2/events/{$eventId}/waitlist", [])->assertForbidden();
+        $this->apiPost('/v2/events/recurring', [
+            'title' => 'Blocked series',
+            'description' => 'Recurring Events are disabled.',
+            'location' => 'Community Hall',
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(14)->addHour()->format('Y-m-d H:i:s'),
+            'recurrence_frequency' => 'weekly',
+        ])->assertForbidden();
     }
 
     // ================================================================

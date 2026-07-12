@@ -5,6 +5,25 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'events_config_settings_required' => 'Provide at least one Events setting.',
+    'events_config_version_required' => 'A valid Events configuration version is required.',
+    'events_config_reason_required' => 'Explain why this Events configuration is changing.',
+    'events_config_stale' => 'These Events settings changed after you opened the page. Reload and review them before saving.',
+    'events_config_no_changes' => 'No Events settings changed.',
+    'events_config_unknown_key' => 'One or more Events settings are not supported.',
+    'events_config_boolean_required' => 'This Events setting must be on or off.',
+    'events_config_capacity_invalid' => 'Capacity must be a whole number between 0 and 100,000.',
+    'events_config_choice_invalid' => 'Choose a supported Events setting value.',
+    'events_config_registration_dependency' => 'Required registration cannot be enabled while Event registration is disabled.',
+    'events_config_waitlist_dependency' => 'Timed waitlist offers require waitlists to be enabled.',
+    'events_config_platform_unavailable' => 'This Event capability is not enabled by the platform.',
+    'events_config_notification_consumer_required' => 'Authoritative outbox delivery requires the Event notification consumer to be enabled.',
+    'events_config_impact_confirmation_required' => 'Confirm that you reviewed the active Event records affected by this change.',
+    'events_creation_not_allowed' => 'Your community only allows authorized staff to create Events.',
+    'events_waitlist_disabled' => 'Event waitlists are disabled for this community.',
+    'events_registration_disabled' => 'Event registration is disabled for this community.',
+    'events_guests_disabled' => 'Guest registration is disabled for this community.',
+    'events_recurrence_disabled' => 'Recurring Events are disabled for this community.',
     // ============================================
     // AUTHENTICATION & AUTHORIZATION
     // ============================================

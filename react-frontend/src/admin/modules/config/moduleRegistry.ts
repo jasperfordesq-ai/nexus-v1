@@ -259,11 +259,8 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     icon: Calendar,
     type: 'feature',
     configSource: 'tenant_features',
-    configOptions: [
-      { key: 'events.require_rsvp', label: 'Require RSVP', description: 'Members must RSVP to attend events', type: 'boolean', defaultValue: false, category: 'Attendance', comingSoon: true },
-      { key: 'events.max_attendees', label: 'Default Max Attendees', description: 'Default maximum attendees per event (0 = unlimited)', type: 'number', defaultValue: 0, category: 'Limits', comingSoon: true, min: 0, max: 10000 },
-      { key: 'events.allow_recurring', label: 'Allow Recurring Events', description: 'Allow organizers to create recurring event series', type: 'boolean', defaultValue: true, category: 'Features', comingSoon: true },
-    ],
+    configOptions: [],
+    detailPageUrl: '/admin/events/settings',
   },
   {
     id: 'groups',

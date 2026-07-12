@@ -305,6 +305,13 @@ final class EventRegistrationSettingsService
         if ($guestsEnabled === null) {
             throw new EventRegistrationFoundationException('event_registration_guests_enabled_invalid');
         }
+        if ($guestsEnabled && ! (bool) app(EventConfigurationService::class)->value(
+            'guest_registration_enabled',
+            true,
+            (int) $event->tenant_id,
+        )) {
+            throw new EventRegistrationFoundationException('event_registration_guests_tenant_disabled');
+        }
         $maxGuests = $this->boundedInt(
             $value('max_guests_per_registration', $current?->max_guests_per_registration ?? 0),
             0,

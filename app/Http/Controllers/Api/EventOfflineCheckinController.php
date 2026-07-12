@@ -14,6 +14,7 @@ use App\Exceptions\EventOfflineCheckinException;
 use App\Models\EventCheckinCredential;
 use App\Models\User;
 use App\Services\EventAttendanceService;
+use App\Services\EventConfigurationService;
 use App\Services\EventCheckinCredentialService;
 use App\Services\EventCheckinDeviceService;
 use App\Services\EventCheckinManifestService;
@@ -161,7 +162,7 @@ final class EventOfflineCheckinController extends BaseApiController
     public function revokeCredential(int $id, int $credentialId): JsonResponse
     {
         try {
-            $actor = $this->actor();
+            $actor = $this->actor(true);
             $credential = $this->credentials->revoke(
                 $id,
                 $credentialId,
@@ -253,7 +254,7 @@ final class EventOfflineCheckinController extends BaseApiController
     public function revokeDevice(int $id, int $deviceId): JsonResponse
     {
         try {
-            $actor = $this->actor();
+            $actor = $this->actor(true);
             $device = $this->devices->revoke(
                 $id,
                 $deviceId,
@@ -435,9 +436,16 @@ final class EventOfflineCheckinController extends BaseApiController
         }
     }
 
-    private function actor(): User
+    private function actor(bool $allowRevocation = false): User
     {
         $tenantId = TenantContext::currentId();
+        if ($tenantId === null || (! $allowRevocation && ! (bool) app(EventConfigurationService::class)->value(
+            'offline_checkin_enabled',
+            true,
+            $tenantId,
+        ))) {
+            throw new EventOfflineCheckinException('event_checkin_feature_disabled');
+        }
         $actor = $tenantId !== null
             ? User::withoutGlobalScopes()
                 ->where('tenant_id', $tenantId)
@@ -586,6 +594,7 @@ final class EventOfflineCheckinController extends BaseApiController
             ],
             str_contains($exception->reasonCode, 'authorization')
                 || str_contains($exception->reasonCode, 'forbidden')
+                || str_contains($exception->reasonCode, 'feature_disabled')
                 || str_contains($exception->reasonCode, 'actor_invalid')
                 || str_contains($exception->reasonCode, 'actor_mismatch') => [
                     'EVENT_CHECKIN_FORBIDDEN', 403,

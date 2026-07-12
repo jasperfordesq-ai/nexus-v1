@@ -219,6 +219,12 @@ class EventReminderService
 
                 return 0;
             }
+            if (! (bool) TenantContext::getSetting('events.reminders_enabled', true)) {
+                Log::info('[EventReminderService] Event reminders skipped by tenant policy', [
+                    'tenant_id' => $tenantId,
+                ]);
+                return 0;
+            }
 
             $sent = 0;
 
@@ -242,6 +248,9 @@ class EventReminderService
     {
         return (int) TenantContext::runForTenant($tenantId, function () use ($tenantId, $eventId): int {
             if (!TenantContext::hasFeature('events')) {
+                return 0;
+            }
+            if (! (bool) TenantContext::getSetting('events.reminders_enabled', true)) {
                 return 0;
             }
 

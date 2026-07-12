@@ -13,6 +13,7 @@ use App\Exceptions\EventBroadcastException;
 use App\Models\Event;
 use App\Models\User;
 use App\Policies\EventPolicy;
+use App\Services\EventConfigurationService;
 use Illuminate\Support\Facades\Schema;
 use Throwable;
 
@@ -88,6 +89,17 @@ final class EventBroadcastFoundationSupport
         }
 
         return $tenantId;
+    }
+
+    public function assertCreationEnabled(int $tenantId): void
+    {
+        if (! (bool) app(EventConfigurationService::class)->value(
+            'organizer_broadcasts_enabled',
+            true,
+            $tenantId,
+        )) {
+            throw new EventBroadcastException('event_broadcast_feature_disabled');
+        }
     }
 
     public function event(int $tenantId, int $eventId, bool $lock = false): Event

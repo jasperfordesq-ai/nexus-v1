@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Exceptions\EventRegistrationFoundationException;
 use App\Models\User;
 use App\Services\EventInvitationCampaignService;
+use App\Services\EventConfigurationService;
 use App\Services\EventInvitationService;
 use App\Services\EventRegistrationFormService;
 use App\Services\EventRegistrationGuestAttendanceService;
@@ -41,6 +42,7 @@ final class EventRegistrationProductController extends BaseApiController
         private readonly EventRegistrationGuestService $guests,
         private readonly EventRegistrationGuestAttendanceService $guestAttendance,
         private readonly EventRegistrationRetentionService $retention,
+        private readonly EventConfigurationService $eventConfiguration,
     ) {
     }
 
@@ -480,6 +482,9 @@ final class EventRegistrationProductController extends BaseApiController
 
     public function captureGuest(int $id, int $registrationId): JsonResponse
     {
+        if (! (bool) $this->eventConfiguration->value('guest_registration_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
         $revision = $this->positiveInteger(request()->input('expected_registration_version'));
         $ticketInput = request()->input('ticket_entitlement_id');
         $ticketEntitlementId = $ticketInput === null || $ticketInput === ''
@@ -714,6 +719,14 @@ final class EventRegistrationProductController extends BaseApiController
     private function productError(EventRegistrationFoundationException $exception): JsonResponse
     {
         $reason = $exception->getMessage();
+        if ($reason === 'event_registration_guests_tenant_disabled') {
+            return $this->respondWithError(
+                'EVENT_REGISTRATION_GUESTS_DISABLED',
+                __('api.events_guests_disabled'),
+                'guests_enabled',
+                403,
+            );
+        }
         if (str_contains($reason, 'not_found') || $reason === 'event_invitation_invalid') {
             return $this->respondWithError('EVENT_REGISTRATION_NOT_FOUND', __('api.event_not_found'), null, 404);
         }

@@ -49,6 +49,7 @@ final class EventBroadcastService
     ): array {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
+        $this->support->assertCreationEnabled($tenantId);
         $event = $this->support->event($tenantId, $eventId);
         $persistedActor = $this->support->actor($tenantId, $actor);
         $this->support->authorize($persistedActor, $event);
@@ -86,6 +87,7 @@ final class EventBroadcastService
     ): array {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
+        $this->support->assertCreationEnabled($tenantId);
         $normalizedVariant = $this->variant($variant);
         $normalizedSegments = $this->segments($segments, $normalizedVariant);
         $normalizedChannels = $this->channels($channels);
@@ -204,6 +206,7 @@ final class EventBroadcastService
     ): array {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
+        $this->support->assertCreationEnabled($tenantId);
         $normalizedVariant = $this->variant($variant);
         $normalizedSegments = $this->segments($segments, $normalizedVariant);
         $normalizedChannels = $this->channels($channels);
@@ -308,6 +311,7 @@ final class EventBroadcastService
     ): array {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
+        $this->support->assertCreationEnabled($tenantId);
         $requestedSchedule = $scheduledAt === null
             ? null
             : CarbonImmutable::instance($scheduledAt)->utc();
@@ -549,6 +553,7 @@ final class EventBroadcastService
     ): array {
         $this->support->assertSchema();
         $tenantId = $this->support->tenantId();
+        $this->support->assertCreationEnabled($tenantId);
         $keyHash = $this->support->idempotencyHash($idempotencyKey);
 
         return DB::transaction(function () use (

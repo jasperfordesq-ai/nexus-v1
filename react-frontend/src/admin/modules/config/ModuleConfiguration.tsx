@@ -16,6 +16,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Construction from 'lucide-react/icons/construction';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
@@ -48,7 +49,8 @@ export default function ModuleConfiguration() {
   const { t } = useTranslation('admin_config');
   usePageTitle(t('config.module_configuration_title'));
   const toast = useToast();
-  const { refreshTenant } = useTenant();
+  const { refreshTenant, tenantPath } = useTenant();
+  const navigate = useNavigate();
 
   const [config, setConfig] = useState<TenantConfig | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,14 @@ export default function ModuleConfiguration() {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [selectedModule, setSelectedModule] = useState<ModuleDefinition | null>(null);
   const [pendingPasskeyDisable, setPendingPasskeyDisable] = useState(false);
+
+  const handleConfigure = useCallback((module: ModuleDefinition) => {
+    if (module.detailPageUrl) {
+      navigate(tenantPath(module.detailPageUrl));
+      return;
+    }
+    setSelectedModule(module);
+  }, [navigate, tenantPath]);
 
   const coreModules = getCoreModules();
   const featureModules = getFeatureModules();
@@ -283,7 +293,7 @@ export default function ModuleConfiguration() {
                 module={mod}
                 enabled={isModuleEnabled(mod.id, true)}
                 onToggle={handleToggle}
-                onConfigure={setSelectedModule}
+                onConfigure={handleConfigure}
                 toggling={toggling === mod.id}
               />
             ))}
@@ -302,7 +312,7 @@ export default function ModuleConfiguration() {
                 module={mod}
                 enabled={isModuleEnabled(mod.id, false)}
                 onToggle={handleToggle}
-                onConfigure={setSelectedModule}
+                onConfigure={handleConfigure}
                 toggling={toggling === mod.id}
               />
             ))}

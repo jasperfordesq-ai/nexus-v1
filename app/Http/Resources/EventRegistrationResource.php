@@ -14,6 +14,7 @@ use App\Models\Event;
 use App\Models\EventRegistration;
 use App\Models\EventWaitlistEntry;
 use App\Models\User;
+use App\Services\EventConfigurationService;
 use App\Support\Events\EventContractMapper;
 use App\Support\Events\EventRegistrationAvailability;
 use App\Support\Events\EventRegistrationCompatibility;
@@ -70,6 +71,17 @@ final class EventRegistrationResource
             || ($capacity['remaining'] !== null && $capacity['remaining'] > 0);
         $finiteCapacityFull = $capacity['limit'] !== null && $capacity['is_full'];
         $registrable = EventRegistrationAvailability::isRegistrable($event);
+        $tenantId = (int) $event->getAttribute('tenant_id');
+        $registrationEnabled = (bool) app(EventConfigurationService::class)->value(
+            'registration_enabled',
+            true,
+            $tenantId,
+        );
+        $waitlistEnabled = (bool) app(EventConfigurationService::class)->value(
+            'waitlist_enabled',
+            true,
+            $tenantId,
+        );
 
         return [
             'contract_version' => 1,
@@ -115,8 +127,9 @@ final class EventRegistrationResource
             ],
             'capacity' => $capacity,
             'actions' => [
-                'registrable' => $registrable,
+                'registrable' => $registrable && $registrationEnabled,
                 'confirm' => $registrable
+                    && $registrationEnabled
                     && $registrationState !== EventCapacityRegistrationState::Confirmed
                     && ! $offerActive
                     && $capacityAvailable,
@@ -126,6 +139,8 @@ final class EventRegistrationResource
                     EventCapacityRegistrationState::Confirmed,
                 ], true),
                 'join_waitlist' => $registrable
+                    && $registrationEnabled
+                    && $waitlistEnabled
                     && $registrationState !== EventCapacityRegistrationState::Confirmed
                     && ! in_array($waitlistState, [
                         EventWaitlistQueueState::Waiting,

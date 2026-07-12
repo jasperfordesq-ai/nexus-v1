@@ -21,6 +21,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Policies\EventPolicy;
 use App\Services\EventAttendanceService;
+use App\Services\EventConfigurationService;
 use App\Services\EventNotificationDeliveryModeResolver;
 use App\Services\EventRegistrationService;
 use App\Services\EventService;
@@ -58,6 +59,7 @@ class EventsController extends BaseApiController
         private readonly EventReminderPreferenceService $eventReminderPreferences,
         private readonly EventReminderScheduleService $eventReminderSchedules,
         private readonly EventPublicationWorkflowService $eventPublicationWorkflow,
+        private readonly EventConfigurationService $eventConfiguration,
     ) {}
 
     private function eventContractVersion(): int
@@ -843,7 +845,18 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_create', 10, 60);
 
+        $tenantId = (int) TenantContext::getId();
+        if (! $this->eventConfiguration->canCreate($tenantId, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.events_creation_not_allowed'), null, 403);
+        }
+
         $data = $this->getAllInput();
+        if (! array_key_exists('max_attendees', $data)) {
+            $defaultCapacity = (int) $this->eventConfiguration->value('default_capacity', 0, $tenantId);
+            if ($defaultCapacity > 0) {
+                $data['max_attendees'] = $defaultCapacity;
+            }
+        }
 
         $pollIds = [];
         if (array_key_exists('poll_ids', $data)) {
@@ -1148,6 +1161,10 @@ class EventsController extends BaseApiController
                 'field' => 'status',
             ]], 422);
         }
+        if ($status === 'going'
+            && ! (bool) $this->eventConfiguration->value('registration_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
 
         $event = $this->eventService->getById($id, $userId);
         if ($event === null) {
@@ -1183,6 +1200,9 @@ class EventsController extends BaseApiController
                 } catch (EventRegistrationException $exception) {
                     if ($exception->reasonCode !== 'event_registration_capacity_full') {
                         throw $exception;
+                    }
+                    if (! (bool) $this->eventConfiguration->value('waitlist_enabled', true)) {
+                        return $this->respondWithError('EVENT_FULL', __('api.invalid_input'), null, 409);
                     }
                     $waitlisted = $this->eventWaitlistService->joinCompatibility(
                         $id,
@@ -1507,6 +1527,10 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_waitlist', 30, 60);
 
+        if (! (bool) $this->eventConfiguration->value('waitlist_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.events_waitlist_disabled'), null, 403);
+        }
+
         $event = $this->eventService->getById($id, $userId);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
@@ -1589,6 +1613,10 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
+        if (! (bool) $this->eventConfiguration->value('reminders_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
+
         if ($this->eventService->getById($id, $userId) === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
@@ -1606,6 +1634,10 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
         $this->rateLimit('events_reminders', 20, 60);
+
+        if (! (bool) $this->eventConfiguration->value('reminders_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
 
         if ($this->eventService->getById($id, $userId) === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
@@ -1646,6 +1678,9 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
         $this->rateLimit('events_reminders', 20, 60);
+        if (! (bool) $this->eventConfiguration->value('reminders_enabled', true)) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+        }
         if ($this->eventService->getById($id, $userId) === null) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
@@ -2056,7 +2091,21 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_create', 5, 60);
 
+        $tenantId = (int) TenantContext::getId();
+        if (! $this->eventConfiguration->canCreate($tenantId, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.events_creation_not_allowed'), null, 403);
+        }
+        if (! (bool) $this->eventConfiguration->value('recurrence_enabled', true, $tenantId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.events_recurrence_disabled'), null, 403);
+        }
+
         $data = $this->getAllInput();
+        if (! array_key_exists('max_attendees', $data)) {
+            $defaultCapacity = (int) $this->eventConfiguration->value('default_capacity', 0, $tenantId);
+            if ($defaultCapacity > 0) {
+                $data['max_attendees'] = $defaultCapacity;
+            }
+        }
 
         $result = $this->eventService->createRecurring($userId, $data);
 

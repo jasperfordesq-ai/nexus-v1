@@ -174,6 +174,39 @@ final class EventRegistrationControllerTest extends TestCase
             ->count());
     }
 
+    public function test_tenant_registration_and_waitlist_policies_hide_and_block_canonical_actions(): void
+    {
+        $organizer = $this->member('Policy Organizer');
+        $member = $this->member('Policy Member');
+        $eventId = $this->event((int) $organizer->id, 1);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode([
+                'events' => [
+                    'registration_enabled' => false,
+                    'waitlist_enabled' => false,
+                ],
+            ]),
+        ]);
+        Sanctum::actingAs($member, ['*']);
+
+        $this->apiGet("/v2/events/{$eventId}/relationship")
+            ->assertOk()
+            ->assertJsonPath('data.actions.confirm', false)
+            ->assertJsonPath('data.actions.join_waitlist', false);
+
+        $this->apiPost(
+            "/v2/events/{$eventId}/registration/confirm",
+            [],
+            ['Idempotency-Key' => 'tenant-registration-disabled'],
+        )->assertForbidden()->assertJsonPath('errors.0.code', 'EVENT_REGISTRATION_DISABLED');
+
+        $this->apiPost(
+            "/v2/events/{$eventId}/registration/waitlist",
+            [],
+            ['Idempotency-Key' => 'tenant-waitlist-disabled'],
+        )->assertForbidden()->assertJsonPath('errors.0.code', 'EVENT_WAITLIST_DISABLED');
+    }
+
     public function test_relationship_capacity_reserves_live_offers_and_deduplicates_corrupt_overlap(): void
     {
         $organizer = $this->member('Capacity Read Organizer');

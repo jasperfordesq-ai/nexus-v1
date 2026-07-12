@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Http\Middleware\RedactEventCalendarFeedSecret;
 use App\I18n\LocaleContext;
 use App\Models\User;
+use App\Services\EventConfigurationService;
 use App\Services\EventCalendarService;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -98,7 +99,7 @@ final class EventCalendarController extends BaseApiController
     public function tokens(): JsonResponse
     {
         return $this->sensitiveJson($this->respondWithData(
-            $this->calendars->listFeedTokens($this->actor()),
+            $this->calendars->listFeedTokens($this->actor(true)),
             ['secrets_returned' => false],
         ));
     }
@@ -148,7 +149,7 @@ final class EventCalendarController extends BaseApiController
 
     public function revokeToken(int $tokenId): JsonResponse
     {
-        if (! $this->calendars->revokeFeedToken($this->actor(), $tokenId)) {
+        if (! $this->calendars->revokeFeedToken($this->actor(true), $tokenId)) {
             return $this->respondNotFound(
                 __('event_calendar.token_not_found'),
                 'EVENT_CALENDAR_TOKEN_NOT_FOUND',
@@ -178,6 +179,13 @@ final class EventCalendarController extends BaseApiController
             function () use ($resolved): Response|JsonResponse {
                 try {
                     if (! TenantContext::hasFeature('events')) {
+                        return $this->feedNotFound();
+                    }
+                    if (! (bool) app(EventConfigurationService::class)->value(
+                        'calendar_feeds_enabled',
+                        true,
+                        (int) $resolved['tenant']->getKey(),
+                    )) {
                         return $this->feedNotFound();
                     }
                 } catch (Throwable) {
@@ -259,9 +267,16 @@ final class EventCalendarController extends BaseApiController
         return [$from, $until, $timezone];
     }
 
-    private function actor(): User
+    private function actor(bool $allowManagementExit = false): User
     {
         $tenantId = TenantContext::currentId();
+        abort_unless(
+            $tenantId !== null
+                && ($allowManagementExit
+                    || (bool) app(EventConfigurationService::class)->value('calendar_feeds_enabled', true, $tenantId)),
+            403,
+            __('api.forbidden'),
+        );
         $user = $tenantId === null
             ? null
             : User::withoutGlobalScopes()

@@ -632,6 +632,7 @@ final class EventNotificationOutboxProcessorTest extends TestCase
         $waitlist->join($eventId, (int) $waiter->id, $waiter, 'superseded-waiter');
         $registrations->withdraw($eventId, (int) $holder->id, $holder, 'superseded-release');
         Config::set('events.registration.timed_waitlist_offers_enabled', true);
+        $this->enableTenantTimedWaitlistOffers();
         $offer = $waitlist->offerNext($eventId, $organizer, 'superseded-offer');
         $this->assertNotNull($offer);
         $offeredOutboxId = (int) $offer->outboxId;
@@ -727,6 +728,7 @@ final class EventNotificationOutboxProcessorTest extends TestCase
         $waitlist->join($eventId, (int) $waiter->id, $waiter, 'processor-waiter');
         $registrations->withdraw($eventId, (int) $holder->id, $holder, 'processor-release');
         Config::set('events.registration.timed_waitlist_offers_enabled', true);
+        $this->enableTenantTimedWaitlistOffers();
         $offer = $waitlist->offerNext($eventId, $organizer, 'processor-offer');
         $this->assertNotNull($offer);
         $token = (string) $offer->offerToken;
@@ -871,5 +873,17 @@ final class EventNotificationOutboxProcessorTest extends TestCase
             ],
             EventNotificationDeliveryMode::OutboxAuthoritative,
         );
+    }
+
+    private function enableTenantTimedWaitlistOffers(): void
+    {
+        $raw = DB::table('tenants')->where('id', $this->testTenantId)->value('configuration');
+        $configuration = is_string($raw) ? (json_decode($raw, true) ?: []) : [];
+        $events = is_array($configuration['events'] ?? null) ? $configuration['events'] : [];
+        $events['timed_waitlist_offers_enabled'] = true;
+        $configuration['events'] = $events;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'configuration' => json_encode($configuration, JSON_THROW_ON_ERROR),
+        ]);
     }
 }

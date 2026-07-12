@@ -1427,9 +1427,15 @@ class EventService
             'cover_image' => array_key_exists('cover_image', $input)
                 ? $input['cover_image']
                 : ($event !== null ? $existing($event, 'cover_image') : null),
-            'federated_visibility' => array_key_exists('federated_visibility', $input)
-                ? $input['federated_visibility']
-                : ($event !== null ? $existing($event, 'federated_visibility') : 'none'),
+            'federated_visibility' => (bool) app(EventConfigurationService::class)->value(
+                'federation_sharing_enabled',
+                false,
+                $tenantId,
+            )
+                ? (array_key_exists('federated_visibility', $input)
+                    ? $input['federated_visibility']
+                    : ($event !== null ? $existing($event, 'federated_visibility') : 'none'))
+                : 'none',
             'timezone' => $timezone,
             'all_day' => array_key_exists('all_day', $input)
                 ? $input['all_day']
@@ -2256,9 +2262,11 @@ class EventService
         $policyAbilities = $viewer === null
             ? []
             : $eventPolicy->abilitiesForEvents($viewer, $eventModels->values());
-        $moderationSettings = ContentModerationService::getModerationSettings($tenantId);
-        $eventModerationRequired = ($moderationSettings['enabled'] ?? false) === true
-            && ($moderationSettings['require_event'] ?? false) === true;
+        $eventModerationRequired = (bool) app(EventConfigurationService::class)->value(
+            'moderation_required',
+            false,
+            $tenantId,
+        );
         $viewerIsTenantAdmin = self::isTenantAdmin($viewerId, $tenantId);
         $rsvpMap = $viewerId !== null ? self::getUserRsvpsBatch($eventIds, $viewerId) : [];
 
@@ -2552,6 +2560,16 @@ class EventService
             }
         }
 
+        $registrationEnabled = (bool) app(EventConfigurationService::class)->value(
+            'registration_enabled',
+            true,
+            $tenantId,
+        );
+        $waitlistEnabled = (bool) app(EventConfigurationService::class)->value(
+            'waitlist_enabled',
+            true,
+            $tenantId,
+        );
         $facts = [];
         foreach ($eventsById as $eventId => $event) {
             $rawLegacyStatus = $rsvpMap[$eventId]
@@ -2702,9 +2720,9 @@ class EventService
                 'can_message_organizer' => false,
                 'allowed_actions' => [
                     'set_interest' => $canParticipate,
-                    'register' => $canParticipate && ! $hasRegistration && ! $isFull && ! $activeWaitlist,
+                    'register' => $registrationEnabled && $canParticipate && ! $hasRegistration && ! $isFull && ! $activeWaitlist,
                     'withdraw' => $canWithdraw,
-                    'join_waitlist' => $canParticipate && $isFull && ! $hasRegistration && ! $activeWaitlist,
+                    'join_waitlist' => $registrationEnabled && $waitlistEnabled && $canParticipate && $isFull && ! $hasRegistration && ! $activeWaitlist,
                     // Exit-only actions remain available if the event later
                     // stops accepting registrations.
                     'leave_waitlist' => $activeWaitlist,

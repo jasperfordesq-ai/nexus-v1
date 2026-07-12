@@ -1686,6 +1686,10 @@ Route::delete('/v2/admin/invite-codes/{id}', [\App\Http\Controllers\Api\Registra
 Route::get('/v2/admin/registration/breaker', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getBreakerStatus']);
 Route::post('/v2/admin/registration/resume-signups', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'resumeSignups']);
 Route::get('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'getGroupConfig']);
+Route::get('/v2/admin/config/events', [\App\Http\Controllers\Api\AdminConfigController::class, 'getEventConfig']);
+Route::get('/v2/admin/config/events/audit-log', [\App\Http\Controllers\Api\AdminConfigController::class, 'getEventConfigAuditLog']);
+Route::put('/v2/admin/config/events', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateEventConfig']);
+Route::post('/v2/admin/config/events/restore-defaults', [\App\Http\Controllers\Api\AdminConfigController::class, 'restoreEventConfigDefaults']);
 Route::put('/v2/admin/config/groups', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfig']);
 Route::put('/v2/admin/config/groups/bulk', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateGroupConfigBulk']);
 Route::get('/v2/admin/config/listings', [\App\Http\Controllers\Api\AdminConfigController::class, 'getListingConfig']);

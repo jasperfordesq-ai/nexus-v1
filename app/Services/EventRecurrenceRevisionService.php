@@ -354,7 +354,12 @@ final class EventRecurrenceRevisionService
                     $event->getRawOriginal('end_time'),
                 );
 
-                if ((string) $event->getAttribute('federated_visibility') !== 'none'
+                if ((bool) app(EventConfigurationService::class)->value(
+                        'federation_sharing_enabled',
+                        true,
+                        $tenantId,
+                    )
+                    && (string) $event->getAttribute('federated_visibility') !== 'none'
                     && Schema::hasTable('event_federation_deliveries')
                     && Schema::hasTable('federation_external_partners')) {
                     app(EventFederationPublisher::class)->publish($event);

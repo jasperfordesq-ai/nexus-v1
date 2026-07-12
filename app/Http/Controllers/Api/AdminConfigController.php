@@ -11,6 +11,7 @@ use App\Services\Auth\AuthenticationMethodGuard;
 use App\Services\AuditLogService;
 use App\Services\FederationFeatureService;
 use App\Services\FeedRankingService;
+use App\Services\EventConfigurationService;
 use App\Services\GroupConfigurationService;
 use App\Services\JobConfigurationService;
 use App\Services\ListingConfigurationService;
@@ -51,6 +52,7 @@ class AdminConfigController extends BaseApiController
         private readonly MemberRankingService $memberRankingService,
         private readonly SearchService $searchService,
         private readonly TenantSettingsService $tenantSettingsService,
+        private readonly EventConfigurationService $eventConfigurationService,
     ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -2635,6 +2637,127 @@ class AdminConfigController extends BaseApiController
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    // =========================================================================
+    // Events Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/events */
+    public function getEventConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData(
+            $this->eventConfigurationService->inspect($this->getTenantId()),
+        );
+    }
+
+    /** GET /api/v2/admin/config/events/audit-log */
+    public function getEventConfigAuditLog(): JsonResponse
+    {
+        $this->requireAdmin();
+        $entries = DB::table('org_audit_log as audit')
+            ->leftJoin('users as actor', function ($join): void {
+                $join->on('actor.id', '=', 'audit.user_id')
+                    ->on('actor.tenant_id', '=', 'audit.tenant_id');
+            })
+            ->where('audit.tenant_id', $this->getTenantId())
+            ->whereIn('audit.action', [
+                'events_configuration_updated',
+                'events_configuration_defaults_restored',
+            ])
+            ->orderByDesc('audit.id')
+            ->limit(50)
+            ->get([
+                'audit.id',
+                'audit.action',
+                'audit.details',
+                'audit.created_at',
+                'audit.user_id',
+                'actor.name as actor_name',
+            ])
+            ->map(static function (object $entry): array {
+                $details = is_string($entry->details) ? json_decode($entry->details, true) : null;
+                return [
+                    'id' => (int) $entry->id,
+                    'action' => (string) $entry->action,
+                    'actor_id' => $entry->user_id === null ? null : (int) $entry->user_id,
+                    'actor_name' => is_string($entry->actor_name) ? $entry->actor_name : null,
+                    'reason' => is_array($details) && is_string($details['reason'] ?? null)
+                        ? $details['reason']
+                        : null,
+                    'version' => is_array($details) ? (int) ($details['version'] ?? 0) : 0,
+                    'changes' => is_array($details) && is_array($details['changes'] ?? null)
+                        ? $details['changes']
+                        : [],
+                    'created_at' => (string) $entry->created_at,
+                ];
+            })
+            ->all();
+
+        return $this->respondWithData($entries);
+    }
+
+    /** PUT /api/v2/admin/config/events */
+    public function updateEventConfig(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $settings = $this->input('settings');
+        $version = $this->input('version');
+        $reason = $this->input('reason');
+
+        if (! is_array($settings) || $settings === []) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_settings_required'), 'settings', 422);
+        }
+        if (! is_int($version) && ! (is_string($version) && ctype_digit($version))) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_version_required'), 'version', 422);
+        }
+        if (! is_string($reason) || trim($reason) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_reason_required'), 'reason', 422);
+        }
+        $result = $this->eventConfigurationService->update(
+            $this->getTenantId(),
+            $adminId,
+            (int) $version,
+            $settings,
+            $reason,
+            $this->input('confirm_disruptive') === true,
+        );
+        $this->redisCache->delete('tenant_bootstrap', $this->getTenantId());
+
+        return $this->respondWithData($result);
+    }
+
+    /** POST /api/v2/admin/config/events/restore-defaults */
+    public function restoreEventConfigDefaults(): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $version = $this->input('version');
+        $reason = $this->input('reason');
+        $keys = $this->input('keys');
+        if (! is_int($version) && ! (is_string($version) && ctype_digit($version))) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_version_required'), 'version', 422);
+        }
+        if (! is_string($reason) || trim($reason) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_reason_required'), 'reason', 422);
+        }
+        if ($keys !== null && (! is_array($keys)
+            || $keys === []
+            || array_filter($keys, static fn (mixed $key): bool => ! is_string($key)) !== [])) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.events_config_unknown_key'), 'keys', 422);
+        }
+
+        $result = $this->eventConfigurationService->restoreDefaults(
+            $this->getTenantId(),
+            $adminId,
+            (int) $version,
+            $reason,
+            $keys === null ? null : array_values($keys),
+        );
+        $this->redisCache->delete('tenant_bootstrap', $this->getTenantId());
+
+        return $this->respondWithData($result);
     }
 
     // =========================================================================

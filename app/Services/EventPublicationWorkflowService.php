@@ -47,10 +47,11 @@ final class EventPublicationWorkflowService
             throw new EventLifecycleTransitionException('event_lifecycle_tenant_context_missing');
         }
 
-        $settings = ContentModerationService::getModerationSettings($tenantId);
-
-        return ($settings['enabled'] ?? false) === true
-            && ($settings['require_event'] ?? false) === true;
+        return (bool) app(EventConfigurationService::class)->value(
+            'moderation_required',
+            false,
+            $tenantId,
+        );
     }
 
     /** @return array{result:EventLifecycleTransitionResult,series:array<string,mixed>,action:string,target_state:string} */

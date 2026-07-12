@@ -81,14 +81,14 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
                   ? t('config.option_count', { count: liveCount })
                   : t('config.planned_count', { count: optionCount })}
               </Chip>
-            ) : (
+            ) : !module.detailPageUrl ? (
               <Chip size="sm" variant="soft">{t('config.no_options')}</Chip>
-            )}
+            ) : null}
             {module.type === 'core' && (
               <Chip size="sm" variant="soft">{t('config.core')}</Chip>
             )}
           </div>
-          {optionCount > 0 && (
+          {(optionCount > 0 || module.detailPageUrl) && (
             <Button
               size="sm"
               variant="tertiary"

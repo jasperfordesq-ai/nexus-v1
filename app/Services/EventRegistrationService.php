@@ -63,6 +63,13 @@ final class EventRegistrationService
         ?int $expectedVersion = null,
     ): EventRegistrationTransitionResult {
         $tenantId = $this->tenantId();
+        if (in_array($target, [
+            EventCapacityRegistrationState::Invited,
+            EventCapacityRegistrationState::Pending,
+            EventCapacityRegistrationState::Confirmed,
+        ], true) && ! (bool) app(EventConfigurationService::class)->value('registration_enabled', true, $tenantId)) {
+            throw new EventRegistrationException('event_registration_tenant_disabled');
+        }
         $pool = $this->capacityPool($capacityPoolKey);
         $allocation = $this->allocationKey($allocationKey);
         $key = $this->idempotencyKey(

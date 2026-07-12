@@ -233,6 +233,13 @@ class EventRecurrenceOccurrenceWriter
                 array_intersect_key($resolved, $rootAttributes),
             );
         }
+        if (! (bool) app(EventConfigurationService::class)->value(
+            'federation_sharing_enabled',
+            true,
+            $tenantId,
+        )) {
+            $rootAttributes['federated_visibility'] = 'none';
+        }
 
         $now = now();
         return array_merge($rootAttributes, [

@@ -1513,6 +1513,9 @@ final class EventNotificationOutboxActionHandler implements EventNotificationOut
         int $ruleId,
         string $channel,
     ): ?string {
+        if (! (bool) app(EventConfigurationService::class)->value('reminders_enabled', true, $tenantId)) {
+            return 'tenant_reminders_disabled';
+        }
         $resolution = EventNotificationPreferenceResolver::resolveForEvent(
             $userId,
             $tenantId,
