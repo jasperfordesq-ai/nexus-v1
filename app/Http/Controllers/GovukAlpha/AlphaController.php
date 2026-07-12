@@ -1714,6 +1714,9 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $uploadedCoverImage = null;
+        $eventCreated = false;
+
         try {
             $isRecurring = $request->boolean('is_recurring');
             $inputData = $this->eventInput($request);
@@ -1746,6 +1749,10 @@ class AlphaController extends Controller
                         ]),
                     ]);
                 }
+                $uploadedCoverImage = $this->uploadEventCoverImage($request);
+                if ($uploadedCoverImage !== null) {
+                    $inputData['cover_image'] = $uploadedCoverImage;
+                }
                 // Merge recurrence fields and call the recurring path.
                 $recurrenceData = array_merge($inputData, [
                     'recurrence_frequency' => $frequencySelection === 'biweekly' ? 'weekly' : $frequencySelection,
@@ -1759,11 +1766,14 @@ class AlphaController extends Controller
                 // Retrieve the created template event for XP/feed recording.
                 $event = EventService::getById($eventId, $userId);
             } else {
+                $uploadedCoverImage = $this->uploadEventCoverImage($request);
+                if ($uploadedCoverImage !== null) {
+                    $inputData['cover_image'] = $uploadedCoverImage;
+                }
                 $event = EventService::create($userId, $inputData);
                 $eventId = (int) $event->id;
             }
-
-            $this->attachEventCoverImage($request, $eventId, $userId, $isRecurring ? 'all' : null);
+            $eventCreated = true;
 
             try {
                 \App\Services\GamificationService::awardXP(
@@ -1794,6 +1804,9 @@ class AlphaController extends Controller
                 Log::warning('Accessible event feed activity failed', ['event_id' => $eventId, 'error' => $e->getMessage()]);
             }
         } catch (ValidationException $e) {
+            if (!$eventCreated && $uploadedCoverImage !== null) {
+                ImageUploader::deleteTenantUpload($uploadedCoverImage, 'events');
+            }
             // Forward the per-field error bag so the create form can render an
             // anchored govuk-error-summary + inline govuk-error-message per field.
             return redirect()
@@ -1801,6 +1814,9 @@ class AlphaController extends Controller
                 ->withErrors($e->errors())
                 ->withInput();
         } catch (\Throwable $e) {
+            if (!$eventCreated && $uploadedCoverImage !== null) {
+                ImageUploader::deleteTenantUpload($uploadedCoverImage, 'events');
+            }
             report($e);
 
             return redirect()
@@ -12494,9 +12510,22 @@ class AlphaController extends Controller
         ?string $scope = null,
     ): void
     {
+        $imageUrl = $this->uploadEventCoverImage($request);
+        if ($imageUrl === null) {
+            return;
+        }
+
+        if (!EventService::updateImage($eventId, $userId, $imageUrl, $scope)) {
+            ImageUploader::deleteTenantUpload($imageUrl, 'events');
+        }
+    }
+
+    /** Store an optional Event cover image and return its tenant-scoped URL. */
+    private function uploadEventCoverImage(Request $request): ?string
+    {
         $file = $request->file('image');
         if ($file === null || is_array($file) || !$file->isValid()) {
-            return;
+            return null;
         }
 
         try {
@@ -12508,11 +12537,11 @@ class AlphaController extends Controller
                 'size' => $file->getSize(),
             ], 'events');
 
-            if (is_string($imageUrl) && $imageUrl !== '') {
-                EventService::updateImage($eventId, $userId, $imageUrl, $scope);
-            }
+            return is_string($imageUrl) && $imageUrl !== '' ? $imageUrl : null;
         } catch (\Throwable $e) {
             report($e);
+
+            return null;
         }
     }
 

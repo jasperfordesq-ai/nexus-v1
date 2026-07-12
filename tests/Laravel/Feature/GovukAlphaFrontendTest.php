@@ -1924,8 +1924,13 @@ class GovukAlphaFrontendTest extends TestCase
         $createForm->assertSee('name="max_attendees"', false);
         $createForm->assertSee('id="freq-biweekly" name="recurrence_frequency" type="radio" value="biweekly"', false);
         $createForm->assertSee('id="freq-yearly" name="recurrence_frequency" type="radio" value="yearly"', false);
-        $createForm->assertSee('id="rec-end-never" name="recurrence_ends_type" type="radio" value="never"', false);
-        $createForm->assertSee('name="recurrence_ends_after_count" type="number" min="2" max="366"', false);
+        $createForm->assertDontSee('id="rec-end-never" name="recurrence_ends_type" type="radio" value="never"', false);
+        $maxOccurrences = app(\App\Services\EventRecurrenceCapabilityService::class)
+            ->capabilities()['max_occurrences'];
+        $createForm->assertSee(
+            'name="recurrence_ends_after_count" type="number" min="2" max="' . $maxOccurrences . '"',
+            false,
+        );
 
         $create = $this->post("/{$this->testTenantSlug}/accessible/events/new", [
             'title' => 'Alpha created event',
