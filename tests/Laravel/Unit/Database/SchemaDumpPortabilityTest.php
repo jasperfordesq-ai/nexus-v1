@@ -17,9 +17,9 @@ class SchemaDumpPortabilityTest extends TestCase
 
         self::assertNotFalse($schema, 'The committed MySQL schema dump must be readable.');
         self::assertStringNotContainsString(
-            'DEFINER=',
+            '/*!50017 DEFINER=',
             $schema,
-            'Schema objects must use the importing database account, not an environment-specific DEFINER.',
+            'Schema objects must use the importing database account, not an explicit mysqldump DEFINER clause.',
         );
     }
 }
