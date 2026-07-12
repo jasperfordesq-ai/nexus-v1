@@ -35,7 +35,25 @@
       "createdTitle": "Cruthaíodh dréacht imeachta",
       "createdDescription": "Déan é a athbhreithniú agus a fhoilsiú ar leithligh nuair a bheidh sé réidh.",
       "createFailedTitle": "Ní féidir dréacht a chruthú",
-      "createFailedDescription": "Níorbh fhéidir dréacht an imeachta a chruthú. Bain triail eile as."
+      "createFailedDescription": "Níorbh fhéidir dréacht an imeachta a chruthú. Bain triail eile as.",
+      "auditButton": "Stair iniúchta",
+      "auditTitle": "Iniúchadh: {{title}}",
+      "auditDescription": "Athbhreithnigh stair oibriúcháin an teimpléid seo atá scagtha ar mhaithe le príobháideachas.",
+      "auditImmutableTitle": "Ní féidir an stair a athrú",
+      "auditImmutableDescription": "Coinnítear taifid gabhála, athbhreithnithe, cartlainne agus cruthaithe mar fhianaise do-athraithe.",
+      "auditLoading": "Stair iniúchta an teimpléid á lódáil",
+      "auditLoadFailedTitle": "Níl an stair iniúchta ar fáil",
+      "auditLoadFailedDescription": "Níorbh fhéidir stair an teimpléid a lódáil. Bain triail eile as.",
+      "auditEmpty": "Níl aon iontrálacha iniúchta ar fáil.",
+      "auditEntry": "Leagan {{version}} · {{date}}",
+      "auditMaterializedEvent": "Cruthaíodh imeacht #{{id}}",
+      "notRecorded": "Gan taifead",
+      "auditActions": {
+        "captured": "Teimpléad gafa",
+        "revised": "Teimpléad athbhreithnithe",
+        "archived": "Teimpléad curtha sa chartlann",
+        "materialized": "Dréacht cruthaithe"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Tá cead agat fós an t-imeacht foinse a bhainistiú",

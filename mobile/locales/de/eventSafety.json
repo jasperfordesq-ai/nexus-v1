@@ -7,6 +7,12 @@
       "request_guardian_consent": "Fordern Sie die Zustimmung des Erziehungsberechtigten an",
       "withdraw_guardian_consent": "Einwilligungsanfrage zurückziehen"
     },
+    "confirmations": {
+      "withdraw_code_title": "Bestätigung des Verhaltenskodex zurückziehen?",
+      "withdraw_code_body": "Dies kann Ihre Teilnahme sperren, bis Sie die aktuelle Fassung erneut bestätigen.",
+      "withdraw_guardian_title": "Anfrage zur Zustimmung der Aufsichtsperson zurückziehen?",
+      "withdraw_guardian_body": "Die aktuelle Anfrage wird ungültig. Vor der Teilnahme müssen Sie möglicherweise eine neue Anfrage senden."
+    },
     "attendee": {
       "title": "Teilnahmevoraussetzungen",
       "description": "Führen Sie die entsprechenden Sicherheitsmaßnahmen durch, bevor Sie sich registrieren oder sich auf die Warteliste setzen.",

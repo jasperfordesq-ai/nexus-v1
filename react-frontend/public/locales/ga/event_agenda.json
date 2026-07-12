@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "Tarraingt siar ón seisiún seo?",
+  "withdraw_confirm_body": "Scaoilfear d’áit in {{title}} agus d’fhéadfadh duine eile í a ghlacadh.",
+  "keep_registration": "Coinnigh m’áit",
   "capacity_label": "Toilleadh an tseisiúin",
   "capacity_hint": "Fág bán é mura bhfuil teorainn ann. Ní athraíonn áit seisiúin clárú an imeachta ná ticéid.",
   "capacity_unlimited": "{{registered}} cláraithe · gan teorainn",

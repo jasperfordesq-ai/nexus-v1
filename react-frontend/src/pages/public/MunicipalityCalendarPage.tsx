@@ -151,11 +151,11 @@ export default function MunicipalityCalendarPage() {
   }, [locale]);
   const firstDayJs = firstDay % 7;
   const leadingBlankDays = (monthStart.getDay() - firstDayJs + 7) % 7;
-  const weekdayLabels = useMemo(() => Array.from({ length: 7 }, (_, index) => {
+  const weekdayLabels = Array.from({ length: 7 }, (_, index) => {
     const jsDay = (firstDayJs + index) % 7;
     const date = new Date(2024, 0, 7 + jsDay);
     return date.toLocaleDateString(getFormattingLocale(), { weekday: 'short' });
-  }), [firstDayJs, locale]);
+  });
 
   const renderDayCell = (day: number) => {
     const date = new Date(monthStart);

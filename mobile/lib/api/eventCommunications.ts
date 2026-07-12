@@ -54,7 +54,7 @@ export const mobileEventBroadcastSchema = z.object({
   updated_at: timestamp,
 }).strict();
 
-const historySchema = z.object({
+export const mobileEventBroadcastHistorySchema = z.object({
   id: z.number().int().positive(),
   version: z.number().int().positive(),
   action: z.enum(['created', 'revised', 'scheduled', 'sending', 'sent', 'cancelled', 'failed', 'retried']),
@@ -78,7 +78,7 @@ export const mobileEventBroadcastPreviewSchema = z.object({
 
 const detailSchema = z.object({
   broadcast: mobileEventBroadcastSchema,
-  history: z.array(historySchema),
+  history: z.array(mobileEventBroadcastHistorySchema),
 }).strict();
 const mutationSchema = detailSchema.extend({
   changed: z.boolean(),
@@ -100,9 +100,12 @@ const previewEnvelopeSchema = z.object({
   data: mobileEventBroadcastPreviewSchema,
   meta: responseMetaSchema,
 }).strict();
+const detailEnvelopeSchema = z.object({ data: detailSchema, meta: responseMetaSchema }).strict();
 const mutationEnvelopeSchema = z.object({ data: mutationSchema, meta: responseMetaSchema }).strict();
 
 export type MobileEventBroadcast = z.infer<typeof mobileEventBroadcastSchema>;
+export type MobileEventBroadcastHistory = z.infer<typeof mobileEventBroadcastHistorySchema>;
+export type MobileEventBroadcastDetail = z.infer<typeof detailSchema>;
 export type MobileEventBroadcastPreview = z.infer<typeof mobileEventBroadcastPreviewSchema>;
 export type MobileEventBroadcastSegment = z.infer<typeof segmentSchema>;
 export type MobileEventBroadcastChannel = z.infer<typeof channelSchema>;
@@ -140,9 +143,12 @@ function idempotencyOptions(key: string) {
   return { headers: { 'Idempotency-Key': key } };
 }
 
-export async function getEventCommunications(eventId: number) {
+export async function getEventCommunications(eventId: number, page = 1, perPage = 50) {
   const endpoint = `${API_V2}/events/${eventId}/broadcasts`;
-  const response = await api.get<unknown>(endpoint, { page: '1', per_page: '50' });
+  const response = await api.get<unknown>(endpoint, {
+    page: String(page),
+    per_page: String(perPage),
+  });
   return parseContract(endpoint, listEnvelopeSchema, response);
 }
 
@@ -162,6 +168,28 @@ export async function createEventCommunication(
 ): Promise<MobileEventBroadcast> {
   const endpoint = `${API_V2}/events/${eventId}/broadcasts`;
   const response = await api.post<unknown>(endpoint, input, idempotencyOptions(idempotencyKey));
+  return parseContract(endpoint, mutationEnvelopeSchema, response).data.broadcast;
+}
+
+export async function getEventCommunicationDetail(
+  broadcastId: number,
+): Promise<MobileEventBroadcastDetail> {
+  const endpoint = `${API_V2}/event-broadcasts/${broadcastId}`;
+  const response = await api.get<unknown>(endpoint);
+  return parseContract(endpoint, detailEnvelopeSchema, response).data;
+}
+
+export async function reviseEventCommunication(
+  broadcastId: number,
+  expectedVersion: number,
+  input: MobileEventBroadcastInput,
+  idempotencyKey: string,
+): Promise<MobileEventBroadcast> {
+  const endpoint = `${API_V2}/event-broadcasts/${broadcastId}/revisions`;
+  const response = await api.post<unknown>(endpoint, {
+    ...input,
+    expected_version: expectedVersion,
+  }, idempotencyOptions(idempotencyKey));
   return parseContract(endpoint, mutationEnvelopeSchema, response).data.broadcast;
 }
 

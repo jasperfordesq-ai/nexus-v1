@@ -21,6 +21,14 @@
       "edit_review": "Aktualizacja decyzji",
       "withdraw_review": "Cofnij decyzję"
     },
+    "confirmations": {
+      "withdraw_code_title": "Wycofać akceptację kodeksu postępowania?",
+      "withdraw_code_body": "Może to zablokować udział do czasu ponownej akceptacji bieżącej wersji.",
+      "withdraw_guardian_title": "Wycofać prośbę o zgodę opiekuna?",
+      "withdraw_guardian_body": "Bieżąca prośba stanie się nieważna. Przed udziałem może być konieczne wysłanie nowej.",
+      "withdraw_review_title": "Wycofać tę decyzję dotyczącą udziału?",
+      "withdraw_review_body": "Kończy to aktywną decyzję dla {{name}}, zachowując jej historię audytu."
+    },
     "organizer": {
       "title": "Bezpieczeństwo wydarzeń",
       "description": "Ustawiaj wersjonowane wymagania dotyczące uczestnictwa i prowadź kontrolowany, podlegający audytowi zapis decyzji dotyczących bezpieczeństwa.",

@@ -163,7 +163,13 @@ final class EventNotificationOutboxConsumer
             || mb_strlen($actor) > 191 || mb_strlen($rawReason) > 1000) {
             return false;
         }
-        $actor = EventNotificationErrorSanitizer::sanitize($actor, 191);
+        // The actor is audit evidence, not an error payload. Preserve an operator
+        // email/service identity so a replay remains attributable; the generic
+        // error sanitizer intentionally redacts email addresses and would destroy
+        // that evidence. Reject control characters instead of rewriting identity.
+        if (preg_match('/[\x00-\x1F\x7F]/u', $actor) === 1) {
+            return false;
+        }
         $reason = EventNotificationErrorSanitizer::sanitize($rawReason, 1000);
 
         return DB::transaction(function () use ($outboxId, $actor, $reason, $tenantId): bool {

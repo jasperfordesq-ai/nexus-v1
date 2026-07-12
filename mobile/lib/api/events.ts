@@ -494,7 +494,7 @@ const eventAgendaEnvelopeSchema = z.object({
 }).strict();
 const eventAgendaRegistrationMutationEnvelopeSchema = z.object({
   data: z.object({
-    session: eventAgendaSessionSchema,
+    session: eventAgendaSessionSchema.nullable(),
     registration_version: z.number().int().nonnegative(),
     changed: z.boolean(),
     idempotent_replay: z.boolean(),
@@ -631,6 +631,8 @@ export interface CreateEventPayload {
   description: string;
   start_time: string;
   end_time?: string | null;
+  timezone: string;
+  all_day: boolean;
   group_id?: number | null;
   location?: string | null;
   latitude?: number | null;

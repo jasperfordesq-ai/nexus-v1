@@ -143,7 +143,7 @@ export function EventTicketsPanel({
   const payload = (): EventTicketTypePayload | null => {
     const opens = eventLocalInputToIso(draft.salesOpen, eventTimezone);
     const closes = eventLocalInputToIso(draft.salesClose, eventTimezone);
-    const refund = draft.refundCutoff
+    const refund = draft.kind === 'time_credit' && draft.refundCutoff
       ? eventLocalInputToIso(draft.refundCutoff, eventTimezone)
       : null;
     const allocation = Number(draft.allocation);
@@ -153,7 +153,7 @@ export function EventTicketsPanel({
       .split(',')
       .map((value) => Number(value.trim()));
     if (!draft.name.trim() || !opens || !closes
-      || (draft.refundCutoff && !refund)
+      || (draft.kind === 'time_credit' && draft.refundCutoff && !refund)
       || !Number.isInteger(allocation) || allocation < 1
       || !Number.isInteger(perMember) || perMember < 1 || perMember > allocation
       || !Number.isInteger(accountAge) || accountAge < 0
@@ -178,7 +178,7 @@ export function EventTicketsPanel({
         required_group_ids: groupIds,
       },
       refund_cutoff_at: refund,
-      organizer_cancel_refundable: draft.organizerRefundable,
+      organizer_cancel_refundable: draft.kind === 'time_credit' && draft.organizerRefundable,
     };
   };
 
@@ -414,7 +414,11 @@ export function EventTicketsPanel({
           <div className="space-y-2">{catalogue.own_entitlements.map((entitlement) => (
             <Card key={entitlement.id}><CardBody className="flex-row items-center justify-between gap-4 p-4">
               <div><p className="font-medium">{names.get(entitlement.ticket_type_id) ?? t('tickets.ticket_fallback')}</p><p className="text-sm text-default-600">{t('tickets.units', { count: entitlement.units })}</p></div>
-              {entitlement.status === 'confirmed' ? <Button size="sm" variant="danger-soft" onPress={() => setCancelTarget(entitlement)}>{t('tickets.cancel')}</Button> : <Chip size="sm" variant="soft">{t('tickets.cancelled')}</Chip>}
+              {entitlement.status === 'confirmed' && entitlement.kind === 'free'
+                ? <Button size="sm" variant="danger-soft" onPress={() => setCancelTarget(entitlement)}>{t('tickets.cancel')}</Button>
+                : entitlement.status === 'confirmed'
+                  ? <p className="max-w-sm text-sm text-default-600">{t('tickets.time_credit_cancel_disabled')}</p>
+                  : <Chip size="sm" variant="soft">{t('tickets.cancelled')}</Chip>}
             </CardBody></Card>
           ))}</div>
         </section>
@@ -493,13 +497,13 @@ function TicketTypeEditor({ isOpen, editing, draft, setDraft, error, isSaving, t
           <Input type="number" min="1" label={t('tickets.per_member')} value={draft.perMember} onChange={(event) => setDraft((current) => ({ ...current, perMember: event.target.value }))} />
           <Input type="datetime-local" label={t('tickets.sales_open')} value={draft.salesOpen} onChange={(event) => setDraft((current) => ({ ...current, salesOpen: event.target.value }))} isRequired />
           <Input type="datetime-local" label={t('tickets.sales_close')} value={draft.salesClose} onChange={(event) => setDraft((current) => ({ ...current, salesClose: event.target.value }))} isRequired />
-          <Input type="datetime-local" label={t('tickets.refund_cutoff')} value={draft.refundCutoff} onChange={(event) => setDraft((current) => ({ ...current, refundCutoff: event.target.value }))} />
+          {draft.kind === 'time_credit' && <Input type="datetime-local" label={t('tickets.refund_cutoff')} value={draft.refundCutoff} onChange={(event) => setDraft((current) => ({ ...current, refundCutoff: event.target.value }))} />}
           <Input type="number" min="0" label={t('tickets.account_age')} value={draft.accountAgeDays} onChange={(event) => setDraft((current) => ({ ...current, accountAgeDays: event.target.value }))} />
         </div>
         <p className="text-xs text-default-500">{t('tickets.timezone_hint', { timezone: timeZone })}</p>
         <Input label={t('tickets.group_ids')} description={t('tickets.group_ids_hint')} value={draft.groupIds} onChange={(event) => setDraft((current) => ({ ...current, groupIds: event.target.value }))} />
         <Checkbox isSelected={draft.approvedOnly} onValueChange={(value) => setDraft((current) => ({ ...current, approvedOnly: value }))}>{t('tickets.approved_only')}</Checkbox>
-        <Checkbox isSelected={draft.organizerRefundable} onValueChange={(value) => setDraft((current) => ({ ...current, organizerRefundable: value }))}>{t('tickets.organizer_refundable')}</Checkbox>
+        {draft.kind === 'time_credit' && <Checkbox isSelected={draft.organizerRefundable} onValueChange={(value) => setDraft((current) => ({ ...current, organizerRefundable: value }))}>{t('tickets.organizer_refundable')}</Checkbox>}
         {draft.kind === 'time_credit' && <p className="rounded-lg bg-warning/10 p-3 text-sm text-warning">{t('tickets.time_credit_draft_warning')}</p>}
       </ModalBody><ModalFooter><Button variant="secondary" isDisabled={isSaving} onPress={onClose}>{t('tickets.close')}</Button><Button variant="primary" isLoading={isSaving} onPress={onSave}>{t(editing ? 'tickets.save' : 'tickets.create')}</Button></ModalFooter></ModalContent>
     </Modal>

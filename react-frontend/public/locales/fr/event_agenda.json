@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "Vous désinscrire de cette session ?",
+  "withdraw_confirm_body": "Votre place pour {{title}} sera libérée et pourra être attribuée à une autre personne.",
+  "keep_registration": "Conserver ma place",
   "capacity_label": "Capacité de la séance",
   "capacity_hint": "Laissez vide pour un nombre de places illimité. Les places de séance ne modifient ni l’inscription à l’événement ni les billets.",
   "capacity_unlimited": "{{registered}} inscrits · sans limite",

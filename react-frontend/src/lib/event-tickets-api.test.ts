@@ -12,7 +12,12 @@ const { apiMock, logErrorMock } = vi.hoisted(() => ({
 vi.mock('@/lib/api', () => ({ api: apiMock }));
 vi.mock('@/lib/logger', () => ({ logError: logErrorMock }));
 
-import { eventTicketCatalogueSchema, eventTicketsApi, type EventTicketCatalogue } from './event-tickets-api';
+import {
+  eventTicketCatalogueSchema,
+  eventTicketsApi,
+  type EventTicketCatalogue,
+  type EventTicketTypePayload,
+} from './event-tickets-api';
 
 function catalogue(overrides: Partial<EventTicketCatalogue> = {}): EventTicketCatalogue {
   return {
@@ -32,8 +37,8 @@ function catalogue(overrides: Partial<EventTicketCatalogue> = {}): EventTicketCa
       sales_opens_at: '2029-12-01T00:00:00+00:00',
       sales_closes_at: '2030-01-01T09:00:00+00:00',
       per_member_limit: 1,
-      refund_cutoff_at: '2029-12-31T10:00:00+00:00',
-      organizer_cancel_refundable: true,
+      refund_cutoff_at: null,
+      organizer_cancel_refundable: false,
       status: 'active',
       availability: {
         eligibility: { eligible: true, reasons: [] },
@@ -44,9 +49,9 @@ function catalogue(overrides: Partial<EventTicketCatalogue> = {}): EventTicketCa
         gateway_status: 'not_required',
         attendance_reward_included: false,
         refund_policy: {
-          cutoff_at: '2029-12-31T10:00:00+00:00',
-          organizer_cancel_refundable: true,
-          execution_status: 'not_integrated',
+          cutoff_at: null,
+          organizer_cancel_refundable: false,
+          execution_status: 'not_applicable',
         },
       },
       eligibility_policy: null,
@@ -118,6 +123,57 @@ describe('eventTicketsApi', () => {
       '/v2/events/42/tickets/9/allocate',
       { units: 1 },
       { headers: { 'Idempotency-Key': 'ticket-allocation-1' } },
+    );
+  });
+
+  it('uses the canonical mutation routes for types and entitlement cancellation', async () => {
+    apiMock.post.mockResolvedValue({ success: false, code: 'EXPECTED_TEST_FAILURE' });
+    apiMock.put.mockResolvedValue({ success: false, code: 'EXPECTED_TEST_FAILURE' });
+    const payload: EventTicketTypePayload = {
+      name: 'Community ticket',
+      description: null,
+      kind: 'free',
+      unit_price_credits: '0.00',
+      allocation_limit: 20,
+      sales_opens_at: '2029-12-01T00:00:00+00:00',
+      sales_closes_at: '2030-01-01T09:00:00+00:00',
+      per_member_limit: 1,
+      eligibility_policy: {
+        approved_member_required: true,
+        minimum_account_age_days: 0,
+        required_group_ids: [],
+      },
+      refund_cutoff_at: null,
+      organizer_cancel_refundable: false,
+    };
+
+    await eventTicketsApi.createType(42, payload, 'create-key');
+    await eventTicketsApi.updateType(42, 9, 2, payload, 'update-key');
+    await eventTicketsApi.transitionType(42, 9, 'activate', 2, null, 'activate-key');
+    await eventTicketsApi.cancel(42, 8, 1, 'Plans changed', 'cancel-key');
+
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      1,
+      '/v2/events/42/ticket-types',
+      payload,
+      { headers: { 'Idempotency-Key': 'create-key' } },
+    );
+    expect(apiMock.put).toHaveBeenCalledWith(
+      '/v2/events/42/ticket-types/9',
+      { ...payload, expected_version: 2 },
+      { headers: { 'Idempotency-Key': 'update-key' } },
+    );
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      2,
+      '/v2/events/42/ticket-types/9/activate',
+      { expected_version: 2, reason: null },
+      { headers: { 'Idempotency-Key': 'activate-key' } },
+    );
+    expect(apiMock.post).toHaveBeenNthCalledWith(
+      3,
+      '/v2/events/42/ticket-entitlements/8/cancel',
+      { expected_version: 1, reason: 'Plans changed' },
+      { headers: { 'Idempotency-Key': 'cancel-key' } },
     );
   });
 });

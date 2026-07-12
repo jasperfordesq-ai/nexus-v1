@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'No se pudo agregar el comentario. Intentar otra vez.',
         'not_available' => 'No disponible',
     ],
+    'forms' => [
+        'error_prefix' => 'Error de formulario:',
+    ],
     'home' => [
         'module_signin' => 'Iniciar sesión',
         'module_signin_hint' => 'Inicia sesión para usar esto.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Sin categoría',
         'start_time_label' => 'Hora de inicio',
         'end_time_label' => 'Hora de finalización',
+        'timezone_label' => 'Zona horaria del evento',
+        'timezone_hint' => 'Use una zona horaria IANA, por ejemplo Europe/Madrid o America/New_York.',
+        'all_day_label' => 'Este evento dura todo el día',
+        'all_day_hint' => 'Las horas introducidas se ignoran. Indique la primera y la última fecha del evento.',
+        'all_day_end_hint' => 'Para eventos de todo el día, indique la última fecha incluida.',
         'datetime_hint' => 'Utilice el selector de fecha y hora, o ingrese una fecha y hora.',
         'end_time_hint' => 'Opcional. Agregue una hora de finalización si el evento la tiene.',
         'location_label' => 'Ubicación',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Tus respuestas son privadas y solo se usan para protección. Puedes cambiarlas o eliminarlas en cualquier momento desde tu configuración. No se selecciona nada a menos que tú lo elijas.',
             'none_separator' => 'O',
             'none_label' => 'Ninguna de estas me aplica',
+            'options_legend' => 'Opciones de protección',
+            'select_none' => 'Ninguna seleccionada',
         ],
         'confirm' => [
             'title' => 'Revisa tus respuestas',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Fraude o estafa sospechosa',
         'report_reason_duplicate' => 'Anuncio duplicado',
         'report_reason_other' => 'Otro',
+        'report_reason_required' => 'Elija un motivo para esta denuncia.',
         'report_details_label' => 'Detalles adicionales (opcional)',
         'report_details_hint' => 'Proporcione cualquier otra información que nos ayude a investigar.',
         'report_submit' => 'Enviar informe',

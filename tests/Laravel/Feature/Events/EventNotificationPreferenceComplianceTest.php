@@ -29,6 +29,7 @@ class EventNotificationPreferenceComplianceTest extends TestCase
     {
         parent::setUp();
         TenantContext::setById($this->testTenantId);
+        Cache::forget('notification_queue:instant:runner_lock');
     }
 
     public function test_events_email_defaults_on_but_explicit_opt_out_wins(): void
@@ -182,7 +183,7 @@ class EventNotificationPreferenceComplianceTest extends TestCase
         $this->assertDatabaseHas('notification_queue', ['id' => $messageQueueId, 'status' => 'sent']);
     }
 
-    public function test_digest_worker_atomically_moves_daily_event_row_to_current_monthly_cadence(): void
+    public function test_digest_worker_keeps_null_context_legacy_behavior_and_moves_to_global_monthly_cadence(): void
     {
         DB::table('notification_queue')->delete();
         $user = $this->member();
@@ -198,11 +199,206 @@ class EventNotificationPreferenceComplianceTest extends TestCase
         $this->assertCount(1, $mailer->calls);
         $this->assertDatabaseHas('notification_queue', [
             'id' => $eventQueueId,
+            'event_id' => null,
             'status' => 'pending',
             'frequency' => 'monthly',
             'processing_batch_id' => null,
         ]);
         $this->assertDatabaseHas('notification_queue', ['id' => $messageQueueId, 'status' => 'sent']);
+    }
+
+    public function test_contextual_event_email_opt_out_suppresses_digest_before_send(): void
+    {
+        DB::table('notification_queue')->delete();
+        $user = $this->member();
+        $organizer = $this->member();
+        $eventId = $this->eventOwnedBy($organizer);
+        $this->setPreferences($user->id, ['email_events' => true, 'email_digest' => true]);
+        $this->setFrequency($user->id, 'daily');
+        $this->setEventPreference($user->id, $eventId, [
+            'email_enabled' => false,
+            'cadence' => 'daily',
+        ]);
+        $queueId = $this->enqueue(
+            $user->id,
+            'event_update',
+            'daily',
+            'Scoped event update',
+            $eventId,
+        );
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        $this->invokeCronMethod('processDigest', ['daily']);
+
+        $this->assertCount(0, $mailer->calls);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $queueId,
+            'event_id' => $eventId,
+            'status' => 'suppressed',
+        ]);
+    }
+
+    public function test_contextual_category_cadence_moves_only_the_event_digest_row(): void
+    {
+        DB::table('notification_queue')->delete();
+        $user = $this->member();
+        $organizer = $this->member();
+        $categoryId = $this->eventCategory();
+        $eventId = $this->eventOwnedBy($organizer, $categoryId);
+        $this->setPreferences($user->id, ['email_events' => true, 'email_digest' => true]);
+        $this->setFrequency($user->id, 'daily');
+        $this->setCategoryPreference($user->id, $categoryId, [
+            'email_enabled' => true,
+            'cadence' => 'monthly',
+        ]);
+        $eventQueueId = $this->enqueue(
+            $user->id,
+            'event_update',
+            'daily',
+            'Move contextual event monthly',
+            $eventId,
+        );
+        $messageQueueId = $this->enqueue(
+            $user->id,
+            'new_message',
+            'daily',
+            'Keep unrelated message daily',
+        );
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        $this->invokeCronMethod('processDigest', ['daily']);
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertStringNotContainsString('Move contextual event monthly', $mailer->calls[0]['body']);
+        $this->assertStringContainsString('Keep unrelated message daily', $mailer->calls[0]['body']);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $eventQueueId,
+            'event_id' => $eventId,
+            'status' => 'pending',
+            'frequency' => 'monthly',
+            'processing_batch_id' => null,
+        ]);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $messageQueueId,
+            'status' => 'sent',
+        ]);
+    }
+
+    public function test_contextual_routine_feature_disable_is_enforced_by_internal_instant_runner(): void
+    {
+        DB::table('notification_queue')->delete();
+        $user = $this->member();
+        $organizer = $this->member();
+        $eventId = $this->eventOwnedBy($organizer);
+        $this->setPreferences($user->id, ['email_events' => true, 'email_digest' => true]);
+        $this->setFrequency($user->id, 'instant');
+        $this->setEventsFeature(false);
+        $eventQueueId = $this->enqueue(
+            $user->id,
+            'event_update',
+            'instant',
+            'Disabled routine event traffic',
+            $eventId,
+        );
+        $messageQueueId = $this->enqueue(
+            $user->id,
+            'new_message',
+            'instant',
+            'Unrelated instant message',
+        );
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        $this->invokeCronMethod('runInstantQueueInternal');
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $eventQueueId,
+            'event_id' => $eventId,
+            'status' => 'suppressed',
+        ]);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $messageQueueId,
+            'status' => 'sent',
+        ]);
+    }
+
+    public function test_deleted_contextual_cancellation_uses_global_consent_and_remains_deliverable(): void
+    {
+        DB::table('notification_queue')->delete();
+        $user = $this->member();
+        $organizer = $this->member();
+        $eventId = $this->eventOwnedBy($organizer);
+        $this->setPreferences($user->id, ['email_events' => true, 'email_digest' => true]);
+        $this->setFrequency($user->id, 'instant');
+        $queueId = $this->enqueue(
+            $user->id,
+            'event_cancellation',
+            'instant',
+            'Deleted event cancellation',
+            $eventId,
+        );
+        DB::table('events')->where('id', $eventId)->where('tenant_id', $this->testTenantId)->delete();
+        $this->setEventsFeature(false);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        $this->invokeCronMethod('runInstantQueueInternal');
+
+        $this->assertCount(1, $mailer->calls);
+        $this->assertStringContainsString('Deleted event cancellation', $mailer->calls[0]['body']);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $queueId,
+            'event_id' => $eventId,
+            'status' => 'sent',
+        ]);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function test_public_instant_runner_applies_contextual_channel_suppression(): void
+    {
+        if (! defined('CRON_INTERNAL_RUN')) {
+            define('CRON_INTERNAL_RUN', true);
+        }
+        DB::table('notification_queue')->delete();
+        Cache::forget('notification_queue:instant:runner_lock');
+        $user = $this->member();
+        $organizer = $this->member();
+        $eventId = $this->eventOwnedBy($organizer);
+        $this->setPreferences($user->id, ['email_events' => true, 'email_digest' => true]);
+        $this->setFrequency($user->id, 'instant');
+        $this->setEventPreference($user->id, $eventId, [
+            'email_enabled' => false,
+            'cadence' => 'instant',
+        ]);
+        $queueId = $this->enqueue(
+            $user->id,
+            'event_update',
+            'instant',
+            'Public runner contextual suppression',
+            $eventId,
+        );
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        ob_start();
+        try {
+            (new CronJobRunner())->runInstantQueue();
+        } finally {
+            ob_end_clean();
+        }
+
+        $this->assertCount(0, $mailer->calls);
+        $this->assertDatabaseHas('notification_queue', [
+            'id' => $queueId,
+            'event_id' => $eventId,
+            'status' => 'suppressed',
+        ]);
     }
 
     public function test_mixed_digest_contains_visible_events_only_unsubscribe_action(): void
@@ -392,9 +588,15 @@ class EventNotificationPreferenceComplianceTest extends TestCase
         TenantContext::setById($this->testTenantId);
     }
 
-    private function enqueue(int $userId, string $activityType, string $frequency, string $content): int
+    private function enqueue(
+        int $userId,
+        string $activityType,
+        string $frequency,
+        string $content,
+        ?int $eventId = null,
+    ): int
     {
-        return (int) DB::table('notification_queue')->insertGetId([
+        $row = [
             'tenant_id' => $this->testTenantId,
             'user_id' => $userId,
             'activity_type' => $activityType,
@@ -404,7 +606,84 @@ class EventNotificationPreferenceComplianceTest extends TestCase
             'email_body' => '<p>' . $content . '</p>',
             'status' => 'pending',
             'created_at' => now(),
+        ];
+        if ($eventId !== null) {
+            $row['event_id'] = $eventId;
+        }
+
+        return (int) DB::table('notification_queue')->insertGetId($row);
+    }
+
+    private function eventOwnedBy(User $organizer, ?int $categoryId = null): int
+    {
+        return (int) DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organizer->id,
+            'category_id' => $categoryId,
+            'title' => 'Queue preference event ' . uniqid('', true),
+            'description' => 'Queue preference coverage.',
+            'start_time' => now()->addDay(),
+            'end_time' => now()->addDay()->addHour(),
+            'status' => 'active',
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'is_recurring_template' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+    }
+
+    private function eventCategory(): int
+    {
+        $suffix = str_replace('.', '-', uniqid('', true));
+
+        return (int) DB::table('categories')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Queue category ' . $suffix,
+            'slug' => 'queue-category-' . $suffix,
+            'type' => 'event',
+            'sort_order' => 0,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /** @param array<string,mixed> $overrides */
+    private function setEventPreference(int $userId, int $eventId, array $overrides): void
+    {
+        $this->setScopedEventPreference($userId, $eventId, null, $overrides);
+    }
+
+    /** @param array<string,mixed> $overrides */
+    private function setCategoryPreference(int $userId, int $categoryId, array $overrides): void
+    {
+        $this->setScopedEventPreference($userId, null, $categoryId, $overrides);
+    }
+
+    /** @param array<string,mixed> $overrides */
+    private function setScopedEventPreference(
+        int $userId,
+        ?int $eventId,
+        ?int $categoryId,
+        array $overrides,
+    ): void {
+        DB::table('event_notification_preferences')->insert(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'event_id' => $eventId,
+            'category_id' => $categoryId,
+            'email_enabled' => null,
+            'in_app_enabled' => null,
+            'web_push_enabled' => null,
+            'fcm_enabled' => null,
+            'realtime_enabled' => null,
+            'cadence' => null,
+            'reminders_enabled' => null,
+            'preference_version' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
     }
 
     /** @param list<mixed> $arguments */

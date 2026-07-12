@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Bewertet von',
         'withdraw_review' => 'Entscheidung zurückziehen',
         'ledger_empty' => 'Für diese Veranstaltung wurden keine Teilnahmebewertungen erfasst.',
+        'confirm_archive_checkbox' => 'Ich verstehe, dass dadurch die aktuellen Sicherheitsanforderungen deaktiviert werden.',
+        'confirm_withdraw_code' => 'Ich verstehe, dass meine Teilnahme gesperrt sein kann, bis ich den Kodex erneut bestätige.',
+        'confirm_withdraw_guardian' => 'Ich verstehe, dass die aktuelle Zustimmungsanfrage ungültig wird.',
+        'confirm_withdraw_review' => 'Ich bestätige, dass ich die aktive Entscheidung für :name zurückziehen möchte.',
     ],
 ];

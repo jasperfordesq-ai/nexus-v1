@@ -10,6 +10,7 @@ import { Button, Card, Chip } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import {
   registerEventAgendaSession,
   withdrawEventAgendaSession,
@@ -21,7 +22,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 interface EventAgendaEnterprisePanelProps {
   eventId: number;
   session: EventAgendaSession;
-  onSessionChange: (session: EventAgendaSession) => void;
+  onSessionChange: (session: EventAgendaSession | null) => void;
 }
 
 function idempotencyKey(): string {
@@ -39,6 +40,7 @@ export function EventAgendaEnterprisePanel({
   const theme = useTheme();
   const primary = usePrimaryColor();
   const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [pending, setPending] = useState<'register' | 'withdraw' | null>(null);
 
   const mutate = async (action: 'register' | 'withdraw') => {
@@ -75,6 +77,21 @@ export function EventAgendaEnterprisePanel({
     }
   };
 
+  const requestMutation = (action: 'register' | 'withdraw') => {
+    if (action === 'register') {
+      void mutate(action);
+      return;
+    }
+    confirm({
+      title: t('agenda.enterprise.withdrawConfirmTitle'),
+      message: t('agenda.enterprise.withdrawConfirmDescription', { title: session.title }),
+      confirmLabel: t('agenda.enterprise.withdraw'),
+      cancelLabel: t('agenda.enterprise.keepRegistration'),
+      variant: 'danger',
+      onConfirm: () => mutate('withdraw'),
+    });
+  };
+
   const openResource = async (url: string) => {
     try {
       await Linking.openURL(url);
@@ -88,6 +105,7 @@ export function EventAgendaEnterprisePanel({
   };
 
   return (
+    <>
     <Card variant="secondary" className="mt-3" testID={`agenda-enterprise-${session.id}`}>
       <Card.Body className="gap-3 p-3">
         <View className="flex-row flex-wrap items-center gap-2">
@@ -142,7 +160,7 @@ export function EventAgendaEnterprisePanel({
             size="sm"
             variant="primary"
             isDisabled={pending !== null}
-            onPress={() => void mutate('register')}
+            onPress={() => requestMutation('register')}
             testID={`agenda-register-${session.id}`}
           >
             <Button.Label>{pending === 'register' ? t('agenda.enterprise.registering') : t('agenda.enterprise.register')}</Button.Label>
@@ -153,7 +171,7 @@ export function EventAgendaEnterprisePanel({
             size="sm"
             variant="outline"
             isDisabled={pending !== null}
-            onPress={() => void mutate('withdraw')}
+            onPress={() => requestMutation('withdraw')}
             testID={`agenda-withdraw-${session.id}`}
           >
             <Button.Label>{pending === 'withdraw' ? t('agenda.enterprise.withdrawing') : t('agenda.enterprise.withdraw')}</Button.Label>
@@ -171,5 +189,7 @@ export function EventAgendaEnterprisePanel({
         ) : null}
       </Card.Body>
     </Card>
+    {confirmDialog}
+    </>
   );
 }

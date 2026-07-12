@@ -156,7 +156,7 @@ export async function cancelEventTicket(
   reason: string,
   idempotencyKey: string,
 ): Promise<MobileEventTicketMutation> {
-  const endpoint = `${API_V2}/events/${eventId}/tickets/entitlements/${entitlementId}/cancel`;
+  const endpoint = `${API_V2}/events/${eventId}/ticket-entitlements/${entitlementId}/cancel`;
   const response = await api.post<unknown>(endpoint, {
     expected_version: expectedVersion,
     reason,

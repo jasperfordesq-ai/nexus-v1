@@ -20,6 +20,7 @@ use App\Services\EventNotificationOutboxActionHandler;
 use App\Services\EventSafetyRequirementService;
 use App\Support\Events\EventSafetyFoundationSupport;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +44,20 @@ final class EventSafetyGuardianDeliveryBoundaryTest extends TestCase
         ]);
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
+    }
+
+    public function test_guardian_delivery_rollback_refuses_phase_b_delivery_dependency(): void
+    {
+        /** @var Migration $migration */
+        $migration = require database_path(
+            'migrations/2026_07_11_000061_add_event_guardian_delivery_boundary.php',
+        );
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'event_guardian_delivery_rollback_refused_dependents_exist',
+        );
+        $migration->down();
     }
 
     public function test_expand_migration_enforces_xor_and_composite_scope(): void

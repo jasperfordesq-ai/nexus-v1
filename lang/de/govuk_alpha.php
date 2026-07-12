@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'Der Kommentar konnte nicht hinzugefügt werden. Versuchen Sie es erneut.',
         'not_available' => 'Nicht verfügbar',
     ],
+    'forms' => [
+        'error_prefix' => 'Fehler:',
+    ],
     'home' => [
         'module_signin' => 'Melden Sie sich an',
         'module_signin_hint' => 'Melden Sie sich an, um dies zu nutzen.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Keine Kategorie',
         'start_time_label' => 'Startzeit',
         'end_time_label' => 'Endzeit',
+        'timezone_label' => 'Zeitzone der Veranstaltung',
+        'timezone_hint' => 'Verwenden Sie eine IANA-Zeitzone, zum Beispiel Europe/Berlin oder America/New_York.',
+        'all_day_label' => 'Dies ist eine ganztägige Veranstaltung',
+        'all_day_hint' => 'Die eingegebenen Uhrzeiten werden ignoriert. Geben Sie den ersten und letzten Kalendertag ein.',
+        'all_day_end_hint' => 'Geben Sie bei ganztägigen Veranstaltungen den einschließlich letzten Kalendertag ein.',
         'datetime_hint' => 'Verwenden Sie die Datums- und Uhrzeitauswahl oder geben Sie ein Datum und eine Uhrzeit ein.',
         'end_time_hint' => 'Optional. Fügen Sie eine Endzeit hinzu, falls das Ereignis eine hat.',
         'location_label' => 'Standort',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Ihre Antworten sind vertraulich und werden ausschließlich für Schutzmaßnahmen verwendet. Sie können sie jederzeit in Ihren Einstellungen ändern oder entfernen. Nichts wird ausgewählt, sofern Sie es nicht selbst wählen.',
             'none_separator' => 'Oder',
             'none_label' => 'Nichts davon trifft auf mich zu',
+            'options_legend' => 'Schutzoptionen',
+            'select_none' => 'Keine ausgewählt',
         ],
         'confirm' => [
             'title' => 'Angaben prüfen',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Verdacht auf Betrug oder Schwindel',
         'report_reason_duplicate' => 'Doppeltes Angebot',
         'report_reason_other' => 'Sonstiges',
+        'report_reason_required' => 'Wählen Sie einen Grund für diese Meldung.',
         'report_details_label' => 'Zusätzliche Details (optional)',
         'report_details_hint' => 'Geben Sie uns alle weiteren Informationen, die uns bei der Untersuchung helfen.',
         'report_submit' => 'Meldung senden',

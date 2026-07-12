@@ -30,6 +30,7 @@ import {
   Spinner,
   Textarea,
 } from '@/components/ui';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventSafetyApi,
@@ -111,6 +112,7 @@ function optionalInteger(value: string): number | null {
 export function EventSafetyWorkspace({ eventId }: { eventId: number }) {
   const { t, i18n } = useTranslation('event_safety');
   const toast = useToast();
+  const confirm = useConfirm();
   const [safety, setSafety] = useState<EventSafety | null>(null);
   const [requirements, setRequirements] = useState<RequirementForm | null>(null);
   const [reviews, setReviews] = useState<EventSafetyReviews | null>(null);
@@ -325,7 +327,15 @@ export function EventSafetyWorkspace({ eventId }: { eventId: number }) {
     setExpectedReviewVersion(item.denial.decision_version);
   };
 
-  const withdrawReview = async (denialId: number, version: number) => {
+  const withdrawReview = async (denialId: number, version: number, displayName: string) => {
+    const accepted = await confirm({
+      title: t('safety.confirmations.withdraw_review_title'),
+      body: t('safety.confirmations.withdraw_review_body', { name: displayName }),
+      confirmLabel: t('safety.actions.withdraw_review'),
+      cancelLabel: t('safety.actions.cancel'),
+      status: 'danger',
+    });
+    if (!accepted) return;
     setPendingAction(`withdraw-${denialId}`);
     try {
       const response = await eventSafetyApi.withdrawReview(
@@ -725,7 +735,11 @@ export function EventSafetyWorkspace({ eventId }: { eventId: number }) {
                         isDisabled={pendingAction !== null}
                         isLoading={pendingAction === `withdraw-${item.denial.id}`}
                         startContent={<Undo2 className="h-4 w-4" aria-hidden="true" />}
-                        onPress={() => void withdrawReview(item.denial.id, item.denial.decision_version)}
+                        onPress={() => void withdrawReview(
+                          item.denial.id,
+                          item.denial.decision_version,
+                          item.member.display_name,
+                        )}
                       >
                         {t('safety.actions.withdraw_review')}
                       </Button>

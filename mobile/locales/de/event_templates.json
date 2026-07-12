@@ -35,7 +35,25 @@
       "createdTitle": "Veranstaltungsentwurf erstellt",
       "createdDescription": "Überprüfen und veröffentlichen Sie es separat, wenn es fertig ist.",
       "createFailedTitle": "Entwurf kann nicht erstellt werden",
-      "createFailedDescription": "Der Veranstaltungsentwurf konnte nicht erstellt werden. Versuchen Sie es erneut."
+      "createFailedDescription": "Der Veranstaltungsentwurf konnte nicht erstellt werden. Versuchen Sie es erneut.",
+      "auditButton": "Prüfverlauf",
+      "auditTitle": "Prüfung: {{title}}",
+      "auditDescription": "Prüfen Sie den datenschutzgefilterten Betriebsverlauf dieser Vorlage.",
+      "auditImmutableTitle": "Der Verlauf kann nicht geändert werden",
+      "auditImmutableDescription": "Erfassungs-, Überarbeitungs-, Archivierungs- und Verwendungseinträge bleiben als unveränderliche Nachweise erhalten.",
+      "auditLoading": "Vorlagen-Prüfverlauf wird geladen",
+      "auditLoadFailedTitle": "Prüfverlauf nicht verfügbar",
+      "auditLoadFailedDescription": "Der Vorlagenverlauf konnte nicht geladen werden. Versuchen Sie es erneut.",
+      "auditEmpty": "Keine Prüfeinträge verfügbar.",
+      "auditEntry": "Version {{version}} · {{date}}",
+      "auditMaterializedEvent": "Veranstaltung #{{id}} erstellt",
+      "notRecorded": "Nicht erfasst",
+      "auditActions": {
+        "captured": "Vorlage erfasst",
+        "revised": "Vorlage überarbeitet",
+        "archived": "Vorlage archiviert",
+        "materialized": "Entwurf erstellt"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Sie haben weiterhin die Berechtigung, das Quellereignis zu verwalten",

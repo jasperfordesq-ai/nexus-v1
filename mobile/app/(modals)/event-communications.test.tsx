@@ -7,8 +7,10 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockGet = jest.fn();
+const mockGetDetail = jest.fn();
 const mockPreview = jest.fn();
 const mockCreate = jest.fn();
+const mockRevise = jest.fn();
 const mockSchedule = jest.fn();
 const mockCancel = jest.fn();
 const mockRetry = jest.fn();
@@ -29,8 +31,10 @@ jest.mock('@/components/ui/AppToast', () => ({
 }));
 jest.mock('@/lib/api/eventCommunications', () => ({
   getEventCommunications: (...args: unknown[]) => mockGet(...args),
+  getEventCommunicationDetail: (...args: unknown[]) => mockGetDetail(...args),
   previewEventCommunication: (...args: unknown[]) => mockPreview(...args),
   createEventCommunication: (...args: unknown[]) => mockCreate(...args),
+  reviseEventCommunication: (...args: unknown[]) => mockRevise(...args),
   scheduleEventCommunication: (...args: unknown[]) => mockSchedule(...args),
   cancelEventCommunication: (...args: unknown[]) => mockCancel(...args),
   retryEventCommunication: (...args: unknown[]) => mockRetry(...args),
@@ -43,6 +47,8 @@ jest.mock('react-i18next', () => {
     new_message: 'New message',
     compose_title: 'Compose message',
     compose_description: 'Write a message for an exact audience.',
+    compose_edit_title: 'Revise draft',
+    compose_edit_description: 'Review the current draft before saving a new version.',
     variant_label: 'Message type',
     segments_label: 'Audience segments',
     segments_description: 'Canonical event audiences.',
@@ -50,6 +56,7 @@ jest.mock('react-i18next', () => {
     body_label: 'Message',
     preview_button: 'Preview audience',
     save_draft_button: 'Save draft',
+    revise_draft_button: 'Save changes',
     preview_title: 'Exact audience preview',
     preview_summary: '{{recipients}} recipients, {{deliveries}} deliveries',
     schedule_title: 'Schedule message',
@@ -68,6 +75,20 @@ jest.mock('react-i18next', () => {
     schedule_button: 'Schedule',
     cancel_button: 'Cancel',
     retry_button: 'Retry',
+    history_button: 'Audit history',
+    history_title: '{{type}} audit history',
+    history_description: 'Append-only lifecycle evidence.',
+    history_immutable_title: 'History cannot be changed',
+    history_immutable_description: 'Every lifecycle transition remains available.',
+    history_loading: 'Loading audit history',
+    history_load_failed_title: 'Audit history unavailable',
+    history_load_failed_description: 'Try again.',
+    history_empty: 'No history entries.',
+    history_entry_version: 'Version {{version}} on {{date}}',
+    history_transition: '{{from}} to {{to}}',
+    history_initial_status: 'Initial status: {{status}}',
+    'history_actions.created': 'Draft created',
+    'history_actions.revised': 'Draft revised',
     not_recorded: 'Not recorded',
     version: 'Version {{version}}',
     audience_summary: '{{count}} recipients across {{segments}}',
@@ -86,6 +107,9 @@ jest.mock('react-i18next', () => {
     'channels.email': 'Email',
     'channels.in_app': 'In-app notification',
     'channels.push': 'Push notification',
+    'common:buttons.loadMore': 'Load more',
+    'common:buttons.edit': 'Edit',
+    'common:buttons.done': 'Done',
   };
   return {
     useTranslation: () => ({
@@ -144,6 +168,19 @@ beforeEach(() => {
     generated_at: '2026-07-11T10:00:00+00:00',
   });
   mockCreate.mockResolvedValue(broadcast({ body: '  Exact organizer prose.\n  ' }));
+  mockGetDetail.mockResolvedValue({
+    broadcast: broadcast({ body: 'Original draft body' }),
+    history: [{
+      id: 31,
+      version: 1,
+      action: 'created',
+      from_status: null,
+      to_status: 'draft',
+      metadata: { recipient_count: 12 },
+      created_at: '2026-07-11T10:00:00+00:00',
+    }],
+  });
+  mockRevise.mockResolvedValue(broadcast({ body: 'Revised organizer prose.', version: 2 }));
   mockSchedule.mockResolvedValue(broadcast({
     status: 'scheduled',
     version: 2,
@@ -198,5 +235,57 @@ describe('EventCommunicationsScreen', () => {
     fireEvent.press(screen.getByText('Confirm cancellation'));
 
     await waitFor(() => expect(mockCancel).toHaveBeenCalledWith(8, 2, 'Plan changed', expect.any(String)));
+  });
+
+  it('loads the current draft and saves a revision with optimistic versioning', async () => {
+    const screen = render(<EventCommunicationsScreen />);
+    await screen.findByText('Announcement');
+
+    fireEvent.press(screen.getByText('Edit'));
+    const body = await screen.findByDisplayValue('Original draft body');
+    fireEvent.changeText(body, 'Revised organizer prose.');
+    fireEvent.press(screen.getByText('Preview audience'));
+    await screen.findByText('12 recipients, 24 deliveries');
+    fireEvent.press(screen.getByText('Save changes'));
+
+    await waitFor(() => expect(mockRevise).toHaveBeenCalledWith(
+      8,
+      1,
+      expect.objectContaining({ body: 'Revised organizer prose.' }),
+      expect.any(String),
+    ));
+  });
+
+  it('shows the privacy-filtered append-only communication audit ledger', async () => {
+    const screen = render(<EventCommunicationsScreen />);
+    await screen.findByText('Announcement');
+
+    fireEvent.press(screen.getByText('Audit history'));
+
+    expect(await screen.findByText('Announcement audit history')).toBeTruthy();
+    expect(screen.getByText('History cannot be changed')).toBeTruthy();
+    expect(screen.getByText('Draft created')).toBeTruthy();
+    expect(screen.getByText('Initial status: Draft')).toBeTruthy();
+    expect(mockGetDetail).toHaveBeenCalledWith(8);
+    expect(screen.queryByText(/@/)).toBeNull();
+  });
+
+  it('loads every page of the communication ledger', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        data: [broadcast()],
+        meta: { base_url: '', current_page: 1, per_page: 50, total: 51, total_pages: 2, has_more: true },
+      })
+      .mockResolvedValueOnce({
+        data: [broadcast({ id: 9, audience: { segments: ['registration_confirmed'], recipient_count: 3 } })],
+        meta: { base_url: '', current_page: 2, per_page: 50, total: 51, total_pages: 2, has_more: false },
+      });
+    const screen = render(<EventCommunicationsScreen />);
+
+    await screen.findByText('Load more');
+    fireEvent.press(screen.getByText('Load more'));
+
+    await waitFor(() => expect(mockGet).toHaveBeenLastCalledWith(42, 2));
+    expect(await screen.findByText('3 recipients across Confirmed registrations')).toBeTruthy();
   });
 });

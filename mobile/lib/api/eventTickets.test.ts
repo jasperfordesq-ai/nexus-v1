@@ -35,7 +35,7 @@ const availability = {
   refund_policy: {
     cutoff_at: null,
     organizer_cancel_refundable: false,
-    execution_status: 'not_integrated',
+    execution_status: 'not_applicable',
   },
 };
 
@@ -134,7 +134,7 @@ describe('mobile event tickets API', () => {
     await cancelEventTicket(4, 12, 1, 'Plans changed', 'mobile-ticket-cancel');
 
     expect(api.post).toHaveBeenCalledWith(
-      '/api/v2/events/4/tickets/entitlements/12/cancel',
+      '/api/v2/events/4/ticket-entitlements/12/cancel',
       { expected_version: 1, reason: 'Plans changed' },
       { headers: { 'Idempotency-Key': 'mobile-ticket-cancel' } },
     );

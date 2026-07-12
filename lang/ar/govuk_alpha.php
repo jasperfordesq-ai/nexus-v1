@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'لا يمكن إضافة التعليق. حاول ثانية.',
         'not_available' => 'غير متوفر',
     ],
+    'forms' => [
+        'error_prefix' => 'خطأ:',
+    ],
     'home' => [
         'module_signin' => 'تسجيل الدخول',
         'module_signin_hint' => 'تسجيل الدخول لاستخدام هذا.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'لا توجد فئة',
         'start_time_label' => 'وقت البدء',
         'end_time_label' => 'وقت الانتهاء',
+        'timezone_label' => 'المنطقة الزمنية للفعالية',
+        'timezone_hint' => 'استخدم اسم منطقة زمنية من IANA، مثل Asia/Riyadh أو Europe/Dublin.',
+        'all_day_label' => 'هذه فعالية تستمر طوال اليوم',
+        'all_day_hint' => 'سيتم تجاهل الأوقات المدخلة. أدخل تاريخ أول يوم وآخر يوم في الفعالية.',
+        'all_day_end_hint' => 'للفعاليات التي تستمر طوال اليوم، أدخل تاريخ اليوم الأخير ضمن الفعالية.',
         'datetime_hint' => 'استخدم منتقي التاريخ والوقت، أو أدخل التاريخ والوقت.',
         'end_time_hint' => 'خياري. أضف وقت انتهاء إذا كان للحدث وقت.',
         'location_label' => 'الموقع',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'إجاباتك خاصة وتُستخدم فقط لأغراض الحماية. يمكنك تغييرها أو إزالتها في أي وقت من إعداداتك. لا يُحدَّد أي خيار ما لم تختره أنت.',
             'none_separator' => 'أو',
             'none_label' => 'لا ينطبق عليّ أي من هذه',
+            'options_legend' => 'خيارات الحماية',
+            'select_none' => 'لا شيء مختار',
         ],
         'confirm' => [
             'title' => 'تحقق من إجاباتك',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'احتيال أو نصب مشتبه به',
         'report_reason_duplicate' => 'قائمة مكررة',
         'report_reason_other' => 'أخرى',
+        'report_reason_required' => 'اختر سببًا لهذا البلاغ.',
         'report_details_label' => 'تفاصيل إضافية (اختياري)',
         'report_details_hint' => 'أعطنا أي معلومات إضافية تساعدنا في التحقيق.',
         'report_submit' => 'إرسال البلاغ',

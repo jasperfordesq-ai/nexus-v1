@@ -23,6 +23,9 @@ use App\Services\EventRegistrationSettingsService;
 use App\Services\EventRegistrationSubmissionExportService;
 use App\Services\EventRegistrationSubmissionService;
 use App\Services\EventService;
+use App\Support\Events\EventRegistrationFoundationSupport;
+use App\Support\Events\EventRegistrationFormRuleSet;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -72,11 +75,11 @@ trait EventRegistrationParity
             ? $this->eventsRegistrationPositiveInteger($request->input('max_guests_per_registration'))
             : 0;
         $approvalMode = $request->input('approval_mode');
-        $dateInputsAreValid = collect([
-            $request->input('opens_at'),
-            $request->input('closes_at'),
-            $request->input('cancellation_cutoff_at'),
-        ])->every(static fn (mixed $value): bool => $value === null || is_string($value));
+        $opensAt = $request->input('opens_at');
+        $closesAt = $request->input('closes_at');
+        $cancellationCutoff = $request->input('cancellation_cutoff_at');
+        $dateInputsAreValid = collect([$opensAt, $closesAt, $cancellationCutoff])
+            ->every(static fn (mixed $value): bool => $value === null || is_string($value));
         if ($key === null || $revision === null || $perMemberLimit === null
             || $guestRetentionDays === null || $maxGuests === null
             || ! $dateInputsAreValid || ! is_string($approvalMode)
@@ -87,15 +90,20 @@ trait EventRegistrationParity
         }
 
         try {
+            $support = app(EventRegistrationFoundationSupport::class);
+            $tenantId = $support->tenantId();
+            $event = $support->concreteEvent($tenantId, $id);
+            $timezone = $support->eventTimezone($event);
             app(EventRegistrationSettingsService::class)->save(
                 $id,
                 $actor,
                 [
                     'approval_mode' => $approvalMode,
-                    'opens_at' => $this->eventsRegistrationNullableString($request->input('opens_at')),
-                    'closes_at' => $this->eventsRegistrationNullableString($request->input('closes_at')),
-                    'cancellation_cutoff_at' => $this->eventsRegistrationNullableString(
-                        $request->input('cancellation_cutoff_at'),
+                    'opens_at' => $this->eventsRegistrationLocalInstant($opensAt, $timezone),
+                    'closes_at' => $this->eventsRegistrationLocalInstant($closesAt, $timezone),
+                    'cancellation_cutoff_at' => $this->eventsRegistrationLocalInstant(
+                        $cancellationCutoff,
+                        $timezone,
                     ),
                     'per_member_limit' => $perMemberLimit,
                     'guests_enabled' => $guestsEnabled,
@@ -712,7 +720,7 @@ trait EventRegistrationParity
         }
         $revision = $this->eventsRegistrationPositiveInteger($request->input('expected_revision'));
         $reason = is_string($request->input('reason')) ? trim((string) $request->input('reason')) : '';
-        if ($revision === null || $reason === '') {
+        if ($revision === null || $reason === '' || ! $request->boolean('confirm_destructive')) {
             return $this->eventsRegistrationIndexRedirect($tenantSlug, $id)
                 ->withErrors(['registration' => __('event_registration.accessible.validation_error')]);
         }
@@ -802,7 +810,7 @@ trait EventRegistrationParity
             return $actor;
         }
         $key = $this->eventsRegistrationIdempotencyKey($request);
-        if ($key === null) {
+        if ($key === null || ! $request->boolean('confirm_destructive')) {
             return $this->eventsRegistrationIndexRedirect($tenantSlug, $id)
                 ->withErrors(['registration' => __('event_registration.accessible.validation_error')]);
         }
@@ -954,15 +962,26 @@ trait EventRegistrationParity
         $input = $request->input('answers', []);
         $input = is_array($input) ? $input : [];
         $answers = [];
+        $visibleAnswers = [];
+        $rules = app(EventRegistrationFormRuleSet::class);
         foreach ($form->questions as $question) {
             $key = (string) $question->stable_key;
             $type = $question->question_type->value;
+            $visibilityRules = is_array($question->visibility_rules) ? $question->visibility_rules : null;
+            if (! $rules->isVisible($visibilityRules, $visibleAnswers)) {
+                continue;
+            }
             if (in_array($type, ['consent', 'waiver'], true)) {
-                $answers[$key] = filter_var($input[$key] ?? false, FILTER_VALIDATE_BOOL);
-            } elseif ($type === 'multiple_choice') {
-                $answers[$key] = is_array($input[$key] ?? null) ? array_values($input[$key]) : [];
+                if (array_key_exists($key, $input)) {
+                    $answers[$key] = filter_var($input[$key], FILTER_VALIDATE_BOOL);
+                }
+            } elseif ($type === 'multiple_choice' && array_key_exists($key, $input)) {
+                $answers[$key] = is_array($input[$key]) ? array_values($input[$key]) : [];
             } elseif (array_key_exists($key, $input) && is_string($input[$key])) {
-                $answers[$key] = trim($input[$key]);
+                $answers[$key] = $input[$key];
+            }
+            if (array_key_exists($key, $answers)) {
+                $visibleAnswers[$key] = $answers[$key];
             }
         }
 
@@ -1017,14 +1036,21 @@ trait EventRegistrationParity
         return $parsed === false ? null : (int) $parsed;
     }
 
-    private function eventsRegistrationNullableString(mixed $value): ?string
+    private function eventsRegistrationLocalInstant(mixed $value, string $timezone): ?string
     {
         if (! is_string($value)) {
             return null;
         }
         $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+        $instant = CarbonImmutable::createFromFormat('!Y-m-d\TH:i', $value, $timezone);
+        if ($instant === false || $instant->format('Y-m-d\TH:i') !== $value) {
+            throw new EventRegistrationFoundationException('event_registration_local_instant_invalid');
+        }
 
-        return $value === '' ? null : $value;
+        return $instant->format('Y-m-d\TH:i:sP');
     }
 
     private function eventsRegistrationFailure(

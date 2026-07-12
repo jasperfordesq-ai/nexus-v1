@@ -42,6 +42,7 @@
     "units": "{{count}} unidad",
     "units_other": "{{count}} unidades",
     "cancel": "Cancelar billete",
+    "time_credit_cancel_disabled": "La cancelación de entradas con créditos de tiempo no está disponible en este flujo solo gratuito. No se ha realizado ninguna acción en la cartera.",
     "cancelled": "Cancelado",
     "cancel_title": "¿Cancelar este billete?",
     "cancel_reason": "Motivo de la cancelación",

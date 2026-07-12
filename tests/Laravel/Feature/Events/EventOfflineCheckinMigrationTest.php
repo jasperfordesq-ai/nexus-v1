@@ -43,6 +43,7 @@ final class EventOfflineCheckinMigrationTest extends TestCase
         '2026_07_11_000064_add_event_venue_accessibility.php',
         '2026_07_11_000065_expand_event_agenda_enterprise.php',
         '2026_07_11_000066_add_event_context_to_notification_queue.php',
+        '2026_07_11_000067_pin_event_agenda_registration_versions.php',
     ];
 
     public function test_schema_is_tenant_scoped_versioned_bounded_and_append_only(): void

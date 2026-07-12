@@ -13,6 +13,10 @@
     "options": { "any": "Qualquer local", "yes": "Acesso sem degraus confirmado", "no": "Com degraus", "unknown": "Desconhecido" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Sair da lista de espera?",
+    "leaveWaitlistConfirmDescription": "Perderá a posição atual e poderá ter de voltar a entrar no fim da fila.",
+    "offerDeclineConfirmTitle": "Recusar este lugar reservado?",
+    "offerDeclineConfirmDescription": "O lugar reservado será libertado e a sua oferta da lista de espera terminará.",
     "offerAvailable": "Lugar disponível",
     "offerTitle": "Há um lugar disponível para si",
     "offerDescription": "Tem agora um lugar reservado da lista de espera. Aceite-o para confirmar a sua presença.",
@@ -129,6 +133,9 @@
       "cancelled": "Cancelada"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Retirar-se desta sessão?",
+      "withdrawConfirmDescription": "O seu lugar em {{title}} será libertado e poderá ser ocupado por outra pessoa.",
+      "keepRegistration": "Manter o meu lugar",
       "capacityUnlimited": "{{count}} inscritos · sem limite",
       "capacityLimited": "{{registered}} de {{limit}} inscritos",
       "full": "Lotada",

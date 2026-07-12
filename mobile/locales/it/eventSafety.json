@@ -7,6 +7,12 @@
       "request_guardian_consent": "Richiedi il consenso del tutore",
       "withdraw_guardian_consent": "Ritirare la richiesta di consenso"
     },
+    "confirmations": {
+      "withdraw_code_title": "Ritirare l’accettazione del codice di condotta?",
+      "withdraw_code_body": "La partecipazione potrebbe essere bloccata finché non accetti di nuovo la versione corrente.",
+      "withdraw_guardian_title": "Ritirare la richiesta di consenso del tutore?",
+      "withdraw_guardian_body": "La richiesta attuale diventerà non valida. Potresti doverne inviare una nuova prima di partecipare."
+    },
     "attendee": {
       "title": "Requisiti di partecipazione",
       "description": "Completa i passaggi di sicurezza applicabili prima di registrarti o iscriverti alla lista d'attesa.",

@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "このセッションを辞退しますか？",
+  "withdraw_confirm_body": "{{title}} の席は解放され、別の参加者が利用できるようになります。",
+  "keep_registration": "席を維持する",
   "capacity_label": "セッション定員",
   "capacity_hint": "無制限の場合は空欄にします。セッション枠はイベント登録やチケットを変更しません。",
   "capacity_unlimited": "登録 {{registered}} 人・定員なし",

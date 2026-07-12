@@ -13,6 +13,7 @@ use App\Enums\EventInvitationCampaignType;
 use App\Exceptions\EventRegistrationFoundationException;
 use App\Models\EventInvitationCampaign;
 use App\Models\User;
+use App\Support\Events\EventInvitationRecipientAuthorizer;
 use App\Support\Events\EventInvitationRecipientExpander;
 use App\Support\Events\EventRegistrationFoundationSupport;
 use Carbon\CarbonImmutable;
@@ -27,10 +28,14 @@ final class EventInvitationCampaignService
         'ar', 'de', 'en', 'es', 'fr', 'ga', 'it', 'ja', 'nl', 'pl', 'pt',
     ];
 
+    private readonly EventInvitationRecipientAuthorizer $recipientAuthorizer;
+
     public function __construct(
         private readonly EventRegistrationFoundationSupport $support = new EventRegistrationFoundationSupport(),
         private readonly EventInvitationRecipientExpander $expander = new EventInvitationRecipientExpander(),
+        ?EventInvitationRecipientAuthorizer $recipientAuthorizer = null,
     ) {
+        $this->recipientAuthorizer = $recipientAuthorizer ?? new EventInvitationRecipientAuthorizer();
     }
 
     /**
@@ -68,7 +73,18 @@ final class EventInvitationCampaignService
             $event = $this->support->concreteEvent($tenantId, $eventId, true);
             $persistedActor = $this->support->actor($tenantId, $actor, true);
             $this->support->authorizeManager($persistedActor, $event);
-            $expanded = $this->expander->expand($tenantId, $type, $source);
+            $expanded = $this->expander->expand(
+                $tenantId,
+                $type,
+                $source,
+                $persistedActor,
+            );
+            $expanded = $this->recipientAuthorizer->filterPreview(
+                $tenantId,
+                $event,
+                $persistedActor,
+                $expanded,
+            );
             $locale = $this->locale($defaultLocale ?? (string) ($persistedActor->preferred_language ?? 'en'));
             $requestHash = $this->support->requestHash([
                 'action' => 'campaign_previewed',

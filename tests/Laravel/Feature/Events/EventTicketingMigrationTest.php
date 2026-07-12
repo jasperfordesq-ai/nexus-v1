@@ -148,21 +148,13 @@ final class EventTicketingMigrationTest extends TestCase
         );
     }
 
-    public function test_rollback_refuses_even_draft_ticket_type_evidence(): void
+    public function test_rollback_refuses_guest_ticket_entitlement_dependency_before_teardown(): void
     {
-        $owner = $this->ticketUser();
-        [$eventId, $start] = $this->ticketEvent((int) $owner->id);
-        (new \App\Services\EventTicketTypeService())->create(
-            $eventId,
-            $owner,
-            $this->ticketTypePayload($start),
-            'rollback-ticket-create',
-        );
         /** @var Migration $migration */
         $migration = require database_path('migrations/' . self::MIGRATION);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('event_ticketing_rollback_refused_durable_evidence');
+        $this->expectExceptionMessage('event_ticketing_rollback_refused_dependents_exist');
         $migration->down();
     }
 

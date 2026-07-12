@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'レビュー者',
         'withdraw_review' => '決定の撤回',
         'ledger_empty' => 'このイベントには参加レビューが記録されていません。',
+        'confirm_archive_checkbox' => '現在の安全要件が無効になることを理解しています。',
+        'confirm_withdraw_code' => '行動規範に再度同意するまで参加できなくなる場合があることを理解しています。',
+        'confirm_withdraw_guardian' => '現在の同意依頼が無効になることを理解しています。',
+        'confirm_withdraw_review' => ':name に対する有効な決定を取り消すことを確認します。',
     ],
 ];

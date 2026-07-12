@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import Checkbox from '@/components/ui/Checkbox';
 import Input from '@/components/ui/Input';
 import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import {
   acceptRegistrationInvitation,
   amendRegistrationSubmission,
@@ -23,6 +24,12 @@ import {
   type RegistrationQuestion,
   type RegistrationSubmission,
 } from '@/lib/api/eventRegistration';
+import {
+  type RegistrationAnswerValidationError,
+  validateRegistrationAnswers,
+  visibleRegistrationAnswers,
+  visibleRegistrationQuestions,
+} from '@/lib/events/eventRegistrationFormRules';
 import { useApi } from '@/lib/hooks/useApi';
 import type { Theme } from '@/lib/hooks/useTheme';
 
@@ -37,37 +44,6 @@ function mutationKey(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function isVisible(question: RegistrationQuestion, answers: Record<string, unknown>): boolean {
-  const rules = question.visibility_rules as {
-    match?: 'all' | 'any';
-    conditions?: Array<{ question_key?: string; operator?: string; value?: unknown }>;
-  } | null | undefined;
-  if (!rules?.conditions?.length) return true;
-  const matches = rules.conditions.map((condition) => {
-    const actual = condition.question_key ? answers[condition.question_key] : undefined;
-    const answered = actual !== undefined && actual !== null && actual !== ''
-      && (!Array.isArray(actual) || actual.length > 0);
-    if (condition.operator === 'is_answered') return answered;
-    if (condition.operator === 'is_not_answered') return !answered;
-    if (!answered) return false;
-    if (condition.operator === 'equals') return actual === condition.value;
-    if (condition.operator === 'not_equals') return actual !== condition.value;
-    if (condition.operator === 'contains') {
-      return Array.isArray(actual)
-        ? actual.includes(condition.value)
-        : typeof actual === 'string' && typeof condition.value === 'string' && actual.includes(condition.value);
-    }
-    if (condition.operator === 'not_contains') {
-      return Array.isArray(actual)
-        ? !actual.includes(condition.value)
-        : typeof actual !== 'string' || typeof condition.value !== 'string' || !actual.includes(condition.value);
-    }
-    return false;
-  });
-
-  return rules.match === 'any' ? matches.some(Boolean) : matches.every(Boolean);
-}
-
 export default function EventRegistrationPanel({
   eventId,
   primary,
@@ -76,12 +52,14 @@ export default function EventRegistrationPanel({
 }: EventRegistrationPanelProps) {
   const { t, i18n } = useTranslation('eventRegistration');
   const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const registrationApi = useApi(
     () => getAttendeeRegistrationProduct(eventId),
     [eventId],
     { enabled: eventId > 0 },
   );
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, RegistrationAnswerValidationError>>({});
   const [submissionOverride, setSubmissionOverride] = useState<RegistrationSubmission | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [guestName, setGuestName] = useState('');
@@ -92,6 +70,7 @@ export default function EventRegistrationPanel({
 
   useEffect(() => {
     setAnswers({});
+    setValidationErrors({});
     setSubmissionOverride(null);
   }, [eventId]);
 
@@ -114,6 +93,10 @@ export default function EventRegistrationPanel({
     )) ?? null;
   }, [activeRegistration, state?.form, state?.submissions]);
   const submission = submissionOverride ?? serverSubmission;
+  const visibleQuestions = useMemo(
+    () => state?.form ? visibleRegistrationQuestions(state.form.questions, answers) : [],
+    [answers, state?.form],
+  );
 
   useEffect(() => {
     if (!submission || submission.status !== 'draft') return;
@@ -141,12 +124,15 @@ export default function EventRegistrationPanel({
 
   async function saveAnswers(shouldSubmit: boolean) {
     if (!state?.form || !activeRegistration) return;
+    const nextErrors = validateRegistrationAnswers(state.form.questions, answers, shouldSubmit);
+    setValidationErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      showToast({ title: t('accessible.validation_error'), variant: 'danger' });
+      return;
+    }
     setPendingAction(shouldSubmit ? 'submit' : 'save');
     try {
-      const visibleAnswers = Object.fromEntries(state.form.questions
-        .filter((question) => isVisible(question, answers))
-        .filter((question) => Object.prototype.hasOwnProperty.call(answers, question.stable_key))
-        .map((question) => [question.stable_key, answers[question.stable_key]]));
+      const visibleAnswers = visibleRegistrationAnswers(state.form.questions, answers);
       const saved = await saveRegistrationSubmission(eventId, {
         registrationId: activeRegistration.id,
         formVersionId: state.form.id,
@@ -248,12 +234,34 @@ export default function EventRegistrationPanel({
 
   function updateAnswer(question: RegistrationQuestion, value: unknown) {
     setAnswers((current) => ({ ...current, [question.stable_key]: value }));
+    setValidationErrors((current) => {
+      if (!current[question.stable_key]) return current;
+      const next = { ...current };
+      delete next[question.stable_key];
+      return next;
+    });
+  }
+
+  function requestGuestCancellation(guestId: number, revision: number, displayName: string) {
+    confirm({
+      title: t('guests.cancel_confirm_title'),
+      message: t('guests.cancel_confirm_body', { name: displayName }),
+      confirmLabel: t('guests.cancel'),
+      cancelLabel: t('guests.keep'),
+      variant: 'danger',
+      onConfirm: () => cancelGuest(guestId, revision),
+    });
+  }
+
+  function validationMessage(error: RegistrationAnswerValidationError | undefined): string | undefined {
+    if (!error) return undefined;
+    return t(`answers.validation.${error.code}`, { count: error.limit, limit: error.limit });
   }
 
   function renderQuestion(question: RegistrationQuestion) {
-    if (!isVisible(question, answers)) return null;
     const value = answers[question.stable_key];
     const choices = question.choice_options ?? [];
+    const error = validationMessage(validationErrors[question.stable_key]);
     if (question.question_type === 'single_choice') {
       return (
         <View key={question.id} className="gap-2">
@@ -272,6 +280,7 @@ export default function EventRegistrationPanel({
               </Button>
             ))}
           </View>
+          {error ? <Text className="text-sm" style={{ color: theme.error }} accessibilityRole="alert">{error}</Text> : null}
         </View>
       );
     }
@@ -291,6 +300,7 @@ export default function EventRegistrationPanel({
               label={choice}
             />
           ))}
+          {error ? <Text className="text-sm" style={{ color: theme.error }} accessibilityRole="alert">{error}</Text> : null}
         </View>
       );
     }
@@ -307,6 +317,7 @@ export default function EventRegistrationPanel({
               {question.displayed_text}
             </Text>
           ) : null}
+          {error ? <Text className="text-sm" style={{ color: theme.error }} accessibilityRole="alert">{error}</Text> : null}
         </View>
       );
     }
@@ -315,9 +326,13 @@ export default function EventRegistrationPanel({
         <Input
           key={question.id}
           label={question.prompt}
+          error={error}
           value={typeof value === 'string' ? value : ''}
           onChangeText={(text) => updateAnswer(question, text)}
-          maxLength={Number((question.validation_rules as { max_length?: number } | null)?.max_length ?? 2000)}
+          maxLength={Math.min(
+            Number((question.validation_rules as { max_length?: number } | null)?.max_length ?? 500),
+            500,
+          )}
         />
       );
     }
@@ -332,9 +347,14 @@ export default function EventRegistrationPanel({
           textAlignVertical="top"
           value={typeof value === 'string' ? value : ''}
           onChangeText={(text) => updateAnswer(question, text)}
-          maxLength={Number((question.validation_rules as { max_length?: number } | null)?.max_length ?? 20000)}
+          maxLength={Math.min(
+            Number((question.validation_rules as { max_length?: number } | null)?.max_length ?? 10000),
+            10000,
+          )}
           accessibilityLabel={question.prompt}
+          accessibilityHint={error ?? question.help_text ?? undefined}
         />
+        {error ? <Text className="text-sm" style={{ color: theme.error }} accessibilityRole="alert">{error}</Text> : null}
       </View>
     );
   }
@@ -369,6 +389,7 @@ export default function EventRegistrationPanel({
   if (!state || (!state.settings && state.invitations.length === 0)) return null;
 
   return (
+    <>
     <Card variant="secondary" testID="event-registration-panel">
       <Card.Body className="gap-5 p-4">
         <View className="flex-row items-start justify-between gap-3">
@@ -420,7 +441,7 @@ export default function EventRegistrationPanel({
               </Button>
             ) : (
               <>
-                {state.form.questions.map(renderQuestion)}
+                {visibleQuestions.map(renderQuestion)}
                 <View className="flex-row flex-wrap gap-2">
                   <Button variant="secondary" isDisabled={pendingAction !== null} onPress={() => void saveAnswers(false)}>
                     {pendingAction === 'save' ? <Spinner size="sm" /> : t('submissions.save_draft')}
@@ -449,7 +470,16 @@ export default function EventRegistrationPanel({
                   <Text className="text-xs" style={{ color: theme.textSecondary }}>{t(`statuses.${guest.status}`)}</Text>
                 </View>
                 {guest.status === 'captured' ? (
-                  <Button size="sm" variant="secondary" isDisabled={pendingAction !== null} onPress={() => void cancelGuest(guest.id, guest.revision)}>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    isDisabled={pendingAction !== null}
+                    onPress={() => requestGuestCancellation(
+                      guest.id,
+                      guest.revision,
+                      guest.display_name ?? t('guests.name_hidden'),
+                    )}
+                  >
                     {pendingAction === `guest-${guest.id}` ? <Spinner size="sm" /> : t('guests.cancel')}
                   </Button>
                 ) : null}
@@ -478,5 +508,7 @@ export default function EventRegistrationPanel({
         ) : null}
       </Card.Body>
     </Card>
+    {confirmDialog}
+    </>
   );
 }

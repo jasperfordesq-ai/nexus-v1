@@ -7,6 +7,12 @@
       "request_guardian_consent": "Iarr toiliú caomhnóra",
       "withdraw_guardian_consent": "Iarratas ar thoiliú a tharraingt siar"
     },
+    "confirmations": {
+      "withdraw_code_title": "Tarraing siar d’admháil ar an gcód iompair?",
+      "withdraw_code_body": "D’fhéadfadh sé seo bac a chur ar do rannpháirtíocht go dtí go n-admhóidh tú an leagan reatha arís.",
+      "withdraw_guardian_title": "Tarraing siar an t-iarratas ar thoiliú caomhnóra?",
+      "withdraw_guardian_body": "Beidh an t-iarratas reatha neamhbhailí. Seans go mbeidh ort iarratas nua a sheoladh sula nglacfaidh tú páirt."
+    },
     "attendee": {
       "title": "Ceanglais rannpháirtíochta",
       "description": "Críochnaigh na céimeanna sábháilteachta is infheidhme roimh chlárú nó dul isteach ar an liosta feithimh.",

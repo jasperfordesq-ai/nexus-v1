@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Révisé par',
         'withdraw_review' => 'Retirer la décision',
         'ledger_empty' => 'Aucun avis de participation n\'a été enregistré pour cet événement.',
+        'confirm_archive_checkbox' => 'Je comprends que cela désactivera les exigences de sécurité actuelles.',
+        'confirm_withdraw_code' => 'Je comprends que cela peut bloquer ma participation jusqu’à ce que j’accepte à nouveau le code.',
+        'confirm_withdraw_guardian' => 'Je comprends que la demande de consentement actuelle deviendra invalide.',
+        'confirm_withdraw_review' => 'Je confirme vouloir retirer la décision active pour :name.',
     ],
 ];

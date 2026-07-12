@@ -15,6 +15,7 @@ use App\Exceptions\EventTicketingException;
 use App\Models\Event;
 use App\Models\EventTicketEntitlement;
 use App\Models\User;
+use App\Policies\EventPolicy;
 use App\Support\Events\EventTicketEligibilityPolicy;
 use App\Support\Events\EventTicketingSupport;
 use Carbon\CarbonImmutable;
@@ -29,6 +30,7 @@ final class EventTicketEntitlementService
     public function __construct(
         private readonly EventTicketingSupport $support = new EventTicketingSupport(),
         private readonly EventTicketEligibilityPolicy $eligibility = new EventTicketEligibilityPolicy(),
+        private readonly EventPolicy $policy = new EventPolicy(),
     ) {
     }
 
@@ -129,7 +131,6 @@ final class EventTicketEntitlementService
                 }
                 $this->support->authorizeView($persistedActor, $event);
             }
-            $ticket = $this->ticketRow($tenantId, $eventId, $ticketTypeId, true);
             $replay = $this->allocationReplay(
                 $tenantId,
                 $eventId,
@@ -140,7 +141,7 @@ final class EventTicketEntitlementService
                 $units,
                 $keyHash,
                 $requestHash,
-                true,
+                false,
             );
             if ($replay !== null) {
                 [$confirmedUnits] = $this->confirmedUnitTotalsForUpdate(
@@ -156,14 +157,6 @@ final class EventTicketEntitlementService
                     'confirmed_units_after' => $confirmedUnits,
                 ];
             }
-            if ((string) $ticket->kind === EventTicketKind::TimeCredit->value) {
-                throw new EventTicketingException('event_ticket_time_credit_gateway_unavailable');
-            }
-            if ((string) $ticket->kind !== EventTicketKind::Free->value
-                || (string) $ticket->status !== EventTicketTypeStatus::Active->value
-                || (string) $ticket->unit_price_credits !== '0.00') {
-                throw new EventTicketingException('event_ticket_free_type_not_allocatable');
-            }
             $registration = DB::table('event_registrations')
                 ->where('tenant_id', $tenantId)
                 ->where('event_id', $eventId)
@@ -173,6 +166,15 @@ final class EventTicketEntitlementService
                 ->first();
             if ($registration === null || (string) $registration->registration_state !== 'confirmed') {
                 throw new EventTicketingException('event_ticket_confirmed_registration_required');
+            }
+            $ticket = $this->ticketRow($tenantId, $eventId, $ticketTypeId, true);
+            if ((string) $ticket->kind === EventTicketKind::TimeCredit->value) {
+                throw new EventTicketingException('event_ticket_time_credit_gateway_unavailable');
+            }
+            if ((string) $ticket->kind !== EventTicketKind::Free->value
+                || (string) $ticket->status !== EventTicketTypeStatus::Active->value
+                || (string) $ticket->unit_price_credits !== '0.00') {
+                throw new EventTicketingException('event_ticket_free_type_not_allocatable');
             }
             $now = CarbonImmutable::now('UTC');
             $opens = CarbonImmutable::parse((string) $ticket->sales_opens_at_utc, 'UTC')->utc();
@@ -288,10 +290,7 @@ final class EventTicketEntitlementService
         string $idempotencyKey,
     ): array {
         $this->assertSchema();
-        $reason = trim(strip_tags($reason));
-        if ($reason === '' || mb_strlen($reason) > 500) {
-            throw new EventTicketingException('event_ticket_cancellation_reason_invalid');
-        }
+        $reason = $this->cancellationReason($reason, false);
         $tenantId = $this->support->tenantId();
         $keyHash = $this->support->idempotencyHash($idempotencyKey);
 
@@ -322,6 +321,7 @@ final class EventTicketEntitlementService
             ]);
             $this->ticketRow($tenantId, $eventId, (int) $candidate->ticket_type_id, true);
             $entitlement = $this->entitlementRow($tenantId, $eventId, $entitlementId, true);
+            $this->assertFreeEntitlementSnapshot($entitlement);
             $replay = $this->entitlementHistoryReplay($tenantId, $keyHash, $requestHash, true);
             if ($replay !== null) {
                 [$confirmedUnits] = $this->confirmedUnitTotalsForUpdate(
@@ -403,6 +403,213 @@ final class EventTicketEntitlementService
                 'confirmed_units_after' => $after,
             ];
         }, 3);
+    }
+
+    /**
+     * Release every confirmed zero-value entitlement when its registration exits.
+     *
+     * The caller owns the registration transaction. This boundary deliberately
+     * refuses time-credit or monetary effects: those require a separately
+     * approved refund gateway and transaction ledger.
+     */
+    public function cancelConfirmedForRegistrationExitWithinTransaction(
+        int $eventId,
+        int $registrationId,
+        User|int $actor,
+        string $reason,
+        string $idempotencyPrefix,
+    ): int {
+        if (DB::transactionLevel() <= 0) {
+            throw new EventTicketingException('event_ticket_registration_exit_transaction_required');
+        }
+        if (! Schema::hasTable('event_ticket_entitlements')) {
+            return 0;
+        }
+        $tenantId = $this->support->tenantId();
+        $hasConfirmedEntitlement = DB::table('event_ticket_entitlements')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('registration_id', $registrationId)
+            ->where('status', EventTicketEntitlementStatus::Confirmed->value)
+            ->exists();
+        if (! $hasConfirmedEntitlement) {
+            return 0;
+        }
+        foreach ([
+            'event_ticket_types',
+            'event_ticket_entitlement_history',
+            'event_ticket_inventory_history',
+            'event_registrations',
+            'events',
+        ] as $requiredTable) {
+            if (! Schema::hasTable($requiredTable)) {
+                return 0;
+            }
+        }
+        if (! Schema::hasColumn('events', 'is_recurring_template')
+            || ! Schema::hasColumn('events', 'occurrence_key')) {
+            return 0;
+        }
+        $eventScope = DB::table('events')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $eventId)
+            ->first(['is_recurring_template', 'occurrence_key']);
+        if ($eventScope === null
+            || (bool) $eventScope->is_recurring_template
+            || trim((string) $eventScope->occurrence_key) === '') {
+            return 0;
+        }
+
+        $this->assertSchema();
+        $reason = $this->cancellationReason($reason, true);
+        $idempotencyPrefix = trim($idempotencyPrefix);
+        if ($idempotencyPrefix === '') {
+            throw new EventTicketingException('event_ticket_idempotency_key_invalid');
+        }
+        $event = $this->support->concreteEvent($tenantId, $eventId, false);
+        $persistedActor = $this->support->actor($tenantId, $actor, false);
+        $registration = DB::table('event_registrations')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('id', $registrationId)
+            ->lockForUpdate()
+            ->first(['id', 'user_id', 'registration_state']);
+        if ($registration === null) {
+            throw new EventTicketingException('event_ticket_registration_not_found');
+        }
+        if ((int) $registration->user_id === (int) $persistedActor->id) {
+            $this->support->authorizeView($persistedActor, $event);
+        } elseif (! $this->policy->manageRegistration($persistedActor, $event)) {
+            throw new EventTicketingException('event_ticket_registration_exit_denied');
+        }
+        if ((string) $registration->registration_state === 'confirmed') {
+            throw new EventTicketingException('event_ticket_registration_exit_not_persisted');
+        }
+
+        $entitlements = DB::table('event_ticket_entitlements')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $eventId)
+            ->where('registration_id', $registrationId)
+            ->where('status', EventTicketEntitlementStatus::Confirmed->value)
+            ->orderBy('ticket_type_id')
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+        $released = 0;
+        foreach ($entitlements as $entitlement) {
+            $this->assertFreeEntitlementSnapshot($entitlement);
+            $expectedVersion = (int) $entitlement->entitlement_version;
+            if ($expectedVersion < 1) {
+                throw new EventTicketingException('event_ticket_entitlement_version_conflict');
+            }
+            $version = $expectedVersion + 1;
+            $operationKey = 'registration-exit:'
+                . hash('sha256', $idempotencyPrefix)
+                . ':entitlement:' . (int) $entitlement->id
+                . ':v' . $expectedVersion;
+            $keyHash = $this->support->idempotencyHash($operationKey);
+            $requestHash = $this->support->requestHash([
+                'action' => 'cancelled',
+                'source' => 'registration_exit',
+                'event_id' => $eventId,
+                'registration_id' => $registrationId,
+                'entitlement_id' => (int) $entitlement->id,
+                'actor_id' => (int) $persistedActor->id,
+                'expected_version' => $expectedVersion,
+                'reason' => $reason,
+            ]);
+            if ($this->entitlementHistoryReplay($tenantId, $keyHash, $requestHash, true) !== null) {
+                throw new EventTicketingException('event_ticket_entitlement_replay_evidence_invalid');
+            }
+            $now = CarbonImmutable::now('UTC');
+            if (DB::table('event_ticket_entitlements')
+                ->where('tenant_id', $tenantId)
+                ->where('event_id', $eventId)
+                ->where('id', (int) $entitlement->id)
+                ->where('entitlement_version', $expectedVersion)
+                ->where('status', EventTicketEntitlementStatus::Confirmed->value)
+                ->update([
+                    'status' => EventTicketEntitlementStatus::Cancelled->value,
+                    'entitlement_version' => $version,
+                    'cancelled_by' => (int) $persistedActor->id,
+                    'cancellation_reason' => $reason,
+                    'cancelled_at' => $now,
+                    'updated_at' => $now,
+                ]) !== 1) {
+                throw new EventTicketingException('event_ticket_entitlement_version_conflict');
+            }
+            [$after] = $this->confirmedUnitTotalsForUpdate(
+                $tenantId,
+                $eventId,
+                (int) $entitlement->ticket_type_id,
+                (int) $entitlement->user_id,
+            );
+            $this->recordEntitlementHistory(
+                $tenantId,
+                $eventId,
+                (int) $entitlement->ticket_type_id,
+                (int) $entitlement->id,
+                $registrationId,
+                (int) $entitlement->user_id,
+                $version,
+                'cancelled',
+                (int) $entitlement->units,
+                (int) $persistedActor->id,
+                $keyHash,
+                $requestHash,
+                $reason,
+                [
+                    'release_only' => true,
+                    'refund_executed' => false,
+                    'source' => 'registration_exit',
+                ],
+                $now,
+            );
+            $this->recordInventoryHistory(
+                $tenantId,
+                $eventId,
+                (int) $entitlement->ticket_type_id,
+                (int) $entitlement->id,
+                $version,
+                'released',
+                -((int) $entitlement->units),
+                $after,
+                (int) $persistedActor->id,
+                $keyHash,
+                $requestHash,
+                $now,
+            );
+            $released++;
+        }
+
+        return $released;
+    }
+
+    private function assertFreeEntitlementSnapshot(stdClass $entitlement): void
+    {
+        if ((string) $entitlement->ticket_kind_snapshot !== EventTicketKind::Free->value
+            || $this->support->creditCents((string) $entitlement->unit_price_credits_snapshot) !== 0
+            || $this->support->creditCents((string) $entitlement->total_price_credits_snapshot) !== 0) {
+            throw new EventTicketingException('event_ticket_time_credit_gateway_unavailable');
+        }
+    }
+
+    private function cancellationReason(string $reason, bool $truncateWithEvidence): string
+    {
+        $reason = trim(strip_tags($reason));
+        $reason = trim((string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $reason));
+        if ($reason === '') {
+            throw new EventTicketingException('event_ticket_cancellation_reason_invalid');
+        }
+        if (mb_strlen($reason) <= 500) {
+            return $reason;
+        }
+        if (! $truncateWithEvidence) {
+            throw new EventTicketingException('event_ticket_cancellation_reason_invalid');
+        }
+
+        return mb_substr($reason, 0, 420)
+            . '… [sha256:' . hash('sha256', $reason) . ']';
     }
 
     private function ticketRow(int $tenantId, int $eventId, int $ticketTypeId, bool $lock): stdClass

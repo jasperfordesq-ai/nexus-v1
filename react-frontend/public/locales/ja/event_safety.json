@@ -21,6 +21,14 @@
       "edit_review": "更新の決定",
       "withdraw_review": "決定の撤回"
     },
+    "confirmations": {
+      "withdraw_code_title": "行動規範への同意を取り消しますか？",
+      "withdraw_code_body": "現行版に再度同意するまで、参加できなくなる場合があります。",
+      "withdraw_guardian_title": "保護者同意の依頼を取り消しますか？",
+      "withdraw_guardian_body": "現在の依頼は無効になります。参加前に新しい依頼が必要になる場合があります。",
+      "withdraw_review_title": "この参加決定を取り消しますか？",
+      "withdraw_review_body": "{{name}} に対する有効な決定を終了し、監査履歴は保持します。"
+    },
     "organizer": {
       "title": "イベントの安全性",
       "description": "バージョン管理された参加要件を設定し、安全に関する決定について管理され、監査可能な記録を保管します。",

@@ -42,6 +42,7 @@
     "units": "{{count}} unità",
     "units_other": "{{count}} unità",
     "cancel": "Annulla biglietto",
+    "time_credit_cancel_disabled": "L’annullamento dei biglietti a crediti di tempo non è disponibile in questo flusso riservato ai biglietti gratuiti. Non è stata eseguita alcuna operazione sul portafoglio.",
     "cancelled": "Annullato",
     "cancel_title": "Annullare questo biglietto?",
     "cancel_reason": "Motivo della cancellazione",

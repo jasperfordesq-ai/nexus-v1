@@ -276,6 +276,8 @@ describe('canonical Events boundary', () => {
       title: 'Community repair morning',
       description: 'Repair together.',
       start_time: '2030-05-01T10:15:00+00:00',
+      timezone: 'Europe/Dublin',
+      all_day: false,
       category_id: 4,
     };
     const created = await createEvent(payload);

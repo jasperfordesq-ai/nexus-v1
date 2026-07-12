@@ -288,6 +288,142 @@ final class EventPolicyIntegrationTest extends TestCase
         );
     }
 
+    public function test_named_series_count_only_includes_events_visible_to_the_current_actor(): void
+    {
+        Carbon::setTestNow('2030-05-01 10:00:00 UTC');
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $outsider = $this->user(['first_name' => 'Outsider']);
+        $privateGroupId = $this->group((int) $organizer->getKey());
+        $this->joinGroup($privateGroupId, $organizer, 'owner');
+        $seriesId = $this->series($organizer);
+
+        $visibleEventId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Visible series event',
+            'series_id' => $seriesId,
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(1),
+            'end_time' => now()->addDays(1)->addHour(),
+        ]);
+        $this->event((int) $organizer->getKey(), [
+            'title' => 'Private series event',
+            'series_id' => $seriesId,
+            'group_id' => $privateGroupId,
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(2),
+            'end_time' => now()->addDays(2)->addHour(),
+        ]);
+        $this->event((int) $organizer->getKey(), [
+            'title' => 'Draft series event',
+            'series_id' => $seriesId,
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHour(),
+        ]);
+
+        Sanctum::actingAs($outsider, ['*']);
+        $this->apiGet("/v2/events/{$visibleEventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.series.named.event_count', 1);
+
+        Sanctum::actingAs($organizer, ['*']);
+        $this->apiGet("/v2/events/{$visibleEventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.series.named.event_count', 3);
+    }
+
+    public function test_recurrence_projection_omits_private_and_draft_sibling_ids_and_times_for_outsiders(): void
+    {
+        Carbon::setTestNow('2030-05-01 10:00:00 UTC');
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $outsider = $this->user(['first_name' => 'Outsider']);
+        $privateGroupId = $this->group((int) $organizer->getKey());
+        $this->joinGroup($privateGroupId, $organizer, 'owner');
+        $occurrenceKeyPrefix = 'policy-recurrence-' . uniqid();
+
+        $rootId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Draft recurrence template',
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'operational_status' => 'scheduled',
+            'is_recurring_template' => 1,
+            'occurrence_key' => null,
+            'occurrence_date' => now()->addDays(1)->toDateString(),
+            'start_time' => now()->addDays(1),
+            'end_time' => now()->addDays(1)->addHour(),
+        ]);
+        $visibleOccurrenceId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Visible recurrence occurrence',
+            'parent_event_id' => $rootId,
+            'is_recurring_template' => 0,
+            'occurrence_key' => $occurrenceKeyPrefix . '-visible',
+            'occurrence_date' => now()->addDays(2)->toDateString(),
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(2),
+            'end_time' => now()->addDays(2)->addHour(),
+        ]);
+        $draftOccurrenceId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Draft recurrence occurrence',
+            'parent_event_id' => $rootId,
+            'is_recurring_template' => 0,
+            'occurrence_key' => $occurrenceKeyPrefix . '-draft',
+            'occurrence_date' => now()->addDays(3)->toDateString(),
+            'status' => 'draft',
+            'publication_status' => 'draft',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHour(),
+        ]);
+        $privateOccurrenceId = $this->event((int) $organizer->getKey(), [
+            'title' => 'Private recurrence occurrence',
+            'parent_event_id' => $rootId,
+            'is_recurring_template' => 0,
+            'occurrence_key' => $occurrenceKeyPrefix . '-private',
+            'occurrence_date' => now()->addDays(4)->toDateString(),
+            'group_id' => $privateGroupId,
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'start_time' => now()->addDays(4),
+            'end_time' => now()->addDays(4)->addHour(),
+        ]);
+
+        Sanctum::actingAs($outsider, ['*']);
+        $outsiderResponse = $this->apiGet(
+            "/v2/events/{$visibleOccurrenceId}",
+            ['X-Events-Contract' => '2'],
+        );
+        $outsiderResponse->assertOk()
+            ->assertJsonPath('data.series.recurrence.occurrence_count', 1);
+        $outsiderOccurrences = $outsiderResponse->json('data.series.recurrence.occurrences');
+        $this->assertSame(
+            [$visibleOccurrenceId],
+            array_column($outsiderOccurrences, 'id'),
+        );
+        $this->assertSame(
+            ['2030-05-03'],
+            array_map(
+                static fn (array $occurrence): string => substr((string) $occurrence['start_at'], 0, 10),
+                $outsiderOccurrences,
+            ),
+        );
+
+        Sanctum::actingAs($organizer, ['*']);
+        $organizerResponse = $this->apiGet(
+            "/v2/events/{$visibleOccurrenceId}",
+            ['X-Events-Contract' => '2'],
+        );
+        $organizerResponse->assertOk()
+            ->assertJsonPath('data.series.recurrence.occurrence_count', 4);
+        $this->assertSame(
+            [$rootId, $visibleOccurrenceId, $draftOccurrenceId, $privateOccurrenceId],
+            array_column($organizerResponse->json('data.series.recurrence.occurrences'), 'id'),
+        );
+    }
+
     public function test_private_group_and_cross_tenant_direct_ids_fail_closed(): void
     {
         $organizer = $this->user(['first_name' => 'Organizer']);

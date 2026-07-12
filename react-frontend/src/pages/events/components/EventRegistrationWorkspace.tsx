@@ -41,6 +41,7 @@ import {
   Switch,
   Textarea,
 } from '@/components/ui';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventRegistrationApi,
@@ -174,6 +175,7 @@ function reviewCorrelationId(): string {
 export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspaceProps) {
   const { t, i18n } = useTranslation('event_registration');
   const toast = useToast();
+  const confirm = useConfirm();
   const [overview, setOverview] = useState<EventRegistrationOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -602,7 +604,20 @@ export function EventRegistrationWorkspace({ eventId }: EventRegistrationWorkspa
   }
 
   async function applyRetention() {
-    if (!retentionRun) return;
+    if (!retentionRun || isRetentionBusy) return;
+    const accepted = await confirm({
+      title: t('retention.warning_title'),
+      body: (
+        <span>
+          {t('retention.warning_description')}{' '}
+          <strong>{t('retention.eligible')}: {retentionRun.eligible_count}</strong>
+        </span>
+      ),
+      confirmLabel: t('retention.apply'),
+      cancelLabel: t('common.cancel'),
+      status: 'danger',
+    });
+    if (!accepted) return;
     setIsRetentionBusy(true);
     try {
       const response = await eventRegistrationApi.retentionApply(eventId, retentionRun.id);

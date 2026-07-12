@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert, Button, Card, Chip, Spinner } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 import Checkbox from '@/components/ui/Checkbox';
 import Input from '@/components/ui/Input';
 import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import {
   acknowledgeEventCode,
   getEventSafety,
@@ -44,6 +45,7 @@ export default function EventSafetyCard({
 }: EventSafetyCardProps) {
   const { t, i18n } = useTranslation('eventSafety');
   const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const safetyApi = useApi(() => getEventSafety(eventId), [eventId], { enabled: eventId > 0 });
   const [safetyOverride, setSafetyOverride] = useState<EventSafety | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
@@ -98,14 +100,23 @@ export default function EventSafetyCard({
     ));
   }
 
-  async function withdrawCode() {
+  function withdrawCode() {
     const acknowledgementId = safety?.evidence.code_of_conduct.acknowledgement_id;
     if (!acknowledgementId) return;
-    await mutate('withdraw_code', () => withdrawEventCode(
-      eventId,
-      acknowledgementId,
-      mutationKey('event-safety-code-withdraw'),
-    ));
+    confirm({
+      title: t('safety.confirmations.withdraw_code_title'),
+      message: t('safety.confirmations.withdraw_code_body'),
+      confirmLabel: t('safety.actions.withdraw_acknowledgement'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        await mutate('withdraw_code', () => withdrawEventCode(
+          eventId,
+          acknowledgementId,
+          mutationKey('event-safety-code-withdraw'),
+        ));
+      },
+    });
   }
 
   async function requestGuardian() {
@@ -126,14 +137,23 @@ export default function EventSafetyCard({
     }
   }
 
-  async function withdrawGuardian() {
+  function withdrawGuardian() {
     const consentId = safety?.evidence.guardian_consent.consent_id;
     if (!consentId) return;
-    await mutate('withdraw_guardian', () => withdrawEventGuardianConsent(
-      eventId,
-      consentId,
-      mutationKey('event-safety-guardian-withdraw'),
-    ));
+    confirm({
+      title: t('safety.confirmations.withdraw_guardian_title'),
+      message: t('safety.confirmations.withdraw_guardian_body'),
+      confirmLabel: t('safety.actions.withdraw_guardian_consent'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        await mutate('withdraw_guardian', () => withdrawEventGuardianConsent(
+          eventId,
+          consentId,
+          mutationKey('event-safety-guardian-withdraw'),
+        ));
+      },
+    });
   }
 
   if (safetyApi.isLoading && !safety) {
@@ -173,6 +193,7 @@ export default function EventSafetyCard({
   const blocked = safety.eligibility.status === 'deny' || safety.eligibility.status === 'unavailable';
 
   return (
+    <>
     <Card variant="secondary" testID="event-safety-card">
       <Card.Body className="gap-4 px-4 py-4">
         <View className="flex-row items-start justify-between gap-3">
@@ -217,9 +238,15 @@ export default function EventSafetyCard({
                 <Chip.Label>{t(`safety.code.status.${codeEvidence.status}`)}</Chip.Label>
               </Chip>
             </View>
-            <View className="max-h-64 rounded-xl border border-border bg-surface-secondary p-3">
+            <ScrollView
+              className="max-h-64 rounded-xl border border-border bg-surface-secondary p-3"
+              contentContainerClassName="pb-3"
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              testID="event-safety-code-scroll"
+            >
               <Text selectable className="text-sm leading-5" style={{ color: theme.text }}>{code.text}</Text>
-            </View>
+            </ScrollView>
             {safety.permissions.acknowledge_code_of_conduct ? (
               <View className="gap-3">
                 <Checkbox
@@ -242,7 +269,7 @@ export default function EventSafetyCard({
               <Button
                 variant="secondary"
                 isDisabled={pendingAction !== null}
-                onPress={() => void withdrawCode()}
+                onPress={withdrawCode}
               >
                 {pendingAction === 'withdraw_code' ? <Spinner size="sm" /> : t('safety.actions.withdraw_acknowledgement')}
               </Button>
@@ -312,7 +339,7 @@ export default function EventSafetyCard({
               <Button
                 variant="secondary"
                 isDisabled={pendingAction !== null}
-                onPress={() => void withdrawGuardian()}
+                onPress={withdrawGuardian}
               >
                 {pendingAction === 'withdraw_guardian' ? <Spinner size="sm" /> : t('safety.actions.withdraw_guardian_consent')}
               </Button>
@@ -321,5 +348,7 @@ export default function EventSafetyCard({
         ) : null}
       </Card.Body>
     </Card>
+    {confirmDialog}
+    </>
   );
 }

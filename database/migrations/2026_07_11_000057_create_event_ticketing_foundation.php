@@ -29,12 +29,21 @@ return new class extends Migration
         'trg_event_ticket_inv_hist_no_delete',
     ];
 
+    /** @var list<string> */
+    private const TABLES = [
+        'event_ticket_inventory_history',
+        'event_ticket_entitlement_history',
+        'event_ticket_entitlements',
+        'event_ticket_type_history',
+        'event_ticket_types',
+    ];
+
     public function up(): void
     {
-        if (! Schema::hasTable('events')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('event_registrations')) {
-            return;
+        foreach (['tenants', 'events', 'users', 'event_registrations'] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_ticketing_prerequisite_missing:{$required}");
+            }
         }
 
         $this->createTicketTypes();
@@ -48,24 +57,20 @@ return new class extends Migration
 
     public function down(): void
     {
-        foreach ([
-            'event_ticket_inventory_history',
-            'event_ticket_entitlement_history',
-            'event_ticket_entitlements',
-            'event_ticket_type_history',
-            'event_ticket_types',
-        ] as $table) {
+        if ($this->hasDependentSchema()) {
+            throw new LogicException('event_ticketing_rollback_refused_dependents_exist');
+        }
+
+        foreach (self::TABLES as $table) {
             if (Schema::hasTable($table) && DB::table($table)->exists()) {
                 throw new LogicException('event_ticketing_rollback_refused_durable_evidence');
             }
         }
 
         $this->dropTriggers();
-        Schema::dropIfExists('event_ticket_inventory_history');
-        Schema::dropIfExists('event_ticket_entitlement_history');
-        Schema::dropIfExists('event_ticket_entitlements');
-        Schema::dropIfExists('event_ticket_type_history');
-        Schema::dropIfExists('event_ticket_types');
+        foreach (self::TABLES as $table) {
+            Schema::dropIfExists($table);
+        }
     }
 
     private function createTicketTypes(): void
@@ -512,6 +517,24 @@ return new class extends Migration
             ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
             ->where('TABLE_NAME', $table)
             ->where('CONSTRAINT_NAME', $name)
+            ->exists();
+    }
+
+    private function hasDependentSchema(): bool
+    {
+        if (Schema::hasTable('event_registration_guests')
+            && Schema::hasColumn('event_registration_guests', 'ticket_entitlement_id')) {
+            return true;
+        }
+
+        if (DB::getDriverName() !== 'mysql') {
+            return false;
+        }
+
+        return DB::table('information_schema.REFERENTIAL_CONSTRAINTS')
+            ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
+            ->whereIn('REFERENCED_TABLE_NAME', self::TABLES)
+            ->whereNotIn('TABLE_NAME', self::TABLES)
             ->exists();
     }
 };

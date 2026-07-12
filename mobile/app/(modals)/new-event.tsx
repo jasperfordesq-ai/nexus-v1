@@ -28,6 +28,12 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { contrastText, withAlpha } from '@/lib/utils/color';
+import {
+  eventIsoToLocalInput,
+  eventLocalInputToIso,
+  localEventTimeZone,
+  shiftEventLocalDate,
+} from '@/lib/utils/eventDateTime';
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
@@ -37,24 +43,23 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 const eventCategoryIds = ['workshop', 'social', 'outdoor', 'online', 'meeting', 'training', 'other'] as const;
 const MAX_COVER_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_COVER_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const DEFAULT_EVENT_TIME_ZONE = localEventTimeZone();
 
-function tomorrowLocalValue() {
-  const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  date.setMinutes(0, 0, 0);
-  return date.toISOString().slice(0, 16);
+function tomorrowLocalValue(timeZone = DEFAULT_EVENT_TIME_ZONE) {
+  const value = eventIsoToLocalInput(
+    new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    timeZone,
+  );
+  return value ? `${value.slice(0, 13)}:00` : '';
 }
 
-function toApiDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toISOString();
-}
-
-function toDateInputValue(value: string | null | undefined) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toISOString().slice(0, 16);
+function toApiDate(value: string, timeZone: string, allDay: boolean, isEnd: boolean) {
+  const trimmed = value.trim();
+  const dateOnly = trimmed.slice(0, 10);
+  const localValue = allDay
+    ? `${isEnd ? shiftEventLocalDate(dateOnly, 1) : dateOnly}T00:00`
+    : trimmed;
+  return eventLocalInputToIso(localValue, timeZone) ?? '';
 }
 
 function toNumber(value: string): number | null {
@@ -89,7 +94,9 @@ function NewEventScreen() {
   const isEditing = Number.isFinite(eventId) && eventId > 0;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [startTime, setStartTime] = useState(tomorrowLocalValue());
+  const [timezone, setTimezone] = useState(DEFAULT_EVENT_TIME_ZONE);
+  const [allDay, setAllDay] = useState(false);
+  const [startTime, setStartTime] = useState(tomorrowLocalValue(DEFAULT_EVENT_TIME_ZONE));
   const [endTime, setEndTime] = useState('');
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState<EventCategory[]>([]);
@@ -152,10 +159,17 @@ function NewEventScreen() {
   }, []);
 
   function hydrateFromEvent(event: CanonicalEvent) {
+    const eventTimezone = event.schedule.timezone || 'UTC';
+    const startLocal = eventIsoToLocalInput(event.schedule.start_at, eventTimezone);
+    const endBoundaryLocal = eventIsoToLocalInput(event.schedule.end_at, eventTimezone);
     setTitle(event.title ?? '');
     setDescription(event.description ?? '');
-    setStartTime(toDateInputValue(event.schedule.start_at) || tomorrowLocalValue());
-    setEndTime(toDateInputValue(event.schedule.end_at));
+    setTimezone(eventTimezone);
+    setAllDay(event.schedule.all_day);
+    setStartTime(event.schedule.all_day ? startLocal.slice(0, 10) : startLocal);
+    setEndTime(event.schedule.all_day && endBoundaryLocal
+      ? shiftEventLocalDate(endBoundaryLocal.slice(0, 10), -1)
+      : endBoundaryLocal);
     setCategory(resolveEventCategory(event));
     setLocation(event.location.label ?? '');
     setLatitude(event.location.latitude !== null ? String(event.location.latitude) : '');
@@ -167,6 +181,17 @@ function NewEventScreen() {
     setExistingCoverImage(event.primary_image?.url ?? null);
     setSeriesId(event.series.named?.id ?? null);
     setSelectedImageUri(null);
+  }
+
+  function toggleAllDay() {
+    const next = !allDay;
+    setAllDay(next);
+    setStartTime((current) => next
+      ? current.slice(0, 10)
+      : (current.length === 10 ? `${current}T09:00` : current));
+    setEndTime((current) => next
+      ? current.slice(0, 10)
+      : (current.length === 10 ? `${current}T10:00` : current));
   }
 
   async function pickCoverImage() {
@@ -200,9 +225,10 @@ function NewEventScreen() {
       return;
     }
 
-    const start = toApiDate(startTime);
-    const end = endTime.trim() ? toApiDate(endTime) : null;
-    if (!title.trim() || !description.trim() || !start) {
+    const eventTimezone = timezone.trim();
+    const start = toApiDate(startTime, eventTimezone, allDay, false);
+    const end = endTime.trim() ? toApiDate(endTime, eventTimezone, allDay, true) : null;
+    if (!title.trim() || !description.trim() || !eventTimezone || !start || (allDay && !end)) {
       showToast({ title: t('create.validationTitle'), description: t('create.validationRequired'), variant: 'warning' });
       return;
     }
@@ -248,6 +274,8 @@ function NewEventScreen() {
         description: description.trim(),
         start_time: start,
         end_time: end,
+        timezone: eventTimezone,
+        all_day: allDay,
         group_id: isEditing ? undefined : groupId,
         location: location.trim() || null,
         latitude: latitudeValue,
@@ -405,8 +433,16 @@ function NewEventScreen() {
                 </TagGroup.List>
               </TagGroup>
             </View>
-            <FormField label={t('create.startLabel')} value={startTime} onChangeText={setStartTime} placeholder={t('create.datePlaceholder')} theme={theme} />
-            <FormField label={t('create.endLabel')} value={endTime} onChangeText={setEndTime} placeholder={t('create.optionalDatePlaceholder')} theme={theme} />
+            <FormField label={t('create.timezoneLabel')} value={timezone} onChangeText={setTimezone} placeholder={t('create.timezonePlaceholder')} theme={theme} />
+            <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>{t('create.timezoneHint')}</Text>
+            <ToggleChip
+              label={t('create.allDay')}
+              selected={allDay}
+              onPress={toggleAllDay}
+              primary={primary}
+            />
+            <FormField label={t('create.startLabel')} value={startTime} onChangeText={setStartTime} placeholder={t(allDay ? 'create.dateOnlyPlaceholder' : 'create.datePlaceholder')} theme={theme} />
+            <FormField label={t(allDay ? 'create.allDayEndLabel' : 'create.endLabel')} value={endTime} onChangeText={setEndTime} placeholder={t(allDay ? 'create.dateOnlyPlaceholder' : 'create.optionalDatePlaceholder')} theme={theme} />
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />
             <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
               <View className="flex-row items-start gap-3">

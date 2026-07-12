@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Athbhreithnithe ag',
         'withdraw_review' => 'Cinneadh a tharraingt siar',
         'ledger_empty' => 'Níl aon léirmheasanna rannpháirtíochta taifeadta don imeacht seo.',
+        'confirm_archive_checkbox' => 'Tuigim go ndíghníomhóidh sé seo na riachtanais sábháilteachta reatha.',
+        'confirm_withdraw_code' => 'Tuigim go bhféadfadh sé seo bac a chur ar mo rannpháirtíocht go dtí go n-admhóidh mé an cód arís.',
+        'confirm_withdraw_guardian' => 'Tuigim go mbeidh an t-iarratas toilithe reatha neamhbhailí.',
+        'confirm_withdraw_review' => 'Deimhním gur mian liom an cinneadh gníomhach do :name a tharraingt siar.',
     ],
 ];

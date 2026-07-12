@@ -24,12 +24,12 @@ final class EventAgendaEnterpriseMigrationTest extends TestCase
             ],
             'event_session_registrations' => [
                 'tenant_id', 'event_id', 'session_id', 'user_id', 'event_registration_id',
-                'version', 'status', 'registered_at', 'withdrawn_at',
+                'event_registration_version', 'version', 'status', 'registered_at', 'withdrawn_at',
             ],
             'event_session_registration_history' => [
                 'tenant_id', 'event_id', 'session_id', 'registration_id', 'user_id',
-                'event_registration_id', 'actor_user_id', 'registration_version',
-                'action', 'idempotency_key', 'request_hash',
+                'event_registration_id', 'event_registration_version', 'actor_user_id',
+                'registration_version', 'action', 'idempotency_key', 'request_hash',
             ],
         ] as $table => $columns) {
             self::assertTrue(Schema::hasTable($table), $table);
@@ -61,8 +61,10 @@ final class EventAgendaEnterpriseMigrationTest extends TestCase
             'chk_ev_session_resource_visibility',
             'chk_ev_session_resource_media',
             'chk_ev_session_reg_version',
+            'chk_ev_session_reg_event_version',
             'chk_ev_session_reg_status',
             'chk_ev_session_reg_state',
+            'chk_ev_session_reg_hist_event_version',
             'chk_ev_session_reg_hist_action',
         ] as $constraint) {
             self::assertTrue($this->constraintExists($constraint, 'CHECK'), $constraint);
@@ -70,6 +72,7 @@ final class EventAgendaEnterpriseMigrationTest extends TestCase
         foreach ([
             'trg_ev_session_reg_hist_no_update',
             'trg_ev_session_reg_hist_no_delete',
+            'trg_ev_session_reg_hist_pin_insert',
             'trg_ev_session_reg_validate_insert',
             'trg_ev_session_reg_validate_update',
         ] as $trigger) {
@@ -77,6 +80,26 @@ final class EventAgendaEnterpriseMigrationTest extends TestCase
                 ->where('TRIGGER_SCHEMA', DB::getDatabaseName())
                 ->where('TRIGGER_NAME', $trigger)
                 ->exists(), $trigger);
+        }
+        $validationTrigger = (string) DB::table('information_schema.TRIGGERS')
+            ->where('TRIGGER_SCHEMA', DB::getDatabaseName())
+            ->where('TRIGGER_NAME', 'trg_ev_session_reg_validate_update')
+            ->value('ACTION_STATEMENT');
+        self::assertStringContainsString('event_registration_version', $validationTrigger);
+        self::assertStringContainsString('registration_version', $validationTrigger);
+        self::assertStringContainsString('SET NEW.`event_registration_version`', $validationTrigger);
+        $historyInsertTrigger = (string) DB::table('information_schema.TRIGGERS')
+            ->where('TRIGGER_SCHEMA', DB::getDatabaseName())
+            ->where('TRIGGER_NAME', 'trg_ev_session_reg_hist_pin_insert')
+            ->value('ACTION_STATEMENT');
+        self::assertStringContainsString('SET NEW.`event_registration_version`', $historyInsertTrigger);
+
+        foreach (['event_session_registrations', 'event_session_registration_history'] as $table) {
+            self::assertSame('YES', DB::table('information_schema.COLUMNS')
+                ->where('TABLE_SCHEMA', DB::getDatabaseName())
+                ->where('TABLE_NAME', $table)
+                ->where('COLUMN_NAME', 'event_registration_version')
+                ->value('IS_NULLABLE'), $table);
         }
     }
 

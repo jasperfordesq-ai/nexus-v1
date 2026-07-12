@@ -165,16 +165,13 @@ final class EventRegistrationFormsMigrationTest extends TestCase
         );
     }
 
-    public function test_rollback_refuses_any_durable_registration_configuration_evidence(): void
+    public function test_rollback_refuses_phase_b_dependent_schema_before_foundation_teardown(): void
     {
-        $owner = $this->eventUser();
-        [$eventId, $start] = $this->registrationEvent((int) $owner->id);
-        $this->registrationSettings($eventId, $owner, $start);
         /** @var Migration $migration */
         $migration = require database_path('migrations/' . self::MIGRATION);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('event_registration_forms_rollback_refused_evidence_exists');
+        $this->expectExceptionMessage('event_registration_forms_rollback_refused_dependents_exist');
         $migration->down();
     }
 

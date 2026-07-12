@@ -143,7 +143,10 @@ const projection: EventCalendarProjection = {
 
 function renderCalendar(view: 'month' | 'agenda', entry: string) {
   return render(
-    <MemoryRouter initialEntries={[entry]}>
+    <MemoryRouter
+      initialEntries={[entry]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <EventCalendarViews view={view} />
       <LocationProbe />
     </MemoryRouter>,

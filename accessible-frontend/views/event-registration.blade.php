@@ -4,7 +4,7 @@
   Author: Jasper Ford
   See NOTICE file for attribution and acknowledgements.
 --}}
-@extends('accessible-frontend::layouts.app')
+@extends('accessible-frontend::layout')
 
 @section('content')
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $eventId]) }}">
@@ -51,6 +51,8 @@
             $publishedForm = $attendee['form'] ?? null;
             $ownRegistrations = collect($attendee['registrations'] ?? []);
             $activeRegistration = $ownRegistrations->first(fn ($row) => in_array((string) data_get($row, 'registration_state'), ['invited', 'confirmed', 'pending'], true));
+            $oldAnswers = old('answers', []);
+            $oldAnswers = is_array($oldAnswers) ? $oldAnswers : [];
         @endphp
 
         @if ($publishedForm && $activeRegistration)
@@ -63,7 +65,7 @@
                 'id' => $eventId,
                 'registrationId' => data_get($activeRegistration, 'id'),
                 'formId' => $publishedForm->id,
-            ]) }}" novalidate>
+            ]) }}" data-alpha-registration-form>
                 @csrf
                 <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
                 @foreach ($publishedForm->questions as $question)
@@ -71,8 +73,34 @@
                         $questionType = $question->question_type->value;
                         $answerName = 'answers[' . $question->stable_key . ']';
                         $answerId = 'answer-' . $question->stable_key;
+                        $answerValue = $oldAnswers[$question->stable_key] ?? null;
+                        $validationRules = is_array($question->validation_rules) ? $question->validation_rules : [];
+                        $visibilityRules = is_array($question->visibility_rules) ? $question->visibility_rules : null;
+                        $nativeRequired = $question->is_required && $visibilityRules === null;
+                        $encodedValidationRules = base64_encode(json_encode($validationRules, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+                        $encodedVisibilityRules = $visibilityRules === null
+                            ? ''
+                            : base64_encode(json_encode($visibilityRules, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+                        $minLength = isset($validationRules['min_length']) ? (int) $validationRules['min_length'] : null;
+                        $configuredMaxLength = isset($validationRules['max_length']) ? (int) $validationRules['max_length'] : null;
+                        $hardMaxLength = $questionType === 'short_text' ? 500 : 10000;
+                        $maxLength = min($configuredMaxLength ?? $hardMaxLength, $hardMaxLength);
+                        $minSelections = isset($validationRules['min_selections']) ? (int) $validationRules['min_selections'] : null;
+                        $maxSelections = isset($validationRules['max_selections']) ? (int) $validationRules['max_selections'] : null;
                     @endphp
-                    <div class="govuk-form-group">
+                    <div
+                        class="govuk-form-group"
+                        data-alpha-registration-question="{{ $question->stable_key }}"
+                        data-alpha-registration-type="{{ $questionType }}"
+                        data-alpha-registration-required="{{ $question->is_required ? '1' : '0' }}"
+                        data-alpha-registration-validation="{{ $encodedValidationRules }}"
+                        @if ($encodedVisibilityRules !== '') data-alpha-registration-visibility="{{ $encodedVisibilityRules }}" @endif
+                        data-alpha-registration-required-message="{{ __('event_registration.answers.validation.required') }}"
+                        @if ($minLength !== null) data-alpha-registration-min-length-message="{{ __('event_registration.answers.validation.min_length', ['limit' => $minLength]) }}" @endif
+                        @if ($configuredMaxLength !== null) data-alpha-registration-max-length-message="{{ __('event_registration.answers.validation.max_length', ['limit' => $configuredMaxLength]) }}" @endif
+                        @if ($minSelections !== null) data-alpha-registration-min-selections-message="{{ trans_choice('event_registration.answers.validation.min_selections', $minSelections, ['count' => $minSelections]) }}" @endif
+                        @if ($maxSelections !== null) data-alpha-registration-max-selections-message="{{ trans_choice('event_registration.answers.validation.max_selections', $maxSelections, ['count' => $maxSelections]) }}" @endif
+                    >
                         @if (in_array($questionType, ['single_choice', 'multiple_choice'], true))
                             <fieldset class="govuk-fieldset" @if ($question->is_required) aria-required="true" @endif>
                                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">{{ $question->prompt }}</legend>
@@ -86,6 +114,10 @@
                                                 name="{{ $answerName }}{{ $questionType === 'multiple_choice' ? '[]' : '' }}"
                                                 type="{{ $questionType === 'single_choice' ? 'radio' : 'checkbox' }}"
                                                 value="{{ $choice }}"
+                                                @if ($questionType === 'single_choice' && $nativeRequired && $choiceIndex === 0) required @endif
+                                                @checked($questionType === 'multiple_choice'
+                                                    ? in_array($choice, is_array($answerValue) ? $answerValue : [], true)
+                                                    : $answerValue === $choice)
                                             >
                                             <label class="{{ $questionType === 'single_choice' ? 'govuk-label govuk-radios__label' : 'govuk-label govuk-checkboxes__label' }}" for="{{ $answerId }}-{{ $choiceIndex }}">{{ $choice }}</label>
                                         </div>
@@ -95,7 +127,15 @@
                         @elseif (in_array($questionType, ['consent', 'waiver'], true))
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="{{ $answerId }}" name="{{ $answerName }}" type="checkbox" value="1">
+                                    <input
+                                        class="govuk-checkboxes__input"
+                                        id="{{ $answerId }}"
+                                        name="{{ $answerName }}"
+                                        type="checkbox"
+                                        value="1"
+                                        @if ($nativeRequired) required @endif
+                                        @checked(filter_var($answerValue, FILTER_VALIDATE_BOOL))
+                                    >
                                     <label class="govuk-label govuk-checkboxes__label" for="{{ $answerId }}">{{ $question->prompt }}</label>
                                     <div class="govuk-hint govuk-checkboxes__hint">{{ $question->displayed_text }}</div>
                                 </div>
@@ -103,11 +143,28 @@
                         @elseif ($questionType === 'short_text')
                             <label class="govuk-label govuk-label--m" for="{{ $answerId }}">{{ $question->prompt }}</label>
                             @if ($question->help_text)<div class="govuk-hint" id="{{ $answerId }}-hint">{{ $question->help_text }}</div>@endif
-                            <input class="govuk-input" id="{{ $answerId }}" name="{{ $answerName }}" type="text" @if ($question->is_required) required @endif>
+                            <input
+                                class="govuk-input"
+                                id="{{ $answerId }}"
+                                name="{{ $answerName }}"
+                                type="text"
+                                value="{{ is_string($answerValue) ? $answerValue : '' }}"
+                                @if ($nativeRequired) required @endif
+                                @if ($minLength !== null) minlength="{{ $minLength }}" @endif
+                                maxlength="{{ $maxLength }}"
+                            >
                         @else
                             <label class="govuk-label govuk-label--m" for="{{ $answerId }}">{{ $question->prompt }}</label>
                             @if ($question->help_text)<div class="govuk-hint" id="{{ $answerId }}-hint">{{ $question->help_text }}</div>@endif
-                            <textarea class="govuk-textarea" id="{{ $answerId }}" name="{{ $answerName }}" rows="5" @if ($question->is_required) required @endif></textarea>
+                            <textarea
+                                class="govuk-textarea"
+                                id="{{ $answerId }}"
+                                name="{{ $answerName }}"
+                                rows="5"
+                                @if ($nativeRequired) required @endif
+                                @if ($minLength !== null) minlength="{{ $minLength }}" @endif
+                                maxlength="{{ $maxLength }}"
+                            >{{ is_string($answerValue) ? $answerValue : '' }}</textarea>
                         @endif
                     </div>
                 @endforeach
@@ -119,7 +176,9 @@
 
         <h3 class="govuk-heading-m">{{ __('event_registration.accessible.your_invitations') }}</h3>
         @forelse (($attendee['invitations'] ?? []) as $invitation)
-            @php($invitationStatus = (string) data_get($invitation, 'status'))
+            @php
+                $invitationStatus = (string) data_get($invitation, 'status');
+            @endphp
             <div class="govuk-summary-card">
                 <div class="govuk-summary-card__title-wrapper">
                     <h4 class="govuk-summary-card__title">{{ __('event_registration.invitations.types.member') }}</h4>
@@ -190,6 +249,12 @@
                                     <input type="hidden" name="expected_revision" value="{{ data_get($guest, 'revision') }}">
                                     <label class="govuk-label" for="guest-cancel-reason-{{ data_get($guest, 'id') }}">{{ __('event_registration.guests.cancel_reason') }}</label>
                                     <input class="govuk-input" id="guest-cancel-reason-{{ data_get($guest, 'id') }}" name="reason" type="text" required>
+                                    <div class="govuk-checkboxes govuk-!-margin-top-3">
+                                        <div class="govuk-checkboxes__item">
+                                            <input class="govuk-checkboxes__input" id="guest-cancel-confirm-{{ data_get($guest, 'id') }}" name="confirm_destructive" type="checkbox" value="1" required>
+                                            <label class="govuk-label govuk-checkboxes__label" for="guest-cancel-confirm-{{ data_get($guest, 'id') }}">{{ __('event_registration.guests.cancel_confirm_body', ['name' => data_get($guest, 'display_name') ?? __('event_registration.guests.name_hidden')]) }}</label>
+                                        </div>
+                                    </div>
                                     <button class="govuk-button govuk-button--warning govuk-!-margin-top-3 govuk-!-margin-bottom-0" data-module="govuk-button" type="submit">{{ __('event_registration.guests.cancel') }}</button>
                                 </form>
                             </dd>
@@ -441,7 +506,9 @@
 
             <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ __('event_registration.guests.title') }}</h3>
             @forelse ($organizer['guests'] as $guest)
-                @php($attendance = data_get($guest, 'attendance'))
+                @php
+                    $attendance = data_get($guest, 'attendance');
+                @endphp
                 <div class="govuk-summary-card">
                     <div class="govuk-summary-card__title-wrapper">
                         <h4 class="govuk-summary-card__title">{{ data_get($guest, 'display_name') ?? __('event_registration.guests.name_hidden') }}</h4>
@@ -489,6 +556,12 @@
                     <form method="post" action="{{ route('govuk-alpha.events.registration.retention.apply', ['tenantSlug' => $tenantSlug, 'id' => $eventId, 'runId' => $retentionRun->id]) }}">
                         @csrf
                         <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
+                        <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="retention-apply-confirm" name="confirm_destructive" type="checkbox" value="1" required>
+                                <label class="govuk-label govuk-checkboxes__label" for="retention-apply-confirm">{{ __('event_registration.retention.confirm_apply') }}</label>
+                            </div>
+                        </div>
                         <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">{{ __('event_registration.retention.apply') }}</button>
                     </form>
                 @endif

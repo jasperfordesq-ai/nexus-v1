@@ -200,4 +200,25 @@ describe('EventCommunicationsWorkspace', () => {
     expect(within(dialog).getByText('Draft')).toBeInTheDocument();
     expect(within(dialog).queryByText('Exact organizer prose.')).not.toBeInTheDocument();
   });
+
+  it('pages through the complete communication ledger', async () => {
+    const user = userEvent.setup();
+    const list = vi.spyOn(eventCommunicationsApi, 'list')
+      .mockResolvedValueOnce({
+        success: true,
+        data: [broadcastFixture()],
+        meta: { current_page: 1, per_page: 20, total: 21, total_pages: 2, has_more: true },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: [broadcastFixture({ id: 9, audience: { segments: ['registration_confirmed'], recipient_count: 2 } })],
+        meta: { current_page: 2, per_page: 20, total: 21, total_pages: 2, has_more: false },
+      });
+    renderEventComponent(<EventCommunicationsWorkspace eventId={42} />);
+
+    await user.click(await screen.findByText('2'));
+
+    await waitFor(() => expect(list).toHaveBeenLastCalledWith(42, 2));
+    expect(await screen.findByText('2 recipients')).toBeInTheDocument();
+  });
 });

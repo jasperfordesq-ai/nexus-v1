@@ -13,6 +13,10 @@
     "options": { "any": "Tous les lieux", "yes": "Accès sans marche confirmé", "no": "Accès avec marches", "unknown": "Non renseigné" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Quitter la liste d’attente ?",
+    "leaveWaitlistConfirmDescription": "Vous perdrez votre position actuelle et devrez peut-être rejoindre à nouveau la fin de la file.",
+    "offerDeclineConfirmTitle": "Refuser cette place réservée ?",
+    "offerDeclineConfirmDescription": "La place réservée sera libérée et votre offre de liste d’attente prendra fin.",
     "offerAvailable": "Place disponible",
     "offerTitle": "Une place est disponible pour vous",
     "offerDescription": "Une place de la liste d'attente vous est maintenant réservée. Acceptez-la pour confirmer votre présence.",
@@ -129,6 +133,9 @@
       "cancelled": "Annulée"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Vous désinscrire de cette session ?",
+      "withdrawConfirmDescription": "Votre place pour {{title}} sera libérée et pourra être attribuée à une autre personne.",
+      "keepRegistration": "Conserver ma place",
       "capacityUnlimited": "{{count}} inscrits · sans limite",
       "capacityLimited": "{{registered}} inscrits sur {{limit}}",
       "full": "Complet",

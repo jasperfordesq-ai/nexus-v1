@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'Le commentaire n\'a pas pu être ajouté. Essayer à nouveau.',
         'not_available' => 'Non disponible',
     ],
+    'forms' => [
+        'error_prefix' => 'Erreur:',
+    ],
     'home' => [
         'module_signin' => 'Connectez-vous',
         'module_signin_hint' => 'Connectez-vous pour l\'utiliser.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Aucune catégorie',
         'start_time_label' => 'Heure de début',
         'end_time_label' => 'Heure de fin',
+        'timezone_label' => 'Fuseau horaire de l’événement',
+        'timezone_hint' => 'Utilisez un fuseau horaire IANA, par exemple Europe/Paris ou America/New_York.',
+        'all_day_label' => 'Cet événement dure toute la journée',
+        'all_day_hint' => 'Les heures saisies sont ignorées. Indiquez la première et la dernière date de l’événement.',
+        'all_day_end_hint' => 'Pour un événement sur toute la journée, indiquez la dernière date incluse.',
         'datetime_hint' => 'Utilisez le sélecteur de date et d’heure ou entrez une date et une heure.',
         'end_time_hint' => 'Facultatif. Ajoutez une heure de fin si l\'événement en a une.',
         'location_label' => 'Emplacement',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Vos réponses sont privées et utilisées uniquement à des fins de protection. Vous pouvez les modifier ou les supprimer à tout moment dans vos paramètres. Rien n\'est sélectionné sauf si vous le choisissez.',
             'none_separator' => 'Ou',
             'none_label' => 'Aucune de ces situations ne me concerne',
+            'options_legend' => 'Options de protection',
+            'select_none' => 'Aucune sélection',
         ],
         'confirm' => [
             'title' => 'Vérifiez vos réponses',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Fraude ou arnaque présumée',
         'report_reason_duplicate' => 'Annonce en double',
         'report_reason_other' => 'Autre',
+        'report_reason_required' => 'Choisissez un motif pour ce signalement.',
         'report_details_label' => 'Détails supplémentaires (facultatif)',
         'report_details_hint' => 'Fournissez toute information supplémentaire qui nous aidera dans notre examen.',
         'report_submit' => 'Envoyer le signalement',

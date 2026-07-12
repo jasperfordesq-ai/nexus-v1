@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "Ritirarti da questa sessione?",
+  "withdraw_confirm_body": "Il tuo posto in {{title}} verrà liberato e potrà essere occupato da un’altra persona.",
+  "keep_registration": "Mantieni il mio posto",
   "capacity_label": "Capienza della sessione",
   "capacity_hint": "Lascia vuoto per non imporre limiti. I posti della sessione non modificano l’iscrizione all’evento né i biglietti.",
   "capacity_unlimited": "{{registered}} iscritti · nessun limite",

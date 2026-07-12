@@ -20,6 +20,7 @@ use App\Models\EventInvitationCampaign;
 use App\Models\EventRegistration;
 use App\Models\EventWaitlistEntry;
 use App\Models\User;
+use App\Support\Events\EventInvitationRecipientAuthorizer;
 use App\Support\Events\EventInvitationRecipientExpander;
 use App\Support\Events\EventRegistrationFoundationSupport;
 use Carbon\CarbonImmutable;
@@ -34,6 +35,7 @@ final class EventInvitationService
     private readonly EventRegistrationService $registrations;
     private readonly EventWaitlistService $waitlist;
     private readonly EventInvitationDeliveryService $delivery;
+    private readonly EventInvitationRecipientAuthorizer $recipientAuthorizer;
 
     public function __construct(
         private readonly EventRegistrationFoundationSupport $support = new EventRegistrationFoundationSupport(),
@@ -42,10 +44,12 @@ final class EventInvitationService
         ?EventRegistrationService $registrations = null,
         ?EventWaitlistService $waitlist = null,
         ?EventInvitationDeliveryService $delivery = null,
+        ?EventInvitationRecipientAuthorizer $recipientAuthorizer = null,
     ) {
         $this->registrations = $registrations ?? app(EventRegistrationService::class);
         $this->waitlist = $waitlist ?? app(EventWaitlistService::class);
         $this->delivery = $delivery ?? app(EventInvitationDeliveryService::class);
+        $this->recipientAuthorizer = $recipientAuthorizer ?? new EventInvitationRecipientAuthorizer();
     }
 
     /**
@@ -164,6 +168,18 @@ final class EventInvitationService
                     'invitations' => $results,
                 ];
             }
+            $this->expander->assertSnapshotSourceAuthority(
+                $tenantId,
+                $type,
+                $expanded['snapshot'],
+                $persistedActor,
+            );
+            $this->recipientAuthorizer->assertEligibleForIssue(
+                $tenantId,
+                $event,
+                $persistedActor,
+                $expanded['recipients'],
+            );
             $campaignStatus = (string) $campaign->status;
             if (! in_array($campaignStatus, [
                 EventInvitationCampaignStatus::Previewed->value,

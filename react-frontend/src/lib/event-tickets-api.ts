@@ -174,7 +174,7 @@ export const eventTicketsApi = {
   },
 
   async createType(eventId: number, payload: EventTicketTypePayload, key: string) {
-    const endpoint = `/v2/events/${eventId}/tickets/types`;
+    const endpoint = `/v2/events/${eventId}/ticket-types`;
     return parse(endpoint, await api.post(endpoint, payload, idempotency(key)), typeMutationSchema);
   },
 
@@ -185,7 +185,7 @@ export const eventTicketsApi = {
     payload: EventTicketTypePayload,
     key: string,
   ) {
-    const endpoint = `/v2/events/${eventId}/tickets/types/${ticketTypeId}`;
+    const endpoint = `/v2/events/${eventId}/ticket-types/${ticketTypeId}`;
     return parse(
       endpoint,
       await api.put(endpoint, { ...payload, expected_version: expectedVersion }, idempotency(key)),
@@ -201,7 +201,7 @@ export const eventTicketsApi = {
     reason: string | null,
     key: string,
   ) {
-    const endpoint = `/v2/events/${eventId}/tickets/types/${ticketTypeId}/${action}`;
+    const endpoint = `/v2/events/${eventId}/ticket-types/${ticketTypeId}/${action}`;
     return parse(
       endpoint,
       await api.post(endpoint, { expected_version: expectedVersion, reason }, idempotency(key)),
@@ -225,7 +225,7 @@ export const eventTicketsApi = {
     reason: string,
     key: string,
   ) {
-    const endpoint = `/v2/events/${eventId}/tickets/entitlements/${entitlementId}/cancel`;
+    const endpoint = `/v2/events/${eventId}/ticket-entitlements/${entitlementId}/cancel`;
     return parse(
       endpoint,
       await api.post(endpoint, { expected_version: expectedVersion, reason }, idempotency(key)),

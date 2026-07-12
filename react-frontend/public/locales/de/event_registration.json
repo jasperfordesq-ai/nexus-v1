@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Diesen Gast stornieren?",
+    "cancel_confirm_body": "Der für {{name}} reservierte Platz wird freigegeben. Dies kann auf diesem Bildschirm nicht rückgängig gemacht werden.",
+    "keep": "Gast behalten",
     "title": "Gästeliste und Anwesenheit",
     "description": "Die Identität und Kontaktdaten des Gastes werden nur angezeigt, wenn Ihre Veranstaltungsberechtigungen dies zulassen.",
     "empty": "Es wurden keine Gäste gefangen genommen.",
@@ -313,6 +316,17 @@
     "settings_save_error": "Die Registrierungsrichtlinie konnte nicht gespeichert werden. Überprüfen Sie die Daten und Beschränkungen.",
     "settings_published": "Registrierungsrichtlinie veröffentlicht.",
     "settings_publish_error": "Die Registrierungsrichtlinie konnte nicht veröffentlicht werden."
+  },
+  "answers": {
+    "validation": {
+      "required": "Beantworten Sie diese Frage.",
+      "min_length": "Geben Sie mindestens {{limit}} Zeichen ein.",
+      "max_length": "Geben Sie höchstens {{limit}} Zeichen ein.",
+      "min_selections": "Wählen Sie mindestens {{count}} Option aus.",
+      "min_selections_other": "Wählen Sie mindestens {{count}} Optionen aus.",
+      "max_selections": "Wählen Sie höchstens {{count}} Option aus.",
+      "max_selections_other": "Wählen Sie höchstens {{count}} Optionen aus."
+    }
   },
   "accessible": {
     "organizer_heading": "Organizer-Bedienelemente",

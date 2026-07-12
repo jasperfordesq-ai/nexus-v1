@@ -4,20 +4,24 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import EventSafetyCard from './EventSafetyCard';
 import { DARK } from '@/lib/hooks/useTheme';
-import { acknowledgeEventCode, requestEventGuardianConsent } from '@/lib/api/eventSafety';
+import { acknowledgeEventCode, requestEventGuardianConsent, withdrawEventCode } from '@/lib/api/eventSafety';
 
 const mockSafetyFixture = require('../../../contracts/events/v2/event-safety.json');
 const mockRefresh = jest.fn();
 const mockShow = jest.fn();
+const mockConfirm = jest.fn();
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/lib/hooks/useApi', () => ({
   useApi: () => ({ data: { data: mockSafetyFixture }, isLoading: false, error: null, refresh: mockRefresh }),
 }));
 jest.mock('@/components/ui/AppToast', () => ({ useAppToast: () => ({ show: mockShow }) }));
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({ confirm: mockConfirm, confirmDialog: null }),
+}));
 jest.mock('@/lib/api/eventSafety', () => ({
   acknowledgeEventCode: jest.fn(async () => ({
     data: {
@@ -49,6 +53,9 @@ jest.mock('react-i18next', () => ({
       'safety.code.confirm_read': 'I have read the code.',
       'safety.actions.acknowledge': 'Acknowledge the code',
       'safety.actions.withdraw_acknowledgement': 'Withdraw acknowledgement',
+      'safety.confirmations.withdraw_code_title': 'Withdraw acknowledgement?',
+      'safety.confirmations.withdraw_code_body': 'Participation may be blocked.',
+      'common:buttons.cancel': 'Cancel',
       'safety.attendee.success.acknowledge': 'Code acknowledged.',
     } as Record<string, string>)[key] ?? key,
     i18n: { language: 'en', resolvedLanguage: 'en' },
@@ -59,10 +66,11 @@ describe('EventSafetyCard', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('shows the exact published code and submits its version/hash only after confirmation', async () => {
-    const { getByText } = render(
+    const { getByTestId, getByText } = render(
       <EventSafetyCard eventId={101} primary="#6366f1" theme={DARK} />,
     );
 
+    expect(getByTestId('event-safety-code-scroll')).toBeTruthy();
     expect(getByText('Treat everyone with respect and follow the event safety guidance.')).toBeTruthy();
     fireEvent.press(getByText('I have read the code.'));
     fireEvent.press(getByText('Acknowledge the code'));
@@ -74,5 +82,31 @@ describe('EventSafetyCard', () => {
       expect.stringContaining('event-safety-code-'),
     ));
     expect(requestEventGuardianConsent).not.toHaveBeenCalled();
+  });
+
+  it('requires branded confirmation before withdrawing an acknowledgement', async () => {
+    const { getByText } = render(
+      <EventSafetyCard eventId={101} primary="#6366f1" theme={DARK} />,
+    );
+
+    fireEvent.press(getByText('I have read the code.'));
+    fireEvent.press(getByText('Acknowledge the code'));
+    await waitFor(() => expect(getByText('Withdraw acknowledgement')).toBeTruthy());
+
+    fireEvent.press(getByText('Withdraw acknowledgement'));
+    expect(withdrawEventCode).not.toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Withdraw acknowledgement?',
+      variant: 'danger',
+    }));
+
+    await act(async () => {
+      await mockConfirm.mock.calls[0][0].onConfirm();
+    });
+    expect(withdrawEventCode).toHaveBeenCalledWith(
+      101,
+      91,
+      expect.stringContaining('event-safety-code-withdraw-'),
+    );
   });
 });

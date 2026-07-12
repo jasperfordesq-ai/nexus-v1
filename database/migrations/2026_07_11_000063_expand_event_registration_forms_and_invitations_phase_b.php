@@ -30,7 +30,10 @@ return new class extends Migration
     public function up(): void
     {
         foreach ([
+            'tenants',
+            'users',
             'event_registration_form_questions',
+            'event_registration_form_submissions',
             'event_invitation_campaigns',
             'event_invitations',
             'event_registration_guests',
@@ -39,7 +42,9 @@ return new class extends Migration
             'event_domain_outbox',
         ] as $required) {
             if (! Schema::hasTable($required)) {
-                return;
+                throw new LogicException(
+                    "event_registration_phase_b_prerequisite_missing:{$required}",
+                );
             }
         }
 

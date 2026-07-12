@@ -4,18 +4,24 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import EventRegistrationPanel from './EventRegistrationPanel';
 import { DARK } from '@/lib/hooks/useTheme';
 import {
   acceptRegistrationInvitation,
+  cancelRegistrationGuest,
   getAttendeeRegistrationProduct,
   saveRegistrationSubmission,
   submitRegistrationSubmission,
 } from '@/lib/api/eventRegistration';
 
+const mockConfirm = jest.fn();
+
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ui/AppToast', () => ({ useAppToast: () => ({ show: jest.fn() }) }));
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({ confirm: mockConfirm, confirmDialog: null }),
+}));
 jest.mock('@/lib/api/eventRegistration', () => ({
   getAttendeeRegistrationProduct: jest.fn(),
   getOwnRegistrationAnswers: jest.fn().mockResolvedValue({}),
@@ -28,7 +34,7 @@ jest.mock('@/lib/api/eventRegistration', () => ({
 }));
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => ({
+    t: (key: string, options?: Record<string, unknown>) => ({
       title: 'Registration and guests',
       description: 'Complete event registration details.',
       'common.refresh': 'Refresh',
@@ -42,8 +48,16 @@ jest.mock('react-i18next', () => ({
       'accessible.guest_phone': 'Guest phone',
       'accessible.privacy_consent_label': 'Guest consent confirmed',
       'accessible.notification_consent_label': 'Guest notification consent',
+      'guests.cancel': 'Cancel guest',
+      'guests.cancel_reason_default': 'Cancelled by the registration holder',
+      'guests.cancel_confirm_title': 'Cancel this guest place?',
+      'guests.cancel_confirm_body': `The place held for ${String(options?.name ?? '')} will be released.`,
+      'guests.keep': 'Keep guest place',
       'submissions.save_draft': 'Save draft',
       'statuses.issued': 'Issued',
+      'accessible.validation_error': 'Check the information you entered and try again.',
+      'answers.validation.required': 'Answer this question.',
+      'answers.validation.min_length': 'Enter at least 3 characters.',
     }[key] ?? key),
     i18n: { language: 'en', resolvedLanguage: 'en' },
   }),
@@ -77,7 +91,7 @@ const state = {
       purpose: 'Prepare adjustments',
       retention_days: 30,
       choice_options: null,
-      validation_rules: { max_length: 500 },
+      validation_rules: { min_length: 3, max_length: 500 },
       visibility_rules: null,
       displayed_text: null,
       displayed_text_version: null,
@@ -170,6 +184,57 @@ describe('EventRegistrationPanel', () => {
       50,
       1,
       expect.stringContaining('event-registration-submit'),
+    );
+  });
+
+  it('blocks submit until visible required and range-constrained answers are valid', async () => {
+    const view = render(<EventRegistrationPanel eventId={42} primary="#6366f1" theme={DARK} />);
+
+    fireEvent.press(await view.findByText('Submit answers'));
+    expect(await view.findByText('Answer this question.')).toBeTruthy();
+    expect(saveRegistrationSubmission).not.toHaveBeenCalled();
+
+    fireEvent.changeText(view.getByLabelText('What support would help?'), 'No');
+    fireEvent.press(view.getByText('Submit answers'));
+    expect(await view.findByText('Enter at least 3 characters.')).toBeTruthy();
+    expect(saveRegistrationSubmission).not.toHaveBeenCalled();
+  });
+
+  it('keeps a guest place until destructive cancellation is confirmed', async () => {
+    const withGuest = {
+      ...state,
+      guests: [{
+        id: 81,
+        registration_id: 20,
+        guest_number: 1,
+        revision: 2,
+        status: 'captured' as const,
+        display_name: 'Sam Guest',
+        notification_consent: false,
+      }],
+    };
+    (getAttendeeRegistrationProduct as jest.Mock).mockResolvedValue({ data: withGuest });
+    (cancelRegistrationGuest as jest.Mock).mockResolvedValue({
+      data: { guest: { ...withGuest.guests[0], status: 'withdrawn', revision: 3 } },
+    });
+    const view = render(<EventRegistrationPanel eventId={42} primary="#6366f1" theme={DARK} />);
+
+    fireEvent.press(await view.findByText('Cancel guest'));
+    expect(cancelRegistrationGuest).not.toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Cancel this guest place?',
+      message: 'The place held for Sam Guest will be released.',
+      variant: 'danger',
+    }));
+
+    await act(async () => {
+      await mockConfirm.mock.calls[0][0].onConfirm();
+    });
+    expect(cancelRegistrationGuest).toHaveBeenCalledWith(
+      42,
+      81,
+      2,
+      'Cancelled by the registration holder',
     );
   });
 });

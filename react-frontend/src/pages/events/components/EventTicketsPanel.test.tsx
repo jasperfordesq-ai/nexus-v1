@@ -33,7 +33,7 @@ function catalogue(overrides: Partial<EventTicketCatalogue> = {}): EventTicketCa
       sales_closes_at: '2030-01-01T09:00:00+00:00',
       per_member_limit: 1,
       refund_cutoff_at: null,
-      organizer_cancel_refundable: true,
+      organizer_cancel_refundable: false,
       status: 'active',
       availability: {
         eligibility: { eligible: true, reasons: [] },
@@ -43,7 +43,7 @@ function catalogue(overrides: Partial<EventTicketCatalogue> = {}): EventTicketCa
         materialization_supported: true,
         gateway_status: 'not_required',
         attendance_reward_included: false,
-        refund_policy: { cutoff_at: null, organizer_cancel_refundable: true, execution_status: 'not_integrated' },
+        refund_policy: { cutoff_at: null, organizer_cancel_refundable: false, execution_status: 'not_applicable' },
       },
       eligibility_policy: null,
     }],
@@ -110,6 +110,33 @@ describe('EventTicketsPanel', () => {
 
     expect(await screen.findByText('This ticket type cannot currently be reserved.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reserve ticket' })).toBeDisabled();
+  });
+
+  it('never offers a refund-like cancellation for a time-credit entitlement', async () => {
+    const value = catalogue({
+      own_entitlements: [{
+        id: 20,
+        ticket_type_id: 9,
+        units: 1,
+        kind: 'time_credit',
+        unit_price_credits: '2.00',
+        total_price_credits: '2.00',
+        status: 'confirmed',
+        version: 1,
+        confirmed_at: '2030-01-01T08:00:00+00:00',
+        cancelled_at: null,
+      }],
+    });
+    vi.spyOn(eventTicketsApi, 'get').mockResolvedValue({ success: true, data: value });
+
+    renderEventComponent(
+      <EventTicketsPanel eventId={1} eventStart="2030-01-02T10:00:00+00:00" eventTimezone="UTC" />,
+    );
+
+    expect(await screen.findByText(
+      'Time-credit ticket cancellation is unavailable in this free-only flow. No wallet action has been taken.',
+    )).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel ticket' })).not.toBeInTheDocument();
   });
 
   it('runs a read-only reconciliation for finance-authorised organisers', async () => {

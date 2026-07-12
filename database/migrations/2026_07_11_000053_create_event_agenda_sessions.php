@@ -19,8 +19,10 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('events') || ! Schema::hasTable('users')) {
-            return;
+        foreach (['tenants', 'events', 'users'] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_agenda_prerequisite_missing:{$required}");
+            }
         }
 
         $this->addCompositeParentIndexes();

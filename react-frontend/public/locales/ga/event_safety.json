@@ -21,6 +21,14 @@
       "edit_review": "Cinneadh a nuashonrú",
       "withdraw_review": "Cinneadh a tharraingt siar"
     },
+    "confirmations": {
+      "withdraw_code_title": "Tarraing siar d’admháil ar an gcód iompair?",
+      "withdraw_code_body": "D’fhéadfadh sé seo bac a chur ar do rannpháirtíocht go dtí go n-admhóidh tú an leagan reatha arís.",
+      "withdraw_guardian_title": "Tarraing siar an t-iarratas ar thoiliú caomhnóra?",
+      "withdraw_guardian_body": "Beidh an t-iarratas reatha neamhbhailí. Seans go mbeidh ort iarratas nua a sheoladh sula nglacfaidh tú páirt.",
+      "withdraw_review_title": "Tarraing siar an cinneadh rannpháirtíochta seo?",
+      "withdraw_review_body": "Cuireann sé seo deireadh leis an gcinneadh gníomhach do {{name}} agus coinnítear stair an iniúchta."
+    },
     "organizer": {
       "title": "Sábháilteacht imeachtaí",
       "description": "Riachtanais rannpháirtíochta leagan a shocrú agus taifead rialaithe, in-iniúchta ar chinntí sábháilteachta a choinneáil.",

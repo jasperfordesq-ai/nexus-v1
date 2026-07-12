@@ -52,7 +52,10 @@ describe('EventGuardianConsentPage', () => {
     const replaceState = vi.spyOn(window.history, 'replaceState');
 
     render(
-      <MemoryRouter initialEntries={['/events/101/guardian-consent?token=private-capability']}>
+      <MemoryRouter
+        initialEntries={['/events/101/guardian-consent?token=private-capability']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <EventGuardianConsentPage />
       </MemoryRouter>,
     );
@@ -80,7 +83,10 @@ describe('EventGuardianConsentPage', () => {
 
   it('shows one non-enumerating error when the token is absent', () => {
     render(
-      <MemoryRouter initialEntries={['/events/101/guardian-consent']}>
+      <MemoryRouter
+        initialEntries={['/events/101/guardian-consent']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <EventGuardianConsentPage />
       </MemoryRouter>,
     );

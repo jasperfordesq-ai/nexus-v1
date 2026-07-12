@@ -18,7 +18,9 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasTable('notification_queue')) {
-            return;
+            throw new LogicException(
+                'event_notification_queue_context_prerequisite_missing:notification_queue',
+            );
         }
 
         if (! Schema::hasColumn('notification_queue', 'event_id')) {

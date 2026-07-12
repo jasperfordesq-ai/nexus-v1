@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Exceptions\EventSessionException;
+use App\Models\EventSession;
 use App\Models\User;
 use App\Services\EventSessionService;
 use App\Support\Events\EventSessionContractMapper;
@@ -326,7 +327,7 @@ final class EventAgendaController extends BaseApiController
 
     /**
      * @param array{
-     *   session:\App\Models\EventSession,
+     *   session:?\App\Models\EventSession,
      *   changed:bool,
      *   history_id:?int,
      *   agenda_version:int,
@@ -337,7 +338,9 @@ final class EventAgendaController extends BaseApiController
     private function registrationMutation(array $result, string $idempotencyKey): array
     {
         return [
-            'session' => EventSessionContractMapper::session($result['session']),
+            'session' => $result['session'] instanceof EventSession
+                ? EventSessionContractMapper::session($result['session'])
+                : null,
             'registration_version' => $result['registration_version'],
             'changed' => $result['changed'],
             'idempotent_replay' => ! $result['changed']
@@ -380,6 +383,7 @@ final class EventAgendaController extends BaseApiController
             'event_agenda_idempotency_conflict',
             'event_agenda_registration_version_conflict',
             'event_agenda_registration_idempotency_conflict',
+            'event_agenda_session_registration_not_found',
             'event_agenda_capacity_below_registrations',
             'event_agenda_room_conflict',
             'event_agenda_speaker_conflict' => [

@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'Níorbh fhéidir an nóta tráchta a chur leis. Bain triail eile as.',
         'not_available' => 'Níl sé ar fáil',
     ],
+    'forms' => [
+        'error_prefix' => 'Earráid:',
+    ],
     'home' => [
         'module_signin' => 'Sínigh isteach',
         'module_signin_hint' => 'Sínigh isteach chun é seo a úsáid.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Gan catagóir',
         'start_time_label' => 'Am tosaithe',
         'end_time_label' => 'Am deiridh',
+        'timezone_label' => 'Crios ama na hócáide',
+        'timezone_hint' => 'Úsáid crios ama IANA, mar shampla Europe/Dublin nó America/New_York.',
+        'all_day_label' => 'Ócáid lae iomláin í seo',
+        'all_day_hint' => 'Déantar neamhaird de na hamanna a chuirtear isteach. Cuir isteach an chéad agus an dáta deiridh den ócáid.',
+        'all_day_end_hint' => 'I gcás ócáid lae iomláin, cuir isteach an dáta deiridh atá san áireamh.',
         'datetime_hint' => 'Bain úsáid as an roghnóir dáta agus ama, nó cuir isteach dáta agus am.',
         'end_time_hint' => 'Roghnach. Cuir am críochnaithe leis má tá ceann ag an imeacht.',
         'location_label' => 'Suíomh',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Tá do chuid freagraí príobháideach agus ní úsáidtear iad ach chun críocha cosanta. Is féidir leat iad a athrú nó a bhaint in am ar bith i do shocruithe. Ní roghnaítear aon rud mura roghnaíonn tú féin é.',
             'none_separator' => 'Nó',
             'none_label' => 'Níl aon cheann de seo ag baint liomsa',
+            'options_legend' => 'Roghanna cosanta',
+            'select_none' => 'Dada roghnaithe',
         ],
         'confirm' => [
             'title' => 'Seiceáil do chuid freagraí',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Caimiléireacht nó camscéim amhrasta',
         'report_reason_duplicate' => 'Liostáil dhúblach',
         'report_reason_other' => 'Eile',
+        'report_reason_required' => 'Roghnaigh cúis leis an tuairisc seo.',
         'report_details_label' => 'Sonraí breise (roghnach)',
         'report_details_hint' => 'Cuir aon eolas eile ar fáil a chabhróidh linn an cheist a fhiosrú.',
         'report_submit' => 'Seol tuarascáil',

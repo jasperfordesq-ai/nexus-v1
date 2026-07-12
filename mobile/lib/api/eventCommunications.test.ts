@@ -21,8 +21,10 @@ import { api } from '@/lib/api/client';
 import {
   cancelEventCommunication,
   createEventCommunication,
+  getEventCommunicationDetail,
   getEventCommunications,
   previewEventCommunication,
+  reviseEventCommunication,
   scheduleEventCommunication,
 } from './eventCommunications';
 
@@ -85,6 +87,27 @@ describe('mobile event communications API', () => {
     });
   });
 
+  it('requests an explicit subsequent communications page', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: [broadcastFixture()],
+      meta: {
+        base_url: 'https://api.example.test',
+        current_page: 2,
+        per_page: 25,
+        total: 26,
+        total_pages: 2,
+        has_more: false,
+      },
+    });
+
+    await getEventCommunications(42, 2, 25);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/events/42/broadcasts', {
+      page: '2',
+      per_page: '25',
+    });
+  });
+
   it('previews canonical segments without sending organizer content', async () => {
     (api.post as jest.Mock).mockResolvedValue({
       data: {
@@ -133,6 +156,55 @@ describe('mobile event communications API', () => {
       '/api/v2/events/42/broadcasts',
       expect.objectContaining({ body: '  Exact organizer prose.\nSecond line.  ' }),
       { headers: { 'Idempotency-Key': 'mobile-create-key' } },
+    );
+  });
+
+  it('loads the privacy-filtered append-only detail ledger', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: {
+        broadcast: broadcastFixture('Exact organizer prose.'),
+        history: [{
+          id: 31,
+          version: 1,
+          action: 'created',
+          from_status: null,
+          to_status: 'draft',
+          metadata: { recipient_count: 12 },
+          created_at: '2026-07-11T10:00:00+00:00',
+        }],
+      },
+      meta: { base_url: 'https://api.example.test' },
+    });
+
+    const detail = await getEventCommunicationDetail(8);
+
+    expect(detail.broadcast.body).toBe('Exact organizer prose.');
+    expect(detail.history[0]).toEqual(expect.objectContaining({ action: 'created', version: 1 }));
+    expect(api.get).toHaveBeenCalledWith('/api/v2/event-broadcasts/8');
+  });
+
+  it('revises an eligible draft with optimistic versioning and an idempotency header', async () => {
+    (api.post as jest.Mock).mockResolvedValue(mutationEnvelope({
+      ...broadcastFixture('Revised organizer prose.'),
+      version: 2,
+    }));
+    const input = {
+      variant: 'announcement' as const,
+      segments: ['registration_confirmed'] as const,
+      channels: ['email'] as const,
+      body: 'Revised organizer prose.',
+    };
+
+    await reviseEventCommunication(8, 1, {
+      ...input,
+      segments: [...input.segments],
+      channels: [...input.channels],
+    }, 'mobile-revise-key');
+
+    expect(api.post).toHaveBeenCalledWith(
+      '/api/v2/event-broadcasts/8/revisions',
+      { ...input, segments: [...input.segments], channels: [...input.channels], expected_version: 1 },
+      { headers: { 'Idempotency-Key': 'mobile-revise-key' } },
     );
   });
 

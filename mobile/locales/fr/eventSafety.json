@@ -7,6 +7,12 @@
       "request_guardian_consent": "Demander le consentement du tuteur",
       "withdraw_guardian_consent": "Retirer la demande de consentement"
     },
+    "confirmations": {
+      "withdraw_code_title": "Retirer votre acceptation du code de conduite ?",
+      "withdraw_code_body": "Cela peut bloquer votre participation jusqu’à ce que vous acceptiez à nouveau la version actuelle.",
+      "withdraw_guardian_title": "Retirer la demande de consentement du responsable légal ?",
+      "withdraw_guardian_body": "La demande actuelle deviendra invalide. Vous devrez peut-être en envoyer une nouvelle avant de participer."
+    },
     "attendee": {
       "title": "Conditions de participation",
       "description": "Suivez les étapes de sécurité applicables avant de vous inscrire ou de rejoindre la liste d'attente.",

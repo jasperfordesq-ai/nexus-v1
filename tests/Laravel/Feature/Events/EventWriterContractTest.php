@@ -288,6 +288,11 @@ final class EventWriterContractTest extends TestCase
             'end_time' => '2027-03-28 03:00:00',
         ]))->assertStatus(422);
         $this->apiPost('/v2/events', $this->validPayload([
+            'title' => 'Ambiguous DST wall time',
+            'start_time' => '2027-10-31 01:30:00',
+            'end_time' => '2027-10-31 03:00:00',
+        ]))->assertStatus(422);
+        $this->apiPost('/v2/events', $this->validPayload([
             'title' => 'Misaligned all day time',
             'start_time' => '2027-07-15 09:00:00',
             'end_time' => '2027-07-16 09:00:00',

@@ -21,6 +21,7 @@ import {
   CardBody,
   Chip,
   Input,
+  Pagination,
   Select,
   SelectItem,
   Spinner,
@@ -75,10 +76,15 @@ function localDate(value: string, locale: string): string {
 export function EventOfflineCheckinWorkspace({ eventId }: { eventId: number }) {
   const { t, i18n } = useTranslation('event_offline_checkin');
   const toast = useToast();
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
   const confirm = useConfirm();
   const [workspace, setWorkspace] = useState<OfflineCheckinWorkspace | null>(null);
   const [session, setSession] = useState<OfflineCheckinSession | null>(null);
   const [conflicts, setConflicts] = useState<OfflineCheckinConflicts | null>(null);
+  const [isConflictsLoading, setIsConflictsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -92,9 +98,21 @@ export function EventOfflineCheckinWorkspace({ eventId }: { eventId: number }) {
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const loadConflicts = useCallback(async () => {
-    const response = await eventOfflineCheckinApi.conflicts(eventId);
-    if (response.success && response.data) setConflicts(response.data);
+  const loadConflicts = useCallback(async (page = 1) => {
+    setIsConflictsLoading(true);
+    try {
+      const response = await eventOfflineCheckinApi.conflicts(eventId, page);
+      if (response.success && response.data) {
+        setConflicts(response.data);
+      } else {
+        toastRef.current.error(tRef.current('conflicts.load_error'));
+      }
+    } catch (error) {
+      logError('Failed to load Event offline check-in conflicts', error);
+      toastRef.current.error(tRef.current('conflicts.load_error'));
+    } finally {
+      setIsConflictsLoading(false);
+    }
   }, [eventId]);
 
   const restoreSession = useCallback(async (next: OfflineCheckinWorkspace) => {
@@ -529,7 +547,7 @@ export function EventOfflineCheckinWorkspace({ eventId }: { eventId: number }) {
             <h3 className="font-semibold text-theme-primary">{t('conflicts.title')}</h3>
             <p className="text-sm text-theme-muted">{t('conflicts.description')}</p>
           </div>
-          {!conflicts ? <Button size="sm" variant="outline" onPress={() => void loadConflicts()}>{t('workspace.retry')}</Button> : conflicts.items.length === 0 ? <p className="text-sm text-theme-muted">{t('conflicts.empty')}</p> : conflicts.items.map((item) => (
+          {isConflictsLoading && !conflicts ? <Spinner label={t('conflicts.title')} /> : !conflicts ? <Button size="sm" variant="outline" onPress={() => void loadConflicts()}>{t('workspace.retry')}</Button> : conflicts.items.length === 0 ? <p className="text-sm text-theme-muted">{t('conflicts.empty')}</p> : conflicts.items.map((item) => (
             <div key={item.item_id} className="space-y-3 rounded-xl border border-warning/40 bg-warning/5 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
@@ -546,6 +564,18 @@ export function EventOfflineCheckinWorkspace({ eventId }: { eventId: number }) {
               </div>
             </div>
           ))}
+          {conflicts && conflicts.total > conflicts.per_page && (
+            <div className="flex justify-end border-t border-theme-default pt-4">
+              <Pagination
+                page={conflicts.page}
+                total={Math.ceil(conflicts.total / conflicts.per_page)}
+                showControls
+                isDisabled={isConflictsLoading || isBusy}
+                aria-label={t('conflicts.title')}
+                onChange={(nextPage) => void loadConflicts(nextPage)}
+              />
+            </div>
+          )}
         </CardBody>
       </Card>
 

@@ -132,6 +132,14 @@ trait EventSafetyParity
         $action = self::asStr($request->input('action'));
         $status = 'safety-updated';
         try {
+            if (in_array($action, [
+                'archive_requirements',
+                'withdraw_code',
+                'withdraw_guardian_consent',
+                'withdraw_review',
+            ], true) && ! $request->boolean('confirm_destructive')) {
+                throw new EventSafetyException('event_safety_confirmation_required');
+            }
             $idempotencyKey = $this->eventsSafetyMutationKey($request);
             match ($action) {
                 'save_requirements' => app(EventSafetyRequirementService::class)->saveDraft(

@@ -7,6 +7,12 @@
       "request_guardian_consent": "Request guardian consent",
       "withdraw_guardian_consent": "Withdraw consent request"
     },
+    "confirmations": {
+      "withdraw_code_title": "Withdraw your code-of-conduct acknowledgement?",
+      "withdraw_code_body": "This may block your participation until you acknowledge the current version again.",
+      "withdraw_guardian_title": "Withdraw the guardian consent request?",
+      "withdraw_guardian_body": "The current request will become invalid. You may need to send a new request before participating."
+    },
     "attendee": {
       "title": "Participation requirements",
       "description": "Complete the applicable safety steps before registering or joining the waitlist.",

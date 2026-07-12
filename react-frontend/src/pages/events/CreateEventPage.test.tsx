@@ -143,6 +143,23 @@ describe('CreateEventPage', () => {
     expect(screen.getByRole('textbox', { name: 'Start Date' })).toBeInTheDocument();
   });
 
+  it('exposes the canonical timezone and all-day schedule controls', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('textbox', { name: 'Event time zone' })).toHaveValue(
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+    );
+    const allDay = screen.getByRole('switch', { name: 'All-day event' });
+    expect(allDay).not.toBeChecked();
+    expect(screen.getByRole('textbox', { name: 'Start Time' })).toBeInTheDocument();
+
+    fireEvent.click(allDay);
+
+    expect(allDay).toBeChecked();
+    expect(screen.queryByRole('textbox', { name: 'Start Time' })).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Final event day' })).toBeInTheDocument();
+  });
+
   it('renders the max-attendees number input', async () => {
     await renderCreateEventPage();
 

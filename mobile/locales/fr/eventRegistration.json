@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Annuler la participation de cet invité ?",
+    "cancel_confirm_body": "La place réservée à {{name}} sera libérée. Cette action ne peut pas être annulée depuis cet écran.",
+    "keep": "Conserver l’invité",
     "title": "Liste des invités et présence",
     "description": "L'identité et les coordonnées des invités ne sont affichées que lorsque les autorisations de votre événement le permettent.",
     "empty": "Aucun invité n'a été capturé.",
@@ -313,6 +316,17 @@
     "settings_save_error": "La politique d'inscription n'a pas pu être enregistrée. Vérifiez les dates et les limites.",
     "settings_published": "Politique d'inscription publiée.",
     "settings_publish_error": "La politique d'inscription n'a pas pu être publiée."
+  },
+  "answers": {
+    "validation": {
+      "required": "Répondez à cette question.",
+      "min_length": "Saisissez au moins {{limit}} caractères.",
+      "max_length": "Saisissez au maximum {{limit}} caractères.",
+      "min_selections": "Sélectionnez au moins {{count}} option.",
+      "min_selections_other": "Sélectionnez au moins {{count}} options.",
+      "max_selections": "Sélectionnez au maximum {{count}} option.",
+      "max_selections_other": "Sélectionnez au maximum {{count}} options."
+    }
   },
   "accessible": {
     "organizer_heading": "Contrôles de l'organiseur",

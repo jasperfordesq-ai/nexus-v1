@@ -35,7 +35,25 @@
       "createdTitle": "Brouillon d'événement créé",
       "createdDescription": "Révisez-le et publiez-le séparément lorsqu’il est prêt.",
       "createFailedTitle": "Impossible de créer un brouillon",
-      "createFailedDescription": "Le brouillon de l'événement n'a pas pu être créé. Essayer à nouveau."
+      "createFailedDescription": "Le brouillon de l'événement n'a pas pu être créé. Essayer à nouveau.",
+      "auditButton": "Historique d’audit",
+      "auditTitle": "Audit : {{title}}",
+      "auditDescription": "Consultez l’historique opérationnel de ce modèle, filtré pour protéger la vie privée.",
+      "auditImmutableTitle": "L’historique ne peut pas être modifié",
+      "auditImmutableDescription": "Les enregistrements de capture, révision, archivage et création sont conservés comme preuves immuables.",
+      "auditLoading": "Chargement de l’historique d’audit du modèle",
+      "auditLoadFailedTitle": "Historique d’audit indisponible",
+      "auditLoadFailedDescription": "Impossible de charger l’historique du modèle. Réessayez.",
+      "auditEmpty": "Aucune entrée d’audit disponible.",
+      "auditEntry": "Version {{version}} · {{date}}",
+      "auditMaterializedEvent": "Événement n° {{id}} créé",
+      "notRecorded": "Non enregistré",
+      "auditActions": {
+        "captured": "Modèle capturé",
+        "revised": "Modèle révisé",
+        "archived": "Modèle archivé",
+        "materialized": "Brouillon créé"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Vous êtes toujours autorisé à gérer l'événement source",

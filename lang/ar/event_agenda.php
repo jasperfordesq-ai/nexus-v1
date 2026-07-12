@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'أفهم أنه سيتم تحرير مكاني في :title وقد يشغله شخص آخر.',
     'capacity_label' => 'سعة الجلسة',
     'capacity_hint' => 'اترك الحقل فارغًا لعدم تحديد عدد الأماكن. أماكن الجلسة لا تغيّر تسجيل الفعالية أو التذاكر.',
     'capacity_unlimited' => ':registered مسجلون · بلا حد',

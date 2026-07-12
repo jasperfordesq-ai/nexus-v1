@@ -35,7 +35,25 @@
       "createdTitle": "Borrador de evento creado",
       "createdDescription": "Revíselo y publíquelo por separado cuando esté listo.",
       "createFailedTitle": "No se puede crear un borrador",
-      "createFailedDescription": "No se pudo crear el borrador del evento. Intentar otra vez."
+      "createFailedDescription": "No se pudo crear el borrador del evento. Intentar otra vez.",
+      "auditButton": "Historial de auditoría",
+      "auditTitle": "Auditoría: {{title}}",
+      "auditDescription": "Consulta el historial operativo de esta plantilla filtrado por privacidad.",
+      "auditImmutableTitle": "El historial no se puede cambiar",
+      "auditImmutableDescription": "Los registros de captura, revisión, archivo y creación se conservan como pruebas inmutables.",
+      "auditLoading": "Cargando historial de auditoría de la plantilla",
+      "auditLoadFailedTitle": "Historial de auditoría no disponible",
+      "auditLoadFailedDescription": "No se pudo cargar el historial de la plantilla. Inténtalo de nuevo.",
+      "auditEmpty": "No hay entradas de auditoría disponibles.",
+      "auditEntry": "Versión {{version}} · {{date}}",
+      "auditMaterializedEvent": "Evento #{{id}} creado",
+      "notRecorded": "Sin registrar",
+      "auditActions": {
+        "captured": "Plantilla capturada",
+        "revised": "Plantilla revisada",
+        "archived": "Plantilla archivada",
+        "materialized": "Borrador creado"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Aún tienes permiso para gestionar el evento de origen.",

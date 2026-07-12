@@ -21,6 +21,14 @@
       "edit_review": "Atualizar decisão",
       "withdraw_review": "Retirar decisão"
     },
+    "confirmations": {
+      "withdraw_code_title": "Retirar a aceitação do código de conduta?",
+      "withdraw_code_body": "Isto pode impedir a sua participação até aceitar novamente a versão atual.",
+      "withdraw_guardian_title": "Retirar o pedido de consentimento do responsável?",
+      "withdraw_guardian_body": "O pedido atual ficará inválido. Poderá ter de enviar um novo antes de participar.",
+      "withdraw_review_title": "Retirar esta decisão de participação?",
+      "withdraw_review_body": "Isto termina a decisão ativa de {{name}}, preservando o respetivo histórico de auditoria."
+    },
     "organizer": {
       "title": "Segurança do evento",
       "description": "Defina requisitos de participação versionados e mantenha um registro controlado e auditável das decisões de segurança.",

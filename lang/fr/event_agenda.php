@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'Je comprends que ma place pour :title sera libérée et pourra être attribuée à une autre personne.',
     'capacity_label' => 'Capacité de la séance',
     'capacity_hint' => 'Laissez vide pour un nombre de places illimité. Les places de séance ne modifient ni l’inscription à l’événement ni les billets.',
     'capacity_unlimited' => ':registered inscrits · sans limite',

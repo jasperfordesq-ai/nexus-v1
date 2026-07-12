@@ -10,7 +10,10 @@ namespace App\Support\Events;
 
 use App\Enums\EventInvitationCampaignType;
 use App\Exceptions\EventRegistrationFoundationException;
+use App\Models\User;
+use App\Services\GroupAccessService;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Expands allow-listed invitation inputs into an immutable, encrypted snapshot.
@@ -49,7 +52,9 @@ final class EventInvitationRecipientExpander
         int $tenantId,
         EventInvitationCampaignType $type,
         array $source,
+        User|int $actor,
     ): array {
+        $actorId = $actor instanceof User ? (int) $actor->getKey() : $actor;
         $reference = null;
         $candidates = [];
         $structuralErrors = [];
@@ -61,10 +66,15 @@ final class EventInvitationRecipientExpander
                 throw new EventRegistrationFoundationException('event_invitation_source_fields_unknown');
             }
             $groupId = filter_var($source['group_id'] ?? null, FILTER_VALIDATE_INT);
-            if ($groupId === false || $groupId <= 0
-                || ! DB::table('groups')->where('tenant_id', $tenantId)->where('id', $groupId)->exists()) {
+            if ($groupId === false || $groupId <= 0) {
                 throw new EventRegistrationFoundationException('event_invitation_group_not_found');
             }
+            $this->assertGroupSourceAuthority(
+                $tenantId,
+                $actorId,
+                [(int) $groupId],
+                'event_invitation_group_not_found',
+            );
             $reference = 'group:' . $groupId;
             $candidates = DB::table('group_members')
                 ->where('tenant_id', $tenantId)
@@ -93,7 +103,7 @@ final class EventInvitationRecipientExpander
             }
         } elseif ($type === EventInvitationCampaignType::Audience) {
             [$candidates, $criteriaSnapshot, $criteriaSummary, $reference] =
-                $this->audienceCandidates($tenantId, $source);
+                $this->audienceCandidates($tenantId, $source, $actorId);
         } elseif ($type === EventInvitationCampaignType::Email) {
             if (array_diff(array_keys($source), ['emails']) !== []) {
                 throw new EventRegistrationFoundationException('event_invitation_source_fields_unknown');
@@ -306,10 +316,68 @@ final class EventInvitationRecipientExpander
     }
 
     /**
+     * Revalidate every group-derived audience at issue time. Losing authority
+     * after preview invalidates the immutable target snapshot; callers receive
+     * the same not-found reason as an unknown group so group existence is not
+     * disclosed across authorization boundaries.
+     *
+     * @param array<string,mixed> $snapshot
+     */
+    public function assertSnapshotSourceAuthority(
+        int $tenantId,
+        EventInvitationCampaignType $type,
+        array $snapshot,
+        User|int $actor,
+    ): void {
+        $actorId = $actor instanceof User ? (int) $actor->getKey() : $actor;
+        if ($type === EventInvitationCampaignType::Group) {
+            $reference = $snapshot['source_reference'] ?? null;
+            if (! is_string($reference)
+                || preg_match('/^group:([1-9][0-9]*)$/', $reference, $matches) !== 1) {
+                throw new EventRegistrationFoundationException('event_invitation_campaign_snapshot_invalid');
+            }
+            $this->assertGroupSourceAuthority(
+                $tenantId,
+                $actorId,
+                [(int) $matches[1]],
+                'event_invitation_group_not_found',
+            );
+
+            return;
+        }
+
+        if ($type !== EventInvitationCampaignType::Audience) {
+            return;
+        }
+        $criteria = $snapshot['criteria'] ?? null;
+        if (! is_array($criteria) || ! array_key_exists('group_ids', $criteria)) {
+            return;
+        }
+        $groupIds = $criteria['group_ids'];
+        if (! is_array($groupIds) || ! array_is_list($groupIds) || $groupIds === []) {
+            throw new EventRegistrationFoundationException('event_invitation_campaign_snapshot_invalid');
+        }
+        $normalized = [];
+        foreach ($groupIds as $groupId) {
+            $parsed = filter_var($groupId, FILTER_VALIDATE_INT);
+            if ($parsed === false || $parsed <= 0) {
+                throw new EventRegistrationFoundationException('event_invitation_campaign_snapshot_invalid');
+            }
+            $normalized[] = (int) $parsed;
+        }
+        $this->assertGroupSourceAuthority(
+            $tenantId,
+            $actorId,
+            array_values(array_unique($normalized)),
+            'event_invitation_audience_group_not_found',
+        );
+    }
+
+    /**
      * @param array<string,mixed> $source
      * @return array{0:list<array{member_id:mixed}>,1:array<string,mixed>,2:array<string,mixed>,3:string}
      */
-    private function audienceCandidates(int $tenantId, array $source): array
+    private function audienceCandidates(int $tenantId, array $source, int $actorId): array
     {
         if (array_keys($source) === ['member_ids']) {
             $ids = $source['member_ids'];
@@ -417,14 +485,12 @@ final class EventInvitationRecipientExpander
 
         $groupIds = $this->positiveIntegerList($raw, 'group_ids', self::MAX_GROUPS);
         if ($groupIds !== null) {
-            $validGroupCount = DB::table('groups')
-                ->where('tenant_id', $tenantId)
-                ->whereIn('id', $groupIds)
-                ->distinct()
-                ->count('id');
-            if ($validGroupCount !== count($groupIds)) {
-                throw new EventRegistrationFoundationException('event_invitation_audience_group_not_found');
-            }
+            $this->assertGroupSourceAuthority(
+                $tenantId,
+                $actorId,
+                $groupIds,
+                'event_invitation_audience_group_not_found',
+            );
             $match = strtolower(trim((string) ($raw['group_match'] ?? 'any')));
             if (! in_array($match, ['any', 'all'], true)) {
                 throw new EventRegistrationFoundationException('event_invitation_audience_group_match_invalid');
@@ -483,6 +549,32 @@ final class EventInvitationRecipientExpander
             $summary,
             $reference,
         ];
+    }
+
+    /** @param list<int> $groupIds */
+    private function assertGroupSourceAuthority(
+        int $tenantId,
+        int $actorId,
+        array $groupIds,
+        string $reason,
+    ): void {
+        if ($actorId <= 0 || $groupIds === []) {
+            throw new EventRegistrationFoundationException($reason);
+        }
+        foreach ($groupIds as $groupId) {
+            try {
+                $authorized = DB::table('groups')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $groupId)
+                    ->exists()
+                    && GroupAccessService::canManageMembers($groupId, $actorId);
+            } catch (Throwable) {
+                $authorized = false;
+            }
+            if (! $authorized) {
+                throw new EventRegistrationFoundationException($reason);
+            }
+        }
     }
 
     private function boolean(mixed $value, string $reason): bool

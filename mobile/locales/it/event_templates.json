@@ -35,7 +35,25 @@
       "createdTitle": "Bozza dell'evento creata",
       "createdDescription": "Rivedilo e pubblicalo separatamente quando sarà pronto.",
       "createFailedTitle": "Impossibile creare la bozza",
-      "createFailedDescription": "Impossibile creare la bozza dell'evento. Riprova."
+      "createFailedDescription": "Impossibile creare la bozza dell'evento. Riprova.",
+      "auditButton": "Cronologia di audit",
+      "auditTitle": "Audit del modello: {{title}}",
+      "auditDescription": "Consulta la cronologia operativa del modello filtrata per la privacy.",
+      "auditImmutableTitle": "La cronologia non può essere modificata",
+      "auditImmutableDescription": "I record di acquisizione, revisione, archiviazione e creazione sono conservati come prove immutabili.",
+      "auditLoading": "Caricamento cronologia di audit del modello",
+      "auditLoadFailedTitle": "Cronologia di audit non disponibile",
+      "auditLoadFailedDescription": "Impossibile caricare la cronologia del modello. Riprova.",
+      "auditEmpty": "Non sono disponibili voci di audit.",
+      "auditEntry": "Versione {{version}} · {{date}}",
+      "auditMaterializedEvent": "Evento #{{id}} creato",
+      "notRecorded": "Non registrato",
+      "auditActions": {
+        "captured": "Modello acquisito",
+        "revised": "Modello rivisto",
+        "archived": "Modello archiviato",
+        "materialized": "Bozza creata"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Hai ancora l'autorizzazione per gestire l'evento di origine",

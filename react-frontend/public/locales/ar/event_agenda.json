@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "الانسحاب من هذه الجلسة؟",
+  "withdraw_confirm_body": "سيتم تحرير مكانك في {{title}} وقد يشغله شخص آخر.",
+  "keep_registration": "الاحتفاظ بمكاني",
   "capacity_label": "سعة الجلسة",
   "capacity_hint": "اترك الحقل فارغًا لعدم تحديد عدد الأماكن. أماكن الجلسة لا تغيّر تسجيل الفعالية أو التذاكر.",
   "capacity_unlimited": "{{registered}} مسجلون · بلا حد",

@@ -4,7 +4,7 @@
   Author: Jasper Ford
   See NOTICE file for attribution and acknowledgements.
 --}}
-@extends('accessible-frontend::layouts.app')
+@extends('accessible-frontend::layout')
 
 @section('content')
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.registration.index', ['tenantSlug' => $tenantSlug, 'id' => $eventId]) }}">

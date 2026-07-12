@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Deze gast annuleren?",
+    "cancel_confirm_body": "De voor {{name}} gereserveerde plaats komt vrij. Dit kan vanuit dit scherm niet ongedaan worden gemaakt.",
+    "keep": "Gast behouden",
     "title": "Gastenlijst en aanwezigheid",
     "description": "De identiteit en contactgegevens van gasten worden alleen weergegeven als uw evenementrechten dit toestaan.",
     "empty": "Er zijn geen gasten gevangengenomen.",
@@ -313,6 +316,17 @@
     "settings_save_error": "Registratiebeleid kan niet worden opgeslagen. Controleer de data en limieten.",
     "settings_published": "Registratiebeleid gepubliceerd.",
     "settings_publish_error": "Het registratiebeleid kon niet worden gepubliceerd."
+  },
+  "answers": {
+    "validation": {
+      "required": "Beantwoord deze vraag.",
+      "min_length": "Voer minimaal {{limit}} tekens in.",
+      "max_length": "Voer maximaal {{limit}} tekens in.",
+      "min_selections": "Selecteer minimaal {{count}} optie.",
+      "min_selections_other": "Selecteer minimaal {{count}} opties.",
+      "max_selections": "Selecteer maximaal {{count}} optie.",
+      "max_selections_other": "Selecteer maximaal {{count}} opties."
+    }
   },
   "accessible": {
     "organizer_heading": "Organisatorbedieningen",

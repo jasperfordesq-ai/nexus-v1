@@ -27,11 +27,13 @@ final class EventSessionRegistrationHistory extends Model
     protected $hidden = [
         'tenant_id',
         'event_registration_id',
+        'event_registration_version',
         'actor_user_id',
         'request_hash',
     ];
 
     protected $casts = [
+        'event_registration_version' => 'integer',
         'registration_version' => 'integer',
         'created_at' => 'immutable_datetime',
     ];

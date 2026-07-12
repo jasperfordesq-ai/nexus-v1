@@ -42,6 +42,7 @@
     "units": "{{count}} eenheid",
     "units_other": "{{count}} eenheden",
     "cancel": "Ticket annuleren",
+    "time_credit_cancel_disabled": "Annulering van tijdskrediettickets is niet beschikbaar in deze uitsluitend gratis stroom. Er is geen portemonneeactie uitgevoerd.",
     "cancelled": "Geannuleerd",
     "cancel_title": "Dit ticket annuleren?",
     "cancel_reason": "Reden van annulering",

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   eventGuardianConsentGrantSchema,
   eventSafetyReviewsSchema,
@@ -107,6 +107,7 @@ describe('Event Safety API contract', () => {
   });
 
   it('fails closed on contract drift without retaining response data', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const response = parseEventSafetyResponse('/v2/events/101/safety', {
       success: true,
       data: { ...safety, contract_version: 2 },
@@ -115,6 +116,11 @@ describe('Event Safety API contract', () => {
     expect(response.success).toBe(false);
     expect(response.code).toBe('EVENT_SAFETY_CONTRACT_DRIFT');
     expect(response.data).toBeUndefined();
+    expect(errorSpy).toHaveBeenCalledWith(
+      '[Error] Event Safety contract drift',
+      expect.objectContaining({ endpoint: '/v2/events/101/safety', version: 1 }),
+    );
+    errorSpy.mockRestore();
   });
 
   it('validates controlled review history without notes or contact data', () => {

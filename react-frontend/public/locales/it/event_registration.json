@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Annullare questo ospite?",
+    "cancel_confirm_body": "Il posto riservato a {{name}} verrà liberato. Non è possibile annullare l’operazione da questa schermata.",
+    "keep": "Mantieni l’ospite",
     "title": "Elenco degli ospiti e presenze",
     "description": "L'identità dell'ospite e i dettagli di contatto vengono mostrati solo quando le autorizzazioni dell'evento lo consentono.",
     "empty": "Nessun ospite è stato catturato.",
@@ -313,6 +316,17 @@
     "settings_save_error": "Impossibile salvare la politica di registrazione. Controlla le date e i limiti.",
     "settings_published": "Politica di registrazione pubblicata.",
     "settings_publish_error": "Impossibile pubblicare la politica di registrazione."
+  },
+  "answers": {
+    "validation": {
+      "required": "Rispondi a questa domanda.",
+      "min_length": "Inserisci almeno {{limit}} caratteri.",
+      "max_length": "Inserisci non più di {{limit}} caratteri.",
+      "min_selections": "Seleziona almeno {{count}} opzione.",
+      "min_selections_other": "Seleziona almeno {{count}} opzioni.",
+      "max_selections": "Seleziona non più di {{count}} opzione.",
+      "max_selections_other": "Seleziona non più di {{count}} opzioni."
+    }
   },
   "accessible": {
     "organizer_heading": "Controlli dell'organizzatore",

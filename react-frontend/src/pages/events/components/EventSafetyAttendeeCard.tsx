@@ -23,6 +23,7 @@ import {
   SelectItem,
   Spinner,
 } from '@/components/ui';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventSafetyApi,
@@ -56,6 +57,7 @@ function idempotencyKey(prefix: string): string {
 export function EventSafetyAttendeeCard({ eventId, onChanged }: EventSafetyAttendeeCardProps) {
   const { t, i18n } = useTranslation('event_safety');
   const toast = useToast();
+  const confirm = useConfirm();
   const [safety, setSafety] = useState<EventSafety | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -127,6 +129,14 @@ export function EventSafetyAttendeeCard({ eventId, onChanged }: EventSafetyAtten
   const withdrawCode = async () => {
     const acknowledgementId = safety?.evidence.code_of_conduct.acknowledgement_id;
     if (!acknowledgementId) return;
+    const accepted = await confirm({
+      title: t('safety.confirmations.withdraw_code_title'),
+      body: t('safety.confirmations.withdraw_code_body'),
+      confirmLabel: t('safety.actions.withdraw_acknowledgement'),
+      cancelLabel: t('safety.actions.cancel'),
+      status: 'danger',
+    });
+    if (!accepted) return;
     await complete('withdraw_code', () => eventSafetyApi.withdrawCode(
       eventId,
       acknowledgementId,
@@ -155,6 +165,14 @@ export function EventSafetyAttendeeCard({ eventId, onChanged }: EventSafetyAtten
   const withdrawGuardianConsent = async () => {
     const consentId = safety?.evidence.guardian_consent.consent_id;
     if (!consentId) return;
+    const accepted = await confirm({
+      title: t('safety.confirmations.withdraw_guardian_title'),
+      body: t('safety.confirmations.withdraw_guardian_body'),
+      confirmLabel: t('safety.actions.withdraw_guardian_consent'),
+      cancelLabel: t('safety.actions.cancel'),
+      status: 'danger',
+    });
+    if (!accepted) return;
     await complete('withdraw_guardian', () => eventSafetyApi.withdrawGuardianConsent(
       eventId,
       consentId,

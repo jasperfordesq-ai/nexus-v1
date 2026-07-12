@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Oceniony przez',
         'withdraw_review' => 'Cofnij decyzję',
         'ledger_empty' => 'Nie zarejestrowano żadnych recenzji uczestnictwa w tym wydarzeniu.',
+        'confirm_archive_checkbox' => 'Rozumiem, że spowoduje to wyłączenie bieżących wymagań bezpieczeństwa.',
+        'confirm_withdraw_code' => 'Rozumiem, że może to zablokować mój udział do czasu ponownej akceptacji kodeksu.',
+        'confirm_withdraw_guardian' => 'Rozumiem, że bieżąca prośba o zgodę stanie się nieważna.',
+        'confirm_withdraw_review' => 'Potwierdzam, że chcę wycofać aktywną decyzję dotyczącą :name.',
     ],
 ];

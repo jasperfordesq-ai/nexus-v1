@@ -494,7 +494,7 @@ const eventAgendaReorderMutationSchema = z.object({
 }).passthrough();
 
 const eventAgendaRegistrationMutationSchema = z.object({
-  session: eventAgendaSessionSchema,
+  session: eventAgendaSessionSchema.nullable(),
   registration_version: z.number().int().nonnegative(),
   changed: z.boolean(),
   idempotent_replay: z.boolean(),

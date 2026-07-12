@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'Nie można dodać komentarza. Spróbuj ponownie.',
         'not_available' => 'Niedostępne',
     ],
+    'forms' => [
+        'error_prefix' => 'Błąd:',
+    ],
     'home' => [
         'module_signin' => 'Zaloguj się',
         'module_signin_hint' => 'Zaloguj się, aby z tego skorzystać.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Brak kategorii',
         'start_time_label' => 'Czas rozpoczęcia',
         'end_time_label' => 'Koniec czasu',
+        'timezone_label' => 'Strefa czasowa wydarzenia',
+        'timezone_hint' => 'Użyj strefy czasowej IANA, na przykład Europe/Warsaw lub America/New_York.',
+        'all_day_label' => 'To wydarzenie całodniowe',
+        'all_day_hint' => 'Wprowadzone godziny zostaną pominięte. Podaj pierwszą i ostatnią datę wydarzenia.',
+        'all_day_end_hint' => 'Dla wydarzenia całodniowego podaj ostatnią datę objętą wydarzeniem.',
         'datetime_hint' => 'Użyj selektora daty i godziny lub wprowadź datę i godzinę.',
         'end_time_hint' => 'Fakultatywny. Dodaj godzinę zakończenia, jeśli wydarzenie ją posiada.',
         'location_label' => 'Lokalizacja',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Twoje odpowiedzi są prywatne i używane wyłącznie do celów ochrony. Możesz je zmienić lub usunąć w dowolnym momencie w ustawieniach. Nic nie jest zaznaczone, jeśli tego nie wybierzesz.',
             'none_separator' => 'Lub',
             'none_label' => 'Żadne z tych nie dotyczy mnie',
+            'options_legend' => 'Opcje ochrony',
+            'select_none' => 'Nic nie wybrano',
         ],
         'confirm' => [
             'title' => 'Sprawdź swoje odpowiedzi',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Podejrzenie oszustwa lub wyłudzenia',
         'report_reason_duplicate' => 'Duplikat ogłoszenia',
         'report_reason_other' => 'Inne',
+        'report_reason_required' => 'Wybierz powód tego zgłoszenia.',
         'report_details_label' => 'Dodatkowe szczegóły (opcjonalne)',
         'report_details_hint' => 'Podaj wszelkie inne informacje, które pomogą nam w zbadaniu sprawy.',
         'report_submit' => 'Wyślij zgłoszenie',

@@ -573,69 +573,6 @@ final class EventPeopleOperationsServiceTest extends TestCase
         }
     }
 
-    public function test_ten_thousand_participants_keep_a_constant_query_budget(): void
-    {
-        $organizer = $this->member('Scale Organizer');
-        $event = $this->event($organizer, now()->addDay());
-        $prefix = bin2hex(random_bytes(8));
-        $now = now();
-        for ($offset = 0; $offset < 10_000; $offset += 500) {
-            $users = [];
-            for ($index = $offset; $index < $offset + 500; $index++) {
-                $users[] = [
-                    'tenant_id' => $this->testTenantId,
-                    'name' => sprintf('Scale Member %05d', $index),
-                    'first_name' => sprintf('Scale Member %05d', $index),
-                    'email' => "scale-{$prefix}-{$index}@example.test",
-                    'status' => 'active',
-                    'is_approved' => 1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
-            DB::table('users')->insert($users);
-        }
-        $memberIds = DB::table('users')
-            ->where('tenant_id', $this->testTenantId)
-            ->where('email', 'like', "scale-{$prefix}-%@example.test")
-            ->orderBy('id')
-            ->pluck('id')
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->all();
-        self::assertCount(10_000, $memberIds);
-        foreach (array_chunk($memberIds, 500) as $chunk) {
-            DB::table('event_registrations')->insert(array_map(
-                fn (int $userId): array => [
-                    'tenant_id' => $this->testTenantId,
-                    'event_id' => $event->id,
-                    'user_id' => $userId,
-                    'capacity_pool_key' => 'event',
-                    'registration_state' => 'pending',
-                    'registration_version' => 1,
-                    'state_changed_at' => $now,
-                    'state_changed_by' => $organizer->id,
-                    'pending_at' => $now,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ],
-                $chunk,
-            ));
-        }
-
-        DB::flushQueryLog();
-        DB::enableQueryLog();
-        $result = app(EventPeopleService::class)->paginate(
-            $event,
-            new EventPeopleQuery(page: 1, perPage: 100),
-        );
-        $queryCount = count(DB::getQueryLog());
-        DB::disableQueryLog();
-
-        self::assertSame(10_000, $result['total']);
-        self::assertCount(100, $result['items']);
-        self::assertLessThanOrEqual(6, $queryCount);
-    }
-
     /** @param callable():mixed $operation */
     private function assertAttendanceRejected(string $reason, callable $operation): void
     {

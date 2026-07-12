@@ -28,6 +28,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Pagination,
   Select,
   SelectItem,
   Spinner,
@@ -78,6 +79,14 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
   const toast = useToast();
   const generation = useRef(0);
   const [broadcasts, setBroadcasts] = useState<EventBroadcast[]>([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<{
+    current_page: number;
+    per_page: number;
+    total: number;
+    total_pages: number;
+    has_more: boolean;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
@@ -106,13 +115,14 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
     setIsLoading(true);
     setLoadError(false);
     try {
-      const response = await eventCommunicationsApi.list(eventId);
+      const response = await eventCommunicationsApi.list(eventId, page);
       if (requestGeneration !== generation.current) return;
       if (!response.success || !response.data) {
         setLoadError(true);
         return;
       }
       setBroadcasts(response.data);
+      setPagination(response.meta ?? null);
     } catch (error) {
       if (requestGeneration !== generation.current) return;
       logError('Failed to load event communications', error);
@@ -120,6 +130,10 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
     } finally {
       if (requestGeneration === generation.current) setIsLoading(false);
     }
+  }, [eventId, page]);
+
+  useEffect(() => {
+    setPage(1);
   }, [eventId]);
 
   useEffect(() => {
@@ -385,8 +399,9 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
           <p className="mt-1 text-sm text-theme-muted">{t('empty_description')}</p>
         </div>
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2" aria-live="polite">
-          {broadcasts.map((broadcast) => (
+        <>
+          <div className="grid gap-4 xl:grid-cols-2" aria-live="polite">
+            {broadcasts.map((broadcast) => (
             <Card key={broadcast.id} className="border border-theme-default">
               <CardHeader className="flex items-start justify-between gap-3">
                 <div>
@@ -456,8 +471,20 @@ export function EventCommunicationsWorkspace({ eventId, eventTitle }: EventCommu
                 )}
               </CardFooter>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+          {pagination && pagination.total_pages > 1 && (
+            <div className="flex justify-end border-t border-theme-default pt-4">
+              <Pagination
+                page={pagination.current_page}
+                total={pagination.total_pages}
+                showControls
+                aria-label={t('title')}
+                onChange={setPage}
+              />
+            </div>
+          )}
+        </>
       )}
 
       <Modal isOpen={composerOpen} size="3xl" scrollBehavior="inside" onOpenChange={setComposerOpen}>

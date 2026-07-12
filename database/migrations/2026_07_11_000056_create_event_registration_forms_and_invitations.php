@@ -41,10 +41,10 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('events')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('event_registrations')) {
-            return;
+        foreach (['tenants', 'events', 'users', 'event_registrations'] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_registration_forms_prerequisite_missing:{$required}");
+            }
         }
 
         $this->addPartySize();
@@ -69,6 +69,9 @@ return new class extends Migration
 
     public function down(): void
     {
+        if ($this->hasDependentSchema()) {
+            throw new LogicException('event_registration_forms_rollback_refused_dependents_exist');
+        }
         if ($this->containsDurableEvidence()) {
             throw new LogicException('event_registration_forms_rollback_refused_evidence_exists');
         }
@@ -1063,5 +1066,67 @@ return new class extends Migration
         return Schema::hasTable('event_registrations')
             && Schema::hasColumn('event_registrations', 'party_size')
             && DB::table('event_registrations')->where('party_size', '!=', 1)->exists();
+    }
+
+    private function hasDependentSchema(): bool
+    {
+        foreach ([
+            'event_invitation_campaign_history',
+            'event_invitation_delivery_evidence',
+            'event_registration_guest_attendance',
+            'event_registration_guest_attendance_history',
+        ] as $table) {
+            if (Schema::hasTable($table)) {
+                return true;
+            }
+        }
+
+        foreach ([
+            'event_registration_form_questions' => [
+                'validation_rules',
+                'visibility_rules',
+            ],
+            'event_registration_form_submissions' => [
+                'supersedes_submission_id',
+                'lineage_root_submission_id',
+                'attempt_number',
+                'effective_slot',
+                'superseded_at',
+            ],
+            'event_invitation_campaigns' => [
+                'source_schema_version',
+                'source_snapshot_ciphertext',
+                'segment_criteria_summary',
+                'default_locale',
+                'scheduled_for_utc',
+                'started_at',
+                'completed_at',
+                'cancelled_reason',
+            ],
+            'event_registration_guests' => [
+                'preferred_locale',
+                'notification_consent',
+                'notification_consent_version',
+                'notification_consent_text_hash',
+                'notification_consented_at',
+                'ticket_entitlement_id',
+            ],
+        ] as $table => $columns) {
+            foreach ($columns as $column) {
+                if (Schema::hasColumn($table, $column)) {
+                    return true;
+                }
+            }
+        }
+
+        if (DB::getDriverName() !== 'mysql') {
+            return false;
+        }
+
+        return DB::table('information_schema.REFERENTIAL_CONSTRAINTS')
+            ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
+            ->whereIn('REFERENCED_TABLE_NAME', self::TABLES)
+            ->whereNotIn('TABLE_NAME', self::TABLES)
+            ->exists();
     }
 };

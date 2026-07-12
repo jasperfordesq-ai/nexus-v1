@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "¿Cancelar a este invitado?",
+    "cancel_confirm_body": "La plaza reservada para {{name}} se liberará. Esto no se puede deshacer desde esta pantalla.",
+    "keep": "Mantener al invitado",
     "title": "Lista de invitados y asistencia",
     "description": "La identidad del invitado y los detalles de contacto se muestran solo cuando los permisos de su evento lo permiten.",
     "empty": "No se ha capturado a ningún invitado.",
@@ -313,6 +316,17 @@
     "settings_save_error": "No se pudo guardar la política de registro. Consulta las fechas y límites.",
     "settings_published": "Política de registro publicada.",
     "settings_publish_error": "No se pudo publicar la política de registro."
+  },
+  "answers": {
+    "validation": {
+      "required": "Responde a esta pregunta.",
+      "min_length": "Introduce al menos {{limit}} caracteres.",
+      "max_length": "Introduce como máximo {{limit}} caracteres.",
+      "min_selections": "Selecciona al menos {{count}} opción.",
+      "min_selections_other": "Selecciona al menos {{count}} opciones.",
+      "max_selections": "Selecciona como máximo {{count}} opción.",
+      "max_selections_other": "Selecciona como máximo {{count}} opciones."
+    }
   },
   "accessible": {
     "organizer_heading": "Controles del organizador",

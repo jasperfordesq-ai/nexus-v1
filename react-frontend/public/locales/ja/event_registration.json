@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "このゲストを取り消しますか？",
+    "cancel_confirm_body": "{{name}} のために確保された席が解放されます。この画面からは元に戻せません。",
+    "keep": "ゲストを維持する",
     "title": "ゲスト名簿と出席者数",
     "description": "ゲストの ID と連絡先の詳細は、イベントの権限で許可されている場合にのみ表示されます。",
     "empty": "ゲストは誰も捕まっていません。",
@@ -313,6 +316,17 @@
     "settings_save_error": "登録ポリシーを保存できませんでした。日付と制限を確認してください。",
     "settings_published": "登録ポリシーが公開されました。",
     "settings_publish_error": "登録ポリシーを公開できませんでした。"
+  },
+  "answers": {
+    "validation": {
+      "required": "この質問に回答してください。",
+      "min_length": "{{limit}} 文字以上で入力してください。",
+      "max_length": "{{limit}} 文字以内で入力してください。",
+      "min_selections": "{{count}} 個以上の選択肢を選んでください。",
+      "min_selections_other": "{{count}} 個以上の選択肢を選んでください。",
+      "max_selections": "選択肢は {{count}} 個以内にしてください。",
+      "max_selections_other": "選択肢は {{count}} 個以内にしてください。"
+    }
   },
   "accessible": {
     "organizer_heading": "オーガナイザーコントロール",

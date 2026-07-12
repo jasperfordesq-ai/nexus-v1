@@ -42,6 +42,7 @@
     "units": "{{count}} jednostka",
     "units_other": "{{count}} jednostek",
     "cancel": "Anuluj bilet",
+    "time_credit_cancel_disabled": "Anulowanie biletu opłacanego kredytami czasowymi nie jest dostępne w tym przepływie obejmującym wyłącznie bilety bezpłatne. Nie wykonano żadnej operacji na portfelu.",
     "cancelled": "Anulowano",
     "cancel_title": "Anulować ten bilet?",
     "cancel_reason": "Powód anulowania",

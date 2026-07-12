@@ -37,11 +37,16 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('events')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('event_registrations')
-            || ! Schema::hasTable('event_attendance_activity')) {
-            return;
+        foreach ([
+            'tenants',
+            'events',
+            'users',
+            'event_registrations',
+            'event_attendance_activity',
+        ] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_offline_checkin_prerequisite_missing:{$required}");
+            }
         }
 
         $this->addCompositeParentIndexes();

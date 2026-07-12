@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "Uitschrijven voor deze sessie?",
+  "withdraw_confirm_body": "Uw plaats voor {{title}} komt vrij en kan door iemand anders worden ingenomen.",
+  "keep_registration": "Mijn plaats behouden",
   "capacity_label": "Capaciteit van de sessie",
   "capacity_hint": "Laat leeg voor onbeperkte plaatsen. Sessieplaatsen wijzigen de evenementregistratie of tickets niet.",
   "capacity_unlimited": "{{registered}} ingeschreven · onbeperkt",

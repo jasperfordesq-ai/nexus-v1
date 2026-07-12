@@ -20,10 +20,14 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('event_notification_deliveries')
-            || ! Schema::hasTable('event_guardian_consents')
-            || ! Schema::hasTable('event_domain_outbox')) {
-            return;
+        foreach ([
+            'event_notification_deliveries',
+            'event_guardian_consents',
+            'event_domain_outbox',
+        ] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_guardian_delivery_prerequisite_missing:{$required}");
+            }
         }
 
         if (! Schema::hasIndex(
@@ -211,6 +215,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if ($this->hasDependentSchema()) {
+            throw new LogicException('event_guardian_delivery_rollback_refused_dependents_exist');
+        }
+
         foreach ([
             'event_guardian_consent_delivery_access',
             'event_guardian_consent_delivery_envelopes',
@@ -227,6 +235,13 @@ return new class extends Migration
                 ->exists()) {
             throw new LogicException(
                 'External Event delivery evidence exists and cannot be rolled back.',
+            );
+        }
+        if (Schema::hasTable('event_guardian_consents')
+            && Schema::hasColumn('event_guardian_consents', 'guardian_locale')
+            && DB::table('event_guardian_consents')->whereNotNull('guardian_locale')->exists()) {
+            throw new LogicException(
+                'event_guardian_delivery_rollback_refused_guardian_locale_evidence',
             );
         }
 
@@ -267,6 +282,34 @@ return new class extends Migration
                 $table->dropUnique('uq_event_guardian_consent_scope_id');
             });
         }
+    }
+
+    private function hasDependentSchema(): bool
+    {
+        if (Schema::hasTable('event_invitation_delivery_evidence')) {
+            return true;
+        }
+
+        if (DB::getDriverName() !== 'mysql') {
+            return false;
+        }
+
+        return DB::table('information_schema.REFERENTIAL_CONSTRAINTS')
+            ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
+            ->whereNotIn('TABLE_NAME', [
+                'event_guardian_consent_delivery_access',
+                'event_guardian_consent_delivery_envelopes',
+            ])
+            ->where(static function ($query): void {
+                $query->where(static function ($outbox): void {
+                    $outbox->where('REFERENCED_TABLE_NAME', 'event_domain_outbox')
+                        ->where('UNIQUE_CONSTRAINT_NAME', 'uq_event_outbox_scope_id');
+                })->orWhere(static function ($consent): void {
+                    $consent->where('REFERENCED_TABLE_NAME', 'event_guardian_consents')
+                        ->where('UNIQUE_CONSTRAINT_NAME', 'uq_event_guardian_consent_scope_id');
+                });
+            })
+            ->exists();
     }
 
     private function installRecipientChecks(): void

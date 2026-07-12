@@ -555,6 +555,7 @@ return [
         'capacity_hint' => 'How many collections this slot can take.',
         'capacity_value' => ':booked of :capacity booked',
         'remaining_value' => ':count remaining',
+        'not_set' => '未設定',
         'recurring' => 'Repeats weekly',
         'inactive' => 'Not active',
         'active_label' => 'Slot is active',

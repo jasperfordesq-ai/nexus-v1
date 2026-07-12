@@ -13,6 +13,10 @@
     "options": { "any": "Aon ionad", "yes": "Rochtain gan chéimeanna deimhnithe", "no": "Níl rochtain gan chéimeanna ann", "unknown": "Ní fios" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Fág an liosta feithimh?",
+    "leaveWaitlistConfirmDescription": "Caillfidh tú do shuíomh reatha agus b’fhéidir go mbeidh ort dul isteach arís ag deireadh na scuaine.",
+    "offerDeclineConfirmTitle": "Diúltaigh don áit áirithinte seo?",
+    "offerDeclineConfirmDescription": "Scaoilfear an áit áirithinte agus tiocfaidh deireadh le do thairiscint ón liosta feithimh.",
     "offerAvailable": "Áit ar fáil",
     "offerTitle": "Tá áit ar fáil duit",
     "offerDescription": "Tá áit curtha in áirithe duit anois ón liosta feithimh. Glac léi chun do fhreastal a dheimhniú.",
@@ -129,6 +133,9 @@
       "cancelled": "Cealaithe"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Tarraingt siar ón seisiún seo?",
+      "withdrawConfirmDescription": "Scaoilfear d’áit in {{title}} agus d’fhéadfadh duine eile í a ghlacadh.",
+      "keepRegistration": "Coinnigh m’áit",
       "capacityUnlimited": "{{count}} cláraithe · gan teorainn",
       "capacityLimited": "{{registered}} as {{limit}} cláraithe",
       "full": "Lán",

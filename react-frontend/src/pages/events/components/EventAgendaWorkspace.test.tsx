@@ -21,8 +21,10 @@ const mockToast = vi.hoisted(() => ({
   info: vi.fn(),
   warning: vi.fn(),
 }));
+const mockConfirm = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts/ToastContext', () => ({ useToast: () => mockToast }));
+vi.mock('@/components/ui/ConfirmDialog', () => ({ useConfirm: () => mockConfirm }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 function session(overrides: Partial<EventAgendaSession> = {}): EventAgendaSession {
@@ -107,6 +109,7 @@ function manageableEvent(overrides: Partial<Event> = {}): Event {
 describe('EventAgendaWorkspace', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfirm.mockResolvedValue(true);
   });
 
   it('renders the authorised running order, visibility, rooms, tracks, and speakers', async () => {
@@ -265,5 +268,53 @@ describe('EventAgendaWorkspace', () => {
       expect.any(String),
     ));
     expect(mockToast.success).toHaveBeenCalledWith('You are registered for this session.');
+  });
+
+  it('preserves a session place until the attendee confirms withdrawal', async () => {
+    const user = userEvent.setup();
+    const current = session({
+      title: 'Opening workshop',
+      registration: {
+        state: 'registered',
+        version: 3,
+        can_register: false,
+        can_withdraw: true,
+      },
+    });
+    vi.spyOn(eventsApi, 'agenda').mockResolvedValue({
+      success: true,
+      data: agenda({ permissions: { manage: false }, sessions: [current] }),
+    });
+    const withdraw = vi.spyOn(eventsApi, 'withdrawAgendaSession').mockResolvedValue({
+      success: true,
+      data: {
+        session: session({
+          ...current,
+          registration: {
+            state: 'withdrawn',
+            version: 4,
+            can_register: true,
+            can_withdraw: false,
+          },
+        }),
+        registration_version: 4,
+        changed: true,
+        idempotent_replay: false,
+        history_entry_id: 903,
+      },
+    });
+    mockConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    renderEventComponent(<EventAgendaWorkspace event={createCanonicalEventFixture()} />);
+
+    const button = await screen.findByRole('button', { name: 'Withdraw from session' });
+    await user.click(button);
+    expect(withdraw).not.toHaveBeenCalled();
+
+    await user.click(button);
+    await waitFor(() => expect(withdraw).toHaveBeenCalledWith(1, 501, 3, expect.any(String)));
+    expect(mockConfirm).toHaveBeenLastCalledWith(expect.objectContaining({
+      body: 'Your place in Opening workshop will be released and may be taken by someone else.',
+      status: 'danger',
+    }));
   });
 });

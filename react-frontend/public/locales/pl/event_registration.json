@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Anulować tego gościa?",
+    "cancel_confirm_body": "Miejsce zarezerwowane dla {{name}} zostanie zwolnione. Tej czynności nie można cofnąć na tym ekranie.",
+    "keep": "Zachowaj gościa",
     "title": "Lista gości i frekwencja",
     "description": "Tożsamość gościa i dane kontaktowe są wyświetlane tylko wtedy, gdy pozwalają na to uprawnienia wydarzenia.",
     "empty": "Żaden gość nie został schwytany.",
@@ -313,6 +316,17 @@
     "settings_save_error": "Nie można zapisać zasad rejestracji. Sprawdź daty i limity.",
     "settings_published": "Opublikowano zasady rejestracji.",
     "settings_publish_error": "Nie można opublikować zasad rejestracji."
+  },
+  "answers": {
+    "validation": {
+      "required": "Odpowiedz na to pytanie.",
+      "min_length": "Wprowadź co najmniej {{limit}} znaków.",
+      "max_length": "Wprowadź nie więcej niż {{limit}} znaków.",
+      "min_selections": "Wybierz co najmniej {{count}} opcję.",
+      "min_selections_other": "Wybierz co najmniej {{count}} opcje.",
+      "max_selections": "Wybierz nie więcej niż {{count}} opcję.",
+      "max_selections_other": "Wybierz nie więcej niż {{count}} opcje."
+    }
   },
   "accessible": {
     "organizer_heading": "Kontrole organizatora",

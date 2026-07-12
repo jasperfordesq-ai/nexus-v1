@@ -8,7 +8,16 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.back_to_event') }}</a>
 
     @php
-        $toLocal = fn ($value): string => $value ? \Illuminate\Support\Carbon::parse($value)->format('Y-m-d\TH:i') : '';
+        $eventTimezone = old('timezone', $event['timezone'] ?? 'UTC');
+        $eventAllDay = session()->hasOldInput()
+            ? (bool) old('all_day')
+            : (bool) ($event['all_day'] ?? false);
+        $toLocal = fn ($value): string => $value
+            ? \Illuminate\Support\Carbon::parse($value, 'UTC')->setTimezone($eventTimezone)->format('Y-m-d\TH:i')
+            : '';
+        $visibleEnd = !empty($event['end_time']) && $eventAllDay
+            ? \Illuminate\Support\Carbon::parse($event['end_time'], 'UTC')->setTimezone($eventTimezone)->subDay()->format('Y-m-d\TH:i')
+            : $toLocal($event['end_time'] ?? null);
     @endphp
 
     <div class="govuk-grid-row">
@@ -90,6 +99,25 @@
                         <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_time_title') }}</h2>
                     </legend>
 
+                    <div class="govuk-form-group{{ $errors->has('timezone') ? ' govuk-form-group--error' : '' }}">
+                        <label class="govuk-label" for="timezone">{{ __('govuk_alpha.events.timezone_label') }}</label>
+                        <div id="timezone-hint" class="govuk-hint">{{ __('govuk_alpha.events.timezone_hint') }}</div>
+                        @error('timezone')
+                            <p id="timezone-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
+                        @enderror
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('timezone') ? ' govuk-input--error' : '' }}" id="timezone" name="timezone" type="text" value="{{ $eventTimezone }}" maxlength="64" aria-describedby="timezone-hint{{ $errors->has('timezone') ? ' timezone-error' : '' }}" required>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="all_day" name="all_day" type="checkbox" value="1" @checked($eventAllDay)>
+                                <label class="govuk-label govuk-checkboxes__label" for="all_day">{{ __('govuk_alpha.events.all_day_label') }}</label>
+                                <div id="all-day-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.events.all_day_hint') }}</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="govuk-form-group{{ $errors->has('start_time') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="start_time">{{ __('govuk_alpha.events.start_time_label') }}</label>
                         <div id="start-time-hint" class="govuk-hint">{{ __('govuk_alpha.events.datetime_hint') }}</div>
@@ -101,11 +129,11 @@
 
                     <div class="govuk-form-group{{ $errors->has('end_time') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="end_time">{{ __('govuk_alpha.events.end_time_label') }}</label>
-                        <div id="end-time-hint" class="govuk-hint">{{ __('govuk_alpha.events.end_time_hint') }}</div>
+                        <div id="end-time-hint" class="govuk-hint">{{ __('govuk_alpha.events.end_time_hint') }} {{ __('govuk_alpha.events.all_day_end_hint') }}</div>
                         @error('end_time')
                             <p id="end_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
-                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $toLocal($event['end_time'] ?? null)) }}" aria-describedby="end-time-hint{{ $errors->has('end_time') ? ' end_time-error' : '' }}">
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $visibleEnd) }}" aria-describedby="end-time-hint{{ $errors->has('end_time') ? ' end_time-error' : '' }}">
                     </div>
                 </fieldset>
 

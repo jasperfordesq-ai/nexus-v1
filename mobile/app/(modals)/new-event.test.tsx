@@ -46,6 +46,12 @@ jest.mock('react-i18next', () => ({
         'create.categoryLabel': 'Category',
         'create.startLabel': 'Start',
         'create.endLabel': 'End',
+        'create.timezoneLabel': 'Event time zone',
+        'create.timezonePlaceholder': 'Europe/Dublin',
+        'create.timezoneHint': 'Use an IANA time zone.',
+        'create.allDay': 'All-day event',
+        'create.allDayEndLabel': 'Final event day',
+        'create.dateOnlyPlaceholder': 'YYYY-MM-DD',
         'create.datePlaceholder': 'YYYY-MM-DDTHH:mm',
         'create.optionalDatePlaceholder': 'Optional end time',
         'create.locationLabel': 'Location',
@@ -340,9 +346,33 @@ describe('NewEventRoute', () => {
         longitude: -0.125,
         is_online: true,
         video_url: 'https://meet.example/workshop',
+        timezone: expect.any(String),
+        all_day: false,
       }));
     });
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } }));
+  });
+
+  it('converts an inclusive all-day range in the selected IANA timezone', async () => {
+    const { getAllByPlaceholderText, getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Brisbane community weekend');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'A two-day community programme.');
+    fireEvent.changeText(getByPlaceholderText('Europe/Dublin'), 'Australia/Brisbane');
+    fireEvent.press(getByText('All-day event'));
+    const dateFields = getAllByPlaceholderText('YYYY-MM-DD');
+    fireEvent.changeText(dateFields[0], '2099-01-02');
+    fireEvent.changeText(dateFields[1], '2099-01-03');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({
+        start_time: '2099-01-01T14:00:00.000Z',
+        end_time: '2099-01-03T14:00:00.000Z',
+        timezone: 'Australia/Brisbane',
+        all_day: true,
+      }));
+    });
   });
 
   it('uploads a selected cover image after creating the event', async () => {
@@ -385,6 +415,8 @@ describe('NewEventRoute', () => {
         video_url: 'https://meet.example/old',
         max_attendees: 25,
         federated_visibility: 'listed',
+        timezone: canonicalEditEvent.schedule.timezone,
+        all_day: canonicalEditEvent.schedule.all_day,
       }));
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();

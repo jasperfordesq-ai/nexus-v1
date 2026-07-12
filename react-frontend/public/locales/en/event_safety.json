@@ -21,6 +21,14 @@
       "edit_review": "Update decision",
       "withdraw_review": "Withdraw decision"
     },
+    "confirmations": {
+      "withdraw_code_title": "Withdraw your code-of-conduct acknowledgement?",
+      "withdraw_code_body": "This may block your participation until you acknowledge the current version again.",
+      "withdraw_guardian_title": "Withdraw the guardian consent request?",
+      "withdraw_guardian_body": "The current request will become invalid. You may need to send a new request before participating.",
+      "withdraw_review_title": "Withdraw this participation decision?",
+      "withdraw_review_body": "This ends the active decision for {{name}} while preserving its audit history."
+    },
     "organizer": {
       "title": "Event safety",
       "description": "Set versioned participation requirements and keep a controlled, auditable record of safety decisions.",

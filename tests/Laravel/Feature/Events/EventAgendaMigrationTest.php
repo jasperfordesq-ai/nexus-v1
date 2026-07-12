@@ -266,22 +266,34 @@ final class EventAgendaMigrationTest extends TestCase
         self::assertSame(0, DB::table('event_session_registration_history')->count());
         self::assertFalse(DB::table('events')->where('agenda_version', '>', 0)->exists());
 
+        $versioning = $this->versionMigration();
         $enterprise = $this->enterpriseMigration();
         $migration = $this->migration();
-        $enterprise->down();
+        $versioning->down();
         try {
-            $migration->down();
+            $enterprise->down();
             try {
-                self::assertFalse(Schema::hasTable('event_sessions'));
-                self::assertFalse(Schema::hasTable('event_session_speakers'));
-                self::assertFalse(Schema::hasTable('event_session_history'));
-                self::assertFalse(Schema::hasColumn('events', 'agenda_version'));
-                self::assertFalse(Schema::hasIndex('events', 'uq_events_tenant_id'));
+                $migration->down();
+                try {
+                    self::assertFalse(Schema::hasTable('event_sessions'));
+                    self::assertFalse(Schema::hasTable('event_session_speakers'));
+                    self::assertFalse(Schema::hasTable('event_session_history'));
+                    self::assertFalse(Schema::hasColumn('events', 'agenda_version'));
+                    self::assertFalse(Schema::hasIndex('events', 'uq_events_tenant_id'));
+                } finally {
+                    $migration->up();
+                }
             } finally {
-                $migration->up();
+                $enterprise->up();
             }
         } finally {
-            $enterprise->up();
+            if (! Schema::hasTable('event_sessions')) {
+                $migration->up();
+            }
+            if (! Schema::hasTable('event_session_registrations')) {
+                $enterprise->up();
+            }
+            $versioning->up();
         }
 
         self::assertTrue(Schema::hasTable('event_sessions'));
@@ -292,6 +304,10 @@ final class EventAgendaMigrationTest extends TestCase
         self::assertTrue(Schema::hasTable('event_session_resources'));
         self::assertTrue(Schema::hasTable('event_session_registrations'));
         self::assertTrue(Schema::hasTable('event_session_registration_history'));
+        self::assertTrue(Schema::hasColumn(
+            'event_session_registrations',
+            'event_registration_version',
+        ));
     }
 
     /** @return list<string> */
@@ -391,6 +407,16 @@ final class EventAgendaMigrationTest extends TestCase
         /** @var Migration $migration */
         $migration = require database_path(
             'migrations/2026_07_11_000065_expand_event_agenda_enterprise.php',
+        );
+
+        return $migration;
+    }
+
+    private function versionMigration(): Migration
+    {
+        /** @var Migration $migration */
+        $migration = require database_path(
+            'migrations/2026_07_11_000067_pin_event_agenda_registration_versions.php',
         );
 
         return $migration;

@@ -35,7 +35,25 @@
       "createdTitle": "Event draft created",
       "createdDescription": "Review and publish it separately when it is ready.",
       "createFailedTitle": "Unable to create draft",
-      "createFailedDescription": "The event draft could not be created. Try again."
+      "createFailedDescription": "The event draft could not be created. Try again.",
+      "auditButton": "Audit history",
+      "auditTitle": "Audit: {{title}}",
+      "auditDescription": "Review the privacy-filtered operational history for this template.",
+      "auditImmutableTitle": "History cannot be changed",
+      "auditImmutableDescription": "Capture, revision, archive and materialization records are retained as append-only evidence.",
+      "auditLoading": "Loading template audit history",
+      "auditLoadFailedTitle": "Audit history unavailable",
+      "auditLoadFailedDescription": "The template history could not be loaded. Try again.",
+      "auditEmpty": "No audit entries are available.",
+      "auditEntry": "Version {{version}} · {{date}}",
+      "auditMaterializedEvent": "Created event #{{id}}",
+      "notRecorded": "Not recorded",
+      "auditActions": {
+        "captured": "Template captured",
+        "revised": "Template revised",
+        "archived": "Template archived",
+        "materialized": "Draft materialized"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "You still have permission to manage the source event",

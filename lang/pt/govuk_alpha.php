@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'O comentário não pôde ser adicionado. Tente novamente.',
         'not_available' => 'Não disponível',
     ],
+    'forms' => [
+        'error_prefix' => 'Erro:',
+    ],
     'home' => [
         'module_signin' => 'Faça login',
         'module_signin_hint' => 'Faça login para usar isso.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Nenhuma categoria',
         'start_time_label' => 'Hora de início',
         'end_time_label' => 'Hora de término',
+        'timezone_label' => 'Fuso horário do evento',
+        'timezone_hint' => 'Use um fuso horário IANA, por exemplo Europe/Lisbon ou America/New_York.',
+        'all_day_label' => 'Este é um evento de dia inteiro',
+        'all_day_hint' => 'As horas introduzidas são ignoradas. Indique a primeira e a última data do evento.',
+        'all_day_end_hint' => 'Para eventos de dia inteiro, indique a última data incluída.',
         'datetime_hint' => 'Use o seletor de data e hora ou insira uma data e hora.',
         'end_time_hint' => 'Opcional. Adicione um horário de término se o evento tiver um.',
         'location_label' => 'Localização',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'As suas respostas são privadas e utilizadas apenas para fins de protecção. Pode alterá-las ou removê-las a qualquer momento nas suas definições. Nada é seleccionado sem a sua escolha.',
             'none_separator' => 'Ou',
             'none_label' => 'Nenhuma destas situações se aplica a mim',
+            'options_legend' => 'Opções de proteção',
+            'select_none' => 'Nenhum selecionado',
         ],
         'confirm' => [
             'title' => 'Verifique as suas respostas',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Suspeita de fraude ou burla',
         'report_reason_duplicate' => 'Anúncio duplicado',
         'report_reason_other' => 'Outro',
+        'report_reason_required' => 'Escolha um motivo para esta denúncia.',
         'report_details_label' => 'Detalhes adicionais (opcional)',
         'report_details_hint' => 'Forneça-nos qualquer outra informação que nos ajude a investigar.',
         'report_submit' => 'Enviar denúncia',

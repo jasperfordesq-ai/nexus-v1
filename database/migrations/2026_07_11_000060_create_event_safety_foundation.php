@@ -51,13 +51,22 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('tenants')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('events')
-            || ! Schema::hasTable('user_blocks')
-            || ! Schema::hasColumn('user_blocks', 'tenant_id')
-            || ! Schema::hasColumn('users', 'date_of_birth')) {
-            return;
+        foreach (['tenants', 'users', 'events', 'user_blocks'] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_safety_prerequisite_missing:{$required}");
+            }
+        }
+        foreach ([
+            'user_blocks' => ['tenant_id'],
+            'users' => ['date_of_birth'],
+        ] as $table => $columns) {
+            foreach ($columns as $column) {
+                if (! Schema::hasColumn($table, $column)) {
+                    throw new LogicException(
+                        "event_safety_prerequisite_column_missing:{$table}.{$column}",
+                    );
+                }
+            }
         }
 
         $this->createRequirements();

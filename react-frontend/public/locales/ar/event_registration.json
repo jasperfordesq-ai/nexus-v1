@@ -203,6 +203,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "إلغاء هذا الضيف؟",
+    "cancel_confirm_body": "سيتم تحرير المكان المحجوز لـ {{name}}. لا يمكن التراجع عن ذلك من هذه الشاشة.",
+    "keep": "الاحتفاظ بالضيف",
     "title": "قائمة الضيوف والحضور",
     "description": "يتم عرض هوية الضيف وتفاصيل الاتصال فقط عندما تسمح أذونات الحدث الخاصة بك بذلك.",
     "empty": "لم يتم القبض على أي ضيوف.",
@@ -313,6 +316,17 @@
     "settings_save_error": "لا يمكن حفظ سياسة التسجيل. التحقق من التواريخ والحدود.",
     "settings_published": "تم نشر سياسة التسجيل.",
     "settings_publish_error": "لا يمكن نشر سياسة التسجيل."
+  },
+  "answers": {
+    "validation": {
+      "required": "أجب عن هذا السؤال.",
+      "min_length": "أدخل {{limit}} أحرف على الأقل.",
+      "max_length": "أدخل ما لا يزيد على {{limit}} أحرف.",
+      "min_selections": "حدد {{count}} خيارًا على الأقل.",
+      "min_selections_other": "حدد {{count}} خيارات على الأقل.",
+      "max_selections": "حدد ما لا يزيد على {{count}} خيار.",
+      "max_selections_other": "حدد ما لا يزيد على {{count}} خيارات."
+    }
   },
   "accessible": {
     "organizer_heading": "ضوابط المنظم",

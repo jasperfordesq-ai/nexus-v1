@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => ':title の席が解放され、別の参加者が利用できるようになることを理解しています。',
     'capacity_label' => 'セッション定員',
     'capacity_hint' => '無制限の場合は空欄にします。セッション枠はイベント登録やチケットを変更しません。',
     'capacity_unlimited' => '登録 :registered 人・定員なし',

@@ -21,8 +21,10 @@ const mockToast = vi.hoisted(() => ({
   info: vi.fn(),
   warning: vi.fn(),
 }));
+const mockConfirm = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts/ToastContext', () => ({ useToast: () => mockToast }));
+vi.mock('@/components/ui/ConfirmDialog', () => ({ useConfirm: () => mockConfirm }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 function formFixture(): RegistrationForm {
@@ -120,6 +122,7 @@ function overviewFixture(): EventRegistrationOverview {
 describe('EventRegistrationWorkspace', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfirm.mockResolvedValue(true);
     vi.spyOn(eventRegistrationApi, 'organizerOverview').mockResolvedValue({
       success: true,
       data: overviewFixture(),
@@ -247,5 +250,50 @@ describe('EventRegistrationWorkspace', () => {
     await user.click(screen.getByRole('tab', { name: 'Guests' }));
     await user.click(await screen.findByRole('button', { name: 'Check in' }));
     await waitFor(() => expect(attendance).toHaveBeenCalledWith(42, 81, 'check_in', 0));
+  });
+
+  it('keeps a frozen retention preview until irreversible anonymisation is confirmed', async () => {
+    const user = userEvent.setup();
+    const run = {
+      id: 501,
+      mode: 'dry_run' as const,
+      dry_run_id: null,
+      as_of_utc: '2030-01-31T23:59:59Z',
+      eligible_count: 4,
+      affected_count: 0,
+      completed_at: '2030-02-01T00:00:00Z',
+    };
+    vi.spyOn(eventRegistrationApi, 'retentionDryRun').mockResolvedValue({
+      success: true,
+      data: { value: run, changed: true, idempotent_replay: false },
+    });
+    const apply = vi.spyOn(eventRegistrationApi, 'retentionApply').mockResolvedValue({
+      success: true,
+      data: {
+        value: { ...run, mode: 'apply', dry_run_id: run.id, affected_count: 4 },
+        changed: true,
+        idempotent_replay: false,
+      },
+    });
+    mockConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    renderEventRoute(<EventRegistrationWorkspace eventId={42} />, {
+      path: '/events/42/manage/registration',
+      route: '/events/42/manage/registration',
+    });
+
+    await user.click(await screen.findByRole('tab', { name: 'Retention' }));
+    await user.click(await screen.findByRole('button', { name: 'Run preview' }));
+    const applyButton = await screen.findByRole('button', { name: 'Apply anonymisation' });
+
+    await user.click(applyButton);
+    expect(apply).not.toHaveBeenCalled();
+    expect(screen.getByText('4')).toBeInTheDocument();
+
+    await user.click(applyButton);
+    await waitFor(() => expect(apply).toHaveBeenCalledWith(42, 501));
+    expect(mockConfirm).toHaveBeenLastCalledWith(expect.objectContaining({
+      status: 'danger',
+      confirmLabel: 'Apply anonymisation',
+    }));
   });
 });

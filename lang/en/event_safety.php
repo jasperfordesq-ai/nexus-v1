@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Reviewed by',
         'withdraw_review' => 'Withdraw decision',
         'ledger_empty' => 'No participation reviews have been recorded for this event.',
+        'confirm_archive_checkbox' => 'I understand this will deactivate the current safety requirements.',
+        'confirm_withdraw_code' => 'I understand this may block my participation until I acknowledge the code again.',
+        'confirm_withdraw_guardian' => 'I understand the current consent request will become invalid.',
+        'confirm_withdraw_review' => 'I confirm that I want to withdraw the active decision for :name.',
     ],
 ];

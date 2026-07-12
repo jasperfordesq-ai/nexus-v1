@@ -18,7 +18,7 @@ import Download from 'lucide-react/icons/download';
 import PlusCircle from 'lucide-react/icons/circle-plus';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
-import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl } from '@/lib/helpers';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';

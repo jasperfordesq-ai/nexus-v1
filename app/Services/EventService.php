@@ -739,7 +739,9 @@ class EventService
             ->find($id);
 
         $tenantId = (int) TenantContext::getId();
-        if (! $event || ! self::policyAllows($event, $currentUserId, 'view')) {
+        $viewer = self::policyUser($currentUserId, $tenantId);
+        $policy = app(EventPolicy::class);
+        if (! $event || $viewer === null || ! $policy->view($viewer, $event)) {
             return null;
         }
 
@@ -799,20 +801,49 @@ class EventService
             );
             $data['recurrence_frequency'] = $freq->frequency ?? null;
 
-            $occRows = DB::select(
-                "SELECT id, start_time, occurrence_date
-                 FROM events
-                 WHERE tenant_id = ? AND (id = ? OR parent_event_id = ?) AND start_time >= NOW()
-                 ORDER BY start_time ASC
-                 LIMIT 50",
-                [$tenantId, $rootId, $rootId]
+            // A recurrence can contain independently moderated occurrences.
+            // Never let one visible occurrence reveal draft/private sibling IDs
+            // or timestamps: evaluate the complete candidate set through the
+            // same policy used for direct event reads before applying the UI cap.
+            $occurrenceModels = Event::query()
+                ->where('tenant_id', $tenantId)
+                ->where(static function (Builder $series) use ($rootId): void {
+                    $series->whereKey($rootId)->orWhere('parent_event_id', $rootId);
+                })
+                ->where('start_time', '>=', now())
+                ->orderBy('start_time')
+                ->orderBy('id')
+                ->get([
+                    'id',
+                    'tenant_id',
+                    'user_id',
+                    'group_id',
+                    'status',
+                    'publication_status',
+                    'operational_status',
+                    'is_recurring_template',
+                    'start_time',
+                    'occurrence_date',
+                ]);
+            $visibleOccurrenceIds = self::policyVisibleEventIdMap(
+                $occurrenceModels,
+                $viewer,
+                $policy,
             );
-            $data['series_occurrences'] = array_map(static fn ($row) => [
-                'id'         => (int) $row->id,
-                'start_time' => $row->start_time,
-                'date'       => $row->occurrence_date,
-            ], $occRows);
-            $data['series_count'] = count($occRows);
+            $visibleOccurrences = $occurrenceModels
+                ->filter(static fn (Event $occurrence): bool => isset(
+                    $visibleOccurrenceIds[(int) $occurrence->getKey()],
+                ))
+                ->take(50)
+                ->values();
+            $data['series_occurrences'] = $visibleOccurrences
+                ->map(static fn (Event $occurrence): array => [
+                    'id' => (int) $occurrence->getKey(),
+                    'start_time' => $occurrence->getRawOriginal('start_time'),
+                    'date' => $occurrence->getRawOriginal('occurrence_date'),
+                ])
+                ->all();
+            $data['series_count'] = $visibleOccurrences->count();
         }
 
         return self::redactOnlineAccessForEvents([$data], $currentUserId)[0];
@@ -1549,8 +1580,49 @@ class EventService
         if ($expectedLocal !== null && $date->format('Y-m-d H:i:s') !== $expectedLocal) {
             self::throwInvalidEventDate($field);
         }
+        if ($expectedLocal !== null) {
+            self::assertUnambiguousLocalEventDate($expectedLocal, $zone, $field);
+        }
 
         return $date->setTimezone($utc)->format('Y-m-d H:i:s');
+    }
+
+    private static function assertUnambiguousLocalEventDate(
+        string $expectedLocal,
+        \DateTimeZone $zone,
+        string $field,
+    ): void {
+        $utc = new \DateTimeZone('UTC');
+        $wallClock = \DateTimeImmutable::createFromFormat('!Y-m-d H:i:s', $expectedLocal, $utc);
+        if (! $wallClock instanceof \DateTimeImmutable) {
+            self::throwInvalidEventDate($field);
+        }
+
+        $wallTimestamp = $wallClock->getTimestamp();
+        $transitions = $zone->getTransitions($wallTimestamp - 259200, $wallTimestamp + 259200);
+        if (! is_array($transitions)) {
+            self::throwInvalidEventDate($field);
+        }
+
+        $offsets = [];
+        foreach ($transitions as $transition) {
+            $offsets[(int) ($transition['offset'] ?? 0)] = true;
+        }
+
+        $candidateInstants = [];
+        foreach (array_keys($offsets) as $offset) {
+            $candidateTimestamp = $wallTimestamp - $offset;
+            $candidate = (new \DateTimeImmutable('@' . $candidateTimestamp))->setTimezone($zone);
+            if ($candidate->format('Y-m-d H:i:s') === $expectedLocal) {
+                $candidateInstants[$candidateTimestamp] = true;
+            }
+        }
+
+        // Zero candidates is a DST gap; two candidates is a fall-back overlap.
+        // Neither can safely preserve an organizer's wall-clock intent.
+        if (count($candidateInstants) !== 1) {
+            self::throwInvalidEventDate($field);
+        }
     }
 
     private static function normalizeStoredUtcDate(mixed $value, string $field): string
@@ -1982,9 +2054,10 @@ class EventService
             ])
             ->keyBy('id');
         $viewer = self::policyUser($viewerId, $tenantId);
+        $eventPolicy = app(EventPolicy::class);
         $policyAbilities = $viewer === null
             ? []
-            : app(EventPolicy::class)->abilitiesForEvents($viewer, $eventModels->values());
+            : $eventPolicy->abilitiesForEvents($viewer, $eventModels->values());
         $rsvpMap = $viewerId !== null ? self::getUserRsvpsBatch($eventIds, $viewerId) : [];
 
         $canonicalRegistrations = collect();
@@ -2210,17 +2283,47 @@ class EventService
 
         $namedSeriesMap = [];
         if ($seriesIds !== []) {
+            $seriesEventModels = Event::query()
+                ->where('tenant_id', $tenantId)
+                ->whereIn('series_id', $seriesIds)
+                ->get([
+                    'id',
+                    'tenant_id',
+                    'user_id',
+                    'group_id',
+                    'series_id',
+                    'status',
+                    'publication_status',
+                    'operational_status',
+                    'is_recurring_template',
+                    'start_time',
+                ]);
+            $visibleSeriesEventIds = self::policyVisibleEventIdMap(
+                $seriesEventModels,
+                $viewer,
+                $eventPolicy,
+            );
+            $visibleSeriesCounts = [];
+            foreach ($seriesEventModels as $seriesEvent) {
+                if (! isset($visibleSeriesEventIds[(int) $seriesEvent->getKey()])) {
+                    continue;
+                }
+                $seriesId = (int) $seriesEvent->getAttribute('series_id');
+                if ($seriesId > 0) {
+                    $visibleSeriesCounts[$seriesId] = ($visibleSeriesCounts[$seriesId] ?? 0) + 1;
+                }
+            }
+
             $seriesRows = EventSeries::query()
                 ->where('tenant_id', $tenantId)
                 ->whereIn('id', $seriesIds)
-                ->withCount('events')
                 ->get(['id', 'title', 'description']);
             foreach ($seriesRows as $series) {
                 $namedSeriesMap[(int) $series->id] = [
                     'id' => (int) $series->id,
                     'title' => $series->title,
                     'description' => $series->description,
-                    'event_count' => (int) $series->events_count,
+                    'event_count' => (int) ($visibleSeriesCounts[(int) $series->id] ?? 0),
                 ];
             }
         }
@@ -3558,6 +3661,42 @@ class EventService
                 'is_tenant_super_admin',
                 'is_god',
             ]);
+    }
+
+    /**
+     * Resolve visible event IDs through the canonical policy in bounded queries.
+     *
+     * @param  iterable<Event>  $events
+     * @return array<int, true>
+     */
+    private static function policyVisibleEventIdMap(
+        iterable $events,
+        ?User $viewer,
+        EventPolicy $policy,
+    ): array {
+        if ($viewer === null) {
+            return [];
+        }
+
+        $eventModels = [];
+        foreach ($events as $event) {
+            if ($event instanceof Event && (int) $event->getKey() > 0) {
+                $eventModels[] = $event;
+            }
+        }
+
+        if ($eventModels === []) {
+            return [];
+        }
+
+        $visibleEventIds = [];
+        foreach ($policy->abilitiesForEvents($viewer, $eventModels) as $eventId => $abilities) {
+            if (($abilities['view'] ?? false) === true) {
+                $visibleEventIds[(int) $eventId] = true;
+            }
+        }
+
+        return $visibleEventIds;
     }
 
     private static function policyAllows(

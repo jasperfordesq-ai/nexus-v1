@@ -3,7 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { formatEventSchedule } from './eventDateTime';
+import {
+  eventIsoToLocalInput,
+  eventLocalInputToIso,
+  formatEventSchedule,
+  shiftEventLocalDate,
+} from './eventDateTime';
 
 describe('formatEventSchedule', () => {
   it('formats timed events in the event IANA timezone', () => {
@@ -31,5 +36,24 @@ describe('formatEventSchedule', () => {
     expect(result.endDateLabel).toContain('November 1, 2026');
     expect(result.dateLabel).not.toContain('November 2, 2026');
     expect(result.timeLabel).toBeNull();
+  });
+
+  it('round-trips event-local editor values without using the device timezone', () => {
+    expect(eventIsoToLocalInput('2030-05-01T17:30:00.000Z', 'America/Los_Angeles'))
+      .toBe('2030-05-01T10:30');
+    expect(eventLocalInputToIso('2030-05-01T10:30', 'America/Los_Angeles'))
+      .toBe('2030-05-01T17:30:00.000Z');
+    expect(eventIsoToLocalInput('2030-05-01T00:30:00.000Z', 'Australia/Brisbane'))
+      .toBe('2030-05-01T10:30');
+  });
+
+  it('rejects nonexistent and ambiguous DST wall clocks', () => {
+    expect(eventLocalInputToIso('2026-03-08T02:30', 'America/New_York')).toBeNull();
+    expect(eventLocalInputToIso('2026-11-01T01:30', 'America/New_York')).toBeNull();
+  });
+
+  it('shifts inclusive all-day dates using calendar arithmetic', () => {
+    expect(shiftEventLocalDate('2026-03-08', 1)).toBe('2026-03-09');
+    expect(shiftEventLocalDate('2026-03-01', -1)).toBe('2026-02-28');
   });
 });

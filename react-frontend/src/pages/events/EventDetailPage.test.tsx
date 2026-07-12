@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getFormattingLocale } from '@/lib/helpers';
 import { createCanonicalEventFixture, renderEventRoute } from '@/test/events-test-harness';
+import type { EventRosterMember } from '@/lib/events-api';
 
 const { mockApi, mockToast } = vi.hoisted(() => ({
   mockApi: {
@@ -26,6 +27,9 @@ const { mockApi, mockToast } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/api', () => ({ api: mockApi }));
+vi.mock('@/components/ui/ConfirmDialog', () => ({
+  useConfirm: () => vi.fn(),
+}));
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -63,6 +67,14 @@ vi.mock('./components/EventCheckinCredentialCard', () => ({
     <section aria-label="Attendee check-in credential">credential-{eventId}</section>
   ),
 }));
+vi.mock('./components/EventCheckInWorkspace', () => ({
+  EventCheckInWorkspace: ({ eventId }: { eventId: number }) => (
+    <section aria-label="Paginated check-in workspace">checkin-{eventId}</section>
+  ),
+}));
+vi.mock('./components/EventSafetyAttendeeCard', () => ({
+  EventSafetyAttendeeCard: () => null,
+}));
 vi.mock('./components/EventRegistrationAttendeeCard', () => ({
   default: ({ eventId }: { eventId: number }) => (
     <section aria-label="Attendee registration workspace">registration-{eventId}</section>
@@ -72,6 +84,24 @@ vi.mock('./components/EventRegistrationAttendeeCard', () => ({
 import { EventDetailPage } from './EventDetailPage';
 
 const mockEvent = createCanonicalEventFixture();
+
+function createRosterMember(id: number, displayName: string): EventRosterMember {
+  return {
+    contract_version: 2,
+    member: { id, display_name: displayName, avatar_url: null },
+    engagement: { state: 'none', can_change: false },
+    registration: {
+      state: 'confirmed',
+      waitlist_position: null,
+      can_register: false,
+      can_withdraw: false,
+      can_join_waitlist: false,
+      can_leave_waitlist: false,
+    },
+    attendance: { state: 'not_checked_in', checked_in_at: null, checked_out_at: null },
+    registered_at: '2026-01-01T10:00:00Z',
+  };
+}
 
 function installSuccessfulEventResponses() {
   mockApi.get.mockImplementation((url: string) => {
@@ -191,13 +221,20 @@ describe('EventDetailPage', () => {
     const user = userEvent.setup();
     await renderLoadedEvent();
 
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+    const detailsPanel = document.getElementById(detailsTab.getAttribute('aria-controls') ?? '');
+    expect(detailsPanel).toContainElement(screen.getByText('Join us for a community garden event'));
+
     expect(mockApi.get).not.toHaveBeenCalledWith(
       '/v2/events/1/agenda?include_cancelled=false',
       expect.anything(),
     );
-    await user.click(screen.getByRole('tab', { name: 'Agenda' }));
+    const agendaTab = screen.getByRole('tab', { name: 'Agenda' });
+    await user.click(agendaTab);
 
-    expect(await screen.findByRole('heading', { name: 'Community welcome' })).toBeInTheDocument();
+    const agendaHeading = await screen.findByRole('heading', { name: 'Community welcome' });
+    const agendaPanel = document.getElementById(agendaTab.getAttribute('aria-controls') ?? '');
+    expect(agendaPanel).toContainElement(agendaHeading);
     expect(screen.getByText(/View the event running order/)).toBeInTheDocument();
   });
 
@@ -546,6 +583,135 @@ describe('EventDetailPage', () => {
     expect(screen.getByRole('radio', { name: 'Mark yourself as not going' })).toBeInTheDocument();
   });
 
+  it('does not infer RSVP or waitlist actions when canonical capabilities deny them', async () => {
+    const lockedEvent = createCanonicalEventFixture({
+      relationship: {
+        ...mockEvent.relationship,
+        engagement: { state: 'none', can_change: false },
+        registration: {
+          ...mockEvent.relationship.registration,
+          can_register: false,
+          can_withdraw: false,
+          can_join_waitlist: false,
+          can_leave_waitlist: false,
+        },
+        capacity: {
+          ...mockEvent.relationship.capacity,
+          remaining: 0,
+          is_full: true,
+        },
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: lockedEvent });
+    });
+
+    await renderLoadedEvent();
+
+    expect(screen.queryByRole('radiogroup', { name: 'RSVP options' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Join the waitlist for this event' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Leave the waitlist for this event' })).not.toBeInTheDocument();
+  });
+
+  it('shows the waitlist action when the canonical capability allows it', async () => {
+    const waitlistEvent = createCanonicalEventFixture({
+      relationship: {
+        ...mockEvent.relationship,
+        registration: {
+          ...mockEvent.relationship.registration,
+          can_register: false,
+          can_join_waitlist: true,
+        },
+        capacity: {
+          ...mockEvent.relationship.capacity,
+          is_full: false,
+        },
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: waitlistEvent });
+    });
+
+    await renderLoadedEvent();
+
+    expect(screen.getByRole('button', { name: 'Join the waitlist for this event' })).toBeInTheDocument();
+  });
+
+  it('distinguishes a roster load failure from a genuinely empty roster', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees')) return Promise.reject(new Error('roster unavailable'));
+      if (url.startsWith('/v2/polls?')) return Promise.resolve({ success: true, data: [] });
+      return Promise.resolve({ success: true, data: mockEvent });
+    });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('tab', { name: /Attendees/ }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load event people');
+    expect(screen.queryByText('No attendees yet')).not.toBeInTheDocument();
+  });
+
+  it('loads the attendee roster across cursor pages without truncating at 50', async () => {
+    const firstPerson = createRosterMember(101, 'First Attendee');
+    const secondPerson = createRosterMember(102, 'Second Attendee');
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') && url.includes('cursor=next-roster')) {
+        return Promise.resolve({
+          success: true,
+          data: [secondPerson],
+          meta: { cursor: null, has_more: false, per_page: 50 },
+        });
+      }
+      if (url.includes('/attendees')) {
+        return Promise.resolve({
+          success: true,
+          data: [firstPerson],
+          meta: { cursor: 'next-roster', has_more: true, per_page: 50 },
+        });
+      }
+      if (url.startsWith('/v2/polls?')) return Promise.resolve({ success: true, data: [] });
+      return Promise.resolve({ success: true, data: mockEvent });
+    });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('tab', { name: /Attendees/ }));
+    expect(screen.getByText('First Attendee')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /more/ }));
+
+    expect(await screen.findByText('Second Attendee')).toBeInTheDocument();
+    expect(mockApi.get).toHaveBeenCalledWith(
+      expect.stringContaining('cursor=next-roster'),
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+  });
+
+  it('mounts the canonical paginated check-in workspace for authorised staff', async () => {
+    const checkInEvent = createCanonicalEventFixture({
+      permissions: { ...mockEvent.permissions, check_in: true },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/attendees') || url.startsWith('/v2/polls?')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: true, data: checkInEvent });
+    });
+    const user = userEvent.setup();
+    await renderLoadedEvent();
+
+    await user.click(screen.getByRole('tab', { name: 'Check-in' }));
+
+    expect(screen.getByRole('region', { name: 'Paginated check-in workspace' }))
+      .toHaveTextContent('checkin-1');
+  });
+
   it('presents and accepts a live waitlist offer without conflicting RSVP controls', async () => {
     const offeredEvent = createCanonicalEventFixture({
       relationship: {
@@ -593,6 +759,8 @@ describe('EventDetailPage', () => {
 
     expect(screen.getByText('A place is available for you')).toBeInTheDocument();
     expect(screen.queryByRole('radiogroup', { name: 'RSVP options' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Decline the available place for this event' }))
+      .toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Accept the available place for this event' }));
 
     await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith(

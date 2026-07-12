@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderEventComponent } from '@/test/events-test-harness';
 import { eventOfflineCheckinApi, type OfflineCheckinWorkspace } from '@/lib/event-offline-checkin-api';
@@ -153,5 +154,51 @@ describe('EventOfflineCheckinWorkspace', () => {
 
     await waitFor(() => expect(screen.getByText('Offline check-in is unavailable')).toBeInTheDocument());
     expect(screen.getByText('live-name-fallback')).toBeInTheDocument();
+  });
+
+  it('pages through every open offline conflict', async () => {
+    const user = userEvent.setup();
+    vi.mocked(eventOfflineCheckinApi.workspace).mockResolvedValue({
+      success: true,
+      data: { ...workspaceFixture, open_conflicts: 26 },
+    });
+    vi.mocked(eventOfflineCheckinApi.conflicts)
+      .mockResolvedValueOnce({
+        success: true,
+        data: {
+          contract_version: 1,
+          event_id: 42,
+          items: [],
+          total: 26,
+          page: 1,
+          per_page: 25,
+          privacy: {
+            credential_redacted: true,
+            contact_fields_redacted: true,
+            free_text_member_profile_redacted: true,
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: {
+          contract_version: 1,
+          event_id: 42,
+          items: [],
+          total: 26,
+          page: 2,
+          per_page: 25,
+          privacy: {
+            credential_redacted: true,
+            contact_fields_redacted: true,
+            free_text_member_profile_redacted: true,
+          },
+        },
+      });
+    renderEventComponent(<EventOfflineCheckinWorkspace eventId={42} />);
+
+    await user.click(await screen.findByText('2'));
+
+    await waitFor(() => expect(eventOfflineCheckinApi.conflicts).toHaveBeenLastCalledWith(42, 2));
   });
 });

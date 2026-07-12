@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services;
 use App\Models\User;
 use App\Services\GroupExchangeService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class GroupExchangeServiceTest extends TestCase
@@ -23,7 +24,31 @@ class GroupExchangeServiceTest extends TestCase
         $this->service = new GroupExchangeService();
     }
 
-    public function test_create_returns_id(): void
+    public function test_create_returns_mocked_id(): void
+    {
+        $users = \Mockery::mock();
+        $users->shouldReceive('where')->twice()->andReturnSelf();
+        $users->shouldReceive('whereIn')->with('id', [5])->once()->andReturnSelf();
+        $users->shouldReceive('count')->once()->andReturn(1);
+        DB::shouldReceive('table')->with('users')->once()->andReturn($users);
+
+        $exchanges = \Mockery::mock();
+        $exchanges->shouldReceive('insertGetId')->once()->andReturn(42);
+        DB::shouldReceive('table')->with('group_exchanges')->once()->andReturn($exchanges);
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(static fn (callable $callback): mixed => $callback());
+
+        $result = $this->service->create(5, [
+            'title' => 'Group Exchange',
+            'total_hours' => 10,
+            'split_type' => 'equal',
+        ]);
+
+        $this->assertSame(42, $result);
+    }
+
+    public function test_create_persists_exchange_for_active_tenant_organizer(): void
     {
         $organizer = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',

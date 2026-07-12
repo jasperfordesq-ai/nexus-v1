@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'I understand that my place in :title will be released and may be taken by someone else.',
     'capacity_label' => 'Session capacity',
     'capacity_hint' => 'Leave blank for no limit. Session places do not change event registration or tickets.',
     'capacity_unlimited' => ':registered registered · no limit',

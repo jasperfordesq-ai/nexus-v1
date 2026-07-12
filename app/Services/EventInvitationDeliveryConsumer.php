@@ -12,7 +12,10 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
+use App\Models\Event;
 use App\Models\Notification;
+use App\Models\User;
+use App\Support\Events\EventInvitationRecipientAuthorizer;
 use App\Support\Events\EventNotificationOutboxHandleResult;
 use App\Support\Events\EventRegistrationFoundationSupport;
 use Illuminate\Support\Facades\DB;
@@ -28,10 +31,14 @@ final class EventInvitationDeliveryConsumer
     private const EMAIL_CATEGORY = 'event_invitation';
     private const TERMINAL = ['delivered', 'suppressed', 'failed_terminal'];
 
+    private readonly EventInvitationRecipientAuthorizer $recipientAuthorizer;
+
     public function __construct(
         private readonly EventRegistrationFoundationSupport $support = new EventRegistrationFoundationSupport(),
         private readonly EventReminderChannelDeliveryService $deliveries = new EventReminderChannelDeliveryService(),
+        ?EventInvitationRecipientAuthorizer $recipientAuthorizer = null,
     ) {
+        $this->recipientAuthorizer = $recipientAuthorizer ?? new EventInvitationRecipientAuthorizer();
     }
 
     /** @param array<string,mixed> $outbox */
@@ -56,10 +63,10 @@ final class EventInvitationDeliveryConsumer
         if ($invitationId <= 0 || $campaignId <= 0 || $version <= 0 || $locale === '') {
             throw new RuntimeException('event_invitation_delivery_payload_invalid');
         }
-        $event = DB::table('events')
+        $event = Event::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
-            ->where('id', $eventId)
-            ->first(['id', 'title']);
+            ->whereKey($eventId)
+            ->first();
         $invitation = DB::table('event_invitations')
             ->where('tenant_id', $tenantId)
             ->where('event_id', $eventId)
@@ -111,10 +118,16 @@ final class EventInvitationDeliveryConsumer
         $memberId = $payload['recipient_user_id'] === null
             ? null
             : (int) $payload['recipient_user_id'];
-        $recipient = $memberId === null ? null : DB::table('users')
+        if (($memberId !== null
+                && ((string) $invitation->target_type !== 'member'
+                    || (int) $invitation->member_user_id !== $memberId))
+            || ($memberId === null && (string) $invitation->target_type !== 'email')) {
+            throw new RuntimeException('event_invitation_delivery_target_invalid');
+        }
+        $recipient = $memberId === null ? null : User::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
-            ->where('id', $memberId)
-            ->first(['id', 'email', 'name', 'first_name', 'status', 'deleted_at']);
+            ->whereKey($memberId)
+            ->first();
         $eligible = $memberId === null
             || ($recipient !== null
                 && (string) $recipient->status === 'active'
@@ -125,11 +138,7 @@ final class EventInvitationDeliveryConsumer
             && now()->lt((string) $invitation->token_expires_at);
         if (! $eligible || ! $active) {
             $reason = ! $eligible ? 'recipient_ineligible' : 'invitation_not_active';
-            foreach ($rows as $row) {
-                if (! in_array((string) $row->status, self::TERMINAL, true)) {
-                    $this->deliveries->markSuppressed($tenantId, (int) $row->id, $reason);
-                }
-            }
+            $this->suppressPending($tenantId, $rows, $reason);
 
             return $this->complete($tenantId, $eventId, $campaignId, $invitationId, $rows);
         }
@@ -160,6 +169,35 @@ final class EventInvitationDeliveryConsumer
             )) {
                 throw new RuntimeException('event_invitation_delivery_email_invalid');
             }
+        }
+        $issuer = User::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey((int) $invitation->created_by)
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->first();
+        if ($issuer === null) {
+            $this->suppressPending($tenantId, $rows, 'invitation_actor_ineligible');
+
+            return $this->complete($tenantId, $eventId, $campaignId, $invitationId, $rows);
+        }
+        $targetDecision = $this->recipientAuthorizer->deliveryDecision(
+            $tenantId,
+            $event,
+            $issuer,
+            [
+                'type' => $memberId === null ? 'email' : 'member',
+                'member_id' => $memberId,
+                'email' => $memberId === null ? $email : null,
+            ],
+        );
+        if ($targetDecision === EventInvitationRecipientAuthorizer::UNAVAILABLE) {
+            throw new RuntimeException('event_invitation_target_policy_unavailable');
+        }
+        if ($targetDecision !== EventInvitationRecipientAuthorizer::ALLOWED) {
+            $this->suppressPending($tenantId, $rows, 'invitation_target_ineligible');
+
+            return $this->complete($tenantId, $eventId, $campaignId, $invitationId, $rows);
         }
         $path = '/events/' . $eventId . '?invitation=' . $invitationId;
         $emailUrl = TenantContext::getFrontendUrl()
@@ -517,6 +555,16 @@ final class EventInvitationDeliveryConsumer
                 : null,
             'created_at' => now(),
         ]);
+    }
+
+    /** @param iterable<object> $rows */
+    private function suppressPending(int $tenantId, iterable $rows, string $reason): void
+    {
+        foreach ($rows as $row) {
+            if (! in_array((string) $row->status, self::TERMINAL, true)) {
+                $this->deliveries->markSuppressed($tenantId, (int) $row->id, $reason);
+            }
+        }
     }
 
     private function successfulEmailEvidence(int $tenantId, string $deliveryKey): bool

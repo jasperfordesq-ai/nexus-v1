@@ -21,6 +21,14 @@
       "edit_review": "Entscheidung aktualisieren",
       "withdraw_review": "Entscheidung zurückziehen"
     },
+    "confirmations": {
+      "withdraw_code_title": "Bestätigung des Verhaltenskodex zurückziehen?",
+      "withdraw_code_body": "Dies kann Ihre Teilnahme sperren, bis Sie die aktuelle Fassung erneut bestätigen.",
+      "withdraw_guardian_title": "Anfrage zur Zustimmung der Aufsichtsperson zurückziehen?",
+      "withdraw_guardian_body": "Die aktuelle Anfrage wird ungültig. Vor der Teilnahme müssen Sie möglicherweise eine neue Anfrage senden.",
+      "withdraw_review_title": "Diese Teilnahmeentscheidung zurückziehen?",
+      "withdraw_review_body": "Damit wird die aktive Entscheidung für {{name}} beendet; der Prüfverlauf bleibt erhalten."
+    },
     "organizer": {
       "title": "Veranstaltungssicherheit",
       "description": "Legen Sie versionierte Teilnahmeanforderungen fest und führen Sie eine kontrollierte, überprüfbare Aufzeichnung von Sicherheitsentscheidungen.",

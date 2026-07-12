@@ -24,10 +24,14 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('events')
-            || ! Schema::hasTable('federation_external_partners')
-            || ! Schema::hasTable('federation_events')) {
-            return;
+        foreach ([
+            'events',
+            'federation_external_partners',
+            'federation_events',
+        ] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_federation_prerequisite_missing:{$required}");
+            }
         }
 
         $this->addFederationVersion();

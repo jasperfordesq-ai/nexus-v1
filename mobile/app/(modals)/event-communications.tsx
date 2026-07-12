@@ -25,12 +25,15 @@ import { useAppToast } from '@/components/ui/AppToast';
 import {
   cancelEventCommunication,
   createEventCommunication,
+  getEventCommunicationDetail,
   getEventCommunications,
   previewEventCommunication,
+  reviseEventCommunication,
   retryEventCommunication,
   scheduleEventCommunication,
   type MobileEventBroadcast,
   type MobileEventBroadcastChannel,
+  type MobileEventBroadcastDetail,
   type MobileEventBroadcastInput,
   type MobileEventBroadcastPreview,
   type MobileEventBroadcastSegment,
@@ -84,9 +87,14 @@ function EventCommunicationsScreenInner() {
   const safeEventId = Number.isInteger(eventId) && eventId > 0 ? eventId : 0;
   const { show: showToast } = useAppToast();
   const [broadcasts, setBroadcasts] = useState<MobileEventBroadcast[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [editing, setEditing] = useState<MobileEventBroadcast | null>(null);
+  const [openingDraftId, setOpeningDraftId] = useState<number | null>(null);
   const [input, setInput] = useState<MobileEventBroadcastInput>(initialInput);
   const [preview, setPreview] = useState<MobileEventBroadcastPreview | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -98,6 +106,10 @@ function EventCommunicationsScreenInner() {
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [retryingId, setRetryingId] = useState<number | null>(null);
+  const [auditTarget, setAuditTarget] = useState<MobileEventBroadcast | null>(null);
+  const [auditDetail, setAuditDetail] = useState<MobileEventBroadcastDetail | null>(null);
+  const [isAuditLoading, setIsAuditLoading] = useState(false);
+  const [auditLoadFailed, setAuditLoadFailed] = useState(false);
 
   const load = useCallback(async () => {
     if (safeEventId <= 0) {
@@ -111,6 +123,8 @@ function EventCommunicationsScreenInner() {
     try {
       const response = await getEventCommunications(safeEventId);
       setBroadcasts(response.data);
+      setPage(response.meta.current_page);
+      setHasMore(response.meta.has_more);
     } catch {
       setLoadFailed(true);
     } finally {
@@ -122,9 +136,92 @@ function EventCommunicationsScreenInner() {
     void load();
   }, [load]);
 
+  async function loadMore() {
+    if (!hasMore || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const response = await getEventCommunications(safeEventId, page + 1);
+      setBroadcasts((current) => {
+        const byId = new Map(current.map((broadcast) => [broadcast.id, broadcast]));
+        response.data.forEach((broadcast) => byId.set(broadcast.id, broadcast));
+        return [...byId.values()];
+      });
+      setPage(response.meta.current_page);
+      setHasMore(response.meta.has_more);
+    } catch {
+      showToast({
+        title: t('load_failed_title'),
+        description: t('load_failed_description'),
+        variant: 'danger',
+      });
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
+
   function updateInput(next: Partial<MobileEventBroadcastInput>) {
     setInput((current) => ({ ...current, ...next }));
     setPreview(null);
+  }
+
+  function openNewComposer() {
+    setEditing(null);
+    setInput(initialInput());
+    setPreview(null);
+    setComposerOpen(true);
+  }
+
+  function closeComposer() {
+    setComposerOpen(false);
+    setEditing(null);
+    setInput(initialInput());
+    setPreview(null);
+  }
+
+  async function openEditComposer(broadcast: MobileEventBroadcast) {
+    setOpeningDraftId(broadcast.id);
+    try {
+      const detail = await getEventCommunicationDetail(broadcast.id);
+      const latest = detail.broadcast;
+      replaceBroadcast(latest);
+      if (!latest.capabilities.edit || latest.body === null) {
+        throw new Error('event_broadcast_not_editable');
+      }
+      setEditing(latest);
+      setInput({
+        variant: latest.variant,
+        segments: [...latest.audience.segments],
+        channels: [...latest.channels],
+        body: latest.body,
+      });
+      setPreview(null);
+      setComposerOpen(true);
+    } catch {
+      showToast({
+        title: t('detail_failed_title'),
+        description: t('detail_failed_description'),
+        variant: 'danger',
+      });
+    } finally {
+      setOpeningDraftId(null);
+    }
+  }
+
+  async function openAudit(broadcast: MobileEventBroadcast) {
+    setAuditTarget(broadcast);
+    setAuditDetail(null);
+    setAuditLoadFailed(false);
+    setIsAuditLoading(true);
+    try {
+      const detail = await getEventCommunicationDetail(broadcast.id);
+      replaceBroadcast(detail.broadcast);
+      setAuditTarget(detail.broadcast);
+      setAuditDetail(detail);
+    } catch {
+      setAuditLoadFailed(true);
+    } finally {
+      setIsAuditLoading(false);
+    }
   }
 
   function selectVariant(variant: MobileEventBroadcastVariant) {
@@ -184,18 +281,24 @@ function EventCommunicationsScreenInner() {
     if (!preview || preview.recipient_count < 1 || !input.body.trim()) return;
     setIsSaving(true);
     try {
-      const broadcast = await createEventCommunication(
-        safeEventId,
-        input,
-        idempotencyKey('create'),
-      );
-      setBroadcasts((current) => [broadcast, ...current]);
-      setComposerOpen(false);
-      setInput(initialInput());
-      setPreview(null);
+      const broadcast = editing
+        ? await reviseEventCommunication(
+          editing.id,
+          editing.version,
+          input,
+          idempotencyKey('revise'),
+        )
+        : await createEventCommunication(
+          safeEventId,
+          input,
+          idempotencyKey('create'),
+        );
+      upsertBroadcast(broadcast);
+      const revised = editing !== null;
+      closeComposer();
       showToast({
-        title: t('created_title'),
-        description: t('created_description'),
+        title: t(revised ? 'revised_title' : 'created_title'),
+        description: t(revised ? 'revised_description' : 'created_description'),
         variant: 'success',
       });
     } catch {
@@ -317,6 +420,12 @@ function EventCommunicationsScreenInner() {
     setBroadcasts((current) => current.map((broadcast) => broadcast.id === next.id ? next : broadcast));
   }
 
+  function upsertBroadcast(next: MobileEventBroadcast) {
+    setBroadcasts((current) => current.some((broadcast) => broadcast.id === next.id)
+      ? current.map((broadcast) => broadcast.id === next.id ? next : broadcast)
+      : [next, ...current]);
+  }
+
   function dateLabel(value: string | null): string {
     if (!value) return t('not_recorded');
     const date = new Date(value);
@@ -346,11 +455,7 @@ function EventCommunicationsScreenInner() {
         <Button
           variant="primary"
           isDisabled={composerOpen}
-          onPress={() => {
-            setInput(initialInput());
-            setPreview(null);
-            setComposerOpen(true);
-          }}
+          onPress={openNewComposer}
         >
           {t('new_message')}
         </Button>
@@ -358,8 +463,8 @@ function EventCommunicationsScreenInner() {
         {composerOpen ? (
           <Card>
             <Card.Body className="gap-4">
-              <Card.Title>{t('compose_title')}</Card.Title>
-              <Card.Description>{t('compose_description')}</Card.Description>
+              <Card.Title>{t(editing ? 'compose_edit_title' : 'compose_title')}</Card.Title>
+              <Card.Description>{t(editing ? 'compose_edit_description' : 'compose_description')}</Card.Description>
 
               <Text className="font-semibold text-foreground">{t('variant_label')}</Text>
               <View className="flex-row flex-wrap gap-2">
@@ -448,11 +553,7 @@ function EventCommunicationsScreenInner() {
               <Button
                 variant="secondary"
                 isDisabled={isPreviewing || isSaving}
-                onPress={() => {
-                  setComposerOpen(false);
-                  setInput(initialInput());
-                  setPreview(null);
-                }}
+                onPress={closeComposer}
               >
                 {t('common:buttons.cancel')}
               </Button>
@@ -467,7 +568,7 @@ function EventCommunicationsScreenInner() {
                 isDisabled={isSaving || !preview || preview.recipient_count < 1}
                 onPress={() => void saveDraft()}
               >
-                {isSaving ? <Spinner size="sm" /> : t('save_draft_button')}
+                {isSaving ? <Spinner size="sm" /> : t(editing ? 'revise_draft_button' : 'save_draft_button')}
               </Button>
             </Card.Footer>
           </Card>
@@ -526,6 +627,77 @@ function EventCommunicationsScreenInner() {
           </Card>
         ) : null}
 
+        {auditTarget ? (
+          <Card testID={`event-communication-history-${auditTarget.id}`}>
+            <Card.Body className="gap-4">
+              <Card.Title>{t('history_title', {
+                type: t(`variants.${auditTarget.variant}`),
+              })}</Card.Title>
+              <Card.Description>{t('history_description')}</Card.Description>
+              <Alert status="accent">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Title>{t('history_immutable_title')}</Alert.Title>
+                  <Alert.Description>{t('history_immutable_description')}</Alert.Description>
+                </Alert.Content>
+              </Alert>
+              {isAuditLoading ? (
+                <View className="items-center py-8" accessibilityLabel={t('history_loading')}>
+                  <Spinner size="lg" />
+                </View>
+              ) : auditLoadFailed ? (
+                <Alert status="danger">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Title>{t('history_load_failed_title')}</Alert.Title>
+                    <Alert.Description>{t('history_load_failed_description')}</Alert.Description>
+                  </Alert.Content>
+                  <Button size="sm" variant="danger" onPress={() => void openAudit(auditTarget)}>
+                    {t('common:retry')}
+                  </Button>
+                </Alert>
+              ) : auditDetail?.history.length === 0 ? (
+                <Text className="text-sm text-muted-foreground">{t('history_empty')}</Text>
+              ) : (
+                <View className="gap-3">
+                  {auditDetail?.history.map((entry) => (
+                    <View key={entry.id} className="gap-1 rounded-xl bg-default/40 p-3">
+                      <Text className="font-semibold text-foreground">
+                        {t(`history_actions.${entry.action}`)}
+                      </Text>
+                      <Text className="text-sm text-muted-foreground">
+                        {t('history_entry_version', {
+                          version: entry.version,
+                          date: dateLabel(entry.created_at),
+                        })}
+                      </Text>
+                      <Text className="text-sm text-foreground">
+                        {entry.from_status
+                          ? t('history_transition', {
+                            from: t(`statuses.${entry.from_status}`),
+                            to: t(`statuses.${entry.to_status}`),
+                          })
+                          : t('history_initial_status', {
+                            status: t(`statuses.${entry.to_status}`),
+                          })}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Card.Body>
+            <Card.Footer>
+              <Button variant="secondary" onPress={() => {
+                setAuditTarget(null);
+                setAuditDetail(null);
+                setAuditLoadFailed(false);
+              }}>
+                {t('common:buttons.done')}
+              </Button>
+            </Card.Footer>
+          </Card>
+        ) : null}
+
         <Text className="text-xl font-semibold text-foreground">{t('status_title')}</Text>
         {isLoading ? (
           <View className="items-center py-16" accessibilityLabel={t('loading')}>
@@ -547,8 +719,10 @@ function EventCommunicationsScreenInner() {
               <Card.Description>{t('empty_description')}</Card.Description>
             </Card.Body>
           </Card>
-        ) : broadcasts.map((broadcast) => (
-          <Card key={broadcast.id}>
+        ) : (
+          <>
+            {broadcasts.map((broadcast) => (
+              <Card key={broadcast.id}>
             <Card.Header className="flex-row items-center justify-between gap-3">
               <Text className="flex-1 font-semibold text-foreground">{t(`variants.${broadcast.variant}`)}</Text>
               <Chip size="sm" variant="soft" color={statusColor(broadcast.status)}>
@@ -575,6 +749,26 @@ function EventCommunicationsScreenInner() {
               })}</Text>
             </Card.Body>
             <Card.Footer className="flex-row flex-wrap gap-2">
+              {broadcast.capabilities.edit ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  isDisabled={openingDraftId !== null || isSaving || composerOpen}
+                  onPress={() => void openEditComposer(broadcast)}
+                >
+                  {openingDraftId === broadcast.id ? <Spinner size="sm" /> : t('common:buttons.edit')}
+                </Button>
+              ) : null}
+              <Button
+                size="sm"
+                variant="secondary"
+                isDisabled={isAuditLoading && auditTarget?.id === broadcast.id}
+                onPress={() => void openAudit(broadcast)}
+              >
+                {isAuditLoading && auditTarget?.id === broadcast.id
+                  ? <Spinner size="sm" />
+                  : t('history_button')}
+              </Button>
               {broadcast.capabilities.schedule ? (
                 <Button size="sm" onPress={() => {
                   setScheduleTarget(broadcast);
@@ -598,8 +792,15 @@ function EventCommunicationsScreenInner() {
                 </Button>
               ) : null}
             </Card.Footer>
-          </Card>
-        ))}
+              </Card>
+            ))}
+            {hasMore ? (
+              <Button variant="secondary" isDisabled={isLoadingMore} onPress={() => void loadMore()}>
+                {isLoadingMore ? <Spinner size="sm" /> : t('common:buttons.loadMore')}
+              </Button>
+            ) : null}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

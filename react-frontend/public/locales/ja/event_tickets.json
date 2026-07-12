@@ -42,6 +42,7 @@
     "units": "{{count}}ユニット",
     "units_other": "{{count}} ユニット",
     "cancel": "チケットをキャンセルする",
+    "time_credit_cancel_disabled": "この無料チケット専用フローでは、タイムクレジット・チケットをキャンセルできません。ウォレットへの操作は行われていません。",
     "cancelled": "キャンセルされました",
     "cancel_title": "このチケットをキャンセルしますか?",
     "cancel_reason": "キャンセルの理由",

@@ -110,8 +110,14 @@ final class EventSessionService
         }
 
         $canManage = $this->policy->manageAgenda($persistedViewer, $event);
-        $canViewRegistered = $this->policy->viewRegisteredAgenda($persistedViewer, $event);
         $canViewStaff = $this->policy->viewStaffAgenda($persistedViewer, $event);
+        $canViewRegistered = $canViewStaff
+            || $this->confirmedEventRegistration(
+                $tenantId,
+                $eventId,
+                (int) $persistedViewer->getKey(),
+                false,
+            ) !== null;
         $visibilities = [EventSessionVisibility::Public->value];
         if ($canViewRegistered) {
             $visibilities[] = EventSessionVisibility::Registered->value;
@@ -729,6 +735,9 @@ final class EventSessionService
             }
             $this->assertMutableEvent($event);
             $session = $this->sessionRowOrFail($tenantId, $eventId, $sessionId, true);
+            if (! $this->canViewSession($persistedActor, $event, $session)) {
+                throw new EventSessionException('event_agenda_authorization_denied');
+            }
             if ((string) $session->status !== EventSessionStatus::Scheduled->value) {
                 throw new EventSessionException('event_agenda_session_cancelled');
             }
@@ -754,7 +763,6 @@ final class EventSessionService
                     $persistedActor,
                     false,
                     (int) $replay->id,
-                    (int) $replay->registration_version,
                     (int) ($event->getRawOriginal('agenda_version') ?? 0),
                 );
             }
@@ -768,6 +776,7 @@ final class EventSessionService
             if ($eventRegistration === null) {
                 throw new EventSessionException('event_agenda_registration_eligibility_required');
             }
+            $eventRegistrationVersion = (int) $eventRegistration->registration_version;
             $registration = $this->sessionRegistrationRow(
                 $tenantId,
                 $eventId,
@@ -779,20 +788,14 @@ final class EventSessionService
             if ($currentVersion !== $expectedVersion) {
                 throw new EventSessionException('event_agenda_registration_version_conflict');
             }
-            if ($registration !== null
-                && (string) $registration->status === EventSessionRegistrationStatus::Registered->value) {
-                return $this->sessionRegistrationResult(
-                    $sessionId,
-                    $persistedActor,
-                    false,
-                    null,
-                    $currentVersion,
-                    (int) ($event->getRawOriginal('agenda_version') ?? 0),
-                );
-            }
 
             $capacity = $session->capacity === null ? null : (int) $session->capacity;
-            if ($capacity !== null
+            $isActiveForCurrentEligibility = $registration !== null
+                && (string) $registration->status === EventSessionRegistrationStatus::Registered->value
+                && (int) $registration->event_registration_id === (int) $eventRegistration->id
+                && (int) $registration->event_registration_version === $eventRegistrationVersion;
+            if (! $isActiveForCurrentEligibility
+                && $capacity !== null
                 && $this->activeSessionRegistrationCount($tenantId, $eventId, $sessionId) >= $capacity) {
                 throw new EventSessionException('event_agenda_session_capacity_full');
             }
@@ -805,6 +808,7 @@ final class EventSessionService
                     'session_id' => $sessionId,
                     'user_id' => (int) $persistedActor->id,
                     'event_registration_id' => (int) $eventRegistration->id,
+                    'event_registration_version' => $eventRegistrationVersion,
                     'version' => $nextVersion,
                     'status' => EventSessionRegistrationStatus::Registered->value,
                     'registered_at' => $now,
@@ -822,6 +826,7 @@ final class EventSessionService
                     ->where('version', $currentVersion)
                     ->update([
                         'event_registration_id' => (int) $eventRegistration->id,
+                        'event_registration_version' => $eventRegistrationVersion,
                         'version' => $nextVersion,
                         'status' => EventSessionRegistrationStatus::Registered->value,
                         'registered_at' => $now,
@@ -839,6 +844,7 @@ final class EventSessionService
                 $registrationId,
                 (int) $persistedActor->id,
                 (int) $eventRegistration->id,
+                $eventRegistrationVersion,
                 $nextVersion,
                 EventSessionRegistrationStatus::Registered->value,
                 $idempotencyKey,
@@ -851,7 +857,6 @@ final class EventSessionService
                 $persistedActor,
                 true,
                 $historyId,
-                $nextVersion,
                 (int) ($event->getRawOriginal('agenda_version') ?? 0),
             );
         }, 5);
@@ -861,7 +866,7 @@ final class EventSessionService
      * Withdraw only the session-level place. This deliberately remains valid
      * after canonical event eligibility changes so stale capacity can be freed.
      *
-     * @return array{session:EventSession,changed:bool,history_id:?int,agenda_version:int,registration_version:int}
+     * @return array{session:?EventSession,changed:bool,history_id:?int,agenda_version:int,registration_version:int}
      */
     public function withdrawSession(
         int $eventId,
@@ -914,7 +919,6 @@ final class EventSessionService
                     $persistedActor,
                     false,
                     (int) $replay->id,
-                    (int) $replay->registration_version,
                     (int) ($event->getRawOriginal('agenda_version') ?? 0),
                 );
             }
@@ -930,16 +934,8 @@ final class EventSessionService
             if ($currentVersion !== $expectedVersion) {
                 throw new EventSessionException('event_agenda_registration_version_conflict');
             }
-            if ($registration === null
-                || (string) $registration->status === EventSessionRegistrationStatus::Withdrawn->value) {
-                return $this->sessionRegistrationResult(
-                    $sessionId,
-                    $persistedActor,
-                    false,
-                    null,
-                    $currentVersion,
-                    (int) ($event->getRawOriginal('agenda_version') ?? 0),
-                );
+            if ($registration === null) {
+                throw new EventSessionException('event_agenda_session_registration_not_found');
             }
 
             $nextVersion = $this->nextVersion($currentVersion);
@@ -966,6 +962,7 @@ final class EventSessionService
                 (int) $registration->id,
                 (int) $persistedActor->id,
                 (int) $registration->event_registration_id,
+                (int) $registration->event_registration_version,
                 $nextVersion,
                 EventSessionRegistrationStatus::Withdrawn->value,
                 $idempotencyKey,
@@ -978,7 +975,6 @@ final class EventSessionService
                 $persistedActor,
                 true,
                 $historyId,
-                $nextVersion,
                 (int) ($event->getRawOriginal('agenda_version') ?? 0),
             );
         }, 5);
@@ -1508,6 +1504,10 @@ final class EventSessionService
             ->where('session_registration.session_id', $sessionId)
             ->where('session_registration.status', EventSessionRegistrationStatus::Registered->value)
             ->where('event_registration.registration_state', 'confirmed')
+            ->whereColumn(
+                'event_registration.registration_version',
+                'session_registration.event_registration_version',
+            )
             ->count();
     }
 
@@ -1805,7 +1805,7 @@ final class EventSessionService
             $query->lockForUpdate();
         }
 
-        return $query->first(['id']);
+        return $query->first(['id', 'registration_version']);
     }
 
     private function sessionRegistrationRow(
@@ -1863,6 +1863,7 @@ final class EventSessionService
         int $registrationId,
         int $actorId,
         int $eventRegistrationId,
+        int $eventRegistrationVersion,
         int $registrationVersion,
         string $action,
         string $idempotencyKey,
@@ -1876,6 +1877,7 @@ final class EventSessionService
             'registration_id' => $registrationId,
             'user_id' => $actorId,
             'event_registration_id' => $eventRegistrationId,
+            'event_registration_version' => $eventRegistrationVersion,
             'actor_user_id' => $actorId,
             'registration_version' => $registrationVersion,
             'action' => $action,
@@ -1886,14 +1888,13 @@ final class EventSessionService
     }
 
     /**
-     * @return array{session:EventSession,changed:bool,history_id:?int,agenda_version:int,registration_version:int}
+     * @return array{session:?EventSession,changed:bool,history_id:?int,agenda_version:int,registration_version:int}
      */
     private function sessionRegistrationResult(
         int $sessionId,
         User $viewer,
         bool $changed,
         ?int $historyId,
-        int $registrationVersion,
         int $agendaVersion,
     ): array {
         $result = $this->result(
@@ -1903,9 +1904,39 @@ final class EventSessionService
             $agendaVersion,
             $viewer,
         );
-        $result['registration_version'] = $registrationVersion;
+        $result['registration_version'] = max(
+            0,
+            (int) $result['session']->getAttribute('viewer_registration_version'),
+        );
+        $visibilityAttribute = $result['session']->getAttribute('visibility');
+        $visibility = $visibilityAttribute instanceof EventSessionVisibility
+            ? $visibilityAttribute->value
+            : (string) $visibilityAttribute;
+        $visible = match ($visibility) {
+            EventSessionVisibility::Public->value => true,
+            EventSessionVisibility::Registered->value => (bool) $result['session']
+                ->getAttribute('viewer_can_view_registered'),
+            EventSessionVisibility::Staff->value => (bool) $result['session']
+                ->getAttribute('viewer_can_view_staff'),
+            default => false,
+        };
+        if (! $visible) {
+            // Withdrawal remains an exit-only operation after permissions change,
+            // but the mutation must not disclose a now-hidden staff session.
+            $result['session'] = null;
+        }
 
         return $result;
+    }
+
+    private function canViewSession(User $viewer, Event $event, object $session): bool
+    {
+        return match ((string) ($session->visibility ?? '')) {
+            EventSessionVisibility::Public->value => $this->policy->view($viewer, $event),
+            EventSessionVisibility::Registered->value => $this->policy->viewRegisteredAgenda($viewer, $event),
+            EventSessionVisibility::Staff->value => $this->policy->viewStaffAgenda($viewer, $event),
+            default => false,
+        };
     }
 
     /** @param Collection<int,EventSession> $sessions */
@@ -1933,13 +1964,19 @@ final class EventSessionService
             ->where('user_id', $viewerId)
             ->where('registration_state', 'confirmed')
             ->orderByDesc('id')
-            ->first(['id']);
+            ->first(['id', 'registration_version']);
         $viewerRegistrations = DB::table('event_session_registrations')
             ->where('tenant_id', $tenantId)
             ->where('event_id', $eventId)
             ->where('user_id', $viewerId)
             ->whereIn('session_id', $sessionIds)
-            ->get(['session_id', 'version', 'status'])
+            ->get([
+                'session_id',
+                'event_registration_id',
+                'event_registration_version',
+                'version',
+                'status',
+            ])
             ->keyBy('session_id');
         $registeredCounts = DB::table('event_session_registrations as session_registration')
             ->join('event_registrations as event_registration', function ($join): void {
@@ -1953,6 +1990,10 @@ final class EventSessionService
             ->whereIn('session_registration.session_id', $sessionIds)
             ->where('session_registration.status', EventSessionRegistrationStatus::Registered->value)
             ->where('event_registration.registration_state', 'confirmed')
+            ->whereColumn(
+                'event_registration.registration_version',
+                'session_registration.event_registration_version',
+            )
             ->groupBy('session_registration.session_id')
             ->selectRaw('session_registration.session_id, COUNT(*) AS registered_count')
             ->pluck('registered_count', 'session_registration.session_id');
@@ -1967,8 +2008,15 @@ final class EventSessionService
                 ? null
                 : (string) $viewerRegistration->status;
             $eligible = $canonicalRegistration !== null;
+            $activeForCurrentEligibility = $viewerRegistration !== null
+                && $canonicalRegistration !== null
+                && $persistedStatus === EventSessionRegistrationStatus::Registered->value
+                && (int) $viewerRegistration->event_registration_id
+                    === (int) $canonicalRegistration->id
+                && (int) $viewerRegistration->event_registration_version
+                    === (int) $canonicalRegistration->registration_version;
             $state = match (true) {
-                $persistedStatus === EventSessionRegistrationStatus::Registered->value && $eligible => 'registered',
+                $activeForCurrentEligibility => 'registered',
                 $persistedStatus === EventSessionRegistrationStatus::Registered->value => 'ineligible',
                 $persistedStatus === EventSessionRegistrationStatus::Withdrawn->value => 'withdrawn',
                 default => 'not_registered',
@@ -1986,7 +2034,7 @@ final class EventSessionService
                 'viewer_can_register',
                 $eligible
                     && $sessionStatus === EventSessionStatus::Scheduled->value
-                    && $persistedStatus !== EventSessionRegistrationStatus::Registered->value
+                    && ! $activeForCurrentEligibility
                     && ! $isFull,
             );
             $session->setAttribute(
@@ -2017,8 +2065,14 @@ final class EventSessionService
         }
         $event = $this->eventOrFail($tenantId, (int) $session->event_id, false);
         $canManage = $this->policy->manageAgenda($viewer, $event);
-        $canViewRegistered = $this->policy->viewRegisteredAgenda($viewer, $event);
         $canViewStaff = $this->policy->viewStaffAgenda($viewer, $event);
+        $canViewRegistered = $canViewStaff
+            || $this->confirmedEventRegistration(
+                $tenantId,
+                (int) $event->getKey(),
+                (int) $viewer->getKey(),
+                false,
+            ) !== null;
         $this->decorateSessionFacts(
             $tenantId,
             $event,

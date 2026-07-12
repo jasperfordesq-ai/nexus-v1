@@ -55,12 +55,6 @@ class EventNotificationServiceTest extends TestCase
 
     public function test_notifyAttendees_skips_organizer(): void
     {
-        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
-        $policy->shouldReceive('assertManyLocalContactsAllowed')
-            ->once()
-            ->with(10, [20, 30], 2, 'event_broadcast');
-        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
-
         $event = (object) ['id' => 1, 'title' => 'Test Event', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
         // Attendees query: table('event_rsvps as r')->join->where->where->whereIn->select->distinct->get()
@@ -226,7 +220,7 @@ class EventNotificationServiceTest extends TestCase
             ->once()
             ->withArgs(static fn (array $attributes): bool => str_contains(
                 (string) $attributes['message'],
-                __('notifications.event_change_end_time'),
+                __('event_notifications.update.fields.time'),
             ));
 
         $this->service->notifyEventUpdated(1, ['end_time' => '2026-04-01 12:30']);

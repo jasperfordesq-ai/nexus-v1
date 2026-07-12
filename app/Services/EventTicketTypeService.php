@@ -490,6 +490,13 @@ final class EventTicketTypeService
         } else {
             $refundable = (bool) ($current?->organizer_cancel_refundable ?? false);
         }
+        if ($kind === EventTicketKind::Free) {
+            // A free entitlement is released, not refunded. Keep payment-policy
+            // fields empty so callers cannot advertise a refund effect that does
+            // not exist.
+            $refund = null;
+            $refundable = false;
+        }
 
         return [
             'name' => $name,

@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'Tuigim go scaoilfear m’áit in :title agus go bhféadfadh duine eile í a ghlacadh.',
     'capacity_label' => 'Toilleadh an tseisiúin',
     'capacity_hint' => 'Fág bán é mura bhfuil teorainn ann. Ní athraíonn áit seisiúin clárú an imeachta ná ticéid.',
     'capacity_unlimited' => ':registered cláraithe · gan teorainn',

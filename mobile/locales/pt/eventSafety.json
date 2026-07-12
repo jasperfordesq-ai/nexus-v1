@@ -7,6 +7,12 @@
       "request_guardian_consent": "Solicitar consentimento do responsável",
       "withdraw_guardian_consent": "Retirar solicitação de consentimento"
     },
+    "confirmations": {
+      "withdraw_code_title": "Retirar a aceitação do código de conduta?",
+      "withdraw_code_body": "Isto pode impedir a sua participação até aceitar novamente a versão atual.",
+      "withdraw_guardian_title": "Retirar o pedido de consentimento do responsável?",
+      "withdraw_guardian_body": "O pedido atual ficará inválido. Poderá ter de enviar um novo antes de participar."
+    },
     "attendee": {
       "title": "Requisitos de participação",
       "description": "Conclua as etapas de segurança aplicáveis ​​antes de se registrar ou entrar na lista de espera.",

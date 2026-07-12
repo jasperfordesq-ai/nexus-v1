@@ -19,6 +19,7 @@ jest.mock('@sentry/react-native', () => ({ captureMessage: jest.fn() }));
 import * as Sentry from '@sentry/react-native';
 import { api } from '@/lib/api/client';
 import {
+  getEventTemplateHistory,
   getEventTemplates,
   materializeEventTemplate,
 } from './eventTemplates';
@@ -45,8 +46,8 @@ function templateFixture() {
       copied_fields: ['title'],
       skipped_fields: ['related.registrations'],
     },
-    usage: { materialization_count: 2 },
-    capabilities: { materialize: true },
+    usage: { materialization_count: 2, audit_entry_count: 3 },
+    capabilities: { materialize: true, view_audit: true },
   };
 }
 
@@ -65,6 +66,49 @@ describe('mobile event templates API', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/event-templates', {
       status: 'active',
       per_page: '20',
+    });
+  });
+
+  it('requests the next opaque template cursor without reinterpreting it', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: [templateFixture()],
+      meta: { per_page: 20, next_cursor: null, has_more: false },
+    });
+
+    await getEventTemplates('opaque-template-cursor');
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/event-templates', {
+      status: 'active',
+      per_page: '20',
+      cursor: 'opaque-template-cursor',
+    });
+  });
+
+  it('loads privacy-filtered immutable template history through an opaque cursor', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: [{
+        id: 18,
+        action: 'materialized',
+        template_version: 1,
+        source_event_id: 9,
+        materialized_event_id: 21,
+        evidence: { federation_normalized: true },
+        created_at: '2026-07-11T10:00:00+00:00',
+        immutable: true,
+      }],
+      meta: { per_page: 50, next_cursor: null, has_more: false },
+    });
+
+    const response = await getEventTemplateHistory(4, 'opaque-audit-cursor');
+
+    expect(response.data[0]).toEqual(expect.objectContaining({
+      action: 'materialized',
+      immutable: true,
+      materialized_event_id: 21,
+    }));
+    expect(api.get).toHaveBeenCalledWith('/api/v2/event-templates/4/history', {
+      per_page: '50',
+      cursor: 'opaque-audit-cursor',
     });
   });
 

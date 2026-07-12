@@ -21,7 +21,7 @@ final class EventAgendaEnterpriseStaticTest extends TestCase
 
     public function test_schema_and_service_preserve_enterprise_boundaries(): void
     {
-        $migration = $this->source(
+        $enterpriseMigration = $this->source(
             'database/migrations/2026_07_11_000065_expand_event_agenda_enterprise.php',
         );
         foreach ([
@@ -36,8 +36,28 @@ final class EventAgendaEnterpriseStaticTest extends TestCase
             'event_session_confirmed_registration_required',
             'event_agenda_enterprise_rollback_refused_dependents_exist',
         ] as $needle) {
-            self::assertStringContainsString($needle, $migration, $needle);
+            self::assertStringContainsString($needle, $enterpriseMigration, $needle);
         }
+        self::assertStringNotContainsString('event_registration_version', $enterpriseMigration);
+
+        $versionMigration = $this->source(
+            'database/migrations/2026_07_11_000067_pin_event_agenda_registration_versions.php',
+        );
+        foreach ([
+            "unsignedBigInteger('event_registration_version')",
+            '->nullable()',
+            'SET `history`.`event_registration_version` = `session_registration`.`event_registration_version`',
+            '`registration_version` = NEW.`event_registration_version`',
+            'event_agenda_registration_version_backfill_incomplete',
+            'event_agenda_registration_version_rollback_refused_evidence_exists',
+            'CREATE OR REPLACE TRIGGER',
+            '@nexus_event_agenda_version_backfill',
+            'HISTORY_INSERT_TRIGGER',
+            'installHistoryImmutabilityTrigger',
+        ] as $needle) {
+            self::assertStringContainsString($needle, $versionMigration, $needle);
+        }
+        self::assertStringNotContainsString('MODIFY COLUMN', $versionMigration);
         $foundation = $this->source(
             'database/migrations/2026_07_11_000053_create_event_agenda_sessions.php',
         );
@@ -57,8 +77,10 @@ final class EventAgendaEnterpriseStaticTest extends TestCase
             'Crypt::encryptString',
             'event_agenda_resource_media_visibility_invalid',
             '$this->policy->manageAgenda($viewer, $event)',
-            '$this->policy->viewRegisteredAgenda($viewer, $event)',
             '$this->policy->viewStaffAgenda($viewer, $event)',
+            "'event_registration_version' => \$eventRegistrationVersion",
+            "->whereColumn(\n                'event_registration.registration_version'",
+            'event_agenda_session_registration_not_found',
         ] as $needle) {
             self::assertStringContainsString($needle, $service, $needle);
         }
@@ -99,11 +121,21 @@ final class EventAgendaEnterpriseStaticTest extends TestCase
         self::assertStringContainsString('session.registration.can_register', $react);
         self::assertStringContainsString('session.capacity.registered', $react);
         self::assertStringContainsString('rel="noopener noreferrer"', $react);
+        self::assertStringContainsString('withdraw_confirm_title', $react);
+        self::assertStringContainsString("status: 'danger'", $react);
 
         $accessible = $this->source('accessible-frontend/views/event-agenda.blade.php');
-        self::assertStringContainsString("? 'withdraw' : 'register'", $accessible);
+        self::assertStringContainsString('name="action" value="register"', $accessible);
+        self::assertStringContainsString('name="action" value="withdraw"', $accessible);
         self::assertStringContainsString("registration['version']", $accessible);
         self::assertStringContainsString('rel="noopener noreferrer"', $accessible);
+        self::assertStringContainsString('name="confirm_destructive"', $accessible);
+
+        $accessibleController = $this->source(
+            'app/Http/Controllers/GovukAlpha/Concerns/EventAgendaParity.php',
+        );
+        self::assertStringContainsString("boolean('confirm_destructive')", $accessibleController);
+        self::assertStringContainsString('event_agenda_confirmation_required', $accessibleController);
 
         $mobileApi = $this->source('mobile/lib/api/events.ts');
         self::assertStringContainsString('registerEventAgendaSession(', $mobileApi);
@@ -114,6 +146,8 @@ final class EventAgendaEnterpriseStaticTest extends TestCase
         self::assertStringContainsString('<Card.Body', $mobile);
         self::assertStringContainsString('<Button.Label>', $mobile);
         self::assertStringContainsString('session.registration.version', $mobile);
+        self::assertStringContainsString('withdrawConfirmTitle', $mobile);
+        self::assertStringContainsString("variant: 'danger'", $mobile);
     }
 
     public function test_enterprise_agenda_translations_are_complete_and_not_english_fallbacks(): void

@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'The comment could not be added. Try again.',
         'not_available' => 'Not available',
     ],
+    'forms' => [
+        'error_prefix' => 'Error:',
+    ],
     'home' => [
         'module_signin' => 'Sign in',
         'module_signin_hint' => 'Sign in to use this.',
@@ -1100,6 +1103,11 @@ return [
         'no_category' => 'No category',
         'start_time_label' => 'Start time',
         'end_time_label' => 'End time',
+        'timezone_label' => 'Event time zone',
+        'timezone_hint' => 'Use an IANA time zone, for example Europe/Dublin or America/New_York.',
+        'all_day_label' => 'This is an all-day event',
+        'all_day_hint' => 'The entered times are ignored. Enter the first and last calendar dates of the event.',
+        'all_day_end_hint' => 'For all-day events, enter the inclusive final calendar date.',
         'datetime_hint' => 'Use the date and time picker, or enter a date and time.',
         'end_time_hint' => 'Optional. Add an end time if the event has one.',
         'location_label' => 'Location',
@@ -3362,6 +3370,8 @@ return [
             'gdpr_notice' => 'Your answers are private and only used for safeguarding. You can change or remove them at any time in your settings. Nothing is selected unless you choose it.',
             'none_separator' => 'Or',
             'none_label' => 'None of these apply to me',
+            'options_legend' => 'Safeguarding options',
+            'select_none' => 'None selected',
         ],
         'confirm' => [
             'title' => 'Check your answers',
@@ -4527,6 +4537,7 @@ return [
         'report_reason_fraud' => 'Suspected fraud or scam',
         'report_reason_duplicate' => 'Duplicate listing',
         'report_reason_other' => 'Other',
+        'report_reason_required' => 'Choose a reason for this report.',
         'report_details_label' => 'Additional details (optional)',
         'report_details_hint' => 'Give us any other information that will help us investigate.',
         'report_submit' => 'Send report',

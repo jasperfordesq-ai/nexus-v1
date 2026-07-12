@@ -13,6 +13,7 @@ import {
   type RouteObject,
 } from 'react-router-dom';
 import {
+  act,
   render as testingLibraryRender,
   type RenderOptions,
 } from '@testing-library/react';
@@ -148,8 +149,10 @@ export function renderEventRoute(
     router: {
       navigate: async (to: string) => {
         if (!navigate) throw new Error('Events test router is not ready');
-        navigate(to);
-        await Promise.resolve();
+        await act(async () => {
+          navigate?.(to);
+          await Promise.resolve();
+        });
       },
     },
   };

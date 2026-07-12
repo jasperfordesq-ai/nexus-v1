@@ -41,6 +41,7 @@ import {
   Spinner,
   Textarea,
 } from '@/components/ui';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventIsoToLocalInput as isoToLocalInput,
@@ -186,6 +187,7 @@ function draftFromSession(session: EventAgendaSession): SessionDraft {
 export function EventAgendaWorkspace({ event }: EventAgendaWorkspaceProps) {
   const { t, i18n } = useTranslation(['events', 'event_agenda']);
   const toast = useToast();
+  const confirm = useConfirm();
   const [agenda, setAgenda] = useState<EventAgenda | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -428,6 +430,16 @@ export function EventAgendaWorkspace({ event }: EventAgendaWorkspaceProps) {
     action: 'register' | 'withdraw',
   ) => {
     if (registrationPendingId !== null) return;
+    if (action === 'withdraw') {
+      const accepted = await confirm({
+        title: t('event_agenda:withdraw_confirm_title'),
+        body: t('event_agenda:withdraw_confirm_body', { title: session.title }),
+        confirmLabel: t('event_agenda:withdraw_action'),
+        cancelLabel: t('event_agenda:keep_registration'),
+        status: 'danger',
+      });
+      if (!accepted) return;
+    }
     setRegistrationPendingId(session.id);
     try {
       const response = action === 'register'
@@ -448,10 +460,16 @@ export function EventAgendaWorkspace({ event }: EventAgendaWorkspaceProps) {
         await loadAgenda();
         return;
       }
+      const updatedSession = response.data.session;
+      if (updatedSession === null) {
+        await loadAgenda();
+        toast.success(t(`event_agenda:${action}_success`));
+        return;
+      }
       setAgenda((current) => current === null ? current : ({
         ...current,
         sessions: current.sessions.map((candidate) => (
-          candidate.id === response.data?.session.id ? response.data.session : candidate
+          candidate.id === updatedSession.id ? updatedSession : candidate
         )),
       }));
       toast.success(t(`event_agenda:${action}_success`));

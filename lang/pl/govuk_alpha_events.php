@@ -24,6 +24,10 @@ return [
         'cancel' => 'Cancel',
     ],
 
+    'safety' => [
+        'title' => 'Bezpieczeństwo wydarzeń',
+    ],
+
     // ---- Category toggle-button browse ---------------------------------
     'browse' => [
         'title' => 'Browse events by category',

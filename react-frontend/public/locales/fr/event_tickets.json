@@ -42,6 +42,7 @@
     "units": "{{count}} unité",
     "units_other": "{{count}} unités",
     "cancel": "Annuler le billet",
+    "time_credit_cancel_disabled": "L’annulation d’un billet en crédits-temps n’est pas disponible dans ce parcours réservé aux billets gratuits. Aucune opération n’a été effectuée sur le portefeuille.",
     "cancelled": "Annulé",
     "cancel_title": "Annuler ce billet ?",
     "cancel_reason": "Raison de l'annulation",

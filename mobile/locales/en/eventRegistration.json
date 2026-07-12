@@ -188,6 +188,9 @@
     }
   },
   "guests": {
+    "cancel_confirm_title": "Cancel this guest?",
+    "cancel_confirm_body": "The place held for {{name}} will be released. This cannot be undone from this screen.",
+    "keep": "Keep guest",
     "title": "Guest roster and attendance",
     "description": "Guest identity and contact details are shown only when your event permissions allow them.",
     "empty": "No guests have been captured.",
@@ -298,6 +301,17 @@
     "settings_save_error": "Registration policy could not be saved. Check the dates and limits.",
     "settings_published": "Registration policy published.",
     "settings_publish_error": "Registration policy could not be published."
+  },
+  "answers": {
+    "validation": {
+      "required": "Answer this question.",
+      "min_length": "Enter at least {{limit}} characters.",
+      "max_length": "Enter no more than {{limit}} characters.",
+      "min_selections": "Select at least {{count}} option.",
+      "min_selections_other": "Select at least {{count}} options.",
+      "max_selections": "Select no more than {{count}} option.",
+      "max_selections_other": "Select no more than {{count}} options."
+    }
   },
   "accessible": {
     "organizer_heading": "Organiser controls",

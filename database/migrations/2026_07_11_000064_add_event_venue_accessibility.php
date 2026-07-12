@@ -8,14 +8,29 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /** @var list<string> */
+    private const COLUMNS = [
+        'accessibility_step_free',
+        'accessibility_toilet',
+        'accessibility_hearing_loop',
+        'accessibility_quiet_space',
+        'accessibility_seating',
+        'accessibility_parking',
+        'accessibility_parking_details',
+        'accessibility_transit_details',
+        'accessibility_assistance_contact',
+        'accessibility_notes',
+    ];
+
     public function up(): void
     {
         if (! Schema::hasTable('events')) {
-            return;
+            throw new LogicException('event_venue_accessibility_prerequisite_missing:events');
         }
 
         $needsIndex = ! Schema::hasIndex('events', 'idx_events_tenant_step_free_start');
@@ -65,6 +80,11 @@ return new class extends Migration
         if (! Schema::hasTable('events')) {
             return;
         }
+        if ($this->containsDurableEvidence()) {
+            throw new LogicException(
+                'event_venue_accessibility_rollback_refused_evidence_exists',
+            );
+        }
 
         $hasIndex = Schema::hasIndex('events', 'idx_events_tenant_step_free_start');
         Schema::table('events', static function (Blueprint $table) use ($hasIndex): void {
@@ -72,23 +92,30 @@ return new class extends Migration
                 $table->dropIndex('idx_events_tenant_step_free_start');
             }
 
-            $columns = [
-                'accessibility_step_free',
-                'accessibility_toilet',
-                'accessibility_hearing_loop',
-                'accessibility_quiet_space',
-                'accessibility_seating',
-                'accessibility_parking',
-                'accessibility_parking_details',
-                'accessibility_transit_details',
-                'accessibility_assistance_contact',
-                'accessibility_notes',
-            ];
-            foreach ($columns as $column) {
+            foreach (self::COLUMNS as $column) {
                 if (Schema::hasColumn('events', $column)) {
                     $table->dropColumn($column);
                 }
             }
         });
+    }
+
+    private function containsDurableEvidence(): bool
+    {
+        $columns = array_values(array_filter(
+            self::COLUMNS,
+            static fn (string $column): bool => Schema::hasColumn('events', $column),
+        ));
+        if ($columns === []) {
+            return false;
+        }
+
+        return DB::table('events')
+            ->where(static function ($query) use ($columns): void {
+                foreach ($columns as $column) {
+                    $query->orWhereNotNull($column);
+                }
+            })
+            ->exists();
     }
 };

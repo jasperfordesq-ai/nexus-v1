@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'De opmerking kon niet worden toegevoegd. Probeer het opnieuw.',
         'not_available' => 'Niet beschikbaar',
     ],
+    'forms' => [
+        'error_prefix' => 'Fout:',
+    ],
     'home' => [
         'module_signin' => 'Log in',
         'module_signin_hint' => 'Log in om dit te gebruiken.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Geen categorie',
         'start_time_label' => 'Begintijd',
         'end_time_label' => 'Eindtijd',
+        'timezone_label' => 'Tijdzone van het evenement',
+        'timezone_hint' => 'Gebruik een IANA-tijdzone, bijvoorbeeld Europe/Amsterdam of America/New_York.',
+        'all_day_label' => 'Dit is een evenement dat de hele dag duurt',
+        'all_day_hint' => 'De ingevoerde tijden worden genegeerd. Vul de eerste en laatste kalenderdatum van het evenement in.',
+        'all_day_end_hint' => 'Vul voor een evenement van een hele dag de laatste inbegrepen kalenderdatum in.',
         'datetime_hint' => 'Gebruik de datum- en tijdkiezer of voer een datum en tijd in.',
         'end_time_hint' => 'Optioneel. Voeg een eindtijd toe als de gebeurtenis er een heeft.',
         'location_label' => 'Locatie',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Uw antwoorden zijn privé en worden alleen gebruikt voor beveiligingsdoeleinden. U kunt ze op elk moment wijzigen of verwijderen in uw instellingen. Er wordt niets geselecteerd tenzij u dat zelf doet.',
             'none_separator' => 'Of',
             'none_label' => 'Geen van deze is op mij van toepassing',
+            'options_legend' => 'Veiligheidsopties',
+            'select_none' => 'Geen geselecteerd',
         ],
         'confirm' => [
             'title' => 'Controleer uw antwoorden',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Vermoedelijke fraude of oplichting',
         'report_reason_duplicate' => 'Dubbele aanbieding',
         'report_reason_other' => 'Overig',
+        'report_reason_required' => 'Kies een reden voor deze melding.',
         'report_details_label' => 'Aanvullende details (optioneel)',
         'report_details_hint' => 'Geef ons eventuele aanvullende informatie die ons helpt bij het onderzoek.',
         'report_submit' => 'Melding verzenden',

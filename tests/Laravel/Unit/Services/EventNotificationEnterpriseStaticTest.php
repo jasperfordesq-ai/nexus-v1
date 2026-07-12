@@ -187,6 +187,18 @@ final class EventNotificationEnterpriseStaticTest extends TestCase
         self::assertStringContainsString('isCriticalEventActivity(', $filter);
     }
 
+    public function test_focused_events_harness_selects_enterprise_notification_contracts(): void
+    {
+        $source = $this->source('scripts/test-events.mjs');
+
+        self::assertSame(4, substr_count(
+            $source,
+            'EventNotificationEnterpriseStaticTest',
+        ));
+        self::assertStringContainsString("phpBatch === 'notifications'", $source);
+        self::assertStringContainsString("phpBatch === 'broadcasts'", $source);
+    }
+
     private function source(string $relative): string
     {
         $path = dirname(__DIR__, 4) . '/' . $relative;

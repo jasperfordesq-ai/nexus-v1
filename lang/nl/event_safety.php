@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Beoordeeld door',
         'withdraw_review' => 'Beslissing intrekken',
         'ledger_empty' => 'Voor dit evenement zijn geen deelnamebeoordelingen geregistreerd.',
+        'confirm_archive_checkbox' => 'Ik begrijp dat hierdoor de huidige veiligheidsvereisten worden gedeactiveerd.',
+        'confirm_withdraw_code' => 'Ik begrijp dat mijn deelname kan worden geblokkeerd totdat ik opnieuw met de code instem.',
+        'confirm_withdraw_guardian' => 'Ik begrijp dat het huidige toestemmingsverzoek ongeldig wordt.',
+        'confirm_withdraw_review' => 'Ik bevestig dat ik het actieve besluit voor :name wil intrekken.',
     ],
 ];

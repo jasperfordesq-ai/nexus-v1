@@ -113,5 +113,9 @@ return [
         'reviewed_by' => 'Revisado por',
         'withdraw_review' => 'decisión de retirar',
         'ledger_empty' => 'No se han registrado reseñas de participación para este evento.',
+        'confirm_archive_checkbox' => 'Entiendo que esto desactivará los requisitos de seguridad actuales.',
+        'confirm_withdraw_code' => 'Entiendo que esto puede impedir mi participación hasta que vuelva a aceptar el código.',
+        'confirm_withdraw_guardian' => 'Entiendo que la solicitud de consentimiento actual dejará de ser válida.',
+        'confirm_withdraw_review' => 'Confirmo que quiero retirar la decisión activa para :name.',
     ],
 ];

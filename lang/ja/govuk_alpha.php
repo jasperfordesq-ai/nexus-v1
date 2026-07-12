@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'コメントを追加できませんでした。もう一度やり直してください。',
         'not_available' => '利用できません',
     ],
+    'forms' => [
+        'error_prefix' => 'エラー:',
+    ],
     'home' => [
         'module_signin' => 'サインイン',
         'module_signin_hint' => 'これを使用するにはサインインしてください。',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'カテゴリなし',
         'start_time_label' => '開始時間',
         'end_time_label' => '終了時刻',
+        'timezone_label' => 'イベントのタイムゾーン',
+        'timezone_hint' => 'Asia/Tokyo や Europe/Dublin などの IANA タイムゾーンを使用してください。',
+        'all_day_label' => '終日のイベントです',
+        'all_day_hint' => '入力した時刻は無視されます。イベントの最初の日と最後の日を入力してください。',
+        'all_day_end_hint' => '終日のイベントでは、イベントに含まれる最後の日付を入力してください。',
         'datetime_hint' => '日付と時刻のピッカーを使用するか、日付と時刻を入力します。',
         'end_time_hint' => 'オプション。イベントに終了時刻がある場合は、終了時刻を追加します。',
         'location_label' => '場所',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => '回答は非公開であり、セーフガーディングの目的にのみ使用されます。設定からいつでも変更・削除できます。選択しない限り、何も選ばれません。',
             'none_separator' => 'または',
             'none_label' => 'これらは私には当てはまりません',
+            'options_legend' => '保護オプション',
+            'select_none' => '選択されていません',
         ],
         'confirm' => [
             'title' => '回答を確認する',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => '詐欺または不正行為の疑い',
         'report_reason_duplicate' => '重複したリスティング',
         'report_reason_other' => 'その他',
+        'report_reason_required' => 'この報告の理由を選択してください。',
         'report_details_label' => '追加の詳細（任意）',
         'report_details_hint' => '調査に役立つその他の情報をご提供ください。',
         'report_submit' => '報告を送信する',

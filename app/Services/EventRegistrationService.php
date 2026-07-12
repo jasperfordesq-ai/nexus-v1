@@ -35,17 +35,20 @@ final class EventRegistrationService
     private readonly EventParticipationEligibilityService $eligibility;
     private readonly EventPolicy $policy;
     private readonly EventReminderScheduleService $reminderSchedules;
+    private readonly EventTicketEntitlementService $ticketEntitlements;
 
     public function __construct(
         ?EventDomainOutboxService $outbox = null,
         ?EventParticipationEligibilityService $eligibility = null,
         ?EventPolicy $policy = null,
         ?EventReminderScheduleService $reminderSchedules = null,
+        ?EventTicketEntitlementService $ticketEntitlements = null,
     ) {
         $this->outbox = $outbox ?? new EventDomainOutboxService();
         $this->eligibility = $eligibility ?? app(EventParticipationEligibilityService::class);
         $this->policy = $policy ?? app(EventPolicy::class);
         $this->reminderSchedules = $reminderSchedules ?? app(EventReminderScheduleService::class);
+        $this->ticketEntitlements = $ticketEntitlements ?? app(EventTicketEntitlementService::class);
     }
 
     public function transition(
@@ -524,6 +527,15 @@ final class EventRegistrationService
             }
 
             $this->reconcileReminderState($registration, $target);
+            if (! $target->consumesCapacity()) {
+                $this->ticketEntitlements->cancelConfirmedForRegistrationExitWithinTransaction(
+                    $eventId,
+                    (int) $registration->getKey(),
+                    $actor,
+                    $reason ?? 'registration_cancelled',
+                    $idempotencyKey,
+                );
+            }
 
             return new EventRegistrationTransitionResult(
                 $registration,
@@ -626,6 +638,17 @@ final class EventRegistrationService
         }
 
         $cancelledPendingReminders = $this->reconcileReminderState($registration, $target);
+        $releasedTicketEntitlements = 0;
+        if ($wasConsuming && ! $target->consumesCapacity()) {
+            $releasedTicketEntitlements = $this->ticketEntitlements
+                ->cancelConfirmedForRegistrationExitWithinTransaction(
+                    $eventId,
+                    (int) $registration->getKey(),
+                    $actor,
+                    $reason ?? 'registration_cancelled',
+                    $idempotencyKey,
+                );
+        }
 
         $action = $canonicalizing ? 'canonicalized' : $target->value;
         try {
@@ -648,6 +671,7 @@ final class EventRegistrationService
                     'source' => 'event_registration_service',
                     'accepted_waitlist_entry_id' => $acceptedWaitlistEntryId,
                     'cancelled_pending_reminders' => $cancelledPendingReminders,
+                    'released_ticket_entitlements' => $releasedTicketEntitlements,
                 ], JSON_THROW_ON_ERROR),
                 'created_at' => $now,
             ]);
@@ -680,6 +704,7 @@ final class EventRegistrationService
                 'to_state' => $target->value,
                 'reason' => $reason,
                 'cancelled_pending_reminders' => $cancelledPendingReminders,
+                'released_ticket_entitlements' => $releasedTicketEntitlements,
                 'occurred_at' => $now->toIso8601String(),
             ],
         );

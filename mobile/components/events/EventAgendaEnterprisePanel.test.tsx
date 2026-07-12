@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Linking } from 'react-native';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import { EventAgendaEnterprisePanel } from './EventAgendaEnterprisePanel';
 import {
@@ -15,9 +15,13 @@ import {
 } from '@/lib/api/events';
 
 const mockShowToast = jest.fn();
+const mockConfirm = jest.fn();
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ui/AppToast', () => ({ useAppToast: () => ({ show: mockShowToast }) }));
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({ confirm: mockConfirm, confirmDialog: null }),
+}));
 jest.mock('@/lib/hooks/useTenant', () => ({ usePrimaryColor: () => '#6366f1' }));
 jest.mock('@/lib/hooks/useTheme', () => {
   const actual = jest.requireActual('@/lib/hooks/useTheme');
@@ -39,6 +43,9 @@ jest.mock('react-i18next', () => ({
       'agenda.enterprise.register': 'Register for session',
       'agenda.enterprise.registering': 'Registering…',
       'agenda.enterprise.withdraw': 'Withdraw from session',
+      'agenda.enterprise.withdrawConfirmTitle': 'Withdraw from this session?',
+      'agenda.enterprise.withdrawConfirmDescription': `Release ${String(options?.title ?? '')}`,
+      'agenda.enterprise.keepRegistration': 'Keep my place',
       'agenda.enterprise.withdrawing': 'Withdrawing…',
       'agenda.enterprise.registered': 'Registered for this session',
       'agenda.enterprise.ineligible': 'Your event registration is no longer eligible for this session.',
@@ -126,5 +133,41 @@ describe('EventAgendaEnterprisePanel', () => {
     expect(withdrawEventAgendaSession).not.toHaveBeenCalled();
     expect(onSessionChange).toHaveBeenCalledWith(updated);
     expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ variant: 'success' }));
+  });
+
+  it('does not release a session place before destructive confirmation', async () => {
+    const current = session({
+      title: 'Community workshop',
+      registration: {
+        state: 'registered',
+        version: 4,
+        can_register: false,
+        can_withdraw: true,
+      },
+    });
+    (withdrawEventAgendaSession as jest.Mock).mockResolvedValue({
+      data: { session: current },
+    });
+    const view = render(
+      <EventAgendaEnterprisePanel eventId={101} session={current} onSessionChange={jest.fn()} />,
+    );
+
+    fireEvent.press(view.getByText('Withdraw from session'));
+    expect(withdrawEventAgendaSession).not.toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Withdraw from this session?',
+      message: 'Release Community workshop',
+      variant: 'danger',
+    }));
+
+    await act(async () => {
+      await mockConfirm.mock.calls[0][0].onConfirm();
+    });
+    expect(withdrawEventAgendaSession).toHaveBeenCalledWith(
+      101,
+      current.id,
+      4,
+      expect.any(String),
+    );
   });
 });

@@ -42,6 +42,7 @@
     "units": "{{count}} aonad",
     "units_other": "{{count}} aonad",
     "cancel": "Cealaigh ticéad",
+    "time_credit_cancel_disabled": "Níl cealú ticéid creidmheasa ama ar fáil sa sreabhadh saor in aisce seo. Ní dhearnadh aon athrú ar an sparán.",
     "cancelled": "Ar ceal",
     "cancel_title": "Cealaigh an ticéad seo?",
     "cancel_reason": "An chúis le cealú",

@@ -694,9 +694,16 @@ final class EventContractMapper
         $recurrence = null;
         if ($isRecurring) {
             $rule = is_array($facts['recurrence'] ?? null) ? $facts['recurrence'] : [];
+            $hasProjectedOccurrences = is_array($event['series_occurrences'] ?? null)
+                || is_array($rule['occurrences'] ?? null);
             $occurrences = is_array($event['series_occurrences'] ?? null)
                 ? $event['series_occurrences']
                 : (is_array($rule['occurrences'] ?? null) ? $rule['occurrences'] : []);
+            $projectedOccurrences = array_values(array_map(static fn (array $occurrence): array => [
+                'id' => self::intValue($occurrence['id'] ?? 0),
+                'start_at' => self::dateString($occurrence['start_at'] ?? $occurrence['start_time'] ?? null),
+                'date' => self::nullableString($occurrence['date'] ?? $occurrence['occurrence_date'] ?? null),
+            ], $occurrences));
             $recurrence = [
                 'parent_event_id' => self::nullableInt($event['parent_event_id'] ?? null),
                 'root_event_id' => self::intValue(
@@ -709,12 +716,10 @@ final class EventContractMapper
                 'frequency' => self::nullableString($rule['frequency'] ?? $event['recurrence_frequency'] ?? null),
                 'interval' => self::intValue($rule['interval_value'] ?? 1),
                 'rrule' => self::nullableString($rule['rrule'] ?? null),
-                'occurrence_count' => self::intValue($event['series_count'] ?? count($occurrences)),
-                'occurrences' => array_values(array_map(static fn (array $occurrence): array => [
-                    'id' => self::intValue($occurrence['id'] ?? 0),
-                    'start_at' => self::dateString($occurrence['start_at'] ?? $occurrence['start_time'] ?? null),
-                    'date' => self::nullableString($occurrence['date'] ?? $occurrence['occurrence_date'] ?? null),
-                ], $occurrences)),
+                'occurrence_count' => $hasProjectedOccurrences
+                    ? count($projectedOccurrences)
+                    : self::intValue($event['series_count'] ?? 0),
+                'occurrences' => $projectedOccurrences,
             ];
         }
 

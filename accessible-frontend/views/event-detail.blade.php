@@ -427,7 +427,6 @@
         </p>
     @endif
 
-    @unless($isCancelled)
     @if ($requiresAuth)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="events-auth-title">
             <div class="govuk-notification-banner__header">
@@ -445,13 +444,32 @@
         @php
             $hasActiveWaitlistOffer = $registrationState === 'offered';
             $onWaitlist = in_array($registrationState, ['waitlisted', 'offered'], true);
-            // The canonical relationship owns registration and capacity state;
-            // the HTML form is only a progressive-enhancement adapter.
-            $eventIsFull = (bool) ($relationship['capacity']['is_full'] ?? false);
-            $isGoing = $registrationState === 'confirmed';
+            $registrationCapabilities = is_array($relationship['registration'] ?? null)
+                ? $relationship['registration']
+                : [];
+            $canRegister = (bool) ($registrationCapabilities['can_register'] ?? false);
+            $canWithdraw = (bool) ($registrationCapabilities['can_withdraw'] ?? false);
+            $canJoinWaitlist = (bool) ($registrationCapabilities['can_join_waitlist'] ?? false);
+            $canLeaveWaitlist = (bool) ($registrationCapabilities['can_leave_waitlist'] ?? false);
+            $canChangeEngagement = (bool) ($relationship['engagement']['can_change'] ?? false);
+            $rsvpOptions = [];
+            if ($canRegister) {
+                $rsvpOptions[] = 'going';
+            }
+            if ($canChangeEngagement) {
+                $rsvpOptions[] = 'interested';
+            }
+            if ($canWithdraw || $canChangeEngagement) {
+                $rsvpOptions[] = 'not_going';
+            }
+            $requiresRsvpCancellationConfirmation = in_array($currentRsvp, ['going', 'interested'], true)
+                && in_array('not_going', $rsvpOptions, true);
+            if ($requiresRsvpCancellationConfirmation) {
+                $rsvpOptions = array_values(array_diff($rsvpOptions, ['not_going']));
+            }
         @endphp
 
-        @if ($onWaitlist || ($eventIsFull && !$isGoing))
+        @if ($onWaitlist || $canJoinWaitlist)
             <section class="govuk-!-margin-top-7" aria-labelledby="waitlist-heading">
                 <h2 class="govuk-heading-m" id="waitlist-heading">{{ $hasActiveWaitlistOffer ? __('govuk_alpha.events.waitlist_offer_title') : __('govuk_alpha.events.waitlist_heading') }}</h2>
                 @if ($hasActiveWaitlistOffer)
@@ -464,10 +482,18 @@
                             <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
                             <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_offer_accept') }}</button>
                         </form>
-                        <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
-                            @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_offer_decline') }}</button>
-                        </form>
+                        @if ($canLeaveWaitlist)
+                            <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.waitlist_offer_decline') }}</span></summary>
+                                <div class="govuk-details__text">
+                                    <p class="govuk-body">{{ __('govuk_alpha.events.waitlist_offer_description') }}</p>
+                                    <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                                        @csrf
+                                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_offer_decline') }}</button>
+                                    </form>
+                                </div>
+                            </details>
+                        @endif
                     </div>
                 @elseif ($onWaitlist)
                     <div class="govuk-inset-text">
@@ -476,11 +502,19 @@
                             <p class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ __('govuk_alpha.events.waitlist_position', ['position' => $relationship['registration']['waitlist_position']]) }}</p>
                         @endif
                     </div>
-                    <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
-                        @csrf
-                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_leave') }}</button>
-                    </form>
-                @else
+                    @if ($canLeaveWaitlist)
+                        <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                            <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.waitlist_leave') }}</span></summary>
+                            <div class="govuk-details__text">
+                                <p class="govuk-body">{{ __('govuk_alpha.events.waitlist_on_list_note') }}</p>
+                                <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                                    @csrf
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_leave') }}</button>
+                                </form>
+                            </div>
+                        </details>
+                    @endif
+                @elseif ($canJoinWaitlist)
                     <p class="govuk-body">{{ __('govuk_alpha.events.waitlist_full_note') }}</p>
                     <form method="post" action="{{ route('govuk-alpha.events.waitlist.join', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
                         @csrf
@@ -490,7 +524,7 @@
             </section>
         @endif
 
-        @unless($hasActiveWaitlistOffer)
+        @if (!$hasActiveWaitlistOffer && !empty($rsvpOptions))
         <form method="post" action="{{ route('govuk-alpha.events.rsvp.store', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" class="govuk-!-margin-top-7">
             @csrf
             <fieldset class="govuk-fieldset" aria-describedby="rsvp-hint">
@@ -499,7 +533,7 @@
                 </legend>
                 <div id="rsvp-hint" class="govuk-hint">{{ __('govuk_alpha.events.rsvp_hint') }}</div>
                 <div class="govuk-radios" data-module="govuk-radios">
-                    @foreach (['going', 'interested', 'not_going'] as $rsvpStatus)
+                    @foreach ($rsvpOptions as $rsvpStatus)
                         <div class="govuk-radios__item">
                             <input class="govuk-radios__input" id="status-{{ $rsvpStatus }}" name="status" type="radio" value="{{ $rsvpStatus }}" required @checked(($currentRsvp ?? null) === $rsvpStatus)>
                             <label class="govuk-label govuk-radios__label" for="status-{{ $rsvpStatus }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvpStatus) }}</label>
@@ -509,7 +543,21 @@
             </fieldset>
             <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button">{{ __('govuk_alpha.actions.rsvp') }}</button>
         </form>
-        @endunless
+        @endif
+
+        @if ($requiresRsvpCancellationConfirmation)
+            <details class="govuk-details govuk-!-margin-top-7" data-module="govuk-details">
+                <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.rsvp_status.not_going') }}</span></summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body">{{ __('govuk_alpha.events.rsvp_hint') }}</p>
+                    <form method="post" action="{{ route('govuk-alpha.events.rsvp.store', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="not_going">
+                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.rsvp') }}</button>
+                    </form>
+                </div>
+            </details>
+        @endif
 
         {{-- ===== Event polls ===== --}}
         @if (!empty($polls))
@@ -605,7 +653,6 @@
             </section>
         @endif
     @endif
-    @endunless {{-- /isCancelled --}}
 
     {{-- ===== Recurring series navigation ===== --}}
     @if (!empty($seriesEvents) && count($seriesEvents) > 1)
@@ -639,64 +686,61 @@
     @endif
 
     {{-- ===== Attendee list (govuk-list, no custom class on <li>) ===== --}}
-    @if (!empty($attendees))
+    @if (($attendeesLoadFailed ?? false) || !empty($attendees))
         <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.events.attendees_title') }}</h2>
 
-        {{-- ===== Organiser check-in panel (owner only) — WAVE NIGHT-EVENTS ===== --}}
-        @if ($isOwner ?? false)
-            <section class="govuk-!-margin-bottom-6" aria-labelledby="checkin-heading">
-                <h3 class="govuk-heading-m" id="checkin-heading">{{ __('govuk_alpha.events.polish_events.checkin_heading') }}</h3>
-                <p class="govuk-body">{{ __('govuk_alpha.events.polish_events.checkin_intro') }}</p>
-                <dl class="govuk-summary-list">
-                    @foreach ($attendees as $attendee)
-                        @php
-                            $attendeeName = trim((string) ($attendee['member']['display_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                            $attendeeId = (int) ($attendee['member']['id'] ?? 0);
-                            $attendeeAttendance = (string) ($attendee['attendance']['state'] ?? 'not_checked_in');
-                            $isAttended = in_array($attendeeAttendance, ['attended', 'checked_in', 'checked_out'], true);
-                        @endphp
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">{{ $attendeeName }}</dt>
-                            <dd class="govuk-summary-list__value">
-                                @if ($isAttended)
-                                    <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.polish_events.checkin_done_tag') }}</strong>
-                                @else
-                                    <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.events.rsvp_status.going') }}</strong>
-                                @endif
-                            </dd>
-                            <dd class="govuk-summary-list__actions">
-                                @unless($isAttended)
-                                    <form method="post" action="{{ route('govuk-alpha.events.checkin', ['tenantSlug' => $tenantSlug, 'id' => $event['id'], 'attendeeId' => $attendeeId]) }}">
-                                        @csrf
-                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.polish_events.checkin_button') }}</button>
-                                    </form>
-                                @endunless
-                            </dd>
-                        </div>
-                    @endforeach
-                </dl>
-            </section>
+        {{-- Roster failures remain distinct from a genuinely empty roster. --}}
+        @if ($attendeesLoadFailed ?? false)
+            <div class="govuk-error-summary" data-module="govuk-error-summary" role="alert" aria-labelledby="attendees-error-title">
+                <h3 class="govuk-error-summary__title" id="attendees-error-title">{{ __('govuk_alpha.states.error_title') }}</h3>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <a href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                                {{ __('govuk_alpha.events.attendees_title') }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         @endif
 
-        <ul class="govuk-list">
-            @foreach ($attendees as $attendee)
-                @php
-                    $attendeeName = trim((string) ($attendee['member']['display_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                    $attendeeRegistration = (string) ($attendee['registration']['state'] ?? 'none');
-                    $attendeeEngagement = (string) ($attendee['engagement']['state'] ?? 'none');
-                    $rsvpDisplay = $attendeeRegistration === 'confirmed' ? 'going' : ($attendeeEngagement === 'interested' ? 'interested' : 'not_going');
-                @endphp
-                <li>
-                    @if (!empty($attendee['member']['avatar_url']))
-                        <img class="nexus-alpha-avatar" src="{{ $attendee['member']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
-                    @else
-                        <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($attendeeName, 0, 1)) }}</span>
-                    @endif
-                    <span class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ $attendeeName }}</span>
-                    <strong class="govuk-tag {{ $rsvpDisplay === 'going' ? 'govuk-tag--green' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvpDisplay) }}</strong>
-                </li>
-            @endforeach
-        </ul>
+        @if (!empty($attendees))
+            <ul class="govuk-list">
+                @foreach ($attendees as $attendee)
+                    @php
+                        $attendeeName = trim((string) ($attendee['member']['display_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                        $attendeeRegistration = (string) ($attendee['registration']['state'] ?? 'none');
+                        $attendeeEngagement = (string) ($attendee['engagement']['state'] ?? 'none');
+                        $rsvpDisplay = $attendeeRegistration === 'confirmed' ? 'going' : ($attendeeEngagement === 'interested' ? 'interested' : 'not_going');
+                    @endphp
+                    <li>
+                        @if (!empty($attendee['member']['avatar_url']))
+                            <img class="nexus-alpha-avatar" src="{{ $attendee['member']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                        @else
+                            <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($attendeeName, 0, 1)) }}</span>
+                        @endif
+                        <span class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ $attendeeName }}</span>
+                        <strong class="govuk-tag {{ $rsvpDisplay === 'going' ? 'govuk-tag--green' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvpDisplay) }}</strong>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        @if (!empty($attendeesMeta['has_more']) && !empty($attendeesMeta['cursor']))
+            @php
+                $attendeesNextQuery = request()->query();
+                $attendeesNextQuery['attendees_cursor'] = $attendeesMeta['cursor'];
+            @endphp
+            <p class="govuk-body govuk-!-margin-top-4">
+                <a class="govuk-link" rel="next" href="{{ route('govuk-alpha.events.show', array_merge([
+                    'tenantSlug' => $tenantSlug,
+                    'id' => $event['id'],
+                ], $attendeesNextQuery)) }}">
+                    {{ __('govuk_alpha.actions.load_more') }}
+                </a>
+            </p>
+        @endif
     @endif
         </div>
     </div>

@@ -13,6 +13,10 @@
     "options": { "any": "Alle Veranstaltungsorte", "yes": "Stufenloser Zugang bestätigt", "no": "Nicht stufenlos", "unknown": "Nicht bekannt" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Warteliste verlassen?",
+    "leaveWaitlistConfirmDescription": "Sie verlieren Ihre aktuelle Position und müssen sich möglicherweise am Ende der Warteschlange erneut eintragen.",
+    "offerDeclineConfirmTitle": "Diesen reservierten Platz ablehnen?",
+    "offerDeclineConfirmDescription": "Der reservierte Platz wird freigegeben und Ihr Wartelistenangebot endet.",
     "offerAvailable": "Platz verfügbar",
     "offerTitle": "Ein Platz ist für Sie frei",
     "offerDescription": "Sie haben jetzt einen reservierten Platz von der Warteliste. Nehmen Sie ihn an, um Ihre Teilnahme zu bestätigen.",
@@ -129,6 +133,9 @@
       "cancelled": "Abgesagt"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Von dieser Sitzung abmelden?",
+      "withdrawConfirmDescription": "Ihr Platz in {{title}} wird freigegeben und kann anderweitig vergeben werden.",
+      "keepRegistration": "Meinen Platz behalten",
       "capacityUnlimited": "{{count}} angemeldet · unbegrenzt",
       "capacityLimited": "{{registered}} von {{limit}} angemeldet",
       "full": "Ausgebucht",

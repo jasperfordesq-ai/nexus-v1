@@ -42,6 +42,8 @@ describe('mobile event-template locale content', () => {
     'templates.mobile.safetyDescription',
     'templates.mobile.scheduleTitle',
     'templates.mobile.reviewTitle',
+    'templates.mobile.auditTitle',
+    'templates.mobile.auditImmutableTitle',
     'templates.mobile.createDraft',
     'templates.checks.event_template_check_private_records_skipped',
   ] as const;

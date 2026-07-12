@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'Ik begrijp dat mijn plaats voor :title vrijkomt en door iemand anders kan worden ingenomen.',
     'capacity_label' => 'Capaciteit van de sessie',
     'capacity_hint' => 'Laat leeg voor onbeperkte plaatsen. Sessieplaatsen wijzigen de evenementregistratie of tickets niet.',
     'capacity_unlimited' => ':registered ingeschreven · onbeperkt',

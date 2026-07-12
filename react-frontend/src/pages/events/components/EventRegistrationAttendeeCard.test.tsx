@@ -20,8 +20,10 @@ const mockToast = vi.hoisted(() => ({
   info: vi.fn(),
   warning: vi.fn(),
 }));
+const mockConfirm = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts/ToastContext', () => ({ useToast: () => mockToast }));
+vi.mock('@/components/ui/ConfirmDialog', () => ({ useConfirm: () => mockConfirm }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 function submissionFixture(status: RegistrationSubmission['status'] = 'draft'): RegistrationSubmission {
@@ -67,6 +69,7 @@ function stateFixture(): AttendeeRegistrationState {
           data_classification: 'internal',
           purpose: 'Event administration',
           retention_days: 30,
+          validation_rules: { min_length: 3, max_length: 20 },
         },
         {
           id: 22,
@@ -114,6 +117,7 @@ function stateFixture(): AttendeeRegistrationState {
 describe('EventRegistrationAttendeeCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfirm.mockResolvedValue(true);
     vi.spyOn(eventRegistrationApi, 'attendeeState').mockResolvedValue({
       success: true,
       data: stateFixture(),
@@ -170,6 +174,53 @@ describe('EventRegistrationAttendeeCard', () => {
     expect(mockToast.success).toHaveBeenCalledWith('Registration answers submitted.');
   });
 
+  it('blocks submission and identifies a required or range-invalid visible answer', async () => {
+    const user = userEvent.setup();
+    const save = vi.spyOn(eventRegistrationApi, 'saveSubmission');
+    renderEventRoute(<EventRegistrationAttendeeCard eventId={42} />, {
+      path: '/events/42',
+      route: '/events/42',
+    });
+
+    await user.type(await screen.findByRole('textbox', { name: 'Preferred name' }), 'Al');
+    await user.click(screen.getByRole('button', { name: 'Save and submit answers' }));
+
+    expect(await screen.findByText('Enter at least 3 characters.')).toBeInTheDocument();
+    expect(save).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalledWith('Check the information you entered and try again.');
+  });
+
+  it('shows conditional questions only while their earlier visible answers match', async () => {
+    const user = userEvent.setup();
+    const conditionalState = stateFixture();
+    conditionalState.form?.questions.push({
+      id: 24,
+      stable_key: 'meal_notes',
+      question_type: 'long_text',
+      prompt: 'Meal notes',
+      is_required: true,
+      data_classification: 'sensitive',
+      purpose: 'Catering',
+      retention_days: 30,
+      visibility_rules: {
+        match: 'all',
+        conditions: [{ question_key: 'meal_choice', operator: 'equals', value: 'Plant-based' }],
+      },
+    });
+    vi.spyOn(eventRegistrationApi, 'attendeeState').mockResolvedValue({ success: true, data: conditionalState });
+    renderEventRoute(<EventRegistrationAttendeeCard eventId={42} />, {
+      path: '/events/42',
+      route: '/events/42',
+    });
+
+    expect(await screen.findByRole('radio', { name: 'Plant-based' })).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'Meal notes' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: 'Plant-based' }));
+    expect(screen.getByRole('textbox', { name: 'Meal notes' })).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: 'Standard' }));
+    expect(screen.queryByRole('textbox', { name: 'Meal notes' })).not.toBeInTheDocument();
+  });
+
   it('captures explicit guest privacy and notification consent', async () => {
     const user = userEvent.setup();
     const capture = vi.spyOn(eventRegistrationApi, 'captureGuest').mockResolvedValue({
@@ -204,5 +255,45 @@ describe('EventRegistrationAttendeeCard', () => {
       notification_consent: true,
       notification_consent_text: 'The guest agreed to receive necessary event updates at the email address provided.',
     })));
+  });
+
+  it('keeps a guest place until destructive cancellation is confirmed', async () => {
+    const user = userEvent.setup();
+    const withGuest = stateFixture();
+    withGuest.guests = [{
+      id: 81,
+      registration_id: 61,
+      guest_number: 1,
+      revision: 2,
+      status: 'captured',
+      display_name: 'Sam Guest',
+      notification_consent: false,
+    }];
+    vi.spyOn(eventRegistrationApi, 'attendeeState').mockResolvedValue({ success: true, data: withGuest });
+    const cancel = vi.spyOn(eventRegistrationApi, 'cancelGuest').mockResolvedValue({
+      success: true,
+      data: { guest: { ...withGuest.guests[0]!, status: 'withdrawn', revision: 3 }, party_size: 1, changed: true },
+    });
+    mockConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    renderEventRoute(<EventRegistrationAttendeeCard eventId={42} />, {
+      path: '/events/42',
+      route: '/events/42',
+    });
+
+    const button = await screen.findByRole('button', { name: 'Cancel guest' });
+    await user.click(button);
+    expect(cancel).not.toHaveBeenCalled();
+
+    await user.click(button);
+    await waitFor(() => expect(cancel).toHaveBeenCalledWith(
+      42,
+      81,
+      2,
+      'Cancelled by the registration holder',
+    ));
+    expect(mockConfirm).toHaveBeenLastCalledWith(expect.objectContaining({
+      body: 'The place held for Sam Guest will be released. This cannot be undone from this screen.',
+      status: 'danger',
+    }));
   });
 });

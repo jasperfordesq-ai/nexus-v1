@@ -24,9 +24,14 @@ final class EventSessionRegistration extends Model
 
     protected $guarded = ['*'];
 
-    protected $hidden = ['tenant_id', 'event_registration_id'];
+    protected $hidden = [
+        'tenant_id',
+        'event_registration_id',
+        'event_registration_version',
+    ];
 
     protected $casts = [
+        'event_registration_version' => 'integer',
         'version' => 'integer',
         'status' => EventSessionRegistrationStatus::class,
         'registered_at' => 'immutable_datetime',

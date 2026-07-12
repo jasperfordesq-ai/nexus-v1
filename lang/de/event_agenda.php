@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 return [
+    'withdraw_confirmation' => 'Ich verstehe, dass mein Platz in :title freigegeben wird und anderweitig vergeben werden kann.',
     'capacity_label' => 'Kapazität der Sitzung',
     'capacity_hint' => 'Leer lassen für unbegrenzte Plätze. Sitzungsplätze ändern weder die Veranstaltungsanmeldung noch Tickets.',
     'capacity_unlimited' => ':registered angemeldet · unbegrenzt',

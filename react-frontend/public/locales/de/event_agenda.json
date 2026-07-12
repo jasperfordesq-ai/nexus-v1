@@ -1,4 +1,7 @@
 {
+  "withdraw_confirm_title": "Von dieser Sitzung abmelden?",
+  "withdraw_confirm_body": "Ihr Platz in {{title}} wird freigegeben und kann anderweitig vergeben werden.",
+  "keep_registration": "Meinen Platz behalten",
   "capacity_label": "Kapazität der Sitzung",
   "capacity_hint": "Leer lassen für unbegrenzte Plätze. Sitzungsplätze ändern weder die Veranstaltungsanmeldung noch Tickets.",
   "capacity_unlimited": "{{registered}} angemeldet · unbegrenzt",

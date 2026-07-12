@@ -46,6 +46,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { eventsApi, type EventCategory } from '@/lib/events-api';
+import { eventIsoToLocalInput, eventLocalInputToIso } from '@/lib/eventLocalDateTime';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import {
@@ -67,6 +68,8 @@ interface FormData {
   startTime: TimeInputValue | null;
   endDate: DateInputValue | null;
   endTime: TimeInputValue | null;
+  timezone: string;
+  allDay: boolean;
   location: string;
   latitude?: number;
   longitude?: number;
@@ -95,6 +98,8 @@ const initialFormData: FormData = {
   startTime: null,
   endDate: null,
   endTime: null,
+  timezone: getLocalTimeZone(),
+  allDay: false,
   location: '',
   venueAccessibility: { ...EMPTY_VENUE_ACCESSIBILITY },
   max_attendees: '',
@@ -109,15 +114,17 @@ const initialFormData: FormData = {
   recurrenceEndDate: null,
 };
 
-/** Convert a DateInputValue + TimeInputValue into a JS Date */
-function toJSDate(date: DateInputValue, time: TimeInputValue | null): Date {
-  const dateStr = date.toString(); // "2026-02-17"
-  if (time) {
-    const h = String(time.hour).padStart(2, '0');
-    const m = String(time.minute).padStart(2, '0');
-    return new Date(`${dateStr}T${h}:${m}:00`);
-  }
-  return new Date(`${dateStr}T00:00:00`);
+function wallClockValue(date: DateInputValue, time: TimeInputValue | null, allDay: boolean): string {
+  const hour = allDay ? '00' : String(time?.hour ?? 0).padStart(2, '0');
+  const minute = allDay ? '00' : String(time?.minute ?? 0).padStart(2, '0');
+  return `${date.toString()}T${hour}:${minute}`;
+}
+
+function shiftCalendarDate(value: string, days: number): string {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return value;
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
 /** Build an RRULE string from recurrence form data */
@@ -219,8 +226,13 @@ export function CreateEventPage() {
       if (response.success && response.data) {
         const event = response.data;
         setSeriesLinked(event.series.recurrence !== null);
-        const startDate = new Date(event.schedule.start_at ?? '');
-        const endDate = event.schedule.end_at ? new Date(event.schedule.end_at) : null;
+        const timezone = event.schedule.timezone || 'UTC';
+        const startLocal = eventIsoToLocalInput(event.schedule.start_at, timezone);
+        const endBoundaryLocal = eventIsoToLocalInput(event.schedule.end_at, timezone);
+        const startDateValue = startLocal.slice(0, 10);
+        const visibleEndDate = event.schedule.all_day && endBoundaryLocal
+          ? shiftCalendarDate(endBoundaryLocal.slice(0, 10), -1)
+          : endBoundaryLocal.slice(0, 10);
         geocodedAddressRef.current = event.location.latitude !== null && event.location.longitude !== null
           ? event.location.label
           : null;
@@ -228,10 +240,16 @@ export function CreateEventPage() {
         setFormData({
           title: event.title,
           description: event.description || '',
-          startDate: parseDate(startDate.toISOString().split('T')[0] ?? ''),
-          startTime: parseTime(startDate.toTimeString().slice(0, 5)),
-          endDate: endDate ? parseDate(endDate.toISOString().split('T')[0] ?? '') : null,
-          endTime: endDate ? parseTime(endDate.toTimeString().slice(0, 5)) : null,
+          startDate: startDateValue ? parseDate(startDateValue) : null,
+          startTime: !event.schedule.all_day && startLocal
+            ? parseTime(startLocal.slice(11, 16))
+            : null,
+          endDate: visibleEndDate ? parseDate(visibleEndDate) : null,
+          endTime: !event.schedule.all_day && endBoundaryLocal
+            ? parseTime(endBoundaryLocal.slice(11, 16))
+            : null,
+          timezone,
+          allDay: event.schedule.all_day,
           location: event.location.label || '',
           latitude: event.location.latitude ?? undefined,
           longitude: event.location.longitude ?? undefined,
@@ -401,8 +419,18 @@ export function CreateEventPage() {
       newErrors.startDate = t('form.validation.start_date_required');
     }
 
-    if (!formData.startTime) {
+    if (!formData.allDay && !formData.startTime) {
       newErrors.startTime = t('form.validation.start_time_required');
+    }
+
+    if (!formData.timezone.trim()) {
+      newErrors.timezone = t('form.validation.timezone_required');
+    }
+
+    if (formData.allDay && !formData.endDate) {
+      newErrors.endDate = t('form.validation.all_day_end_date_required');
+    } else if (!formData.allDay && formData.endDate && !formData.endTime) {
+      newErrors.endTime = t('form.validation.end_time_required');
     }
 
     if (formData.startDate && formData.endDate) {
@@ -482,19 +510,44 @@ export function CreateEventPage() {
     try {
       setIsSubmitting(true);
 
-      const startDateTime = formData.startDate
-        ? toJSDate(formData.startDate, formData.startTime)
-        : new Date();
-
-      const endDateTime = formData.endDate
-        ? toJSDate(formData.endDate, formData.endTime)
+      const timezone = formData.timezone.trim();
+      const startWallClock = formData.startDate
+        ? wallClockValue(formData.startDate, formData.startTime, formData.allDay)
+        : '';
+      const endDateValue = formData.endDate
+        ? (formData.allDay
+            ? shiftCalendarDate(formData.endDate.toString(), 1)
+            : formData.endDate.toString())
         : null;
+      const endWallClock = endDateValue
+        ? `${endDateValue}T${formData.allDay ? '00:00' : `${String(formData.endTime?.hour ?? 0).padStart(2, '0')}:${String(formData.endTime?.minute ?? 0).padStart(2, '0')}`}`
+        : null;
+      const startDateTime = eventLocalInputToIso(startWallClock, timezone);
+      const endDateTime = endWallClock ? eventLocalInputToIso(endWallClock, timezone) : null;
+      if (!startDateTime || (endWallClock !== null && !endDateTime)) {
+        setErrors((current) => ({
+          ...current,
+          timezone: t('form.validation.timezone_or_time_invalid'),
+        }));
+        toast.error(t('form.toast.fix_errors'));
+        return;
+      }
+      if (endDateTime && new Date(endDateTime) <= new Date(startDateTime)) {
+        setErrors((current) => ({
+          ...current,
+          endDate: t('form.validation.end_date_before_start'),
+        }));
+        toast.error(t('form.toast.fix_errors'));
+        return;
+      }
 
       const payload: Record<string, unknown> = {
         title: formData.title,
         description: formData.description,
-        start_time: startDateTime.toISOString(),
-        end_time: endDateTime?.toISOString() || null,
+        start_time: startDateTime,
+        end_time: endDateTime,
+        timezone,
+        all_day: formData.allDay,
         location: formData.location || null,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -882,8 +935,40 @@ export function CreateEventPage() {
             />
           </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              label={t('form.timezone_label')}
+              description={t('form.timezone_hint')}
+              value={formData.timezone}
+              onChange={(event) => {
+                setFormData((current) => ({ ...current, timezone: event.target.value }));
+                if (errors.timezone) setErrors((current) => ({ ...current, timezone: '' }));
+              }}
+              isRequired
+              isInvalid={!!errors.timezone}
+              errorMessage={errors.timezone}
+              autoComplete="off"
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+                label: 'text-theme-muted',
+              }}
+            />
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-theme-default bg-theme-elevated p-4">
+              <div>
+                <p className="font-medium text-theme-primary">{t('form.all_day_label')}</p>
+                <p className="text-sm text-theme-subtle">{t('form.all_day_hint')}</p>
+              </div>
+              <Switch
+                aria-label={t('form.all_day_label')}
+                isSelected={formData.allDay}
+                onValueChange={(allDay) => setFormData((current) => ({ ...current, allDay }))}
+              />
+            </div>
+          </div>
+
           {/* Start Date & Time */}
-          <fieldset className="grid sm:grid-cols-2 gap-4">
+          <fieldset className={`grid gap-4 ${formData.allDay ? '' : 'sm:grid-cols-2'}`}>
             <legend className="sr-only">{t('form.legend_start_datetime')}</legend>
             <div>
               <DatePicker
@@ -903,7 +988,7 @@ export function CreateEventPage() {
               />
             </div>
 
-            <div>
+            {!formData.allDay && <div>
               <TimeInput
                 label={t('form.start_time_label')}
                 value={formData.startTime}
@@ -918,15 +1003,15 @@ export function CreateEventPage() {
                   label: 'text-theme-muted',
                 }}
               />
-            </div>
+            </div>}
           </fieldset>
 
           {/* End Date & Time (optional) */}
-          <fieldset className="grid sm:grid-cols-2 gap-4">
+          <fieldset className={`grid gap-4 ${formData.allDay ? '' : 'sm:grid-cols-2'}`}>
             <legend className="sr-only">{t('form.legend_end_datetime')}</legend>
             <div>
               <DatePicker
-                label={t('form.end_date_label')}
+                label={t(formData.allDay ? 'form.all_day_end_date_label' : 'form.end_date_label')}
                 value={formData.endDate}
                 onChange={(val) => {
                   setFormData((prev) => ({ ...prev, endDate: val }));
@@ -942,17 +1027,22 @@ export function CreateEventPage() {
               />
             </div>
 
-            <div>
+            {!formData.allDay && <div>
               <TimeInput
                 label={t('form.end_time_label')}
                 value={formData.endTime}
-                onChange={(val) => setFormData((prev) => ({ ...prev, endTime: val }))}
+                onChange={(val) => {
+                  setFormData((prev) => ({ ...prev, endTime: val }));
+                  if (errors.endTime) setErrors((prev) => ({ ...prev, endTime: '' }));
+                }}
+                isInvalid={!!errors.endTime}
+                errorMessage={errors.endTime}
                 classNames={{
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                 }}
               />
-            </div>
+            </div>}
           </fieldset>
 
           {/* Recurring Event Toggle */}

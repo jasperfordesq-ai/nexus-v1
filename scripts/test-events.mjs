@@ -71,6 +71,13 @@ function collectPhpTests(directory) {
     .sort();
 }
 
+function assertPathsExist(paths, label) {
+  const missing = paths.filter((path) => !existsSync(path));
+  if (missing.length > 0) {
+    throw new Error(`${label} is missing required test paths:\n${missing.join('\n')}`);
+  }
+}
+
 function prepareIsolatedTestDatabase(database) {
   if (!/^nexus_test_events_[0-9]+$/.test(database)) {
     throw new Error('Refusing to prepare an unexpected Events test database name.');
@@ -119,6 +126,32 @@ function cleanupIsolatedTestDatabase(database) {
   }
 }
 
+let activeIsolatedDatabase = null;
+let cleaningIsolatedDatabase = false;
+
+function cleanupActiveIsolatedDatabase() {
+  if (activeIsolatedDatabase === null || cleaningIsolatedDatabase) {
+    return;
+  }
+
+  const database = activeIsolatedDatabase;
+  activeIsolatedDatabase = null;
+  cleaningIsolatedDatabase = true;
+  try {
+    cleanupIsolatedTestDatabase(database);
+  } finally {
+    cleaningIsolatedDatabase = false;
+  }
+}
+
+process.on('exit', cleanupActiveIsolatedDatabase);
+for (const [signal, exitCode] of [['SIGINT', 130], ['SIGTERM', 143], ['SIGHUP', 129]]) {
+  process.once(signal, () => {
+    cleanupActiveIsolatedDatabase();
+    process.exit(exitCode);
+  });
+}
+
 const phpBatches = [
   'core',
   'contract',
@@ -140,6 +173,7 @@ const phpBatches = [
   'analytics',
   'safety',
   'broadcasts',
+  'performance',
 ];
 
 if (only && ![...only].every((arg) => ['--php-only', '--react-only', '--mobile-only'].includes(arg))) {
@@ -160,32 +194,45 @@ if (phpFilter !== null && (phpFilter.trim() === '' || only === null || !only.has
 }
 
 if (shouldRun('php')) {
-  let candidates = [
-    ...collectPhpTests('tests/Laravel/Feature/Events'),
+  const explicitPhpTests = [
     'tests/Laravel/Feature/Controllers/EventsControllerTest.php',
     'tests/Laravel/Feature/Controllers/AdminEventsControllerTest.php',
     'tests/Laravel/Feature/GovukAlpha/EventsParityTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventCanonicalMutationTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventOperationsTest.php',
+    'tests/Laravel/Feature/GovukAlpha/AccessibleEventRegistrationProductTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventAgendaTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventAnalyticsTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventSafetyTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventTemplatesTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventTicketsTest.php',
+    'tests/Laravel/Feature/GovukAlpha/AccessibleEventTimeIdentityTest.php',
     'tests/Laravel/Feature/GovukAlpha/AccessibleEventVenueAccessibilityTest.php',
     'tests/Laravel/Integration/EventNotificationStateTest.php',
     'tests/Laravel/Integration/EventEmailReliabilityTest.php',
     'tests/Laravel/Integration/EventNotificationProducerLocaleTest.php',
     'tests/Laravel/Unit/Listeners/NotifyAdminOfNewCommunityEventTest.php',
+    'tests/Laravel/Unit/Listeners/HandleFederatedCommunityEventReceivedTest.php',
     'tests/Laravel/Unit/Listeners/PushCommunityEventToFederatedPartnersTest.php',
+    'tests/Laravel/Unit/Observers/EventObserverTest.php',
+    'tests/Laravel/Unit/Observers/EventPrerenderObserverTest.php',
+    'tests/Laravel/Unit/Providers/EventServiceProviderTest.php',
     'tests/Laravel/Unit/Services/EventCategoryResolutionTest.php',
+    'tests/Laravel/Unit/Services/EventCheckinCredentialSignerTest.php',
+    'tests/Laravel/Unit/Services/EventFederationPayloadBuilderTest.php',
     'tests/Laravel/Unit/Enums/EventBroadcastEnumsTest.php',
     'tests/Laravel/Unit/Http/Resources/EventBroadcastResourceTest.php',
+    'tests/Laravel/Unit/Http/Resources/EventAnalyticsResourceTest.php',
     'tests/Laravel/Unit/Services/AccessibleEventCommunicationsStaticTest.php',
     'tests/Laravel/Unit/Services/EventAgendaEnterpriseStaticTest.php',
+    'tests/Laravel/Unit/Services/EventMigrationChainSafetyStaticTest.php',
+    'tests/Laravel/Unit/Services/EventAccessibilityDiscoveryStaticTest.php',
     'tests/Laravel/Unit/Services/EventBroadcastPhaseBStaticTest.php',
     'tests/Laravel/Unit/Services/EventGuardianConsentStatusNotificationStaticTest.php',
     'tests/Laravel/Unit/Services/EventFederationPhaseBStaticTest.php',
+    'tests/Laravel/Unit/Services/EventNotificationEnterpriseStaticTest.php',
+    'tests/Laravel/Unit/Services/EventOfflineCheckinAccessibleStaticTest.php',
+    'tests/Laravel/Unit/Services/EventRegistrationSettingsOutboxContractTest.php',
     'tests/Laravel/Unit/Services/EventNotificationServiceTest.php',
     'tests/Laravel/Unit/Services/EventReminderServiceTest.php',
     'tests/Laravel/Unit/Services/EventServiceTest.php',
@@ -196,11 +243,17 @@ if (shouldRun('php')) {
     'tests/Laravel/Unit/Middleware/RedactEventCalendarFeedSecretTest.php',
     'tests/Laravel/Unit/Models/EventTimeIdentityModelTest.php',
     'tests/Laravel/Unit/Models/EventLifecycleModelTest.php',
+    'tests/Laravel/Unit/Models/EventTest.php',
+    'tests/Laravel/Unit/Models/EventRsvpTest.php',
     'tests/Laravel/Unit/Enums/EventContractEnumsTest.php',
     'tests/Laravel/Unit/Enums/EventStaffRoleTest.php',
     'tests/Laravel/Unit/Enums/EventLifecycleEnumsTest.php',
     'tests/Laravel/Unit/Support/EventContractMapperPermissionsTest.php',
+    'tests/Laravel/Unit/Support/EventRegistrationFormRuleSetTest.php',
+    'tests/Laravel/Unit/Support/EventSessionContractMapperTest.php',
     'tests/Laravel/Unit/Support/EventAnalyticsCsvTest.php',
+    'tests/Laravel/Unit/Support/EventSafetyContractMapperTest.php',
+    'tests/Laravel/Unit/Services/AI/Tools/SearchEventsToolTest.php',
     // Settings persistence is a cross-module controller, but Events email
     // preference changes must stay covered by the focused Events gate.
     'tests/Laravel/Feature/Controllers/MemberSelfServiceTest.php',
@@ -215,9 +268,19 @@ if (shouldRun('php')) {
     'tests/Laravel/Feature/Events/EventOutboxFoundationTest.php',
     'tests/Laravel/Feature/Events/EventNotificationOutboxProcessorTest.php',
     'tests/Laravel/Feature/Events/EventNotificationPreferenceComplianceTest.php',
-  ].filter(existsSync).filter((path, index, all) => all.indexOf(path) === index);
+  ];
+  assertPathsExist(explicitPhpTests, 'Events PHP harness');
+  let candidates = [
+    ...collectPhpTests('tests/Laravel/Feature/Events'),
+    ...explicitPhpTests,
+  ].filter((path, index, all) => all.indexOf(path) === index);
 
-  if (phpBatch === 'calendar') {
+  if (phpBatch === 'performance') {
+    candidates = [
+      'tests/Performance/Events/EventPeopleRosterPerformanceTest.php',
+    ];
+    assertPathsExist(candidates, 'Events performance harness');
+  } else if (phpBatch === 'calendar') {
     const calendarTests = new Set([
       'tests/Laravel/Feature/Events/EventCalendarIntegrationTest.php',
       'tests/Laravel/Feature/Events/EventCalendarFeedTokenConcurrencyTest.php',
@@ -260,8 +323,10 @@ if (shouldRun('php')) {
   } else if (phpBatch === 'forms') {
     candidates = candidates.filter((path) => (
       /EventRegistrationForms/.test(path)
-      || /EventRegistration(SettingsAndForm|Submission|GuestAndRetention)/.test(path)
+      || /EventRegistration(SettingsAndForm|Submission|GuestAndRetention|PhaseB|SettingsOutbox)/.test(path)
+      || /EventRegistrationFormRuleSet/.test(path)
       || /EventInvitation/.test(path)
+      || /AccessibleEventRegistration/.test(path)
     ));
   } else if (phpBatch === 'ticketing') {
     candidates = candidates.filter((path) => /EventTicket|EventTimeCreditTicket/.test(path));
@@ -275,6 +340,7 @@ if (shouldRun('php')) {
     candidates = candidates.filter((path) => (
       /EventBroadcast/.test(path)
       || /EventGuardianConsentStatusNotification/.test(path)
+      || /EventNotificationEnterpriseStaticTest/.test(path)
       || /AccessibleEventCommunications/.test(path)
     ));
   } else if (phpBatch === 'contract') {
@@ -287,7 +353,9 @@ if (shouldRun('php')) {
       'tests/Laravel/Feature/Events/EventTimeIdentityIntegrityTest.php',
       'tests/Laravel/Feature/Events/EventVenueAccessibilityMigrationTest.php',
       'tests/Laravel/Feature/Events/EventWriterContractTest.php',
+      'tests/Laravel/Feature/GovukAlpha/AccessibleEventTimeIdentityTest.php',
       'tests/Laravel/Feature/GovukAlpha/AccessibleEventVenueAccessibilityTest.php',
+      'tests/Laravel/Unit/Services/EventMigrationChainSafetyStaticTest.php',
       'tests/Laravel/Unit/Support/EventContractMapperPermissionsTest.php',
     ]);
     candidates = candidates.filter((path) => contractTests.has(path));
@@ -373,6 +441,7 @@ if (shouldRun('php')) {
       'tests/Laravel/Integration/EventEmailReliabilityTest.php',
       'tests/Laravel/Integration/EventNotificationProducerLocaleTest.php',
       'tests/Laravel/Unit/Listeners/NotifyAdminOfNewCommunityEventTest.php',
+      'tests/Laravel/Unit/Services/EventNotificationEnterpriseStaticTest.php',
       'tests/Laravel/Unit/Services/EventNotificationServiceTest.php',
       'tests/Laravel/Unit/Services/EventReminderServiceTest.php',
       'tests/Laravel/Unit/Services/NotificationServiceTest.php',
@@ -390,6 +459,7 @@ if (shouldRun('php')) {
       'tests/Laravel/Integration/EventEmailReliabilityTest.php',
       'tests/Laravel/Integration/EventNotificationProducerLocaleTest.php',
       'tests/Laravel/Unit/Listeners/NotifyAdminOfNewCommunityEventTest.php',
+      'tests/Laravel/Unit/Services/EventNotificationEnterpriseStaticTest.php',
       'tests/Laravel/Unit/Services/EventNotificationServiceTest.php',
       'tests/Laravel/Unit/Services/EventReminderServiceTest.php',
       'tests/Laravel/Unit/Services/NotificationServiceTest.php',
@@ -409,21 +479,13 @@ if (shouldRun('php')) {
     ['inspect', '-f', '{{.State.Running}}', 'nexus-php-db'],
     { encoding: 'utf8' },
   );
-  const phpunitArgs = [
-    'vendor/bin/phpunit',
-    '--no-coverage',
-    '--colors=always',
-    '--fail-on-empty-test-suite',
-    ...(phpFilter === null ? [] : ['--filter', phpFilter]),
-    ...candidates,
-  ];
-
   if (appDocker.status === 0 && appDocker.stdout.trim() === 'true'
     && databaseDocker.status === 0 && databaseDocker.stdout.trim() === 'true') {
     const database = `nexus_test_events_${process.pid}`;
     process.stdout.write(`\n[events] Laravel Events tests (isolated database ${database})\n`);
 
     let result;
+    activeIsolatedDatabase = database;
     try {
       prepareIsolatedTestDatabase(database);
       result = spawnSync('docker', [
@@ -457,7 +519,7 @@ if (shouldRun('php')) {
         ...candidates,
       ], { cwd: process.cwd(), stdio: 'inherit' });
     } finally {
-      cleanupIsolatedTestDatabase(database);
+      cleanupActiveIsolatedDatabase();
     }
 
     if (result?.error) {
@@ -467,7 +529,11 @@ if (shouldRun('php')) {
       process.exit(result?.status ?? 1);
     }
   } else {
-    run('Laravel containment and preference tests', 'php', phpunitArgs);
+    process.stderr.write(
+      '[events] Refusing to run PHP Events tests without both nexus-php-app and nexus-php-db. '
+      + 'The harness requires an isolated disposable database and will not fall back to host PHP.\n',
+    );
+    process.exit(2);
   }
 }
 
@@ -475,6 +541,15 @@ if (shouldRun('react')) {
   const reactTests = [
     'src/pages/events',
     'src/lib/events-api.test.ts',
+    'src/lib/event-analytics-api.test.ts',
+    'src/lib/event-communications-api.test.ts',
+    'src/lib/event-offline-checkin-store.test.ts',
+    'src/lib/event-registration-api.test.ts',
+    'src/lib/event-registration-form-rules.test.ts',
+    'src/lib/event-safety-api.test.ts',
+    'src/lib/event-templates-api.test.ts',
+    'src/lib/event-tickets-api.test.ts',
+    'src/lib/eventLocalDateTime.test.ts',
     'src/App.route-gates.test.tsx',
     'src/admin/modules/events/EventsAdmin.test.tsx',
     'src/components/compose/tabs/EventTab.test.tsx',
@@ -501,9 +576,33 @@ if (shouldRun('mobile')) {
     '--runTestsByPath',
     'app/(tabs)/events.test.tsx',
     'app/(modals)/event-detail.test.tsx',
+    'app/(modals)/event-attendance.test.tsx',
+    'app/(modals)/event-communications.test.tsx',
+    'app/(modals)/event-templates.test.tsx',
+    'app/(modals)/event-tickets.test.tsx',
+    'app/(modals)/federation-groups-events.test.tsx',
     'app/(modals)/new-event.test.tsx',
+    'components/events/EventAgendaEnterprisePanel.test.tsx',
+    'components/events/EventAnalyticsCard.test.tsx',
+    'components/events/EventCheckinCredentialCard.test.tsx',
+    'components/events/EventRegistrationPanel.test.tsx',
+    'components/events/EventSafetyCard.test.tsx',
     'lib/api/client.test.ts',
+    'lib/api/eventAnalytics.test.ts',
+    'lib/api/eventCommunications.test.ts',
+    'lib/api/eventOfflineCheckin.test.ts',
+    'lib/api/eventRegistration.test.ts',
+    'lib/api/eventSafety.test.ts',
+    'lib/api/eventTemplates.test.ts',
+    'lib/api/eventTickets.test.ts',
     'lib/api/events.test.ts',
+    'lib/eventOfflineCheckinStore.test.ts',
+    'lib/events/eventRegistrationFormRules.test.ts',
+    'lib/utils/eventDateTime.test.ts',
+    'locales/event-communications-content.test.ts',
+    'locales/event-templates-content.test.ts',
+    'locales/event-tickets-content.test.ts',
+    'locales/events-content.test.ts',
   ]);
   run('Native mobile Events tests', npmCommand, npmArgs);
 }

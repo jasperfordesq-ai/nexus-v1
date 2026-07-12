@@ -56,6 +56,12 @@
     "categoryLabel": "Category",
     "startLabel": "Start",
     "endLabel": "End",
+    "timezoneLabel": "Event time zone",
+    "timezonePlaceholder": "Europe/Dublin",
+    "timezoneHint": "Use an IANA time zone. Times are saved exactly in this zone.",
+    "allDay": "All-day event",
+    "allDayEndLabel": "Final event day",
+    "dateOnlyPlaceholder": "YYYY-MM-DD",
     "datePlaceholder": "YYYY-MM-DDTHH:mm",
     "optionalDatePlaceholder": "Optional end time",
     "locationLabel": "Location",
@@ -103,6 +109,10 @@
     "options": { "any": "Any venue", "yes": "Step-free access confirmed", "no": "Not step-free", "unknown": "Not known" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Leave the waitlist?",
+    "leaveWaitlistConfirmDescription": "You will lose your current position and may have to join again at the end of the queue.",
+    "offerDeclineConfirmTitle": "Decline this reserved place?",
+    "offerDeclineConfirmDescription": "The reserved place will be released and your waitlist offer will end.",
     "offerAvailable": "Place available",
     "offerTitle": "A place is available for you",
     "offerDescription": "You now have a reserved place from the waitlist. Accept it to confirm your attendance.",
@@ -189,6 +199,9 @@
       "cancelled": "Cancelled"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Withdraw from this session?",
+      "withdrawConfirmDescription": "Your place in {{title}} will be released and may be taken by someone else.",
+      "keepRegistration": "Keep my place",
       "capacityUnlimited": "{{count}} registered · no limit",
       "capacityLimited": "{{registered}} of {{limit}} registered",
       "full": "Full",

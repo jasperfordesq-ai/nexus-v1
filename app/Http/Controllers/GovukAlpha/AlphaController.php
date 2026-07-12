@@ -41,6 +41,7 @@ use App\Services\OnboardingConfigService;
 use App\Services\RegistrationService;
 use App\Services\SearchService;
 use App\Services\SocialNotificationService;
+use App\Services\TenantSettingsService;
 use App\Services\UserService;
 use App\Services\VolunteerService;
 use App\Support\FeedItemTables;
@@ -1577,15 +1578,23 @@ class AlphaController extends Controller
         // self-enforces roster privacy, returning an empty list when the viewer
         // may not see it.
         $attendees = [];
+        $attendeesLoadFailed = false;
+        $attendeesMeta = ['cursor' => null, 'has_more' => false];
+        $attendeesCursor = self::asStr(request()->query('attendees_cursor')) ?: null;
         try {
-            $legacyAttendees = EventService::getAttendees(
+            $attendeeResult = EventService::getAttendees(
                 $id,
-                ['status' => 'all', 'limit' => 50],
+                ['status' => 'all', 'limit' => 50, 'cursor' => $attendeesCursor],
                 $viewerId
-            )['items'] ?? [];
-            $attendees = $this->eventsCanonicalRoster($legacyAttendees);
+            );
+            $attendees = $this->eventsCanonicalRoster($attendeeResult['items'] ?? []);
+            $attendeesMeta = [
+                'cursor' => $attendeeResult['cursor'] ?? null,
+                'has_more' => (bool) ($attendeeResult['has_more'] ?? false),
+            ];
         } catch (\Throwable $e) {
             report($e);
+            $attendeesLoadFailed = true;
         }
 
         // Polls attached to this event (event_id scope). PollService::getById
@@ -1650,6 +1659,8 @@ class AlphaController extends Controller
             'requiresAuth' => $viewerId === null,
             'isOwner' => $viewerId !== null && (int) ($event['organizer']['id'] ?? 0) === $viewerId,
             'attendees' => $attendees,
+            'attendeesLoadFailed' => $attendeesLoadFailed,
+            'attendeesMeta' => $attendeesMeta,
             'polls' => $polls,
             'seriesEvents' => $seriesEvents,
             'eventOperations' => $eventOperations,
@@ -1673,6 +1684,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'events',
             'categories' => $this->categoriesForTypes(['events', 'event']),
+            'eventTimezone' => $this->accessibleEventDefaultTimezone(),
             'status' => $request->query('status') ?: session('status'),
         ]);
     }
@@ -12526,7 +12538,17 @@ class AlphaController extends Controller
         $location = trim(self::asStr($request->input('location')));
         $onlineLink = trim(self::asStr($request->input('online_link')));
         $videoUrl = trim(self::asStr($request->input('video_url')));
+        $timezone = trim(self::asStr($request->input('timezone')));
+        if ($timezone === '') {
+            $timezone = $this->accessibleEventDefaultTimezone();
+        }
+        $allDay = $request->boolean('all_day');
+        $startTime = trim(self::asStr($request->input('start_time')));
         $endTime = trim(self::asStr($request->input('end_time')));
+        if ($allDay) {
+            $startTime = $this->accessibleAllDayBoundary($startTime, $timezone, false);
+            $endTime = $this->accessibleAllDayBoundary($endTime, $timezone, true);
+        }
         $categoryId = self::asStr($request->input('category_id'));
         $triState = static fn (mixed $value): ?bool => match (trim((string) $value)) {
             'yes' => true,
@@ -12542,8 +12564,10 @@ class AlphaController extends Controller
         return [
             'title' => trim(self::asStr($request->input('title'))),
             'description' => trim(self::asStr($request->input('description'))),
-            'start_time' => $request->input('start_time'),
+            'start_time' => $startTime,
             'end_time' => $endTime !== '' ? $endTime : null,
+            'timezone' => $timezone,
+            'all_day' => $allDay,
             'location' => $location !== '' ? $location : null,
             'category_id' => $categoryId !== null && $categoryId !== '' ? (int) $categoryId : null,
             'max_attendees' => $maxAttendees !== '' ? max(1, (int) $maxAttendees) : null,
@@ -12564,6 +12588,49 @@ class AlphaController extends Controller
                 'notes' => $accessibilityText($request, 'accessibility_notes'),
             ],
         ];
+    }
+
+    private function accessibleEventDefaultTimezone(): string
+    {
+        $candidates = [
+            app(TenantSettingsService::class)->get((int) TenantContext::getId(), 'general.timezone'),
+            config('app.timezone', 'UTC'),
+            'UTC',
+        ];
+
+        foreach ($candidates as $candidate) {
+            $timezone = trim(is_string($candidate) ? $candidate : '');
+            if ($timezone === '') {
+                continue;
+            }
+            try {
+                new \DateTimeZone($timezone);
+
+                return $timezone;
+            } catch (\Throwable) {
+                // Continue to the auditable application/UTC fallback used by EventService.
+            }
+        }
+
+        return 'UTC';
+    }
+
+    private function accessibleAllDayBoundary(string $value, string $timezone, bool $exclusiveEnd): string
+    {
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})(?:[T ]|$)/', $value, $matches) !== 1) {
+            return $value;
+        }
+
+        try {
+            $date = new \DateTimeImmutable($matches[1] . ' 00:00:00', new \DateTimeZone($timezone));
+            if ($exclusiveEnd) {
+                $date = $date->modify('+1 day');
+            }
+
+            return $date->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return $value;
+        }
     }
 
     private function volunteeringFilters(Request $request): array

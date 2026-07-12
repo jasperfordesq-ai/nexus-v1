@@ -168,6 +168,7 @@ trait EventAgendaParity
                 'event_agenda_speaker_conflict',
                 'event_agenda_registration_version_conflict',
                 'event_agenda_registration_idempotency_conflict',
+                'event_agenda_session_registration_not_found',
                 'event_agenda_capacity_below_registrations',
             ], true)
                 ? __('govuk_alpha.events.agenda.conflict_error')
@@ -284,6 +285,9 @@ trait EventAgendaParity
         User $actor,
         string $idempotencyKey,
     ): string {
+        if (! $request->boolean('confirm_destructive')) {
+            throw new EventSessionException('event_agenda_confirmation_required');
+        }
         $service->withdrawSession(
             $eventId,
             $this->eventsAgendaPositiveInteger($request->input('session_id')),

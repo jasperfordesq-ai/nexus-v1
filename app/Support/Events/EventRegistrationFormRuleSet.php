@@ -49,9 +49,10 @@ final class EventRegistrationFormRuleSet
         }
 
         $normalized = [];
+        $lengthLimit = $type === EventRegistrationQuestionType::ShortText ? 500 : 10000;
         foreach (['min_length', 'max_length'] as $key) {
             if (array_key_exists($key, $rules)) {
-                $normalized[$key] = $this->integer($rules[$key], 0, 20000);
+                $normalized[$key] = $this->integer($rules[$key], 0, $lengthLimit);
             }
         }
         if (isset($normalized['min_length'], $normalized['max_length'])

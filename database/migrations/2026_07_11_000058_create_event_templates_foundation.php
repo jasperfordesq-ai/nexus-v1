@@ -36,10 +36,10 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('tenants')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('events')) {
-            return;
+        foreach (['tenants', 'users', 'events'] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_templates_prerequisite_missing:{$required}");
+            }
         }
 
         $this->createTemplates();

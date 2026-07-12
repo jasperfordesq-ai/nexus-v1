@@ -24,6 +24,7 @@ import {
   Spinner,
   Textarea,
 } from '@/components/ui';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventRegistrationApi,
@@ -31,6 +32,12 @@ import {
   type RegistrationQuestion,
   type RegistrationSubmission,
 } from '@/lib/event-registration-api';
+import {
+  type RegistrationAnswerValidationError,
+  validateRegistrationAnswers,
+  visibleRegistrationAnswers,
+  visibleRegistrationQuestions,
+} from '@/lib/event-registration-form-rules';
 import { logError } from '@/lib/logger';
 
 interface EventRegistrationAttendeeCardProps {
@@ -44,55 +51,15 @@ function correlation(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function isAnswered(value: unknown): boolean {
-  return value !== undefined
-    && value !== null
-    && value !== ''
-    && (!Array.isArray(value) || value.length > 0);
-}
-
-function isVisible(question: RegistrationQuestion, answers: Record<string, unknown>): boolean {
-  const rules = question.visibility_rules as {
-    match?: 'all' | 'any';
-    conditions?: Array<{ question_key?: string; operator?: string; value?: unknown }>;
-  } | null | undefined;
-  if (!rules?.conditions?.length) return true;
-
-  const matches = rules.conditions.map((condition) => {
-    const actual = condition.question_key ? answers[condition.question_key] : undefined;
-    const answered = isAnswered(actual);
-    if (condition.operator === 'is_answered') return answered;
-    if (condition.operator === 'is_not_answered') return !answered;
-    if (!answered) return false;
-    if (condition.operator === 'equals') return actual === condition.value;
-    if (condition.operator === 'not_equals') return actual !== condition.value;
-    if (condition.operator === 'contains') {
-      return Array.isArray(actual)
-        ? actual.includes(condition.value)
-        : typeof actual === 'string'
-          && typeof condition.value === 'string'
-          && actual.includes(condition.value);
-    }
-    if (condition.operator === 'not_contains') {
-      return Array.isArray(actual)
-        ? !actual.includes(condition.value)
-        : typeof actual !== 'string'
-          || typeof condition.value !== 'string'
-          || !actual.includes(condition.value);
-    }
-    return false;
-  });
-
-  return rules.match === 'any' ? matches.some(Boolean) : matches.every(Boolean);
-}
-
 export default function EventRegistrationAttendeeCard({ eventId }: EventRegistrationAttendeeCardProps) {
   const { t, i18n } = useTranslation('event_registration');
   const toast = useToast();
+  const confirm = useConfirm();
   const [state, setState] = useState<AttendeeRegistrationState | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, RegistrationAnswerValidationError>>({});
   const [submissionOverride, setSubmissionOverride] = useState<RegistrationSubmission | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [guestName, setGuestName] = useState('');
@@ -107,6 +74,7 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
       const response = await eventRegistrationApi.attendeeState(eventId);
       if (!response.success || !response.data) throw new Error(response.message);
       setState(response.data);
+      setValidationErrors({});
       setSubmissionOverride(null);
       setLoadFailed(false);
     } catch (error) {
@@ -134,6 +102,10 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
   }, [activeRegistration, state?.form, state?.submissions]);
   const submission = submissionOverride ?? serverSubmission;
   const draftSubmissionId = submission?.status === 'draft' ? submission.id : null;
+  const visibleQuestions = useMemo(
+    () => state?.form ? visibleRegistrationQuestions(state.form.questions, answers) : [],
+    [answers, state?.form],
+  );
 
   useEffect(() => {
     if (draftSubmissionId === null) return undefined;
@@ -161,7 +133,21 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
 
   const updateAnswer = useCallback((question: RegistrationQuestion, value: unknown) => {
     setAnswers((current) => ({ ...current, [question.stable_key]: value }));
+    setValidationErrors((current) => {
+      if (!current[question.stable_key]) return current;
+      const next = { ...current };
+      delete next[question.stable_key];
+      return next;
+    });
   }, []);
+
+  const validationMessage = useCallback((error: RegistrationAnswerValidationError | undefined): string | undefined => {
+    if (!error) return undefined;
+    return t(`answers.validation.${error.code}`, {
+      count: error.limit,
+      limit: error.limit,
+    });
+  }, [t]);
 
   const acceptInvitation = useCallback(async (invitationId: number) => {
     setPendingAction(`invitation-${invitationId}`);
@@ -180,12 +166,20 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
 
   const saveAnswers = useCallback(async (submitAfterSave: boolean) => {
     if (!state?.form || !activeRegistration) return;
+    const nextErrors = validateRegistrationAnswers(state.form.questions, answers, submitAfterSave);
+    setValidationErrors(nextErrors);
+    const firstInvalidKey = Object.keys(nextErrors)[0];
+    if (firstInvalidKey) {
+      toast.error(t('accessible.validation_error'));
+      requestAnimationFrame(() => {
+        const group = document.getElementById(`registration-question-${firstInvalidKey}`);
+        group?.querySelector<HTMLElement>('input, textarea, button, [tabindex]:not([tabindex="-1"])')?.focus();
+      });
+      return;
+    }
     setPendingAction(submitAfterSave ? 'submit' : 'save');
     try {
-      const visibleAnswers = Object.fromEntries(state.form.questions
-        .filter((question) => isVisible(question, answers))
-        .filter((question) => Object.prototype.hasOwnProperty.call(answers, question.stable_key))
-        .map((question) => [question.stable_key, answers[question.stable_key]]));
+      const visibleAnswers = visibleRegistrationAnswers(state.form.questions, answers);
       const saved = await eventRegistrationApi.saveSubmission(eventId, {
         registration_id: activeRegistration.id,
         form_version_id: state.form.id,
@@ -281,7 +275,15 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
     toast,
   ]);
 
-  const cancelGuest = useCallback(async (guestId: number, revision: number) => {
+  const cancelGuest = useCallback(async (guestId: number, revision: number, displayName: string) => {
+    const accepted = await confirm({
+      title: t('guests.cancel_confirm_title'),
+      body: t('guests.cancel_confirm_body', { name: displayName }),
+      confirmLabel: t('guests.cancel'),
+      cancelLabel: t('guests.keep'),
+      status: 'danger',
+    });
+    if (!accepted) return;
     setPendingAction(`guest-${guestId}`);
     try {
       const response = await eventRegistrationApi.cancelGuest(
@@ -299,20 +301,26 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
     } finally {
       setPendingAction(null);
     }
-  }, [eventId, load, t, toast]);
+  }, [confirm, eventId, load, t, toast]);
 
   function renderQuestion(question: RegistrationQuestion) {
-    if (!isVisible(question, answers)) return null;
     const value = answers[question.stable_key];
     const choices = question.choice_options ?? [];
     const key = question.id ?? question.stable_key;
+    const error = validationMessage(validationErrors[question.stable_key]);
+    const minLength = Number(question.validation_rules?.min_length ?? 0) || undefined;
+    const configuredMaxLength = Number(question.validation_rules?.max_length ?? 0) || undefined;
+    const questionId = `registration-question-${question.stable_key}`;
 
     if (question.question_type === 'single_choice') {
       return (
         <RadioGroup
           key={key}
+          id={questionId}
           label={question.prompt}
           description={question.help_text}
+          errorMessage={error}
+          isInvalid={Boolean(error)}
           isRequired={question.is_required}
           value={typeof value === 'string' ? value : ''}
           onValueChange={(next) => updateAnswer(question, next)}
@@ -328,8 +336,11 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
       return (
         <CheckboxGroup
           key={key}
+          id={questionId}
           label={question.prompt}
           description={question.help_text}
+          errorMessage={error}
+          isInvalid={Boolean(error)}
           isRequired={question.is_required}
           value={selected}
           onValueChange={(next) => updateAnswer(question, next)}
@@ -340,15 +351,19 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
     }
     if (question.question_type === 'consent' || question.question_type === 'waiver') {
       return (
-        <Checkbox
-          key={key}
-          isRequired={question.is_required}
-          isSelected={value === true}
-          description={question.help_text}
-          onValueChange={(next) => updateAnswer(question, next)}
-        >
-          {question.displayed_text || question.prompt}
-        </Checkbox>
+        <div key={key} id={questionId} className="space-y-1">
+          <Checkbox
+            aria-describedby={error ? `${questionId}-error` : undefined}
+            isInvalid={Boolean(error)}
+            isRequired={question.is_required}
+            isSelected={value === true}
+            description={question.help_text}
+            onValueChange={(next) => updateAnswer(question, next)}
+          >
+            {question.displayed_text || question.prompt}
+          </Checkbox>
+          {error ? <p id={`${questionId}-error`} className="text-sm text-danger" role="alert">{error}</p> : null}
+        </div>
       );
     }
     if (question.question_type === 'long_text'
@@ -357,10 +372,14 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
       return (
         <Textarea
           key={key}
+          id={questionId}
           label={question.prompt}
           description={question.help_text}
+          errorMessage={error}
+          isInvalid={Boolean(error)}
           isRequired={question.is_required}
-          maxLength={10000}
+          minLength={minLength}
+          maxLength={Math.min(configuredMaxLength ?? 10000, 10000)}
           value={typeof value === 'string' ? value : ''}
           onValueChange={(next) => updateAnswer(question, next)}
         />
@@ -369,10 +388,14 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
     return (
       <Input
         key={key}
+        id={questionId}
         label={question.prompt}
         description={question.help_text}
+        errorMessage={error}
+        isInvalid={Boolean(error)}
         isRequired={question.is_required}
-        maxLength={500}
+        minLength={minLength}
+        maxLength={Math.min(configuredMaxLength ?? 500, 500)}
         value={typeof value === 'string' ? value : ''}
         onValueChange={(next) => updateAnswer(question, next)}
       />
@@ -456,7 +479,7 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
               </Button>
             ) : (
               <>
-                <div className="space-y-4">{state.form.questions.map(renderQuestion)}</div>
+                <div className="space-y-4">{visibleQuestions.map(renderQuestion)}</div>
                 <div className="flex flex-wrap gap-3">
                   <Button
                     variant="secondary"
@@ -495,7 +518,11 @@ export default function EventRegistrationAttendeeCard({ eventId }: EventRegistra
                     variant="secondary"
                     isDisabled={pendingAction !== null}
                     isLoading={pendingAction === `guest-${guest.id}`}
-                    onPress={() => void cancelGuest(guest.id, guest.revision)}
+                    onPress={() => void cancelGuest(
+                      guest.id,
+                      guest.revision,
+                      guest.display_name ?? t('guests.name_hidden'),
+                    )}
                   >
                     {t('guests.cancel')}
                   </Button>

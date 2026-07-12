@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Events;
 
 use App\Exceptions\EventTicketingException;
+use App\Services\EventRegistrationService;
 use App\Services\EventTicketEntitlementService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -290,6 +291,97 @@ final class EventTicketEntitlementServiceTest extends TestCase
                 'allocation-per-member-second',
             ),
         );
+    }
+
+    public function test_registration_exit_releases_free_entitlements_exactly_once(): void
+    {
+        $owner = $this->ticketUser();
+        $member = $this->ticketUser();
+        [$eventId, $start] = $this->ticketEvent((int) $owner->id);
+        $registrationId = $this->ticketRegistration($eventId, (int) $member->id);
+        $ticket = $this->activeTicketType($eventId, $owner, $start, [
+            'allocation_limit' => 4,
+            'per_member_limit' => 2,
+        ]);
+        $tickets = new EventTicketEntitlementService();
+        $allocated = $tickets->allocateSelf(
+            $eventId,
+            (int) $ticket->id,
+            $registrationId,
+            $member,
+            2,
+            'registration-exit-ticket-allocation',
+        );
+        $registrations = new EventRegistrationService(ticketEntitlements: $tickets);
+
+        $withdrawn = $registrations->withdraw(
+            $eventId,
+            (int) $member->id,
+            $member,
+            'registration-exit-transition',
+            reason: 'Member withdrew from the event.',
+        );
+        $replay = $registrations->withdraw(
+            $eventId,
+            (int) $member->id,
+            $member,
+            'registration-exit-transition',
+            reason: 'Member withdrew from the event.',
+        );
+
+        self::assertTrue($withdrawn->changed);
+        self::assertFalse($replay->changed);
+        self::assertTrue($replay->replayed);
+        self::assertSame('cancelled', DB::table('event_ticket_entitlements')
+            ->where('id', (int) $allocated['entitlement']->id)
+            ->value('status'));
+        self::assertSame(2, (int) DB::table('event_ticket_entitlements')
+            ->where('id', (int) $allocated['entitlement']->id)
+            ->value('entitlement_version'));
+        self::assertSame(['confirmed', 'cancelled'], DB::table('event_ticket_entitlement_history')
+            ->where('entitlement_id', (int) $allocated['entitlement']->id)
+            ->orderBy('id')
+            ->pluck('action')
+            ->all());
+        self::assertSame([2, -2], DB::table('event_ticket_inventory_history')
+            ->where('entitlement_id', (int) $allocated['entitlement']->id)
+            ->orderBy('id')
+            ->pluck('quantity_delta')
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->all());
+        $metadata = json_decode((string) DB::table('event_ticket_entitlement_history')
+            ->where('entitlement_id', (int) $allocated['entitlement']->id)
+            ->where('action', 'cancelled')
+            ->value('metadata'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('registration_exit', $metadata['source'] ?? null);
+        self::assertFalse((bool) ($metadata['refund_executed'] ?? true));
+    }
+
+    public function test_registration_exit_without_ticket_does_not_depend_on_concrete_ticket_scope(): void
+    {
+        $owner = $this->ticketUser();
+        $member = $this->ticketUser();
+        [$eventId] = $this->ticketEvent(
+            (int) $owner->id,
+            template: true,
+        );
+        $this->ticketRegistration($eventId, (int) $member->id);
+
+        $result = (new EventRegistrationService())->withdraw(
+            $eventId,
+            (int) $member->id,
+            $member,
+            'registration-exit-without-ticket',
+        );
+
+        self::assertTrue($result->changed);
+        self::assertSame('cancelled', (string) DB::table('event_registrations')
+            ->where('event_id', $eventId)
+            ->where('user_id', (int) $member->id)
+            ->value('registration_state'));
+        self::assertSame(0, DB::table('event_ticket_entitlements')
+            ->where('event_id', $eventId)
+            ->count());
     }
 
     /** @return array<string,mixed> */

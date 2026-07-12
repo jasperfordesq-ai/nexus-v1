@@ -8,11 +8,16 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Feature\Events;
 
+use App\Models\Event;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 final class EventVenueAccessibilityMigrationTest extends TestCase
 {
+    use DatabaseTransactions;
+
     public function test_structured_public_venue_columns_and_filter_index_exist(): void
     {
         foreach ([
@@ -34,5 +39,22 @@ final class EventVenueAccessibilityMigrationTest extends TestCase
             Schema::hasIndex('events', 'idx_events_tenant_step_free_start'),
             'The first accessible-venue discovery filter must remain index-backed.',
         );
+    }
+
+    public function test_rollback_refuses_non_null_accessibility_evidence_including_false(): void
+    {
+        Event::factory()->forTenant($this->testTenantId)->create([
+            'accessibility_step_free' => false,
+        ]);
+        /** @var Migration $migration */
+        $migration = require database_path(
+            'migrations/2026_07_11_000064_add_event_venue_accessibility.php',
+        );
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'event_venue_accessibility_rollback_refused_evidence_exists',
+        );
+        $migration->down();
     }
 }

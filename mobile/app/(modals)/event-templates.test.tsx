@@ -7,6 +7,7 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockGetTemplates = jest.fn();
+const mockGetHistory = jest.fn();
 const mockPreview = jest.fn();
 const mockMaterialize = jest.fn();
 const mockReplace = jest.fn();
@@ -35,6 +36,20 @@ jest.mock('react-i18next', () => {
   const labels: Record<string, string> = {
     'templates.mobile.safetyTitle': 'Templates copy configuration only',
     'templates.mobile.useTemplate': 'Use template',
+    'templates.mobile.auditButton': 'Audit history',
+    'templates.mobile.auditTitle': 'Audit: {{title}}',
+    'templates.mobile.auditDescription': 'Append-only operational history.',
+    'templates.mobile.auditImmutableTitle': 'History cannot be changed',
+    'templates.mobile.auditImmutableDescription': 'Every template lifecycle record is retained.',
+    'templates.mobile.auditLoading': 'Loading template audit history',
+    'templates.mobile.auditLoadFailedTitle': 'Audit history unavailable',
+    'templates.mobile.auditLoadFailedDescription': 'Try again.',
+    'templates.mobile.auditEmpty': 'No audit entries.',
+    'templates.mobile.auditEntry': 'Version {{version}} on {{date}}',
+    'templates.mobile.auditMaterializedEvent': 'Created event #{{id}}',
+    'templates.mobile.notRecorded': 'Not recorded',
+    'templates.mobile.auditActions.materialized': 'Draft materialized',
+    'templates.mobile.auditActions.revised': 'Template revised',
     'templates.mobile.scheduleTitle': 'Schedule draft',
     'templates.mobile.eventTitle': 'Event title',
     'templates.mobile.start': 'Start',
@@ -42,6 +57,8 @@ jest.mock('react-i18next', () => {
     'templates.mobile.review': 'Review draft',
     'templates.mobile.readyTitle': 'Ready to create a draft',
     'templates.mobile.createDraft': 'Create draft',
+    'common:buttons.loadMore': 'Load more',
+    'common:buttons.done': 'Done',
   };
   return {
     useTranslation: () => ({
@@ -52,11 +69,13 @@ jest.mock('react-i18next', () => {
         });
         return value;
       },
+      i18n: { language: 'en' },
     }),
   };
 });
 jest.mock('@/lib/api/eventTemplates', () => ({
   getEventTemplates: (...args: unknown[]) => mockGetTemplates(...args),
+  getEventTemplateHistory: (...args: unknown[]) => mockGetHistory(...args),
   previewEventTemplate: (...args: unknown[]) => mockPreview(...args),
   materializeEventTemplate: (...args: unknown[]) => mockMaterialize(...args),
 }));
@@ -84,8 +103,8 @@ const template = {
     copied_fields: ['title'],
     skipped_fields: ['related.registrations'],
   },
-  usage: { materialization_count: 2 },
-  capabilities: { materialize: true },
+  usage: { materialization_count: 2, audit_entry_count: 3 },
+  capabilities: { materialize: true, view_audit: true },
 };
 
 beforeEach(() => {
@@ -132,6 +151,19 @@ beforeEach(() => {
     changed: true,
     idempotent_replay: false,
   });
+  mockGetHistory.mockResolvedValue({
+    data: [{
+      id: 18,
+      action: 'materialized',
+      template_version: 1,
+      source_event_id: 9,
+      materialized_event_id: 21,
+      evidence: { federation_normalized: true },
+      created_at: '2026-07-11T10:00:00+00:00',
+      immutable: true,
+    }],
+    meta: { per_page: 50, next_cursor: null, has_more: false },
+  });
 });
 
 describe('EventTemplatesScreen', () => {
@@ -167,5 +199,83 @@ describe('EventTemplatesScreen', () => {
         params: { id: '21' },
       });
     });
+  });
+  it('loads every cursor page in the template library', async () => {
+    mockGetTemplates
+      .mockResolvedValueOnce({
+        data: [template],
+        meta: { per_page: 20, next_cursor: 'template-cursor-4', has_more: true },
+      })
+      .mockResolvedValueOnce({
+        data: [{
+          ...template,
+          id: 5,
+          source_event: { id: 10, title: 'Second source event' },
+          version: {
+            ...template.version,
+            configuration: { ...template.version.configuration, title: 'Second reusable event' },
+          },
+        }],
+        meta: { per_page: 20, next_cursor: null, has_more: false },
+      });
+    const screen = render(<EventTemplatesScreen />);
+
+    await screen.findByText('Load more');
+    fireEvent.press(screen.getByText('Load more'));
+
+    await waitFor(() => expect(mockGetTemplates).toHaveBeenLastCalledWith('template-cursor-4'));
+    expect(await screen.findByText('Second reusable event')).toBeTruthy();
+  });
+
+  it('shows privacy-filtered immutable template audit history', async () => {
+    const screen = render(<EventTemplatesScreen />);
+    await screen.findByText('Reusable event');
+
+    fireEvent.press(screen.getByText('Audit history'));
+
+    expect(await screen.findByText('Audit: Reusable event')).toBeTruthy();
+    expect(screen.getByText('History cannot be changed')).toBeTruthy();
+    expect(screen.getByText('Draft materialized')).toBeTruthy();
+    expect(screen.getByText('Created event #21')).toBeTruthy();
+    expect(mockGetHistory).toHaveBeenCalledWith(4);
+  });
+
+  it('loads every opaque cursor page in template audit history', async () => {
+    mockGetHistory
+      .mockResolvedValueOnce({
+        data: [{
+          id: 18,
+          action: 'materialized',
+          template_version: 1,
+          source_event_id: 9,
+          materialized_event_id: 21,
+          evidence: {},
+          created_at: '2026-07-11T10:00:00+00:00',
+          immutable: true,
+        }],
+        meta: { per_page: 50, next_cursor: 'audit-cursor-18', has_more: true },
+      })
+      .mockResolvedValueOnce({
+        data: [{
+          id: 17,
+          action: 'revised',
+          template_version: 1,
+          source_event_id: 9,
+          materialized_event_id: null,
+          evidence: {},
+          created_at: '2026-07-10T10:00:00+00:00',
+          immutable: true,
+        }],
+        meta: { per_page: 50, next_cursor: null, has_more: false },
+      });
+    const screen = render(<EventTemplatesScreen />);
+    await screen.findByText('Reusable event');
+
+    fireEvent.press(screen.getByText('Audit history'));
+    await screen.findByText('Draft materialized');
+    fireEvent.press(screen.getByText('Load more'));
+
+    await waitFor(() => expect(mockGetHistory).toHaveBeenLastCalledWith(4, 'audit-cursor-18'));
+    expect(await screen.findByText('Template revised')).toBeTruthy();
   });
 });

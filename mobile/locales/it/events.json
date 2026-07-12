@@ -13,6 +13,10 @@
     "options": { "any": "Qualsiasi sede", "yes": "Accesso senza gradini confermato", "no": "Accesso con gradini", "unknown": "Non noto" }
   },
   "detail": {
+    "leaveWaitlistConfirmTitle": "Uscire dalla lista d’attesa?",
+    "leaveWaitlistConfirmDescription": "Perderai la posizione attuale e potresti doverti iscrivere di nuovo in fondo alla coda.",
+    "offerDeclineConfirmTitle": "Rifiutare questo posto riservato?",
+    "offerDeclineConfirmDescription": "Il posto riservato verrà liberato e la tua offerta dalla lista d’attesa terminerà.",
     "offerAvailable": "Posto disponibile",
     "offerTitle": "C'è un posto disponibile per te",
     "offerDescription": "Ora hai un posto riservato dalla lista d'attesa. Accettalo per confermare la tua partecipazione.",
@@ -129,6 +133,9 @@
       "cancelled": "Annullata"
     },
     "enterprise": {
+      "withdrawConfirmTitle": "Ritirarti da questa sessione?",
+      "withdrawConfirmDescription": "Il tuo posto in {{title}} verrà liberato e potrà essere occupato da un’altra persona.",
+      "keepRegistration": "Mantieni il mio posto",
       "capacityUnlimited": "{{count}} iscritti · nessun limite",
       "capacityLimited": "{{registered}} iscritti su {{limit}}",
       "full": "Completa",

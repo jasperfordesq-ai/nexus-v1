@@ -93,6 +93,7 @@ final class EventTicketQuoteService
         $windowOpen = (string) $ticket->status === EventTicketTypeStatus::Active->value
             && ! $now->lessThan($opens)
             && $now->lessThan($closes);
+        $hasRefundEffect = $kind === EventTicketKind::TimeCredit;
 
         return [
             'ticket_type_id' => (int) $ticket->id,
@@ -111,12 +112,13 @@ final class EventTicketQuoteService
                 : 'not_required',
             'attendance_reward_included' => false,
             'refund_policy' => [
-                'cutoff_at_utc' => $ticket->refund_cutoff_at_utc === null
+                'cutoff_at_utc' => ! $hasRefundEffect || $ticket->refund_cutoff_at_utc === null
                     ? null
                     : CarbonImmutable::parse((string) $ticket->refund_cutoff_at_utc, 'UTC')
                         ->utc()->toIso8601String(),
-                'organizer_cancel_refundable' => (bool) $ticket->organizer_cancel_refundable,
-                'execution_status' => 'not_integrated',
+                'organizer_cancel_refundable' => $hasRefundEffect
+                    && (bool) $ticket->organizer_cancel_refundable,
+                'execution_status' => $hasRefundEffect ? 'not_integrated' : 'not_applicable',
             ],
         ];
     }

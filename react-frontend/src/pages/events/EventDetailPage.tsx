@@ -12,9 +12,10 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Surface } from '@/components/ui/Surface';
-import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Tabs } from '@heroui/react/tabs';
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 /**
  * Event Detail Page - Single event view with enhanced RSVP, sharing, and organizer check-in
  */
@@ -59,6 +60,7 @@ import { LocationMapCard } from '@/components/location/LocationMapCard';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { EventAgendaWorkspace } from './components/EventAgendaWorkspace';
+import { EventCheckInWorkspace } from './components/EventCheckInWorkspace';
 import { EventCheckinCredentialCard } from './components/EventCheckinCredentialCard';
 import EventRegistrationAttendeeCard from './components/EventRegistrationAttendeeCard';
 import { EventSafetyAttendeeCard } from './components/EventSafetyAttendeeCard';
@@ -118,19 +120,24 @@ function relationshipRsvpStatus(event: Event): RsvpOption | null {
 }
 
 export function EventDetailPage() {
-  const { t } = useTranslation(['events', 'event_tickets']);
+  const { t } = useTranslation(['events', 'event_tickets', 'community']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [event, setEvent] = useState<Event | null>(null);
   // Reflect the loaded event name in the tab/title; falls back to the static label while loading.
   usePageTitle(event?.title ?? t('title'));
   const [translatedEventDesc, setTranslatedEventDesc] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<EventRosterMember[]>([]);
+  const [isRosterLoading, setIsRosterLoading] = useState(false);
+  const [rosterLoadError, setRosterLoadError] = useState(false);
+  const [rosterCursor, setRosterCursor] = useState<string | null>(null);
+  const [rosterHasMore, setRosterHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpOption | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -142,7 +149,6 @@ export function EventDetailPage() {
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
-  const [checkingInUserId, setCheckingInUserId] = useState<number | null>(null);
   const [isWaitlisted, setIsWaitlisted] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
   const [seriesEvents, setSeriesEvents] = useState<EventSeriesOccurrence[]>([]);
@@ -177,6 +183,7 @@ export function EventDetailPage() {
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
+  const rosterRequestGeneration = useRef(0);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -197,11 +204,17 @@ export function EventDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
+      rosterRequestGeneration.current += 1;
+      setAttendees([]);
+      setRosterCursor(null);
+      setRosterHasMore(false);
+      setRosterLoadError(false);
+      setIsRosterLoading(true);
       const [eventRes, attendeesRes] = await Promise.all([
         eventsApi.get(id, { signal: controller.signal }),
         eventsApi.roster(id, { per_page: 50, status: 'all' }, { signal: controller.signal }).catch((err) => {
           logError('Failed to load attendees', err);
-          return { success: true, data: [] };
+          return null;
         }),
       ]);
 
@@ -220,8 +233,12 @@ export function EventDetailPage() {
         setEvent(null);
         setError(tRef.current('detail.not_found_desc'));
       }
-      if (attendeesRes.success && attendeesRes.data) {
+      if (attendeesRes?.success && attendeesRes.data) {
         setAttendees(attendeesRes.data);
+        setRosterCursor(attendeesRes.meta?.cursor ?? attendeesRes.meta?.next_cursor ?? null);
+        setRosterHasMore(attendeesRes.meta?.has_more ?? false);
+      } else {
+        setRosterLoadError(true);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -232,6 +249,40 @@ export function EventDetailPage() {
       setError(tRef.current('detail.unable_to_load'));
     } finally {
       setIsLoading(false);
+      setIsRosterLoading(false);
+    }
+  }, [id]);
+
+  const loadRosterPage = useCallback(async (cursor: string | null, append: boolean) => {
+    if (!id) return;
+    const requestGeneration = ++rosterRequestGeneration.current;
+    setIsRosterLoading(true);
+    setRosterLoadError(false);
+    try {
+      const response = await eventsApi.roster(id, {
+        per_page: 50,
+        status: 'all',
+        cursor: cursor ?? undefined,
+      });
+      if (requestGeneration !== rosterRequestGeneration.current) return;
+      if (!response.success || !response.data) {
+        setRosterLoadError(true);
+        return;
+      }
+      setAttendees((current) => {
+        if (!append) return response.data!;
+        const merged = new Map(current.map((attendee) => [attendee.member.id, attendee]));
+        response.data!.forEach((attendee) => merged.set(attendee.member.id, attendee));
+        return [...merged.values()];
+      });
+      setRosterCursor(response.meta?.cursor ?? response.meta?.next_cursor ?? null);
+      setRosterHasMore(response.meta?.has_more ?? false);
+    } catch (caught) {
+      if (requestGeneration !== rosterRequestGeneration.current) return;
+      logError('Failed to load attendee roster page', caught);
+      setRosterLoadError(true);
+    } finally {
+      if (requestGeneration === rosterRequestGeneration.current) setIsRosterLoading(false);
     }
   }, [id]);
 
@@ -338,8 +389,32 @@ export function EventDetailPage() {
   async function handleRsvp(newStatus: RsvpOption) {
     if (!event || !isAuthenticated) return;
 
+    const registration = event.relationship.registration;
+    const engagement = event.relationship.engagement;
+    const canClearCurrentStatus = rsvpStatus === 'going'
+      ? registration.can_withdraw
+      : engagement.can_change;
+    const canSetStatus = newStatus === 'going'
+      ? registration.can_register
+      : newStatus === 'interested'
+        ? engagement.can_change
+        : registration.can_withdraw || engagement.can_change;
+
     // If already this status, cancel (remove RSVP)
     if (rsvpStatus === newStatus) {
+      if (!canClearCurrentStatus) return;
+      const accepted = await confirm({
+        title: tRef.current('detail.rsvp_panel_title'),
+        body: rsvpStatus === 'going'
+          ? tRef.current('detail.rsvp_going')
+          : rsvpStatus === 'interested'
+            ? tRef.current('detail.rsvp_interested')
+            : tRef.current('detail.rsvp_not_going'),
+        confirmLabel: tRef.current('detail.not_going_btn'),
+        cancelLabel: tRef.current('detail.cancel'),
+        status: 'warning',
+      });
+      if (!accepted) return;
       try {
         setIsSubmitting(true);
         const response = await eventsApi.removeRsvp(event.id);
@@ -357,6 +432,8 @@ export function EventDetailPage() {
       }
       return;
     }
+
+    if (!canSetStatus) return;
 
     try {
       setIsSubmitting(true);
@@ -440,26 +517,6 @@ export function EventDetailPage() {
     }
   }
 
-  async function handleCheckIn(attendeeId: number) {
-    if (!event) return;
-
-    try {
-      setCheckingInUserId(attendeeId);
-      const response = await eventsApi.checkIn(event.id, attendeeId);
-      if (response.success) {
-        await loadEvent();
-        toastRef.current.success(tRef.current('toast.checkin_success'));
-      } else {
-        toastRef.current.error(tRef.current('toast.checkin_failed'));
-      }
-    } catch (err) {
-      logError('Failed to check in attendee', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
-    } finally {
-      setCheckingInUserId(null);
-    }
-  }
-
   async function handleCancelEvent() {
     if (!event) return;
     const reason = cancelReason.trim();
@@ -488,7 +545,7 @@ export function EventDetailPage() {
   }
 
   async function handleJoinWaitlist() {
-    if (!event) return;
+    if (!event || !event.relationship.registration.can_join_waitlist) return;
 
     try {
       setIsSubmitting(true);
@@ -510,7 +567,16 @@ export function EventDetailPage() {
   }
 
   async function handleLeaveWaitlist() {
-    if (!event) return;
+    if (!event || !event.relationship.registration.can_leave_waitlist) return;
+
+    const accepted = await confirm({
+      title: tRef.current('detail.leave_waitlist'),
+      body: tRef.current('community:waitlist.leave_confirm'),
+      confirmLabel: tRef.current('detail.leave_waitlist'),
+      cancelLabel: tRef.current('detail.cancel'),
+      status: 'warning',
+    });
+    if (!accepted) return;
 
     try {
       setIsSubmitting(true);
@@ -571,9 +637,6 @@ export function EventDetailPage() {
   const isPendingReview = event?.schedule.publication_state === 'pending_review';
   const isDraft = event?.schedule.publication_state === 'draft';
   const hasActiveWaitlistOffer = event?.relationship.registration.state === 'offered';
-  const goingAttendees = attendees.filter((attendee) => attendee.registration.state === 'confirmed');
-  const checkedInCount = attendees.filter((attendee) => attendee.attendance.state !== 'not_checked_in').length;
-  const checkInPercent = goingAttendees.length > 0 ? Math.round((checkedInCount / goingAttendees.length) * 100) : 0;
   const getAttendeeName = (attendee: EventRosterMember) =>
     attendee.member.display_name || t('detail.community_member');
 
@@ -719,6 +782,20 @@ export function EventDetailPage() {
       organizer: organizerName,
     });
   const attendanceTotal = goingCount + interestedCount;
+  const canRegister = event.relationship.registration.can_register;
+  const canWithdraw = event.relationship.registration.can_withdraw;
+  const canJoinWaitlist = event.relationship.registration.can_join_waitlist;
+  const canLeaveWaitlist = event.relationship.registration.can_leave_waitlist;
+  const canChangeEngagement = event.relationship.engagement.can_change;
+  const showGoingAction = canRegister;
+  const showInterestedAction = canChangeEngagement;
+  const showNotGoingAction = canWithdraw || canChangeEngagement;
+  const hasRsvpActions = showGoingAction || showInterestedAction || showNotGoingAction;
+  const hasRelationshipActions = canRegister
+    || canWithdraw
+    || canJoinWaitlist
+    || canLeaveWaitlist
+    || canChangeEngagement;
   const hasOnlineAccess = event.online_access.reveal_state === 'available'
     && Boolean(event.online_access.video_url || event.online_access.join_url);
 
@@ -1092,7 +1169,7 @@ export function EventDetailPage() {
 
         {/* Tabs: Details / Agenda / Attendees / authorised check-in */}
         <Tabs
-          aria-label={t('detail.tabs_aria')}
+          className="w-full min-w-0"
           selectedKey={activeTab}
           onSelectionChange={(key) => {
             const nextTab = String(key);
@@ -1102,61 +1179,53 @@ export function EventDetailPage() {
             else nextParams.set('tab', nextTab);
             setSearchParams(nextParams, { replace: true });
           }}
-          variant="underlined"
-          classNames={{
-            tabList: 'border-b border-theme-default mb-6',
-            tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-            cursor: 'bg-gradient-to-r from-accent to-accent-gradient-end',
-          }}
         >
-          <Tab key="details" title={t('detail.tab_details')} />
-          <Tab
-            key="agenda"
-            title={
-              <span className="flex items-center gap-2">
+          <Tabs.ListContainer className="max-w-full overflow-x-auto border-b border-theme-default">
+            <Tabs.List aria-label={t('detail.tabs_aria')} className="min-w-max gap-1">
+              <Tabs.Tab
+                id="details"
+                className="min-h-10 min-w-fit px-4 text-sm font-medium text-theme-muted data-[selected=true]:text-theme-primary"
+              >
+                {t('detail.tab_details')}
+              </Tabs.Tab>
+              <Tabs.Tab
+                id="agenda"
+                className="min-h-10 min-w-fit px-4 text-sm font-medium text-theme-muted data-[selected=true]:text-theme-primary"
+              >
                 <ListOrdered className="h-4 w-4" aria-hidden="true" />
                 {t('manage.tab_agenda')}
-              </span>
-            }
-          />
-          {canViewTickets && (
-            <Tab
-              key="tickets"
-              title={
-                <span className="flex items-center gap-2">
+              </Tabs.Tab>
+              {canViewTickets && (
+                <Tabs.Tab
+                  id="tickets"
+                  className="min-h-10 min-w-fit px-4 text-sm font-medium text-theme-muted data-[selected=true]:text-theme-primary"
+                >
                   <Ticket className="h-4 w-4" aria-hidden="true" />
                   {t('event_tickets:tickets.title')}
-                </span>
-              }
-            />
-          )}
-          <Tab
-            key="attendees"
-            title={
-              <span className="flex items-center gap-2">
+                </Tabs.Tab>
+              )}
+              <Tabs.Tab
+                id="attendees"
+                className="min-h-10 min-w-fit px-4 text-sm font-medium text-theme-muted data-[selected=true]:text-theme-primary"
+              >
                 {t('detail.tab_attendees')}
                 <Chip size="sm" variant="flat" color="default">{goingCount + interestedCount}</Chip>
-              </span>
-            }
-          />
-          {canCheckIn && (
-            <Tab
-              key="checkin"
-              title={
-                <span className="flex items-center gap-2">
+              </Tabs.Tab>
+              {canCheckIn && (
+                <Tabs.Tab
+                  id="checkin"
+                  className="min-h-10 min-w-fit px-4 text-sm font-medium text-theme-muted data-[selected=true]:text-theme-primary"
+                >
                   <ClipboardCheck className="w-4 h-4" aria-hidden="true" />
                   {t('detail.tab_checkin')}
-                  {checkedInCount > 0 && (
-                    <Chip size="sm" variant="flat" color="success">{checkedInCount}</Chip>
-                  )}
-                </span>
-              }
-            />
-          )}
-        </Tabs>
+                </Tabs.Tab>
+              )}
+            </Tabs.List>
+          </Tabs.ListContainer>
 
         {/* Tab Content */}
-        <AnimatePresence mode="wait">
+        <Tabs.Panel id="details" className="pt-6 outline-none">
+          <AnimatePresence mode="wait">
           {activeTab === 'details' && (
             <motion.div
               key="details"
@@ -1320,7 +1389,11 @@ export function EventDetailPage() {
               )}
             </motion.div>
           )}
+          </AnimatePresence>
+        </Tabs.Panel>
 
+        <Tabs.Panel id="agenda" className="pt-6 outline-none">
+          <AnimatePresence mode="wait">
           {activeTab === 'agenda' && (
             <motion.div
               key="agenda"
@@ -1331,8 +1404,13 @@ export function EventDetailPage() {
               <EventAgendaWorkspace event={event} />
             </motion.div>
           )}
+          </AnimatePresence>
+        </Tabs.Panel>
 
-          {activeTab === 'tickets' && canViewTickets && event.schedule.start_at && (
+        {canViewTickets && event.schedule.start_at && (
+          <Tabs.Panel id="tickets" className="pt-6 outline-none">
+            <AnimatePresence mode="wait">
+            {activeTab === 'tickets' && (
             <motion.div
               key="tickets"
               initial={{ opacity: 0, y: 10 }}
@@ -1345,167 +1423,138 @@ export function EventDetailPage() {
                 eventTimezone={event.schedule.timezone}
               />
             </motion.div>
-          )}
+            )}
+            </AnimatePresence>
+          </Tabs.Panel>
+        )}
 
-          {activeTab === 'attendees' && (
-            <motion.div
-              key="attendees"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-4"
-            >
-              {attendees.length === 0 ? (
-                <EmptyState
-                  icon={<Users className="w-10 h-10 text-theme-subtle" aria-hidden="true" />}
-                  title={t('detail.no_attendees_title')}
-                  description={t('detail.no_attendees')}
-                  className="py-10"
-                />
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {attendees.map((attendee) => (
-                    <div key={attendee.member.id} className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3">
-                      <Avatar
-                        src={resolveAvatarUrl(attendee.member.avatar_url)}
-                        name={getAttendeeName(attendee)}
-                        size="sm"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-theme-primary font-medium truncate">
-                          {getAttendeeName(attendee)}
-                        </p>
+        <Tabs.Panel id="attendees" className="pt-6 outline-none">
+          <AnimatePresence mode="wait">
+            {activeTab === 'attendees' && (
+              <motion.div
+                key="attendees"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-4"
+              >
+                {rosterLoadError && (
+                  <Surface
+                    variant="secondary"
+                    className="rounded-xl border border-red-500/30 p-4"
+                  >
+                    <div role="alert" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-theme-primary">{t('manage.people.load_error_title')}</p>
+                        <p className="text-sm text-theme-muted">{t('manage.people.load_error_desc')}</p>
                       </div>
-                      <Chip
+                      <Button
                         size="sm"
                         variant="flat"
-                        color={
-                          attendee.registration.state === 'confirmed'
-                            ? 'success'
-                            : attendee.engagement.state === 'interested'
-                              ? 'warning'
-                              : 'default'
-                        }
+                        startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+                        onPress={() => loadRosterPage(rosterCursor, attendees.length > 0)}
+                        isDisabled={isRosterLoading}
                       >
-                        {attendee.registration.state === 'confirmed'
-                          ? t('detail.attendee_going')
-                          : attendee.engagement.state === 'interested'
-                            ? t('detail.attendee_interested')
-                            : t('detail.attendee_rsvp')}
-                      </Chip>
-                      {attendee.attendance.state !== 'not_checked_in' && (
-                        <Chip size="sm" variant="flat" color="success" startContent={<UserCheck className="w-3 h-3" aria-hidden="true" />}>
-                          {t('detail.attendee_checked_in')}
-                        </Chip>
-                      )}
+                        {t('manage.try_again')}
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          )}
+                  </Surface>
+                )}
 
-          {activeTab === 'checkin' && canCheckIn && (
-            <motion.div
-              key="checkin"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-4"
-            >
-              {/* Check-in Stats */}
-              <GlassCard className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-theme-muted text-sm">{t('detail.checkin_progress')}</p>
-                    <p className="text-2xl font-bold text-theme-primary">
-                      {checkedInCount} <span className="text-base font-normal text-theme-muted">/ {goingAttendees.length}</span>
-                    </p>
+                {isRosterLoading && attendees.length === 0 && !rosterLoadError && (
+                  <div role="status" aria-live="polite" className="py-10 text-center text-sm text-theme-muted">
+                    {t('manage.people.loading')}
                   </div>
-                  <div className="w-16 h-16 relative">
-                    <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64" role="img" aria-label={t('detail.checkin_progress_chart_aria', { percent: checkInPercent })}>
-                      <circle
-                        cx="32" cy="32" r="28"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="6"
-                        className="text-theme-muted"
-                      />
-                      <circle
-                        cx="32" cy="32" r="28"
-                        fill="none"
-                        stroke="url(#checkinGradient)"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 28}`}
-                        strokeDashoffset={`${2 * Math.PI * 28 * (1 - (goingAttendees.length > 0 ? checkedInCount / goingAttendees.length : 0))}`}
-                      />
-                      <defs>
-                        <linearGradient id="checkinGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#6366f1" />
-                          <stop offset="100%" stopColor="#a855f7" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-theme-primary">
-                      {checkInPercent}%
-                    </span>
-                  </div>
-                </div>
-              </GlassCard>
+                )}
 
-              {/* Attendee Check-in List */}
-              {goingAttendees.length === 0 ? (
-                <EmptyState
-                  icon={<UserCheck className="w-10 h-10 text-theme-subtle" aria-hidden="true" />}
-                  title={t('detail.no_checkin_attendees_title')}
-                  description={t('detail.no_checkin_attendees')}
-                  className="py-10"
-                />
-              ) : (
-                <div className="space-y-2">
-                  {goingAttendees.map((attendee) => (
-                    <div key={attendee.member.id} className="flex min-w-0 flex-col gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3 sm:flex-row sm:items-center">
-                      <Avatar
-                        src={resolveAvatarUrl(attendee.member.avatar_url)}
-                        name={getAttendeeName(attendee)}
-                        size="sm"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-theme-primary font-medium truncate">
-                          {getAttendeeName(attendee)}
-                        </p>
-                      </div>
-                      {attendee.attendance.state !== 'not_checked_in' ? (
+                {!isRosterLoading && !rosterLoadError && attendees.length === 0 && (
+                  <EmptyState
+                    icon={<Users className="w-10 h-10 text-theme-subtle" aria-hidden="true" />}
+                    title={t('detail.no_attendees_title')}
+                    description={t('detail.no_attendees')}
+                    className="py-10"
+                  />
+                )}
+
+                {attendees.length > 0 && (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {attendees.map((attendee) => (
+                      <div key={attendee.member.id} className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3">
+                        <Avatar
+                          src={resolveAvatarUrl(attendee.member.avatar_url)}
+                          name={getAttendeeName(attendee)}
+                          size="sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-theme-primary font-medium truncate">
+                            {getAttendeeName(attendee)}
+                          </p>
+                        </div>
                         <Chip
                           size="sm"
                           variant="flat"
-                          color="success"
-                          startContent={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />}
+                          color={
+                            attendee.registration.state === 'confirmed'
+                              ? 'success'
+                              : attendee.engagement.state === 'interested'
+                                ? 'warning'
+                                : 'default'
+                          }
                         >
-                          {t('detail.attendee_checked_in')}
+                          {attendee.registration.state === 'confirmed'
+                            ? t('detail.attendee_going')
+                            : attendee.engagement.state === 'interested'
+                              ? t('detail.attendee_interested')
+                              : t('detail.attendee_rsvp')}
                         </Chip>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
-                          startContent={<UserCheck className="w-3.5 h-3.5" aria-hidden="true" />}
-                          isLoading={checkingInUserId === attendee.member.id}
-                          onPress={() => handleCheckIn(attendee.member.id)}
-                        >
-                          {t('detail.check_in')}
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                        {attendee.attendance.state !== 'not_checked_in' && (
+                          <Chip size="sm" variant="flat" color="success" startContent={<UserCheck className="w-3 h-3" aria-hidden="true" />}>
+                            {t('detail.attendee_checked_in')}
+                          </Chip>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!rosterLoadError && rosterHasMore && rosterCursor && (
+                  <div className="flex justify-center pt-2">
+                    <Button
+                      variant="flat"
+                      isLoading={isRosterLoading}
+                      onPress={() => loadRosterPage(rosterCursor, true)}
+                    >
+                      {t('detail.more_attendees', {
+                        count: Math.max(1, attendanceTotal - attendees.length),
+                      })}
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Tabs.Panel>
+
+        {canCheckIn && (
+          <Tabs.Panel id="checkin" className="pt-6 outline-none">
+            <AnimatePresence mode="wait">
+              {activeTab === 'checkin' && (
+                <motion.div
+                  key="checkin"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <EventCheckInWorkspace eventId={event.id} />
+                </motion.div>
               )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </AnimatePresence>
+          </Tabs.Panel>
+        )}
+        </Tabs>
 
         {/* Action Buttons */}
-        {isAuthenticated && ((!isPast && !isCancelled) || hasOnlineAccess) && (
+        {isAuthenticated && (hasRelationshipActions || hasActiveWaitlistOffer || hasOnlineAccess || (!isPast && !isCancelled)) && (
           <div className="mt-8 rounded-xl border border-theme-default bg-theme-elevated p-4">
             <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1538,15 +1587,17 @@ export function EventDetailPage() {
                   >
                     {t('detail.accept_offer')}
                   </Button>
-                  <Button
-                    variant="flat"
-                    startContent={<XCircle className="h-4 w-4" aria-hidden="true" />}
-                    onPress={handleLeaveWaitlist}
-                    isDisabled={isSubmitting}
-                    aria-label={t('detail.decline_offer_aria')}
-                  >
-                    {t('detail.decline_offer')}
-                  </Button>
+                  {canLeaveWaitlist && (
+                    <Button
+                      variant="flat"
+                      startContent={<XCircle className="h-4 w-4" aria-hidden="true" />}
+                      onPress={handleLeaveWaitlist}
+                      isDisabled={isSubmitting}
+                      aria-label={t('detail.decline_offer_aria')}
+                    >
+                      {t('detail.decline_offer')}
+                    </Button>
+                  )}
                 </div>
               </Surface>
             )}
@@ -1554,8 +1605,9 @@ export function EventDetailPage() {
               {/* RSVP Options — single-select toggle; clicking the active option clears
                   the RSVP (handleRsvp cancels when newStatus === current). The group is
                   disabled while a request is in flight. */}
-              {!isPast && !isCancelled && <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:items-center">
-                {!hasActiveWaitlistOffer && <ToggleButtonGroup
+              {(hasRsvpActions || canJoinWaitlist || canLeaveWaitlist) && (
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:items-center">
+                {!hasActiveWaitlistOffer && hasRsvpActions && <ToggleButtonGroup
                   aria-label={t('detail.rsvp_aria')}
                   selectionMode="single"
                   isDetached
@@ -1568,37 +1620,42 @@ export function EventDetailPage() {
                   }}
                   className="grid gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap"
                 >
-                  <ToggleButton
-                    id="going"
-                    variant="ghost"
-                    aria-label={t('detail.rsvp_going_aria')}
-                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-emerald-500/20 data-[selected=true]:bg-emerald-500 data-[selected=true]:text-white"
-                  >
-                    <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-                    {t('detail.going_btn')}
-                  </ToggleButton>
-                  <ToggleButton
-                    id="interested"
-                    variant="ghost"
-                    aria-label={t('detail.rsvp_interested_aria')}
-                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-amber-500/20 data-[selected=true]:bg-amber-500 data-[selected=true]:text-white"
-                  >
-                    <Heart className="w-4 h-4" aria-hidden="true" />
-                    {t('detail.interested_btn')}
-                  </ToggleButton>
-                  <ToggleButton
-                    id="not_going"
-                    variant="ghost"
-                    aria-label={t('detail.rsvp_not_going_aria')}
-                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-theme-hover data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-muted"
-                  >
-                    <XCircle className="w-4 h-4" aria-hidden="true" />
-                    {t('detail.not_going_btn')}
-                  </ToggleButton>
+                  {showGoingAction && (
+                    <ToggleButton
+                      id="going"
+                      variant="ghost"
+                      aria-label={t('detail.rsvp_going_aria')}
+                      className="bg-theme-elevated text-theme-primary transition-colors hover:bg-emerald-500/20 data-[selected=true]:bg-emerald-500 data-[selected=true]:text-white"
+                    >
+                      <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                      {t('detail.going_btn')}
+                    </ToggleButton>
+                  )}
+                  {showInterestedAction && (
+                    <ToggleButton
+                      id="interested"
+                      variant="ghost"
+                      aria-label={t('detail.rsvp_interested_aria')}
+                      className="bg-theme-elevated text-theme-primary transition-colors hover:bg-amber-500/20 data-[selected=true]:bg-amber-500 data-[selected=true]:text-white"
+                    >
+                      <Heart className="w-4 h-4" aria-hidden="true" />
+                      {t('detail.interested_btn')}
+                    </ToggleButton>
+                  )}
+                  {showNotGoingAction && (
+                    <ToggleButton
+                      id="not_going"
+                      variant="ghost"
+                      aria-label={t('detail.rsvp_not_going_aria')}
+                      className="bg-theme-elevated text-theme-primary transition-colors hover:bg-theme-hover data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-muted"
+                    >
+                      <XCircle className="w-4 h-4" aria-hidden="true" />
+                      {t('detail.not_going_btn')}
+                    </ToggleButton>
+                  )}
                 </ToggleButtonGroup>}
 
-                {/* E3: Waitlist join/leave button when event is full */}
-                {event.relationship.capacity.is_full && !rsvpStatus && !isWaitlisted && (
+                {canJoinWaitlist && (
                   <Button
                     className="bg-theme-elevated text-theme-primary hover:bg-amber-500/20"
                     startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
@@ -1609,7 +1666,7 @@ export function EventDetailPage() {
                     {t('detail.join_waitlist')}
                   </Button>
                 )}
-                {isWaitlisted && !hasActiveWaitlistOffer && (
+                {canLeaveWaitlist && !hasActiveWaitlistOffer && (
                   <Button
                     className="bg-amber-500/10 text-amber-400"
                     variant="flat"
@@ -1621,7 +1678,8 @@ export function EventDetailPage() {
                     {t('detail.leave_waitlist')}
                   </Button>
                 )}
-              </div>}
+                </div>
+              )}
 
             <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
               {/* Share */}

@@ -40,9 +40,11 @@ describe('mobile event communications locale content', () => {
     'title',
     'privacy_title',
     'compose_title',
+    'compose_edit_title',
     'preview_title',
     'schedule_title',
     'cancel_title',
+    'history_title',
     'variants.review_request',
     'statuses.failed',
   ] as const;

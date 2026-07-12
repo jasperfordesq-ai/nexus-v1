@@ -21,12 +21,14 @@ final class EventTicketResource
     /** @param array<string,mixed> $quote @return array<string,mixed> */
     public static function quote(array $quote): array
     {
+        $kind = self::enum($quote['kind'] ?? 'free');
+        $hasRefundEffect = $kind === 'time_credit';
         $eligibility = self::array($quote['eligibility'] ?? null);
         $refund = self::array($quote['refund_policy'] ?? null);
 
         return [
             'ticket_type_id' => self::positiveInt($quote['ticket_type_id'] ?? null),
-            'kind' => self::enum($quote['kind'] ?? 'free'),
+            'kind' => $kind,
             'units' => self::count($quote['units'] ?? 0),
             'unit_price_credits' => self::decimal($quote['unit_price_credits'] ?? 0),
             'total_price_credits' => self::decimal($quote['total_price_credits'] ?? 0),
@@ -45,9 +47,14 @@ final class EventTicketResource
             'gateway_status' => self::text($quote['gateway_status'] ?? null) ?? 'unavailable',
             'attendance_reward_included' => false,
             'refund_policy' => [
-                'cutoff_at' => self::date($refund['cutoff_at_utc'] ?? null),
-                'organizer_cancel_refundable' => (bool) ($refund['organizer_cancel_refundable'] ?? false),
-                'execution_status' => self::text($refund['execution_status'] ?? null) ?? 'not_integrated',
+                'cutoff_at' => $hasRefundEffect
+                    ? self::date($refund['cutoff_at_utc'] ?? null)
+                    : null,
+                'organizer_cancel_refundable' => $hasRefundEffect
+                    && (bool) ($refund['organizer_cancel_refundable'] ?? false),
+                'execution_status' => $hasRefundEffect
+                    ? (self::text($refund['execution_status'] ?? null) ?? 'not_integrated')
+                    : 'not_applicable',
             ],
         ];
     }
@@ -126,6 +133,8 @@ final class EventTicketResource
     public static function type(EventTicketType|array $source): array
     {
         $type = $source instanceof EventTicketType ? $source->toArray() : $source;
+        $kind = self::enum($type['kind'] ?? 'free');
+        $hasRefundEffect = $kind === 'time_credit';
         $availability = self::array($type['availability'] ?? null);
         $eligibility = self::array($availability['eligibility'] ?? null);
         $refund = self::array($availability['refund_policy'] ?? null);
@@ -136,14 +145,17 @@ final class EventTicketResource
             'version' => max(1, self::int($type['version'] ?? $type['ticket_version'] ?? 1)),
             'name' => self::text($type['name'] ?? null) ?? '',
             'description' => self::text($type['description'] ?? null),
-            'kind' => self::enum($type['kind'] ?? 'free'),
+            'kind' => $kind,
             'unit_price_credits' => self::decimal($type['unit_price_credits'] ?? 0),
             'allocation_limit' => self::count($type['allocation_limit'] ?? 0),
             'sales_opens_at' => self::date($type['sales_opens_at'] ?? $type['sales_opens_at_utc'] ?? null),
             'sales_closes_at' => self::date($type['sales_closes_at'] ?? $type['sales_closes_at_utc'] ?? null),
             'per_member_limit' => self::count($type['per_member_limit'] ?? 0),
-            'refund_cutoff_at' => self::date($type['refund_cutoff_at'] ?? $type['refund_cutoff_at_utc'] ?? null),
-            'organizer_cancel_refundable' => (bool) ($type['organizer_cancel_refundable'] ?? false),
+            'refund_cutoff_at' => $hasRefundEffect
+                ? self::date($type['refund_cutoff_at'] ?? $type['refund_cutoff_at_utc'] ?? null)
+                : null,
+            'organizer_cancel_refundable' => $hasRefundEffect
+                && (bool) ($type['organizer_cancel_refundable'] ?? false),
             'status' => self::enum($type['status'] ?? 'draft'),
             'availability' => [
                 'eligibility' => [
@@ -160,9 +172,14 @@ final class EventTicketResource
                 'gateway_status' => self::text($availability['gateway_status'] ?? null) ?? 'unavailable',
                 'attendance_reward_included' => false,
                 'refund_policy' => [
-                    'cutoff_at' => self::date($refund['cutoff_at_utc'] ?? null),
-                    'organizer_cancel_refundable' => (bool) ($refund['organizer_cancel_refundable'] ?? false),
-                    'execution_status' => self::text($refund['execution_status'] ?? null) ?? 'not_integrated',
+                    'cutoff_at' => $hasRefundEffect
+                        ? self::date($refund['cutoff_at_utc'] ?? null)
+                        : null,
+                    'organizer_cancel_refundable' => $hasRefundEffect
+                        && (bool) ($refund['organizer_cancel_refundable'] ?? false),
+                    'execution_status' => $hasRefundEffect
+                        ? (self::text($refund['execution_status'] ?? null) ?? 'not_integrated')
+                        : 'not_applicable',
                 ],
             ],
             'eligibility_policy' => is_array($policy) ? [

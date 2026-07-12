@@ -35,7 +35,25 @@
       "createdTitle": "Rascunho do evento criado",
       "createdDescription": "Revise e publique-o separadamente quando estiver pronto.",
       "createFailedTitle": "Não foi possível criar o rascunho",
-      "createFailedDescription": "Não foi possível criar o rascunho do evento. Tente novamente."
+      "createFailedDescription": "Não foi possível criar o rascunho do evento. Tente novamente.",
+      "auditButton": "Histórico de auditoria",
+      "auditTitle": "Auditoria: {{title}}",
+      "auditDescription": "Consulte o histórico operacional deste modelo filtrado para proteger a privacidade.",
+      "auditImmutableTitle": "O histórico não pode ser alterado",
+      "auditImmutableDescription": "Os registos de captura, revisão, arquivo e criação são mantidos como provas imutáveis.",
+      "auditLoading": "A carregar histórico de auditoria do modelo",
+      "auditLoadFailedTitle": "Histórico de auditoria indisponível",
+      "auditLoadFailedDescription": "Não foi possível carregar o histórico do modelo. Tente novamente.",
+      "auditEmpty": "Não existem entradas de auditoria disponíveis.",
+      "auditEntry": "Versão {{version}} · {{date}}",
+      "auditMaterializedEvent": "Evento #{{id}} criado",
+      "notRecorded": "Não registado",
+      "auditActions": {
+        "captured": "Modelo capturado",
+        "revised": "Modelo revisto",
+        "archived": "Modelo arquivado",
+        "materialized": "Rascunho criado"
+      }
     },
     "checks": {
       "event_template_check_source_manage": "Você ainda tem permissão para gerenciar o evento de origem",

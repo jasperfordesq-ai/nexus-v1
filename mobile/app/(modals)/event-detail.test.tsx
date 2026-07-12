@@ -10,6 +10,9 @@ import { Linking, ScrollView, StyleSheet } from 'react-native';
 // --- Mocks ---
 
 const mockRouterPush = jest.fn();
+const mockConfirm = jest.fn((opts: { onConfirm: () => void | Promise<void> }) => {
+  void opts.onConfirm();
+});
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockRouterPush, replace: jest.fn(), back: jest.fn() }),
@@ -60,6 +63,10 @@ jest.mock('react-i18next', () => ({
         'allDay': 'All day',
         'detail.joinWaitlist': 'Join waitlist',
         'detail.leaveWaitlist': 'Leave waitlist',
+        'detail.leaveWaitlistConfirmTitle': 'Leave the waitlist?',
+        'detail.leaveWaitlistConfirmDescription': 'You will lose your current position.',
+        'detail.offerDeclineConfirmTitle': 'Decline this reserved place?',
+        'detail.offerDeclineConfirmDescription': 'The reserved place will be released.',
         'detail.joinWaitlistError': 'Could not join the waitlist.',
         'detail.leaveWaitlistError': 'Could not leave the waitlist.',
         'detail.offerAvailable': 'Place available',
@@ -227,6 +234,22 @@ jest.mock('@/components/events/EventCheckinCredentialCard', () => {
   return () => <Text testID="event-checkin-credential-card-stub">Attendee check-in code</Text>;
 });
 
+jest.mock('@/components/events/EventRegistrationPanel', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return () => <Text testID="event-registration-panel-stub">Event registration</Text>;
+});
+
+jest.mock('@/components/events/EventAgendaEnterprisePanel', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return {
+    EventAgendaEnterprisePanel: () => (
+      <Text testID="event-agenda-enterprise-panel-stub">Session registration</Text>
+    ),
+  };
+});
+
 jest.mock('@/lib/api/events', () => ({
   acceptEventWaitlistOffer: jest.fn().mockResolvedValue({
     data: {
@@ -296,9 +319,7 @@ jest.mock('@/components/ui/AppToast', () => {
 // old Alert.alert yes/no button-press simulation.
 jest.mock('@/components/ui/useConfirm', () => ({
   useConfirm: () => ({
-    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
-      void opts.onConfirm();
-    },
+    confirm: mockConfirm,
     confirmDialog: null,
   }),
 }));
@@ -442,8 +463,9 @@ describe('EventDetailScreen', () => {
   it('renders without crashing when data is loaded', () => {
     mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { toJSON } = render(<EventDetailScreen />);
+    const { getByTestId, toJSON } = render(<EventDetailScreen />);
     expect(toJSON()).toBeTruthy();
+    expect(getByTestId('event-registration-panel-stub')).toBeTruthy();
   });
 
   it('renders private analytics only for event organisers', () => {
@@ -726,9 +748,10 @@ describe('EventDetailScreen', () => {
     expect(screen.getByText('Registered attendees')).toBeTruthy();
     expect(screen.getByText(/Aug 10.*10:30/)).toBeTruthy();
     expect(screen.getByText(/Aug 10.*11:15/)).toBeTruthy();
-    expect(screen.getByLabelText(
-      /Repair skills workshop.*Practical skills.*Workshop room.*Alex Morgan — Facilitator/,
-    )).toBeTruthy();
+    expect(screen.getByText(/Practical skills/)).toBeTruthy();
+    expect(screen.getByText(/Workshop room/)).toBeTruthy();
+    expect(screen.getByText(/Alex Morgan — Facilitator/)).toBeTruthy();
+    expect(screen.getByTestId('event-agenda-enterprise-panel-stub')).toBeTruthy();
     expect(screen.queryByText('Edit session')).toBeNull();
 
     const agendaHook = mockUseApi.mock.calls.find((call) => (
@@ -960,6 +983,16 @@ describe('EventDetailScreen', () => {
     });
     const secondRender = render(<EventDetailScreen />);
     expect(secondRender.getByText('You are on the waitlist: #2')).toBeTruthy();
+    mockConfirm.mockImplementationOnce(() => undefined);
+    fireEvent.press(secondRender.getByText('Leave waitlist'));
+
+    expect(leaveEventWaitlist).not.toHaveBeenCalled();
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Leave the waitlist?',
+      message: 'You will lose your current position.',
+      variant: 'danger',
+    }));
+
     fireEvent.press(secondRender.getByText('Leave waitlist'));
 
     await waitFor(() => {

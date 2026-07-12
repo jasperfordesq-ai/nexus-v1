@@ -21,6 +21,14 @@
       "edit_review": "Actualizar decisión",
       "withdraw_review": "decisión de retirar"
     },
+    "confirmations": {
+      "withdraw_code_title": "¿Retirar tu aceptación del código de conducta?",
+      "withdraw_code_body": "Esto puede impedir tu participación hasta que vuelvas a aceptar la versión actual.",
+      "withdraw_guardian_title": "¿Retirar la solicitud de consentimiento del tutor?",
+      "withdraw_guardian_body": "La solicitud actual dejará de ser válida. Puede que tengas que enviar una nueva antes de participar.",
+      "withdraw_review_title": "¿Retirar esta decisión de participación?",
+      "withdraw_review_body": "Esto finaliza la decisión activa para {{name}} y conserva su historial de auditoría."
+    },
     "organizer": {
       "title": "Seguridad en eventos",
       "description": "Establezca requisitos de participación versionados y mantenga un registro controlado y auditable de las decisiones de seguridad.",

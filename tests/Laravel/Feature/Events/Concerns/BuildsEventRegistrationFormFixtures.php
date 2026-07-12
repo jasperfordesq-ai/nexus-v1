@@ -123,7 +123,13 @@ trait BuildsEventRegistrationFormFixtures
             (int) $settings['settings']->revision,
             'settings-publish-' . bin2hex(random_bytes(8)),
         );
-        self::assertSame($timezone, (string) $published['settings']->event_timezone_snapshot);
+        $expectedTimezone = in_array($timezone, ['Z', '+00:00', 'GMT'], true)
+            ? 'UTC'
+            : $timezone;
+        self::assertSame(
+            $expectedTimezone,
+            (string) $published['settings']->event_timezone_snapshot,
+        );
 
         return $published['settings'];
     }

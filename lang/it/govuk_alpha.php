@@ -239,6 +239,9 @@ return [
         'comment-failed' => 'Impossibile aggiungere il commento. Riprova.',
         'not_available' => 'Non disponibile',
     ],
+    'forms' => [
+        'error_prefix' => 'Errore:',
+    ],
     'home' => [
         'module_signin' => 'Accedi',
         'module_signin_hint' => 'Accedi per usarlo.',
@@ -1161,6 +1164,11 @@ return [
         'no_category' => 'Nessuna categoria',
         'start_time_label' => 'Ora di inizio',
         'end_time_label' => 'Ora di fine',
+        'timezone_label' => 'Fuso orario dell’evento',
+        'timezone_hint' => 'Usa un fuso orario IANA, ad esempio Europe/Rome o America/New_York.',
+        'all_day_label' => 'Questo è un evento che dura tutto il giorno',
+        'all_day_hint' => 'Gli orari inseriti vengono ignorati. Indica la prima e l’ultima data dell’evento.',
+        'all_day_end_hint' => 'Per gli eventi di un’intera giornata, indica l’ultima data inclusa.',
         'datetime_hint' => 'Utilizza il selettore di data e ora oppure inserisci una data e un\'ora.',
         'end_time_hint' => 'Opzionale. Aggiungi un\'ora di fine se l\'evento ne ha una.',
         'location_label' => 'Posizione',
@@ -3341,6 +3349,8 @@ return [
             'gdpr_notice' => 'Le tue risposte sono private e utilizzate esclusivamente per la tutela. Puoi modificarle o rimuoverle in qualsiasi momento nelle impostazioni. Nulla viene selezionato a meno che tu non lo scelga.',
             'none_separator' => 'Oppure',
             'none_label' => 'Nessuna di queste si applica a me',
+            'options_legend' => 'Opzioni di protezione',
+            'select_none' => 'Nessuna selezione',
         ],
         'confirm' => [
             'title' => 'Verifica le tue risposte',
@@ -4482,6 +4492,7 @@ return [
         'report_reason_fraud' => 'Sospetta frode o truffa',
         'report_reason_duplicate' => 'Annuncio duplicato',
         'report_reason_other' => 'Altro',
+        'report_reason_required' => 'Scegli un motivo per questa segnalazione.',
         'report_details_label' => 'Dettagli aggiuntivi (facoltativi)',
         'report_details_hint' => 'Fornisci qualsiasi altra informazione utile per l\'indagine.',
         'report_submit' => 'Invia segnalazione',

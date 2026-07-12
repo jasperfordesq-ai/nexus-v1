@@ -12,6 +12,7 @@ import {
 import { Checkbox as HeroUICheckbox } from '@heroui/react/checkbox';
 import { CheckboxGroup as HeroUICheckboxGroup } from '@heroui/react/checkbox-group';
 import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
 import { Label } from '@heroui/react/label';
 
 type HeroUICheckboxProps = ComponentPropsWithoutRef<typeof HeroUICheckbox>;
@@ -50,6 +51,7 @@ export type CheckboxGroupProps = Omit<HeroUICheckboxGroupProps, 'children' | 'cl
     description?: string;
   };
   description?: ReactNode;
+  errorMessage?: ReactNode;
   label?: ReactNode;
   onChange?: (value: string[]) => void;
   onValueChange?: (value: string[]) => void;
@@ -184,6 +186,7 @@ export function CheckboxGroup({
   className,
   classNames,
   description,
+  errorMessage,
   label,
   onChange,
   onValueChange,
@@ -225,6 +228,7 @@ export function CheckboxGroup({
       {label ? <Label className={classNames?.label}>{label}</Label> : null}
       {description ? <Description className={classNames?.description}>{description}</Description> : null}
       {children}
+      {errorMessage ? <FieldError>{errorMessage}</FieldError> : null}
     </HeroUICheckboxGroup>
   );
 }

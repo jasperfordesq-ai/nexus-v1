@@ -37,12 +37,37 @@ export const mobileEventTemplateSchema = z.object({
     copied_fields: z.array(z.string()),
     skipped_fields: z.array(z.string()),
   }).passthrough(),
-  usage: z.object({ materialization_count: z.number().int().nonnegative() }).passthrough(),
-  capabilities: z.object({ materialize: z.boolean() }).passthrough(),
+  usage: z.object({
+    materialization_count: z.number().int().nonnegative(),
+    audit_entry_count: z.number().int().nonnegative(),
+  }).passthrough(),
+  capabilities: z.object({
+    materialize: z.boolean(),
+    view_audit: z.boolean(),
+  }).passthrough(),
 }).passthrough();
+
+export const mobileEventTemplateAuditSchema = z.object({
+  id: z.number().int().positive(),
+  action: z.enum(['captured', 'revised', 'archived', 'materialized']),
+  template_version: z.number().int().positive(),
+  source_event_id: z.number().int().positive(),
+  materialized_event_id: z.number().int().positive().nullable(),
+  evidence: z.record(z.string(), z.unknown()),
+  created_at: nullableString,
+  immutable: z.literal(true),
+}).strict();
 
 const templateListEnvelopeSchema = z.object({
   data: z.array(mobileEventTemplateSchema),
+  meta: z.object({
+    per_page: z.number().int().positive(),
+    next_cursor: nullableString,
+    has_more: z.boolean(),
+  }).passthrough(),
+}).passthrough();
+const templateHistoryEnvelopeSchema = z.object({
+  data: z.array(mobileEventTemplateAuditSchema),
   meta: z.object({
     per_page: z.number().int().positive(),
     next_cursor: nullableString,
@@ -97,6 +122,7 @@ const previewEnvelopeSchema = z.object({ data: mobileEventTemplatePreviewSchema 
 const materializationEnvelopeSchema = z.object({ data: mobileEventTemplateMaterializationSchema }).passthrough();
 
 export type MobileEventTemplate = z.infer<typeof mobileEventTemplateSchema>;
+export type MobileEventTemplateAudit = z.infer<typeof mobileEventTemplateAuditSchema>;
 export type MobileEventTemplatePreview = z.infer<typeof mobileEventTemplatePreviewSchema>;
 export type MobileEventTemplateMaterialization = z.infer<typeof mobileEventTemplateMaterializationSchema>;
 
@@ -137,6 +163,14 @@ export async function getEventTemplates(cursor?: string | null) {
   if (cursor) params.cursor = cursor;
   const response = await api.get<unknown>(endpoint, params);
   return parseContract(endpoint, templateListEnvelopeSchema, response);
+}
+
+export async function getEventTemplateHistory(templateId: number, cursor?: string | null) {
+  const endpoint = `${API_V2}/event-templates/${templateId}/history`;
+  const params: Record<string, string> = { per_page: '50' };
+  if (cursor) params.cursor = cursor;
+  const response = await api.get<unknown>(endpoint, params);
+  return parseContract(endpoint, templateHistoryEnvelopeSchema, response);
 }
 
 export async function previewEventTemplate(

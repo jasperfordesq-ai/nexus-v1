@@ -99,6 +99,8 @@ final class EventRegistrationSubmissionServiceTest extends TestCase
             $owner,
             'Operational attendee support',
             'answer-read-correlation',
+            'read',
+            true,
         );
         $export = $service->readAnswers(
             $eventId,
@@ -107,6 +109,7 @@ final class EventRegistrationSubmissionServiceTest extends TestCase
             'Authorised event export',
             'answer-export-correlation',
             'export',
+            true,
         );
         self::assertSame($answers['dietary_needs'], $read['dietary_needs']['value']);
         self::assertSame($answers['waiver'], $export['waiver']['value']);

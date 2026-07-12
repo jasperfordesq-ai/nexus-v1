@@ -42,6 +42,7 @@
     "units": "{{count}} Einheit",
     "units_other": "{{count}} Einheiten",
     "cancel": "Ticket stornieren",
+    "time_credit_cancel_disabled": "Die Stornierung von Zeitguthaben-Tickets ist in diesem kostenlosen Ablauf nicht verfügbar. Es wurde keine Wallet-Aktion ausgeführt.",
     "cancelled": "Abgesagt",
     "cancel_title": "Dieses Ticket stornieren?",
     "cancel_reason": "Grund für die Stornierung",

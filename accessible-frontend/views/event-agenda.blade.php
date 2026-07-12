@@ -155,22 +155,37 @@
                         </ul>
                     @endif
 
-                    @if (!empty($registration['can_register']) || !empty($registration['can_withdraw']))
+                    @if (!empty($registration['can_register']))
                         <form method="post" action="{{ route('govuk-alpha.events.agenda.update', ['tenantSlug' => $tenantSlug, 'id' => $eventId]) }}" class="govuk-!-margin-bottom-4">
                             @csrf
-                            <input type="hidden" name="action" value="{{ !empty($registration['can_withdraw']) ? 'withdraw' : 'register' }}">
+                            <input type="hidden" name="action" value="register">
                             <input type="hidden" name="session_id" value="{{ $sessionId }}">
                             <input type="hidden" name="expected_version" value="{{ (int) ($registration['version'] ?? 0) }}">
                             <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
-                            <button class="govuk-button {{ !empty($registration['can_withdraw']) ? 'govuk-button--secondary' : '' }}" data-module="govuk-button">
-                                {{ !empty($registration['can_withdraw']) ? __('event_agenda.withdraw_action') : __('event_agenda.register_action') }}
-                            </button>
+                            <button class="govuk-button" data-module="govuk-button">{{ __('event_agenda.register_action') }}</button>
                         </form>
-                    @elseif (($registration['state'] ?? null) === 'registered')
+                    @endif
+                    @if (!empty($registration['can_withdraw']))
+                        <form method="post" action="{{ route('govuk-alpha.events.agenda.update', ['tenantSlug' => $tenantSlug, 'id' => $eventId]) }}" class="govuk-!-margin-bottom-4">
+                            @csrf
+                            <input type="hidden" name="action" value="withdraw">
+                            <input type="hidden" name="session_id" value="{{ $sessionId }}">
+                            <input type="hidden" name="expected_version" value="{{ (int) ($registration['version'] ?? 0) }}">
+                            <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
+                            <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="{{ $sessionKey }}-confirm-withdraw" name="confirm_destructive" type="checkbox" value="1" required>
+                                    <label class="govuk-label govuk-checkboxes__label" for="{{ $sessionKey }}-confirm-withdraw">{{ __('event_agenda.withdraw_confirmation', ['title' => $session['title']]) }}</label>
+                                </div>
+                            </div>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('event_agenda.withdraw_action') }}</button>
+                        </form>
+                    @endif
+                    @if (($registration['state'] ?? null) === 'registered')
                         <p class="govuk-body"><strong>{{ __('event_agenda.registered_state') }}</strong></p>
                     @elseif (($registration['state'] ?? null) === 'ineligible')
                         <p class="govuk-body">{{ __('event_agenda.ineligible_state') }}</p>
-                    @elseif (!empty($capacity['is_full']))
+                    @elseif (empty($registration['can_register']) && empty($registration['can_withdraw']) && !empty($capacity['is_full']))
                         <p class="govuk-body">{{ __('event_agenda.full_state') }}</p>
                     @endif
 

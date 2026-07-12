@@ -40,6 +40,13 @@ final class EventSessionContractMapperTest extends TestCase
             'room_name' => 'Workshop room',
             'position' => 1,
             'cancellation_reason' => null,
+            'capacity' => 24,
+            'capacity_registered' => 12,
+            'viewer_registration_state' => 'registered',
+            'viewer_registration_version' => 1,
+            'viewer_can_view_registered' => true,
+            'viewer_can_register' => false,
+            'viewer_can_withdraw' => true,
             'speakers' => [[
                 'user_id' => 7,
                 'display_name' => null,
@@ -50,6 +57,24 @@ final class EventSessionContractMapperTest extends TestCase
                     'name' => 'Alex Morgan',
                 ],
             ]],
+            'resources' => [
+                [
+                    'id' => 701,
+                    'type' => 'slides',
+                    'title' => 'Workshop slides',
+                    'visibility' => 'registered',
+                    'position' => 1,
+                    'url' => 'https://events.example.test/resources/workshop-slides',
+                ],
+                [
+                    'id' => 702,
+                    'type' => 'stream',
+                    'title' => 'Live workshop stream',
+                    'visibility' => 'registered',
+                    'position' => 2,
+                    'url' => 'https://events.example.test/live/workshop',
+                ],
+            ],
         ]]);
 
         self::assertSame($fixture, $actual);

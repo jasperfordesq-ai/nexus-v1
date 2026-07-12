@@ -150,6 +150,12 @@
                                         <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                                         <input type="hidden" name="expected_revision" value="{{ $requirements['revision'] }}">
                                         <input type="hidden" name="expected_version" value="{{ $requirements['current_version'] }}">
+                                        <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="confirm-archive-requirements" name="confirm_destructive" type="checkbox" value="1" required>
+                                                <label class="govuk-label govuk-checkboxes__label" for="confirm-archive-requirements">{{ __('event_safety.govuk.confirm_archive_checkbox') }}</label>
+                                            </div>
+                                        </div>
                                         <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('event_safety.govuk.confirm_archive') }}</button>
                                     </form>
                                 </div>
@@ -201,6 +207,12 @@
                             <input type="hidden" name="action" value="withdraw_code">
                             <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                             <input type="hidden" name="acknowledgement_id" value="{{ $codeEvidence['acknowledgement_id'] ?? '' }}">
+                            <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="confirm-withdraw-code" name="confirm_destructive" type="checkbox" value="1" required>
+                                    <label class="govuk-label govuk-checkboxes__label" for="confirm-withdraw-code">{{ __('event_safety.govuk.confirm_withdraw_code') }}</label>
+                                </div>
+                            </div>
                             <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('event_safety.govuk.withdraw_acknowledgement') }}</button>
                         </form>
                     @endif
@@ -239,6 +251,12 @@
                             <input type="hidden" name="action" value="withdraw_guardian_consent">
                             <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                             <input type="hidden" name="consent_id" value="{{ $guardianEvidence['consent_id'] ?? '' }}">
+                            <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="confirm-withdraw-guardian" name="confirm_destructive" type="checkbox" value="1" required>
+                                    <label class="govuk-label govuk-checkboxes__label" for="confirm-withdraw-guardian">{{ __('event_safety.govuk.confirm_withdraw_guardian') }}</label>
+                                </div>
+                            </div>
                             <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('event_safety.govuk.withdraw_guardian') }}</button>
                         </form>
                     @endif
@@ -319,6 +337,12 @@
                                     <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                                     <input type="hidden" name="denial_id" value="{{ $item['denial']['id'] }}">
                                     <input type="hidden" name="expected_version" value="{{ $item['denial']['decision_version'] }}">
+                                    <div class="govuk-checkboxes govuk-!-margin-bottom-4">
+                                        <div class="govuk-checkboxes__item">
+                                            <input class="govuk-checkboxes__input" id="confirm-withdraw-review-{{ $item['denial']['id'] }}" name="confirm_destructive" type="checkbox" value="1" required>
+                                            <label class="govuk-label govuk-checkboxes__label" for="confirm-withdraw-review-{{ $item['denial']['id'] }}">{{ __('event_safety.govuk.confirm_withdraw_review', ['name' => $item['member']['display_name'] ?: __('event_safety.govuk.member_fallback', ['id' => $item['member']['id']])]) }}</label>
+                                        </div>
+                                    </div>
                                     <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('event_safety.govuk.withdraw_review') }}</button>
                                 </form>
                             @endif

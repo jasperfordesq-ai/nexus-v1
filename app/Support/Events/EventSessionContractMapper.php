@@ -74,11 +74,23 @@ final class EventSessionContractMapper
             [$left['position'], $left['member_id'] ?? PHP_INT_MAX, $left['display_name'] ?? '']
                 <=> [$right['position'], $right['member_id'] ?? PHP_INT_MAX, $right['display_name'] ?? '']);
 
-        $canManage = $canManage || (bool) ($sessionModel?->getAttribute('viewer_can_manage') ?? false);
+        $canManage = $canManage || (bool) (
+            $sessionModel?->getAttribute('viewer_can_manage')
+            ?? $data['viewer_can_manage']
+            ?? false
+        );
         $canViewRegistered = $canManage
-            || (bool) ($sessionModel?->getAttribute('viewer_can_view_registered') ?? false);
+            || (bool) (
+                $sessionModel?->getAttribute('viewer_can_view_registered')
+                ?? $data['viewer_can_view_registered']
+                ?? false
+            );
         $canViewStaff = $canManage
-            || (bool) ($sessionModel?->getAttribute('viewer_can_view_staff') ?? false);
+            || (bool) (
+                $sessionModel?->getAttribute('viewer_can_view_staff')
+                ?? $data['viewer_can_view_staff']
+                ?? false
+            );
         $resources = $sessionModel !== null && $sessionModel->relationLoaded('resources')
             ? $sessionModel->getRelation('resources')
             : ($data['resources'] ?? []);
@@ -102,13 +114,19 @@ final class EventSessionContractMapper
         $capacityLimit = self::nullableInt($data['capacity'] ?? null);
         $capacityRegistered = max(
             0,
-            self::intValue($sessionModel?->getAttribute('capacity_registered') ?? 0),
+            self::intValue(
+                $sessionModel?->getAttribute('capacity_registered')
+                ?? $data['capacity_registered']
+                ?? 0,
+            ),
         );
         $capacityRemaining = $capacityLimit === null
             ? null
             : max(0, $capacityLimit - $capacityRegistered);
         $registrationState = self::nullableString(
-            $sessionModel?->getAttribute('viewer_registration_state') ?? null,
+            $sessionModel?->getAttribute('viewer_registration_state')
+            ?? $data['viewer_registration_state']
+            ?? null,
         ) ?? 'not_registered';
         if (! in_array($registrationState, [
             'not_registered',
@@ -137,11 +155,21 @@ final class EventSessionContractMapper
                 'version' => max(
                     0,
                     self::intValue(
-                        $sessionModel?->getAttribute('viewer_registration_version') ?? 0,
+                        $sessionModel?->getAttribute('viewer_registration_version')
+                        ?? $data['viewer_registration_version']
+                        ?? 0,
                     ),
                 ),
-                'can_register' => (bool) ($sessionModel?->getAttribute('viewer_can_register') ?? false),
-                'can_withdraw' => (bool) ($sessionModel?->getAttribute('viewer_can_withdraw') ?? false),
+                'can_register' => (bool) (
+                    $sessionModel?->getAttribute('viewer_can_register')
+                    ?? $data['viewer_can_register']
+                    ?? false
+                ),
+                'can_withdraw' => (bool) (
+                    $sessionModel?->getAttribute('viewer_can_withdraw')
+                    ?? $data['viewer_can_withdraw']
+                    ?? false
+                ),
             ],
             'status' => self::enumValue($data['status'] ?? 'scheduled'),
             'start_at' => self::dateString($data['starts_at_utc'] ?? $data['start_at'] ?? null),

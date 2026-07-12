@@ -56,6 +56,7 @@ import EventSafetyCard from '@/components/events/EventSafetyCard';
 import { EventAnalyticsSummaryCard } from '@/components/events/EventAnalyticsSummaryCard';
 import EventCheckinCredentialCard from '@/components/events/EventCheckinCredentialCard';
 import EventRegistrationPanel from '@/components/events/EventRegistrationPanel';
+import { EventAgendaEnterprisePanel } from '@/components/events/EventAgendaEnterprisePanel';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const REMINDER_OPTIONS = [60, 1440, 10080] as const;
@@ -287,13 +288,12 @@ function EventDetailScreenInner() {
     agendaApi.refresh();
   }
 
-  async function handleToggleWaitlist() {
+  async function changeWaitlist(leaving: boolean) {
     if (!event || updating) return;
-
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setUpdating(true);
     try {
-      if (currentRelationship.registration.can_leave_waitlist) {
+      if (leaving) {
         await leaveEventWaitlist(event.id);
         refresh();
         return;
@@ -304,16 +304,38 @@ function EventDetailScreenInner() {
     } catch {
       showToast({
         title: t('common:errors.alertTitle'),
-        description: t(hasActiveWaitlistOffer
-          ? 'detail.offerDeclineError'
-          : currentRelationship.registration.can_leave_waitlist
-            ? 'detail.leaveWaitlistError'
-            : 'detail.joinWaitlistError'),
+        description: t(leaving
+          ? hasActiveWaitlistOffer
+            ? 'detail.offerDeclineError'
+            : 'detail.leaveWaitlistError'
+          : 'detail.joinWaitlistError'),
         variant: 'danger',
       });
     } finally {
       setUpdating(false);
     }
+  }
+
+  function handleToggleWaitlist() {
+    if (!event || updating) return;
+    if (!currentRelationship.registration.can_leave_waitlist) {
+      void changeWaitlist(false);
+      return;
+    }
+
+    const decliningOffer = hasActiveWaitlistOffer;
+    confirm({
+      title: t(decliningOffer
+        ? 'detail.offerDeclineConfirmTitle'
+        : 'detail.leaveWaitlistConfirmTitle'),
+      message: t(decliningOffer
+        ? 'detail.offerDeclineConfirmDescription'
+        : 'detail.leaveWaitlistConfirmDescription'),
+      confirmLabel: t(decliningOffer ? 'detail.declineOffer' : 'detail.leaveWaitlist'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => changeWaitlist(true),
+    });
   }
 
   async function handleAcceptWaitlistOffer() {
@@ -656,7 +678,7 @@ function EventDetailScreenInner() {
                   className="flex-1"
                   variant="secondary"
                   isDisabled={updating}
-                  onPress={() => void handleToggleWaitlist()}
+                  onPress={handleToggleWaitlist}
                   accessibilityLabel={t('detail.declineOffer')}
                   accessibilityState={{ busy: updating }}
                 >
@@ -701,7 +723,7 @@ function EventDetailScreenInner() {
                   variant={currentRelationship.registration.can_leave_waitlist ? 'secondary' : 'primary'}
                   isDisabled={updating}
                   style={!currentRelationship.registration.can_leave_waitlist ? { backgroundColor: primary } : undefined}
-                  onPress={() => void handleToggleWaitlist()}
+                  onPress={handleToggleWaitlist}
                   accessibilityLabel={currentRelationship.registration.can_leave_waitlist ? t('detail.leaveWaitlist') : t('detail.joinWaitlist')}
                   accessibilityState={{ busy: updating }}
                 >
@@ -741,6 +763,21 @@ function EventAgendaCard({
   theme: Theme;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const [sessionOverrides, setSessionOverrides] = useState<
+    Record<number, EventAgenda['sessions'][number]>
+  >({});
+
+  useEffect(() => {
+    if (!agenda || !Array.isArray(agenda.sessions)) {
+      setSessionOverrides({});
+      return;
+    }
+
+    const next: Record<number, EventAgenda['sessions'][number]> = {};
+    for (const session of agenda.sessions) next[session.id] = session;
+    setSessionOverrides(next);
+  }, [agenda]);
+
   if (!agenda && isLoading) {
     return (
       <Surface
@@ -786,7 +823,8 @@ function EventAgendaCard({
         </View>
 
         <View className="gap-3">
-          {agenda.sessions.map((session) => {
+          {agenda.sessions.map((serverSession) => {
+            const session = sessionOverrides[serverSession.id] ?? serverSession;
             const startLabel = formatAgendaDateTime(session.start_at, agenda.timezone, locale);
             const endLabel = formatAgendaDateTime(session.end_at, agenda.timezone, locale);
             const typeLabel = t(`agenda.type.${session.type}`);
@@ -797,27 +835,11 @@ function EventAgendaCard({
                 ? t('agenda.speakerWithRole', { name, role: speaker.role })
                 : name;
             });
-            const accessibilityDetails = [
-              session.track ? `${t('agenda.track')}: ${session.track}` : null,
-              session.room ? `${t('agenda.room')}: ${session.room}` : null,
-              speakerLabels.length > 0 ? `${t('agenda.speakers')}: ${speakerLabels.join(', ')}` : null,
-              session.status === 'cancelled' ? t('agenda.status.cancelled') : null,
-            ].filter(Boolean).join('. ');
-
             return (
               <Surface
                 key={session.id}
                 variant="tertiary"
                 className="gap-3 rounded-xl border border-border px-3 py-3"
-                accessible
-                accessibilityLabel={t('agenda.sessionAccessibility', {
-                  title: session.title,
-                  type: typeLabel,
-                  visibility: visibilityLabel,
-                  start: startLabel,
-                  end: endLabel,
-                  details: accessibilityDetails,
-                })}
               >
                 <View className="gap-2">
                   <View className="flex-row flex-wrap items-center gap-2">
@@ -888,6 +910,22 @@ function EventAgendaCard({
                     </Text>
                   </View>
                 ) : null}
+
+                <EventAgendaEnterprisePanel
+                  eventId={agenda.event_id}
+                  session={session}
+                  onSessionChange={(updatedSession) => {
+                    if (updatedSession === null) {
+                      onRefresh();
+                      return;
+                    }
+                    setSessionOverrides((current) => ({
+                      ...current,
+                      [updatedSession.id]: updatedSession,
+                    }));
+                    onRefresh();
+                  }}
+                />
               </Surface>
             );
           })}

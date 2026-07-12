@@ -31,14 +31,27 @@ return new class extends Migration
 
     public function up(): void
     {
-        if (! Schema::hasTable('events')
-            || ! Schema::hasTable('users')
-            || ! Schema::hasTable('event_sessions')
-            || ! Schema::hasTable('event_session_history')
-            || ! Schema::hasTable('event_registrations')
-            || ! Schema::hasIndex('event_sessions', self::SESSION_SCOPE_INDEX)
-            || ! Schema::hasIndex('event_registrations', self::EVENT_REGISTRATION_SCOPE_INDEX)) {
-            return;
+        foreach ([
+            'tenants',
+            'events',
+            'users',
+            'event_sessions',
+            'event_session_history',
+            'event_registrations',
+        ] as $required) {
+            if (! Schema::hasTable($required)) {
+                throw new LogicException("event_agenda_enterprise_prerequisite_missing:{$required}");
+            }
+        }
+        foreach ([
+            'event_sessions' => self::SESSION_SCOPE_INDEX,
+            'event_registrations' => self::EVENT_REGISTRATION_SCOPE_INDEX,
+        ] as $table => $index) {
+            if (! Schema::hasIndex($table, $index)) {
+                throw new LogicException(
+                    "event_agenda_enterprise_prerequisite_missing:{$table}.{$index}",
+                );
+            }
         }
 
         $this->addSessionCapacity();
