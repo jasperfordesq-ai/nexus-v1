@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\GovukAlpha;
 
+use App\Core\ImageUploader;
 use App\Core\TenantContext;
 use App\Core\Validator;
 use App\Enums\EventNotificationDeliveryMode;
