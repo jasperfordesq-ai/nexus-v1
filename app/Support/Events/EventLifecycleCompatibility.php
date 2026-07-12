@@ -100,7 +100,7 @@ final class EventLifecycleCompatibility
 
     private static function normalizeLegacyStatus(?string $status): string
     {
-        if ($status === null) {
+        if ($status === null || trim($status) === '') {
             return 'active';
         }
 
