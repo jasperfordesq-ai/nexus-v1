@@ -6,14 +6,15 @@
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useDisclosure } from '@/components/ui/useDisclosure';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 /**
  * Group Detail Page - Single group view
  * Full discussions UI, admin features, events tab, member management
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';import AlertCircle from 'lucide-react/icons/circle-alert';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -24,24 +25,63 @@ import { LoadingScreen } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
-import { runConfirmedMutation } from '@/lib/confirmedMutation';
 import { logError } from '@/lib/logger';
 import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import type { FeedItem } from '@/components/feed/types';
-import type { ReactionType } from '@/components/social';
-import type { Group, User, FeedPost, Event } from '@/types/api';
-
-// Tab types
-import type { Discussion, DiscussionDetail, DiscussionMessage } from './tabs/GroupDiscussionTab';
-import type { GroupMember } from './tabs/GroupMembersTab';
+import type { ReactionType } from '@/components/social/reactions';
+import type { Event } from '@/types/api';
 
 // Sub-components
 import { GroupHeader } from './components/GroupHeader';
-import type { JoinRequest } from './components/GroupHeader';
 import { GroupTabNav } from './components/GroupTabNav';
 import { GroupTabContent } from './components/GroupTabContent';
 import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
+import { getAvailableGroupSections, isGroupSectionKey, type GroupSectionKey } from './groupSections';
+import {
+  createGroupDiscussion,
+  createGroupInviteLink,
+  decideGroupJoinRequest,
+  deleteGroup,
+  deleteGroupFeedItem,
+  getGroupDetail,
+  getGroupDiscussion,
+  GroupApiError,
+  hideGroupFeedItem,
+  joinGroup,
+  leaveGroup,
+  listGroupDiscussions,
+  listGroupEvents,
+  listGroupFeed,
+  listGroupInvites,
+  listGroupJoinRequests,
+  listGroupMembers,
+  listGroupTags,
+  muteGroupFeedUser,
+  reactToGroupFeedItem,
+  removeGroupMember,
+  revokeGroupInvite,
+  replyToGroupDiscussion,
+  reportGroupFeedItem,
+  sendGroupInvites,
+  toggleGroupFeedLike,
+  updateGroupMemberRole,
+  voteInGroupFeedPoll,
+  emptyGroupFormDraft,
+  emptyGroupImageDraft,
+  getGroupFormCapabilities,
+  groupFormFingerprint,
+  updateGroupFromDraft,
+  type GroupDetailRecord,
+  type GroupDiscussion,
+  type GroupDiscussionDetail,
+  type GroupJoinRequestRecord,
+  type GroupInviteRecord,
+  type GroupInviteSendResult,
+  type GroupMemberRecord,
+  type GroupTagRecord,
+  type GroupFormCapabilities,
+  type GroupFormDraft,
+} from './api';
 import { GroupNotificationPrefs } from './components/GroupNotificationPrefs';
 import { CourseGroupRecommendations } from '@/components/courses/CourseGroupRecommendations';
 import {
@@ -57,10 +97,11 @@ import {
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface GroupDetails extends Group {
-  members?: User[];
-  recent_posts?: FeedPost[];
-}
+type GroupDetails = GroupDetailRecord;
+type Discussion = GroupDiscussion;
+type DiscussionDetail = GroupDiscussionDetail;
+type GroupMember = GroupMemberRecord;
+type JoinRequest = GroupJoinRequestRecord;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -84,20 +125,54 @@ function isGroupAdmin(group: GroupDetails): boolean {
   return group.is_admin ?? false;
 }
 
+function appendUniqueById<T extends { id: number }>(current: T[], next: T[]): T[] {
+  const seen = new Set(current.map((item) => item.id));
+  return [...current, ...next.filter((item) => !seen.has(item.id))];
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupDetailPage() {
-  const { t } = useTranslation('groups');
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user: currentUser, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
+  const numericId = id && /^\d+$/.test(id) ? Number(id) : Number.NaN;
+
+  if (!Number.isSafeInteger(numericId) || numericId <= 0) {
+    return <Navigate to={tenantPath('/groups')} replace />;
+  }
+
+  return <GroupDetailView key={numericId} groupId={numericId} />;
+}
+
+interface GroupDetailViewProps {
+  groupId: number;
+}
+
+function GroupDetailView({ groupId }: GroupDetailViewProps) {
+  const { t } = useTranslation('groups');
+  const id = String(groupId);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { user: currentUser, isAuthenticated } = useAuth();
+  const { tenantPath, hasGroupTab, hasFeature } = useTenant();
   const toast = useToast();
+  const confirm = useConfirm();
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
+  const requestScopeRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestScopeRef.current = controller;
+
+    return () => {
+      controller.abort();
+      if (requestScopeRef.current === controller) requestScopeRef.current = null;
+    };
+  }, []);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -107,10 +182,41 @@ export function GroupDetailPage() {
 
   // Core state
   const [group, setGroup] = useState<GroupDetails | null>(null);
-  const [activeTab, setActiveTab] = useState('feed');
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const userIsMember = group ? isMember(group) : false;
+  const userIsAdmin = group ? isGroupAdmin(group) : false;
+  const hasSubGroups = Boolean(group?.sub_groups?.length);
+  const availableSections = useMemo(
+    () => getAvailableGroupSections({
+      hasGroupTab,
+      hasSubgroups: hasSubGroups,
+      userIsAdmin,
+      userIsMember,
+      hasEventsFeature: hasFeature('events'),
+    }),
+    [hasFeature, hasGroupTab, hasSubGroups, userIsAdmin, userIsMember],
+  );
+  const requestedTab = searchParams.get('tab');
+  const activeTab: GroupSectionKey = isGroupSectionKey(requestedTab) && availableSections.includes(requestedTab)
+    ? requestedTab
+    : (availableSections[0] ?? 'feed');
+
+  useEffect(() => {
+    if (!group || availableSections.length === 0 || requestedTab === activeTab) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', activeTab);
+    setSearchParams(next, { replace: true });
+  }, [activeTab, availableSections.length, group, requestedTab, searchParams, setSearchParams]);
+
+  const handleTabChange = useCallback((tab: GroupSectionKey) => {
+    if (!availableSections.includes(tab)) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next);
+  }, [availableSections, searchParams, setSearchParams]);
 
   usePageTitle(group?.name ?? t('title'));
 
@@ -118,6 +224,7 @@ export function GroupDetailPage() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedLoaded, setFeedLoaded] = useState(false);
+  const [feedError, setFeedError] = useState(false);
   const [feedHasMore, setFeedHasMore] = useState(false);
   const [feedLoadingMore, setFeedLoadingMore] = useState(false);
   const feedCursorRef = useRef<string | undefined>(undefined);
@@ -134,12 +241,22 @@ export function GroupDetailPage() {
   // Members state
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
+  const [membersLoadingMore, setMembersLoadingMore] = useState(false);
+  const [membersHasMore, setMembersHasMore] = useState(false);
   const [membersLoaded, setMembersLoaded] = useState(false);
+  const [membersError, setMembersError] = useState(false);
+  const membersCursorRef = useRef<string | null>(null);
+  const membersHasMoreRef = useRef(false);
+  const membersSearchRef = useRef('');
+  const membersRequestRef = useRef<AbortController | null>(null);
+  const membersRequestSequenceRef = useRef(0);
+  const membersSeenCursorsRef = useRef(new Set<string>());
 
   // Discussions state
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [discussionsLoading, setDiscussionsLoading] = useState(false);
   const [discussionsLoaded, setDiscussionsLoaded] = useState(false);
+  const [discussionsError, setDiscussionsError] = useState(false);
   const [discussionsCursor, setDiscussionsCursor] = useState<string | undefined>();
   const [discussionsHasMore, setDiscussionsHasMore] = useState(true);
   const [showNewDiscussion, setShowNewDiscussion] = useState(false);
@@ -153,9 +270,13 @@ export function GroupDetailPage() {
   const [inviteMessage, setInviteMessage] = useState('');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [sendingInvites, setSendingInvites] = useState(false);
+  const [pendingInvites, setPendingInvites] = useState<GroupInviteRecord[]>([]);
+  const [inviteResults, setInviteResults] = useState<GroupInviteSendResult[]>([]);
+  const [invitesLoading, setInvitesLoading] = useState(false);
+  const [revokingInvite, setRevokingInvite] = useState<number | null>(null);
 
   // Tags state
-  const [groupTags, setGroupTags] = useState<Array<{ id: number; name: string; color?: string }>>([]);
+  const [groupTags, setGroupTags] = useState<GroupTagRecord[]>([]);
 
   // Notification preferences modal
   const [showNotifPrefs, setShowNotifPrefs] = useState(false);
@@ -164,17 +285,17 @@ export function GroupDetailPage() {
   const [expandedDiscussionId, setExpandedDiscussionId] = useState<number | null>(null);
   const [expandedDiscussion, setExpandedDiscussion] = useState<DiscussionDetail | null>(null);
   const [expandedLoading, setExpandedLoading] = useState(false);
+  const [loadingEarlierReplies, setLoadingEarlierReplies] = useState(false);
+  const expandedDiscussionRequestIdRef = useRef(0);
   const [replyContent, setReplyContent] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
 
   // Admin state
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [settingsName, setSettingsName] = useState('');
-  const [settingsDescription, setSettingsDescription] = useState('');
-  const [settingsPrivate, setSettingsPrivate] = useState(false);
-  const [settingsLocation, setSettingsLocation] = useState('');
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [settingsDraft, setSettingsDraft] = useState<GroupFormDraft>(() => emptyGroupFormDraft());
+  const [settingsCapabilities, setSettingsCapabilities] = useState<GroupFormCapabilities | null>(null);
+  const settingsInitialFingerprintRef = useRef(groupFormFingerprint(emptyGroupFormDraft()));
   const [savingSettings, setSavingSettings] = useState(false);
   const [deletingGroup, setDeletingGroup] = useState(false);
 
@@ -182,6 +303,7 @@ export function GroupDetailPage() {
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [requestsLoaded, setRequestsLoaded] = useState(false);
+  const [requestsError, setRequestsError] = useState(false);
   const [processingRequest, setProcessingRequest] = useState<number | null>(null);
 
   // Member management state
@@ -193,7 +315,20 @@ export function GroupDetailPage() {
   // Events state
   const [events, setEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsLoadingMore, setEventsLoadingMore] = useState(false);
+  const [eventsHasMore, setEventsHasMore] = useState(false);
   const [eventsLoaded, setEventsLoaded] = useState(false);
+  const [eventsError, setEventsError] = useState(false);
+  const eventsCursorRef = useRef<string | null>(null);
+  const eventsHasMoreRef = useRef(false);
+  const eventsRequestRef = useRef<AbortController | null>(null);
+  const eventsRequestSequenceRef = useRef(0);
+  const eventsSeenCursorsRef = useRef(new Set<string>());
+
+  useEffect(() => () => {
+    membersRequestRef.current?.abort();
+    eventsRequestRef.current?.abort();
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Load Group
@@ -208,58 +343,84 @@ export function GroupDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<GroupDetails>(`/v2/groups/${id}`);
-      if (controller.signal.aborted) return;
-      if (response.success && response.data) {
-        setGroup(response.data);
-        if (response.data.sub_groups && response.data.sub_groups.length > 0) {
-          setActiveTab('subgroups');
-        }
-      } else {
-        setError(tRef.current('detail.not_found_desc'));
-      }
+      const nextGroup = await getGroupDetail(groupId, {
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || abortRef.current !== controller) return;
+      setGroup(nextGroup);
     } catch (err) {
-      if (controller.signal.aborted) return;
+      if (controller.signal.aborted || abortRef.current !== controller) return;
       logError('Failed to load group', err);
-      setError(tRef.current('detail.error_load_failed'));
+      setError(
+        err instanceof GroupApiError && err.code === 'NOT_FOUND'
+          ? tRef.current('detail.not_found_desc')
+          : tRef.current('detail.error_load_failed'),
+      );
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted && abortRef.current === controller) {
+        setIsLoading(false);
+      }
     }
-  }, [id]);
+  }, [groupId, id]);
 
   useEffect(() => {
     loadGroup();
+    return () => abortRef.current?.abort();
   }, [loadGroup]);
 
   // Load tags for the group (requires auth)
   useEffect(() => {
     if (!id || !isAuthenticated) return;
+    const controller = new AbortController();
     let cancelled = false;
-    api.get(`/v2/groups/${id}/tags`)
-      .then((resp) => {
+    setGroupTags([]);
+    listGroupTags(groupId, { signal: controller.signal })
+      .then((tags) => {
         if (cancelled) return;
-        setGroupTags((resp.data ?? []) as Array<{ id: number; name: string; color?: string }>);
+        setGroupTags(tags);
       })
-      .catch((err) => { logError('GroupDetailPage.loadTags', err); });
-    return () => { cancelled = true; };
-  }, [id, isAuthenticated]);
+      .catch((err) => {
+        if (!(err instanceof GroupApiError && err.isCancellation)) {
+          logError('GroupDetailPage.loadTags', err);
+        }
+      });
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [groupId, id, isAuthenticated]);
 
   // Invite handlers
+  const loadPendingInvites = useCallback(async () => {
+    if (!id) return;
+    const signal = requestScopeRef.current?.signal;
+    try {
+      setInvitesLoading(true);
+      const invites = await listGroupInvites(groupId, { signal });
+      if (!signal?.aborted) {
+        setPendingInvites(invites);
+        const latestLink = invites.find((invite) => invite.type === 'link' && invite.invite_url);
+        if (latestLink?.invite_url) setInviteLink(latestLink.invite_url);
+      }
+    } catch (err) {
+      if (!(err instanceof GroupApiError && err.isCancellation)) {
+        logError('GroupDetailPage.loadInvites', err);
+        toastRef.current.error(tRef.current('detail.invites_failed'));
+      }
+    } finally {
+      if (!signal?.aborted) setInvitesLoading(false);
+    }
+  }, [groupId, id]);
+
   const handleGenerateInviteLink = async () => {
     if (!id) return;
     try {
-      const resp = await api.post<{ invite_url: string }>(`/v2/groups/${id}/invites/link`);
-      // api.post resolves { success:false } on a 4xx (e.g. 403 for non-admins)
-      // WITHOUT throwing, so the catch never fires — without this branch a
-      // rejected request silently did nothing.
-      if (resp.success && resp.data?.invite_url) {
-        setInviteLink(resp.data.invite_url);
-      } else {
-        toastRef.current.error(t('detail.invite_link_error'));
-      }
+      const invite = await createGroupInviteLink(groupId);
+      setInviteLink(invite.invite_url ?? null);
+      setPendingInvites((current) => [invite, ...current.filter((item) => item.id !== invite.id)]);
     } catch (err) {
       logError('GroupDetailPage.generateInviteLink', err);
-      toastRef.current.error(t('detail.invite_link_error'));
+      toastRef.current.error(tRef.current('detail.invite_link_error'));
     }
   };
 
@@ -267,24 +428,40 @@ export function GroupDetailPage() {
     if (!id || !inviteEmails.trim()) return;
     setSendingInvites(true);
     const emails = inviteEmails.split(',').map((e: string) => e.trim()).filter(Boolean);
-    // api.post resolves { success: false } (it does not throw) on a 4xx/5xx — without
-    // gating on the confirmed result a rejected invite still cleared the form, closed
-    // the modal and showed "invites sent". runConfirmedMutation only runs onConfirmed
-    // when the server confirmed the send.
-    await runConfirmedMutation(
-      () => api.post(`/v2/groups/${id}/invites/email`, { emails, message: inviteMessage }),
-      {
-        onConfirmed: () => {
-          toast.success(t('detail.invites_sent'));
-          setInviteEmails('');
-          setInviteMessage('');
-          setShowInviteModal(false);
-        },
-        onRejected: () => toast.error(t('detail.invites_failed')),
-        onError: (err) => logError('GroupDetailPage.sendInvites', err),
-      },
-    );
-    setSendingInvites(false);
+    try {
+      const results = await sendGroupInvites(groupId, { emails, message: inviteMessage });
+      setInviteResults(results);
+      if (results.some((result) => result.status === 'sent')) {
+        toastRef.current.success(tRef.current('detail.invites_sent'));
+      } else {
+        toastRef.current.error(tRef.current('detail.invites_failed'));
+      }
+      setInviteEmails('');
+      setInviteMessage('');
+      await loadPendingInvites();
+    } catch (err) {
+      logError('GroupDetailPage.sendInvites', err);
+      toastRef.current.error(tRef.current('detail.invites_failed'));
+    } finally {
+      setSendingInvites(false);
+    }
+  };
+
+  const handleRevokeInvite = async (inviteId: number) => {
+    try {
+      setRevokingInvite(inviteId);
+      await revokeGroupInvite(groupId, inviteId);
+      setPendingInvites((current) => current.filter((invite) => invite.id !== inviteId));
+      if (pendingInvites.find((invite) => invite.id === inviteId)?.invite_url === inviteLink) {
+        setInviteLink(null);
+      }
+      toastRef.current.success(tRef.current('toast.invite_revoked'));
+    } catch (err) {
+      logError('GroupDetailPage.revokeInvite', err);
+      toastRef.current.error(tRef.current('toast.invite_revoke_failed'));
+    } finally {
+      setRevokingInvite(null);
+    }
   };
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -294,41 +471,46 @@ export function GroupDetailPage() {
   const loadGroupFeed = useCallback(async (append = false) => {
     if (!id) return;
     if (append && !feedCursorRef.current) return;
+    const signal = requestScopeRef.current?.signal;
 
     try {
       if (append) {
         setFeedLoadingMore(true);
       } else {
         setFeedLoading(true);
+        setFeedError(false);
       }
 
-      const params = new URLSearchParams();
-      params.set('group_id', id);
-      params.set('per_page', '20');
-      if (append && feedCursorRef.current) params.set('cursor', feedCursorRef.current);
-
-      const response = await api.get<FeedItem[]>(`/v2/feed?${params}`);
-      if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
-        if (append) {
-          setFeedItems((prev) => [...prev, ...items]);
-        } else {
-          setFeedItems(items);
-        }
-        setFeedHasMore(response.meta?.has_more ?? false);
-        feedCursorRef.current = response.meta?.cursor ?? undefined;
+      const page = await listGroupFeed(groupId, {
+        cursor: append ? feedCursorRef.current : undefined,
+        perPage: 20,
+        signal,
+      });
+      if (signal?.aborted) return;
+      if (append) {
+        setFeedItems((prev) => [...prev, ...page.items]);
+      } else {
+        setFeedItems(page.items);
       }
+      setFeedHasMore(page.hasMore);
+      feedCursorRef.current = page.nextCursor;
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('Failed to load group feed', err);
       if (!append) {
+        setFeedError(true);
         toastRef.current.error(tRef.current('toast.feed_load_failed'));
+      } else {
+        toastRef.current.error(tRef.current('load_more_error'));
       }
     } finally {
-      setFeedLoading(false);
-      setFeedLoadingMore(false);
-      setFeedLoaded(true);
+      if (!signal?.aborted) {
+        setFeedLoading(false);
+        setFeedLoadingMore(false);
+        setFeedLoaded(true);
+      }
     }
-  }, [id]);
+  }, [groupId, id]);
 
   useEffect(() => {
     const handler = (event: globalThis.Event) => {
@@ -361,23 +543,17 @@ export function GroupDetailPage() {
       )
     );
     try {
-      const response = await api.post<{ action?: string; likes_count: number }>('/v2/feed/like', { target_type: item.type, target_id: item.id });
-      if (response.success && response.data) {
-        const serverLiked = response.data.action === 'liked'
-          ? true
-          : response.data.action === 'unliked'
-            ? false
-            : newIsLiked;
-        const serverLikesCount = response.data.likes_count;
-        setFeedItems((prev) =>
-          prev.map((fi) =>
-            fi.id === item.id && fi.type === item.type
-              ? { ...fi, is_liked: serverLiked, likes_count: serverLikesCount }
-              : fi
-          )
-        );
-        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { is_liked: serverLiked, likes_count: serverLikesCount } });
-      }
+      const result = await toggleGroupFeedLike(item);
+      const serverLiked = result.isLiked ?? newIsLiked;
+      const serverLikesCount = result.likesCount;
+      setFeedItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, is_liked: serverLiked, likes_count: serverLikesCount }
+            : fi
+        )
+      );
+      dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { is_liked: serverLiked, likes_count: serverLikesCount } });
     } catch (err) {
       logError('Failed to toggle like', err);
       setFeedItems((prev) =>
@@ -393,22 +569,15 @@ export function GroupDetailPage() {
   const handleFeedReact = async (item: FeedItem, reactionType: ReactionType) => {
     const previousReactions = item.reactions ?? { counts: {}, total: 0, user_reaction: null, top_reactors: [] };
     try {
-      const response = await api.post<{ reactions: FeedItem['reactions'] }>('/v2/reactions', {
-        target_type: item.type,
-        target_id: item.id,
-        reaction_type: reactionType,
-      });
-      if (response.success && response.data?.reactions) {
-        const reactions = response.data.reactions;
-        setFeedItems((prev) =>
-          prev.map((fi) =>
-            fi.id === item.id && fi.type === item.type
-              ? { ...fi, reactions }
-              : fi
-          )
-        );
-        dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { reactions } });
-      }
+      const reactions = await reactToGroupFeedItem(item, reactionType);
+      setFeedItems((prev) =>
+        prev.map((fi) =>
+          fi.id === item.id && fi.type === item.type
+            ? { ...fi, reactions }
+            : fi
+        )
+      );
+      dispatchFeedSync({ targetType: item.type, targetId: item.id, patch: { reactions } });
     } catch (err) {
       logError('Failed to react', err);
       setFeedItems((prev) =>
@@ -422,34 +591,28 @@ export function GroupDetailPage() {
   };
 
   const handleFeedHidePost = async (item: FeedItem) => {
-    await runConfirmedMutation(
-      () => api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type }),
-      {
-        onConfirmed: () => {
-          setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-          toastRef.current.success(tRef.current('toast.post_hidden'));
-        },
-        onRejected: () => toastRef.current.error(tRef.current('toast.hide_failed')),
-        onError: (err) => logError('Failed to hide post', err),
-      },
-    );
+    try {
+      await hideGroupFeedItem(item);
+      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toastRef.current.success(tRef.current('toast.post_hidden'));
+    } catch (err) {
+      logError('Failed to hide post', err);
+      toastRef.current.error(tRef.current('toast.hide_failed'));
+    }
   };
 
   const handleFeedMuteUser = async (userId: number) => {
-    await runConfirmedMutation(
-      () => api.post(`/v2/feed/users/${userId}/mute`),
-      {
-        onConfirmed: () => {
-          setFeedItems((prev) => prev.filter((fi) => {
-            const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
-            return !author || author.id !== userId;
-          }));
-          toastRef.current.success(tRef.current('toast.user_muted'));
-        },
-        onRejected: () => toastRef.current.error(tRef.current('toast.mute_failed')),
-        onError: (err) => logError('Failed to mute user', err),
-      },
-    );
+    try {
+      await muteGroupFeedUser(userId);
+      setFeedItems((prev) => prev.filter((fi) => {
+        const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
+        return !author || author.id !== userId;
+      }));
+      toastRef.current.success(tRef.current('toast.user_muted'));
+    } catch (err) {
+      logError('Failed to mute user', err);
+      toastRef.current.error(tRef.current('toast.mute_failed'));
+    }
   };
 
   const openFeedReportModal = (postId: number) => {
@@ -464,48 +627,41 @@ export function GroupDetailPage() {
       return;
     }
     setIsReporting(true);
-    await runConfirmedMutation(
-      () => api.post(`/v2/feed/posts/${reportPostId}/report`, { reason: reportReason.trim() }),
-      {
-        onConfirmed: () => {
-          onReportClose();
-          setReportPostId(null);
-          setReportReason('');
-          toastRef.current.success(tRef.current('toast.reported'));
-        },
-        onRejected: () => toastRef.current.error(tRef.current('toast.report_failed')),
-        onError: (err) => logError('Failed to report post', err),
-      },
-    );
-    setIsReporting(false);
+    try {
+      await reportGroupFeedItem(reportPostId, reportReason.trim());
+      onReportClose();
+      setReportPostId(null);
+      setReportReason('');
+      toastRef.current.success(tRef.current('toast.reported'));
+    } catch (err) {
+      logError('Failed to report post', err);
+      toastRef.current.error(tRef.current('toast.report_failed'));
+    } finally {
+      setIsReporting(false);
+    }
   };
 
   const handleFeedDeletePost = async (item: FeedItem) => {
-    await runConfirmedMutation(
-      () => api.post(`/v2/feed/posts/${item.id}/delete`),
-      {
-        onConfirmed: () => {
-          setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-          toastRef.current.success(tRef.current('toast.post_deleted'));
-        },
-        onRejected: () => toastRef.current.error(tRef.current('toast.post_delete_failed')),
-        onError: (err) => logError('Failed to delete post', err),
-      },
-    );
+    try {
+      await deleteGroupFeedItem(item);
+      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toastRef.current.success(tRef.current('toast.post_deleted'));
+    } catch (err) {
+      logError('Failed to delete post', err);
+      toastRef.current.error(tRef.current('toast.post_delete_failed'));
+    }
   };
 
   const handleFeedVotePoll = async (pollId: number, optionId: number) => {
     try {
-      const response = await api.post<{ id: number; question: string; options: Array<{ id: number; text: string; vote_count: number; percentage: number }>; total_votes: number; user_vote_option_id: number | null; is_active: boolean }>(`/v2/feed/polls/${pollId}/vote`, { option_id: optionId });
-      if (response.success && response.data) {
-        setFeedItems((prev) =>
-          prev.map((fi) =>
-            fi.id === pollId && fi.type === 'poll'
-              ? { ...fi, poll_data: response.data as FeedItem['poll_data'] }
-              : fi
-          )
-        );
-      }
+      const pollData = await voteInGroupFeedPoll(pollId, optionId);
+      setFeedItems((prev) =>
+        prev.map((fi) =>
+          fi.id === pollId && fi.type === 'poll'
+            ? { ...fi, poll_data: pollData }
+            : fi
+        )
+      );
     } catch (err) {
       logError('Failed to vote', err);
       toastRef.current.error(tRef.current('toast.vote_failed'));
@@ -519,37 +675,43 @@ export function GroupDetailPage() {
   const loadDiscussions = useCallback(async (append = false) => {
     if (!id || discussionsLoading) return;
     if (append && !discussionsCursor) return;
+    const signal = requestScopeRef.current?.signal;
 
     try {
       setDiscussionsLoading(true);
-      const params = new URLSearchParams();
-      if (append && discussionsCursor) {
-        params.set('cursor', discussionsCursor);
+      if (!append) setDiscussionsError(false);
+      const page = await listGroupDiscussions(groupId, {
+        cursor: append ? discussionsCursor : undefined,
+        perPage: 15,
+        signal,
+      });
+      if (signal?.aborted) return;
+      if (append) {
+        setDiscussions((prev) => {
+          const seen = new Set(prev.map((discussion) => discussion.id));
+          return [...prev, ...page.discussions.filter((discussion) => !seen.has(discussion.id))];
+        });
+      } else {
+        setDiscussions(page.discussions);
       }
-      params.set('per_page', '15');
-
-      const response = await api.get<Discussion[]>(
-        `/v2/groups/${id}/discussions?${params}`
-      );
-      if (response.success && response.data) {
-        if (append) {
-          setDiscussions((prev) => [...prev, ...response.data!]);
-        } else {
-          setDiscussions(response.data);
-        }
-        setDiscussionsCursor(response.meta?.cursor || undefined);
-        setDiscussionsHasMore(response.meta?.has_more ?? response.data.length >= 15);
-      }
+      setDiscussionsCursor(page.nextCursor);
+      setDiscussionsHasMore(page.hasMore);
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('Failed to load discussions', err);
       if (!append) {
+        setDiscussionsError(true);
         toastRef.current.error(tRef.current('toast.discussions_load_failed'));
+      } else {
+        toastRef.current.error(tRef.current('load_more_error'));
       }
     } finally {
-      setDiscussionsLoading(false);
-      setDiscussionsLoaded(true);
+      if (!signal?.aborted) {
+        setDiscussionsLoading(false);
+        setDiscussionsLoaded(true);
+      }
     }
-  }, [id, discussionsCursor, discussionsLoading]);
+  }, [groupId, id, discussionsCursor, discussionsLoading]);
 
   // Load discussions when tab changes to discussion
   useEffect(() => {
@@ -562,26 +724,92 @@ export function GroupDetailPage() {
   // Load Members
   // ─────────────────────────────────────────────────────────────────────────
 
-  const loadMembers = useCallback(async () => {
-    if (!id || membersLoaded || membersLoading) return;
+  const loadMembers = useCallback(async ({
+    append = false,
+    query = membersSearchRef.current,
+  }: { append?: boolean; query?: string } = {}) => {
+    if (!id) return;
+
+    const normalizedQuery = query.trim().replace(/\s+/g, ' ');
+    const requestedCursor = append ? membersCursorRef.current : null;
+    if (append) {
+      if (
+        membersRequestRef.current
+        || !membersHasMoreRef.current
+        || requestedCursor === null
+      ) return;
+    } else {
+      if (
+        membersRequestRef.current
+        && normalizedQuery === membersSearchRef.current
+      ) return;
+      membersRequestRef.current?.abort();
+      membersSearchRef.current = normalizedQuery;
+      membersCursorRef.current = null;
+      membersHasMoreRef.current = false;
+      membersSeenCursorsRef.current.clear();
+      setMembers([]);
+      setMembersHasMore(false);
+    }
+
+    const controller = new AbortController();
+    const requestId = ++membersRequestSequenceRef.current;
+    membersRequestRef.current = controller;
 
     try {
-      setMembersLoading(true);
-      const response = await api.get<GroupMember[]>(`/v2/groups/${id}/members`);
-      if (response.success && response.data) {
-        setMembers(response.data);
+      if (append) {
+        setMembersLoadingMore(true);
+      } else {
+        setMembersLoading(true);
+        setMembersError(false);
       }
+      const page = await listGroupMembers(groupId, {
+        cursor: requestedCursor ?? undefined,
+        perPage: 20,
+        search: normalizedQuery || undefined,
+        signal: controller.signal,
+      });
+      if (
+        controller.signal.aborted
+        || membersRequestSequenceRef.current !== requestId
+        || membersRequestRef.current !== controller
+        || membersSearchRef.current !== normalizedQuery
+      ) return;
+      if (page.nextCursor && membersSeenCursorsRef.current.has(page.nextCursor)) {
+        throw new Error('Groups member collection returned a repeated cursor.');
+      }
+
+      setMembers((current) => append ? appendUniqueById(current, page.items) : page.items);
+      membersCursorRef.current = page.nextCursor;
+      membersHasMoreRef.current = page.hasMore;
+      if (page.nextCursor) membersSeenCursorsRef.current.add(page.nextCursor);
+      setMembersHasMore(page.hasMore);
     } catch (err) {
+      if (
+        controller.signal.aborted
+        || membersRequestSequenceRef.current !== requestId
+        || membersRequestRef.current !== controller
+        || (err instanceof GroupApiError && err.isCancellation)
+      ) return;
       logError('Failed to load group members', err);
+      if (append) {
+        toastRef.current.error(tRef.current('load_more_error'));
+      } else {
+        setMembersError(true);
+      }
     } finally {
-      setMembersLoading(false);
-      setMembersLoaded(true);
+      if (membersRequestRef.current === controller) {
+        membersRequestRef.current = null;
+        if (append) setMembersLoadingMore(false);
+        else setMembersLoading(false);
+        setMembersLoaded(true);
+      }
     }
-  }, [id, membersLoaded, membersLoading]);
+  }, [groupId, id]);
 
   useEffect(() => {
     if (activeTab === 'members' && !membersLoaded) {
-      loadMembers();
+      void loadMembers();
     }
   }, [activeTab, membersLoaded, loadMembers]);
 
@@ -589,26 +817,81 @@ export function GroupDetailPage() {
   // Load Events
   // ─────────────────────────────────────────────────────────────────────────
 
-  const loadEvents = useCallback(async () => {
-    if (!id || eventsLoaded || eventsLoading) return;
+  const loadEvents = useCallback(async ({ append = false }: { append?: boolean } = {}) => {
+    if (!id) return;
+
+    const requestedCursor = append ? eventsCursorRef.current : null;
+    if (append) {
+      if (
+        eventsRequestRef.current
+        || !eventsHasMoreRef.current
+        || requestedCursor === null
+      ) return;
+    } else {
+      if (eventsRequestRef.current) return;
+      eventsCursorRef.current = null;
+      eventsHasMoreRef.current = false;
+      eventsSeenCursorsRef.current.clear();
+      setEvents([]);
+      setEventsHasMore(false);
+    }
+
+    const controller = new AbortController();
+    const requestId = ++eventsRequestSequenceRef.current;
+    eventsRequestRef.current = controller;
 
     try {
-      setEventsLoading(true);
-      const response = await api.get<Event[]>(`/v2/events?group_id=${id}&per_page=20`);
-      if (response.success && response.data) {
-        setEvents(response.data);
+      if (append) {
+        setEventsLoadingMore(true);
+      } else {
+        setEventsLoading(true);
+        setEventsError(false);
       }
+      const page = await listGroupEvents(groupId, {
+        cursor: requestedCursor ?? undefined,
+        perPage: 20,
+        signal: controller.signal,
+      });
+      if (
+        controller.signal.aborted
+        || eventsRequestSequenceRef.current !== requestId
+        || eventsRequestRef.current !== controller
+      ) return;
+      if (page.nextCursor && eventsSeenCursorsRef.current.has(page.nextCursor)) {
+        throw new Error('Groups event collection returned a repeated cursor.');
+      }
+
+      setEvents((current) => append ? appendUniqueById(current, page.items) : page.items);
+      eventsCursorRef.current = page.nextCursor;
+      eventsHasMoreRef.current = page.hasMore;
+      if (page.nextCursor) eventsSeenCursorsRef.current.add(page.nextCursor);
+      setEventsHasMore(page.hasMore);
     } catch (err) {
+      if (
+        controller.signal.aborted
+        || eventsRequestSequenceRef.current !== requestId
+        || eventsRequestRef.current !== controller
+        || (err instanceof GroupApiError && err.isCancellation)
+      ) return;
       logError('Failed to load group events', err);
+      if (append) {
+        toastRef.current.error(tRef.current('load_more_error'));
+      } else {
+        setEventsError(true);
+      }
     } finally {
-      setEventsLoading(false);
-      setEventsLoaded(true);
+      if (eventsRequestRef.current === controller) {
+        eventsRequestRef.current = null;
+        if (append) setEventsLoadingMore(false);
+        else setEventsLoading(false);
+        setEventsLoaded(true);
+      }
     }
-  }, [id, eventsLoaded, eventsLoading]);
+  }, [groupId, id]);
 
   useEffect(() => {
     if (activeTab === 'events' && !eventsLoaded) {
-      loadEvents();
+      void loadEvents();
     }
   }, [activeTab, eventsLoaded, loadEvents]);
 
@@ -617,21 +900,26 @@ export function GroupDetailPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   const loadJoinRequests = useCallback(async () => {
-    if (!id || requestsLoaded || requestsLoading) return;
+    if (!id || requestsLoading) return;
+    const signal = requestScopeRef.current?.signal;
 
     try {
       setRequestsLoading(true);
-      const response = await api.get<JoinRequest[]>(`/v2/groups/${id}/requests`);
-      if (response.success && response.data) {
-        setJoinRequests(response.data);
-      }
+      setRequestsError(false);
+      const nextRequests = await listGroupJoinRequests(groupId, { signal });
+      if (signal?.aborted) return;
+      setJoinRequests(nextRequests);
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('Failed to load join requests', err);
+      setRequestsError(true);
     } finally {
-      setRequestsLoading(false);
-      setRequestsLoaded(true);
+      if (!signal?.aborted) {
+        setRequestsLoading(false);
+        setRequestsLoaded(true);
+      }
     }
-  }, [id, requestsLoaded, requestsLoading]);
+  }, [groupId, id, requestsLoading]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Join / Leave
@@ -640,7 +928,13 @@ export function GroupDetailPage() {
   async function handleJoinLeave() {
     if (!group || !isAuthenticated) return;
 
-    if (isMember(group)) {
+    const membershipStatus = group.viewer_membership?.status ?? (isMember(group) ? 'active' : 'none');
+    if (membershipStatus === 'active') {
+      if (group.viewer_membership?.capabilities?.can_leave === false) return;
+      setShowLeaveConfirm(true);
+      return;
+    }
+    if (membershipStatus === 'pending') {
       setShowLeaveConfirm(true);
       return;
     }
@@ -648,40 +942,45 @@ export function GroupDetailPage() {
     try {
       setIsJoining(true);
       const memberCount = getMemberCount(group);
-      const response = await api.post<{ status?: string }>(`/v2/groups/${group.id}/join`);
-      if (response.success) {
-        const joinStatus = response.data?.status ?? 'active';
-        setGroup((prev) => prev ? {
-          ...prev,
-          is_member: joinStatus === 'active',
-          viewer_membership: { status: joinStatus as 'active' | 'pending' | 'none', role: 'member', is_admin: false },
-          member_count: joinStatus === 'active' ? memberCount + 1 : memberCount,
-          members_count: joinStatus === 'active' ? memberCount + 1 : memberCount,
-        } : null);
-        toastRef.current.success(
-          joinStatus === 'active'
-            ? tRef.current('toast.joined')
-            : tRef.current('toast.join_requested')
-        );
-      } else if (response.code === 'JOIN_FAILED' && response.error?.toLowerCase().includes('already')) {
-        // 409 — already a member but UI was stale; refresh to sync state
-        toastRef.current.success(tRef.current('toast.joined'));
-      } else {
-        toastRef.current.error(tRef.current('toast.join_failed'));
-      }
+      const mutation = await joinGroup(group.id);
+      const joinStatus = mutation.status;
+      const countIncreased = mutation.action === 'joined';
+      setGroup((prev) => prev ? {
+        ...prev,
+        is_member: joinStatus === 'active',
+        viewer_membership: {
+          status: joinStatus,
+          role: mutation.membership?.role ?? 'member',
+          is_admin: false,
+          capabilities: prev.viewer_membership?.capabilities ? {
+            ...prev.viewer_membership.capabilities,
+            can_join: false,
+            can_leave: joinStatus === 'active',
+            can_cancel_request: joinStatus === 'pending',
+          } : undefined,
+        },
+        member_count: countIncreased ? memberCount + 1 : memberCount,
+        members_count: countIncreased ? memberCount + 1 : memberCount,
+      } : null);
+      toastRef.current.success(
+        joinStatus === 'active'
+          ? tRef.current('toast.joined')
+          : tRef.current('toast.join_requested')
+      );
     } catch (err) {
       logError('Failed to join group', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.join_failed'));
     } finally {
       setIsJoining(false);
     }
 
     // Always refresh from server to get authoritative membership state.
     try {
-      const fresh = await api.get<GroupDetails>(`/v2/groups/${group.id}`);
-      if (fresh.success && fresh.data) {
-        setGroup(fresh.data);
-        if (isMember(fresh.data) && !feedLoaded) {
+      const signal = requestScopeRef.current?.signal;
+      const fresh = await getGroupDetail(group.id, { signal });
+      if (!signal?.aborted) {
+        setGroup(fresh);
+        if (isMember(fresh) && !feedLoaded) {
           loadGroupFeed();
         }
       }
@@ -696,22 +995,37 @@ export function GroupDetailPage() {
     try {
       setIsJoining(true);
       const memberCount = getMemberCount(group);
-      const response = await api.delete(`/v2/groups/${group.id}/membership`);
-      if (response.success) {
-        setGroup((prev) => prev ? {
-          ...prev,
-          is_member: false,
-          viewer_membership: prev.viewer_membership ? { ...prev.viewer_membership, status: 'none' } : undefined,
-          member_count: memberCount - 1,
-          members_count: memberCount - 1,
-        } : null);
-        toastRef.current.success(tRef.current('toast.left'));
-      } else {
-        toastRef.current.error(tRef.current('toast.leave_failed'));
-      }
+      const mutation = await leaveGroup(group.id);
+      const countDecreased = mutation.action === 'left';
+      setGroup((prev) => prev ? {
+        ...prev,
+        is_member: false,
+        viewer_membership: prev.viewer_membership ? {
+          ...prev.viewer_membership,
+          status: 'none',
+          role: null,
+          is_admin: false,
+          capabilities: prev.viewer_membership.capabilities ? {
+            ...prev.viewer_membership.capabilities,
+            can_join: true,
+            can_leave: false,
+            can_cancel_request: false,
+            can_invite: false,
+            can_manage_members: false,
+            can_manage_admins: false,
+            can_delete: false,
+          } : undefined,
+        } : undefined,
+        member_count: countDecreased ? Math.max(0, memberCount - 1) : memberCount,
+        members_count: countDecreased ? Math.max(0, memberCount - 1) : memberCount,
+      } : null);
+      toastRef.current.success(tRef.current(
+        mutation.action === 'request_cancelled' ? 'toast.request_cancelled' : 'toast.left',
+      ));
     } catch (err) {
       logError('Failed to leave group', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      const wasPending = group.viewer_membership?.status === 'pending';
+      toastRef.current.error(tRef.current(wasPending ? 'toast.request_cancel_failed' : 'toast.leave_failed'));
     } finally {
       setIsJoining(false);
       setShowLeaveConfirm(false);
@@ -719,10 +1033,9 @@ export function GroupDetailPage() {
 
     // Refresh from server to get authoritative state
     try {
-      const fresh = await api.get<GroupDetails>(`/v2/groups/${group.id}`);
-      if (fresh.success && fresh.data) {
-        setGroup(fresh.data);
-      }
+      const signal = requestScopeRef.current?.signal;
+      const fresh = await getGroupDetail(group.id, { signal });
+      if (!signal?.aborted) setGroup(fresh);
     } catch {
       // Silent — optimistic state is already set
     }
@@ -739,22 +1052,18 @@ export function GroupDetailPage() {
 
     try {
       setCreatingDiscussion(true);
-      const response = await api.post<Discussion>(`/v2/groups/${id}/discussions`, {
+      const discussion = await createGroupDiscussion(groupId, {
         title,
         content,
       });
-      if (response.success && response.data) {
-        setDiscussions((prev) => [response.data!, ...prev]);
-        setNewDiscussionTitle('');
-        setNewDiscussionContent('');
-        setShowNewDiscussion(false);
-        toastRef.current.success(tRef.current('toast.discussion_created'));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.discussion_failed'));
-      }
+      setDiscussions((prev) => [discussion, ...prev]);
+      setNewDiscussionTitle('');
+      setNewDiscussionContent('');
+      setShowNewDiscussion(false);
+      toastRef.current.success(tRef.current('toast.discussion_created'));
     } catch (err) {
       logError('Failed to create discussion', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.discussion_failed'));
     } finally {
       setCreatingDiscussion(false);
     }
@@ -766,34 +1075,76 @@ export function GroupDetailPage() {
 
   async function handleExpandDiscussion(discussionId: number) {
     if (expandedDiscussionId === discussionId) {
+      expandedDiscussionRequestIdRef.current += 1;
       setExpandedDiscussionId(null);
       setExpandedDiscussion(null);
+      setExpandedLoading(false);
+      setLoadingEarlierReplies(false);
       return;
     }
 
     if (!id) return;
+    const signal = requestScopeRef.current?.signal;
+    const requestId = ++expandedDiscussionRequestIdRef.current;
 
     try {
       setExpandedDiscussionId(discussionId);
       setExpandedLoading(true);
+      setLoadingEarlierReplies(false);
       setExpandedDiscussion(null);
       setReplyContent('');
-      const response = await api.get<{ discussion: Discussion; messages: DiscussionMessage[] }>(
-        `/v2/groups/${id}/discussions/${discussionId}`
-      );
-      if (response.success && response.data) {
-        const { discussion: disc, messages } = response.data;
-        setExpandedDiscussion({ ...disc, messages });
-      } else {
-        toastRef.current.error(tRef.current('toast.discussion_load_failed'));
-        setExpandedDiscussionId(null);
-      }
+      const detail = await getGroupDiscussion(groupId, discussionId, { signal });
+      if (signal?.aborted || requestId !== expandedDiscussionRequestIdRef.current) return;
+      setExpandedDiscussion(detail);
     } catch (err) {
+      if (requestId !== expandedDiscussionRequestIdRef.current
+        || (err instanceof GroupApiError && err.isCancellation)) return;
       logError('Failed to load discussion', err);
       toastRef.current.error(tRef.current('toast.discussion_load_failed'));
       setExpandedDiscussionId(null);
     } finally {
-      setExpandedLoading(false);
+      if (!signal?.aborted && requestId === expandedDiscussionRequestIdRef.current) {
+        setExpandedLoading(false);
+      }
+    }
+  }
+
+  async function handleLoadEarlierReplies() {
+    const current = expandedDiscussion;
+    if (!current || !expandedDiscussionId || !current.messagesHasMore || !current.messagesNextCursor || loadingEarlierReplies) {
+      return;
+    }
+    const signal = requestScopeRef.current?.signal;
+    const requestId = expandedDiscussionRequestIdRef.current;
+
+    try {
+      setLoadingEarlierReplies(true);
+      const olderPage = await getGroupDiscussion(groupId, expandedDiscussionId, {
+        cursor: current.messagesNextCursor,
+        perPage: 50,
+        signal,
+      });
+      if (signal?.aborted || requestId !== expandedDiscussionRequestIdRef.current) return;
+      setExpandedDiscussion((previous) => {
+        if (!previous || previous.id !== expandedDiscussionId) return previous;
+        const existingIds = new Set(previous.messages.map((message) => message.id));
+        const olderMessages = olderPage.messages.filter((message) => !existingIds.has(message.id));
+        return {
+          ...previous,
+          messages: [...olderMessages, ...previous.messages],
+          messagesNextCursor: olderPage.messagesNextCursor,
+          messagesHasMore: olderPage.messagesHasMore,
+        };
+      });
+    } catch (err) {
+      if (requestId !== expandedDiscussionRequestIdRef.current
+        || (err instanceof GroupApiError && err.isCancellation)) return;
+      logError('Failed to load earlier discussion replies', err);
+      toastRef.current.error(tRef.current('toast.replies_load_failed'));
+    } finally {
+      if (!signal?.aborted && requestId === expandedDiscussionRequestIdRef.current) {
+        setLoadingEarlierReplies(false);
+      }
     }
   }
 
@@ -807,30 +1158,27 @@ export function GroupDetailPage() {
 
     try {
       setSendingReply(true);
-      const response = await api.post<DiscussionMessage>(
-        `/v2/groups/${id}/discussions/${expandedDiscussionId}/messages`,
-        { content }
+      const newMessage = await replyToGroupDiscussion(groupId, expandedDiscussionId, content);
+      setExpandedDiscussion((prev) =>
+        prev ? {
+          ...prev,
+          messages: [...prev.messages, newMessage],
+          reply_count: prev.reply_count + 1,
+          last_reply_at: newMessage.created_at,
+        } : null
       );
-      if (response.success && response.data) {
-        const newMessage = response.data;
-        setExpandedDiscussion((prev) =>
-          prev ? { ...prev, messages: [...prev.messages, newMessage] } : null
-        );
-        setDiscussions((prev) =>
-          prev.map((d) =>
-            d.id === expandedDiscussionId
-              ? { ...d, reply_count: d.reply_count + 1, last_reply_at: newMessage.created_at }
-              : d
-          )
-        );
-        setReplyContent('');
-        toastRef.current.success(tRef.current('toast.reply_sent'));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.reply_failed'));
-      }
+      setDiscussions((prev) =>
+        prev.map((d) =>
+          d.id === expandedDiscussionId
+            ? { ...d, reply_count: d.reply_count + 1, last_reply_at: newMessage.created_at }
+            : d
+        )
+      );
+      setReplyContent('');
+      toastRef.current.success(tRef.current('toast.reply_sent'));
     } catch (err) {
       logError('Failed to send reply', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.reply_failed'));
     } finally {
       setSendingReply(false);
     }
@@ -842,72 +1190,115 @@ export function GroupDetailPage() {
 
   function openSettingsModal() {
     if (!group) return;
-    setSettingsName(group.name);
-    setSettingsDescription(group.description || '');
-    setSettingsPrivate(group.visibility === 'private' || group.visibility === 'secret');
-    setSettingsLocation(group.location || '');
+    const draft: GroupFormDraft = {
+      name: group.name,
+      description: group.description || '',
+      visibility: group.visibility,
+      location: {
+        label: group.location || '',
+        latitude: group.latitude ?? null,
+        longitude: group.longitude ?? null,
+      },
+      typeId: group.type_id ?? null,
+      parentId: group.parent_id ?? null,
+      templateId: group.template_id ?? null,
+      primaryColor: group.primary_color ?? null,
+      accentColor: group.accent_color ?? null,
+      avatar: emptyGroupImageDraft(group.image_url || null),
+      cover: emptyGroupImageDraft(group.cover_image_url || group.cover_image || null),
+    };
+    settingsInitialFingerprintRef.current = groupFormFingerprint(draft);
+    setSettingsDraft(draft);
     setShowSettingsModal(true);
+    const controller = requestScopeRef.current;
+    void getGroupFormCapabilities(controller?.signal)
+      .then((value) => {
+        if (!controller?.signal.aborted) setSettingsCapabilities(value);
+      })
+      .catch((error) => logError('Failed to load group settings capabilities', error));
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') {
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') {
     const file = e.target.files?.[0];
-    if (!file || !id) return;
-    setUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('type', type);
-      const response = await api.upload(`/v2/groups/${id}/image`, formData);
-      if (response.success) {
-        const data = response.data as Record<string, unknown> | undefined;
-        const url = (data?.url as string) || (data?.image_url as string) || '';
-        if (!url) {
-          toastRef.current.error(tRef.current('toast.image_upload_failed'));
-        } else {
-          setGroup((prev) => prev ? {
-            ...prev,
-            ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
-          } : null);
-          toastRef.current.success(type === 'avatar' ? tRef.current('toast.image_avatar_updated') : tRef.current('toast.image_cover_updated'));
-        }
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.image_upload_failed'));
-      }
-    } catch {
-      toastRef.current.error(tRef.current('toast.image_upload_failed'));
-    } finally {
-      setUploadingImage(false);
+    if (!file) return;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toastRef.current.error(tRef.current('form.toast.image_type'));
       e.target.value = '';
+      return;
     }
+    if (file.size > (settingsCapabilities?.limits.imageMaxBytes ?? 8 * 1024 * 1024)) {
+      toastRef.current.error(tRef.current('form.toast.image_size'));
+      e.target.value = '';
+      return;
+    }
+
+    setSettingsDraft((previous) => {
+      const current = previous[type];
+      if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+      return {
+        ...previous,
+        [type]: {
+          ...current,
+          action: 'replace',
+          file,
+          previewUrl: URL.createObjectURL(file),
+        },
+      };
+    });
+    e.target.value = '';
+  }
+
+  function handleImageRemove(type: 'avatar' | 'cover') {
+    setSettingsDraft((previous) => {
+      const current = previous[type];
+      if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+      return {
+        ...previous,
+        [type]: {
+          ...current,
+          action: current.existingUrl ? 'remove' : 'keep',
+          file: null,
+          previewUrl: null,
+        },
+      };
+    });
+  }
+
+  async function handleSettingsOpenChange(open: boolean) {
+    if (open) {
+      setShowSettingsModal(true);
+      return;
+    }
+    if (groupFormFingerprint(settingsDraft) !== settingsInitialFingerprintRef.current) {
+      const discard = await confirm({
+        title: tRef.current('form.discard_title'),
+        body: tRef.current('form.discard_description'),
+        confirmLabel: tRef.current('form.discard_confirm'),
+        cancelLabel: tRef.current('form.discard_stay'),
+        status: 'warning',
+      });
+      if (!discard) return;
+    }
+    for (const image of [settingsDraft.avatar, settingsDraft.cover]) {
+      if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+    }
+    setShowSettingsModal(false);
   }
 
   async function handleSaveSettings() {
-    if (!id || !settingsName.trim()) return;
+    if (!id || !settingsDraft.name.trim()) return;
 
     try {
       setSavingSettings(true);
-      const response = await api.put(`/v2/groups/${id}`, {
-        name: settingsName.trim(),
-        description: settingsDescription.trim(),
-        visibility: settingsPrivate ? 'private' : 'public',
-        location: settingsLocation.trim(),
-      });
-      if (response.success) {
-        setGroup((prev) => prev ? {
-          ...prev,
-          name: settingsName.trim(),
-          description: settingsDescription.trim(),
-          visibility: settingsPrivate ? 'private' : 'public',
-          ...(settingsLocation.trim() ? { location: settingsLocation.trim() } : {}),
-        } : null);
-        setShowSettingsModal(false);
-        toastRef.current.success(tRef.current('toast.settings_updated'));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.settings_failed'));
-      }
+      await updateGroupFromDraft(groupId, settingsDraft);
+      settingsInitialFingerprintRef.current = groupFormFingerprint(settingsDraft);
+      await loadGroup();
+      setShowSettingsModal(false);
+      toastRef.current.success(tRef.current('toast.settings_updated'));
     } catch (err) {
       logError('Failed to update group settings', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.settings_failed'));
     } finally {
       setSavingSettings(false);
     }
@@ -922,16 +1313,12 @@ export function GroupDetailPage() {
 
     try {
       setDeletingGroup(true);
-      const response = await api.delete(`/v2/groups/${id}`);
-      if (response.success) {
-        toastRef.current.success(tRef.current('toast.deleted'));
-        navigate(tenantPath('/groups'));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.delete_failed'));
-      }
+      await deleteGroup(groupId);
+      toastRef.current.success(tRef.current('toast.deleted'));
+      navigate(tenantPath('/groups'));
     } catch (err) {
       logError('Failed to delete group', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.delete_failed'));
     } finally {
       setDeletingGroup(false);
       setShowDeleteModal(false);
@@ -947,23 +1334,19 @@ export function GroupDetailPage() {
 
     try {
       setProcessingRequest(userId);
-      const response = await api.post(`/v2/groups/${id}/requests/${userId}`, { action });
-      if (response.success) {
-        setJoinRequests((prev) => prev.filter((r) => r.user_id !== userId));
-        toastRef.current.success(action === 'accept' ? tRef.current('toast.request_accepted') : tRef.current('toast.request_rejected'));
-        if (action === 'accept') {
-          // Re-fetch the group to get accurate member counts (avoids stale counts from rapid approvals)
-          loadGroup();
-          if (membersLoaded) {
-            setMembersLoaded(false);
-          }
+      await decideGroupJoinRequest(groupId, userId, action);
+      setJoinRequests((prev) => prev.filter((r) => r.user_id !== userId));
+      toastRef.current.success(action === 'accept' ? tRef.current('toast.request_accepted') : tRef.current('toast.request_rejected'));
+      if (action === 'accept') {
+        // Re-fetch the group to get accurate member counts (avoids stale counts from rapid approvals)
+        loadGroup();
+        if (membersLoaded) {
+          setMembersLoaded(false);
         }
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.request_failed', { action }));
       }
     } catch (err) {
       logError(`Failed to ${action} join request`, err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.request_failed', { action }));
     } finally {
       setProcessingRequest(null);
     }
@@ -978,18 +1361,14 @@ export function GroupDetailPage() {
 
     try {
       setUpdatingMember(userId);
-      const response = await api.put(`/v2/groups/${id}/members/${userId}`, { role: newRole });
-      if (response.success) {
-        setMembers((prev) =>
-          prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
-        );
-        toastRef.current.success(tRef.current('toast.role_updated', { role: newRole }));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.role_update_failed'));
-      }
+      await updateGroupMemberRole(groupId, userId, newRole);
+      setMembers((prev) =>
+        prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
+      );
+      toastRef.current.success(tRef.current('toast.role_updated', { role: newRole }));
     } catch (err) {
       logError('Failed to update member role', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.role_update_failed'));
     } finally {
       setUpdatingMember(null);
     }
@@ -1001,24 +1380,31 @@ export function GroupDetailPage() {
 
   async function handleRemoveMember(userId: number) {
     if (!id) return;
+    const member = members.find((item) => item.id === userId);
+    if (!member || !group) return;
+
+    const confirmed = await confirm({
+      title: tRef.current('detail.remove_member_title'),
+      body: tRef.current('detail.remove_member_confirm', { name: member.name, group: group.name }),
+      confirmLabel: tRef.current('detail.remove_from_group'),
+      cancelLabel: tRef.current('detail.cancel'),
+      status: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       setUpdatingMember(userId);
-      const response = await api.delete(`/v2/groups/${id}/members/${userId}`);
-      if (response.success) {
-        setMembers((prev) => prev.filter((m) => m.id !== userId));
-        setGroup((prev) => prev ? {
-          ...prev,
-          member_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
-          members_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
-        } : null);
-        toastRef.current.success(tRef.current('toast.member_removed'));
-      } else {
-        toastRef.current.error(response.error || tRef.current('toast.member_remove_failed'));
-      }
+      await removeGroupMember(groupId, userId);
+      setMembers((prev) => prev.filter((m) => m.id !== userId));
+      setGroup((prev) => prev ? {
+        ...prev,
+        member_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
+        members_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
+      } : null);
+      toastRef.current.success(tRef.current('toast.member_removed'));
     } catch (err) {
       logError('Failed to remove member', err);
-      toastRef.current.error(tRef.current('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.member_remove_failed'));
     } finally {
       setUpdatingMember(null);
     }
@@ -1028,9 +1414,6 @@ export function GroupDetailPage() {
   // Computed
   // ─────────────────────────────────────────────────────────────────────────
 
-  const userIsMember = group ? isMember(group) : false;
-  const userIsAdmin = group ? isGroupAdmin(group) : false;
-  const hasSubGroups = group?.sub_groups && group.sub_groups.length > 0;
   const isPrivateGroup = group?.visibility === 'private' || group?.visibility === 'secret';
   const metaDescription = isPrivateGroup
     ? t('detail.private_meta_description')
@@ -1136,12 +1519,17 @@ export function GroupDetailPage() {
         joinRequests={joinRequests}
         requestsLoading={requestsLoading}
         requestsLoaded={requestsLoaded}
+        requestsError={requestsError}
         processingRequest={processingRequest}
         getMemberCount={getMemberCount}
         onJoinLeave={handleJoinLeave}
         onOpenSettings={openSettingsModal}
         onOpenDelete={() => setShowDeleteModal(true)}
-        onOpenInvite={() => setShowInviteModal(true)}
+        onOpenInvite={() => {
+          setShowInviteModal(true);
+          setInviteResults([]);
+          void loadPendingInvites();
+        }}
         onOpenNotifPrefs={() => setShowNotifPrefs(true)}
         onLoadJoinRequests={loadJoinRequests}
         onJoinRequest={handleJoinRequest}
@@ -1157,59 +1545,75 @@ export function GroupDetailPage() {
       <GroupTabNav
         activeTab={activeTab}
         userIsAdmin={userIsAdmin}
+        userIsMember={userIsMember}
         hasSubGroups={!!hasSubGroups}
         subGroupCount={group.sub_groups?.length ?? 0}
-        onTabChange={setActiveTab}
-      />
-
-      {/* Tab Content */}
-      <GroupTabContent
-        activeTab={activeTab}
-        groupId={group.id}
-        userIsMember={userIsMember}
-        userIsAdmin={userIsAdmin}
-        isJoining={isJoining}
-        currentUserId={currentUser?.id}
-        groupOwnerId={group.owner?.id}
-        groupAdminIds={group.admins?.map((a) => a.id)}
-        hasSubGroups={!!hasSubGroups}
-        subGroups={group.sub_groups}
-        feedItems={feedItems}
-        feedLoading={feedLoading}
-        feedHasMore={feedHasMore}
-        feedLoadingMore={feedLoadingMore}
-        onComposeOpen={onComposeOpen}
-        onLoadMoreFeed={() => loadGroupFeed(true)}
-        onRefreshFeed={() => { feedCursorRef.current = undefined; return loadGroupFeed(false); }}
-        onToggleLike={handleFeedToggleLike}
-        onReact={handleFeedReact}
-        onHidePost={handleFeedHidePost}
-        onMuteUser={handleFeedMuteUser}
-        onReportPost={openFeedReportModal}
-        onDeletePost={handleFeedDeletePost}
-        onVotePoll={handleFeedVotePoll}
-        discussions={discussions}
-        discussionsLoading={discussionsLoading}
-        discussionsHasMore={discussionsHasMore}
-        expandedDiscussionId={expandedDiscussionId}
-        expandedDiscussion={expandedDiscussion}
-        expandedLoading={expandedLoading}
-        replyContent={replyContent}
-        sendingReply={sendingReply}
-        onShowNewDiscussion={() => setShowNewDiscussion(true)}
-        onExpandDiscussion={handleExpandDiscussion}
-        onLoadMoreDiscussions={() => loadDiscussions(true)}
-        onReplyContentChange={setReplyContent}
-        onSendReply={handleReply}
-        members={members}
-        membersLoading={membersLoading}
-        updatingMember={updatingMember}
-        onUpdateMemberRole={handleUpdateMemberRole}
-        onRemoveMember={handleRemoveMember}
-        events={events}
-        eventsLoading={eventsLoading}
-        onJoinLeave={handleJoinLeave}
-      />
+        onTabChange={handleTabChange}
+      >
+        <GroupTabContent
+          activeTab={activeTab}
+          groupId={group.id}
+          userIsMember={userIsMember}
+          userIsAdmin={userIsAdmin}
+          isJoining={isJoining}
+          currentUserId={currentUser?.id}
+          groupOwnerId={group.owner?.id}
+          groupAdminIds={group.admins?.map((a) => a.id)}
+          hasSubGroups={!!hasSubGroups}
+          subGroups={group.sub_groups}
+          feedItems={feedItems}
+          feedLoading={feedLoading}
+          feedError={feedError}
+          feedHasMore={feedHasMore}
+          feedLoadingMore={feedLoadingMore}
+          onComposeOpen={onComposeOpen}
+          onLoadMoreFeed={() => loadGroupFeed(true)}
+          onRefreshFeed={() => { feedCursorRef.current = undefined; return loadGroupFeed(false); }}
+          onToggleLike={handleFeedToggleLike}
+          onReact={handleFeedReact}
+          onHidePost={handleFeedHidePost}
+          onMuteUser={handleFeedMuteUser}
+          onReportPost={openFeedReportModal}
+          onDeletePost={handleFeedDeletePost}
+          onVotePoll={handleFeedVotePoll}
+          discussions={discussions}
+          discussionsLoading={discussionsLoading}
+          discussionsError={discussionsError}
+          discussionsHasMore={discussionsHasMore}
+          expandedDiscussionId={expandedDiscussionId}
+          expandedDiscussion={expandedDiscussion}
+          expandedLoading={expandedLoading}
+          loadingEarlierReplies={loadingEarlierReplies}
+          replyContent={replyContent}
+          sendingReply={sendingReply}
+          onShowNewDiscussion={() => setShowNewDiscussion(true)}
+          onExpandDiscussion={handleExpandDiscussion}
+          onLoadMoreDiscussions={() => loadDiscussions(true)}
+          onLoadEarlierReplies={handleLoadEarlierReplies}
+          onRetryDiscussions={() => loadDiscussions(false)}
+          onReplyContentChange={setReplyContent}
+          onSendReply={handleReply}
+          members={members}
+          membersLoading={membersLoading}
+          membersLoadingMore={membersLoadingMore}
+          membersHasMore={membersHasMore}
+          membersError={membersError}
+          updatingMember={updatingMember}
+          onUpdateMemberRole={handleUpdateMemberRole}
+          onRemoveMember={handleRemoveMember}
+          onSearchMembers={(query) => { void loadMembers({ query }); }}
+          onLoadMoreMembers={() => { void loadMembers({ append: true }); }}
+          onRetryMembers={() => loadMembers()}
+          events={events}
+          eventsLoading={eventsLoading}
+          eventsLoadingMore={eventsLoadingMore}
+          eventsHasMore={eventsHasMore}
+          eventsError={eventsError}
+          onLoadMoreEvents={() => { void loadEvents({ append: true }); }}
+          onRetryEvents={() => loadEvents()}
+          onJoinLeave={handleJoinLeave}
+        />
+      </GroupTabNav>
 
       {/* ─── New Discussion Modal ─── */}
       <NewDiscussionModal
@@ -1226,19 +1630,14 @@ export function GroupDetailPage() {
       {/* ─── Settings Modal ─── */}
       <GroupSettingsModal
         isOpen={showSettingsModal}
-        onOpenChange={setShowSettingsModal}
+        onOpenChange={(open) => void handleSettingsOpenChange(open)}
         group={group}
-        settingsName={settingsName}
-        settingsDescription={settingsDescription}
-        settingsPrivate={settingsPrivate}
-        settingsLocation={settingsLocation}
-        uploadingImage={uploadingImage}
+        draft={settingsDraft}
+        capabilities={settingsCapabilities}
         savingSettings={savingSettings}
-        onNameChange={setSettingsName}
-        onDescriptionChange={setSettingsDescription}
-        onPrivateChange={setSettingsPrivate}
-        onLocationChange={setSettingsLocation}
+        onDraftChange={setSettingsDraft}
         onImageUpload={handleImageUpload}
+        onImageRemove={handleImageRemove}
         onSave={handleSaveSettings}
       />
 
@@ -1247,6 +1646,7 @@ export function GroupDetailPage() {
         isOpen={showLeaveConfirm}
         onOpenChange={setShowLeaveConfirm}
         groupName={group.name}
+        mode={group.viewer_membership?.status === 'pending' ? 'cancel_request' : 'leave'}
         isLoading={isJoining}
         onConfirm={handleConfirmLeave}
       />
@@ -1295,10 +1695,15 @@ export function GroupDetailPage() {
         inviteEmails={inviteEmails}
         inviteMessage={inviteMessage}
         sendingInvites={sendingInvites}
+        pendingInvites={pendingInvites}
+        inviteResults={inviteResults}
+        invitesLoading={invitesLoading}
+        revokingInvite={revokingInvite}
         onGenerateLink={handleGenerateInviteLink}
         onEmailsChange={setInviteEmails}
         onMessageChange={setInviteMessage}
         onSendInvites={handleSendInvites}
+        onRevokeInvite={handleRevokeInvite}
         onCopyLink={(link) => { navigator.clipboard.writeText(link); toast.success(t('detail.link_copied')); }}
       />
     </motion.div>

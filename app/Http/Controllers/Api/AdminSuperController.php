@@ -113,6 +113,32 @@ class AdminSuperController extends BaseApiController
         }
     }
 
+    /** @param array{success:bool,moved:int,failed:array<string>} $moveResult */
+    private function respondWithUserMoveFailure(array $moveResult): JsonResponse
+    {
+        if (self::moveRequiresPasskeyRecovery($moveResult)) {
+            return $this->respondWithError(
+                ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED,
+                __('api.super_move_user_passkey_recovery_required'),
+                null,
+                409
+            );
+        }
+
+        return $this->respondWithError(
+            ApiErrorCodes::SERVER_INTERNAL_ERROR,
+            __('api.super_move_user_failed'),
+            null,
+            500
+        );
+    }
+
+    /** @param array{failed?:array<string>} $moveResult */
+    private static function moveRequiresPasskeyRecovery(array $moveResult): bool
+    {
+        return in_array('passkey_recovery_required', $moveResult['failed'] ?? [], true);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Dashboard
     // ─────────────────────────────────────────────────────────────────────────
@@ -391,7 +417,20 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithData(['updated' => true, 'tenant_id' => $id]);
         }
 
-        return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, $result['error'], null, 422);
+        $code = (string) ($result['code'] ?? ApiErrorCodes::VALIDATION_ERROR);
+        $response = $this->respondWithError(
+            $code,
+            (string) $result['error'],
+            null,
+            $code === 'PASSKEY_RP_CHANGE_BLOCKED' ? 409 : 422
+        );
+        if (isset($result['security_impact']) && is_array($result['security_impact'])) {
+            $payload = $response->getData(true);
+            $payload['meta']['security_impact'] = $result['security_impact'];
+            $response->setData($payload);
+        }
+
+        return $response;
     }
 
     /**
@@ -554,7 +593,20 @@ class AdminSuperController extends BaseApiController
             ]);
         }
 
-        return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, $result['error'], null, 422);
+        $code = (string) ($result['code'] ?? ApiErrorCodes::VALIDATION_ERROR);
+        $response = $this->respondWithError(
+            $code,
+            (string) $result['error'],
+            null,
+            $code === 'PASSKEY_RP_CHANGE_BLOCKED' ? 409 : 422
+        );
+        if (isset($result['security_impact']) && is_array($result['security_impact'])) {
+            $payload = $response->getData(true);
+            $payload['meta']['security_impact'] = $result['security_impact'];
+            $response->setData($payload);
+        }
+
+        return $response;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -901,7 +953,7 @@ class AdminSuperController extends BaseApiController
 
         $moveResult = User::moveTenant($id, $newTenantId);
         if (!$moveResult['success']) {
-            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.super_move_user_failed'), null, 500);
+            return $this->respondWithUserMoveFailure($moveResult);
         }
 
         // Revoke super admin if moving to a tenant without sub-tenant capability
@@ -972,7 +1024,7 @@ class AdminSuperController extends BaseApiController
         // Step 1: Move user
         $moveResult = User::moveTenant($id, $targetTenantId);
         if (!$moveResult['success']) {
-            return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.super_move_user_failed'), null, 500);
+            return $this->respondWithUserMoveFailure($moveResult);
         }
 
         // Step 2: Grant super admin (role merged into admin; the flag carries the power)
@@ -1077,12 +1129,23 @@ class AdminSuperController extends BaseApiController
 
         // Move all validated users
         $movedCount = 0;
+        $failures = [];
 
         foreach ($validatedUsers as $uid) {
             try {
                 $moveResult = User::moveTenant($uid, $targetTenantId);
                 if (!$moveResult['success']) {
-                    $errors[] = "Failed to move user ID {$uid}";
+                    if (self::moveRequiresPasskeyRecovery($moveResult)) {
+                        $message = __('api.super_move_user_passkey_recovery_required');
+                        $errors[] = $message;
+                        $failures[] = [
+                            'user_id' => $uid,
+                            'code' => ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED,
+                            'message' => $message,
+                        ];
+                    } else {
+                        $errors[] = "Failed to move user ID {$uid}";
+                    }
                     continue;
                 }
 
@@ -1115,6 +1178,7 @@ class AdminSuperController extends BaseApiController
             'moved_count' => $movedCount,
             'total_requested' => count($userIds),
             'errors' => $errors,
+            'failures' => $failures,
         ]);
     }
 

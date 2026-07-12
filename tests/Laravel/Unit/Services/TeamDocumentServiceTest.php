@@ -4,15 +4,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
 use App\Services\TeamDocumentService;
-use App\Core\TenantContext;
-use Illuminate\Support\Facades\DB;
-use Mockery;
+use Tests\Laravel\TestCase;
 
-class TeamDocumentServiceTest extends TestCase
+final class TeamDocumentServiceTest extends TestCase
 {
     private TeamDocumentService $service;
 
@@ -22,125 +21,30 @@ class TeamDocumentServiceTest extends TestCase
         $this->service = new TeamDocumentService();
     }
 
-    public function test_getDocuments_returns_paginated_results(): void
+    public function test_get_documents_fails_closed_without_authenticated_user(): void
     {
-        $tenantId = TenantContext::getId();
-        $groupId = 10;
-
-        DB::shouldReceive('table')->with('team_documents')->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', $groupId)->andReturnSelf();
-        DB::shouldReceive('orderByDesc')->with('id')->andReturnSelf();
-        DB::shouldReceive('limit')->with(51)->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
-
-        $result = $this->service->getDocuments($groupId);
-
-        $this->assertArrayHasKey('items', $result);
-        $this->assertArrayHasKey('cursor', $result);
-        $this->assertArrayHasKey('has_more', $result);
-        $this->assertFalse($result['has_more']);
+        self::assertSame(
+            ['items' => [], 'cursor' => null, 'has_more' => false],
+            $this->service->getDocuments(10),
+        );
+        self::assertSame('FORBIDDEN', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_getDocuments_with_cursor_applies_filter(): void
+    public function test_upload_rejects_missing_or_unreadable_temporary_file(): void
     {
-        $tenantId = TenantContext::getId();
-        $groupId = 10;
-        $filters = ['cursor' => '100', 'limit' => 10];
+        self::assertNull($this->service->upload(1, 1, []));
+        self::assertSame('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
 
-        DB::shouldReceive('table')->with('team_documents')->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', $groupId)->andReturnSelf();
-        DB::shouldReceive('where')->with('id', '<', 100)->andReturnSelf();
-        DB::shouldReceive('orderByDesc')->with('id')->andReturnSelf();
-        DB::shouldReceive('limit')->with(11)->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
-
-        $result = $this->service->getDocuments($groupId, $filters);
-
-        $this->assertEmpty($result['items']);
+        self::assertNull($this->service->upload(1, 1, [
+            'name' => 'missing.pdf',
+            'tmp_name' => '/definitely/not/a/real/upload.pdf',
+            'error' => UPLOAD_ERR_OK,
+        ]));
+        self::assertSame('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_getDocuments_requires_active_group_membership_when_user_is_supplied(): void
+    public function test_get_errors_is_empty_before_an_operation(): void
     {
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-
-        $result = $this->service->getDocuments(10, [], 99);
-
-        $this->assertSame(['items' => [], 'cursor' => null, 'has_more' => false], $result);
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_upload_returns_null_when_no_file_provided(): void
-    {
-        $result = $this->service->upload(1, 1, []);
-
-        $this->assertNull($result);
-        $this->assertNotEmpty($this->service->getErrors());
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_upload_returns_null_when_file_has_upload_error(): void
-    {
-        $fileData = [
-            'tmp_name' => '/tmp/test.pdf',
-            'error' => UPLOAD_ERR_INI_SIZE,
-        ];
-
-        $result = $this->service->upload(1, 1, $fileData);
-
-        $this->assertNull($result);
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_delete_returns_false_when_document_not_found(): void
-    {
-        $tenantId = TenantContext::getId();
-
-        DB::shouldReceive('table')->with('team_documents')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 999)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(null);
-
-        $result = $this->service->delete(999, 1);
-
-        $this->assertFalse($result);
-        $this->assertEquals('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_delete_requires_uploader_or_group_admin(): void
-    {
-        $tenantId = TenantContext::getId();
-        $doc = (object) [
-            'id' => 55,
-            'group_id' => 10,
-            'tenant_id' => $tenantId,
-            'uploaded_by' => 7,
-            'file_path' => null,
-        ];
-
-        DB::shouldReceive('table')->with('team_documents')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 55)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $tenantId)->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($doc, (object) ['role' => 'member']);
-
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-
-        $result = $this->service->delete(55, 99);
-
-        $this->assertFalse($result);
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_getErrors_returns_empty_array_initially(): void
-    {
-        $this->assertEmpty($this->service->getErrors());
+        self::assertSame([], $this->service->getErrors());
     }
 }

@@ -317,6 +317,7 @@
     "intro": "Hier ist eine Zusammenfassung der Neuigkeiten bei Project NEXUS, die Sie verpasst haben:",
     "opted_in_notice": "Sie haben diese E-Mail erhalten, weil Sie sich für eine {{frequency}} Zusammenfassung entschieden haben.",
     "manage_notifications": "Benachrichtigungen verwalten",
+    "unsubscribe_events": "Nur Veranstaltungs-E-Mails abbestellen",
     "view_item": "Ansehen",
     "frequency_instant": "Sofort",
     "frequency_daily": "Täglich",
@@ -394,6 +395,13 @@
     "updated_subject": "Aktualisiert: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} Ihre Veranstaltung \"{{title}}\"",
     "view_event": "Veranstaltung anzeigen",
+    "broadcast_subject": "Eine Nachricht zu {{title}}",
+    "follow_up_subject": "Nachbereitung zu {{title}}",
+    "review_request_subject": "Wie war {{title}}?",
+    "broadcast_heading": "Eine Nachricht zu {{title}}",
+    "follow_up_heading": "Nachbereitung zu {{title}}",
+    "review_request_heading": "Teilen Sie Ihre Erfahrung mit {{title}}",
+    "leave_event_review": "Bewertung abgeben",
     "view_updated_event": "Aktualisierte Veranstaltung anzeigen",
     "browse_events": "Veranstaltungen durchsuchen",
     "new_rsvp_heading": "Neue Anmeldung!",
@@ -409,6 +417,7 @@
     "updated_heading": "Veranstaltung aktualisiert",
     "updated_body": "Die Veranstaltung <strong>\"{{title}}\"</strong> wurde aktualisiert:",
     "change_label_date_time": "Datum/Uhrzeit:",
+    "change_label_end_time": "Endzeit:",
     "change_label_location": "Ort:",
     "change_label_title": "Titel:",
     "reminder_heading_24h": "Veranstaltung morgen",
@@ -617,6 +626,16 @@
     "impact_minor": "Gering",
     "impact_cosmetic": "Kosmetisch"
   },
+  "event_guardian_consent": {
+    "subject": "Einwilligung einer sorgeberechtigten Person für :event erforderlich",
+    "title": "Einwilligung prüfen",
+    "greeting": "Hallo :name,",
+    "introduction": ":minor möchte an :event teilnehmen. Bitte prüfen Sie die Sicherheitsanforderungen der Veranstaltung, bevor Sie Ihre Einwilligung erteilen.",
+    "security_notice": "Dieser Link gilt nur für diese Einwilligungsanfrage. Bitte leiten oder teilen Sie ihn nicht.",
+    "review_button": "Prüfen und einwilligen",
+    "expiry_notice": "Der Link läuft nach der Veranstaltung oder bei Widerruf bzw. Ersetzung der Anfrage ab.",
+    "consent_text": "Ich bestätige, dass ich berechtigt bin, der Teilnahme der minderjährigen Person an :event zuzustimmen, und dass ich die Sicherheitsanforderungen geprüft habe."
+  },
   "donation_admin": {
     "created_subject": "Neue Spende: :amount an :community",
     "created_title": "Neue Spende erhalten",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Anonym",
     "anonymous_note": "(öffentlich als anonym markiert)",
     "review_cta": "Spenden ansehen"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Gastregistrierung storniert: :event",
+    "cancelled_message": "Ihre Gastregistrierung für :event wurde storniert.",
+    "view_event": "Veranstaltung ansehen"
+  },
+  "event_invitation": {
+    "subject": "Sie sind zu :event eingeladen",
+    "message": "Sie wurden zu :event eingeladen. Prüfen Sie die Veranstaltungsdetails und antworten Sie, bevor die Einladung abläuft.",
+    "expiry": "Diese Einladung läuft am :expiry ab.",
+    "accept_button": "Einladung prüfen"
   }
 }

@@ -265,6 +265,46 @@ class SearchEventsToolTest extends TestCase
 
     // ─── Execute: empty query lists events ───────────────────────────────────
 
+    public function test_execute_hides_non_discoverable_event_lifecycle_states(): void
+    {
+        $uniqueToken = 'LIFECYCLEAI' . uniqid();
+        $scheduled = $this->insertFutureEvent([
+            'title' => "{$uniqueToken} scheduled",
+            'status' => 'active',
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'is_recurring_template' => 0,
+        ]);
+        $postponed = $this->insertFutureEvent([
+            'title' => "{$uniqueToken} postponed",
+            'status' => 'cancelled',
+            'publication_status' => 'published',
+            'operational_status' => 'postponed',
+            'is_recurring_template' => 0,
+        ]);
+        foreach ([
+            ['status' => 'draft', 'publication_status' => 'draft', 'operational_status' => 'scheduled'],
+            ['status' => 'draft', 'publication_status' => 'pending_review', 'operational_status' => 'scheduled'],
+            ['status' => 'cancelled', 'publication_status' => 'archived', 'operational_status' => 'cancelled'],
+            ['status' => 'cancelled', 'publication_status' => 'published', 'operational_status' => 'cancelled'],
+            ['status' => 'active', 'publication_status' => 'published', 'operational_status' => 'scheduled', 'is_recurring_template' => 1],
+        ] as $index => $state) {
+            $this->insertFutureEvent([
+                'title' => "{$uniqueToken} hidden {$index}",
+                'is_recurring_template' => 0,
+                ...$state,
+            ]);
+        }
+
+        $result = $this->tool->execute(['query' => $uniqueToken, 'limit' => 8], 1);
+
+        $this->assertTrue($result['ok']);
+        $this->assertEqualsCanonicalizing(
+            [$scheduled, $postponed],
+            array_map('intval', array_column($result['results'], 'id')),
+        );
+    }
+
     public function test_execute_empty_query_returns_multiple_future_events(): void
     {
         $uniqueToken = 'NOQUERYEVT' . uniqid();

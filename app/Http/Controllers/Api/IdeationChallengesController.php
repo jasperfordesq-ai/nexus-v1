@@ -81,6 +81,12 @@ class IdeationChallengesController extends BaseApiController
             if ($code === ApiErrorCodes::RESOURCE_CONFLICT) {
                 return 409;
             }
+            if (in_array($code, ['GROUP_QUOTA_EXCEEDED', 'TENANT_QUOTA_EXCEEDED'], true)) {
+                return 409;
+            }
+            if ($code === 'FILE_TOO_LARGE') {
+                return 413;
+            }
             if ($code === 'SERVER_ERROR') {
                 return 500;
             }
@@ -1015,6 +1021,11 @@ class IdeationChallengesController extends BaseApiController
     {
         $this->ensureFeature();
         $chatrooms = $this->groupChatroomService->getChatrooms((int) $id, null, $this->getUserId());
+        if ($chatrooms === null) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithData($chatrooms);
     }
 
@@ -1033,7 +1044,12 @@ class IdeationChallengesController extends BaseApiController
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
-        $chatroom = $this->groupChatroomService->getById($chatroomId);
+        $chatroom = $this->groupChatroomService->getById($chatroomId, $userId);
+        if ($chatroom === null) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithData($chatroom, null, 201);
     }
 
@@ -1116,7 +1132,7 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('chatroom_pin', 20, 60);
 
-        $success = $this->groupChatroomService->pinMessage((int) $chatroomId, (int) $messageId, $userId);
+        $success = $this->groupChatroomService->pinMessage((int) $groupId, (int) $chatroomId, (int) $messageId, $userId);
 
         if (!$success) {
             $errors = $this->groupChatroomService->getErrors();
@@ -1133,7 +1149,7 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('chatroom_pin', 20, 60);
 
-        $success = $this->groupChatroomService->unpinMessage((int) $chatroomId, (int) $messageId, $userId);
+        $success = $this->groupChatroomService->unpinMessage((int) $groupId, (int) $chatroomId, (int) $messageId, $userId);
 
         if (!$success) {
             $errors = $this->groupChatroomService->getErrors();
@@ -1147,7 +1163,7 @@ class IdeationChallengesController extends BaseApiController
     public function pinnedChatroomMessages($groupId, $chatroomId): JsonResponse
     {
         $this->ensureFeature();
-        $pinned = $this->groupChatroomService->getPinnedMessages((int) $chatroomId, $this->getUserId());
+        $pinned = $this->groupChatroomService->getPinnedMessages((int) $groupId, (int) $chatroomId, $this->getUserId());
         if ($pinned === null) {
             $errors = $this->groupChatroomService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));

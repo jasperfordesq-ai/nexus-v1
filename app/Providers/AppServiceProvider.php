@@ -574,6 +574,16 @@ class AppServiceProvider extends ServiceProvider
             return new EventNotificationService();
         });
 
+        $this->app->bind(
+            \App\Contracts\EventNotificationOutboxHandler::class,
+            \App\Services\EventNotificationOutboxActionHandler::class,
+        );
+
+        $this->app->bind(
+            \App\Contracts\EventFederationTransport::class,
+            \App\Services\NexusEventFederationTransport::class,
+        );
+
         $this->app->singleton(EventReminderService::class, function ($app) {
             return new EventReminderService();
         });
@@ -1055,15 +1065,55 @@ class AppServiceProvider extends ServiceProvider
         // payload deserialization runs, guaranteeing every job starts with a
         // clean null context regardless of what the previous job did.
         //
-        // Also resets after each job and on failure as defence-in-depth.
-        \Illuminate\Support\Facades\Queue::before(function () {
+        // Also resets after each asynchronous job and on failure as
+        // defence-in-depth. The sync driver is different: it executes inline
+        // inside the current HTTP/test tenant scope. Resetting before a sync
+        // job silently changes the remainder of that request to the platform
+        // default tenant. Preserve and restore the outer tenant for sync jobs.
+        $syncQueueTenantIds = [];
+        $restoreSyncQueueTenant = static function (object $event) use (&$syncQueueTenantIds): bool {
+            if (($event->connectionName ?? null) !== 'sync') {
+                return false;
+            }
+
+            $jobKey = spl_object_id($event->job);
+            if (! array_key_exists($jobKey, $syncQueueTenantIds)) {
+                return true;
+            }
+
+            $tenantId = $syncQueueTenantIds[$jobKey];
+            unset($syncQueueTenantIds[$jobKey]);
+            if ($tenantId !== null) {
+                \App\Core\TenantContext::setById($tenantId);
+            } else {
+                \App\Core\TenantContext::reset();
+            }
+
+            return true;
+        };
+
+        \Illuminate\Support\Facades\Queue::before(static function (object $event) use (&$syncQueueTenantIds): void {
+            if (($event->connectionName ?? null) === 'sync') {
+                $syncQueueTenantIds[spl_object_id($event->job)] = \App\Core\TenantContext::currentId();
+                return;
+            }
+
             \App\Core\TenantContext::reset();
         });
-        \Illuminate\Support\Facades\Queue::after(function () {
-            \App\Core\TenantContext::reset();
+        \Illuminate\Support\Facades\Queue::after(static function (object $event) use ($restoreSyncQueueTenant): void {
+            if (! $restoreSyncQueueTenant($event)) {
+                \App\Core\TenantContext::reset();
+            }
         });
-        \Illuminate\Support\Facades\Queue::failing(function () {
-            \App\Core\TenantContext::reset();
+        \Illuminate\Support\Facades\Queue::exceptionOccurred(static function (object $event) use ($restoreSyncQueueTenant): void {
+            if (! $restoreSyncQueueTenant($event)) {
+                \App\Core\TenantContext::reset();
+            }
+        });
+        \Illuminate\Support\Facades\Queue::failing(static function (object $event) use ($restoreSyncQueueTenant): void {
+            if (! $restoreSyncQueueTenant($event)) {
+                \App\Core\TenantContext::reset();
+            }
         });
 
         // Load JSON translation files from lang/{locale}/ subdirectories.

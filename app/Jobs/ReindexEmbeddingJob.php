@@ -7,6 +7,7 @@
 namespace App\Jobs;
 
 use App\Services\EmbeddingService;
+use App\Support\Events\EventSearchVisibility;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -70,10 +71,13 @@ class ReindexEmbeddingJob implements ShouldQueue
             return null;
         }
         [$table, $cols] = $map[$this->contentType];
-        $row = DB::table($table)
+        $query = DB::table($table)
             ->where('tenant_id', $this->tenantId)
-            ->where('id', $this->contentId)
-            ->first($cols);
+            ->where('id', $this->contentId);
+        if ($this->contentType === 'event') {
+            EventSearchVisibility::applyToQuery($query, $this->tenantId, 'events');
+        }
+        $row = $query->first($cols);
 
         return $row ? (array) $row : null;
     }

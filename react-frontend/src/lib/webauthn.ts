@@ -41,32 +41,47 @@ export async function isPlatformAuthenticatorAvailable(): Promise<boolean> {
   return platformAuthenticatorIsAvailable();
 }
 
-/** Check if passkey features should be shown.
- * Requires a platform authenticator (Windows Hello / Touch ID / Android biometric)
- * to be enrolled. This prevents showing the passkey UI on machines that have
- * no Hello PIN/face/fingerprint set up, which would cause a confusing empty
- * Windows Security dialog with no options.
+/**
+ * Backwards-compatible passkey capability check.
+ *
+ * A platform authenticator is only one way to use a passkey. Security keys,
+ * synced passkeys, and hybrid phone flows remain valid when the local device
+ * has no enrolled platform authenticator, so management UI must be gated on
+ * browser WebAuthn support instead.
  */
 export async function isBiometricAvailable(): Promise<boolean> {
-  if (!browserSupportsWebAuthn()) return false;
-  return platformAuthenticatorIsAvailable();
+  return browserSupportsWebAuthn();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface WebAuthnCredential {
+export interface WebAuthnCredential {
   credential_id: string;
   device_name: string | null;
   authenticator_type: string | null;
   created_at: string;
   last_used_at: string | null;
+  rp_id?: string | null;
+  backup_eligible?: boolean | null;
+  backup_state?: boolean | null;
+  user_verified?: boolean | null;
+  credential_discoverable?: boolean | null;
 }
 
-interface WebAuthnStatus {
+export interface WebAuthnStatus {
   registered: boolean;
   count: number;
+  authentication_allowed?: boolean;
+  enrollment_allowed?: boolean;
+  current_rp_id?: string | null;
+  max_credentials?: number;
+  confirmation_methods?: {
+    password?: boolean;
+    passkey?: boolean;
+    totp?: boolean;
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,7 +89,22 @@ interface WebAuthnStatus {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Stable failure codes the UI can map to translated messages. */
-export type WebAuthnFailureCode = 'cancelled' | 'domain_not_allowed' | 'unknown';
+export type WebAuthnFailureCode =
+  | 'cancelled'
+  | 'domain_not_allowed'
+  | 'unknown'
+  | 'FEATURE_DISABLED'
+  | 'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED'
+  | 'AUTH_WEBAUTHN_UNAVAILABLE'
+  | 'AUTH_WEBAUTHN_CHALLENGE_EXPIRED'
+  | 'AUTH_WEBAUTHN_CHALLENGE_INVALID'
+  | 'AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND'
+  | 'AUTH_WEBAUTHN_FAILED'
+  | 'SECURITY_CONFIRMATION_REQUIRED'
+  | 'WEBAUTHN_CREDENTIAL_LIMIT'
+  | 'WEBAUTHN_CREDENTIAL_EXISTS';
+
+type LocalWebAuthnFailureCode = 'cancelled' | 'domain_not_allowed' | 'unknown';
 
 /**
  * Classify a ceremony exception into a stable code.
@@ -84,9 +114,10 @@ export type WebAuthnFailureCode = 'cancelled' | 'domain_not_allowed' | 'unknown'
  * page's domain). Duck-type on `code` rather than `instanceof` so unit-test
  * mocks of the library don't break classification.
  */
-function classifyWebAuthnError(err: unknown): { code: WebAuthnFailureCode; message: string } {
+function classifyWebAuthnError(err: unknown): { code: LocalWebAuthnFailureCode; message: string } {
   const message = err instanceof Error ? err.message : '';
   const libraryCode = (err as { code?: string } | null | undefined)?.code;
+  const errorName = (err as { name?: unknown } | null | undefined)?.name;
 
   if (libraryCode === 'ERROR_INVALID_RP_ID' || libraryCode === 'ERROR_INVALID_DOMAIN') {
     return { code: 'domain_not_allowed', message };
@@ -97,7 +128,8 @@ function classifyWebAuthnError(err: unknown): { code: WebAuthnFailureCode; messa
   const causeName = typeof cause?.name === 'string' ? cause.name : undefined;
   if (
     libraryCode === 'ERROR_CEREMONY_ABORTED' ||
-    (err instanceof Error && (err.name === 'NotAllowedError' || err.name === 'AbortError')) ||
+    errorName === 'NotAllowedError' ||
+    errorName === 'AbortError' ||
     causeName === 'NotAllowedError' ||
     message.includes('NotAllowedError') ||
     message.includes('cancelled') ||
@@ -107,6 +139,38 @@ function classifyWebAuthnError(err: unknown): { code: WebAuthnFailureCode; messa
   }
 
   return { code: 'unknown', message };
+}
+
+interface CeremonyOwner {
+  id: symbol;
+  kind: 'conditional' | 'authentication' | 'registration';
+}
+
+let activeCeremonyOwner: CeremonyOwner | null = null;
+
+function claimCeremony(kind: CeremonyOwner['kind']): CeremonyOwner {
+  const owner = { id: Symbol(kind), kind };
+  activeCeremonyOwner = owner;
+  return owner;
+}
+
+function releaseCeremony(owner: CeremonyOwner): void {
+  if (activeCeremonyOwner?.id === owner.id) {
+    activeCeremonyOwner = null;
+  }
+}
+
+function cancelOwnedCeremony(owner: CeremonyOwner): void {
+  if (activeCeremonyOwner?.id !== owner.id) return;
+  activeCeremonyOwner = null;
+  WebAuthnAbortService.cancelCeremony();
+}
+
+/** Cancel autofill without allowing its later cleanup to cancel a newer modal ceremony. */
+function cancelConditionalCeremony(): void {
+  if (activeCeremonyOwner?.kind !== 'conditional') return;
+  activeCeremonyOwner = null;
+  WebAuthnAbortService.cancelCeremony();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,20 +190,6 @@ export function detectPlatform(): DevicePlatform {
   return 'unknown';
 }
 
-export function getDefaultDeviceName(): string {
-  const platform = detectPlatform();
-  const names: Record<DevicePlatform, string> = {
-    windows: 'Windows PC',
-    mac: 'Mac',
-    iphone: 'iPhone',
-    ipad: 'iPad',
-    android: 'Android device',
-    linux: 'Linux PC',
-    unknown: 'Device',
-  };
-  return names[platform];
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Registration (Enroll a new biometric credential)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -149,11 +199,11 @@ export type AuthenticatorAttachment = 'platform' | 'cross-platform' | undefined;
 export async function registerBiometric(
   deviceName?: string,
   attachment?: AuthenticatorAttachment,
+  securityConfirmationToken?: string,
 ): Promise<{ success: boolean; error?: string; errorCode?: WebAuthnFailureCode }> {
   try {
-    // Modal registration supersedes any pending autofill request — see
-    // authenticateWithBiometric.
-    conditionalCeremonyActive = false;
+    // Registration supersedes passkey autofill before any network wait.
+    cancelConditionalCeremony();
 
     // Step 1: Get registration challenge from server
     const challengeRes = await api.post<{
@@ -170,10 +220,16 @@ export async function registerBiometric(
       timeout: number;
       attestation: string;
       excludeCredentials: Array<{ type: 'public-key'; id: string; transports?: string[] }>;
-    }>('/webauthn/register-challenge', {});
+    }>('/webauthn/register-challenge', {
+      ...(securityConfirmationToken ? { security_confirmation_token: securityConfirmationToken } : {}),
+    });
 
     if (!challengeRes.success || !challengeRes.data) {
-      return { success: false, error: challengeRes.error || 'Failed to get registration challenge' };
+      return {
+        success: false,
+        error: challengeRes.error || 'Failed to get registration challenge',
+        errorCode: challengeRes.code as WebAuthnFailureCode | undefined,
+      };
     }
 
     const serverOptions = challengeRes.data;
@@ -212,6 +268,7 @@ export async function registerBiometric(
     // If platform attachment fails (Windows Hello unavailable), retry without it
     // so the browser shows the generic picker (phone/security key options)
     let credential: RegistrationResponseJSON;
+    const ceremonyOwner = claimCeremony('registration');
     try {
       credential = await startRegistration({ optionsJSON });
     } catch (firstErr: unknown) {
@@ -231,6 +288,8 @@ export async function registerBiometric(
       } else {
         throw firstErr;
       }
+    } finally {
+      releaseCeremony(ceremonyOwner);
     }
 
     // Step 4: Send credential to server for verification + storage
@@ -241,11 +300,16 @@ export async function registerBiometric(
       type: credential.type,
       response: credential.response,
       authenticatorAttachment: credential.authenticatorAttachment,
-      device_name: deviceName || getDefaultDeviceName(),
+      ...(deviceName ? { device_name: deviceName } : {}),
+      ...(securityConfirmationToken ? { security_confirmation_token: securityConfirmationToken } : {}),
     });
 
     if (!verifyRes.success) {
-      return { success: false, error: verifyRes.error || 'Failed to verify registration' };
+      return {
+        success: false,
+        error: verifyRes.error || 'Failed to verify registration',
+        errorCode: verifyRes.code as WebAuthnFailureCode | undefined,
+      };
     }
 
     return { success: true };
@@ -263,7 +327,8 @@ export async function registerBiometric(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function authenticateWithBiometric(
-  email?: string,
+  _email?: string,
+  abortSignal?: AbortSignal,
 ): Promise<{
   success: boolean;
   data?: {
@@ -271,17 +336,24 @@ export async function authenticateWithBiometric(
     access_token: string;
     refresh_token: string;
     expires_in: number;
+    security_confirmation_token?: string;
+    security_confirmation_expires_in?: number;
   };
   error?: string;
   errorCode?: WebAuthnFailureCode;
 }> {
   try {
-    // This modal ceremony supersedes any pending autofill request (the
-    // library aborts it when this one starts) — a later unmount abort from
-    // the autofill caller must not cancel this one.
-    conditionalCeremonyActive = false;
+    // Cancel autofill before the challenge fetch. Ownership tokens prevent
+    // stale autofill cleanup from cancelling this user-initiated request.
+    cancelConditionalCeremony();
+    if (abortSignal?.aborted) {
+      return { success: false, errorCode: 'cancelled' };
+    }
 
     // Step 1: Get authentication challenge from server
+    // Always request a discoverable-credential ceremony. Sending an email here
+    // would require the public API to reveal or pad account-bound credential
+    // descriptors, which creates an account-enumeration timing surface.
     const challengeRes = await api.post<{
       challenge: string;
       challenge_id: string;
@@ -289,10 +361,18 @@ export async function authenticateWithBiometric(
       timeout: number;
       userVerification: string;
       allowCredentials?: Array<{ type: 'public-key'; id: string; transports?: string[] }>;
-    }>('/webauthn/auth-challenge', { email }, { skipAuth: true });
+    }>('/webauthn/auth-challenge', {}, { skipAuth: true });
+
+    if (abortSignal?.aborted) {
+      return { success: false, errorCode: 'cancelled' };
+    }
 
     if (!challengeRes.success || !challengeRes.data) {
-      return { success: false, error: challengeRes.error || 'Failed to get authentication challenge' };
+      return {
+        success: false,
+        error: challengeRes.error || 'Failed to get authentication challenge',
+        errorCode: challengeRes.code as WebAuthnFailureCode | undefined,
+      };
     }
 
     const serverOptions = challengeRes.data;
@@ -313,7 +393,21 @@ export async function authenticateWithBiometric(
     };
 
     // Step 3: Trigger browser passkey prompt
-    const assertion: AuthenticationResponseJSON = await startAuthentication({ optionsJSON });
+    const ceremonyOwner = claimCeremony('authentication');
+    const cancelOnAbort = () => cancelOwnedCeremony(ceremonyOwner);
+    abortSignal?.addEventListener('abort', cancelOnAbort, { once: true });
+
+    let assertion: AuthenticationResponseJSON;
+    try {
+      assertion = await startAuthentication({ optionsJSON });
+    } finally {
+      releaseCeremony(ceremonyOwner);
+      abortSignal?.removeEventListener('abort', cancelOnAbort);
+    }
+
+    if (abortSignal?.aborted) {
+      return { success: false, errorCode: 'cancelled' };
+    }
 
     // Step 4: Send assertion to server for verification
     const verifyRes = await api.post<{
@@ -322,6 +416,8 @@ export async function authenticateWithBiometric(
       access_token: string;
       refresh_token: string;
       expires_in: number;
+      security_confirmation_token?: string;
+      security_confirmation_expires_in?: number;
     }>('/webauthn/auth-verify', {
       challenge_id: serverOptions.challenge_id,
       id: assertion.id,
@@ -331,8 +427,16 @@ export async function authenticateWithBiometric(
       authenticatorAttachment: assertion.authenticatorAttachment,
     }, { skipAuth: true });
 
+    if (abortSignal?.aborted) {
+      return { success: false, errorCode: 'cancelled' };
+    }
+
     if (!verifyRes.success || !verifyRes.data) {
-      return { success: false, error: verifyRes.error || 'Biometric authentication failed' };
+      return {
+        success: false,
+        error: verifyRes.error || 'Biometric authentication failed',
+        errorCode: verifyRes.code as WebAuthnFailureCode | undefined,
+      };
     }
 
     return { success: true, data: verifyRes.data };
@@ -365,14 +469,6 @@ export async function isConditionalMediationAvailable(): Promise<boolean> {
 }
 
 /**
- * True while the autofill (conditional-mediation) request owns the browser's
- * single in-flight WebAuthn ceremony. A user-initiated modal ceremony
- * (authenticateWithBiometric / registerBiometric) takes that slot over, and an
- * unmount abort arriving afterwards must not cancel the user's ceremony.
- */
-let conditionalCeremonyActive = false;
-
-/**
  * Start conditional mediation — browser will show passkey suggestions
  * in the username field's autofill dropdown. Call on page load.
  *
@@ -388,8 +484,11 @@ export async function startConditionalAuthentication(
     access_token: string;
     refresh_token: string;
     expires_in: number;
+    security_confirmation_token?: string;
+    security_confirmation_expires_in?: number;
   };
   error?: string;
+  errorCode?: WebAuthnFailureCode;
 } | null> {
   try {
     if (abortSignal?.aborted) return null;
@@ -404,14 +503,14 @@ export async function startConditionalAuthentication(
       allowCredentials?: Array<{ type: 'public-key'; id: string; transports?: string[] }>;
     }>('/webauthn/auth-challenge', {}, { skipAuth: true });
 
+    if (abortSignal?.aborted) return null;
+
     if (!challengeRes.success || !challengeRes.data) {
       return null;
     }
 
     // The caller may have unmounted while the challenge was in flight —
     // never start a credential request its AbortController can't reach.
-    if (abortSignal?.aborted) return null;
-
     const serverOptions = challengeRes.data;
 
     const optionsJSON: PublicKeyCredentialRequestOptionsJSON = {
@@ -428,12 +527,10 @@ export async function startConditionalAuthentication(
     // navigator.credentials.get() instead of leaking it for the life of the
     // document (leaked OS-mediated requests are what popped native passkey
     // dialogs while login pages sat idle).
-    conditionalCeremonyActive = true;
+    cancelConditionalCeremony();
+    const ceremonyOwner = claimCeremony('conditional');
     const cancelOnAbort = () => {
-      if (conditionalCeremonyActive) {
-        conditionalCeremonyActive = false;
-        WebAuthnAbortService.cancelCeremony();
-      }
+      cancelOwnedCeremony(ceremonyOwner);
     };
     abortSignal?.addEventListener('abort', cancelOnAbort, { once: true });
 
@@ -446,7 +543,7 @@ export async function startConditionalAuthentication(
         useBrowserAutofill: true,
       });
     } finally {
-      conditionalCeremonyActive = false;
+      releaseCeremony(ceremonyOwner);
       abortSignal?.removeEventListener('abort', cancelOnAbort);
     }
 
@@ -460,6 +557,8 @@ export async function startConditionalAuthentication(
       access_token: string;
       refresh_token: string;
       expires_in: number;
+      security_confirmation_token?: string;
+      security_confirmation_expires_in?: number;
     }>('/webauthn/auth-verify', {
       challenge_id: serverOptions.challenge_id,
       id: assertion.id,
@@ -469,8 +568,14 @@ export async function startConditionalAuthentication(
       authenticatorAttachment: assertion.authenticatorAttachment,
     }, { skipAuth: true });
 
+    if (abortSignal?.aborted) return null;
+
     if (!verifyRes.success || !verifyRes.data) {
-      return { success: false, error: verifyRes.error || 'Passkey authentication failed' };
+      return {
+        success: false,
+        error: verifyRes.error || 'Passkey authentication failed',
+        errorCode: verifyRes.code as WebAuthnFailureCode | undefined,
+      };
     }
 
     return { success: true, data: verifyRes.data };
@@ -490,35 +595,100 @@ export async function startConditionalAuthentication(
 
 export async function getWebAuthnStatus(): Promise<WebAuthnStatus> {
   const res = await api.get<WebAuthnStatus>('/webauthn/status');
+  if (!res.success) {
+    throw new Error(res.code || res.error || 'Failed to load passkey status');
+  }
   return res.data ?? { registered: false, count: 0 };
 }
 
 export async function getWebAuthnCredentials(): Promise<WebAuthnCredential[]> {
   const res = await api.get<{ credentials: WebAuthnCredential[]; count: number }>('/webauthn/credentials');
+  if (!res.success) {
+    throw new Error(res.code || res.error || 'Failed to load passkeys');
+  }
   return res.data?.credentials ?? [];
 }
 
 export interface WebAuthnRemovalResult {
   success: boolean;
+  sessionsRevoked?: boolean;
   errorCode?: string;
   error?: string;
 }
 
-export async function removeWebAuthnCredential(credentialId: string): Promise<WebAuthnRemovalResult> {
-  const res = await api.post('/webauthn/remove', { credential_id: credentialId });
-  return { success: res.success, errorCode: res.code, error: res.error };
+export type WebAuthnSecurityConfirmationInput =
+  | Record<string, never>
+  | { current_password: string }
+  | { totp_code: string }
+  | { backup_code: string };
+
+export interface WebAuthnSecurityConfirmationResult {
+  success: boolean;
+  securityConfirmationToken?: string;
+  expiresIn?: number;
+  errorCode?: string;
+  error?: string;
 }
 
-export async function renameWebAuthnCredential(credentialId: string, deviceName: string): Promise<boolean> {
-  const res = await api.post('/webauthn/rename', { credential_id: credentialId, device_name: deviceName });
-  return res.success;
+export async function confirmWebAuthnSecurity(
+  input: WebAuthnSecurityConfirmationInput = {},
+): Promise<WebAuthnSecurityConfirmationResult> {
+  const res = await api.post<{ security_confirmation_token: string; expires_in: number }>(
+    '/webauthn/security-confirm',
+    input,
+  );
+  return {
+    success: res.success,
+    securityConfirmationToken: res.data?.security_confirmation_token,
+    expiresIn: res.data?.expires_in,
+    errorCode: res.code,
+    error: res.error,
+  };
 }
 
-export async function removeAllWebAuthnCredentials(): Promise<WebAuthnRemovalResult & { removedCount: number }> {
-  const res = await api.post<{ removed_count: number }>('/webauthn/remove-all', {});
+export async function removeWebAuthnCredential(
+  credentialId: string,
+  securityConfirmationToken?: string,
+): Promise<WebAuthnRemovalResult> {
+  const res = await api.post<{ sessions_revoked?: boolean }>('/webauthn/remove', {
+    credential_id: credentialId,
+    ...(securityConfirmationToken ? { security_confirmation_token: securityConfirmationToken } : {}),
+  });
+  return {
+    success: res.success,
+    ...(res.data?.sessions_revoked !== undefined ? { sessionsRevoked: res.data.sessions_revoked } : {}),
+    errorCode: res.code,
+    error: res.error,
+  };
+}
+
+export async function renameWebAuthnCredential(
+  credentialId: string,
+  deviceName: string,
+  securityConfirmationToken?: string,
+): Promise<WebAuthnRemovalResult> {
+  const res = await api.post('/webauthn/rename', {
+    credential_id: credentialId,
+    device_name: deviceName,
+    ...(securityConfirmationToken ? { security_confirmation_token: securityConfirmationToken } : {}),
+  });
+  return {
+    success: res.success,
+    errorCode: res.code,
+    error: res.error,
+  };
+}
+
+export async function removeAllWebAuthnCredentials(
+  securityConfirmationToken?: string,
+): Promise<WebAuthnRemovalResult & { removedCount: number }> {
+  const res = await api.post<{ removed_count: number; sessions_revoked?: boolean }>('/webauthn/remove-all', {
+    ...(securityConfirmationToken ? { security_confirmation_token: securityConfirmationToken } : {}),
+  });
   return {
     success: res.success,
     removedCount: res.data?.removed_count ?? 0,
+    ...(res.data?.sessions_revoked !== undefined ? { sessionsRevoked: res.data.sessions_revoked } : {}),
     errorCode: res.code,
     error: res.error,
   };

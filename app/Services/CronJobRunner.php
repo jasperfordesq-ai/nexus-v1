@@ -434,6 +434,20 @@ class CronJobRunner
                          ORDER BY created_at ASC";
             $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $userTenantId, $frequency, $batchId]));
 
+            // Re-check category consent after claiming. An Events unsubscribe
+            // may happen after enqueue; suppress only Events rows so unrelated
+            // items in the same digest remain eligible.
+            $items = $this->filterEventQueueItemsByPreference(
+                $items,
+                (int) $userId,
+                $userTenantId,
+                $batchId,
+            );
+            if ($items === []) {
+                echo " - No claimed items remain eligible after Events delivery policy.\n";
+                continue;
+            }
+
             // Render digest in the RECIPIENT's preferred language — cron workers
             // default to config('app.locale') = 'en' otherwise.
             [$subject, $body] = LocaleContext::withLocale(
@@ -445,7 +459,8 @@ class CronJobRunner
             );
 
             // Send Email
-            if (EmailDispatchService::sendRaw($user['email'], $subject, $body, null, null, null, 'notification_digest', ['tenant_id' => (int) $user['tenant_id']])) {
+            $unsubscribeUrl = $this->notificationQueueUnsubscribeUrl($items, (int) $userId, $userTenantId);
+            if (EmailDispatchService::sendRaw($user['email'], $subject, $body, null, null, $unsubscribeUrl, 'notification_digest', ['tenant_id' => (int) $user['tenant_id']])) {
                 echo " - Email Sent.\n";
 
                 // Mark as Sent
@@ -553,7 +568,7 @@ class CronJobRunner
         }
     }
 
-    private function markNotificationQueueSuppressed(int $id, int $tenantId, string $batchId): void
+    private function markNotificationQueueSuppressed(int $id, int $tenantId, string $batchId, string $reason = 'recipient on local suppression list'): void
     {
         DB::update(
             "UPDATE notification_queue
@@ -563,7 +578,191 @@ class CronJobRunner
                     processing_started_at = NULL,
                     last_error = ?
               WHERE id = ? AND tenant_id = ? AND processing_batch_id = ?",
-            ['recipient on local suppression list', $id, $tenantId, $batchId]
+            [$reason, $id, $tenantId, $batchId]
+        );
+    }
+
+    /**
+     * @param list<array<string,mixed>> $items
+     * @return list<array<string,mixed>>
+     */
+    private function filterEventQueueItemsByPreference(array $items, int $userId, int $tenantId, string $batchId): array
+    {
+        $eventItems = array_values(array_filter(
+            $items,
+            static fn (array $item): bool => EventNotificationPreferenceResolver::isEventActivityType(
+                (string) ($item['activity_type'] ?? ''),
+            ),
+        ));
+        if ($eventItems === []) {
+            return $items;
+        }
+
+        return DB::transaction(function () use ($items, $eventItems, $userId, $tenantId, $batchId): array {
+            // Serialize with unsubscribe/settings writes before re-resolving the
+            // current cadence. A stale queue row is never authoritative.
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['id']);
+
+            $legacyFrequency = null;
+            $removeIds = [];
+            foreach ($eventItems as $item) {
+                $id = (int) $item['id'];
+                $activityType = (string) ($item['activity_type'] ?? '');
+                $queuedFrequency = strtolower((string) ($item['frequency'] ?? ''));
+                $eventId = (int) ($item['event_id'] ?? 0);
+
+                if (!EventNotificationPreferenceResolver::allowsBackgroundActivity($tenantId, $activityType)) {
+                    $this->updateClaimedEventQueueRow(
+                        $id,
+                        $userId,
+                        $tenantId,
+                        $batchId,
+                        'suppressed',
+                        $queuedFrequency,
+                        'Events feature disabled for routine background delivery',
+                    );
+                    $removeIds[] = $id;
+                    continue;
+                }
+
+                if ($eventId > 0) {
+                    $resolution = EventNotificationPreferenceResolver::resolveForEvent(
+                        $userId,
+                        $tenantId,
+                        $eventId,
+                    );
+                    $emailEnabled = (bool) ($resolution['channels']['email'] ?? false);
+                    $currentFrequency = strtolower((string) ($resolution['cadence'] ?? 'off'));
+                    $eventUnavailable = (string) (
+                        $resolution['channel_sources']['email'] ?? ''
+                    ) === 'subject_unavailable';
+                    if ($eventUnavailable
+                        && EventNotificationPreferenceResolver::isCriticalEventActivity($activityType)) {
+                        // A cancellation/retraction already accepted into the
+                        // durable queue must remain deliverable if the event is
+                        // later deleted. Global Events consent/cadence is the
+                        // only preference evidence still resolvable at send time.
+                        $currentFrequency = EventNotificationPreferenceResolver::frequency(
+                            $userId,
+                            $tenantId,
+                        );
+                        $emailEnabled = $currentFrequency !== 'off';
+                    }
+                    if (! $emailEnabled) {
+                        $this->updateClaimedEventQueueRow(
+                            $id,
+                            $userId,
+                            $tenantId,
+                            $batchId,
+                            'suppressed',
+                            $queuedFrequency,
+                            'Events email disabled by current event/category/global preference',
+                        );
+                        $removeIds[] = $id;
+                        continue;
+                    }
+                } else {
+                    // Rows created before the additive Events context migration
+                    // retain their established global Events cadence behavior.
+                    $legacyFrequency ??= EventNotificationPreferenceResolver::frequency(
+                        $userId,
+                        $tenantId,
+                    );
+                    $currentFrequency = $legacyFrequency;
+                }
+
+                if ($currentFrequency === 'off') {
+                    $this->updateClaimedEventQueueRow(
+                        $id,
+                        $userId,
+                        $tenantId,
+                        $batchId,
+                        'suppressed',
+                        $queuedFrequency,
+                        'Events email disabled or recipient is not eligible',
+                    );
+                    $removeIds[] = $id;
+                    continue;
+                }
+
+                if ($queuedFrequency !== $currentFrequency) {
+                    // Move, do not send or discard: the current preference owns
+                    // delivery. Clearing the claim makes the destination worker
+                    // able to pick it up atomically after this transaction.
+                    $this->updateClaimedEventQueueRow(
+                        $id,
+                        $userId,
+                        $tenantId,
+                        $batchId,
+                        'pending',
+                        $currentFrequency,
+                        "Events cadence changed from {$queuedFrequency} to {$currentFrequency}",
+                    );
+                    $removeIds[] = $id;
+                }
+            }
+
+            if ($removeIds === []) {
+                return $items;
+            }
+
+            return array_values(array_filter(
+                $items,
+                static fn (array $item): bool => !in_array((int) $item['id'], $removeIds, true),
+            ));
+        }, 3);
+    }
+
+    private function updateClaimedEventQueueRow(
+        int $id,
+        int $userId,
+        int $tenantId,
+        string $batchId,
+        string $status,
+        string $frequency,
+        string $reason,
+    ): void {
+        DB::table('notification_queue')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('status', 'processing')
+            ->where('processing_batch_id', $batchId)
+            ->update([
+                'status' => $status,
+                'frequency' => $frequency,
+                'sent_at' => null,
+                'processing_batch_id' => null,
+                'processing_started_at' => null,
+                'last_error' => $reason,
+            ]);
+    }
+
+    /**
+     * @param list<array<string,mixed>> $items
+     */
+    private function notificationQueueUnsubscribeUrl(array $items, int $userId, int $tenantId): string
+    {
+        $containsOnlyEvents = $items !== [];
+        foreach ($items as $item) {
+            if (!EventNotificationPreferenceResolver::isEventActivityType((string) ($item['activity_type'] ?? ''))) {
+                $containsOnlyEvents = false;
+                break;
+            }
+        }
+
+        if ($containsOnlyEvents) {
+            return EventNotificationPreferenceResolver::unsubscribeUrl($userId, $tenantId);
+        }
+
+        return \App\Http\Controllers\Api\NotificationUnsubscribeController::buildSignedUrl(
+            $userId,
+            $tenantId,
+            'digest',
         );
     }
 
@@ -710,6 +909,16 @@ class CronJobRunner
                         }
 
                         $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                        $eligibleItems = $this->filterEventQueueItemsByPreference(
+                            [$item],
+                            (int) ($item['user_id'] ?? 0),
+                            $itemTenantId,
+                            $batchId,
+                        );
+                        if ($eligibleItems === []) {
+                            echo "EVENTS OPT-OUT.\n";
+                            continue;
+                        }
                         if ($this->isEmailSuppressed((string) ($item['email'] ?? ''))) {
                             $this->logSuppressedNotificationQueueEmail($item, $subject, $itemTenantId);
                             $this->markNotificationQueueSuppressed((int) $item['id'], $itemTenantId, $batchId);
@@ -718,8 +927,11 @@ class CronJobRunner
                         }
 
                         $auditCategory = self::resolveNotificationQueueAuditCategory((string) ($item['activity_type'] ?? ''));
+                        $unsubscribeUrl = EventNotificationPreferenceResolver::isEventActivityType((string) ($item['activity_type'] ?? ''))
+                            ? EventNotificationPreferenceResolver::unsubscribeUrl((int) $item['user_id'], $itemTenantId)
+                            : null;
 
-                        if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, $auditCategory, ['tenant_id' => $itemTenantId])) {
+                        if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, $unsubscribeUrl, $auditCategory, ['tenant_id' => $itemTenantId])) {
                             DB::update(
                                 "UPDATE notification_queue
                                     SET status = 'sent',
@@ -795,6 +1007,10 @@ class CronJobRunner
      */
     private static function resolveNotificationQueueAuditCategory(string $activityType): string
     {
+        if (EventNotificationPreferenceResolver::isEventActivityType($activityType)) {
+            return 'event_reminder';
+        }
+
         return match ($activityType) {
             'new_message',
             'message_received',
@@ -804,11 +1020,6 @@ class CronJobRunner
             'connection_accepted',
             'friend_request',
             'friend_accepted' => 'connection',
-
-            'event_update',
-            'event_cancellation',
-            'event_reminder',
-            'event_rsvp' => 'event_reminder',
 
             'vol_application_received',
             'vol_application_approved',
@@ -906,6 +1117,29 @@ class CronJobRunner
         $tenantName = htmlspecialchars(TenantContext::get()['name'] ?? __('emails.common.platform_name'), ENT_QUOTES, 'UTF-8');
         $allRightsReserved = __('emails.footer.all_rights_reserved');
         $year = date('Y');
+        $hasEvents = collect($items)->contains(
+            static fn (array $item): bool => EventNotificationPreferenceResolver::isEventActivityType(
+                (string) ($item['activity_type'] ?? ''),
+            ),
+        );
+        $hasOtherActivity = collect($items)->contains(
+            static fn (array $item): bool => !EventNotificationPreferenceResolver::isEventActivityType(
+                (string) ($item['activity_type'] ?? ''),
+            ),
+        );
+        $eventsUnsubscribeAction = '';
+        if ($hasEvents && $hasOtherActivity) {
+            $eventsUnsubscribeUrl = htmlspecialchars(
+                EventNotificationPreferenceResolver::unsubscribeUrl(
+                    (int) ($user['id'] ?? 0),
+                    (int) ($user['tenant_id'] ?? 0),
+                ),
+                ENT_QUOTES,
+                'UTF-8',
+            );
+            $eventsUnsubscribeLabel = __('emails.digest.unsubscribe_events');
+            $eventsUnsubscribeAction = "<p><a href='{$eventsUnsubscribeUrl}' style='color: #aaa;'>{$eventsUnsubscribeLabel}</a></p>";
+        }
 
         return "
         <html>
@@ -923,6 +1157,7 @@ class CronJobRunner
                 <div style='margin-top: 30px; font-size: 12px; color: #aaa; text-align: center;'>
                     <p>{$digestOptedIn}</p>
                     <p><a href='{$settingsUrl}' style='color: #aaa;'>{$manageNotifications}</a></p>
+                    {$eventsUnsubscribeAction}
                     <p>&copy; {$year} {$tenantName}. {$allRightsReserved}</p>
                 </div>
             </div>
@@ -1707,6 +1942,15 @@ class CronJobRunner
                 }
 
                 $itemTenantId = (int) ($item['tenant_id'] ?? $item['user_tenant_id'] ?? 0);
+                $eligibleItems = $this->filterEventQueueItemsByPreference(
+                    [$item],
+                    (int) ($item['user_id'] ?? 0),
+                    $itemTenantId,
+                    $batchId,
+                );
+                if ($eligibleItems === []) {
+                    continue;
+                }
                 if ($this->isEmailSuppressed((string) ($item['email'] ?? ''))) {
                     $this->logSuppressedNotificationQueueEmail($item, $subject, $itemTenantId);
                     $this->markNotificationQueueSuppressed((int) $item['id'], $itemTenantId, $batchId);
@@ -1714,8 +1958,11 @@ class CronJobRunner
                 }
 
                 $auditCategory = self::resolveNotificationQueueAuditCategory((string) ($item['activity_type'] ?? ''));
+                $unsubscribeUrl = EventNotificationPreferenceResolver::isEventActivityType((string) ($item['activity_type'] ?? ''))
+                    ? EventNotificationPreferenceResolver::unsubscribeUrl((int) $item['user_id'], $itemTenantId)
+                    : null;
 
-                if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, null, $auditCategory, ['tenant_id' => $itemTenantId])) {
+                if (EmailDispatchService::sendRaw($item['email'], $subject, $body, null, null, $unsubscribeUrl, $auditCategory, ['tenant_id' => $itemTenantId])) {
                     DB::update(
                         "UPDATE notification_queue
                             SET status = 'sent',

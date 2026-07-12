@@ -33,6 +33,7 @@ export interface NotificationSettings {
   email_connections: boolean;
   email_transactions: boolean;
   email_reviews: boolean;
+  email_events: boolean;
   email_gamification_digest: boolean;
   email_gamification_milestones: boolean;
   email_org_payments: boolean;
@@ -218,6 +219,13 @@ export function NotificationsTab({
               <CreditCard className="w-4 h-4" aria-hidden="true" />
               {t('notification_sections.activity_listings')}
             </h3>
+
+            <SettingToggle
+              label={t('notification_prefs.event_emails')}
+              description={t('notification_descriptions.event_emails')}
+              checked={notifications.email_events}
+              onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_events: checked }))}
+            />
 
             <SettingToggle
               label={t('notification_prefs.listing_activity')}

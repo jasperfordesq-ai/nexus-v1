@@ -281,7 +281,11 @@ class ContextualMessageService
     {
         $tenantId = TenantContext::getId();
 
-        $row = DB::table('groups')->where('id', $id)->where('tenant_id', $tenantId)->first(['id', 'name', 'description']);
+        $row = DB::table('groups')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->where('status', \App\Enums\GroupStatus::Active->value)
+            ->first(['id', 'name', 'description']);
 
         if (!$row) {
             return null;

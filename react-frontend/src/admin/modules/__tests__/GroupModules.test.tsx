@@ -6,7 +6,7 @@
 /**
  * Batch render tests for Group admin modules:
  * - GroupList, GroupDetail, GroupAnalytics, GroupApprovals,
- *   GroupModeration, GroupPolicies, GroupRanking,
+ *   GroupModeration, GroupRanking,
  *   GroupRecommendations, GroupTypes
  *
  * Smoke tests only — verify each component renders without crashing.
@@ -138,8 +138,6 @@ vi.mock('../../api/adminApi', () => ({
     createGroupType: vi.fn().mockResolvedValue({ success: true }),
     updateGroupType: vi.fn().mockResolvedValue({ success: true }),
     deleteGroupType: vi.fn().mockResolvedValue({ success: true }),
-    getPolicies: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    setPolicy: vi.fn().mockResolvedValue({ success: true }),
     getMembers: vi.fn().mockResolvedValue({ success: true, data: [] }),
     promoteMember: vi.fn().mockResolvedValue({ success: true }),
     demoteMember: vi.fn().mockResolvedValue({ success: true }),
@@ -168,8 +166,6 @@ vi.mock('@/admin/api/adminApi', () => ({
     kickMember: vi.fn().mockResolvedValue({ success: true }),
     geocodeGroup: vi.fn().mockResolvedValue({ success: true }),
     getGroupTypes: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    getPolicies: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    setPolicy: vi.fn().mockResolvedValue({ success: true }),
     getFeaturedGroups: vi.fn().mockResolvedValue({ success: true, data: [] }),
     getRecommendationData: vi.fn().mockResolvedValue({ success: true, data: { recommendations: [], stats: { total: 0, avg_score: 0, join_rate: 0 } } }),
     toggleFeatured: vi.fn().mockResolvedValue({ success: true }),
@@ -182,10 +178,15 @@ vi.mock('@/admin/api/adminApi', () => ({
 
 // ─── Wrapper helpers ─────────────────────────────────────────────────────────
 
+const routerFuture = {
+  v7_startTransition: true,
+  v7_relativeSplatPath: true,
+} as const;
+
 function W({ children, path = '/test/admin' }: { children: React.ReactNode; path?: string }) {
   return (
     <>
-      <MemoryRouter initialEntries={[path]}>
+      <MemoryRouter initialEntries={[path]} future={routerFuture}>
         {children}
       </MemoryRouter>
     </>
@@ -195,7 +196,7 @@ function W({ children, path = '/test/admin' }: { children: React.ReactNode; path
 function WRoute({ children, path, entry }: { children: React.ReactNode; path: string; entry: string }) {
   return (
     <>
-      <MemoryRouter initialEntries={[entry]}>
+      <MemoryRouter initialEntries={[entry]} future={routerFuture}>
         <Routes>
           <Route path={path} element={children} />
         </Routes>
@@ -260,31 +261,6 @@ describe('GroupModeration', () => {
   it('renders without crashing', () => {
     const { container } = render(<W><GroupModeration /></W>);
     expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
-// ─── GroupPolicies ───────────────────────────────────────────────────────────
-// Note: This is a modal component requiring props (isOpen, onClose, typeId, typeName).
-
-import GroupPolicies from '../groups/GroupPolicies';
-
-describe('GroupPolicies', () => {
-  it('renders without crashing when closed', () => {
-    const { container } = render(
-      <W>
-        <GroupPolicies isOpen={false} onClose={vi.fn()} typeId={1} typeName="Test Type" />
-      </W>
-    );
-    expect(container).toBeTruthy();
-  });
-
-  it('renders without crashing when open', () => {
-    const { container } = render(
-      <W>
-        <GroupPolicies isOpen={true} onClose={vi.fn()} typeId={1} typeName="Test Type" />
-      </W>
-    );
-    expect(container).toBeTruthy();
   });
 });
 

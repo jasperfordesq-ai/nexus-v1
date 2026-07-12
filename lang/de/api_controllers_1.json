@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Abzeichen-Überprüfung für :count Benutzer abgeschlossen"
     },
     "admin_groups": {
+        "rule_not_found": "Regel nicht gefunden",
         "group_archived": "Gruppe archiviert",
         "group_unarchived": "Gruppe aus dem Archiv geholt",
         "ownership_transferred": "Eigentümerschaft übertragen",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Ihre Anfrage zur Kontolöschung wurde eingereicht. Sie erhalten eine Bestätigung per E-Mail."
     },
     "group_challenge": {
-        "challenge_deleted": "Herausforderung gelöscht"
+        "challenge_deleted": "Herausforderung gelöscht",
+        "challenge_cancelled": "Herausforderung abgebrochen",
+        "challenge_immutable": "Abgeschlossene oder belohnte Herausforderungen können nicht abgebrochen werden"
+    },
+    "group_chatroom": {
+        "default_name": "Allgemein",
+        "default_description": "Standard-Gruppenchat"
     },
     "group_exchange": {
         "exchange_cancelled": "Tausch abgesagt",

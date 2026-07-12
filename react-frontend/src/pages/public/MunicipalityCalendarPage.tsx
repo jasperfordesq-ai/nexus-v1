@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { getFormattingLocale } from '@/lib/helpers';
+import { formatDateValue, getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,6 @@ interface CalendarEventDto {
   id: number;
   title: string;
   start_time: string | null;
-  location: string | null;
   image_url: string | null;
   organization_id: number;
   organization_name: string;
@@ -47,6 +46,14 @@ interface CalendarResponse {
   start: string;
   end: string;
   buckets: Record<string, CalendarEventDto[]>;
+}
+
+function localDateKey(date: Date): string {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
 }
 
 export default function MunicipalityCalendarPage() {
@@ -61,9 +68,21 @@ export default function MunicipalityCalendarPage() {
   const [inputCode, setInputCode] = useState(code);
   const [data, setData] = useState<CalendarResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [monthOffset, setMonthOffset] = useState(0);
 
-  const load = useCallback(async (mc: string) => {
+  const requestedMonth = params.get('month');
+  const monthStart = useMemo(() => {
+    const match = requestedMonth?.match(/^(\d{4})-(\d{2})$/);
+    const value = match
+      ? new Date(Number(match[1]), Number(match[2]) - 1, 1)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    return Number.isNaN(value.getTime()) ? new Date(new Date().getFullYear(), new Date().getMonth(), 1) : value;
+  }, [requestedMonth]);
+
+  const monthEnd = useMemo(() => {
+    return new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+  }, [monthStart]);
+
+  const load = useCallback(async (mc: string, from: string, until: string) => {
     if (!mc) {
       setData(null);
       return;
@@ -71,7 +90,7 @@ export default function MunicipalityCalendarPage() {
     setLoading(true);
     try {
       const res = await api.get<CalendarResponse>(
-        `/v2/municipality/${encodeURIComponent(mc)}/events-calendar?period=month`,
+        `/v2/municipality/${encodeURIComponent(mc)}/events-calendar?from=${from}&to=${until}`,
       );
       if (res.success && res.data) {
         setData(res.data);
@@ -88,27 +107,26 @@ export default function MunicipalityCalendarPage() {
   }, [toast, t]);
 
   useEffect(() => {
-    void load(code);
-  }, [code, load]);
+    void load(code, localDateKey(monthStart), localDateKey(monthEnd));
+  }, [code, load, monthStart, monthEnd]);
 
   const handleSubmitCode = useCallback(() => {
     const next = inputCode.trim();
     if (!next) return;
-    setMonthOffset(0);
     setParams((p) => {
       p.set('code', next);
+      p.set('month', localDateKey(new Date()).slice(0, 7));
       return p;
     });
   }, [inputCode, setParams]);
 
-  // Compute days for the current month view (with offset)
-  const monthStart = useMemo(() => {
-    const d = new Date();
-    d.setDate(1);
-    d.setHours(0, 0, 0, 0);
-    d.setMonth(d.getMonth() + monthOffset);
-    return d;
-  }, [monthOffset]);
+  const setCalendarMonth = useCallback((date: Date) => {
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('month', localDateKey(new Date(date.getFullYear(), date.getMonth(), 1)).slice(0, 7));
+      return next;
+    }, { replace: true });
+  }, [setParams]);
 
   const monthLabel = useMemo(() => {
     return monthStart.toLocaleString(getFormattingLocale(), { month: 'long', year: 'numeric' });
@@ -121,13 +139,31 @@ export default function MunicipalityCalendarPage() {
     return last.getDate();
   }, [monthStart]);
 
+  const locale = getFormattingLocale();
+  const firstDay = useMemo(() => {
+    const localeWithWeekInfo = new Intl.Locale(locale) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number };
+      weekInfo?: { firstDay: number };
+    };
+    return localeWithWeekInfo.getWeekInfo?.().firstDay
+      ?? localeWithWeekInfo.weekInfo?.firstDay
+      ?? 1;
+  }, [locale]);
+  const firstDayJs = firstDay % 7;
+  const leadingBlankDays = (monthStart.getDay() - firstDayJs + 7) % 7;
+  const weekdayLabels = useMemo(() => Array.from({ length: 7 }, (_, index) => {
+    const jsDay = (firstDayJs + index) % 7;
+    const date = new Date(2024, 0, 7 + jsDay);
+    return date.toLocaleDateString(getFormattingLocale(), { weekday: 'short' });
+  }), [firstDayJs, locale]);
+
   const renderDayCell = (day: number) => {
     const date = new Date(monthStart);
     date.setDate(day);
-    const key = date.toISOString().slice(0, 10);
+    const key = localDateKey(date);
     const events = data?.buckets?.[key] ?? [];
     return (
-      <div key={day} className="border border-border rounded-md p-2 min-h-[80px] text-xs">
+      <div key={day} role="gridcell" aria-label={formatDateValue(date)} className="border border-border rounded-md p-2 min-h-[80px] text-xs">
         <div className="font-semibold text-foreground">{day}</div>
         <div className="space-y-1 mt-1">
           {events.map((ev) => (
@@ -176,7 +212,6 @@ export default function MunicipalityCalendarPage() {
             value={inputCode}
             onValueChange={setInputCode}
             className="max-w-xs"
-            placeholder="8001"
           />
           <Button onPress={handleSubmitCode}>
             {t('apply')}
@@ -187,7 +222,7 @@ export default function MunicipalityCalendarPage() {
               isIconOnly
               variant="tertiary"
               size="sm"
-              onPress={() => setMonthOffset((m) => m - 1)}
+              onPress={() => setCalendarMonth(new Date(monthStart.getFullYear(), monthStart.getMonth() - 1, 1))}
               aria-label={t('verein_federation.calendar.prev')}
             >
               <ChevronLeft className="w-4 h-4" aria-hidden="true" />
@@ -197,12 +232,12 @@ export default function MunicipalityCalendarPage() {
               isIconOnly
               variant="tertiary"
               size="sm"
-              onPress={() => setMonthOffset((m) => m + 1)}
+              onPress={() => setCalendarMonth(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1))}
               aria-label={t('verein_federation.calendar.next')}
             >
               <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </Button>
-            <Button size="sm" variant="tertiary" onPress={() => setMonthOffset(0)}>
+            <Button size="sm" variant="tertiary" onPress={() => setCalendarMonth(new Date())}>
               {t('verein_federation.calendar.today')}
             </Button>
           </div>
@@ -222,7 +257,15 @@ export default function MunicipalityCalendarPage() {
               {t('verein_federation.calendar.empty')}
             </p>
           ) : (
-            <div className="grid grid-cols-7 gap-1">
+            <div role="grid" aria-label={monthLabel} className="grid grid-cols-7 gap-1">
+              {weekdayLabels.map((label, index) => (
+                <div key={`${label}-${index}`} role="columnheader" className="p-2 text-center text-xs font-semibold text-muted">
+                  {label}
+                </div>
+              ))}
+              {Array.from({ length: leadingBlankDays }, (_, index) => (
+                <div key={`blank-${index}`} role="gridcell" aria-hidden="true" />
+              ))}
               {Array.from({ length: daysInMonth }, (_, i) => renderDayCell(i + 1))}
             </div>
           )}

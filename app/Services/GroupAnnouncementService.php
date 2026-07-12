@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Exceptions\SafeguardingPolicyException;
+use App\Support\CursorSigner;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -31,21 +32,22 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isMember($groupId, $userId, $tenantId) && !GroupService::canModify($groupId, $userId)) {
+        if (!GroupAccessService::canViewMemberContent($groupId, $userId)) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcements_member_required')];
             return null;
         }
 
-        $limit = min($filters['limit'] ?? 20, 100);
+        $limit = max(1, min((int) ($filters['limit'] ?? 20), 100));
         $cursor = $filters['cursor'] ?? null;
         $includeExpired = $filters['include_expired'] ?? false;
         $pinnedOnly = (bool) ($filters['pinned'] ?? false);
 
-        $cursorId = null;
-        if ($cursor) {
-            $decoded = base64_decode($cursor, true);
-            if ($decoded && is_numeric($decoded)) {
-                $cursorId = (int) $decoded;
+        $cursorPayload = null;
+        if ($cursor !== null && $cursor !== '') {
+            $cursorPayload = $this->decodeCursor($cursor, $groupId);
+            if ($cursorPayload === null) {
+                $this->errors[] = ['code' => 'INVALID_CURSOR', 'message' => __('api.invalid_cursor')];
+                return null;
             }
         }
 
@@ -66,8 +68,26 @@ class GroupAnnouncementService
             $query->where('ga.is_pinned', 1);
         }
 
-        if ($cursorId) {
-            $query->where('ga.id', '<', $cursorId);
+        if ($cursorPayload !== null) {
+            $query->where(function ($after) use ($cursorPayload): void {
+                $after->where('ga.is_pinned', '<', $cursorPayload['pinned'])
+                    ->orWhere(function ($samePinned) use ($cursorPayload): void {
+                        $samePinned->where('ga.is_pinned', $cursorPayload['pinned'])
+                            ->where(function ($lowerPriority) use ($cursorPayload): void {
+                                $lowerPriority->where('ga.priority', '<', $cursorPayload['priority'])
+                                    ->orWhere(function ($samePriority) use ($cursorPayload): void {
+                                        $samePriority->where('ga.priority', $cursorPayload['priority'])
+                                            ->where(function ($older) use ($cursorPayload): void {
+                                                $older->where('ga.created_at', '<', $cursorPayload['created_at'])
+                                                    ->orWhere(function ($sameTime) use ($cursorPayload): void {
+                                                        $sameTime->where('ga.created_at', $cursorPayload['created_at'])
+                                                            ->where('ga.id', '<', $cursorPayload['id']);
+                                                    });
+                                            });
+                                    });
+                            });
+                    });
+            });
         }
 
         $announcements = $query
@@ -85,17 +105,12 @@ class GroupAnnouncementService
             array_pop($announcements);
         }
 
-        $items = [];
-        $lastId = null;
-
-        foreach ($announcements as $a) {
-            $lastId = $a['id'];
-            $items[] = $this->formatAnnouncement($a);
-        }
+        $items = array_map(fn (array $announcement): array => $this->formatAnnouncement($announcement), $announcements);
+        $last = $announcements === [] ? null : $announcements[array_key_last($announcements)];
 
         return [
             'items' => $items,
-            'cursor' => $hasMore && $lastId ? base64_encode((string) $lastId) : null,
+            'cursor' => $hasMore && $last !== null ? $this->encodeCursor($groupId, $last) : null,
             'has_more' => $hasMore,
         ];
     }
@@ -108,7 +123,7 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isMember($groupId, $userId, $tenantId) && !GroupService::canModify($groupId, $userId)) {
+        if (!GroupAccessService::canViewMemberContent($groupId, $userId)) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcements_member_required')];
             return null;
         }
@@ -137,7 +152,7 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isAdmin($groupId, $userId, $tenantId)) {
+        if (!$this->isAdmin($groupId, $userId)) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_create_forbidden')];
             return null;
         }
@@ -211,7 +226,7 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isAdmin($groupId, $userId, $tenantId)) {
+        if (!$this->isAdmin($groupId, $userId)) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_update_forbidden')];
             return null;
         }
@@ -291,45 +306,101 @@ class GroupAnnouncementService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if (!$this->isAdmin($groupId, $userId, $tenantId)) {
+        if (!$this->isAdmin($groupId, $userId)) {
             $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_announcement_admin_delete_forbidden')];
             return false;
         }
 
-        $deleted = DB::table('group_announcements')
-            ->where('id', $announcementId)
-            ->where('group_id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->delete();
+        return DB::transaction(function () use ($groupId, $announcementId, $userId, $tenantId): bool {
+            DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            $announcement = DB::table('group_announcements')
+                ->where('id', $announcementId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if ($announcement === null) {
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
+                return false;
+            }
 
-        if ($deleted === 0) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
-            return false;
-        }
+            $deleted = DB::table('group_announcements')
+                ->where('id', $announcementId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+            if ($deleted !== 1) {
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_announcement_not_found')];
+                return false;
+            }
 
-        return true;
-    }
+            GroupAuditService::log(
+                GroupAuditService::ACTION_ANNOUNCEMENT_DELETED,
+                $groupId,
+                $userId,
+                [
+                    'announcement_id' => $announcementId,
+                    'title' => (string) $announcement->title,
+                    'target_user_id' => (int) $announcement->created_by,
+                ],
+            );
 
-    /**
-     * Check if user is a member of the group.
-     */
-    private function isMember(int $groupId, int $userId, int $tenantId): bool
-    {
-        return DB::table('group_members')
-            ->join('groups', 'groups.id', '=', 'group_members.group_id')
-            ->where('group_members.group_id', $groupId)
-            ->where('group_members.user_id', $userId)
-            ->where('group_members.status', 'active')
-            ->where('groups.tenant_id', $tenantId)
-            ->exists();
+            return true;
+        });
     }
 
     /**
      * Check if user is an admin of the group (admin/owner role).
      */
-    private function isAdmin(int $groupId, int $userId, int $tenantId): bool
+    private function isAdmin(int $groupId, int $userId): bool
     {
-        return GroupService::canModify($groupId, $userId);
+        return GroupAccessService::canManage($groupId, $userId)
+            && GroupAccessService::canWriteContent($groupId, $userId);
+    }
+
+    /** @return array{pinned: int, priority: int, created_at: string, id: int}|null */
+    private function decodeCursor(mixed $cursor, int $groupId): ?array
+    {
+        if (!is_string($cursor) || $cursor === '') {
+            return null;
+        }
+
+        $payload = CursorSigner::decode($cursor);
+        if (
+            !is_array($payload)
+            || ($payload['kind'] ?? null) !== 'group_announcement'
+            || (int) ($payload['group_id'] ?? 0) !== $groupId
+            || !isset($payload['pinned'], $payload['priority'], $payload['created_at'], $payload['id'])
+            || !is_numeric($payload['pinned'])
+            || !is_numeric($payload['priority'])
+            || !is_string($payload['created_at'])
+            || !is_numeric($payload['id'])
+        ) {
+            return null;
+        }
+
+        return [
+            'pinned' => (int) $payload['pinned'],
+            'priority' => (int) $payload['priority'],
+            'created_at' => $payload['created_at'],
+            'id' => (int) $payload['id'],
+        ];
+    }
+
+    private function encodeCursor(int $groupId, array $last): string
+    {
+        return CursorSigner::encode([
+            'kind' => 'group_announcement',
+            'group_id' => $groupId,
+            'pinned' => (int) $last['is_pinned'],
+            'priority' => (int) $last['priority'],
+            'created_at' => (string) $last['created_at'],
+            'id' => (int) $last['id'],
+        ]);
     }
 
     /**

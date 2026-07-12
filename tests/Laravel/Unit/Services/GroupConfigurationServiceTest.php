@@ -6,11 +6,21 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
 use App\Services\GroupConfigurationService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
+use Tests\Laravel\TestCase;
 
-class GroupConfigurationServiceTest extends \Tests\Laravel\TestCase
+class GroupConfigurationServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
+    protected function tearDown(): void
+    {
+        Cache::forget('group_config:' . $this->testTenantId);
+        parent::tearDown();
+    }
+
     public function testClassExists(): void
     {
         $this->assertTrue(class_exists(GroupConfigurationService::class));
@@ -36,5 +46,43 @@ class GroupConfigurationServiceTest extends \Tests\Laravel\TestCase
         $this->assertEquals('profanity_filter_enabled', GroupConfigurationService::CONFIG_PROFANITY_FILTER_ENABLED);
         $this->assertEquals('min_description_length', GroupConfigurationService::CONFIG_MIN_DESCRIPTION_LENGTH);
         $this->assertEquals('max_description_length', GroupConfigurationService::CONFIG_MAX_DESCRIPTION_LENGTH);
+    }
+
+    public function testAllKnownTabsAreMappedAndUnknownTabsFailClosed(): void
+    {
+        $tabs = [
+            'feed' => GroupConfigurationService::CONFIG_TAB_FEED,
+            'discussion' => GroupConfigurationService::CONFIG_TAB_DISCUSSION,
+            'members' => GroupConfigurationService::CONFIG_TAB_MEMBERS,
+            'events' => GroupConfigurationService::CONFIG_TAB_EVENTS,
+            'files' => GroupConfigurationService::CONFIG_TAB_FILES,
+            'announcements' => GroupConfigurationService::CONFIG_TAB_ANNOUNCEMENTS,
+            'qa' => GroupConfigurationService::CONFIG_TAB_QA,
+            'wiki' => GroupConfigurationService::CONFIG_TAB_WIKI,
+            'media' => GroupConfigurationService::CONFIG_TAB_MEDIA,
+            'chatrooms' => GroupConfigurationService::CONFIG_TAB_CHATROOMS,
+            'tasks' => GroupConfigurationService::CONFIG_TAB_TASKS,
+            'challenges' => GroupConfigurationService::CONFIG_TAB_CHALLENGES,
+            'analytics' => GroupConfigurationService::CONFIG_TAB_ANALYTICS,
+            'subgroups' => GroupConfigurationService::CONFIG_TAB_SUBGROUPS,
+        ];
+
+        foreach ($tabs as $tab => $configKey) {
+            GroupConfigurationService::set($configKey, true);
+            $this->assertTrue(GroupConfigurationService::isTabEnabled($tab), $tab . ' should be enabled.');
+
+            GroupConfigurationService::set($configKey, false);
+            $this->assertFalse(GroupConfigurationService::isTabEnabled($tab), $tab . ' should be disabled.');
+        }
+
+        $this->assertFalse(GroupConfigurationService::isTabEnabled('not-a-real-tab'));
+    }
+
+    public function testDiscussionTabAlsoHonoursTheMasterDiscussionPolicy(): void
+    {
+        GroupConfigurationService::set(GroupConfigurationService::CONFIG_TAB_DISCUSSION, true);
+        GroupConfigurationService::set(GroupConfigurationService::CONFIG_ENABLE_DISCUSSIONS, false);
+
+        $this->assertFalse(GroupConfigurationService::isTabEnabled('discussion'));
     }
 }

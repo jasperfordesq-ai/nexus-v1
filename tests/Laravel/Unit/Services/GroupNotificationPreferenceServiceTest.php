@@ -31,9 +31,10 @@ class GroupNotificationPreferenceServiceTest extends TestCase
         $stored = (object) [
             'user_id' => 1,
             'group_id' => 10,
-            'frequency' => 'daily',
+            'frequency' => 'digest',
             'email_enabled' => false,
             'push_enabled' => true,
+            'updated_at' => '2026-07-11 16:20:30',
         ];
 
         DB::shouldReceive('table->where->where->where->first')
@@ -42,9 +43,10 @@ class GroupNotificationPreferenceServiceTest extends TestCase
 
         $result = GroupNotificationPreferenceService::get(1, 10);
 
-        $this->assertEquals('daily', $result['frequency']);
+        $this->assertEquals('digest', $result['frequency']);
         $this->assertFalse($result['email_enabled']);
         $this->assertTrue($result['push_enabled']);
+        $this->assertSame('2026-07-11T16:20:30.000000Z', $result['updated_at']);
     }
 
     public function test_set_calls_updateOrInsert(): void
@@ -54,19 +56,28 @@ class GroupNotificationPreferenceServiceTest extends TestCase
             ->withArgs(function ($match, $values) {
                 return $match['user_id'] === 1
                     && $match['group_id'] === 10
-                    && $values['frequency'] === 'daily'
+                    && $match['tenant_id'] === $this->testTenantId
+                    && $values['frequency'] === 'digest'
                     && $values['email_enabled'] === false
                     && $values['push_enabled'] === true;
             });
+        DB::shouldReceive('table->where->where->where->first')
+            ->once()
+            ->andReturn((object) [
+                'frequency' => 'digest',
+                'email_enabled' => false,
+                'push_enabled' => true,
+                'updated_at' => '2026-07-11 16:20:30',
+            ]);
 
-        GroupNotificationPreferenceService::set(1, 10, [
-            'frequency' => 'daily',
+        $saved = GroupNotificationPreferenceService::set(1, 10, [
+            'frequency' => 'digest',
             'email_enabled' => false,
             'push_enabled' => true,
         ]);
 
-        // No exception = success (method is void)
-        $this->addToAssertionCount(1);
+        $this->assertSame('digest', $saved['frequency']);
+        $this->assertSame('2026-07-11T16:20:30.000000Z', $saved['updated_at']);
     }
 
     public function test_shouldNotify_returns_false_when_muted(): void

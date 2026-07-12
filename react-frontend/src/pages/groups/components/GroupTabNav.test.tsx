@@ -3,18 +3,21 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@/test/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, userEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
+
+const disabledTabs = new Set<string>();
+let eventsFeatureEnabled = true;
 
 vi.mock('@/contexts', () =>
   createMockContexts({
     useTenant: () => ({
       tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-      tenantPath: (p: string) => `/test${p}`,
-      hasFeature: vi.fn(() => true),
+      tenantPath: (path: string) => `/test${path}`,
+      hasFeature: vi.fn((key: string) => key !== 'events' || eventsFeatureEnabled),
       hasModule: vi.fn(() => true),
-      hasGroupTab: vi.fn(() => true),
+      hasGroupTab: (key: string) => !disabledTabs.has(key),
     }),
   }),
 );
@@ -22,97 +25,96 @@ vi.mock('@/contexts', () =>
 import { GroupTabNav } from './GroupTabNav';
 
 const DEFAULT_PROPS = {
-  activeTab: 'feed',
+  activeTab: 'feed' as const,
   userIsAdmin: false,
+  userIsMember: true,
   hasSubGroups: false,
   subGroupCount: 0,
   onTabChange: vi.fn(),
+  children: <div>Selected section content</div>,
 };
 
 describe('GroupTabNav', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    disabledTabs.clear();
+    eventsFeatureEnabled = true;
   });
 
-  it('renders the tab list with aria-label', () => {
+  it('renders an associated HeroUI tab list, tabs, and selected panel', () => {
     render(<GroupTabNav {...DEFAULT_PROPS} />);
-    expect(screen.getByRole('tablist')).toBeInTheDocument();
+
+    const tablist = screen.getByRole('tablist', { name: 'Group navigation' });
+    expect(tablist).toBeInTheDocument();
+    expect(tablist.closest('div.sticky')).toHaveClass(
+      'top-[calc(var(--app-header-desktop-offset,5.5rem)+0.75rem)]',
+    );
+    expect(screen.getByRole('tab', { name: 'Feed' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Selected section content');
   });
 
-  it('renders primary tab buttons', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} />);
-    // HeroUI v3 Button does not forward role="tab" or aria-selected to the DOM.
-    // The primary tabs render as buttons with aria-label matching the tab label.
-    // hasGroupTab returns true for all tabs in tests, so feed/discussion/members/events/files
-    // are present. Each has an aria-label (from t('detail.tab_<key>')).
-    // In the test env the i18n English translations resolve. Check at least one known label.
-    const feedBtn = screen.getByRole('button', { name: /feed/i });
-    expect(feedBtn).toBeInTheDocument();
-  });
-
-  it('active tab has distinctive styling class', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} activeTab="feed" />);
-    // The feed tab is active; it gets bg-theme-hover class applied.
-    // We verify the feed button exists and there are multiple tab buttons.
-    const feedBtn = screen.getByRole('button', { name: /feed/i });
-    expect(feedBtn).toBeInTheDocument();
-    expect(feedBtn.className).toContain('bg-theme-hover');
-  });
-
-  it('active tab styling differs from inactive tab styling', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} activeTab="feed" />);
-    const feedBtn = screen.getByRole('button', { name: /feed/i });
-    const discussionBtn = screen.getByRole('button', { name: /discussion/i });
-    // Active tab gets shadow-sm; inactive does not
-    expect(feedBtn.className).toContain('shadow-sm');
-    expect(discussionBtn.className).not.toContain('shadow-sm');
-  });
-
-  it('calls onTabChange when a tab is pressed', () => {
+  it('changes section through native tab selection', async () => {
     const onTabChange = vi.fn();
-    render(<GroupTabNav {...DEFAULT_PROPS} activeTab="members" onTabChange={onTabChange} />);
-    // Press the feed button (a non-active primary tab)
-    const feedBtn = screen.getByRole('button', { name: /feed/i });
-    fireEvent.click(feedBtn);
-    expect(onTabChange).toHaveBeenCalledTimes(1);
+    render(<GroupTabNav {...DEFAULT_PROPS} onTabChange={onTabChange} />);
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Members' }));
+    expect(onTabChange).toHaveBeenCalledWith('members');
   });
 
-  it('renders "More" dropdown when secondary tabs are enabled', () => {
+  it('supports keyboard arrow selection', () => {
+    const onTabChange = vi.fn();
+    render(<GroupTabNav {...DEFAULT_PROPS} onTabChange={onTabChange} />);
+
+    const feedTab = screen.getByRole('tab', { name: 'Feed' });
+    act(() => {
+      feedTab.focus();
+      fireEvent.keyDown(feedTab, { key: 'ArrowRight' });
+    });
+    expect(onTabChange).toHaveBeenCalledWith('discussion');
+  });
+
+  it('shows the selected section label in the separate mobile dropdown trigger', () => {
+    render(<GroupTabNav {...DEFAULT_PROPS} activeTab="discussion" />);
+
+    expect(screen.getByRole('button', { name: 'Group navigation: Discussion' })).toHaveTextContent('Discussion');
+  });
+
+  it('shows configured subgroups as a real tab', () => {
+    render(<GroupTabNav {...DEFAULT_PROPS} hasSubGroups subGroupCount={3} />);
+
+    expect(screen.getByRole('tab', { name: 'Subgroups (3)' })).toBeInTheDocument();
+  });
+
+  it('honours tenant configuration for subgroups and feed', () => {
+    disabledTabs.add('tab_subgroups');
+    disabledTabs.add('tab_feed');
+    render(<GroupTabNav {...DEFAULT_PROPS} hasSubGroups subGroupCount={3} activeTab="discussion" />);
+
+    expect(screen.queryByRole('tab', { name: 'Subgroups (3)' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Feed' })).not.toBeInTheDocument();
+  });
+
+  it('does not expose member-only sections to a nonmember', () => {
+    render(<GroupTabNav {...DEFAULT_PROPS} userIsMember={false} />);
+
+    expect(screen.getByRole('tab', { name: 'Feed' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Discussion' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Members' })).not.toBeInTheDocument();
+  });
+
+  it('shows analytics only to group admins', () => {
+    const { rerender } = render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin={false} />);
+    expect(screen.queryByRole('tab', { name: 'Analytics' })).not.toBeInTheDocument();
+
+    rerender(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin />);
+    expect(screen.getByRole('tab', { name: 'Analytics' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Automation' })).toBeInTheDocument();
+  });
+
+  it('does not expose Events when the tenant Events feature is disabled', () => {
+    eventsFeatureEnabled = false;
     render(<GroupTabNav {...DEFAULT_PROPS} />);
-    // The "More" button has aria-label matching the i18n key fallback
-    // hasGroupTab returns true for all, so secondary tabs will be present
-    const moreBtn = screen.queryByRole('button', { name: /more/i });
-    // Secondary tabs depend on hasGroupTab; if returned, More button should exist
-    // Note: exact label depends on i18n keys resolving to English fallbacks
-    // We verify the dropdown trigger area is rendered (contains a ChevronDown-icon button)
-    // Just verify no crash and at least 2 buttons total (primary + more)
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBeGreaterThanOrEqual(1);
-  });
 
-  it('shows subgroups tab when hasSubGroups=true', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} hasSubGroups={true} subGroupCount={3} />);
-    // The subgroups tab renders as a Button inside the primary list.
-    // Its label from t('detail.tab_subgroups_count', { count: 3 }) resolves to something
-    // containing "subgroup" in English. In test env, check that more buttons are present
-    // than the base set (feed, discussion, members, events, files, more = 6)
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBeGreaterThan(0);
-    // Also verify the tablist is still there
-    expect(screen.getByRole('tablist')).toBeInTheDocument();
-  });
-
-  it('does not show analytics tab when userIsAdmin=false', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin={false} />);
-    // Analytics is a secondary tab only shown to admins; it lives in "More"
-    // With userIsAdmin=false the analytics item should not exist
-    // We can't easily inspect dropdown items without opening it, so we just
-    // verify the component renders without error and doesn't crash
-    expect(screen.getByRole('tablist')).toBeInTheDocument();
-  });
-
-  it('shows analytics in More menu only for admins (no crash)', () => {
-    render(<GroupTabNav {...DEFAULT_PROPS} userIsAdmin={true} />);
-    expect(screen.getByRole('tablist')).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Events' })).not.toBeInTheDocument();
   });
 });

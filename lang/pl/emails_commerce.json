@@ -23,6 +23,7 @@
     "cta": "Przeglądaj Grupy"
   },
   "group_promoted": {
+    "role_admin": "administrator",
     "subject": "Jesteś teraz {{role}} w {{group_name}} — {{community}}",
     "title": "Aktualizacja Roli",
     "preview": "Gratulacje — zostałeś(aś) mianowany(a) {{role}} w {{group_name}}",

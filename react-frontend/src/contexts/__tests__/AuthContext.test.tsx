@@ -722,6 +722,7 @@ describe('AuthContext', () => {
           user: { id: 1, name: 'Jane' },
           access_token: 'bio-access',
           refresh_token: 'bio-refresh',
+          expires_in: 3600,
         },
       });
       mockApiGet
@@ -744,7 +745,8 @@ describe('AuthContext', () => {
     it('sets status to idle silently when user cancels biometric prompt', async () => {
       mockAuthenticateWithBiometric.mockResolvedValue({
         success: false,
-        error: 'User cancelled the operation',
+        error: 'Localized cancellation text',
+        errorCode: 'cancelled',
       });
 
       const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
@@ -754,6 +756,41 @@ describe('AuthContext', () => {
         await result.current.loginWithBiometric();
       });
 
+      expect(result.current.status).toBe('idle');
+      expect(result.current.error).toBeNull();
+    });
+
+    it('returns to idle without exposing raw passkey errors in shared auth state', async () => {
+      mockAuthenticateWithBiometric.mockResolvedValue({
+        success: false,
+        error: 'Raw browser diagnostic',
+        errorCode: 'AUTH_WEBAUTHN_FAILED',
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      let loginResult!: Awaited<ReturnType<typeof result.current.loginWithBiometric>>;
+      await act(async () => {
+        loginResult = await result.current.loginWithBiometric();
+      });
+
+      expect(loginResult.errorCode).toBe('AUTH_WEBAUTHN_FAILED');
+      expect(result.current.status).toBe('idle');
+      expect(result.current.error).toBeNull();
+    });
+
+    it('clears loading state when the passkey helper rejects', async () => {
+      mockAuthenticateWithBiometric.mockRejectedValue(new Error('chunk failed'));
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      let loginResult!: Awaited<ReturnType<typeof result.current.loginWithBiometric>>;
+      await act(async () => {
+        loginResult = await result.current.loginWithBiometric();
+      });
+
+      expect(loginResult.errorCode).toBe('unknown');
       expect(result.current.status).toBe('idle');
       expect(result.current.error).toBeNull();
     });

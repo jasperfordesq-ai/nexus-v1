@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "安全性",
+    "overview": "安全要件とレビュー"
+  },
+  "safety": {
+    "actions": {
+      "retry": "もう一度やり直してください",
+      "save_draft": "下書きの保存",
+      "publish": "要件を公開する",
+      "archive": "アーカイブ要件",
+      "cancel": "キャンセル",
+      "confirm_archive": "今すぐアーカイブ",
+      "acknowledge": "コードを確認する",
+      "withdraw_acknowledgement": "承認の撤回",
+      "request_guardian_consent": "保護者の同意を求める",
+      "withdraw_guardian_consent": "同意リクエストの撤回",
+      "change_member": "メンバー変更",
+      "save_review": "レビューの決定を保存する",
+      "cancel_edit": "編集をキャンセルする",
+      "edit_review": "更新の決定",
+      "withdraw_review": "決定の撤回"
+    },
+    "organizer": {
+      "title": "イベントの安全性",
+      "description": "バージョン管理された参加要件を設定し、安全に関する決定について管理され、監査可能な記録を保管します。",
+      "loading": "ロードイベントの安全性",
+      "load_error_title": "イベントの安全性を利用できません",
+      "load_error_description": "安全方針とレビュー台帳を読み込むことができませんでした。安全に関する決定は変更されていません。",
+      "configuration_invalid": "構成が無効であるため、安全性の強制は利用できません。",
+      "shadow_title": "観察モード",
+      "shadow_description": "要件は評価および記録されますが、まだ参加を妨げるものではありません。",
+      "read_only": "このポリシーを表示することはできますが、その要件を変更することはできません。",
+      "action_error": "安全性の変更を保存できませんでした。ワークスペースを更新して、再試行してください。",
+      "success": {
+        "saved": "安全要件はドラフトとして保存されます。",
+        "published": "安全要件が公開されました。",
+        "archived": "安全要件がアーカイブされました。"
+      }
+    },
+    "attendee": {
+      "title": "参加要件",
+      "description": "待機リストに登録または参加する前に、該当する安全手順を完了してください。",
+      "loading": "参加要件を読み込んでいます",
+      "load_error_title": "参加要件は利用できません",
+      "load_error_description": "イベントの安全要件を確認できませんでした。登録する前にもう一度お試しください。",
+      "action_error": "その安全手順を完了できませんでした。もう一度やり直してください。",
+      "denial_title": "現在参加は許可されていません",
+      "attention_title": "アクションが必要です",
+      "success": {
+        "acknowledge": "行動規範が承認されました。",
+        "withdraw_code": "コード承認が取り消されました。",
+        "request_guardian": "保護者の同意リクエストが送信されました。",
+        "withdraw_guardian": "保護者の同意リクエストは取り下げられました。"
+      }
+    },
+    "rollout": {
+      "off": "強制オフ",
+      "shadow": "観察モード",
+      "enforce": "執行中"
+    },
+    "requirements": {
+      "title": "参加ポリシー",
+      "description": "ドラフトの変更は公開されるまで非公開です。公開すると、証拠照合用の不変バージョンが作成されます。",
+      "minimum_age": "最低年齢",
+      "minimum_age_hint": "イベントに最低年齢がない場合は空白のままにします。",
+      "guardian_required": "未成年者の場合は保護者の同意が必要です",
+      "guardian_required_hint": "同意は、正確に公開された要件バージョンとイベント日付に拘束されます。",
+      "minor_threshold": "未成年者の年齢制限",
+      "minor_threshold_hint": "イベントにこの年齢未満のメンバーが参加する場合は同意が必要です。",
+      "code_required": "行動規範の承認を要求する",
+      "code_required_hint": "参加者は、参加する前に、公開されたテキストを正確に理解する必要があります。",
+      "code_version": "コードテキストバージョン",
+      "code_version_hint": "events-conduct-2026-01 などの意味のある識別子を使用します。",
+      "code_text": "行動規範",
+      "code_text_hint": "出席者が読んで同意する必要がある完全な規約を述べます。",
+      "archive_title": "これらの安全要件をアーカイブしますか?",
+      "archive_description": "アーカイブされた要件は、積極的な参加ポリシーではなくなります。証拠と監査履歴は保持されます。",
+      "status": {
+        "draft": "下書き",
+        "published": "発行済み",
+        "archived": "アーカイブ済み"
+      }
+    },
+    "eligibility": {
+      "allow": "要件が完了しました",
+      "deny": "参加がブロックされました",
+      "unavailable": "検証が利用できません",
+      "not_evaluated": "まだ評価されていません"
+    },
+    "reasons": {
+      "unknown": "参加要件には依然として注意が必要です。",
+      "safeguarding_policy": "保護政策の決定",
+      "minimum_age": "最低年齢要件",
+      "guardian_consent": "保護者の同意が必要",
+      "code_of_conduct": "行動規範の要件",
+      "conduct_violation": "違反行為",
+      "safety_review": "安全性審査の決定",
+      "user_block": "メンバーブロックにより参加できなくなります",
+      "event_safety_unbound_guest_denied": "サインインして参加要件を確認してください。",
+      "event_safety_user_not_active": "あなたのメンバーアカウントは現在アクティブではありません。",
+      "event_safety_bilateral_user_block": "メンバーブロックにより、このイベントに参加できなくなります。",
+      "event_safety_requirements_not_published": "主催者は安全要件をまだ公表していません。",
+      "event_safety_requirements_integrity_invalid": "公表された安全要件は検証できませんでした。",
+      "event_safety_requirements_version_unavailable": "公開された要件バージョンは利用できません。",
+      "event_safety_date_of_birth_required": "生年月日を追加すると、年齢要件を確認できます。",
+      "event_safety_date_of_birth_invalid": "記録された生年月日を確認できませんでした。",
+      "event_safety_minimum_age_not_met": "このイベントの最低年齢を満たしていません。",
+      "event_safety_minor_policy_unavailable": "未成年者の参加に関するポリシーは利用できません。",
+      "event_safety_guardian_consent_required": "有効な保護者の同意が必要です。",
+      "event_safety_code_of_conduct_acknowledgement_required": "現在の行動規範を認識します。",
+      "event_safety_active_participation_denial": "積極的な安全に関する決定により、参加が妨げられます。",
+      "event_safety_safeguarding_policy_denied": "現在、保護方針により参加は許可されていません。",
+      "event_safety_safeguarding_policy_invalid": "保護措置の決定は検証できなかった。",
+      "event_safety_safeguarding_policy_unavailable": "保護検証は一時的に利用できなくなります。",
+      "event_safety_schema_unavailable": "安全性の検証は一時的に利用できません。",
+      "event_safety_evaluation_unavailable": "安全性の検証は一時的に利用できません。",
+      "event_safety_organizer_not_active": "イベント主催者は現在活動していません。",
+      "event_safety_denial_safeguarding_policy": "保護政策の決定により、参加が妨げられます。"
+    },
+    "code": {
+      "title": "行動規範",
+      "confirm_read": "私は完全な行動規範を読み、これに同意します。",
+      "status": {
+        "not_required": "不要",
+        "required": "承認が必要です",
+        "acknowledged": "確認済み"
+      }
+    },
+    "guardian": {
+      "title": "保護者の同意",
+      "description": "保護者は、期間限定のプライベートリンクを受け取ります。彼らの ID と同意トークンはイベント名簿には表示されません。",
+      "name_label": "守護者名",
+      "email_label": "保護者のメールアドレス",
+      "relationship_label": "出席者との関係",
+      "privacy_notice": "住所は配送のために暗号化され、処理後に配送封筒から削除されます。",
+      "relationships": {
+        "parent": "親",
+        "guardian": "保護者",
+        "legal_guardian": "法定後見人",
+        "carer": "介護者"
+      },
+      "status": {
+        "not_required": "不要",
+        "required": "同意が必要です",
+        "pending": "保護者を待っています",
+        "active": "同意が得られました",
+        "withdrawn": "取り下げ済み",
+        "expired": "期限切れ"
+      }
+    },
+    "decisions": {
+      "deny": "参加を拒否する",
+      "remove": "イベントから削除"
+    },
+    "review_status": {
+      "active": "アクティブ",
+      "withdrawn": "取り下げ済み",
+      "expired": "期限切れ"
+    },
+    "review_actions": {
+      "recorded": "記録された決定",
+      "withdrawn": "決定の撤回",
+      "expired": "決定は期限切れになりました"
+    },
+    "reviews": {
+      "title": "参加レビュー",
+      "description": "自由記述メモ、連絡先詳細、インシデント記録を使用せずに、管理された意思決定を記録します。",
+      "new_title": "決定を記録する",
+      "edit_title": "この決定を更新する",
+      "member_label": "メンバーを探す",
+      "member_hint": "名前で検索し、正しいメンバーを選択します。",
+      "member_search_error": "メンバーを検索できませんでした。もう一度やり直してください。",
+      "decision_label": "決定",
+      "reason_label": "制御された理由",
+      "effective_from": "から有効",
+      "effective_until": "まで有効",
+      "effective_until_hint": "決定に終了予定がない場合は空白のままにしてください。",
+      "no_notes_notice": "プライバシーのため、この台帳は制御された理由コードのみを受け入れます。承認された保護システムに事件と機密証拠を記録します。",
+      "saved": "参加レビューが保存されました。",
+      "withdrawn": "参加レビューは撤回されました。",
+      "action_error": "参加レビューは変更できませんでした。更新して再試行してください。",
+      "history_title": "台帳を確認する",
+      "total": "記録された決定: {{count}}件",
+      "empty": "このイベントには参加レビューが記録されていません。",
+      "reviewed_by": "レビュー者",
+      "version": "決定版",
+      "audit_history": "監査履歴 ({{count}} エントリ)",
+      "pagination": "参加レビューページ"
+    },
+    "guardian_grant": {
+      "page_title": "保護者の同意",
+      "title": "保護者の同意を確認する",
+      "description": "このプライベート リンクを受け取った電子メール アドレスを確認し、公開されているイベントの安全要件に従って出席者が参加することに同意します。",
+      "email_label": "保護者のメールアドレス",
+      "email_hint": "同意リクエストを受信したのと同じアドレスを入力します。",
+      "confirm_label": "私は指定された親、保護者、または介護者であり、この出席者が参加することに同意します。",
+      "privacy_notice": "リンクは時間制限があり、このイベントおよび要件バージョンにのみ使用できます。返信ではメールアドレスが登録されているかどうかはわかりません。",
+      "submit": "同意する",
+      "success_title": "同意が記録されています",
+      "success_description": "参加者は、他のイベント要件が完了したら続行できるようになります。",
+      "invalid_title": "この同意リンクは使用できません",
+      "invalid_description": "リンクまたは電子メール アドレスが間違っているか、有効期限が切れているか、すでに完了している可能性があります。出席者に新しいリクエストを送信するよう依頼します。",
+      "browse_events": "イベントを閲覧する"
+    }
+  },
+  "govuk": {
+    "link": "安全要件とレビュー",
+    "back": "イベントに戻る",
+    "title": "イベントの安全性",
+    "intro": "参加要件を確認し、該当する手順を完了するか、イベントの管理された安全ポリシーを管理します。",
+    "updated": "イベントの安全記録が更新されました。",
+    "failed": "安全性の変更を完了できませんでした。現在の情報を確認して、再試行してください。",
+    "unavailable_title": "イベントの安全性を利用できません",
+    "unavailable_body": "参加要件が確認できませんでした。安全に関する決定は変更されていません。",
+    "rollout": {
+      "off": "強制オフ",
+      "shadow": "観察モード",
+      "enforce": "執行中"
+    },
+    "requirement_status": {
+      "draft": "下書き",
+      "published": "発行済み",
+      "archived": "アーカイブ済み"
+    },
+    "policy_title": "参加ポリシー",
+    "policy_intro": "ドラフトの変更は公開されるまで非公開のままです。公開された各バージョンは証拠照合のために保持されます。",
+    "minimum_age": "最低年齢",
+    "minimum_age_hint": "イベントに最低年齢がない場合は空白のままにします。",
+    "guardian_policy": "保護者の同意",
+    "guardian_required": "未成年者の場合は保護者の同意が必要です",
+    "minor_threshold": "未成年者の年齢制限",
+    "minor_threshold_hint": "イベントにこの年齢未満のメンバーが参加する場合は、保護者の同意が必要です。",
+    "code_policy": "行動規範",
+    "code_required": "参加者に行動規範を承認するよう要求する",
+    "code_version": "コードテキストバージョン",
+    "code_version_hint": "events-conduct-2026-01 などの意味のある識別子を使用します。",
+    "code_text": "行動規範の完全なテキスト",
+    "save_draft": "下書きの保存",
+    "publish": "要件を公開する",
+    "archive": "アーカイブ要件",
+    "archive_warning": "アーカイブされた要件はアクティブなポリシーではなくなります。証拠と監査履歴は保持されます。",
+    "confirm_archive": "今すぐアーカイブ",
+    "attendee_title": "参加要件",
+    "eligibility": {
+      "allow": "該当する要件が完了しました。",
+      "deny": "現在、リストされた要件が解決されるまで参加はブロックされています。",
+      "unavailable": "現在、要件を確認できません。登録する前にもう一度お試しください。",
+      "not_evaluated": "参加要件はまだ評価されていません。"
+    },
+    "action_required": "参加前にアクションが必要です",
+    "code_title": "行動規範",
+    "confirm_code": "私は完全な行動規範を読み、これに同意します。",
+    "acknowledge": "コードを確認する",
+    "withdraw_acknowledgement": "承認の撤回",
+    "guardian_title": "保護者の同意",
+    "guardian_status": {
+      "not_required": "保護者の同意は必要ありません。",
+      "required": "保護者の同意書が必要となります。",
+      "pending": "リクエストは保護者の返答を待っています。",
+      "active": "保護者の同意は得ております。",
+      "withdrawn": "保護者の同意リクエストは取り下げられました。",
+      "expired": "保護者の同意リクエストの有効期限が切れました。"
+    },
+    "guardian_name": "守護者名",
+    "guardian_email": "保護者のメールアドレス",
+    "guardian_relationship": "出席者との関係",
+    "relationships": {
+      "parent": "親",
+      "guardian": "保護者",
+      "legal_guardian": "法定後見人",
+      "carer": "介護者"
+    },
+    "guardian_privacy": "住所は配送のために暗号化され、処理後に配送封筒から削除されます。",
+    "request_guardian": "同意リクエストを送信する",
+    "withdraw_guardian": "同意リクエストの撤回",
+    "reviews_title": "参加レビュー",
+    "reviews_intro": "自由記述のメモ、連絡先の詳細、事件記録を使用せずに、管理された決定を記録します。",
+    "review_member": "イベント参加者",
+    "review_member_choose": "参加者を選択してください",
+    "member_fallback": "メンバー番号:id",
+    "review_decision": "決定",
+    "decisions": {
+      "deny": "参加を拒否する",
+      "remove": "イベントから削除"
+    },
+    "review_reason": "制御された理由",
+    "reasons": {
+      "unknown": "参加要件には依然として注意が必要です。",
+      "safeguarding_policy": "保護政策の決定",
+      "minimum_age": "最低年齢要件",
+      "guardian_consent": "保護者の同意が必要",
+      "code_of_conduct": "行動規範の要件",
+      "conduct_violation": "違反行為",
+      "safety_review": "安全性審査の決定",
+      "user_block": "メンバーブロックにより参加できなくなります"
+    },
+    "effective_from": "から有効",
+    "effective_until": "まで有効",
+    "effective_until_hint": "決定に終了予定がない場合は空白のままにしてください。",
+    "no_notes": "プライバシーのため、管理された理由のみを使用してください。事件と機密証拠を承認された保護システムに保管します。",
+    "save_review": "レビューの決定を保存する",
+    "no_people": "新しいレビューに参加できるイベント参加者はいません。",
+    "open_people": "イベント担当者ワークスペースを開く",
+    "ledger_title": "台帳を確認する",
+    "review_status": "ステータス",
+    "review_states": {
+      "active": "アクティブ",
+      "withdrawn": "取り下げ済み",
+      "expired": "期限切れ"
+    },
+    "reviewed_by": "レビュー者",
+    "withdraw_review": "決定の撤回",
+    "ledger_empty": "このイベントには参加レビューが記録されていません。"
+  }
+}

@@ -19,17 +19,7 @@ export interface GroupType {
   icon?: string;
   color?: string;
   member_count: number;
-  policy_count: number;
   created_at: string;
-}
-
-export interface GroupPolicy {
-  category: string;
-  key: string;
-  value: string | number | boolean;
-  type: 'boolean' | 'number' | 'string';
-  label: string;
-  description?: string;
 }
 
 export interface GroupMember {
@@ -281,6 +271,13 @@ export interface TenantConfig {
   tenant_id: number;
   features: Record<string, boolean>;
   modules: Record<string, boolean>;
+  security_impact?: {
+    biometric_login?: {
+      credential_count: number;
+      registered_users: number;
+      passkey_only_users: number;
+    };
+  };
 }
 
 export interface CacheStats {
@@ -1392,14 +1389,17 @@ export interface ExchangeDetail {
 // Groups
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type GroupStatus = 'pending_review' | 'active' | 'dormant' | 'archived' | 'rejected';
+export type GroupVisibility = 'public' | 'private' | 'hidden';
+
 export interface AdminGroup {
   id: number;
   name: string;
   description?: string;
   image_url?: string | null;
   cover_image_url?: string | null;
-  visibility: string;
-  status: string;
+  visibility: GroupVisibility;
+  status: GroupStatus;
   creator_name?: string;
   member_count: number;
   location?: string;

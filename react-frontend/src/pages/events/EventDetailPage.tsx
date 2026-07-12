@@ -20,7 +20,7 @@ import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGro
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from '@/lib/motion';
 
@@ -29,7 +29,7 @@ import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
 import Edit from 'lucide-react/icons/square-pen';
-import Trash2 from 'lucide-react/icons/trash-2';
+import Archive from 'lucide-react/icons/archive';
 import ExternalLink from 'lucide-react/icons/external-link';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -47,6 +47,9 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import CalendarRange from 'lucide-react/icons/calendar-range';
 import Video from 'lucide-react/icons/video';
 import BarChart3 from 'lucide-react/icons/chart-column';
+import Settings from 'lucide-react/icons/settings';
+import Ticket from 'lucide-react/icons/ticket';
+import Download from 'lucide-react/icons/download';
 import { Helmet } from 'react-helmet-async';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -55,16 +58,37 @@ import { EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location/LocationMapCard';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
+import { EventAgendaWorkspace } from './components/EventAgendaWorkspace';
+import { EventCheckinCredentialCard } from './components/EventCheckinCredentialCard';
+import EventRegistrationAttendeeCard from './components/EventRegistrationAttendeeCard';
+import { EventSafetyAttendeeCard } from './components/EventSafetyAttendeeCard';
+import { EventTicketsPanel } from './components/EventTicketsPanel';
+import { EventVenueAccessibilityCard } from './components/EventVenueAccessibilityCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
+import {
+  eventsApi,
+  type Event,
+  type EventRosterMember,
+  type EventSeriesOccurrence,
+  type EventCalendarActions,
+} from '@/lib/events-api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
-import type { Event, User, RsvpResponse } from '@/types/api';
+import { EventReminderPanel } from './EventReminderPanel';
+import { formatDateTime, formatDateValue, getFormattingLocale, resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
+
+function eventMutationKey(action: 'archive' | 'cancel' | 'accept-offer', eventId: number): string {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `${action}-${eventId}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 interface PollOption {
   id: number;
@@ -86,25 +110,19 @@ interface EventPoll {
   creator?: { id: number; name: string; avatar_url?: string | null };
 }
 
-interface AttendeeWithCheckIn extends User {
-  checked_in?: boolean;
-  rsvp_status?: string;
-}
-
-/** Map backend rsvp_status to our 3-option model */
-function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
-  if (!status) return null;
-  if (status === 'going' || status === 'attending') return 'going';
-  if (status === 'interested' || status === 'maybe') return 'interested';
-  if (status === 'not_going' || status === 'not_attending') return 'not_going';
+function relationshipRsvpStatus(event: Event): RsvpOption | null {
+  if (event.relationship.registration.state === 'confirmed') return 'going';
+  if (event.relationship.engagement.state === 'interested') return 'interested';
+  if (['declined', 'cancelled'].includes(event.relationship.registration.state)) return 'not_going';
   return null;
 }
 
 export function EventDetailPage() {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation(['events', 'event_tickets']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
 
@@ -112,13 +130,14 @@ export function EventDetailPage() {
   // Reflect the loaded event name in the tab/title; falls back to the static label while loading.
   usePageTitle(event?.title ?? t('title'));
   const [translatedEventDesc, setTranslatedEventDesc] = useState<string | null>(null);
-  const [attendees, setAttendees] = useState<AttendeeWithCheckIn[]>([]);
+  const [attendees, setAttendees] = useState<EventRosterMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpOption | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [archiveReason, setArchiveReason] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
@@ -126,11 +145,35 @@ export function EventDetailPage() {
   const [checkingInUserId, setCheckingInUserId] = useState<number | null>(null);
   const [isWaitlisted, setIsWaitlisted] = useState(false);
   const [waitlistPosition, setWaitlistPosition] = useState<number | null>(null);
-  const [seriesEvents, setSeriesEvents] = useState<Event[]>([]);
+  const [seriesEvents, setSeriesEvents] = useState<EventSeriesOccurrence[]>([]);
   const [isLoadingSeriesEvents, setIsLoadingSeriesEvents] = useState(false);
   const [eventPolls, setEventPolls] = useState<EventPoll[]>([]);
   const [isLoadingPolls, setIsLoadingPolls] = useState(false);
   const [votingPollId, setVotingPollId] = useState<number | null>(null);
+  const [calendarActions, setCalendarActions] = useState<EventCalendarActions | null>(null);
+  const [isDownloadingCalendar, setIsDownloadingCalendar] = useState(false);
+  const canViewTickets = Boolean(
+    isAuthenticated
+    && event?.schedule.start_at
+    && (event.relationship.registration.state === 'confirmed'
+      || event.permissions.manage_finance
+      || event.permissions.reconcile_tickets),
+  );
+
+  const requestedDetailTab = searchParams.get('tab');
+  useEffect(() => {
+    if (!event) return;
+    const nextTab = requestedDetailTab === 'attendees'
+      ? 'attendees'
+      : requestedDetailTab === 'agenda'
+        ? 'agenda'
+        : requestedDetailTab === 'tickets' && canViewTickets
+          ? 'tickets'
+        : requestedDetailTab === 'checkin' && event.permissions.check_in
+          ? 'checkin'
+          : 'details';
+    setActiveTab((current) => current === nextTab ? current : nextTab);
+  }, [canViewTickets, event, requestedDetailTab]);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -140,6 +183,9 @@ export function EventDetailPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
+  const archiveMutationKeyRef = useRef<string | null>(null);
+  const cancelMutationKeyRef = useRef<string | null>(null);
+  const acceptOfferMutationKeyRef = useRef<string | null>(null);
 
   const loadEvent = useCallback(async () => {
     if (!id) return;
@@ -152,8 +198,8 @@ export function EventDetailPage() {
       setIsLoading(true);
       setError(null);
       const [eventRes, attendeesRes] = await Promise.all([
-        api.get<Event>(`/v2/events/${id}`),
-        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50&status=all`).catch((err) => {
+        eventsApi.get(id, { signal: controller.signal }),
+        eventsApi.roster(id, { per_page: 50, status: 'all' }, { signal: controller.signal }).catch((err) => {
           logError('Failed to load attendees', err);
           return { success: true, data: [] };
         }),
@@ -163,7 +209,9 @@ export function EventDetailPage() {
 
       if (eventRes.success && eventRes.data) {
         setEvent(eventRes.data);
-        setRsvpStatus(normalizeRsvpStatus(eventRes.data.rsvp_status));
+        setRsvpStatus(relationshipRsvpStatus(eventRes.data));
+        setIsWaitlisted(['waitlisted', 'offered'].includes(eventRes.data.relationship.registration.state));
+        setWaitlistPosition(eventRes.data.relationship.registration.waitlist_position);
       } else {
         // Clear any previously-loaded event so the error screen shows. Without
         // this, navigating from a loaded event to one that fails to load (404/5xx)
@@ -191,10 +239,28 @@ export function EventDetailPage() {
     loadEvent();
   }, [loadEvent]);
 
+  useEffect(() => {
+    if (!id || !isAuthenticated) {
+      setCalendarActions(null);
+      return;
+    }
+    const controller = new AbortController();
+    eventsApi.calendarActions(id, { signal: controller.signal }).then((response) => {
+      if (!controller.signal.aborted && response.success && response.data) {
+        setCalendarActions(response.data);
+      }
+    }).catch((calendarError) => {
+      if (!controller.signal.aborted) {
+        logError('Failed to load event calendar actions', calendarError);
+      }
+    });
+    return () => controller.abort();
+  }, [id, isAuthenticated]);
+
   // Fetch other events in the same series.
   // Depend on the ids (not the whole event object) so an RSVP refetch of the
   // same event doesn't re-trigger the series request.
-  const seriesId = event?.series?.id;
+  const seriesId = event?.series.named?.id;
   const eventId = event?.id;
   useEffect(() => {
     if (!seriesId) {
@@ -206,12 +272,10 @@ export function EventDetailPage() {
     async function fetchSeriesEvents() {
       setIsLoadingSeriesEvents(true);
       try {
-        const res = await api.get<Event[]>(`/v2/events?series_id=${seriesId}&per_page=5`);
+        const res = await eventsApi.series(seriesId!);
         if (!cancelled && res.success && res.data) {
           // Filter out the current event
-          setSeriesEvents(
-            (Array.isArray(res.data) ? res.data : []).filter((e) => e.id !== eventId)
-          );
+          setSeriesEvents(res.data.occurrences.filter((occurrence) => occurrence.id !== eventId));
         }
       } catch (err) {
         logError('Failed to load series events', err);
@@ -278,18 +342,9 @@ export function EventDetailPage() {
     if (rsvpStatus === newStatus) {
       try {
         setIsSubmitting(true);
-        const response = await api.delete(`/v2/events/${event.id}/rsvp`);
+        const response = await eventsApi.removeRsvp(event.id);
         if (response.success) {
-          const prevStatus = rsvpStatus;
-          setRsvpStatus(null);
-          setEvent((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              attendees_count: prevStatus === 'going' ? Math.max(0, (prev.attendees_count ?? 1) - 1) : prev.attendees_count,
-              interested_count: prevStatus === 'interested' ? Math.max(0, (prev.interested_count ?? 1) - 1) : prev.interested_count,
-            };
-          });
+          await loadEvent();
           toastRef.current.success(tRef.current('toast.rsvp_removed'));
         } else {
           toastRef.current.error(tRef.current('toast.rsvp_cancel_failed'));
@@ -305,46 +360,19 @@ export function EventDetailPage() {
 
     try {
       setIsSubmitting(true);
-      const response = await api.post<RsvpResponse>(`/v2/events/${event.id}/rsvp`, { status: newStatus });
+      const response = await eventsApi.rsvp(event.id, newStatus);
       if (response.success && response.data) {
         const rsvpData = response.data;
 
         // Check if user was waitlisted instead
-        if (rsvpData.status === 'waitlisted') {
+        if (rsvpData.relationship.registration.state === 'waitlisted') {
           setIsWaitlisted(true);
-          setWaitlistPosition(rsvpData.waitlist_position ?? null);
+          setWaitlistPosition(rsvpData.relationship.registration.waitlist_position);
           toastRef.current.info(rsvpData.message || tRef.current('toast.added_to_waitlist'));
           return;
         }
 
-        const prevStatus = rsvpStatus;
-        setRsvpStatus(newStatus);
-
-        // Update counts from response
-        if (rsvpData.rsvp_counts) {
-          setEvent((prev) => {
-            if (!prev) return null;
-            return {
-              ...prev,
-              attendees_count: rsvpData.rsvp_counts.going,
-              interested_count: rsvpData.rsvp_counts.interested,
-              spots_left: prev.max_attendees != null ? Math.max(0, prev.max_attendees - rsvpData.rsvp_counts.going) : null,
-              is_full: prev.max_attendees != null ? rsvpData.rsvp_counts.going >= prev.max_attendees : false,
-            };
-          });
-        } else {
-          // Optimistic fallback
-          setEvent((prev) => {
-            if (!prev) return null;
-            let goingCount = prev.attendees_count ?? 0;
-            let interestedCount = prev.interested_count ?? 0;
-            if (prevStatus === 'going') goingCount = Math.max(0, goingCount - 1);
-            if (prevStatus === 'interested') interestedCount = Math.max(0, interestedCount - 1);
-            if (newStatus === 'going') goingCount += 1;
-            if (newStatus === 'interested') interestedCount += 1;
-            return { ...prev, attendees_count: goingCount, interested_count: interestedCount };
-          });
-        }
+        await loadEvent();
 
         const messages: Record<RsvpOption, string> = {
           going: tRef.current('toast.rsvp_going'),
@@ -374,24 +402,41 @@ export function EventDetailPage() {
     }
   }
 
-  async function handleDelete() {
+  async function handleArchive() {
     if (!event) return;
 
     try {
-      setIsDeleting(true);
-      const response = await api.delete(`/v2/events/${event.id}`);
-      if (response.success) {
-        toastRef.current.success(tRef.current('toast.deleted'));
+      setIsArchiving(true);
+      archiveMutationKeyRef.current ??= eventMutationKey('archive', event.id);
+      const response = await eventsApi.archive(
+        event.id,
+        archiveMutationKeyRef.current,
+        archiveReason,
+      );
+      if (response.success && response.data?.archived) {
+        toastRef.current.success(tRef.current('toast.archived'));
         navigate(tenantPath('/events'));
       } else {
-        toastRef.current.error(tRef.current('toast.delete_failed'));
+        toastRef.current.error(tRef.current('toast.archive_failed'));
       }
     } catch (err) {
-      logError('Failed to delete event', err);
+      logError('Failed to archive event', err);
       toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
+      setIsArchiving(false);
+    }
+  }
+
+  async function handleCalendarDownload() {
+    if (!event) return;
+    setIsDownloadingCalendar(true);
+    try {
+      await eventsApi.downloadEventCalendar(event.id);
+    } catch (downloadError) {
+      logError('Failed to download event calendar file', downloadError);
+      toastRef.current.error(tRef.current('calendar_actions.download_error'));
+    } finally {
+      setIsDownloadingCalendar(false);
     }
   }
 
@@ -400,12 +445,9 @@ export function EventDetailPage() {
 
     try {
       setCheckingInUserId(attendeeId);
-      // Use RSVP endpoint with 'attended' status, or a dedicated check-in endpoint
-      const response = await api.post(`/v2/events/${event.id}/attendees/${attendeeId}/check-in`);
+      const response = await eventsApi.checkIn(event.id, attendeeId);
       if (response.success) {
-        setAttendees((prev) =>
-          prev.map((a) => a.id === attendeeId ? { ...a, checked_in: true } : a)
-        );
+        await loadEvent();
         toastRef.current.success(tRef.current('toast.checkin_success'));
       } else {
         toastRef.current.error(tRef.current('toast.checkin_failed'));
@@ -420,12 +462,18 @@ export function EventDetailPage() {
 
   async function handleCancelEvent() {
     if (!event) return;
+    const reason = cancelReason.trim();
+    if (!reason) {
+      toastRef.current.error(tRef.current('toast.cancel_reason_required'));
+      return;
+    }
 
     try {
       setIsCancelling(true);
-      const response = await api.post(`/v2/events/${event.id}/cancel`, { reason: cancelReason });
+      cancelMutationKeyRef.current ??= eventMutationKey('cancel', event.id);
+      const response = await eventsApi.cancel(event.id, reason, cancelMutationKeyRef.current);
       if (response.success) {
-        setEvent((prev) => prev ? { ...prev, status: 'cancelled', cancellation_reason: cancelReason } : null);
+        await loadEvent();
         toastRef.current.success(tRef.current('toast.event_cancelled'));
         setShowCancelModal(false);
       } else {
@@ -444,10 +492,11 @@ export function EventDetailPage() {
 
     try {
       setIsSubmitting(true);
-      const response = await api.post<{ position?: number }>(`/v2/events/${event.id}/waitlist`);
+      const response = await eventsApi.joinWaitlist(event.id);
       if (response.success && response.data) {
         setIsWaitlisted(true);
         setWaitlistPosition(response.data.position ?? null);
+        await loadEvent();
         toastRef.current.success(tRef.current('toast.added_to_waitlist'));
       } else {
         toastRef.current.error(tRef.current('toast.waitlist_join_failed'));
@@ -465,10 +514,11 @@ export function EventDetailPage() {
 
     try {
       setIsSubmitting(true);
-      const response = await api.delete(`/v2/events/${event.id}/waitlist`);
+      const response = await eventsApi.leaveWaitlist(event.id);
       if (response.success) {
         setIsWaitlisted(false);
         setWaitlistPosition(null);
+        await loadEvent();
         toastRef.current.success(tRef.current('toast.removed_from_waitlist'));
       }
     } catch (err) {
@@ -479,13 +529,53 @@ export function EventDetailPage() {
     }
   }
 
-  const isOrganizer = user && event && user.id === event.organizer?.id;
-  const isCancelled = event?.status === 'cancelled';
-  const goingAttendees = attendees.filter((a) => a.rsvp_status === 'going' || a.rsvp_status === 'attending' || !a.rsvp_status);
-  const checkedInCount = attendees.filter((a) => a.checked_in).length;
+  async function handleAcceptWaitlistOffer() {
+    if (!event) return;
+
+    try {
+      setIsSubmitting(true);
+      acceptOfferMutationKeyRef.current ??= eventMutationKey('accept-offer', event.id);
+      const response = await eventsApi.acceptWaitlistOffer(
+        event.id,
+        acceptOfferMutationKeyRef.current,
+      );
+      if (response.success && response.data) {
+        acceptOfferMutationKeyRef.current = null;
+        setIsWaitlisted(false);
+        setWaitlistPosition(null);
+        await loadEvent();
+        toastRef.current.success(tRef.current('detail.offer_accepted'));
+      } else {
+        toastRef.current.error(tRef.current('detail.offer_accept_failed'));
+      }
+    } catch (err) {
+      logError('Failed to accept event waitlist offer', err);
+      toastRef.current.error(tRef.current('detail.offer_accept_failed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const canCheckIn = event?.permissions.check_in ?? false;
+  const canOpenManagement = Boolean(event && (
+    event.permissions.edit
+    || event.permissions.cancel
+    || event.permissions.manage_people
+    || event.permissions.check_in
+    || event.permissions.manage_staff
+  ));
+  const isCancelled = event?.schedule.operational_state === 'cancelled';
+  const isPostponed = event?.schedule.operational_state === 'postponed';
+  const isCompleted = event?.schedule.operational_state === 'completed';
+  const isArchived = event?.schedule.publication_state === 'archived';
+  const isPendingReview = event?.schedule.publication_state === 'pending_review';
+  const isDraft = event?.schedule.publication_state === 'draft';
+  const hasActiveWaitlistOffer = event?.relationship.registration.state === 'offered';
+  const goingAttendees = attendees.filter((attendee) => attendee.registration.state === 'confirmed');
+  const checkedInCount = attendees.filter((attendee) => attendee.attendance.state !== 'not_checked_in').length;
   const checkInPercent = goingAttendees.length > 0 ? Math.round((checkedInCount / goingAttendees.length) * 100) : 0;
-  const getAttendeeName = (attendee: AttendeeWithCheckIn) =>
-    attendee.name || `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || t('detail.community_member');
+  const getAttendeeName = (attendee: EventRosterMember) =>
+    attendee.member.display_name || t('detail.community_member');
 
   if (isLoading) {
     return (
@@ -555,41 +645,82 @@ export function EventDetailPage() {
     );
   }
 
-  const startDate = new Date(event.start_date);
-  const endDate = event.end_date ? new Date(event.end_date) : null;
-  const isPast = startDate < new Date();
-  const goingCount = event.attendees_count ?? 0;
-  const interestedCount = event.interested_count ?? 0;
-  const startMonthLabel = formatMonthShort(startDate, true);
-  const fullDateLabel = formatDateValue(startDate, { weekday: 'long', month: 'long', day: 'numeric' });
-  const startTimeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
-  const endTimeLabel = endDate
-    ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
+  const startDate = new Date(event.schedule.start_at ?? event.created_at ?? 0);
+  const endDate = event.schedule.end_at ? new Date(event.schedule.end_at) : null;
+  const formattingLocale = getFormattingLocale();
+  let eventTimezone = event.schedule.timezone || 'UTC';
+  try {
+    new Intl.DateTimeFormat(formattingLocale, { timeZone: eventTimezone }).format(startDate);
+  } catch {
+    eventTimezone = 'UTC';
+  }
+  const isPast = event.schedule.state === 'ended' || isCompleted;
+  const goingCount = event.metrics.confirmed_count;
+  const interestedCount = event.metrics.interested_count;
+  const dateBadgeMonth = formatDateValue(startDate, {
+    month: 'short',
+    timeZone: eventTimezone,
+  });
+  const startMonthLabel = dateBadgeMonth.toLocaleUpperCase(formattingLocale);
+  const startDayLabel = formatDateValue(startDate, {
+    day: 'numeric',
+    timeZone: eventTimezone,
+  });
+  const visibleEndDate = endDate && event.schedule.all_day
+    ? new Date(endDate.getTime() - 1)
+    : endDate;
+  const dateFormatter = new Intl.DateTimeFormat(formattingLocale, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: eventTimezone,
+  });
+  const rangeFormatter = dateFormatter as Intl.DateTimeFormat & {
+    formatRange?: (start: Date, end: Date) => string;
+  };
+  const fullDateLabel = visibleEndDate
+    && dateFormatter.format(startDate) !== dateFormatter.format(visibleEndDate)
+    ? rangeFormatter.formatRange?.(startDate, visibleEndDate)
+      ?? `${dateFormatter.format(startDate)} – ${dateFormatter.format(visibleEndDate)}`
+    : dateFormatter.format(startDate);
+  const startTimeLabel = event.schedule.all_day
+    ? t('calendar.all_day')
+    : formatDateTime(startDate, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: eventTimezone,
+        timeZoneName: 'short',
+      });
+  const endTimeLabel = endDate && !event.schedule.all_day
+    ? formatDateTime(endDate, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: eventTimezone,
+        timeZoneName: 'short',
+      })
     : null;
-  const eventImage = event.cover_image
-    ? resolveThumbnailUrl(event.cover_image, { width: 1200, height: 675 })
+  const eventImage = event.primary_image?.url
+    ? resolveThumbnailUrl(event.primary_image.url, { width: 1200, height: 675 })
     : undefined;
-  const eventImageProps = event.cover_image
-    ? responsiveThumbnailProps(event.cover_image, {
+  const eventImageProps = event.primary_image?.url
+    ? responsiveThumbnailProps(event.primary_image.url, {
         width: 1200,
         height: 675,
         sizes: '(min-width: 1024px) 896px, 100vw',
       })
     : null;
-  const organizerName = event.organizer?.name || `${event.organizer?.first_name ?? ''} ${event.organizer?.last_name ?? ''}`.trim() || t('detail.community_member');
+  const organizerName = event.organizer.display_name || t('detail.community_member');
   const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160)
     || t('detail.meta_description_fallback', {
       title: event.title,
       date: fullDateLabel,
-      location: event.location || t('detail.remote_attendance_available'),
+      location: event.location.label || t('detail.remote_attendance_available'),
       organizer: organizerName,
     });
   const attendanceTotal = goingCount + interestedCount;
-  const eventSocial = event as Event & {
-    is_liked?: boolean;
-    likes_count?: number;
-    comments_count?: number;
-  };
+  const hasOnlineAccess = event.online_access.reveal_state === 'available'
+    && Boolean(event.online_access.video_url || event.online_access.join_url);
 
   return (
     <motion.div
@@ -602,8 +733,8 @@ export function EventDetailPage() {
         description={seoDescription}
         image={eventImage}
         type="article"
-        publishedTime={event.created_at}
-        modifiedTime={event.updated_at || event.created_at}
+        publishedTime={event.created_at ?? undefined}
+        modifiedTime={event.updated_at ?? event.created_at ?? undefined}
       />
       <Helmet>
         <script type="application/ld+json">
@@ -612,9 +743,9 @@ export function EventDetailPage() {
             '@type': 'Event',
             name: event.title,
             ...(event.description ? { description: event.description.substring(0, 300) } : {}),
-            startDate: event.start_date,
-            ...(event.end_date ? { endDate: event.end_date } : {}),
-            ...(event.location ? { location: { '@type': 'Place', name: event.location } } : {}),
+            startDate: event.schedule.start_at,
+            ...(event.schedule.end_at ? { endDate: event.schedule.end_at } : {}),
+            ...(event.location.label ? { location: { '@type': 'Place', name: event.location.label } } : {}),
             ...(eventImage ? { image: eventImage } : {}),
             organizer: {
               '@type': 'Person',
@@ -656,26 +787,64 @@ export function EventDetailPage() {
                   {t('detail.event_cancelled')}
                 </Chip>
               )}
-              {event.category_name && (
-                <Chip variant="flat" color="secondary" size="sm" className="max-w-full">
-                  <span className="truncate">{event.category_name}</span>
+              {isPostponed && (
+                <Chip variant="flat" color="warning" size="sm">
+                  {t('detail.event_postponed')}
                 </Chip>
               )}
-              {event.is_recurring && (
+              {isCompleted && (
+                <Chip variant="flat" color="success" size="sm">
+                  {t('detail.event_completed')}
+                </Chip>
+              )}
+              {isArchived && (
+                <Chip variant="flat" color="default" size="sm">
+                  {t('detail.event_archived')}
+                </Chip>
+              )}
+              {isPendingReview && (
+                <Chip variant="flat" color="warning" size="sm">
+                  {t('detail.event_pending_review')}
+                </Chip>
+              )}
+              {isDraft && !isArchived && (
+                <Chip variant="flat" color="default" size="sm">
+                  {t('detail.event_draft')}
+                </Chip>
+              )}
+              {event.category?.name && (
+                <Chip variant="flat" color="secondary" size="sm" className="max-w-full">
+                  <span className="truncate">{event.category.name}</span>
+                </Chip>
+              )}
+              {event.series.recurrence && (
                 <Chip variant="flat" color="secondary" size="sm" startContent={<Repeat className="w-3 h-3" aria-hidden="true" />}>
                   {t('detail.recurring_event')}
                 </Chip>
               )}
-              {event.allow_remote_attendance && (
+              {event.location.mode !== 'in_person' && (
                 <Chip variant="flat" color="primary" size="sm" startContent={<Video className="w-3 h-3" aria-hidden="true" />}>
                   {t('detail.remote_attendance_available')}
                 </Chip>
               )}
             </div>
 
-            {isOrganizer && !isCancelled && (
+            {(canOpenManagement
+              || (event.permissions.edit && !isArchived)
+              || (event.permissions.cancel && !isCancelled)) && (
               <div className="flex flex-wrap gap-2 sm:justify-end">
-                <Button
+                {canOpenManagement && <Button
+                  as={Link}
+                  to={tenantPath(`/events/${event.id}/manage`)}
+                  size="sm"
+                  variant="flat"
+                  className="bg-white/15 text-white backdrop-blur-md"
+                  startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+                  aria-label={t('detail.manage_event_aria', { title: event.title })}
+                >
+                  {t('detail.manage')}
+                </Button>}
+                {event.permissions.edit && !isCancelled && <Button
                   as={Link}
                   to={tenantPath(`/events/${event.id}/edit`)}
                   size="sm"
@@ -685,8 +854,8 @@ export function EventDetailPage() {
                   aria-label={t('detail.edit_event_aria', { title: event.title })}
                 >
                   {t('detail.edit')}
-                </Button>
-                <Button
+                </Button>}
+                {event.permissions.cancel && !isCancelled && <Button
                   size="sm"
                   variant="flat"
                   className="bg-amber-500/20 text-amber-100 backdrop-blur-md"
@@ -695,17 +864,17 @@ export function EventDetailPage() {
                   aria-label={t('detail.cancel_event_aria', { title: event.title })}
                 >
                   {t('detail.cancel_event')}
-                </Button>
-                <Button
+                </Button>}
+                {event.permissions.edit && !isArchived && <Button
                   size="sm"
                   variant="flat"
-                  className="bg-red-500/20 text-red-100 backdrop-blur-md"
-                  startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => setShowDeleteModal(true)}
-                  aria-label={t('detail.delete_event_aria', { title: event.title })}
+                  className="bg-white/15 text-white backdrop-blur-md"
+                  startContent={<Archive className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => setShowArchiveModal(true)}
+                  aria-label={t('detail.archive_event_aria', { title: event.title })}
                 >
-                  {t('detail.delete')}
-                </Button>
+                  {t('detail.archive')}
+                </Button>}
               </div>
             )}
           </div>
@@ -714,16 +883,16 @@ export function EventDetailPage() {
             <div className="min-w-0">
               <div className="mb-4 inline-flex min-w-[5.5rem] flex-col items-center rounded-xl border border-white/20 bg-white/15 px-4 py-3 text-center text-white shadow-lg backdrop-blur-md">
                 <span className="text-xs font-semibold uppercase">{startMonthLabel}</span>
-                <span className="text-4xl font-bold leading-none">{startDate.getDate()}</span>
+                <span className="text-4xl font-bold leading-none">{startDayLabel}</span>
               </div>
               <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white sm:text-5xl">
                 {event.title}
               </h1>
-              {event.series && (
-                <Link to={tenantPath(`/events?series=${event.series.id}`)} className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm text-white backdrop-blur-md transition-opacity hover:opacity-90">
+              {event.series.named && (
+                <Link to={tenantPath(`/events?series=${event.series.named.id}`)} className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm text-white backdrop-blur-md transition-opacity hover:opacity-90">
                   <Link2 className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                  <span className="truncate">{event.series.title}</span>
-                  <span className="text-white/75">{t('detail.events_in_series', { count: event.series.event_count })}</span>
+                  <span className="truncate">{event.series.named.title}</span>
+                  <span className="text-white/75">{t('detail.events_in_series', { count: event.series.named.event_count })}</span>
                 </Link>
               )}
             </div>
@@ -748,7 +917,11 @@ export function EventDetailPage() {
                 )}
                 {isWaitlisted && (
                   <Chip variant="flat" color="warning" size="lg" startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}>
-                    {waitlistPosition ? t('detail.on_waitlist_position', { position: waitlistPosition }) : t('detail.on_waitlist')}
+                    {hasActiveWaitlistOffer
+                      ? t('detail.offer_state_chip')
+                      : waitlistPosition
+                        ? t('detail.on_waitlist_position', { position: waitlistPosition })
+                        : t('detail.on_waitlist')}
                   </Chip>
                 )}
               </div>
@@ -766,11 +939,35 @@ export function EventDetailPage() {
               <Ban className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
               <div>
                 <p className="text-red-600 dark:text-red-400 font-semibold">{t('detail.event_cancelled')}</p>
-                {event.cancellation_reason && (
-                  <p className="text-red-300/80 text-sm mt-1">{t('detail.cancellation_reason', { reason: event.cancellation_reason })}</p>
+                {event.schedule.cancellation_reason && (
+                  <p className="text-red-300/80 text-sm mt-1">{t('detail.cancellation_reason', { reason: event.schedule.cancellation_reason })}</p>
                 )}
               </div>
             </div>
+          </div>
+        )}
+        {isPostponed && (
+          <div role="status" className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+              <p className="font-semibold text-amber-700 dark:text-amber-300">
+                {t('detail.event_postponed')}
+              </p>
+            </div>
+          </div>
+        )}
+        {(isDraft || isPendingReview || isArchived) && (
+          <div role="status" className="mb-6 rounded-xl border border-theme-default bg-theme-elevated p-4">
+            <p className="font-semibold text-theme-primary">
+              {isArchived
+                ? t('detail.event_archived')
+                : isPendingReview
+                  ? t('detail.event_pending_review')
+                  : t('detail.event_draft')}
+            </p>
+            <p className="mt-1 text-sm text-theme-muted">
+              {t('detail.lifecycle_private_notice')}
+            </p>
           </div>
         )}
 
@@ -790,32 +987,32 @@ export function EventDetailPage() {
             </div>
             <span className="text-theme-primary font-medium">{interestedCount}</span>
           </Surface>
-          {event.max_attendees != null && (
+          {event.relationship.capacity.limit != null && (
             <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
               <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
                 <Users className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{t('detail.capacity_label')}</span>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-theme-primary font-medium">{t('detail.max_capacity', { count: event.max_attendees })}</span>
-                {event.is_full && (
+                <span className="text-theme-primary font-medium">{t('detail.max_capacity', { count: event.relationship.capacity.limit })}</span>
+                {event.relationship.capacity.is_full && (
                   <Chip size="sm" variant="flat" color="danger">{t('detail.event_full')}</Chip>
                 )}
               </div>
-              {event.spots_left != null && event.spots_left > 0 && (
-                <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'} className="mt-2">
-                  {t('detail.spots_left', { count: event.spots_left })}
+              {event.relationship.capacity.remaining != null && event.relationship.capacity.remaining > 0 && (
+                <Chip size="sm" variant="flat" color={event.relationship.capacity.remaining <= 3 ? 'danger' : 'success'} className="mt-2">
+                  {t('detail.spots_left', { count: event.relationship.capacity.remaining })}
                 </Chip>
               )}
             </Surface>
           )}
-          {(event.waitlist_count ?? 0) > 0 && (
+          {event.metrics.waitlist_count > 0 && (
             <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
               <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
                 <ListOrdered className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{t('detail.waitlist_label')}</span>
               </div>
-              <span className="text-theme-primary font-medium">{t('detail.waitlist_count', { count: event.waitlist_count })}</span>
+              <span className="text-theme-primary font-medium">{t('detail.waitlist_count', { count: event.metrics.waitlist_count })}</span>
             </Surface>
           )}
         </div>
@@ -828,7 +1025,7 @@ export function EventDetailPage() {
             </div>
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail.date_label')}</div>
-              <time dateTime={event.start_date} className="block truncate text-theme-primary">
+              <time dateTime={event.schedule.start_at ?? undefined} className="block truncate text-theme-primary">
                 {fullDateLabel}
               </time>
             </div>
@@ -841,13 +1038,13 @@ export function EventDetailPage() {
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail.time_label')}</div>
               <div className="truncate text-theme-primary">
-                <time dateTime={event.start_date}>
+                <time dateTime={event.schedule.start_at ?? undefined}>
                   {startTimeLabel}
                 </time>
                 {endDate && endTimeLabel && (
                   <>
                     {' - '}
-                    <time dateTime={event.end_date!}>
+                    <time dateTime={event.schedule.end_at ?? undefined}>
                       {endTimeLabel}
                     </time>
                   </>
@@ -856,42 +1053,55 @@ export function EventDetailPage() {
             </div>
           </div>
 
-          {event.location && (
+          {event.location.label && (
             <div className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-4 text-theme-muted sm:col-span-2 lg:col-span-1">
               <div className="flex-shrink-0 rounded-lg bg-emerald-500/20 p-2">
                 <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <div className="text-xs text-theme-subtle">{t('detail.location_label')}</div>
-                <div className="truncate text-theme-primary">{event.location}</div>
+                <div className="truncate text-theme-primary">{event.location.label}</div>
               </div>
             </div>
           )}
         </div>
 
         {/* Location Map */}
-        {event.location && !event.is_online && event.coordinates?.lat && event.coordinates?.lng && (
+        {event.location.label && event.location.mode !== 'online' && event.location.latitude !== null && event.location.longitude !== null && (
           <LocationMapCard
             title={t('detail.event_location')}
-            locationText={event.location}
+            locationText={event.location.label}
             markers={[{
               id: event.id,
-              lat: Number(event.coordinates.lat),
-              lng: Number(event.coordinates.lng),
+              lat: event.location.latitude,
+              lng: event.location.longitude,
               title: event.title,
             }]}
-            center={{ lat: Number(event.coordinates.lat), lng: Number(event.coordinates.lng) }}
+            center={{ lat: event.location.latitude, lng: event.location.longitude }}
             mapHeight="250px"
             zoom={15}
             className="mt-6"
           />
         )}
 
-        {/* Tabs: Details / Attendees / Check-in (organizer only) */}
+        {event.location.mode !== 'online' && event.location.accessibility?.provided && (
+          <div className="mt-6">
+            <EventVenueAccessibilityCard profile={event.location.accessibility} />
+          </div>
+        )}
+
+        {/* Tabs: Details / Agenda / Attendees / authorised check-in */}
         <Tabs
           aria-label={t('detail.tabs_aria')}
           selectedKey={activeTab}
-          onSelectionChange={(key) => setActiveTab(key as string)}
+          onSelectionChange={(key) => {
+            const nextTab = String(key);
+            setActiveTab(nextTab);
+            const nextParams = new URLSearchParams(searchParams);
+            if (nextTab === 'details') nextParams.delete('tab');
+            else nextParams.set('tab', nextTab);
+            setSearchParams(nextParams, { replace: true });
+          }}
           variant="underlined"
           classNames={{
             tabList: 'border-b border-theme-default mb-6',
@@ -901,6 +1111,26 @@ export function EventDetailPage() {
         >
           <Tab key="details" title={t('detail.tab_details')} />
           <Tab
+            key="agenda"
+            title={
+              <span className="flex items-center gap-2">
+                <ListOrdered className="h-4 w-4" aria-hidden="true" />
+                {t('manage.tab_agenda')}
+              </span>
+            }
+          />
+          {canViewTickets && (
+            <Tab
+              key="tickets"
+              title={
+                <span className="flex items-center gap-2">
+                  <Ticket className="h-4 w-4" aria-hidden="true" />
+                  {t('event_tickets:tickets.title')}
+                </span>
+              }
+            />
+          )}
+          <Tab
             key="attendees"
             title={
               <span className="flex items-center gap-2">
@@ -909,7 +1139,7 @@ export function EventDetailPage() {
               </span>
             }
           />
-          {isOrganizer && (
+          {canCheckIn && (
             <Tab
               key="checkin"
               title={
@@ -938,14 +1168,14 @@ export function EventDetailPage() {
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.about')}</h2>
                 <div className="prose prose-invert max-w-none">
-                  <SafeHtml content={translatedEventDesc ?? event.description} className="text-theme-muted whitespace-pre-wrap" as="div" />
+                  <SafeHtml content={translatedEventDesc ?? event.description ?? ''} className="text-theme-muted whitespace-pre-wrap" as="div" />
                 </div>
                 {event.description && (
                   <TranslateButton
                     contentType="event"
                     contentId={event.id}
                     sourceText={event.description}
-                    sourceLocale={(event as { locale?: string | null }).locale ?? null}
+                    sourceLocale={null}
                     onTextChange={(text, isTranslated) => setTranslatedEventDesc(isTranslated ? text : null)}
                     className="mt-1"
                   />
@@ -953,17 +1183,17 @@ export function EventDetailPage() {
               </div>
 
               {/* Organizer */}
-              {event.organizer && (
+              {event.organizer.display_name && (
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-theme-primary mb-3">{t('detail.organized_by')}</h2>
                   <div className="flex items-center gap-3">
                     <Avatar
-                      src={resolveAvatarUrl(event.organizer.avatar)}
-                      name={`${event.organizer.first_name} ${event.organizer.last_name}`}
+                      src={resolveAvatarUrl(event.organizer.avatar_url)}
+                      name={event.organizer.display_name}
                       size="sm"
                     />
                     <span className="text-theme-primary font-medium">
-                      {event.organizer.first_name} {event.organizer.last_name}
+                      {event.organizer.display_name}
                     </span>
                   </div>
                 </div>
@@ -1072,8 +1302,8 @@ export function EventDetailPage() {
                     <AvatarGroup max={8}>
                       {attendees.map((attendee) => (
                         <Avatar
-                          key={attendee.id}
-                          src={resolveAvatarUrl(attendee.avatar)}
+                          key={attendee.member.id}
+                          src={resolveAvatarUrl(attendee.member.avatar_url)}
                           name={getAttendeeName(attendee)}
                           size="sm"
                           className="ring-2 ring-black/50"
@@ -1088,6 +1318,32 @@ export function EventDetailPage() {
                   </div>
                 </div>
               )}
+            </motion.div>
+          )}
+
+          {activeTab === 'agenda' && (
+            <motion.div
+              key="agenda"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <EventAgendaWorkspace event={event} />
+            </motion.div>
+          )}
+
+          {activeTab === 'tickets' && canViewTickets && event.schedule.start_at && (
+            <motion.div
+              key="tickets"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <EventTicketsPanel
+                eventId={event.id}
+                eventStart={event.schedule.start_at}
+                eventTimezone={event.schedule.timezone}
+              />
             </motion.div>
           )}
 
@@ -1109,9 +1365,9 @@ export function EventDetailPage() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {attendees.map((attendee) => (
-                    <div key={attendee.id} className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3">
+                    <div key={attendee.member.id} className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3">
                       <Avatar
-                        src={resolveAvatarUrl(attendee.avatar)}
+                        src={resolveAvatarUrl(attendee.member.avatar_url)}
                         name={getAttendeeName(attendee)}
                         size="sm"
                       />
@@ -1124,20 +1380,20 @@ export function EventDetailPage() {
                         size="sm"
                         variant="flat"
                         color={
-                          attendee.rsvp_status === 'going' || attendee.rsvp_status === 'attending'
+                          attendee.registration.state === 'confirmed'
                             ? 'success'
-                            : attendee.rsvp_status === 'interested' || attendee.rsvp_status === 'maybe'
+                            : attendee.engagement.state === 'interested'
                               ? 'warning'
                               : 'default'
                         }
                       >
-                        {attendee.rsvp_status === 'going' || attendee.rsvp_status === 'attending'
+                        {attendee.registration.state === 'confirmed'
                           ? t('detail.attendee_going')
-                          : attendee.rsvp_status === 'interested' || attendee.rsvp_status === 'maybe'
+                          : attendee.engagement.state === 'interested'
                             ? t('detail.attendee_interested')
                             : t('detail.attendee_rsvp')}
                       </Chip>
-                      {attendee.checked_in && (
+                      {attendee.attendance.state !== 'not_checked_in' && (
                         <Chip size="sm" variant="flat" color="success" startContent={<UserCheck className="w-3 h-3" aria-hidden="true" />}>
                           {t('detail.attendee_checked_in')}
                         </Chip>
@@ -1149,7 +1405,7 @@ export function EventDetailPage() {
             </motion.div>
           )}
 
-          {activeTab === 'checkin' && isOrganizer && (
+          {activeTab === 'checkin' && canCheckIn && (
             <motion.div
               key="checkin"
               initial={{ opacity: 0, y: 10 }}
@@ -1209,9 +1465,9 @@ export function EventDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {goingAttendees.map((attendee) => (
-                    <div key={attendee.id} className="flex min-w-0 flex-col gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3 sm:flex-row sm:items-center">
+                    <div key={attendee.member.id} className="flex min-w-0 flex-col gap-3 rounded-lg border border-theme-default bg-theme-elevated p-3 sm:flex-row sm:items-center">
                       <Avatar
-                        src={resolveAvatarUrl(attendee.avatar)}
+                        src={resolveAvatarUrl(attendee.member.avatar_url)}
                         name={getAttendeeName(attendee)}
                         size="sm"
                       />
@@ -1220,7 +1476,7 @@ export function EventDetailPage() {
                           {getAttendeeName(attendee)}
                         </p>
                       </div>
-                      {attendee.checked_in ? (
+                      {attendee.attendance.state !== 'not_checked_in' ? (
                         <Chip
                           size="sm"
                           variant="flat"
@@ -1234,8 +1490,8 @@ export function EventDetailPage() {
                           size="sm"
                           className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                           startContent={<UserCheck className="w-3.5 h-3.5" aria-hidden="true" />}
-                          isLoading={checkingInUserId === attendee.id}
-                          onPress={() => handleCheckIn(attendee.id)}
+                          isLoading={checkingInUserId === attendee.member.id}
+                          onPress={() => handleCheckIn(attendee.member.id)}
                         >
                           {t('detail.check_in')}
                         </Button>
@@ -1249,7 +1505,7 @@ export function EventDetailPage() {
         </AnimatePresence>
 
         {/* Action Buttons */}
-        {isAuthenticated && !isPast && !isCancelled && (
+        {isAuthenticated && ((!isPast && !isCancelled) || hasOnlineAccess) && (
           <div className="mt-8 rounded-xl border border-theme-default bg-theme-elevated p-4">
             <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1260,12 +1516,46 @@ export function EventDetailPage() {
                 {t('detail.attendance_total', { count: attendanceTotal })}
               </span>
             </div>
+            {hasActiveWaitlistOffer && (
+              <Surface
+                variant="secondary"
+                className="mb-4 flex flex-col gap-4 rounded-lg border border-emerald-500/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex gap-3" role="status" aria-live="polite">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-theme-primary">{t('detail.offer_available_title')}</p>
+                    <p className="text-sm text-theme-muted">{t('detail.offer_available_description')}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    color="success"
+                    startContent={<CheckCircle2 className="h-4 w-4" aria-hidden="true" />}
+                    onPress={handleAcceptWaitlistOffer}
+                    isLoading={isSubmitting}
+                    aria-label={t('detail.accept_offer_aria')}
+                  >
+                    {t('detail.accept_offer')}
+                  </Button>
+                  <Button
+                    variant="flat"
+                    startContent={<XCircle className="h-4 w-4" aria-hidden="true" />}
+                    onPress={handleLeaveWaitlist}
+                    isDisabled={isSubmitting}
+                    aria-label={t('detail.decline_offer_aria')}
+                  >
+                    {t('detail.decline_offer')}
+                  </Button>
+                </div>
+              </Surface>
+            )}
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               {/* RSVP Options — single-select toggle; clicking the active option clears
                   the RSVP (handleRsvp cancels when newStatus === current). The group is
                   disabled while a request is in flight. */}
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:items-center">
-                <ToggleButtonGroup
+              {!isPast && !isCancelled && <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:items-center">
+                {!hasActiveWaitlistOffer && <ToggleButtonGroup
                   aria-label={t('detail.rsvp_aria')}
                   selectionMode="single"
                   isDetached
@@ -1305,10 +1595,10 @@ export function EventDetailPage() {
                     <XCircle className="w-4 h-4" aria-hidden="true" />
                     {t('detail.not_going_btn')}
                   </ToggleButton>
-                </ToggleButtonGroup>
+                </ToggleButtonGroup>}
 
                 {/* E3: Waitlist join/leave button when event is full */}
-                {event.is_full && !rsvpStatus && !isWaitlisted && (
+                {event.relationship.capacity.is_full && !rsvpStatus && !isWaitlisted && (
                   <Button
                     className="bg-theme-elevated text-theme-primary hover:bg-amber-500/20"
                     startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
@@ -1319,7 +1609,7 @@ export function EventDetailPage() {
                     {t('detail.join_waitlist')}
                   </Button>
                 )}
-                {isWaitlisted && (
+                {isWaitlisted && !hasActiveWaitlistOffer && (
                   <Button
                     className="bg-amber-500/10 text-amber-400"
                     variant="flat"
@@ -1331,7 +1621,7 @@ export function EventDetailPage() {
                     {t('detail.leave_waitlist')}
                   </Button>
                 )}
-              </div>
+              </div>}
 
             <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
               {/* Share */}
@@ -1346,10 +1636,10 @@ export function EventDetailPage() {
               </Button>
 
               {/* INF6: Join Meeting button */}
-              {event.video_url && (
+              {event.online_access.video_url && (
                 <Button
                   as="a"
-                  href={event.video_url}
+                  href={event.online_access.video_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
@@ -1361,10 +1651,10 @@ export function EventDetailPage() {
               )}
 
               {/* Online event link */}
-              {event.online_url && (
+              {event.online_access.join_url && (
                 <Button
                   as="a"
-                  href={event.online_url}
+                  href={event.online_access.join_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   variant="flat"
@@ -1380,32 +1670,105 @@ export function EventDetailPage() {
           </div>
         )}
 
+        {isAuthenticated && calendarActions && (
+          <section aria-labelledby="event-calendar-actions" className="mt-4 rounded-xl border border-theme-default bg-theme-elevated p-4">
+            <div>
+              <h2 id="event-calendar-actions" className="text-base font-semibold text-theme-primary">
+                {t('calendar_actions.title')}
+              </h2>
+              <p className="mt-1 text-sm text-theme-muted">{t('calendar_actions.description')}</p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button
+                variant="flat"
+                isLoading={isDownloadingCalendar}
+                startContent={<Download className="h-4 w-4" aria-hidden="true" />}
+                onPress={handleCalendarDownload}
+              >
+                {t('calendar_actions.download')}
+              </Button>
+              <Button
+                as="a"
+                href={calendarActions.google_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="flat"
+                endContent={<ExternalLink className="h-4 w-4" aria-hidden="true" />}
+              >
+                {t('calendar_actions.google')}
+              </Button>
+              <Button
+                as="a"
+                href={calendarActions.outlook_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="flat"
+                endContent={<ExternalLink className="h-4 w-4" aria-hidden="true" />}
+              >
+                {t('calendar_actions.outlook')}
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {isAuthenticated && (
+          <div className="mt-4">
+            <EventRegistrationAttendeeCard eventId={event.id} />
+          </div>
+        )}
+
+        {isAuthenticated && !event.permissions.edit && (
+          <div className="mt-4">
+            <EventSafetyAttendeeCard eventId={event.id} />
+          </div>
+        )}
+
+        {isAuthenticated && event.relationship.registration.state === 'confirmed' && (
+          <div className="mt-4 space-y-4">
+            <EventCheckinCredentialCard eventId={event.id} />
+            <EventReminderPanel eventId={event.id} />
+          </div>
+        )}
+
         <SocialInteractionPanel
           targetType="event"
           targetId={event.id}
-          initialLiked={eventSocial.is_liked ?? false}
-          initialLikesCount={eventSocial.likes_count ?? 0}
-          initialCommentsCount={eventSocial.comments_count ?? 0}
+          initialLiked={false}
+          initialLikesCount={0}
+          initialCommentsCount={0}
           title={event.title}
-          description={event.description}
-          targetOwnerId={event.organizer?.id ?? (event as { organizer_id?: number | string }).organizer_id}
+          description={event.description ?? undefined}
+          targetOwnerId={event.organizer.id}
           className="mt-8"
         />
       </GlassCard>
 
       {/* E1: Upcoming dates in this recurring series */}
-      {event.series_occurrences && event.series_occurrences.length > 1 && (
+      {event.series.recurrence && event.series.recurrence.occurrences.length > 1 && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Repeat className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('detail.series_dates_title')}
           </h2>
           <div className="space-y-3">
-            {event.series_occurrences.map((occ) => {
-              const occDate = new Date(occ.start_time);
-              const monthLabel = formatMonthShort(occDate, true);
+            {event.series.recurrence.occurrences.map((occ) => {
+              const occDate = new Date(occ.start_at ?? occ.date ?? 0);
+              const monthLabel = formatDateValue(occDate, {
+                month: 'short',
+                timeZone: eventTimezone,
+              }).toLocaleUpperCase(formattingLocale);
+              const dayLabel = formatDateValue(occDate, {
+                day: 'numeric',
+                timeZone: eventTimezone,
+              });
               const dateLabel = formatDateTime(occDate, {
-                weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: eventTimezone,
+                timeZoneName: 'short',
               });
               const isCurrent = occ.id === event.id;
               return (
@@ -1424,7 +1787,7 @@ export function EventDetailPage() {
                           {monthLabel}
                         </div>
                         <div className="text-theme-primary text-lg font-bold leading-tight">
-                          {occDate.getDate()}
+                          {dayLabel}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1445,7 +1808,7 @@ export function EventDetailPage() {
       )}
 
       {/* E7: Other Events in This Series */}
-      {event.series && (
+      {event.series.named && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <CalendarRange className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
@@ -1461,9 +1824,21 @@ export function EventDetailPage() {
           ) : seriesEvents.length > 0 ? (
             <div className="space-y-3">
               {seriesEvents.map((seriesEvent) => {
-                const evtDate = new Date(seriesEvent.start_date);
-                const monthLabel = formatMonthShort(evtDate, true);
-                const timeLabel = formatDateTime(evtDate, { hour: '2-digit', minute: '2-digit' });
+                const evtDate = new Date(seriesEvent.start_at ?? 0);
+                const monthLabel = formatDateValue(evtDate, {
+                  month: 'short',
+                  timeZone: eventTimezone,
+                }).toLocaleUpperCase(formattingLocale);
+                const dayLabel = formatDateValue(evtDate, {
+                  day: 'numeric',
+                  timeZone: eventTimezone,
+                });
+                const timeLabel = formatDateTime(evtDate, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: eventTimezone,
+                  timeZoneName: 'short',
+                });
                 return (
                   <Link key={seriesEvent.id} to={tenantPath(`/events/${seriesEvent.id}`)}>
                     <Card
@@ -1477,7 +1852,7 @@ export function EventDetailPage() {
                             {monthLabel}
                           </div>
                           <div className="text-theme-primary text-lg font-bold leading-tight">
-                            {evtDate.getDate()}
+                            {dayLabel}
                           </div>
                         </div>
 
@@ -1487,7 +1862,7 @@ export function EventDetailPage() {
                           </p>
                           <p className="text-theme-subtle text-sm">
                             {timeLabel}
-                            {seriesEvent.location && ` \u00B7 ${seriesEvent.location}`}
+                            {seriesEvent.location_label && ` \u00B7 ${seriesEvent.location_label}`}
                           </p>
                         </div>
 
@@ -1499,14 +1874,14 @@ export function EventDetailPage() {
               })}
 
               {/* View all link */}
-              {event.series.event_count > 5 && (
-                <Button as={Link} to={tenantPath(`/events?series=${event.series.id}`)}
+              {event.series.named.event_count > 5 && (
+                <Button as={Link} to={tenantPath(`/events?series=${event.series.named.id}`)}
                   variant="flat"
                   size="sm"
                   className="block text-center bg-theme-elevated text-theme-primary"
                   endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
                 >
-                  {t('detail.view_all_series', { count: event.series.event_count })}
+                  {t('detail.view_all_series', { count: event.series.named.event_count })}
                 </Button>
               )}
             </div>
@@ -1518,10 +1893,10 @@ export function EventDetailPage() {
         </GlassCard>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Archive confirmation preserves event and audit history. */}
       <Modal
-        isOpen={showDeleteModal}
-        onOpenChange={setShowDeleteModal}
+        isOpen={showArchiveModal}
+        onOpenChange={setShowArchiveModal}
         classNames={{
           base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
@@ -1530,31 +1905,44 @@ export function EventDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">{t('detail.delete_modal_title')}</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t('detail.archive_modal_title')}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              {t('detail.delete_confirm', { title: event.title })}
+              {t('detail.archive_confirm', { title: event.title })}
             </p>
             {!!(event as { is_recurring_template?: number | boolean }).is_recurring_template && (
               <p className="text-sm text-[var(--color-warning)]">
-                {t('detail.delete_series_note')}
+                {t('detail.archive_series_note')}
               </p>
             )}
+            <Textarea
+              label={t('detail.archive_reason_label')}
+              placeholder={t('detail.archive_reason_placeholder')}
+              value={archiveReason}
+              onValueChange={setArchiveReason}
+              minRows={2}
+              maxRows={5}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
           </ModalBody>
           <ModalFooter>
             <Button
               variant="flat"
               className="bg-theme-elevated text-theme-primary"
-              onPress={() => setShowDeleteModal(false)}
+              onPress={() => setShowArchiveModal(false)}
             >
-              {t('detail.cancel')}
+              {t('detail.keep_event')}
             </Button>
             <Button
-              className="bg-red-500 text-white"
-              onPress={handleDelete}
-              isLoading={isDeleting}
+              className="bg-amber-500 text-white"
+              startContent={<Archive className="w-4 h-4" aria-hidden="true" />}
+              onPress={handleArchive}
+              isLoading={isArchiving}
             >
-              {t('detail.delete_confirm_btn')}
+              {t('detail.archive_confirm_btn')}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1587,6 +1975,7 @@ export function EventDetailPage() {
               placeholder={t('detail.cancel_reason_placeholder')}
               value={cancelReason}
               onValueChange={setCancelReason}
+              isRequired
               minRows={3}
               maxRows={6}
               classNames={{
@@ -1608,6 +1997,7 @@ export function EventDetailPage() {
               startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
               onPress={handleCancelEvent}
               isLoading={isCancelling}
+              isDisabled={!cancelReason.trim()}
             >
               {t('detail.cancel_event')}
             </Button>

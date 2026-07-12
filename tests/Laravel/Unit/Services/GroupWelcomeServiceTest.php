@@ -6,12 +6,51 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Enums\GroupStatus;
+use App\Models\Group;
+use App\Models\User;
 use App\Services\GroupWelcomeService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class GroupWelcomeServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
+    /** @return array{group: Group, owner: User, member: User} */
+    private function welcomeFixture(): array
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Admin Bob',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Alice',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $owner->id,
+            'name' => 'Timebank',
+            'status' => GroupStatus::Active->value,
+            'is_active' => true,
+        ]);
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $group->id,
+            'user_id' => $member->id,
+            'role' => 'member',
+            'status' => 'active',
+            'joined_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return compact('group', 'owner', 'member');
+    }
+
     // ── getConfig ────────────────────────────────────────────────────
 
     public function test_getConfig_returns_default_disabled_when_no_policies(): void
@@ -58,66 +97,45 @@ class GroupWelcomeServiceTest extends TestCase
 
     public function test_sendWelcome_returns_false_when_disabled(): void
     {
-        // getConfig returns disabled
-        DB::shouldReceive('table')->with('group_policies')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('pluck')->andReturnSelf();
-        DB::shouldReceive('toArray')->andReturn([]);
+        ['group' => $group, 'member' => $member] = $this->welcomeFixture();
 
-        $this->assertFalse(GroupWelcomeService::sendWelcome(1, 2));
+        $this->assertFalse(GroupWelcomeService::sendWelcome((int) $group->id, (int) $member->id));
+        $this->assertDatabaseMissing('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'type' => 'group_welcome',
+        ]);
     }
 
     public function test_sendWelcome_returns_false_when_user_or_group_missing(): void
     {
-        // Config enabled with message
-        DB::shouldReceive('table')->with('group_policies')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('pluck')->andReturnSelf();
-        DB::shouldReceive('toArray')->andReturn([
-            'welcome_message_enabled_1' => json_encode(true),
-            'welcome_message_1' => json_encode('Hi'),
-        ]);
+        ['group' => $group, 'member' => $member] = $this->welcomeFixture();
+        GroupWelcomeService::setConfig((int) $group->id, true, 'Hi');
 
-        // users lookup returns null
-        DB::shouldReceive('table')->with('users')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(null);
-        DB::shouldReceive('table')->with('groups')->andReturnSelf();
-
-        $this->assertFalse(GroupWelcomeService::sendWelcome(1, 2));
+        $this->assertFalse(GroupWelcomeService::sendWelcome((int) $group->id, 99999999));
+        $this->assertFalse(GroupWelcomeService::sendWelcome(99999999, (int) $member->id));
     }
 
     public function test_sendWelcome_inserts_notification_and_substitutes_vars(): void
     {
-        // Config enabled
-        DB::shouldReceive('table')->with('group_policies')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('whereIn')->andReturnSelf();
-        DB::shouldReceive('pluck')->andReturnSelf();
-        DB::shouldReceive('toArray')->andReturn([
-            'welcome_message_enabled_3' => json_encode(true),
-            'welcome_message_3' => json_encode('Hi {member_name}, welcome to {group_name}'),
-        ]);
-
-        // user/group/owner lookups
-        DB::shouldReceive('table')->with('users')->andReturnSelf();
-        DB::shouldReceive('table')->with('groups')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(
-            (object) ['name' => 'Alice'],             // user
-            (object) ['name' => 'Timebank', 'owner_id' => 99],  // group
-            (object) ['name' => 'Admin Bob']          // owner
+        ['group' => $group, 'member' => $member] = $this->welcomeFixture();
+        GroupWelcomeService::setConfig(
+            (int) $group->id,
+            true,
+            'Hi {member_name}, welcome to {group_name} from {admin_name}',
         );
 
-        // Notification insert
-        DB::shouldReceive('table')->with('notifications')->once()->andReturnSelf();
-        DB::shouldReceive('insert')->once()
-            ->withArgs(function ($data) {
-                return str_contains($data['message'], 'Alice')
-                    && str_contains($data['message'], 'Timebank');
-            })
-            ->andReturn(true);
-
-        $this->assertTrue(GroupWelcomeService::sendWelcome(3, 42));
+        $this->assertTrue(GroupWelcomeService::sendWelcome((int) $group->id, (int) $member->id));
+        $notification = DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $member->id)
+            ->where('type', 'group_welcome')
+            ->first();
+        $this->assertNotNull($notification);
+        $this->assertSame(
+            'Hi Alice, welcome to Timebank from Admin Bob',
+            (string) $notification->message,
+        );
+        $this->assertSame('/groups/' . $group->id, (string) $notification->link);
     }
 }

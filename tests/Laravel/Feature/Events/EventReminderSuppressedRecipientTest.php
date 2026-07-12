@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EventReminderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
@@ -25,6 +26,14 @@ use Tests\Laravel\TestCase;
 class EventReminderSuppressedRecipientTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // This regression exercises the explicit legacy compatibility worker.
+        Config::set('events.reminders.mode', 'legacy');
+    }
 
     public function test_suppressed_recipient_marked_handled_and_still_gets_bell(): void
     {

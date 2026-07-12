@@ -2040,7 +2040,7 @@ class GovukAlphaFrontendTest extends TestCase
 
         // Delete the event (returns to the list).
         $delete = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/delete");
-        $delete->assertRedirect("/{$this->testTenantSlug}/accessible/events?status=event-deleted");
+        $delete->assertRedirect("/{$this->testTenantSlug}/accessible/events?status=event-archived");
     }
 
     public function test_event_edit_rejects_a_non_owner(): void
@@ -3110,6 +3110,7 @@ class GovukAlphaFrontendTest extends TestCase
             'user_id' => $user->id,
             'tenant_id' => $this->testTenantId,
             'credential_id' => 'accessible-existing-passkey',
+            'user_handle' => str_repeat('A', 43),
             'public_key' => 'test-public-key',
             'device_name' => 'Existing accessible passkey',
             'authenticator_type' => 'platform',
@@ -3626,6 +3627,7 @@ class GovukAlphaFrontendTest extends TestCase
             'user_id' => $user->id,
             'tenant_id' => $this->testTenantId,
             'credential_id' => 'test-cred-abc',
+            'user_handle' => str_repeat('B', 43),
             'public_key' => 'PEM',
             'device_name' => 'Old name',
             'authenticator_type' => 'platform',
@@ -3637,19 +3639,40 @@ class GovukAlphaFrontendTest extends TestCase
         $page->assertOk();
         $page->assertSee('Old name');
 
+        // A signed-in session by itself cannot mutate authenticators.
+        $renameWithoutStepUp = $this->post("/{$this->testTenantSlug}/accessible/profile/passkeys/rename", [
+            'credential_id' => 'test-cred-abc',
+            'device_name' => 'Should not persist',
+        ]);
+        $renameWithoutStepUp->assertRedirectContains('status=passkey-password-required');
+        $this->assertSame('Old name', DB::table('webauthn_credentials')
+            ->where('credential_id', 'test-cred-abc')->where('user_id', $user->id)->value('device_name'));
+
         // Rename.
         $rename = $this->post("/{$this->testTenantSlug}/accessible/profile/passkeys/rename", [
             'credential_id' => 'test-cred-abc',
             'device_name' => 'My laptop',
+            'current_password' => 'password',
         ]);
         $rename->assertRedirect();
         $this->assertStringContainsString('status=passkey-renamed', (string) $rename->headers->get('Location'));
         $this->assertSame('My laptop', DB::table('webauthn_credentials')
             ->where('credential_id', 'test-cred-abc')->where('user_id', $user->id)->value('device_name'));
 
+        $removeWithoutStepUp = $this->post("/{$this->testTenantSlug}/accessible/profile/passkeys/remove", [
+            'credential_id' => 'test-cred-abc',
+            'current_password' => 'wrong-password',
+        ]);
+        $removeWithoutStepUp->assertRedirectContains('status=passkey-password-incorrect');
+        $this->assertDatabaseHas('webauthn_credentials', [
+            'credential_id' => 'test-cred-abc',
+            'user_id' => $user->id,
+        ]);
+
         // Remove.
         $remove = $this->post("/{$this->testTenantSlug}/accessible/profile/passkeys/remove", [
             'credential_id' => 'test-cred-abc',
+            'current_password' => 'password',
         ]);
         $remove->assertRedirect();
         $this->assertStringContainsString('status=passkey-removed', (string) $remove->headers->get('Location'));
@@ -5954,8 +5977,8 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertNotNull($row);
         $this->assertSame('private', $row->visibility);
 
-        // Creator is auto-joined as an active admin.
-        $this->assertSame('admin', DB::table('group_members')
+        // Creator is auto-joined as the active owner.
+        $this->assertSame('owner', DB::table('group_members')
             ->where('group_id', $row->id)->where('user_id', $owner->id)->value('role'));
     }
 

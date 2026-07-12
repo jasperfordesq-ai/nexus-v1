@@ -10,8 +10,10 @@ use App\Models\Group;
 use App\Models\GroupDiscussion;
 use App\Models\GroupMember;
 use App\Models\User;
+use App\Services\GroupAuditService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 use Tests\Laravel\Traits\ActsAsMember;
@@ -43,6 +45,14 @@ class GroupLifecycleTest extends TestCase
             'status'      => 'active',
             'is_approved' => true,
         ]);
+
+        // This suite verifies the Groups HTTP/database lifecycle, not queued
+        // embedding, federation, prerender, or notification integrations.
+        // The test environment's sync queue would otherwise perform that real
+        // network work before the first assertion. Keep model events enabled
+        // because HasTenantScope assigns tenant_id during the creating event;
+        // the dedicated job/listener suites cover queued side effects.
+        Queue::fake();
     }
 
     // =========================================================================
@@ -59,7 +69,7 @@ class GroupLifecycleTest extends TestCase
             'visibility'  => 'public',
         ]);
 
-        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $this->assertContains($response->getStatusCode(), [200, 201], $response->getContent());
 
         // Verify group exists in the database
         $group = Group::where('tenant_id', $this->testTenantId)
@@ -107,7 +117,7 @@ class GroupLifecycleTest extends TestCase
         Sanctum::actingAs($this->memberUser, ['*']);
 
         $response = $this->apiPost("/v2/groups/{$group->id}/join");
-        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $this->assertContains($response->getStatusCode(), [200, 201], $response->getContent());
 
         // Verify membership in the database
         $membership = GroupMember::where('group_id', $group->id)
@@ -116,6 +126,16 @@ class GroupLifecycleTest extends TestCase
 
         $this->assertNotNull($membership, 'User should be a member of the group');
         $this->assertContains($membership->status, ['active', 'pending']);
+        $audit = DB::table('group_audit_log')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $group->id)
+            ->where('action', GroupAuditService::ACTION_MEMBER_JOINED)
+            ->first();
+        $this->assertNotNull($audit);
+        $this->assertSame((int) $this->memberUser->id, (int) $audit->user_id);
+        $details = json_decode((string) $audit->details, true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame((int) $this->memberUser->id, (int) $details['target_user_id']);
+        $this->assertSame('direct_join', $details['source']);
     }
 
     public function test_user_can_leave_group(): void
@@ -147,6 +167,16 @@ class GroupLifecycleTest extends TestCase
             ->first();
 
         $this->assertNull($membership, 'Active membership should be removed after leaving');
+        $audit = DB::table('group_audit_log')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $group->id)
+            ->where('action', GroupAuditService::ACTION_MEMBER_LEFT)
+            ->first();
+        $this->assertNotNull($audit);
+        $this->assertSame((int) $this->memberUser->id, (int) $audit->user_id);
+        $details = json_decode((string) $audit->details, true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame((int) $this->memberUser->id, (int) $details['target_user_id']);
+        $this->assertSame('self_leave', $details['source']);
     }
 
     public function test_group_members_endpoint_returns_members(): void
@@ -253,6 +283,12 @@ class GroupLifecycleTest extends TestCase
         ]);
 
         // Member posts to the discussion
+        $storedMembership = DB::table('group_members')
+            ->where('group_id', $group->id)
+            ->where('user_id', $this->memberUser->id)
+            ->first();
+        $this->assertNotNull($storedMembership);
+        $this->assertSame($this->testTenantId, (int) $storedMembership->tenant_id);
         Sanctum::actingAs($this->memberUser, ['*']);
 
         $response = $this->apiPost(
@@ -262,7 +298,7 @@ class GroupLifecycleTest extends TestCase
             ]
         );
 
-        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $this->assertContains($response->getStatusCode(), [200, 201], $response->getContent());
     }
 
     public function test_list_group_discussions(): void
@@ -421,17 +457,10 @@ class GroupLifecycleTest extends TestCase
         ]);
 
         // Create a user on a different tenant
-        $otherTenantId = 998;
-        DB::table('tenants')->insertOrIgnore([
-            'id'         => $otherTenantId,
-            'name'       => 'Other Community',
-            'slug'       => 'other-community',
-            'is_active'  => true,
-            'depth'      => 0,
-            'allows_subtenants' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // TestCase establishes tenant 999 before the per-test transaction.
+        // Reusing that durable fixture lets ResolveTenant see the attacker
+        // tenant from the middleware request boundary deterministically.
+        $otherTenantId = 999;
 
         $otherUser = User::factory()->forTenant($otherTenantId)->create([
             'status'      => 'active',
@@ -447,6 +476,6 @@ class GroupLifecycleTest extends TestCase
         );
 
         // Group should not be visible to another tenant
-        $this->assertContains($response->getStatusCode(), [403, 404]);
+        $this->assertContains($response->getStatusCode(), [403, 404], $response->getContent());
     }
 }

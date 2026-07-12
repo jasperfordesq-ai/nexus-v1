@@ -3151,7 +3151,7 @@ class PrerenderService
                     ->where('tenant_id', $tenantId)
                     ->where('id', (int) $m[1])
                     ->where('visibility', 'public')
-                    ->where('is_active', 1)
+                    ->where('status', \App\Enums\GroupStatus::Active->value)
                     ->exists();
         }
 

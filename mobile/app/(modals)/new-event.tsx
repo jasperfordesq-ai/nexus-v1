@@ -14,7 +14,16 @@ import { Button as HeroButton, Card as HeroCard, TagGroup, Text } from 'heroui-n
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createEvent, getEvent, getEventOnlineLink, updateEvent, uploadEventImage, type CreateEventPayload, type Event } from '@/lib/api/events';
+import {
+  createEvent,
+  getEvent,
+  getEventCategories,
+  updateEvent,
+  uploadEventImage,
+  type CanonicalEvent,
+  type CreateEventPayload,
+  type EventCategory,
+} from '@/lib/api/events';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -26,7 +35,6 @@ import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const eventCategoryIds = ['workshop', 'social', 'outdoor', 'online', 'meeting', 'training', 'other'] as const;
-type EventCategoryId = (typeof eventCategoryIds)[number];
 const MAX_COVER_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_COVER_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -56,10 +64,9 @@ function toNumber(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function resolveEventCategory(event: Event): EventCategoryId | '' {
-  const raw = event.category?.name?.trim().toLowerCase();
-  if (!raw) return '';
-  return eventCategoryIds.includes(raw as EventCategoryId) ? (raw as EventCategoryId) : '';
+function resolveEventCategory(event: CanonicalEvent): string {
+  if (event.category?.id) return String(event.category.id);
+  return event.category?.slug?.trim().toLowerCase() ?? '';
 }
 
 export default function NewEventRoute() {
@@ -72,7 +79,7 @@ export default function NewEventRoute() {
 
 function NewEventScreen() {
   const { t } = useTranslation(['events', 'common']);
-  const params = useLocalSearchParams<{ group_id?: string; id?: string }>();
+  const params = useLocalSearchParams<{ group_id?: string; id?: string; series_id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { show: showToast } = useAppToast();
@@ -84,18 +91,25 @@ function NewEventScreen() {
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState(tomorrowLocalValue());
   const [endTime, setEndTime] = useState('');
-  const [category, setCategory] = useState<EventCategoryId | ''>('');
+  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState<EventCategory[]>([]);
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [maxAttendees, setMaxAttendees] = useState('');
   const [allowRemoteAttendance, setAllowRemoteAttendance] = useState(false);
-  const [isFederated, setIsFederated] = useState(false);
+  const [federatedVisibility, setFederatedVisibility] = useState<CreateEventPayload['federated_visibility']>(
+    isEditing ? undefined : 'none',
+  );
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [existingCoverImage, setExistingCoverImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
+  const parsedSeriesId = Number(params.series_id);
+  const [seriesId, setSeriesId] = useState<number | null>(
+    Number.isFinite(parsedSeriesId) && parsedSeriesId > 0 ? parsedSeriesId : null,
+  );
   const fallbackHref = isEditing
     ? ({ pathname: '/(modals)/event-detail', params: { id: String(eventId) } } as unknown as Href)
     : groupId
@@ -109,6 +123,7 @@ function NewEventScreen() {
     getEvent(eventId)
       .then((response) => {
         if (!isMounted) return;
+        if (!response.data.permissions.edit) throw new Error('EVENT_EDIT_NOT_ALLOWED');
         hydrateFromEvent(response.data);
         setHasHydratedEdit(true);
       })
@@ -122,20 +137,35 @@ function NewEventScreen() {
     };
   }, [eventId, hasHydratedEdit, isEditing, showToast, t]);
 
-  function hydrateFromEvent(event: Event) {
+  useEffect(() => {
+    let isMounted = true;
+    getEventCategories()
+      .then((response) => {
+        if (isMounted) setCategories(response.data);
+      })
+      .catch(() => {
+        if (isMounted) setCategories([]);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  function hydrateFromEvent(event: CanonicalEvent) {
     setTitle(event.title ?? '');
     setDescription(event.description ?? '');
-    setStartTime(toDateInputValue(event.start_date) || tomorrowLocalValue());
-    setEndTime(toDateInputValue(event.end_date));
+    setStartTime(toDateInputValue(event.schedule.start_at) || tomorrowLocalValue());
+    setEndTime(toDateInputValue(event.schedule.end_at));
     setCategory(resolveEventCategory(event));
-    setLocation(event.location ?? '');
-    setLatitude(event.latitude !== null && event.latitude !== undefined ? String(event.latitude) : '');
-    setLongitude(event.longitude !== null && event.longitude !== undefined ? String(event.longitude) : '');
-    setVideoUrl(getEventOnlineLink(event) ?? '');
-    setMaxAttendees(event.max_attendees !== null && event.max_attendees !== undefined ? String(event.max_attendees) : '');
-    setAllowRemoteAttendance(Boolean(event.is_online));
-    setIsFederated(event.federated_visibility === 'listed' || event.federated_visibility === 'bookable');
-    setExistingCoverImage(event.cover_image ?? null);
+    setLocation(event.location.label ?? '');
+    setLatitude(event.location.latitude !== null ? String(event.location.latitude) : '');
+    setLongitude(event.location.longitude !== null ? String(event.location.longitude) : '');
+    setVideoUrl(event.online_access.video_url ?? event.online_access.join_url ?? '');
+    setMaxAttendees(event.relationship.capacity.limit !== null ? String(event.relationship.capacity.limit) : '');
+    setAllowRemoteAttendance(event.location.mode !== 'in_person');
+    setFederatedVisibility(event.federated_visibility ?? undefined);
+    setExistingCoverImage(event.primary_image?.url ?? null);
+    setSeriesId(event.series.named?.id ?? null);
     setSelectedImageUri(null);
   }
 
@@ -165,6 +195,11 @@ function NewEventScreen() {
   }
 
   async function submit() {
+    if (isEditing && !hasHydratedEdit) {
+      showToast({ title: t('create.failedTitle'), description: t('create.loadFailed'), variant: 'danger' });
+      return;
+    }
+
     const start = toApiDate(startTime);
     const end = endTime.trim() ? toApiDate(endTime) : null;
     if (!title.trim() || !description.trim() || !start) {
@@ -206,6 +241,8 @@ function NewEventScreen() {
     let successDestination: Parameters<typeof router.push>[0] | null = null;
     let shouldGoBack = false;
     try {
+      const selectedCategory = categories.find((option) => String(option.id) === category);
+      const numericCategoryId = /^\d+$/.test(category) ? Number(category) : null;
       const payload: CreateEventPayload = {
         title: title.trim(),
         description: description.trim(),
@@ -215,11 +252,13 @@ function NewEventScreen() {
         location: location.trim() || null,
         latitude: latitudeValue,
         longitude: longitudeValue,
-        category_name: category || null,
+        category_id: selectedCategory?.id ?? numericCategoryId,
+        category_name: selectedCategory || numericCategoryId ? null : category || null,
+        series_id: seriesId,
         is_online: allowRemoteAttendance,
-        online_link: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
+        video_url: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
         max_attendees: parsedMaxAttendees,
-        federated_visibility: isFederated ? 'listed' : 'none',
+        federated_visibility: federatedVisibility,
       };
       const result = isEditing ? await updateEvent(eventId, payload) : await createEvent(payload);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -236,8 +275,8 @@ function NewEventScreen() {
       } else {
         shouldGoBack = true;
       }
-    } catch (error) {
-      showToast({ title: t('create.failedTitle'), description: error instanceof Error ? error.message : t('create.failedDescription'), variant: 'danger' });
+    } catch {
+      showToast({ title: t('create.failedTitle'), description: t('create.failedDescription'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -251,6 +290,16 @@ function NewEventScreen() {
       setTimeout(() => router.back(), 0);
     }
   }
+
+  const categoryOptions = categories.length > 0
+    ? categories.map((option) => ({
+        id: String(option.id),
+        label: option.name,
+      }))
+    : eventCategoryIds.map((id) => ({
+        id,
+        label: t(`category.${id}`),
+      }));
 
   return (
     <SafeAreaView testID="new-event-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -335,20 +384,20 @@ function NewEventScreen() {
                 selectedKeys={category ? [category] : []}
                 onSelectionChange={(keys) => {
                   const next = Array.from(keys)[0];
-                  setCategory((next as EventCategoryId | undefined) ?? '');
+                  setCategory(next === undefined ? '' : String(next));
                 }}
               >
                 <TagGroup.List>
-                  {eventCategoryIds.map((value) => {
-                    const isSelected = category === value;
+                  {categoryOptions.map((option) => {
+                    const isSelected = category === option.id;
                     return (
                       <TagGroup.Item
-                        key={value}
-                        id={value}
+                        key={option.id}
+                        id={option.id}
                         style={isSelected ? { backgroundColor: primary } : undefined}
                       >
                         <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
-                          {t(`category.${value}`)}
+                          {option.label}
                         </TagGroup.ItemLabel>
                       </TagGroup.Item>
                     );
@@ -385,7 +434,14 @@ function NewEventScreen() {
             <FormField label={t('create.maxAttendeesLabel')} value={maxAttendees} onChangeText={setMaxAttendees} placeholder={t('create.maxAttendeesPlaceholder')} theme={theme} keyboardType="number-pad" />
 
             <View className="flex-row flex-wrap gap-2">
-              <ToggleChip label={t('create.federated')} selected={isFederated} onPress={() => setIsFederated((value) => !value)} primary={primary} />
+              <ToggleChip
+                label={t('create.federated')}
+                selected={federatedVisibility === 'listed' || federatedVisibility === 'bookable'}
+                onPress={() => setFederatedVisibility((value) => (
+                  value === 'listed' || value === 'bookable' ? 'none' : 'listed'
+                ))}
+                primary={primary}
+              />
             </View>
 
           </HeroCard.Body>

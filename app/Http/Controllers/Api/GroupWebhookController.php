@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\GroupService;
+use App\Services\GroupAccessService;
 use App\Services\GroupWebhookService;
 
 /**
@@ -29,7 +29,7 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
         }
 
@@ -51,7 +51,7 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
         }
 
@@ -59,7 +59,7 @@ class GroupWebhookController extends BaseApiController
         $events = request()->input('events');
         $secret = request()->input('secret');
 
-        if (empty($url)) {
+        if (!is_string($url) || trim($url) === '') {
             return $this->errorResponse(__('api.group_webhook_url_required'), 422);
         }
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -68,8 +68,14 @@ class GroupWebhookController extends BaseApiController
         if (!is_array($events) || empty($events)) {
             return $this->errorResponse(__('api.group_webhook_events_required'), 422);
         }
+        if (!GroupWebhookService::areSupportedEvents($events)) {
+            return $this->errorResponse(__('api.group_webhook_events_invalid'), 422);
+        }
+        if ($secret !== null && !is_string($secret)) {
+            return $this->errorResponse(__('api.group_webhook_register_failed'), 422);
+        }
 
-        $result = GroupWebhookService::register($id, $url, $events, $secret);
+        $result = GroupWebhookService::register($id, trim($url), $events, $secret);
 
         if ($result === null) {
             return $this->errorResponse(__('api.group_webhook_register_failed'), 400);
@@ -90,11 +96,11 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
         }
 
-        $success = GroupWebhookService::delete($id, $webhookId);
+        $success = GroupWebhookService::delete($id, $webhookId, $userId);
 
         if (!$success) {
             return $this->errorResponse(__('api_controllers_3.group_webhook.webhook_not_found'), 404);
@@ -116,18 +122,36 @@ class GroupWebhookController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_webhook_forbidden'), null, 403);
         }
 
-        $isActive = (bool) request()->input('is_active');
+        $isActive = $this->parseStrictBoolean(request()->input('is_active'));
+        if ($isActive === null) {
+            return $this->errorResponse(__('api.group_webhook_active_invalid'), 422);
+        }
 
-        $success = GroupWebhookService::toggle($id, $webhookId, $isActive);
+        $success = GroupWebhookService::toggle($id, $webhookId, $isActive, $userId);
 
         if (!$success) {
             return $this->errorResponse(__('api.group_webhook_not_found'), 404);
         }
 
         return $this->successResponse(['is_active' => $isActive]);
+    }
+
+    private function parseStrictBoolean(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if ($value === 1 || $value === '1' || $value === 'true') {
+            return true;
+        }
+        if ($value === 0 || $value === '0' || $value === 'false') {
+            return false;
+        }
+
+        return null;
     }
 }

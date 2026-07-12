@@ -6,10 +6,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\GroupStatus;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Services\GeocodingService;
 use App\Services\GroupPolicyRepository;
 use App\Services\GroupService;
+use App\Services\GroupApprovalWorkflowService;
+use App\Services\GroupLifecycleService;
 use App\Services\SmartGroupRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
+use App\Models\Group;
 use App\Models\Notification;
 
 /**
@@ -55,10 +59,12 @@ class AdminGroupsController extends BaseApiController
         $conditions = ['g.tenant_id = ?'];
         $params = [$tenantId];
 
-        if ($status === 'active') {
-            $conditions[] = 'g.is_active = 1';
-        } elseif ($status === 'inactive') {
-            $conditions[] = 'g.is_active = 0';
+        if ($status === 'inactive') {
+            $status = GroupStatus::Archived->value;
+        }
+        if (is_string($status) && in_array($status, GroupStatus::values(), true)) {
+            $conditions[] = 'g.status = ?';
+            $params[] = $status;
         }
 
         if ($search) {
@@ -94,7 +100,7 @@ class AdminGroupsController extends BaseApiController
                 'description' => $row->description ?? '',
                 'image_url' => $row->image_url ?: null,
                 'visibility' => $row->visibility ?? 'public',
-                'status' => !empty($row->is_active) ? 'active' : 'inactive',
+                'status' => $row->status ?? GroupStatus::Active->value,
                 'creator_name' => trim($row->creator_name ?? ''),
                 'member_count' => (int) ($row->member_count ?? 0),
                 'created_at' => $row->created_at,
@@ -103,7 +109,7 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
         } catch (\Exception $e) {
             Log::error(__('api.fetch_failed', ['resource' => 'groups']), ['error' => $e->getMessage()]);
-            return $this->respondWithError('GROUPS_QUERY_ERROR', __('api.fetch_failed', ['resource' => 'groups']), null, 500);
+            return $this->respondWithError('GROUPS_QUERY_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -141,7 +147,7 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithData($group);
         } catch (\Exception $e) {
             Log::error(__('api.fetch_failed', ['resource' => 'group']), ['error' => $e->getMessage()]);
-            return $this->respondWithError('GROUP_DETAIL_ERROR', __('api.fetch_failed', ['resource' => 'group']), null, 500);
+            return $this->respondWithError('GROUP_DETAIL_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -168,7 +174,10 @@ class AdminGroupsController extends BaseApiController
                 [$tenantId]
             )->cnt;
             $avgMembers = $totalGroups > 0 ? round($totalMembers / $totalGroups, 1) : 0;
-            $activeGroups = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ? AND is_active = 1", [$tenantId])->cnt;
+            $activeGroups = (int) DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM `groups` WHERE tenant_id = ? AND status = ?",
+                [$tenantId, GroupStatus::Active->value],
+            )->cnt;
             $pendingApprovals = (int) DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM group_members gm JOIN `groups` g ON gm.group_id = g.id WHERE g.tenant_id = ? AND gm.status = 'pending'",
                 [$tenantId]
@@ -192,7 +201,7 @@ class AdminGroupsController extends BaseApiController
                 ], $mostActive),
             ]);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', __('api.fetch_failed', ['resource' => 'group analytics']), null, 500);
+            return $this->respondWithError('GROUPS_ANALYTICS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -233,7 +242,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVALS_ERROR', __('api.fetch_failed', ['resource' => 'group approvals']), null, 500);
+            return $this->respondWithError('GROUPS_APPROVALS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -255,22 +264,14 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
-            GroupService::assertSafeguardingCohortAllowed(
+            if (! GroupService::handleJoinRequest(
                 (int) $membership->group_id,
                 (int) $membership->user_id,
-                (int) $tenantId,
-                'admin_group_member_approval',
-            );
-
-            DB::update(
-                "UPDATE group_members SET status = 'active', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
-                [(int) $id, $tenantId]
-            );
-            DB::update(
-                "UPDATE `groups` SET cached_member_count = cached_member_count + 1 WHERE id = ? AND tenant_id = ?",
-                [(int) $membership->group_id, $tenantId]
-            );
-            ActivityLog::log($adminId, 'admin_approve_group_member', "Approved membership #{$id} for group \"{$membership->group_name}\"");
+                $adminId,
+                'accept',
+            )) {
+                return $this->groupServiceMutationError('GROUPS_APPROVE_ERROR');
+            }
 
             // Notify the member they've been approved (unless admin is the
             // member), rendered in the member's preferred language.
@@ -307,7 +308,7 @@ class AdminGroupsController extends BaseApiController
         } catch (SafeguardingPolicyException $e) {
             return $this->safeguardingPolicyError($e);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_APPROVE_ERROR', __('api.approve_failed', ['resource' => 'membership']), null, 500);
+            return $this->respondWithError('GROUPS_APPROVE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -329,11 +330,14 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', __('api.pending_request_not_found'), null, 404);
             }
 
-            DB::delete(
-                "DELETE FROM group_members WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
-                [(int) $id, $tenantId]
-            );
-            ActivityLog::log($adminId, 'admin_reject_group_member', "Rejected membership #{$id} for group \"{$membership->group_name}\"");
+            if (! GroupService::handleJoinRequest(
+                (int) $membership->group_id,
+                (int) $membership->user_id,
+                $adminId,
+                'reject',
+            )) {
+                return $this->groupServiceMutationError('GROUPS_REJECT_ERROR');
+            }
 
             // Notify the member their request was declined (unless admin is the
             // member), rendered in the member's preferred language.
@@ -368,7 +372,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'rejected']);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_REJECT_ERROR', __('api.reject_failed', ['resource' => 'membership']), null, 500);
+            return $this->respondWithError('GROUPS_REJECT_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -387,7 +391,17 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        DB::update("UPDATE `groups` SET is_active = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $requestId = DB::table('group_approval_requests')
+            ->where('tenant_id', $tenantId)
+            ->where('group_id', $id)
+            ->where('status', GroupApprovalWorkflowService::STATUS_PENDING)
+            ->value('id');
+        if ($requestId === null || ! GroupApprovalWorkflowService::approveGroup(
+            (int) $requestId,
+            $adminId,
+        )) {
+            return $this->respondWithError('INVALID_STATE', __('api.invalid_status'), null, 409);
+        }
 
         // Notify the group owner (unless the admin is the owner), rendered in
         // the owner's preferred language.
@@ -437,22 +451,22 @@ class AdminGroupsController extends BaseApiController
             $items = [];
             try {
                 $items = DB::select(
-                    "SELECT g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name as tenant_name,
+                    "SELECT g.id, g.name, g.status, g.created_at, g.tenant_id, t.name as tenant_name,
                         COUNT(r.id) as report_count
                      FROM `groups` g
                      INNER JOIN reports r ON r.content_type = 'group' AND r.content_id = g.id
                      LEFT JOIN tenants t ON g.tenant_id = t.id
                      WHERE g.tenant_id = ? AND r.status = 'pending'
-                     GROUP BY g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name
+                     GROUP BY g.id, g.name, g.status, g.created_at, g.tenant_id, t.name
                      ORDER BY report_count DESC",
                     [$tenantId]
                 );
             } catch (\Exception $e) {
                 $items = DB::select(
-                    "SELECT g.id, g.name, g.is_active, g.created_at, g.tenant_id, t.name as tenant_name, 0 as report_count
+                    "SELECT g.id, g.name, g.status, g.created_at, g.tenant_id, t.name as tenant_name, 0 as report_count
                      FROM `groups` g LEFT JOIN tenants t ON g.tenant_id = t.id
-                     WHERE g.tenant_id = ? AND g.is_active = 0 ORDER BY g.created_at DESC",
-                    [$tenantId]
+                     WHERE g.tenant_id = ? AND g.status = ? ORDER BY g.created_at DESC",
+                    [$tenantId, GroupStatus::Archived->value]
                 );
             }
 
@@ -461,14 +475,14 @@ class AdminGroupsController extends BaseApiController
                 'name' => $row->name ?? '',
                 'tenant_id' => (int) $row->tenant_id,
                 'tenant_name' => $row->tenant_name ?? 'Unknown',
-                'status' => !empty($row->is_active) ? 'active' : 'inactive',
+                'status' => $row->status ?? GroupStatus::Active->value,
                 'report_count' => (int) ($row->report_count ?? 0),
                 'created_at' => $row->created_at,
             ], $items);
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUPS_MODERATION_ERROR', __('api.fetch_failed', ['resource' => 'moderation data']), null, 500);
+            return $this->respondWithError('GROUPS_MODERATION_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -481,10 +495,18 @@ class AdminGroupsController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
-        $newStatus = $this->input('status');
+        $newStatus = (string) $this->input('status');
+        if ($newStatus === 'inactive') {
+            $newStatus = GroupStatus::Archived->value;
+        }
 
-        if (!in_array($newStatus, ['active', 'inactive'])) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_active_or_inactive'), 'status', 422);
+        if (! in_array($newStatus, GroupStatus::values(), true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_status'),
+                'status',
+                422,
+            );
         }
 
         $group = DB::selectOne("SELECT id, name, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [(int) $id, $tenantId]);
@@ -492,8 +514,9 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        $isActive = $newStatus === 'active' ? 1 : 0;
-        DB::update("UPDATE `groups` SET is_active = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$isActive, (int) $id, $tenantId]);
+        if (! GroupLifecycleService::transition((int) $id, $newStatus, $adminId, 'Admin status update')) {
+            return $this->respondWithError('INVALID_STATE', __('api.invalid_status'), 'status', 409);
+        }
         ActivityLog::log($adminId, 'admin_update_group_status', "Set group #{$id} \"{$group->name}\" to {$newStatus}");
 
         return $this->respondWithData(['id' => (int) $id, 'status' => $newStatus]);
@@ -511,74 +534,35 @@ class AdminGroupsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        $updates = [];
-        $params = [];
-
-        // Basic text fields
-        foreach (['name', 'description', 'visibility', 'location'] as $field) {
-            if (array_key_exists($field, $input)) {
-                $updates[] = "{$field} = ?";
-                $params[] = $field === 'name' ? trim($input[$field]) : ($input[$field] ?? null);
-            }
+        $allowed = [
+            'name', 'description', 'visibility', 'location', 'latitude', 'longitude',
+            'type_id', 'parent_id', 'federated_visibility', 'primary_color', 'accent_color',
+        ];
+        $unsupported = array_values(array_diff(array_keys($input), $allowed));
+        if ($unsupported !== []) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_input'),
+                (string) $unsupported[0],
+                422,
+            );
         }
 
-        // Nullable integer: type_id (null = no type)
-        if (array_key_exists('type_id', $input)) {
-            $typeId = $input['type_id'] !== null && $input['type_id'] !== '' ? (int) $input['type_id'] : null;
-            if ($typeId !== null) {
-                $typeExists = DB::selectOne("SELECT id FROM group_types WHERE id = ? AND tenant_id = ?", [$typeId, $tenantId]);
-                if (!$typeExists) {
-                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_group_type'), null, 422);
-                }
-            }
-            $updates[] = 'type_id = ?';
-            $params[] = $typeId;
-        }
-
-        // Boolean flags
-        if (array_key_exists('is_featured', $input)) {
-            $updates[] = 'is_featured = ?';
-            $params[] = (int) (bool) $input['is_featured'];
-        }
-
-        // Federated visibility
-        if (array_key_exists('federated_visibility', $input)) {
-            $fv = $input['federated_visibility'];
-            if (!in_array($fv, ['none', 'listed', 'joinable'], true)) {
-                $fv = 'none';
-            }
-            $updates[] = 'federated_visibility = ?';
-            $params[] = $fv;
-        }
-
-        // Branding colors (nullable varchar)
-        foreach (['primary_color', 'accent_color'] as $field) {
-            if (array_key_exists($field, $input)) {
-                $color = $input[$field] ?? null;
-                // Allow null or a valid hex color
-                if ($color !== null && !preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
-                    $color = null;
-                }
-                $updates[] = "{$field} = ?";
-                $params[] = $color;
-            }
-        }
-
-        // Cover image URL (set directly — image upload via dedicated endpoint)
-        if (array_key_exists('cover_image_url', $input)) {
-            $updates[] = 'cover_image_url = ?';
-            $params[] = $input['cover_image_url'] ?: null;
-        }
-
-        if (empty($updates)) {
+        if ($input === []) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_fields_to_update'), null, 422);
         }
 
-        $updates[] = 'updated_at = NOW()';
-        $params[] = (int) $id;
-        $params[] = $tenantId;
+        if (! $this->groupService->update((int) $id, $adminId, $input)) {
+            $errors = $this->groupService->getErrors();
+            $status = match ($errors[0]['code'] ?? '') {
+                'NOT_FOUND' => 404,
+                'FORBIDDEN' => 403,
+                default => 422,
+            };
 
-        DB::update("UPDATE `groups` SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+            return $this->respondWithErrors($errors, $status);
+        }
+
         ActivityLog::log($adminId, 'admin_update_group', "Updated group #{$id}: {$group->name}");
 
         return $this->respondWithData(['id' => (int) $id, 'updated' => true]);
@@ -610,8 +594,6 @@ class AdminGroupsController extends BaseApiController
             };
             return $this->respondWithErrors($errors, $status);
         }
-        ActivityLog::log($adminId, 'admin_delete_group', "Deleted group #{$id}: {$group->name}");
-
         return $this->respondWithData(['deleted' => true, 'id' => (int) $id]);
     }
 
@@ -658,7 +640,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPES_ERROR', __('api.fetch_failed', ['resource' => 'group types']), null, 500);
+            return $this->respondWithError('GROUP_TYPES_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -680,10 +662,19 @@ class AdminGroupsController extends BaseApiController
                 [$tenantId, $name, \Illuminate\Support\Str::slug($name), $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1')]
             );
             $id = DB::getPdo()->lastInsertId();
-            ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
+            ActivityLog::log(
+                $adminId,
+                'admin_create_group_type',
+                "Created group type #{$id}: {$name}",
+                false,
+                null,
+                'admin',
+                'group_type',
+                (int) $id,
+            );
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', __('api.create_failed', ['resource' => 'group type']), null, 500);
+            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -697,7 +688,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $existing = DB::selectOne("SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$existing) {
-                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Group type']), null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_type_invalid'), null, 404);
             }
 
             $name = trim($this->input('name', $existing->name));
@@ -705,10 +696,19 @@ class AdminGroupsController extends BaseApiController
                 "UPDATE group_types SET name = ?, description = ?, icon = ?, color = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
                 [$name, $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1'), $id, $tenantId]
             );
-            ActivityLog::log($adminId, 'admin_update_group_type', "Updated group type #{$id}: {$name}");
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group_type',
+                "Updated group type #{$id}: {$name}",
+                false,
+                null,
+                'admin',
+                'group_type',
+                $id,
+            );
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', __('api.update_failed', ['resource' => 'group type']), null, 500);
+            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -722,7 +722,7 @@ class AdminGroupsController extends BaseApiController
         try {
             $type = DB::selectOne("SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$type) {
-                return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Group type']), null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.group_type_invalid'), null, 404);
             }
 
             $count = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
@@ -731,10 +731,19 @@ class AdminGroupsController extends BaseApiController
             }
 
             DB::delete("DELETE FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-            ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type->name}");
+            ActivityLog::log(
+                $adminId,
+                'admin_delete_group_type',
+                "Deleted group type #{$id}: {$type->name}",
+                false,
+                null,
+                'admin',
+                'group_type',
+                $id,
+            );
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', __('api.delete_failed', ['resource' => 'group type']), null, 500);
+            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -765,7 +774,7 @@ class AdminGroupsController extends BaseApiController
             }
             return $this->respondWithData($formatted);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICIES_ERROR', __('api.fetch_failed', ['resource' => 'policies']), null, 500);
+            return $this->respondWithError('POLICIES_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -785,11 +794,28 @@ class AdminGroupsController extends BaseApiController
         try {
             $category = $this->input('category', GroupPolicyRepository::CATEGORY_FEATURES);
             $type = $this->input('type', GroupPolicyRepository::TYPE_STRING);
-            $this->groupPolicyRepository->setPolicy($key, $value, $category, $type, $this->input('description'), $tenantId);
-            ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
+            DB::transaction(function () use ($adminId, $tenantId, $key, $value, $category, $type): void {
+                $this->groupPolicyRepository->setPolicy(
+                    $key,
+                    $value,
+                    $category,
+                    $type,
+                    $this->input('description'),
+                    $tenantId,
+                );
+                ActivityLog::log(
+                    $adminId,
+                    'admin_set_group_policy',
+                    "Set group policy {$key} ({$category}/{$type})",
+                    false,
+                    null,
+                    'admin',
+                    'group_policy',
+                );
+            });
             return $this->respondWithData(['key' => $key, 'value' => $value]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('POLICY_SET_ERROR', __('api.update_failed', ['resource' => 'policy']), null, 500);
+            return $this->respondWithError('POLICY_SET_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -841,7 +867,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData($formatted);
         } catch (\Exception $e) {
-            return $this->respondWithError('GROUP_MEMBERS_ERROR', __('api.fetch_failed', ['resource' => 'members']), null, 500);
+            return $this->respondWithError('GROUP_MEMBERS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -849,30 +875,15 @@ class AdminGroupsController extends BaseApiController
     public function promoteMember($groupId, $userId): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $tenantId = $this->getTenantId();
 
         try {
-            $member = DB::selectOne(
-                "SELECT gm.role, g.tenant_id FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [(int) $groupId, (int) $userId, $tenantId]
-            );
-
-            if (!$member) {
-                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
+            if (! GroupService::updateMemberRole((int) $groupId, (int) $userId, $adminId, 'admin')) {
+                return $this->groupServiceMutationError('PROMOTE_ERROR');
             }
 
-            $newRole = $member->role === 'member' ? 'admin' : 'owner';
-            DB::update(
-                "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
-                [$newRole, (int) $groupId, (int) $userId, $tenantId]
-            );
-            ActivityLog::log($adminId, 'admin_promote_group_member', "Promoted user #{$userId} to {$newRole} in group #{$groupId}");
-
-            return $this->respondWithData(['role' => $newRole]);
+            return $this->respondWithData(['role' => 'admin']);
         } catch (\Exception $e) {
-            return $this->respondWithError('PROMOTE_ERROR', __('api.update_failed', ['resource' => 'member promotion']), null, 500);
+            return $this->respondWithError('PROMOTE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -880,30 +891,15 @@ class AdminGroupsController extends BaseApiController
     public function demoteMember($groupId, $userId): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $tenantId = $this->getTenantId();
 
         try {
-            $member = DB::selectOne(
-                "SELECT gm.role, g.tenant_id FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [(int) $groupId, (int) $userId, $tenantId]
-            );
-
-            if (!$member) {
-                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
+            if (! GroupService::updateMemberRole((int) $groupId, (int) $userId, $adminId, 'member')) {
+                return $this->groupServiceMutationError('DEMOTE_ERROR');
             }
 
-            $newRole = $member->role === 'owner' ? 'admin' : 'member';
-            DB::update(
-                "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
-                [$newRole, (int) $groupId, (int) $userId, $tenantId]
-            );
-            ActivityLog::log($adminId, 'admin_demote_group_member', "Demoted user #{$userId} to {$newRole} in group #{$groupId}");
-
-            return $this->respondWithData(['role' => $newRole]);
+            return $this->respondWithData(['role' => 'member']);
         } catch (\Exception $e) {
-            return $this->respondWithError('DEMOTE_ERROR', __('api.update_failed', ['resource' => 'member demotion']), null, 500);
+            return $this->respondWithError('DEMOTE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -911,60 +907,15 @@ class AdminGroupsController extends BaseApiController
     public function kickMember($groupId, $userId): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $tenantId = $this->getTenantId();
 
         try {
-            $member = DB::selectOne(
-                "SELECT gm.role, g.tenant_id, g.name as group_name FROM group_members gm
-                 JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.group_id = ? AND gm.user_id = ? AND g.tenant_id = ?",
-                [(int) $groupId, (int) $userId, $tenantId]
-            );
-
-            if (!$member) {
-                return $this->respondWithError('NOT_FOUND', __('api.member_not_found'), null, 404);
-            }
-
-            DB::delete(
-                "DELETE FROM group_members WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
-                [(int) $groupId, (int) $userId, $tenantId]
-            );
-            ActivityLog::log($adminId, 'admin_kick_group_member', "Kicked user #{$userId} from group #{$groupId}");
-
-            // Notify the kicked member (unless the admin kicked themselves),
-            // rendered in the member's preferred language.
-            try {
-                if ((int) $userId !== $adminId) {
-                    $recipient = DB::table('users')
-                        ->where('id', (int) $userId)
-                        ->where('tenant_id', $tenantId)
-                        ->select(['preferred_language'])
-                        ->first();
-
-                    LocaleContext::withLocale($recipient, function () use ($userId, $member, $tenantId) {
-                        $msg = __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]);
-                        Notification::createNotification(
-                            (int) $userId,
-                            $msg,
-                            null,
-                            'info',
-                            false,
-                            $tenantId
-                        );
-                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'info', $msg, null);
-                    });
-                }
-            } catch (\Throwable $e) {
-                Log::warning('Failed to send group kick notification', [
-                    'group_id' => $groupId,
-                    'user_id' => $userId,
-                    'error' => $e->getMessage(),
-                ]);
+            if (! GroupService::removeMember((int) $groupId, (int) $userId, $adminId)) {
+                return $this->groupServiceMutationError('KICK_ERROR');
             }
 
             return $this->respondWithData(['kicked' => true]);
         } catch (\Exception $e) {
-            return $this->respondWithError('KICK_ERROR', __('api.delete_failed', ['resource' => 'member']), null, 500);
+            return $this->respondWithError('KICK_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -997,7 +948,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group->name}");
             return $this->respondWithData(['latitude' => $coords['latitude'], 'longitude' => $coords['longitude']]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('GEOCODE_ERROR', __('api.update_failed', ['resource' => 'group geocode']), null, 500);
+            return $this->respondWithError('GEOCODE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1030,7 +981,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_batch_geocode_groups', "Batch geocoded {$success} groups, {$failed} failed");
             return $this->respondWithData(['processed' => count($groups), 'success' => $success, 'failed' => $failed]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('BATCH_GEOCODE_ERROR', __('api.update_failed', ['resource' => 'batch geocode']), null, 500);
+            return $this->respondWithError('BATCH_GEOCODE_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1090,7 +1041,7 @@ class AdminGroupsController extends BaseApiController
                 'stats' => ['total' => (int) $stats['total'], 'avg_score' => round((float) ($stats['avg_score'] ?? 0), 2), 'join_rate' => $joinRate],
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('RECOMMENDATIONS_ERROR', __('api.fetch_failed', ['resource' => 'recommendations']), null, 500);
+            return $this->respondWithError('RECOMMENDATIONS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1104,7 +1055,7 @@ class AdminGroupsController extends BaseApiController
             $groups = $this->smartGroupRankingService->getFeaturedGroupsWithScores('local_hubs', $tenantId);
             return $this->respondWithData($groups);
         } catch (\Throwable $e) {
-            return $this->respondWithError('FEATURED_GROUPS_ERROR', __('api.fetch_failed', ['resource' => 'featured groups']), null, 500);
+            return $this->respondWithError('FEATURED_GROUPS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1119,7 +1070,7 @@ class AdminGroupsController extends BaseApiController
             ActivityLog::log($adminId, 'admin_update_featured_groups', "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared");
             return $this->respondWithData($result);
         } catch (\Throwable $e) {
-            return $this->respondWithError('UPDATE_FEATURED_ERROR', __('api.update_failed', ['resource' => 'featured groups']), null, 500);
+            return $this->respondWithError('UPDATE_FEATURED_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1141,7 +1092,7 @@ class AdminGroupsController extends BaseApiController
 
             return $this->respondWithData(['is_featured' => (bool) $newStatus]);
         } catch (\Exception $e) {
-            return $this->respondWithError('TOGGLE_FEATURED_ERROR', __('api.update_failed', ['resource' => 'featured status']), null, 500);
+            return $this->respondWithError('TOGGLE_FEATURED_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1176,7 +1127,7 @@ class AdminGroupsController extends BaseApiController
                 'events_count' => $eventsCount,
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('ANALYTICS_ERROR', __('api.fetch_failed', ['resource' => 'group analytics']), null, 500);
+            return $this->respondWithError('ANALYTICS_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1196,7 +1147,7 @@ class AdminGroupsController extends BaseApiController
 
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.group_archived')])
-            : $this->errorResponse('Failed to archive group', 400);
+            : $this->respondWithError('INVALID_STATE', __('api.invalid_status'), 'status', 409);
     }
 
     /** POST /api/v2/admin/groups/{id}/unarchive */
@@ -1210,7 +1161,7 @@ class AdminGroupsController extends BaseApiController
 
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.group_unarchived')])
-            : $this->errorResponse('Failed to unarchive group', 400);
+            : $this->respondWithError('INVALID_STATE', __('api.invalid_status'), 'status', 409);
     }
 
     /** POST /api/v2/admin/groups/bulk-archive */
@@ -1222,7 +1173,7 @@ class AdminGroupsController extends BaseApiController
 
         $groupIds = request()->input('group_ids', []);
         if (empty($groupIds) || !is_array($groupIds)) {
-            return $this->errorResponse('group_ids array required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'group_ids', 422);
         }
 
         $affected = \App\Services\GroupLifecycleService::bulkArchive($groupIds, $userId);
@@ -1238,7 +1189,7 @@ class AdminGroupsController extends BaseApiController
 
         $groupIds = request()->input('group_ids', []);
         if (empty($groupIds) || !is_array($groupIds)) {
-            return $this->errorResponse('group_ids array required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'group_ids', 422);
         }
 
         $affected = \App\Services\GroupLifecycleService::bulkUnarchive($groupIds, $userId);
@@ -1254,14 +1205,17 @@ class AdminGroupsController extends BaseApiController
 
         $newOwnerId = (int) request()->input('new_owner_id');
         if (!$newOwnerId) {
-            return $this->errorResponse('new_owner_id required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_user'), 'new_owner_id', 422);
+        }
+        if (! Group::query()->whereKey($id)->exists()) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         $success = \App\Services\GroupLifecycleService::transferOwnership($id, $newOwnerId, $userId);
 
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.ownership_transferred')])
-            : $this->errorResponse('Failed to transfer ownership. Ensure user is an active member.', 400);
+            : $this->respondWithError('VALIDATION_ERROR', __('api.invalid_user'), 'new_owner_id', 422);
     }
 
     /** POST /api/v2/admin/groups/{id}/merge */
@@ -1273,7 +1227,10 @@ class AdminGroupsController extends BaseApiController
 
         $targetGroupId = (int) request()->input('target_group_id');
         if (!$targetGroupId) {
-            return $this->errorResponse('target_group_id required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_not_found'), 'target_group_id', 422);
+        }
+        if (! Group::query()->whereKey($id)->exists()) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         try {
@@ -1284,7 +1241,7 @@ class AdminGroupsController extends BaseApiController
 
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.groups_merged')])
-            : $this->errorResponse('Failed to merge groups', 400);
+            : $this->respondWithError('INVALID_STATE', __('api.invalid_input'), 'target_group_id', 409);
     }
 
     /** POST /api/v2/admin/groups/{id}/clone */
@@ -1294,9 +1251,12 @@ class AdminGroupsController extends BaseApiController
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
 
-        $newName = request()->input('name');
-        if (!$newName) {
-            return $this->errorResponse('name required', 400);
+        $newName = trim((string) request()->input('name', ''));
+        if ($newName === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422);
+        }
+        if (! Group::query()->whereKey($id)->exists()) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
         $cloneMembers = (bool) request()->input('clone_members', false);
@@ -1308,23 +1268,41 @@ class AdminGroupsController extends BaseApiController
 
         return $newGroupId
             ? $this->successResponse(['id' => $newGroupId, 'message' => __('api_controllers_1.admin_groups.group_cloned')])
-            : $this->errorResponse('Failed to clone group', 400);
+            : $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'name', 422);
     }
 
     /** GET /api/v2/admin/groups/{id}/audit-log */
     public function auditLog(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $tenantId = (int) TenantContext::getId();
+
+        $groupExists = DB::table('groups')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (! $groupExists) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
 
         try {
-            $filters = [];
-            if ($this->query('action')) {
-                $filters['action'] = $this->query('action');
+            $filters = [
+                'page' => $this->queryInt('page', 1, 1),
+                'per_page' => $this->queryInt('per_page', 25, 1, 100),
+            ];
+            $action = $this->query('action');
+            if (is_string($action) && trim($action) !== '') {
+                $filters['action'] = mb_substr(trim($action), 0, 100);
             }
-            $logs = \App\Services\GroupAuditService::getGroupLog($id, $filters);
+            $logs = \App\Services\GroupAuditService::getGroupLogPage($id, $filters);
             return $this->successResponse($logs);
         } catch (\Throwable $e) {
-            return $this->successResponse([]);
+            Log::error('Failed to load group audit log', [
+                'tenant_id' => $tenantId,
+                'group_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
 
@@ -1346,28 +1324,72 @@ class AdminGroupsController extends BaseApiController
     /** POST /api/v2/admin/group-tags */
     public function createTag(): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
         $name = request()->input('name');
         if (!$name) {
-            return $this->errorResponse('name required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422);
         }
 
-        $tag = \App\Services\GroupTagService::create($name, request()->input('color'));
+        $tag = DB::transaction(function () use ($adminId, $tenantId, $name): ?array {
+            $slug = \Illuminate\Support\Str::slug((string) $name);
+            $existing = DB::table('group_tags')
+                ->where('tenant_id', $tenantId)
+                ->where('slug', $slug)
+                ->exists();
+            $tag = \App\Services\GroupTagService::create((string) $name, request()->input('color'));
+            if ($tag !== null && ! $existing) {
+                ActivityLog::log(
+                    $adminId,
+                    'admin_create_group_tag',
+                    'Created group tag #' . (int) $tag['id'],
+                    false,
+                    null,
+                    'admin',
+                    'group_tag',
+                    (int) $tag['id'],
+                );
+            }
+
+            return $tag;
+        });
         return $tag
             ? $this->successResponse($tag, 201)
-            : $this->errorResponse('Failed to create tag', 400);
+            : $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'name', 422);
     }
 
     /** DELETE /api/v2/admin/group-tags/{tagId} */
     public function deleteTag(int $tagId): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
 
-        $success = \App\Services\GroupTagService::delete($tagId);
+        $success = DB::transaction(function () use ($adminId, $tenantId, $tagId): bool {
+            $tag = DB::table('group_tags')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $tagId)
+                ->lockForUpdate()
+                ->first(['id']);
+            if ($tag === null || ! \App\Services\GroupTagService::delete($tagId)) {
+                return false;
+            }
+            ActivityLog::log(
+                $adminId,
+                'admin_delete_group_tag',
+                "Deleted group tag #{$tagId}",
+                false,
+                null,
+                'admin',
+                'group_tag',
+                $tagId,
+            );
+
+            return true;
+        });
         return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.tag_deleted')])
-            : $this->errorResponse('Tag not found', 404);
+            : $this->respondWithError('NOT_FOUND', __('api.tag_not_found'), null, 404);
     }
 
     // =========================================================================
@@ -1382,38 +1404,98 @@ class AdminGroupsController extends BaseApiController
 
     public function createCollection(): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
         $data = request()->only(['name', 'description', 'image_url', 'sort_order']);
-        if (empty($data['name'])) return $this->errorResponse('name required', 400);
-        $id = \App\Services\GroupCollectionService::create($data, $userId);
+        if (empty($data['name'])) return $this->respondWithError('VALIDATION_ERROR', __('api.name_required'), 'name', 422);
+        $id = DB::transaction(function () use ($adminId, $data, $userId): int {
+            $id = \App\Services\GroupCollectionService::create($data, $userId);
+            ActivityLog::log(
+                $adminId,
+                'admin_create_group_collection',
+                "Created group collection #{$id}",
+                false,
+                null,
+                'admin',
+                'group_collection',
+                $id,
+            );
+
+            return $id;
+        });
         return $this->successResponse(['id' => $id], 201);
     }
 
     public function updateCollection(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $data = request()->only(['name', 'description', 'image_url', 'sort_order', 'is_active']);
-        return \App\Services\GroupCollectionService::update($id, $data)
+        $success = DB::transaction(function () use ($adminId, $id, $data): bool {
+            if (! \App\Services\GroupCollectionService::update($id, $data)) {
+                return false;
+            }
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group_collection',
+                "Updated group collection #{$id}",
+                false,
+                null,
+                'admin',
+                'group_collection',
+                $id,
+            );
+
+            return true;
+        });
+        return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_updated')])
-            : $this->errorResponse('Not found', 404);
+            : $this->respondWithError('NOT_FOUND', __('api.group_collection_not_found'), null, 404);
     }
 
     public function deleteCollection(int $id): JsonResponse
     {
-        $this->requireAdmin();
-        return \App\Services\GroupCollectionService::delete($id)
+        $adminId = $this->requireAdmin();
+        $success = DB::transaction(function () use ($adminId, $id): bool {
+            if (! \App\Services\GroupCollectionService::delete($id)) {
+                return false;
+            }
+            ActivityLog::log(
+                $adminId,
+                'admin_delete_group_collection',
+                "Deleted group collection #{$id}",
+                false,
+                null,
+                'admin',
+                'group_collection',
+                $id,
+            );
+
+            return true;
+        });
+        return $success
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_deleted')])
-            : $this->errorResponse('Not found', 404);
+            : $this->respondWithError('NOT_FOUND', __('api.group_collection_not_found'), null, 404);
     }
 
     public function setCollectionGroups(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $groupIds = request()->input('group_ids', []);
-        if (!is_array($groupIds)) return $this->errorResponse('group_ids array required', 400);
-        \App\Services\GroupCollectionService::setGroups($id, $groupIds);
+        if (!is_array($groupIds)) return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'group_ids', 422);
+        DB::transaction(function () use ($adminId, $id, $groupIds): void {
+            \App\Services\GroupCollectionService::setGroups($id, $groupIds);
+            ActivityLog::log(
+                $adminId,
+                'admin_set_group_collection_groups',
+                'Set groups for collection #' . $id . '; count=' . count($groupIds),
+                false,
+                null,
+                'admin',
+                'group_collection',
+                $id,
+            );
+        });
         return $this->successResponse(['message' => __('api_controllers_1.admin_groups.collection_groups_set')]);
     }
 
@@ -1428,7 +1510,16 @@ class AdminGroupsController extends BaseApiController
         $rules = DB::table('group_auto_assign_rules as r')
             ->join('groups as g', 'r.group_id', '=', 'g.id')
             ->where('r.tenant_id', $tenantId)
-            ->select('r.*', 'g.name as group_name')
+            ->where('g.tenant_id', $tenantId)
+            ->select(
+                'r.id',
+                'r.group_id',
+                'r.rule_type',
+                'r.rule_value',
+                'r.is_active',
+                'r.created_at',
+                'g.name as group_name',
+            )
             ->orderBy('r.group_id')
             ->get()->map(fn ($r) => (array) $r)->toArray();
         return $this->successResponse($rules);
@@ -1436,31 +1527,160 @@ class AdminGroupsController extends BaseApiController
 
     public function createAutoAssignRule(): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
         $data = request()->only(['group_id', 'rule_type', 'rule_value']);
         if (empty($data['group_id']) || empty($data['rule_type']) || empty($data['rule_value'])) {
-            return $this->errorResponse('group_id, rule_type, and rule_value required', 400);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'group_id', 422);
         }
-        $id = DB::table('group_auto_assign_rules')->insertGetId([
-            'tenant_id' => $tenantId,
-            'group_id' => (int) $data['group_id'],
-            'rule_type' => $data['rule_type'],
-            'rule_value' => $data['rule_value'],
-            'is_active' => true,
-            'created_at' => now(),
-        ]);
+        $groupId = (int) $data['group_id'];
+        if (! DB::table('groups')->where('id', $groupId)->where('tenant_id', $tenantId)->exists()) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+        if (! in_array((string) $data['rule_type'], ['location', 'interest', 'role', 'attribute'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'rule_type', 422);
+        }
+        $id = DB::transaction(function () use ($adminId, $tenantId, $data): int {
+            $id = (int) DB::table('group_auto_assign_rules')->insertGetId([
+                'tenant_id' => $tenantId,
+                'group_id' => (int) $data['group_id'],
+                'rule_type' => $data['rule_type'],
+                'rule_value' => $data['rule_value'],
+                'is_active' => true,
+                'created_at' => now(),
+            ]);
+            ActivityLog::log(
+                $adminId,
+                'admin_create_group_auto_assign_rule',
+                'Created group auto-assign rule #' . $id . '; type=' . (string) $data['rule_type'],
+                false,
+                null,
+                'admin',
+                'group_auto_assign_rule',
+                $id,
+            );
+
+            return $id;
+        });
         return $this->successResponse(['id' => $id], 201);
+    }
+
+    public function updateAutoAssignRule(int $id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $data = request()->only(['group_id', 'rule_type', 'rule_value', 'is_active']);
+        if ($data === []) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), null, 422);
+        }
+        if (array_key_exists('group_id', $data)) {
+            $groupId = (int) $data['group_id'];
+            if ($groupId < 1 || ! DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->exists()) {
+                return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+            }
+            $data['group_id'] = $groupId;
+        }
+        if (array_key_exists('rule_type', $data)
+            && ! in_array((string) $data['rule_type'], ['location', 'interest', 'role', 'attribute'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'rule_type', 422);
+        }
+        if (array_key_exists('rule_value', $data) && trim((string) $data['rule_value']) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'rule_value', 422);
+        }
+
+        $updated = DB::transaction(function () use ($adminId, $tenantId, $id, $data): bool {
+            $rule = DB::table('group_auto_assign_rules')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['id']);
+            if ($rule === null) {
+                return false;
+            }
+
+            $updates = [];
+            foreach (['group_id', 'rule_type', 'rule_value', 'is_active'] as $field) {
+                if (array_key_exists($field, $data)) {
+                    $updates[$field] = $field === 'is_active' ? (bool) $data[$field] : $data[$field];
+                }
+            }
+            DB::table('group_auto_assign_rules')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->update($updates);
+            ActivityLog::log(
+                $adminId,
+                'admin_update_group_auto_assign_rule',
+                "Updated group auto-assign rule #{$id}",
+                false,
+                null,
+                'admin',
+                'group_auto_assign_rule',
+                $id,
+            );
+
+            return true;
+        });
+
+        return $updated
+            ? $this->successResponse(['id' => $id])
+            : $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_groups.rule_not_found'), null, 404);
     }
 
     public function deleteAutoAssignRule(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
-        $deleted = DB::table('group_auto_assign_rules')
-            ->where('id', $id)->where('tenant_id', $tenantId)->delete();
+        $deleted = DB::transaction(function () use ($adminId, $tenantId, $id): int {
+            $rule = DB::table('group_auto_assign_rules')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['id', 'rule_type']);
+            if ($rule === null) {
+                return 0;
+            }
+            $deleted = DB::table('group_auto_assign_rules')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+            if ($deleted === 1) {
+                ActivityLog::log(
+                    $adminId,
+                    'admin_delete_group_auto_assign_rule',
+                    'Deleted group auto-assign rule #' . $id . '; type=' . (string) $rule->rule_type,
+                    false,
+                    null,
+                    'admin',
+                    'group_auto_assign_rule',
+                    $id,
+                );
+            }
+
+            return $deleted;
+        });
         return $deleted > 0
             ? $this->successResponse(['message' => __('api_controllers_1.admin_groups.rule_deleted')])
-            : $this->errorResponse('Not found', 404);
+            : $this->respondWithError('NOT_FOUND', __('api_controllers_1.admin_groups.rule_not_found'), null, 404);
+    }
+
+    private function groupServiceMutationError(string $fallbackCode): JsonResponse
+    {
+        $errors = GroupService::getErrors();
+        if ($errors === []) {
+            return $this->respondWithError($fallbackCode, __('api.server_error'), null, 500);
+        }
+
+        $status = match ($errors[0]['code'] ?? '') {
+            'NOT_FOUND', 'NOT_MEMBER' => 404,
+            'FORBIDDEN', 'OWNER_CANNOT_LEAVE', 'SOLE_ADMIN' => 403,
+            'GROUP_UNAVAILABLE', 'CAPACITY_FULL', 'MEMBERSHIP_LIMIT_REACHED' => 409,
+            default => 422,
+        };
+
+        return $this->respondWithErrors($errors, $status);
     }
 }

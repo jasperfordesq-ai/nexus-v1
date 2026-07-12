@@ -18,7 +18,7 @@ condition of their permissive (BSD / MIT / Apache / ISC) licences.
 | Ecosystem | Packages | Licence spread |
 |---|---|---|
 | npm (browser frontend) | ~362 | MIT (302), Apache-2.0 (29), ISC (15), BSD-3 (5), BSD-2 (2), 0BSD/Unlicense, `MIT AND Zlib`; `MPL-2.0 OR Apache-2.0` (DOMPurify → elect Apache-2.0); Hippocratic-2.1 (react-leaflet) |
-| Composer (PHP backend) | 117 | MIT-dominant, plus BSD-3 / Apache-2.0 / BSD-2 / ISC and the dual/tri-licensed items noted below |
+| Composer (PHP backend) | 120 | MIT-dominant, plus BSD-3 / Apache-2.0 / BSD-2 / ISC and the dual/tri-licensed items noted below |
 
 **No pure GPL/AGPL licence appears in either tree.** The Composer tree is fully
 permissive after removing `rubix/ml` (an optional, `class_exists`-guarded
@@ -39,11 +39,15 @@ The newsletter email builder and the wider platform build on, among others:
 | **Tailwind CSS** | MIT | <https://github.com/tailwindlabs/tailwindcss> |
 | **Lucide** (icons) | ISC | <https://github.com/lucide-icons/lucide> |
 | **Sentry JavaScript** | MIT | <https://github.com/getsentry/sentry-javascript> |
+| **Expo Clipboard / Expo Crypto / Expo FileSystem** (mobile credential actions and authenticated offline storage) | MIT | <https://github.com/expo/expo> |
+| **React Native QR Code SVG** (mobile attendee credential rendering) | MIT | <https://github.com/Expensify/react-native-qrcode-svg> |
+| **TweetNaCl.js** (mobile authenticated secretbox and Ed25519 verification) | Unlicense | <https://github.com/dchest/tweetnacl-js> |
 | **Leaflet** (maps) | BSD-2-Clause | <https://github.com/Leaflet/Leaflet> |
 | **react-leaflet** (maps React wrapper) | Hippocratic-2.1 | <https://github.com/PaulLeCam/react-leaflet> |
 | **DOMPurify** | MPL-2.0 OR Apache-2.0 | <https://github.com/cure53/DOMPurify> |
 | **Laravel framework** | MIT | <https://github.com/laravel/framework> |
 | **Symfony components** | MIT | <https://github.com/symfony> |
+| **sabre/vobject** (RFC 5545 recurrence and iCalendar processing), **sabre/xml**, **sabre/uri** | BSD-3-Clause | <https://github.com/sabre-io/vobject>, <https://github.com/sabre-io/xml>, <https://github.com/sabre-io/uri> |
 
 The GrapesJS name and logo are trademarks of their respective owners; per BSD-3-Clause
 they are **not** used to endorse or promote Project NEXUS.

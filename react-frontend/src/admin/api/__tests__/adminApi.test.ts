@@ -188,8 +188,8 @@ describe('adminApi', () => {
     });
 
     it('updateStatus puts status update', async () => {
-      await adminApi.adminGroups.updateStatus(10, 'inactive');
-      expect(api.put).toHaveBeenCalledWith('/v2/admin/groups/10/status', { status: 'inactive' });
+      await adminApi.adminGroups.updateStatus(10, 'dormant');
+      expect(api.put).toHaveBeenCalledWith('/v2/admin/groups/10/status', { status: 'dormant' });
     });
   });
 

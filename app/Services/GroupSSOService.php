@@ -268,7 +268,7 @@ class GroupSSOService
 
                 // Verify the group exists and is active in this tenant
                 $group = DB::selectOne(
-                    "SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? AND is_active = 1",
+                    "SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? AND status = 'active'",
                     [$groupId, $tenantId]
                 );
 

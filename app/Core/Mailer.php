@@ -409,9 +409,11 @@ class Mailer
                 return;
             }
             $tenantId = $tenantIdOverride ?? TenantContext::currentId();
+            $metadata = self::normalizeEmailMetadata($metadata);
+            $sensitiveExternal = $metadata['sensitive_external'];
             $userId = null;
             try {
-                if ($tenantId !== null) {
+                if ($tenantId !== null && ! $sensitiveExternal) {
                     $userId = \Illuminate\Support\Facades\DB::table('users')
                         ->where('email', $to)
                         ->where('tenant_id', $tenantId)
@@ -424,7 +426,9 @@ class Mailer
             $row = [
                 'tenant_id'           => $tenantId,
                 'user_id'             => $userId,
-                'recipient_email'     => $to,
+                'recipient_email'     => $sensitiveExternal
+                    ? 'external:' . ($metadata['recipient_hash'] ?? 'redacted')
+                    : $to,
                 'category'            => $category !== null ? mb_substr($category, 0, 64) : null,
                 'subject'             => mb_substr($subject, 0, 255),
                 'provider'            => $provider,
@@ -436,7 +440,6 @@ class Mailer
                 'updated_at'          => now(),
             ];
 
-            $metadata = self::normalizeEmailMetadata($metadata);
             if (\Illuminate\Support\Facades\Schema::hasColumn('email_log', 'source')) {
                 $row['source'] = $metadata['source'];
             }
@@ -455,19 +458,41 @@ class Mailer
 
     /**
      * @param array<string,mixed>|null $metadata
-     * @return array{source:?string,idempotency_key:?string,dispatch_id:?string}
+     * @return array{source:?string,idempotency_key:?string,dispatch_id:?string,sensitive_external:bool,recipient_hash:?string}
      */
     private static function normalizeEmailMetadata(?array $metadata): array
     {
         $source = isset($metadata['source']) ? trim((string) $metadata['source']) : '';
         $idempotencyKey = isset($metadata['idempotency_key']) ? trim((string) $metadata['idempotency_key']) : '';
         $dispatchId = isset($metadata['dispatch_id']) ? trim((string) $metadata['dispatch_id']) : '';
+        $sensitiveExternal = (bool) ($metadata['sensitive_external'] ?? false);
+        $recipientHash = isset($metadata['recipient_hash'])
+            ? strtolower(trim((string) $metadata['recipient_hash']))
+            : '';
+        if (preg_match('/^[0-9a-f]{64}$/', $recipientHash) !== 1) {
+            $recipientHash = '';
+        }
 
         return [
             'source' => $source !== '' ? mb_substr($source, 0, 160) : null,
             'idempotency_key' => $idempotencyKey !== '' ? mb_substr($idempotencyKey, 0, 191) : null,
             'dispatch_id' => $dispatchId !== '' ? mb_substr($dispatchId, 0, 64) : null,
+            'sensitive_external' => $sensitiveExternal,
+            'recipient_hash' => $recipientHash !== '' ? $recipientHash : null,
         ];
+    }
+
+    /** @param array<string,mixed>|null $metadata @return array<string,string> */
+    private static function recipientLogContext(string $email, ?array $metadata): array
+    {
+        $normalized = self::normalizeEmailMetadata($metadata);
+        if ($normalized['sensitive_external']) {
+            return [
+                'recipient_fingerprint' => $normalized['recipient_hash'] ?? 'redacted',
+            ];
+        }
+
+        return ['to_masked' => self::maskEmail($email)];
     }
 
     /**
@@ -564,9 +589,10 @@ class Mailer
         // hydrated by the Postmark event webhook.
         if (self::isSuppressed($to)) {
             self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId, $category, $this->driver, $metadata);
-            \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
-                'to_masked' => self::maskEmail($to),
-            ]);
+            \Illuminate\Support\Facades\Log::info(
+                'Mailer: refusing to send to suppressed address',
+                self::recipientLogContext($to, $metadata),
+            );
             return false;
         }
 
@@ -579,9 +605,10 @@ class Mailer
                 \App\Services\EmailMonitorService::recordRateLimitHitStatic($this->tenantId);
             }
             self::logEmail($to, $subject, 'failed', null, 'per-recipient rate limit exceeded', $this->tenantId, $category, $this->driver, $metadata);
-            \Illuminate\Support\Facades\Log::warning('Mailer: rate-limited recipient', [
-                'to_masked' => self::maskEmail($to),
-            ]);
+            \Illuminate\Support\Facades\Log::warning(
+                'Mailer: rate-limited recipient',
+                self::recipientLogContext($to, $metadata),
+            );
             return false;
         }
 
@@ -595,13 +622,19 @@ class Mailer
 
             // Fallback: SMTP (if configured).
             if (!empty($this->host) && !empty($this->username)) {
-                \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SMTP for: " . self::maskEmail($to));
+                \Illuminate\Support\Facades\Log::warning(
+                    'Mailer: Postmark failed, falling back to SMTP',
+                    self::recipientLogContext($to, $metadata),
+                );
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
                 self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Postmark + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
                 return $smtpOk;
             }
 
-            \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed and no fallback configured. Email not sent to: " . self::maskEmail($to));
+            \Illuminate\Support\Facades\Log::warning(
+                'Mailer: Postmark failed and no fallback configured',
+                self::recipientLogContext($to, $metadata),
+            );
             self::logEmail($to, $subject, 'failed', null, 'Postmark failed, no fallback', $this->tenantId, $category, 'postmark', $metadata);
             return false;
         }
@@ -614,7 +647,10 @@ class Mailer
             }
 
             if (!empty($this->host) && !empty($this->username)) {
-                \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
+                \Illuminate\Support\Facades\Log::warning(
+                    'Mailer: Gmail API failed, falling back to SMTP',
+                    self::recipientLogContext($to, $metadata),
+                );
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
                 if (class_exists(\App\Services\EmailMonitorService::class)) {
                     \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('gmail_api_failed', $this->tenantId);
@@ -624,7 +660,10 @@ class Mailer
                 return $smtpOk;
             }
 
-            \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
+            \Illuminate\Support\Facades\Log::warning(
+                'Mailer: Gmail API failed and no SMTP fallback configured',
+                self::recipientLogContext($to, $metadata),
+            );
             self::logEmail($to, $subject, 'failed', null, 'Gmail API failed, no SMTP fallback', $this->tenantId, $category, 'gmail_api', $metadata);
             return false;
         }

@@ -1,0 +1,66 @@
+{
+  "manage": {
+    "federation": {
+      "title": "مشاركة الحدث عبر الاتحاد",
+      "tab": "الاتحاد",
+      "overview": "مراجعة التسليم الاتحادي",
+      "description": "راقب كيفية مشاركة هذا الحدث مع المجتمعات الشريكة دون كشف بيانات الحضور الخاصة.",
+      "refresh": "تحديث",
+      "loading": "جارٍ تحميل حالة الاتحاد...",
+      "load_error_title": "تعذر تحميل حالة الاتحاد",
+      "load_error_description": "تعذر تحميل تشخيصات التسليم. حاول مرة أخرى.",
+      "try_again": "حاول مرة أخرى",
+      "not_configured_title": "لا توجد مجتمعات شريكة مهيأة",
+      "not_configured_description": "لا يتم حاليًا تسليم هذا الحدث إلى أي شريك اتحادي.",
+      "degraded_title": "بعض عمليات التسليم تحتاج إلى متابعة",
+      "degraded_description": "بلغت عملية تسليم واحدة أو أكثر الحد الأقصى لإعادة المحاولة. استخدم رمز التشخيص عند التواصل مع مسؤول.",
+      "metrics": {
+        "configured_partners": "الشركاء المهيأون",
+        "recipient_partners": "سجل التسليم",
+        "federation_version": "إصدار الاتحاد",
+        "visibility": "نطاق الرؤية المشترك"
+      },
+      "visibility": {
+        "none": "غير مشارك",
+        "listed": "مدرج",
+        "joinable": "مدرج ومتاح للانضمام"
+      },
+      "delivery_summary": "ملخص التسليم",
+      "delivery_status": {
+        "pending": "قيد الانتظار",
+        "retry": "تمت جدولة إعادة المحاولة",
+        "processing": "قيد المعالجة",
+        "delivered": "تم التسليم",
+        "dead_letter": "يحتاج إلى متابعة"
+      },
+      "partners_table_aria": "تسليم الحدث الاتحادي حسب الشريك",
+      "columns": {
+        "partner": "الشريك",
+        "action": "الإجراء",
+        "delivery": "التسليم",
+        "attempts": "المحاولات",
+        "activity": "أحدث نشاط"
+      },
+      "no_deliveries": "لم يتم تسجيل أي عمليات تسليم اتحادية لهذا الحدث.",
+      "removed_partner": "شريك تمت إزالته",
+      "partner_status": {
+        "active": "نشط",
+        "pending": "قيد الانتظار",
+        "suspended": "معلق",
+        "failed": "فشل",
+        "removed": "تمت إزالته",
+        "unknown": "حالة غير معروفة"
+      },
+      "events_disabled": "مشاركة الأحداث معطلة",
+      "action": {
+        "upsert": "نشر أو تحديث",
+        "tombstone": "إزالة"
+      },
+      "not_available": "غير متاح",
+      "error_code": "رمز التشخيص: {{code}}",
+      "error_code_unknown": "رمز التشخيص غير متاح",
+      "attempt_count": "{{count}} من {{max}}",
+      "generated_at": "آخر تحديث: {{time}}"
+    }
+  }
+}

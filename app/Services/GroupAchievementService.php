@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -71,6 +72,7 @@ class GroupAchievementService
         return DB::table('groups')
             ->where('id', $groupId)
             ->where('tenant_id', TenantContext::getId())
+            ->where('status', GroupStatus::Active->value)
             ->exists();
     }
 

@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Plantillas de eventos",
+      "safetyTitle": "Las plantillas copian solo la configuración",
+      "safetyDescription": "Nunca se copian personas, registros, respuestas privadas, asistencia, tickets, historial de entregas, identificadores de federación y estado de publicación.",
+      "loading": "Cargando plantillas de eventos",
+      "loadFailedTitle": "No se pueden cargar plantillas",
+      "loadFailedDescription": "No se pudo cargar la biblioteca de plantillas. Intentar otra vez.",
+      "emptyTitle": "No se encontraron plantillas",
+      "emptyDescription": "Guarde un evento como plantilla en la web para crear una biblioteca de configuración reutilizable.",
+      "source": "Fuente: {{title}}",
+      "versionAndUses": "Versión {{version}} · Usos: {{count}}",
+      "useTemplate": "Usar plantilla",
+      "scheduleTitle": "Agenda el nuevo evento",
+      "scheduleDescription": "Revise el título, zona horaria y programación futura. Se creará un nuevo borrador.",
+      "eventTitle": "Título del evento",
+      "start": "Empezar",
+      "end": "Fin (opcional)",
+      "timezone": "Zona horaria",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Opcional YYYY-MM-DDTHH:mm",
+      "validationTitle": "Consulta los detalles del borrador.",
+      "validationDescription": "Ingrese un título, zona horaria y horario futuro válido.",
+      "previewFailedTitle": "No se puede revisar el borrador",
+      "previewFailedDescription": "El servidor no pudo preparar la vista previa del borrador seguro.",
+      "review": "Revisar borrador",
+      "reviewTitle": "Revisar el borrador del nuevo evento",
+      "reviewDescription": "Confirme las comprobaciones del servidor antes de crear el borrador.",
+      "readyTitle": "Listo para crear un borrador",
+      "readyDescription": "Se verificaron la versión actual, los campos seguros, el cronograma y el flujo de trabajo de creación.",
+      "draftState": "Estado de publicación: Borrador",
+      "changeDetails": "Cambiar detalles",
+      "createDraft": "Crear borrador",
+      "createdTitle": "Borrador de evento creado",
+      "createdDescription": "Revíselo y publíquelo por separado cuando esté listo.",
+      "createFailedTitle": "No se puede crear un borrador",
+      "createFailedDescription": "No se pudo crear el borrador del evento. Intentar otra vez."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Aún tienes permiso para gestionar el evento de origen.",
+      "event_template_check_allowlist_exact": "Solo se incluyen los campos de configuración aprobados.",
+      "event_template_check_private_records_skipped": "Se excluyen los registros privados y operativos.",
+      "event_template_check_versioned_snapshot": "La configuración es una instantánea versionada inmutable.",
+      "event_template_check_version_current": "La versión de la plantilla seleccionada es actual",
+      "event_template_check_schedule_valid": "El nuevo horario es válido y en el futuro.",
+      "event_template_check_federation_none": "Federación queda inhabilitada para el nuevo draft",
+      "event_template_check_canonical_writer": "Se utilizará el flujo de trabajo de creación de eventos canónicos."
+    }
+  }
+}

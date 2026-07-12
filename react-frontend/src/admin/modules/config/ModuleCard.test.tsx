@@ -102,6 +102,15 @@ describe('ModuleCard', () => {
     expect(onConfigure).toHaveBeenCalledWith(baseMod);
   });
 
+  it('allows the footer controls to wrap without overlapping', () => {
+    render(
+      <ModuleCard module={baseMod} enabled toggling={false} onToggle={onToggle} onConfigure={onConfigure} />
+    );
+    const footer = screen.getByRole('button', { name: /configure/i }).parentElement;
+    expect(footer).toHaveClass('flex-wrap');
+    expect(screen.getByRole('button', { name: /configure/i })).toHaveClass('shrink-0');
+  });
+
   it('hides the configure button when no configOptions', () => {
     render(
       <ModuleCard module={emptyOptsMod} enabled toggling={false} onToggle={onToggle} onConfigure={onConfigure} />

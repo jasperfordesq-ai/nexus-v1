@@ -4,14 +4,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
 use App\Services\GroupRecommendationService;
-use Illuminate\Support\Facades\DB;
-use Mockery;
+use Tests\Laravel\TestCase;
 
-class GroupRecommendationServiceTest extends TestCase
+final class GroupRecommendationServiceTest extends TestCase
 {
     private GroupRecommendationService $service;
 
@@ -21,27 +21,18 @@ class GroupRecommendationServiceTest extends TestCase
         $this->service = new GroupRecommendationService();
     }
 
-    public function test_getRecommendations_excludes_joined_groups(): void
+    public function test_unknown_user_has_no_recommendations(): void
     {
-        DB::shouldReceive('table->where->pluck->all')->andReturn([1, 2, 3]);
-
-        $mockQuery = Mockery::mock();
-        $mockQuery->shouldReceive('where')->andReturnSelf();
-        $mockQuery->shouldReceive('select')->andReturnSelf();
-        $mockQuery->shouldReceive('whereNotIn')->with('g.id', [1, 2, 3])->andReturnSelf();
-        $mockQuery->shouldReceive('orderByDesc')->andReturnSelf();
-        $mockQuery->shouldReceive('limit')->andReturnSelf();
-        $mockQuery->shouldReceive('get->map->all')->andReturn([]);
-
-        DB::shouldReceive('table->leftJoin->where->where->select')->andReturn($mockQuery);
-
-        $this->markTestIncomplete('Complex DB query builder chain — requires integration test');
+        $this->assertSame([], $this->service->getRecommendations(PHP_INT_MAX));
     }
 
-    public function test_track_inserts_recommendation_event(): void
+    public function test_invalid_tracking_action_fails_without_writing(): void
     {
-        DB::shouldReceive('table->insert')->once();
+        $this->assertFalse($this->service->track(PHP_INT_MAX, PHP_INT_MAX, 'invalid'));
+    }
 
-        $this->service->track(1, 5, 'click');
+    public function test_unknown_similar_source_is_concealed(): void
+    {
+        $this->assertSame([], $this->service->similar(PHP_INT_MAX));
     }
 }

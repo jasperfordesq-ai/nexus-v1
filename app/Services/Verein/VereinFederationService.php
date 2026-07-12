@@ -13,6 +13,7 @@ use App\I18n\LocaleContext;
 use App\Mail\VereinCrossInvitationAccepted;
 use App\Mail\VereinCrossInvitationReceived;
 use App\Services\SafeguardingInteractionPolicy;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use RuntimeException;
@@ -559,14 +560,27 @@ class VereinFederationService
      * Joint municipality calendar — events from all consenting Vereine in the
      * same municipality_code, bucketed by date.
      */
-    public function getMunicipalityCalendar(int $tenantId, string $municipalityCode, ?string $period = 'month'): array
+    public function getMunicipalityCalendar(
+        int $tenantId,
+        string $municipalityCode,
+        ?string $period = 'month',
+        ?string $from = null,
+        ?string $until = null,
+    ): array
     {
-        $start = now()->startOfDay();
-        $end = match ($period) {
-            'week' => $start->copy()->addDays(7),
-            'year' => $start->copy()->addYear(),
-            default => $start->copy()->addMonth(),
-        };
+        $start = $from !== null
+            ? CarbonImmutable::createFromFormat('!Y-m-d', $from, 'UTC')
+            : now()->startOfDay();
+        $end = $until !== null
+            ? CarbonImmutable::createFromFormat('!Y-m-d', $until, 'UTC')
+            : match ($period) {
+                'week' => $start->copy()->addDays(7),
+                'year' => $start->copy()->addYear(),
+                default => $start->copy()->addMonth(),
+            };
+        if (!$start || !$end || $end <= $start || $start->diffInDays($end) > 366) {
+            throw new InvalidArgumentException(__('api.invalid_date'));
+        }
 
         $rows = DB::table('verein_federation_consents as c')
             ->join('vol_organizations as o', 'o.id', '=', 'c.organization_id')
@@ -580,9 +594,10 @@ class VereinFederationService
             ->where('o.org_type', 'club')
             ->where('e.tenant_id', $tenantId)
             ->where('e.status', 'active')
-            ->whereBetween('e.start_time', [$start, $end])
+            ->where('e.start_time', '>=', $start)
+            ->where('e.start_time', '<', $end)
             ->select([
-                'e.id', 'e.title', 'e.start_time', 'e.location', 'e.image_url',
+                'e.id', 'e.title', 'e.start_time', 'e.image_url',
                 'o.id as organization_id', 'o.name as organization_name',
             ])
             ->orderBy('e.start_time')
@@ -596,7 +611,6 @@ class VereinFederationService
                 'id' => (int) $r->id,
                 'title' => (string) $r->title,
                 'start_time' => $r->start_time,
-                'location' => $r->location,
                 'image_url' => $r->image_url,
                 'organization_id' => (int) $r->organization_id,
                 'organization_name' => (string) $r->organization_name,
@@ -605,7 +619,7 @@ class VereinFederationService
 
         return [
             'municipality_code' => $municipalityCode,
-            'period' => $period,
+            'period' => $from !== null ? 'custom' : $period,
             'start' => $start->toDateString(),
             'end' => $end->toDateString(),
             'buckets' => $buckets,

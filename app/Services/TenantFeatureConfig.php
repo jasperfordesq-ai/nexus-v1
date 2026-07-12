@@ -46,9 +46,9 @@ class TenantFeatureConfig
         'local_advertising' => false,
         'regional_analytics' => false,
         'newsletter' => true,
-        // Authentication feature switches govern NEW enrolment only. Existing
-        // TOTP verification and passkey login must remain available so turning
-        // either switch off cannot lock members out of their accounts.
+        // TOTP's switch governs new enrolment only so existing second-factor
+        // challenges remain usable. The biometric_login switch is the explicit
+        // tenant-wide master gate for both passkey enrolment and authentication.
         'two_factor_authentication' => true,
         'biometric_login' => true,
         // Identity verification (Stripe Identity "ID Verified" badge). Default ON

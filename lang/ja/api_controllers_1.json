@@ -76,6 +76,7 @@
         "badge_recheck_completed": ":count 名のユーザーのバッジ再確認が完了しました"
     },
     "admin_groups": {
+        "rule_not_found": "ルールが見つかりません",
         "group_archived": "グループをアーカイブしました",
         "group_unarchived": "グループのアーカイブを解除しました",
         "ownership_transferred": "所有権を移転しました",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "アカウント削除リクエストが提出されました。メールで確認が届きます。"
     },
     "group_challenge": {
-        "challenge_deleted": "チャレンジを削除しました"
+        "challenge_deleted": "チャレンジを削除しました",
+        "challenge_cancelled": "チャレンジをキャンセルしました",
+        "challenge_immutable": "完了済みまたは報酬付与済みのチャレンジはキャンセルできません"
+    },
+    "group_chatroom": {
+        "default_name": "一般",
+        "default_description": "デフォルトのグループチャットルーム"
     },
     "group_exchange": {
         "exchange_cancelled": "交換をキャンセルしました",

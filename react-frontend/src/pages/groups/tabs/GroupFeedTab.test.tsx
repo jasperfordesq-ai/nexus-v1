@@ -108,10 +108,14 @@ vi.mock('@/lib/motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
-  resolveAssetUrl: (url: string | null | undefined) => url ?? '',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
+    resolveAssetUrl: (url: string | null | undefined) => url ?? '',
+  };
+});
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 const makeFeedItem = (overrides = {}) => ({
@@ -185,7 +189,7 @@ describe('GroupFeedTab', () => {
     const statuses = screen.getAllByRole('status');
     const loadingContainer = statuses.find(el => el.getAttribute('aria-busy') === 'true');
     expect(loadingContainer).toBeDefined();
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+    expect(loadingContainer?.querySelectorAll('[data-slot="card"]')).toHaveLength(3);
   });
 
   it('shows empty feed state when member with no items and not loading', async () => {

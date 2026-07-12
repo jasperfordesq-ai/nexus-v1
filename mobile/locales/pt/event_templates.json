@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Modelos de eventos",
+      "safetyTitle": "Somente configuração de cópia de modelos",
+      "safetyDescription": "Pessoas, inscrições, respostas privadas, atendimento, tickets, histórico de entrega, identificadores de federação e estado de publicação nunca são copiados.",
+      "loading": "Carregando modelos de eventos",
+      "loadFailedTitle": "Não foi possível carregar modelos",
+      "loadFailedDescription": "A biblioteca de modelos não pôde ser carregada. Tente novamente.",
+      "emptyTitle": "Nenhum modelo encontrado",
+      "emptyDescription": "Salve um evento como modelo na web para criar uma biblioteca de configuração reutilizável.",
+      "source": "Fonte: {{title}}",
+      "versionAndUses": "Versão {{version}} · Usos: {{count}}",
+      "useTemplate": "Usar modelo",
+      "scheduleTitle": "Agende o novo evento",
+      "scheduleDescription": "Revise o título, fuso horário e programação futura. Um novo rascunho será criado.",
+      "eventTitle": "Título do evento",
+      "start": "Começar",
+      "end": "Fim (opcional)",
+      "timezone": "Fuso horário",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Opcional YYYY-MM-DDTHH:mm",
+      "validationTitle": "Verifique os detalhes do rascunho",
+      "validationDescription": "Insira um título, fuso horário e programação futura válida.",
+      "previewFailedTitle": "Não foi possível revisar o rascunho",
+      "previewFailedDescription": "O servidor não conseguiu preparar a visualização do rascunho seguro.",
+      "review": "Revisar rascunho",
+      "reviewTitle": "Revise o rascunho do novo evento",
+      "reviewDescription": "Confirme as verificações do servidor antes de criar o rascunho.",
+      "readyTitle": "Pronto para criar um rascunho",
+      "readyDescription": "Foram verificados a versão atual, campos seguros, agendamento e fluxo de trabalho de criação.",
+      "draftState": "Estado da publicação: Rascunho",
+      "changeDetails": "Alterar detalhes",
+      "createDraft": "Criar rascunho",
+      "createdTitle": "Rascunho do evento criado",
+      "createdDescription": "Revise e publique-o separadamente quando estiver pronto.",
+      "createFailedTitle": "Não foi possível criar o rascunho",
+      "createFailedDescription": "Não foi possível criar o rascunho do evento. Tente novamente."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Você ainda tem permissão para gerenciar o evento de origem",
+      "event_template_check_allowlist_exact": "Somente campos de configuração aprovados estão incluídos",
+      "event_template_check_private_records_skipped": "Registros privados e operacionais estão excluídos",
+      "event_template_check_versioned_snapshot": "A configuração é um instantâneo com versão imutável",
+      "event_template_check_version_current": "A versão do modelo selecionada é a atual",
+      "event_template_check_schedule_valid": "O novo cronograma é válido e no futuro",
+      "event_template_check_federation_none": "Federação está desativada para o novo draft",
+      "event_template_check_canonical_writer": "O fluxo de trabalho de criação de eventos canônicos será usado"
+    }
+  }
+}

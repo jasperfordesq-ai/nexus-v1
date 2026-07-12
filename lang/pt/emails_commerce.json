@@ -23,6 +23,7 @@
     "cta": "Explorar Grupos"
   },
   "group_promoted": {
+    "role_admin": "administrador",
     "subject": "É agora {{role}} de {{group_name}} — {{community}}",
     "title": "Atualização de Função",
     "preview": "Parabéns — foi nomeado/a {{role}} de {{group_name}}",

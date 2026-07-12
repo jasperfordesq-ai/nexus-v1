@@ -690,7 +690,9 @@ export interface CreditDonation {
 
 export type RsvpStatus = 'attending' | 'maybe' | 'not_attending';
 
-export type EventStatus = 'active' | 'cancelled' | 'postponed' | 'draft';
+export type EventStatus = 'active' | 'cancelled' | 'completed' | 'postponed' | 'draft';
+export type EventPublicationState = 'draft' | 'pending_review' | 'published' | 'archived';
+export type EventOperationalState = 'scheduled' | 'postponed' | 'cancelled' | 'completed';
 
 export interface EventSeries {
   id: number;
@@ -741,6 +743,9 @@ export interface Event {
   can_edit?: boolean;
   // E5: Cancellation
   status?: EventStatus;
+  publication_state?: EventPublicationState;
+  operational_state?: EventOperationalState;
+  lifecycle_version?: number;
   cancellation_reason?: string | null;
   // E7: Series
   series_id?: number | null;
@@ -850,7 +855,7 @@ export interface WaitlistEntry {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type GroupVisibility = 'public' | 'private' | 'secret';
-export type MembershipStatus = 'active' | 'pending' | 'rejected' | null;
+export type MembershipStatus = 'active' | 'pending' | 'invited' | 'banned' | 'rejected' | null;
 
 export interface Group {
   id: number;
@@ -873,7 +878,12 @@ export interface Group {
   location?: string;
   latitude?: number | null;
   longitude?: number | null;
+  type_id?: number | null;
   parent_id?: number | null;
+  template_id?: number | null;
+  template_features?: Record<string, boolean> | string[] | null;
+  primary_color?: string | null;
+  accent_color?: string | null;
   owner?: {
     id: number;
     name?: string;
@@ -903,9 +913,18 @@ export interface Group {
   }>;
   // Viewer's membership info (when authenticated)
   viewer_membership?: {
-    status: 'none' | 'active' | 'pending';
-    role: string | null;
+    status: 'none' | 'active' | 'pending' | 'invited' | 'banned';
+    role: 'member' | 'admin' | 'owner' | null;
     is_admin: boolean;
+    capabilities?: {
+      can_join: boolean;
+      can_leave: boolean;
+      can_cancel_request: boolean;
+      can_invite: boolean;
+      can_manage_members: boolean;
+      can_manage_admins: boolean;
+      can_delete: boolean;
+    };
   };
   type?: {
     id: number;

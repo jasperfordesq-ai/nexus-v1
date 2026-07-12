@@ -195,35 +195,11 @@ final class FeedItemTables
 
     public static function canPostInGroup(int $groupId, int $userId): bool
     {
-        $tenantId = TenantContext::getId();
-        if (!$tenantId || $groupId <= 0 || $userId <= 0) {
+        if (!TenantContext::getId() || $groupId <= 0 || $userId <= 0) {
             return false;
         }
 
-        $group = DB::table('groups')
-            ->where('id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->where(function ($query) {
-                $query->whereNull('status')
-                    ->orWhere('status', 'active');
-            })
-            ->select(['id', 'owner_id'])
-            ->first();
-
-        if (!$group) {
-            return false;
-        }
-
-        if ((int) $group->owner_id === $userId) {
-            return true;
-        }
-
-        return DB::table('group_members')
-            ->where('tenant_id', $tenantId)
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->exists();
+        return \App\Services\GroupAccessService::canWriteContent($groupId, $userId);
     }
 
     public static function canViewGroup(?int $groupId, ?int $viewerId, int $tenantId): bool
@@ -232,38 +208,9 @@ final class FeedItemTables
             return true;
         }
 
-        $group = DB::table('groups')
-            ->where('id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->where(function ($query) {
-                $query->whereNull('status')
-                    ->orWhere('status', 'active');
-            })
-            ->select(['id', 'owner_id', 'visibility'])
-            ->first();
-
-        if (!$group) {
-            return false;
-        }
-
-        if (($group->visibility ?? 'public') === 'public') {
-            return true;
-        }
-
-        if (!$viewerId) {
-            return false;
-        }
-
-        if ((int) $group->owner_id === $viewerId) {
-            return true;
-        }
-
-        return DB::table('group_members')
-            ->where('tenant_id', $tenantId)
-            ->where('group_id', $groupId)
-            ->where('user_id', $viewerId)
-            ->where('status', 'active')
-            ->exists();
+        return $viewerId !== null
+            && (int) TenantContext::getId() === $tenantId
+            && \App\Services\GroupAccessService::canViewMemberContent($groupId, $viewerId);
     }
 
     /**
@@ -293,15 +240,10 @@ final class FeedItemTables
             return false;
         }
 
-        if ((int) $row->owner_id === $viewerId) {
-            return true;
-        }
-
-        return DB::table('group_members')
-            ->where('group_id', $row->group_id)
-            ->where('user_id', $viewerId)
-            ->where('status', 'active')
-            ->exists();
+        return \App\Services\GroupAccessService::canViewMemberContent(
+            (int) $row->group_id,
+            $viewerId,
+        );
     }
 
     private static function canViewComment(int $commentId, ?int $viewerId, int $tenantId): bool

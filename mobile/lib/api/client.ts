@@ -142,8 +142,10 @@ function getTimeoutForMethod(method: RequestMethod, isUpload = false): number {
   return TIMEOUTS.API_MUTATION;
 }
 
-interface RequestOptions {
+export interface RequestOptions {
   params?: Record<string, string>;
+  /** Additional request headers. Auth and tenant headers remain authoritative. */
+  headers?: Record<string, string>;
   /** Override the default per-method timeout (ms) */
   timeout?: number;
   /** Mark as file upload to use the longer upload timeout */
@@ -158,7 +160,7 @@ async function request<T>(
 ): Promise<T> {
   // Support both legacy params-only signature and new options object
   const options: RequestOptions =
-    paramsOrOptions && ('timeout' in paramsOrOptions || 'isUpload' in paramsOrOptions || 'params' in paramsOrOptions)
+    paramsOrOptions && ('timeout' in paramsOrOptions || 'isUpload' in paramsOrOptions || 'params' in paramsOrOptions || 'headers' in paramsOrOptions)
       ? (paramsOrOptions as RequestOptions)
       : { params: paramsOrOptions as Record<string, string> | undefined };
 
@@ -180,7 +182,15 @@ async function request<T>(
   const headers: Record<string, string> = {
     Accept: 'application/json',
     'X-Nexus-Mobile': '1',
+    ...options.headers,
   };
+
+  // Per-request negotiation headers must never impersonate another user or
+  // tenant. Those values are resolved exclusively from trusted app storage.
+  Object.keys(headers).forEach((key) => {
+    const normalized = key.toLowerCase();
+    if (normalized === 'authorization' || normalized === 'x-tenant-slug') delete headers[key];
+  });
 
   // Do NOT set Content-Type for FormData — React Native sets the multipart
   // boundary automatically. For all other requests use JSON.
@@ -303,28 +313,28 @@ async function request<T>(
  *   const result = await api.post<CreateResult>('/api/v2/exchanges', payload);
  */
 export const api = {
-  get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    return request<T>('GET', endpoint, undefined, { params });
+  get<T>(endpoint: string, params?: Record<string, string>, options?: RequestOptions): Promise<T> {
+    return request<T>('GET', endpoint, undefined, { ...options, params });
   },
 
-  post<T>(endpoint: string, body?: unknown): Promise<T> {
-    return request<T>('POST', endpoint, body);
+  post<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    return request<T>('POST', endpoint, body, options);
   },
 
-  put<T>(endpoint: string, body?: unknown): Promise<T> {
-    return request<T>('PUT', endpoint, body);
+  put<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    return request<T>('PUT', endpoint, body, options);
   },
 
-  patch<T>(endpoint: string, body?: unknown): Promise<T> {
-    return request<T>('PATCH', endpoint, body);
+  patch<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    return request<T>('PATCH', endpoint, body, options);
   },
 
-  delete<T>(endpoint: string): Promise<T> {
-    return request<T>('DELETE', endpoint);
+  delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+    return request<T>('DELETE', endpoint, undefined, options);
   },
 
   /** POST with file-upload timeout (60s) for large payloads */
-  upload<T>(endpoint: string, body?: unknown): Promise<T> {
-    return request<T>('POST', endpoint, body, { isUpload: true });
+  upload<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    return request<T>('POST', endpoint, body, { ...options, isUpload: true });
   },
 };

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, userEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 import type { Event } from '@/types/api';
@@ -66,11 +66,15 @@ vi.mock('@/components/ui', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/helpers', () => ({
-  formatDateTime: (_date: Date, _opts?: object) => '10:00 AM',
-  formatMonthShort: (_date: Date, _upper?: boolean) => 'JAN',
-  resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    formatDateTime: (_date: Date, _opts?: object) => '10:00 AM',
+    formatMonthShort: (_date: Date, _upper?: boolean) => 'JAN',
+    resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
+  };
+});
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 const makeEvent = (overrides: Partial<Event> = {}): Event => ({
@@ -92,7 +96,10 @@ const defaultProps = {
   groupId: 7,
   events: [] as Event[],
   eventsLoading: false,
+  eventsLoadingMore: false,
+  eventsHasMore: false,
   isMember: true,
+  onLoadMoreEvents: vi.fn(),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,9 +140,7 @@ describe('GroupEventsTab', () => {
     const { GroupEventsTab } = await import('./GroupEventsTab');
     render(<GroupEventsTab {...defaultProps} events={[]} isMember={true} />);
 
-    const buttons = screen.getAllByRole('button');
-    // Should find a create event button in the header area
-    expect(buttons.length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Create Event' }).length).toBeGreaterThan(0);
   });
 
   it('does NOT show "create event" button for non-members', async () => {
@@ -185,13 +190,55 @@ describe('GroupEventsTab', () => {
     expect(screen.getByText('Event Two')).toBeInTheDocument();
   });
 
+  it('loads the next cursor page without hiding already rendered events', async () => {
+    const onLoadMoreEvents = vi.fn();
+    const { GroupEventsTab } = await import('./GroupEventsTab');
+    const { rerender } = render(
+      <GroupEventsTab
+        {...defaultProps}
+        events={[makeEvent({ id: 1, title: 'Page one event' })]}
+        eventsHasMore
+        onLoadMoreEvents={onLoadMoreEvents}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Load more events' }));
+    expect(onLoadMoreEvents).toHaveBeenCalledOnce();
+    expect(screen.getByText('Page one event')).toBeInTheDocument();
+
+    rerender(
+      <GroupEventsTab
+        {...defaultProps}
+        events={[
+          makeEvent({ id: 1, title: 'Page one event' }),
+          makePastEvent({ id: 2, title: 'Page two past event' }),
+        ]}
+        eventsHasMore={false}
+        onLoadMoreEvents={onLoadMoreEvents}
+      />,
+    );
+    expect(screen.getByText('Page two past event')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Load more events' })).not.toBeInTheDocument();
+  });
+
   it('marks past events with a Past chip', async () => {
     const { GroupEventsTab } = await import('./GroupEventsTab');
     render(<GroupEventsTab {...defaultProps} events={[makePastEvent()]} />);
 
-    // Past chip should be rendered (translation key: detail.past_chip)
-    const chips = screen.getAllByTestId('chip');
-    expect(chips.length).toBeGreaterThan(0);
+    expect(screen.getByText('Past')).toBeInTheDocument();
+  });
+
+  it('classifies an event with a past start and future end as ongoing', async () => {
+    const now = Date.now();
+    const { GroupEventsTab } = await import('./GroupEventsTab');
+    render(<GroupEventsTab {...defaultProps} events={[makeEvent({
+      start_date: new Date(now - 60 * 60 * 1000).toISOString(),
+      end_date: new Date(now + 60 * 60 * 1000).toISOString(),
+    })]} />);
+
+    expect(screen.getByText('Ongoing')).toBeInTheDocument();
+    expect(screen.queryByText('Past')).not.toBeInTheDocument();
+    expect(screen.getByText('Community Cleanup').closest('a')?.firstElementChild).not.toHaveClass('opacity-60');
   });
 
   it('event rows render as links to the event page', async () => {
@@ -201,6 +248,9 @@ describe('GroupEventsTab', () => {
     const links = screen.getAllByRole('link');
     const eventLink = links.find((l) => l.getAttribute('href')?.includes('/events/55'));
     expect(eventLink).toBeDefined();
+    expect(eventLink).toHaveClass('min-w-0');
+    expect(eventLink?.querySelector('time')).toHaveAttribute('dateTime', makeEvent({ id: 55 }).start_date);
+    expect(eventLink?.querySelector('.lucide-chevron-right')).toHaveClass('rtl:rotate-180');
   });
 
   it('create event link points to /events/create with group_id', async () => {
@@ -216,7 +266,7 @@ describe('GroupEventsTab', () => {
     const { GroupEventsTab } = await import('./GroupEventsTab');
     render(<GroupEventsTab {...defaultProps} eventsLoading={false} events={[makeEvent()]} />);
 
-    const statuses = screen.getAllByRole('status');
+    const statuses = screen.queryAllByRole('status');
     const busy = statuses.find((el) => el.getAttribute('aria-busy') === 'true');
     expect(busy).toBeUndefined();
   });

@@ -22,18 +22,13 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveThumbnailUrl } from '@/lib/helpers';
-
-interface GroupMatch {
-  module: string;
-  group_id?: number;
-  title: string;
-  match_score: number;
-  match_reasons?: string[];
-  image_url?: string | null;
-}
+import {
+  getRecommendedGroups,
+  joinRecommendedGroup,
+  type RecommendedGroupMatch,
+} from '../api/recommendations';
 
 export function RecommendedGroups() {
   const { t } = useTranslation('groups');
@@ -41,7 +36,7 @@ export function RecommendedGroups() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  const [groups, setGroups] = useState<GroupMatch[]>([]);
+  const [groups, setGroups] = useState<RecommendedGroupMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [joinedIds, setJoinedIds] = useState<Set<number>>(new Set());
@@ -53,43 +48,42 @@ export function RecommendedGroups() {
       return;
     }
 
-    let cancelled = false;
+    const controller = new AbortController();
+    setLoading(true);
+    setHasError(false);
     (async () => {
       try {
-        const res = await api.get<{ matches?: GroupMatch[] }>('/v2/matches/all?modules=groups&limit=3&min_score=50');
-        if (cancelled) return;
-        if (res.success && Array.isArray(res.data?.matches)) {
-          setGroups(res.data.matches.filter((m) => m.group_id != null).slice(0, 3));
-        } else {
-          setHasError(true);
-        }
+        const matches = await getRecommendedGroups({ signal: controller.signal });
+        if (controller.signal.aborted) return;
+        setGroups(matches);
       } catch (err) {
-        if (!cancelled) {
-          logError('RecommendedGroups.load', err);
-          setHasError(true);
-        }
+        if (controller.signal.aborted) return;
+        logError('RecommendedGroups.load', err);
+        setHasError(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
-      if (!cancelled) setLoading(false);
     })();
 
-    return () => { cancelled = true; };
+    return () => controller.abort();
   }, [isAuthenticated]);
 
   const handleJoin = async (groupId: number) => {
     setJoiningId(groupId);
     try {
-      const res = await api.post(`/v2/groups/${groupId}/join`, {});
-      if (res.success) {
-        setJoinedIds((prev) => new Set(prev).add(groupId));
-        toast.success(t('recommended.joined'));
-      } else {
-        toast.error(res.error || t('unable_to_load'));
-      }
+      const result = await joinRecommendedGroup(groupId);
+      setJoinedIds((prev) => new Set(prev).add(groupId));
+      toast.success(
+        result.status === 'pending'
+          ? t('toast.join_requested')
+          : t('recommended.joined'),
+      );
     } catch (err) {
       logError('RecommendedGroups.join', err);
       toast.error(t('unable_to_load'));
+    } finally {
+      setJoiningId(null);
     }
-    setJoiningId(null);
   };
 
   if (!isAuthenticated || loading || hasError || groups.length === 0) return null;
@@ -102,7 +96,7 @@ export function RecommendedGroups() {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {groups.map((group) => {
-          const hasJoined = group.group_id != null && joinedIds.has(group.group_id);
+          const hasJoined = joinedIds.has(group.group_id);
           const firstReason = Array.isArray(group.match_reasons) ? group.match_reasons[0] : undefined;
           return (
             <GlassCard key={group.group_id} className="p-3 flex flex-col gap-2">
@@ -134,12 +128,12 @@ export function RecommendedGroups() {
                 >
                   {t('recommended.view')}
                 </Button>
-                {!hasJoined && group.group_id != null && (
+                {!hasJoined && (
                   <Button
                     size="sm"
                     className="bg-gradient-to-r from-accent to-accent-gradient-end text-white flex-1"
                     isLoading={joiningId === group.group_id}
-                    onPress={() => handleJoin(group.group_id!)}
+                    onPress={() => handleJoin(group.group_id)}
                   >
                     {t('recommended.join')}
                   </Button>

@@ -6,6 +6,8 @@
 
 namespace App\Models;
 
+use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,8 +26,10 @@ class Group extends Model
     protected $fillable = [
         'owner_id', 'name', 'description', 'image_url',
         'cover_image_url', 'visibility', 'location', 'latitude', 'longitude',
-        'type_id', 'parent_id', 'is_featured', 'has_children',
+        'primary_color', 'accent_color',
+        'type_id', 'template_id', 'template_features', 'parent_id', 'is_featured', 'has_children',
         'cached_member_count', 'federated_visibility',
+        'source_idea_id', 'source_challenge_id',
     ];
 
     protected $appends = ['members_count', 'member_count'];
@@ -41,6 +45,9 @@ class Group extends Model
         'is_featured' => 'boolean',
         'has_children' => 'boolean',
         'cached_member_count' => 'integer',
+        'status' => GroupStatus::class,
+        'is_active' => 'boolean',
+        'template_features' => 'array',
     ];
 
     /**
@@ -66,7 +73,10 @@ class Group extends Model
 
     public function members(): BelongsToMany
     {
+        $tenantId = (int) ($this->getAttribute('tenant_id') ?: TenantContext::getId());
+
         return $this->belongsToMany(User::class, 'group_members')
+                     ->wherePivot('tenant_id', $tenantId)
                      ->withPivot('role', 'status', 'tenant_id')
                      ->withTimestamps();
     }
@@ -141,5 +151,105 @@ class Group extends Model
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
+    }
+
+    /** @param list<GroupStatus|string> $statuses */
+    public function scopeInStates(Builder $query, array $statuses): Builder
+    {
+        $values = array_map(
+            static fn (GroupStatus|string $status): string => $status instanceof GroupStatus
+                ? $status->value
+                : $status,
+            $statuses,
+        );
+
+        return $query->whereIn('status', $values);
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', GroupStatus::Active->value);
+    }
+
+    public function scopeJoinable(Builder $query): Builder
+    {
+        return $query->active();
+    }
+
+    public function scopeWritable(Builder $query): Builder
+    {
+        return $query->active();
+    }
+
+    /**
+     * Overview visibility. Child resources use the stricter GroupAccessService
+     * member-content decision and must not infer access from this scope.
+     */
+    public function scopeViewableBy(
+        Builder $query,
+        int|null $userId,
+        bool $isTenantAdmin = false,
+    ): Builder {
+        if ($userId === null) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $tenantId = (int) TenantContext::getId();
+        $query->whereExists(static function ($actor) use ($userId, $tenantId): void {
+            $actor->selectRaw('1')
+                ->from('users as group_actor')
+                ->where('group_actor.id', $userId)
+                ->where('group_actor.tenant_id', $tenantId);
+        });
+
+        if ($isTenantAdmin) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $visibility) use ($userId, $tenantId): void {
+            $visibility->where('status', GroupStatus::Active->value)
+                ->orWhere('owner_id', $userId)
+                ->orWhere(function (Builder $memberState) use ($userId, $tenantId): void {
+                    $memberState
+                        ->where('status', GroupStatus::Dormant->value)
+                        ->whereIn('id', function ($membership) use ($userId, $tenantId): void {
+                            $membership->select('group_id')
+                                ->from('group_members')
+                                ->where('tenant_id', $tenantId)
+                                ->where('user_id', $userId)
+                                ->where('status', 'active');
+                        });
+                });
+        });
+    }
+
+    public function scopeManageableBy(
+        Builder $query,
+        int $userId,
+        bool $isTenantAdmin = false,
+    ): Builder {
+        $tenantId = (int) TenantContext::getId();
+        $query->whereExists(static function ($actor) use ($userId, $tenantId): void {
+            $actor->selectRaw('1')
+                ->from('users as group_actor')
+                ->where('group_actor.id', $userId)
+                ->where('group_actor.tenant_id', $tenantId);
+        });
+
+        if ($isTenantAdmin) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $manageable) use ($userId, $tenantId): void {
+            $manageable->where('owner_id', $userId)
+                ->orWhereIn('id', function ($membership) use ($userId, $tenantId): void {
+                    $membership->select('group_id')
+                        ->from('group_members')
+                        ->where('tenant_id', $tenantId)
+                        ->where('user_id', $userId)
+                        ->where('status', 'active')
+                        ->whereIn('role', ['owner', 'admin']);
+                });
+        });
     }
 }

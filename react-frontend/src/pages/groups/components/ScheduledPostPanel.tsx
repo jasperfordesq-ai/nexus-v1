@@ -23,24 +23,23 @@ import { useState, useEffect, useCallback } from 'react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
-import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { formatDateTime } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
+import {
+  cancelScheduledGroupPost,
+  createScheduledGroupPost,
+  GroupApiError,
+  listScheduledGroupPosts,
+  type CreateScheduledGroupPostInput,
+  type ScheduledGroupPost,
+  type ScheduledGroupPostRecurrence,
+  type ScheduledGroupPostType,
+} from '../api';
 
 interface ScheduledPostPanelProps {
   groupId: number;
   isAdmin: boolean;
-}
-
-interface ScheduledPost {
-  id: number;
-  post_type: string;
-  title: string;
-  content: string;
-  scheduled_at: string;
-  is_recurring: boolean;
-  recurrence_pattern: string | null;
 }
 
 const POST_TYPES = ['discussion', 'announcement'] as const;
@@ -69,37 +68,46 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
   const { t } = useTranslation('groups');
   const toast = useToast();
 
-  const [posts, setPosts] = useState<ScheduledPost[]>([]);
+  const [posts, setPosts] = useState<ScheduledGroupPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   // Form state
-  const [formType, setFormType] = useState<string>('discussion');
+  const [formType, setFormType] = useState<ScheduledGroupPostType>('discussion');
   const [formTitle, setFormTitle] = useState('');
   const [formContent, setFormContent] = useState('');
   const [formScheduledAt, setFormScheduledAt] = useState('');
   const [formRecurring, setFormRecurring] = useState(false);
-  const [formPattern, setFormPattern] = useState<string>('weekly');
+  const [formPattern, setFormPattern] = useState<ScheduledGroupPostRecurrence>('weekly');
   const [creating, setCreating] = useState(false);
 
-  const loadPosts = useCallback(async () => {
+  const loadPosts = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
+    setLoadFailed(false);
     try {
-      const res = await api.get(`/v2/groups/${groupId}/scheduled-posts`);
-      if (res.success && res.data) {
-        const payload = res.data;
-        setPosts(Array.isArray(payload) ? payload : []);
-      }
-    } catch {
+      setPosts(await listScheduledGroupPosts(groupId, { signal }));
+    } catch (error) {
+      if (error instanceof GroupApiError && error.isCancellation) return;
+      setLoadFailed(true);
       toast.error(t('scheduled.load_failed'));
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, [groupId, toast, t]);
 
   useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
+    if (!isAdmin) {
+      setPosts([]);
+      setLoadFailed(false);
+      setLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    void loadPosts(controller.signal);
+    return () => controller.abort();
+  }, [isAdmin, loadPosts]);
 
   const resetForm = () => {
     setFormType('discussion');
@@ -118,7 +126,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
 
     setCreating(true);
     try {
-      const body: Record<string, unknown> = {
+      const body: CreateScheduledGroupPostInput = {
         post_type: formType,
         title: formTitle.trim(),
         content: formContent.trim(),
@@ -129,15 +137,11 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
         body.recurrence_pattern = formPattern;
       }
 
-      const res = await api.post(`/v2/groups/${groupId}/scheduled-posts`, body);
-      if (res.success) {
-        toast.success(t('scheduled.created'));
-        setModalOpen(false);
-        resetForm();
-        await loadPosts();
-      } else {
-        toast.error(t('scheduled.create_failed'));
-      }
+      await createScheduledGroupPost(groupId, body);
+      toast.success(t('scheduled.created'));
+      setModalOpen(false);
+      resetForm();
+      await loadPosts();
     } catch {
       toast.error(t('scheduled.create_failed'));
     } finally {
@@ -147,13 +151,9 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
 
   const handleCancel = async (postId: number) => {
     try {
-      const res = await api.delete(`/v2/groups/${groupId}/scheduled-posts/${postId}`);
-      if (res.success) {
-        setPosts((prev) => prev.filter((p) => p.id !== postId));
-        toast.success(t('scheduled.cancelled'));
-      } else {
-        toast.error(t('scheduled.cancel_failed'));
-      }
+      await cancelScheduledGroupPost(groupId, postId);
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+      toast.success(t('scheduled.cancelled'));
     } catch {
       toast.error(t('scheduled.cancel_failed'));
     }
@@ -187,6 +187,10 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
           <Spinner size="md" />
         </div>
+      ) : loadFailed ? (
+        <p role="alert" className="py-6 text-center text-sm text-danger">
+          {t('scheduled.load_failed')}
+        </p>
       ) : posts.length === 0 ? (
         <p className="text-sm text-muted text-center py-6">
           {t('scheduled.empty')}
@@ -252,7 +256,9 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                 selectedKeys={new Set([formType])}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0];
-                  if (typeof selected === 'string') setFormType(selected);
+                  if (typeof selected === 'string' && POST_TYPES.includes(selected as ScheduledGroupPostType)) {
+                    setFormType(selected as ScheduledGroupPostType);
+                  }
                 }}
                 variant="bordered"
               >
@@ -307,7 +313,12 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                     selectedKeys={new Set([formPattern])}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0];
-                      if (typeof selected === 'string') setFormPattern(selected);
+                      if (
+                        typeof selected === 'string'
+                        && RECURRENCE_PATTERNS.includes(selected as ScheduledGroupPostRecurrence)
+                      ) {
+                        setFormPattern(selected as ScheduledGroupPostRecurrence);
+                      }
                     }}
                     variant="bordered"
                     size="sm"

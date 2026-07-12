@@ -7,11 +7,12 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\GroupService;
-use App\Services\GroupCustomFieldService;
 
 /**
- * GroupCustomFieldController — Custom field values for groups.
+ * Fail-closed adapter for the unfinished group custom-field capability.
+ *
+ * Re-enable only with a tenant-authoritative field-definition, validation,
+ * lifecycle, and end-user rendering contract.
  */
 class GroupCustomFieldController extends BaseApiController
 {
@@ -29,13 +30,7 @@ class GroupCustomFieldController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canView($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.group_custom_fields_forbidden'), null, 403);
-        }
-
-        $values = GroupCustomFieldService::getValues($id);
-
-        return $this->successResponse($values);
+        return $this->unavailable();
     }
 
     /**
@@ -51,21 +46,16 @@ class GroupCustomFieldController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
-        }
+        return $this->unavailable();
+    }
 
-        $fields = request()->input('fields', []);
-
-        if (!is_array($fields)) {
-            return $this->errorResponse(__('api.group_custom_fields_object_required'), 422);
-        }
-
-        GroupCustomFieldService::setValues($id, $fields);
-
-        // Re-fetch updated values to return
-        $updated = GroupCustomFieldService::getValues($id);
-
-        return $this->successResponse($updated);
+    private function unavailable(): JsonResponse
+    {
+        return $this->respondWithError(
+            'CAPABILITY_UNAVAILABLE',
+            __('api.service_unavailable'),
+            null,
+            410,
+        );
     }
 }

@@ -460,169 +460,201 @@ class EventsControllerTest extends TestCase
         $user = $this->authenticatedUser();
         $eventId = $this->createEvent($user->id);
 
-        $response = $this->apiDelete("/v2/events/{$eventId}");
+        $this->apiDelete("/v2/events/{$eventId}")
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'reason');
+        $response = $this->apiDelete("/v2/events/{$eventId}", [
+            'reason' => 'Organizer archived this event',
+        ]);
 
         $this->assertContains($response->getStatusCode(), [200, 204]);
     }
 
     // ================================================================
-    // DELETE — Recurring series notifies future attendees (cancel parity)
+    // DELETE — Archive-first lifecycle and evidence preservation
     // ================================================================
 
-    public function test_series_delete_notifies_future_attendees_once_and_skips_past_and_cancelled(): void
+    public function test_series_delete_archives_future_series_preserves_evidence_and_replays_without_duplicate_fanout(): void
     {
         $organizer = $this->authenticatedUser();
-        $futureAttendee = User::factory()->forTenant($this->testTenantId)->create([
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
-            'email' => 'series-delete-future-' . uniqid('', true) . '@example.test',
+            'email' => 'series-archive-attendee-' . uniqid('', true) . '@example.test',
         ]);
         $waitlisted = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
-            'email' => 'series-delete-waitlist-' . uniqid('', true) . '@example.test',
+            'email' => 'series-archive-waitlist-' . uniqid('', true) . '@example.test',
         ]);
-        $pastAttendee = User::factory()->forTenant($this->testTenantId)->create([
-            'status' => 'active',
-            'email' => 'series-delete-past-' . uniqid('', true) . '@example.test',
-        ]);
-        $cancelledAttendee = User::factory()->forTenant($this->testTenantId)->create([
-            'status' => 'active',
-            'email' => 'series-delete-cancelled-' . uniqid('', true) . '@example.test',
-        ]);
-
         $templateId = $this->createEvent((int) $organizer->id, [
             'title' => 'Recurring Series',
             'is_recurring_template' => 1,
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
         ]);
-        $futureOccurrenceA = $this->createEvent((int) $organizer->id, [
+        $futureOccurrence = $this->createEvent((int) $organizer->id, [
             'parent_event_id' => $templateId,
             'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
             'end_time' => now()->addDays(14)->addHours(2)->format('Y-m-d H:i:s'),
-        ]);
-        $futureOccurrenceB = $this->createEvent((int) $organizer->id, [
-            'parent_event_id' => $templateId,
-            'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
-            'end_time' => now()->addDays(21)->addHours(2)->format('Y-m-d H:i:s'),
         ]);
         $pastOccurrence = $this->createEvent((int) $organizer->id, [
             'parent_event_id' => $templateId,
             'start_time' => now()->subDays(7)->format('Y-m-d H:i:s'),
             'end_time' => now()->subDays(7)->addHours(2)->format('Y-m-d H:i:s'),
         ]);
-        // Already cancelled future occurrence — its attendees were notified when it
-        // was cancelled; deleting the series must NOT notify them a second time.
-        $cancelledOccurrence = $this->createEvent((int) $organizer->id, [
-            'parent_event_id' => $templateId,
-            'status' => 'cancelled',
-            'start_time' => now()->addDays(28)->format('Y-m-d H:i:s'),
-            'end_time' => now()->addDays(28)->addHours(2)->format('Y-m-d H:i:s'),
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $templateId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
-
-        // Future attendee RSVPs to BOTH future occurrences — must be notified exactly once.
-        foreach ([$futureOccurrenceA, $futureOccurrenceB] as $occurrenceId) {
-            DB::table('event_rsvps')->insert([
-                'tenant_id' => $this->testTenantId,
-                'event_id' => $occurrenceId,
-                'user_id' => $futureAttendee->id,
-                'status' => 'going',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
         DB::table('event_waitlist')->insert([
             'tenant_id' => $this->testTenantId,
-            'event_id' => $futureOccurrenceA,
+            'event_id' => $templateId,
             'user_id' => $waitlisted->id,
             'position' => 1,
             'status' => 'waiting',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('event_rsvps')->insert([
+        DB::table('event_reminders')->insert([
             'tenant_id' => $this->testTenantId,
-            'event_id' => $pastOccurrence,
-            'user_id' => $pastAttendee->id,
-            'status' => 'going',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        DB::table('event_rsvps')->insert([
-            'tenant_id' => $this->testTenantId,
-            'event_id' => $cancelledOccurrence,
-            'user_id' => $cancelledAttendee->id,
-            'status' => 'cancelled',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $this->setDailyNotificationPreference((int) $futureAttendee->id);
-        $this->setDailyNotificationPreference((int) $waitlisted->id);
-
-        $response = $this->apiDelete("/v2/events/{$templateId}");
-
-        $this->assertContains($response->getStatusCode(), [200, 204]);
-
-        // Series rows removed: template + future occurrences gone, past detached but kept.
-        $this->assertNull(DB::table('events')->where('id', $templateId)->value('id'));
-        $this->assertNull(DB::table('events')->where('id', $futureOccurrenceA)->value('id'));
-        $this->assertNull(DB::table('events')->where('id', $futureOccurrenceB)->value('id'));
-        $this->assertNotNull(DB::table('events')->where('id', $pastOccurrence)->value('id'));
-        $this->assertNull(DB::table('events')->where('id', $pastOccurrence)->value('parent_event_id'));
-
-        // Future attendee + waitlisted user each get EXACTLY ONE cancellation bell.
-        $bells = fn (int $userId) => DB::table('notifications')
-            ->where('tenant_id', $this->testTenantId)
-            ->where('user_id', $userId)
-            ->where('link', "/events/{$templateId}")
-            ->where('type', 'event')
-            ->count();
-        $this->assertSame(1, $bells((int) $futureAttendee->id));
-        $this->assertSame(1, $bells((int) $waitlisted->id));
-
-        // Past and already-cancelled attendees get nothing.
-        $this->assertSame(0, $bells((int) $pastAttendee->id));
-        $this->assertSame(0, $bells((int) $cancelledAttendee->id));
-
-        // Email channel mirrors the cancel path: one queued digest entry each
-        // (daily frequency), none for past/cancelled attendees.
-        $queued = fn (int $userId) => DB::table('notification_queue')
-            ->where('tenant_id', $this->testTenantId)
-            ->where('user_id', $userId)
-            ->where('link', "/events/{$templateId}")
-            ->where('activity_type', 'event_cancellation')
-            ->count();
-        $this->assertSame(1, $queued((int) $futureAttendee->id));
-        $this->assertSame(1, $queued((int) $waitlisted->id));
-        $this->assertSame(0, $queued((int) $pastAttendee->id));
-        $this->assertSame(0, $queued((int) $cancelledAttendee->id));
-    }
-
-    public function test_non_recurring_delete_sends_no_cancellation_notifications(): void
-    {
-        $organizer = $this->authenticatedUser();
-        $attendee = User::factory()->forTenant($this->testTenantId)->create([
-            'status' => 'active',
-            'email' => 'plain-delete-attendee-' . uniqid('', true) . '@example.test',
-        ]);
-        $eventId = $this->createEvent((int) $organizer->id);
-        DB::table('event_rsvps')->insert([
-            'tenant_id' => $this->testTenantId,
-            'event_id' => $eventId,
+            'event_id' => $templateId,
             'user_id' => $attendee->id,
-            'status' => 'going',
+            'remind_before_minutes' => 60,
+            'reminder_type' => 'both',
+            'scheduled_for' => now()->addDay(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_attendance')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $templateId,
+            'user_id' => $attendee->id,
+            'checked_in_at' => now()->subHour(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         $this->setDailyNotificationPreference((int) $attendee->id);
+        $this->setDailyNotificationPreference((int) $waitlisted->id);
 
-        $response = $this->apiDelete("/v2/events/{$eventId}");
+        $payload = ['reason' => 'Organizer archived this series'];
+        $headers = ['X-Events-Contract' => '2', 'Idempotency-Key' => 'series-archive-1'];
+        $first = $this->apiDelete("/v2/events/{$templateId}", $payload, $headers);
 
-        $this->assertContains($response->getStatusCode(), [200, 204]);
-        $this->assertSame(0, DB::table('notifications')
+        $first->assertOk()
+            ->assertJsonPath('data.action', 'archive')
+            ->assertJsonPath('data.requested_action', 'delete')
+            ->assertJsonPath('data.outcome', 'archived')
+            ->assertJsonPath('data.changed', true)
+            ->assertJsonPath('data.archived', true)
+            ->assertJsonPath('data.cancelled', true)
+            ->assertJsonPath('data.deleted', false)
+            ->assertJsonPath('data.idempotency_key_supplied', true)
+            ->assertJsonPath('data.cascade.registrations_cancelled', 1)
+            ->assertJsonPath('data.cascade.waitlist_cancelled', 1)
+            ->assertJsonPath('data.cascade.reminders_cancelled', 1)
+            ->assertJsonPath('data.series.is_series', true)
+            ->assertJsonPath('data.series.target_count', 2)
+            ->assertJsonPath('data.series.changed_count', 2)
+            ->assertJsonPath('data.series.outbox_count', 2);
+
+        $this->assertDatabaseHas('events', [
+            'id' => $templateId,
+            'tenant_id' => $this->testTenantId,
+            'publication_status' => 'archived',
+            'operational_status' => 'cancelled',
+            'status' => 'cancelled',
+            'lifecycle_version' => 1,
+        ]);
+        $this->assertDatabaseHas('events', [
+            'id' => $futureOccurrence,
+            'parent_event_id' => $templateId,
+            'publication_status' => 'archived',
+            'operational_status' => 'cancelled',
+        ]);
+        $this->assertDatabaseHas('events', ['id' => $pastOccurrence, 'parent_event_id' => $templateId]);
+        $this->assertDatabaseHas('event_attendance', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $templateId,
+            'user_id' => $attendee->id,
+        ]);
+        $this->assertSame(1, DB::table('event_status_history')
             ->where('tenant_id', $this->testTenantId)
-            ->where('user_id', $attendee->id)
-            ->where('link', "/events/{$eventId}")
+            ->where('event_id', $templateId)
+            ->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $templateId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->count());
+        $this->assertSame(2, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('link', "/events/{$templateId}")
+            ->where('type', 'event')
+            ->count());
+
+        $replay = $this->apiDelete("/v2/events/{$templateId}", $payload, $headers);
+        $replay->assertOk()
+            ->assertJsonPath('data.outcome', 'already_archived')
+            ->assertJsonPath('data.changed', false)
+            ->assertJsonPath('data.replayed', true)
+            ->assertJsonPath('data.already_archived', true)
+            ->assertJsonPath('data.series.changed_count', 0)
+            ->assertJsonPath('data.series.replayed_count', 2);
+        $this->assertSame(1, DB::table('event_status_history')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $templateId)
+            ->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $templateId)
+            ->count());
+        $this->assertSame(2, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('link', "/events/{$templateId}")
+            ->where('type', 'event')
             ->count());
     }
+
+
+
+    public function test_legacy_delete_response_is_no_content_but_event_is_archived_not_deleted(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $eventId = $this->createEvent((int) $organizer->id, [
+            'publication_status' => 'published',
+            'operational_status' => 'completed',
+            'lifecycle_version' => 3,
+            'status' => 'completed',
+        ]);
+
+        $response = $this->apiDelete("/v2/events/{$eventId}", [
+            'reason' => 'Completed event archived',
+        ]);
+
+        $response->assertNoContent();
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'tenant_id' => $this->testTenantId,
+            'publication_status' => 'archived',
+            'operational_status' => 'completed',
+            'status' => 'cancelled',
+            'lifecycle_version' => 4,
+        ]);
+        $this->assertDatabaseHas('event_status_history', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'lifecycle_version' => 4,
+            'to_publication_status' => 'archived',
+            'to_operational_status' => 'completed',
+        ]);
+    }
+
+
 
     // ================================================================
     // DELETE — Authorization (403)
@@ -757,9 +789,49 @@ class EventsControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->apiPost('/v2/events/999999/cancel');
+        $response = $this->apiPost('/v2/events/999999/cancel', [
+            'reason' => 'No longer proceeding',
+        ]);
 
         $this->assertContains($response->getStatusCode(), [400, 404]);
+    }
+
+    public function test_cancel_requires_nonblank_reason_before_any_lifecycle_write(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $eventId = $this->createEvent((int) $organizer->id, [
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+
+        $response = $this->apiPost("/v2/events/{$eventId}/cancel", [
+            'reason' => '   ',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'VALIDATION_REQUIRED_FIELD')
+            ->assertJsonPath('errors.0.field', 'reason');
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+        $this->assertDatabaseMissing('event_status_history', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+        ]);
+
+        $invalidKey = $this->apiPost("/v2/events/{$eventId}/cancel", [
+            'reason' => 'Capacity issue',
+        ], ['Idempotency-Key' => str_repeat('x', 192)]);
+        $invalidKey->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'VALIDATION_ERROR')
+            ->assertJsonPath('errors.0.field', 'idempotency_key');
+        $this->assertDatabaseMissing('event_status_history', [
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+        ]);
     }
 
     public function test_cancel_notifies_rsvp_and_waitlisted_users_after_statuses_change(): void
@@ -773,7 +845,11 @@ class EventsControllerTest extends TestCase
             'status' => 'active',
             'email' => 'event-cancel-waitlisted-' . uniqid('', true) . '@example.test',
         ]);
-        $eventId = $this->createEvent((int) $organizer->id);
+        $eventId = $this->createEvent((int) $organizer->id, [
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
 
         DB::table('event_rsvps')->insert([
             'tenant_id' => $this->testTenantId,
@@ -792,18 +868,58 @@ class EventsControllerTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('event_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'remind_before_minutes' => 60,
+            'reminder_type' => 'both',
+            'scheduled_for' => now()->addDay(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $this->setDailyNotificationPreference((int) $attendee->id);
         $this->setDailyNotificationPreference((int) $waitlisted->id);
 
         $response = $this->apiPost("/v2/events/{$eventId}/cancel", [
             'reason' => 'Weather',
-        ]);
+            'idempotency_key' => str_repeat('b', 192),
+        ], ['Idempotency-Key' => 'cancel-event-1']);
 
-        $response->assertStatus(200);
+        $response->assertOk()
+            ->assertJsonPath('data.action', 'cancel')
+            ->assertJsonPath('data.outcome', 'cancelled')
+            ->assertJsonPath('data.changed', true)
+            ->assertJsonPath('data.replayed', false)
+            ->assertJsonPath('data.cancelled', true)
+            ->assertJsonPath('data.idempotency_key_supplied', true)
+            ->assertJsonPath('data.lifecycle_version', 1)
+            ->assertJsonPath('data.cascade.registrations_cancelled', 1)
+            ->assertJsonPath('data.cascade.waitlist_cancelled', 1)
+            ->assertJsonPath('data.cascade.reminders_cancelled', 1);
         $this->assertSame('cancelled', DB::table('event_rsvps')->where('event_id', $eventId)->where('user_id', $attendee->id)->value('status'));
         $this->assertSame('cancelled', DB::table('event_waitlist')->where('event_id', $eventId)->where('user_id', $waitlisted->id)->value('status'));
         $this->assertSame(2, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
         $this->assertSame(2, DB::table('notification_queue')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('activity_type', 'event_cancellation')->count());
+
+        $replay = $this->apiPost("/v2/events/{$eventId}/cancel", [
+            'reason' => 'Weather',
+        ], ['Idempotency-Key' => 'cancel-event-1']);
+        $replay->assertOk()
+            ->assertJsonPath('data.outcome', 'already_cancelled')
+            ->assertJsonPath('data.changed', false)
+            ->assertJsonPath('data.replayed', true)
+            ->assertJsonPath('data.already_cancelled', true);
+        $this->assertSame(1, DB::table('event_status_history')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $eventId)
+            ->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('event_id', $eventId)
+            ->count());
+        $this->assertSame(2, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
     }
 
     // ================================================================
@@ -959,10 +1075,6 @@ class EventsControllerTest extends TestCase
 
     public function test_get_all_collapses_recurring_series_to_next_occurrence(): void
     {
-        $this->markTestSkipped(
-            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
-        );
-
         $user = $this->authenticatedUser();
 
         // A standalone event must still pass through un-collapsed.
@@ -984,8 +1096,17 @@ class EventsControllerTest extends TestCase
             'parent_event_id' => $templateId,
         ]);
 
+        // This is a direct service call rather than an HTTP request, so pin the
+        // tenant explicitly instead of relying on request middleware state.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
         // Scope to this user so baseline fixtures in the test DB don't interfere.
-        $result = EventService::getAll(['when' => 'upcoming', 'limit' => 50, 'user_id' => $user->id]);
+        $result = EventService::getAll([
+            'when' => 'upcoming',
+            'limit' => 50,
+            'user_id' => $user->id,
+            'viewer_id' => $user->id,
+        ]);
         $ids = array_column($result['items'], 'id');
 
         // Exactly one representative for the series (the soonest = the template),
@@ -1003,10 +1124,6 @@ class EventsControllerTest extends TestCase
 
     public function test_update_image_cascades_cover_to_whole_series(): void
     {
-        $this->markTestSkipped(
-            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
-        );
-
         $user = $this->authenticatedUser();
 
         $templateId = $this->createEvent($user->id, [
@@ -1022,9 +1139,14 @@ class EventsControllerTest extends TestCase
             'parent_event_id' => $templateId,
         ]);
 
+        \App\Core\TenantContext::setById($this->testTenantId);
+
         // Uploading the cover to the template (as the frontend does) must land on
         // every occurrence, not just the row the upload targeted.
-        $this->assertTrue(EventService::updateImage($templateId, $user->id, '/uploads/cover.jpg'));
+        $this->assertTrue(
+            EventService::updateImage($templateId, $user->id, '/uploads/cover.jpg'),
+            json_encode(EventService::getErrors(), JSON_UNESCAPED_UNICODE)
+        );
 
         $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $templateId)->value('cover_image'));
         $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $occ1)->value('cover_image'));

@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Ponowne sprawdzanie odznaki zakończone dla :count użytkowników"
     },
     "admin_groups": {
+        "rule_not_found": "Nie znaleziono reguły",
         "group_archived": "Grupa zarchiwizowana",
         "group_unarchived": "Grupa przywrócona z archiwum",
         "ownership_transferred": "Własność przeniesiona",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Twoje żądanie usunięcia konta zostało przesłane. Otrzymasz potwierdzenie e-mailem."
     },
     "group_challenge": {
-        "challenge_deleted": "Wyzwanie usunięte"
+        "challenge_deleted": "Wyzwanie usunięte",
+        "challenge_cancelled": "Wyzwanie anulowane",
+        "challenge_immutable": "Ukończonych lub nagrodzonych wyzwań nie można anulować"
+    },
+    "group_chatroom": {
+        "default_name": "Ogólne",
+        "default_description": "Domyślny pokój rozmów grupy"
     },
     "group_exchange": {
         "exchange_cancelled": "Wymiana anulowana",

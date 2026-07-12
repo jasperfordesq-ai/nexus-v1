@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Analyse van evenementen",
+    "subtitle": "Operationele prestaties, aanwezigheid, communicatie en privacyveilige conversiestatistieken.",
+    "generated_at": "Gegenereerd {{date}}",
+    "loading": "Gebeurtenisanalyse laden",
+    "load_error": "Gebeurtenisanalyse kan niet worden geladen.",
+    "retry": "Probeer het opnieuw",
+    "refresh": "Vernieuwen",
+    "export": "CSV exporteren",
+    "exporting": "Exporteren…",
+    "export_started": "Analytics-export voorbereid.",
+    "download_error": "De analyse-export kan niet worden gedownload.",
+    "privacy_title": "Privacybeschermde rapportage",
+    "privacy_note": "Optionele statistieken zijn verborgen totdat ten minste {{count}} goedgekeurde mensen zijn vertegenwoordigd.",
+    "consent_bound": "Toestemmingsgebonden",
+    "suppressed": "Onderdrukt",
+    "not_limited": "Geen limiet",
+    "finance_redacted": "Beperkt door uw rol",
+    "columns": {
+      "metric": "Metrisch",
+      "value": "Waarde"
+    },
+    "sections": {
+      "registration": "Registratie",
+      "acquisition": "Uitnodigingen en wachtlijst",
+      "attendance": "Aanwezigheid",
+      "communications": "Communicatie",
+      "funnel": "Privacyveilige trechter",
+      "finance": "Kaartjes en tegoeden"
+    },
+    "metrics": {
+      "confirmed": "Bevestigde inschrijvingen",
+      "pending": "In afwachting van registraties",
+      "cancelled": "Geannuleerde inschrijvingen",
+      "capacity_remaining": "Resterende capaciteit",
+      "invitations_issued": "Uitnodigingen uitgegeven",
+      "invitations_accepted": "Uitnodigingen geaccepteerd",
+      "invitation_conversion": "Conversie van uitnodigingen",
+      "waitlist_joined": "Wachtlijst sluit zich aan",
+      "waitlist_accepted": "Acceptaties op de wachtlijst",
+      "waitlist_conversion": "Conversie van wachtlijsten",
+      "checked_in": "Momenteel ingecheckt",
+      "attended": "Bijgewoond",
+      "no_show": "Niet verschenen",
+      "attendance_rate": "Aanwezigheidspercentage",
+      "delivered": "Meldingen afgeleverd",
+      "suppressed_deliveries": "Meldingen onderdrukt",
+      "failed_deliveries": "Meldingen zijn mislukt",
+      "dead_lettered": "Meldingen die tussenkomst vereisen",
+      "delivery_rate": "Leveringstarief",
+      "event_views": "Gebeurtenisweergaven",
+      "registration_starts": "De registratie begint",
+      "start_conversion": "Conversie van weergave naar registratie",
+      "finance": "Financiële statistieken",
+      "ticket_units": "Bevestigde ticketeenheden",
+      "ticket_credit_value": "Bevestigde tickettegoedwaarde",
+      "completed_credit_claims": "Voltooide kredietclaims",
+      "failed_credit_claims": "Mislukte kredietclaims",
+      "guardian_consents": "Voogd stemt toe"
+    }
+  }
+}

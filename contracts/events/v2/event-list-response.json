@@ -1,0 +1,155 @@
+{
+  "data": [
+    {
+      "contract_version": 2,
+      "id": 202,
+      "title": "Neighbourhood walk",
+      "description": "A relaxed walk around the neighbourhood.",
+      "primary_image": null,
+      "organizer": {
+        "id": 8,
+        "display_name": "Jordan Patel",
+        "avatar_url": null,
+        "relationship": "member",
+        "actions": {
+          "view_profile": true,
+          "message": false
+        }
+      },
+      "category": null,
+      "location": {
+        "label": "Town square",
+        "latitude": null,
+        "longitude": null,
+        "mode": "in_person"
+      },
+      "schedule": {
+        "start_at": "2030-06-01T10:00:00+00:00",
+        "end_at": null,
+        "timezone": "UTC",
+        "all_day": false,
+        "state": "upcoming",
+        "publication_state": "published",
+        "operational_state": "scheduled",
+        "lifecycle_version": 0,
+        "cancellation_reason": null
+      },
+      "relationship": {
+        "engagement": {
+          "state": "none",
+          "can_change": true
+        },
+        "registration": {
+          "state": "none",
+          "waitlist_position": null,
+          "can_register": true,
+          "can_withdraw": false,
+          "can_join_waitlist": false,
+          "can_leave_waitlist": false
+        },
+        "attendance": {
+          "state": "not_checked_in",
+          "checked_in_at": null,
+          "checked_out_at": null
+        },
+        "capacity": {
+          "limit": null,
+          "confirmed": 0,
+          "remaining": null,
+          "is_full": false,
+          "waitlist_count": 0
+        }
+      },
+      "online_access": {
+        "mode": "in_person",
+        "reveal_state": "not_applicable",
+        "join_url": null,
+        "video_url": null,
+        "reveal_at": null,
+        "expires_at": null
+      },
+      "series": {
+        "named": null,
+        "recurrence": null
+      },
+      "permissions": {
+        "edit": false,
+        "cancel": false,
+        "manage_people": false,
+        "check_in": false,
+        "message": false,
+        "export": false,
+        "publish": false,
+        "manage_agenda": false,
+        "manage_staff": false,
+        "manage_registration": false,
+        "broadcast": false,
+        "manage_finance": false,
+        "reconcile_credits": false,
+        "reconcile_tickets": false,
+        "transfer_ownership": false
+      },
+      "metrics": {
+        "confirmed_count": 0,
+        "interested_count": 0,
+        "waitlist_count": 0
+      },
+      "created_at": "2030-05-01T08:00:00+00:00",
+      "updated_at": null,
+      "organizer_id": 8,
+      "user": {
+        "id": 8,
+        "name": "Jordan Patel",
+        "avatar": null,
+        "avatar_url": null
+      },
+      "category_id": null,
+      "category_name": null,
+      "category_slug": null,
+      "location_label": "Town square",
+      "latitude": null,
+      "longitude": null,
+      "coordinates": null,
+      "start_time": "2030-06-01T10:00:00+00:00",
+      "end_time": null,
+      "start_date": "2030-06-01T10:00:00+00:00",
+      "end_date": null,
+      "status": "active",
+      "cancellation_reason": null,
+      "is_online": false,
+      "allow_remote_attendance": false,
+      "online_link": null,
+      "online_url": null,
+      "video_url": null,
+      "cover_image": null,
+      "image_url": null,
+      "max_attendees": null,
+      "spots_left": null,
+      "is_full": false,
+      "attendee_count": 0,
+      "attendees_count": 0,
+      "interested_count": 0,
+      "waitlist_count": 0,
+      "rsvp_counts": {
+        "going": 0,
+        "interested": 0
+      },
+      "my_rsvp": null,
+      "user_rsvp": null,
+      "rsvp_status": null,
+      "series_id": null,
+      "is_series": false,
+      "parent_event_id": null,
+      "recurrence_frequency": null,
+      "series_count": null,
+      "series_occurrences": [],
+      "can_edit": false,
+      "group": null
+    }
+  ],
+  "meta": {
+    "base_url": "https://api.example.test",
+    "per_page": 20,
+    "has_more": false
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Análise de eventos",
+    "subtitle": "Métricas de desempenho operacional, atendimento, comunicações e conversão com privacidade segura.",
+    "generated_at": "Gerado {{date}}",
+    "loading": "Carregando análise de eventos",
+    "load_error": "Não foi possível carregar a análise de eventos.",
+    "retry": "Tente novamente",
+    "refresh": "Atualizar",
+    "export": "Exportar CSV",
+    "exporting": "Exportando…",
+    "export_started": "Exportação de análise preparada.",
+    "download_error": "Não foi possível fazer download da exportação da análise.",
+    "privacy_title": "Relatórios protegidos por privacidade",
+    "privacy_note": "As métricas opcionais ficam ocultas até que pelo menos {{count}} pessoas consentidas sejam representadas.",
+    "consent_bound": "Vinculado ao consentimento",
+    "suppressed": "Suprimido",
+    "not_limited": "Sem limite",
+    "finance_redacted": "Restrito pela sua função",
+    "columns": {
+      "metric": "Métrica",
+      "value": "Valor"
+    },
+    "sections": {
+      "registration": "Cadastro",
+      "acquisition": "Convites e lista de espera",
+      "attendance": "Presença",
+      "communications": "Comunicações",
+      "funnel": "Funil seguro para privacidade",
+      "finance": "Ingressos e créditos"
+    },
+    "metrics": {
+      "confirmed": "Inscrições confirmadas",
+      "pending": "Inscrições pendentes",
+      "cancelled": "Inscrições canceladas",
+      "capacity_remaining": "Capacidade restante",
+      "invitations_issued": "Convites emitidos",
+      "invitations_accepted": "Convites aceitos",
+      "invitation_conversion": "Conversão de convite",
+      "waitlist_joined": "Ingressos na lista de espera",
+      "waitlist_accepted": "Aceitações na lista de espera",
+      "waitlist_conversion": "Conversão de lista de espera",
+      "checked_in": "Atualmente com check-in",
+      "attended": "Participou",
+      "no_show": "Não comparecimentos",
+      "attendance_rate": "Taxa de comparecimento",
+      "delivered": "Notificações entregues",
+      "suppressed_deliveries": "Notificações suprimidas",
+      "failed_deliveries": "Falha nas notificações",
+      "dead_lettered": "Notificações que requerem intervenção",
+      "delivery_rate": "Taxa de entrega",
+      "event_views": "Visualizações de eventos",
+      "registration_starts": "O registro começa",
+      "start_conversion": "Conversão de visualização para registro",
+      "finance": "Métricas financeiras",
+      "ticket_units": "Unidades de ingressos confirmadas",
+      "ticket_credit_value": "Valor de crédito do bilhete confirmado",
+      "completed_credit_claims": "Reivindicações de crédito concluídas",
+      "failed_credit_claims": "Reivindicações de crédito falhadas",
+      "guardian_consents": "Consentimentos do tutor"
+    }
+  }
+}

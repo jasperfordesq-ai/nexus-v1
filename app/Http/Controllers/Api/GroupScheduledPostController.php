@@ -8,8 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SafeguardingPolicyException;
 use Illuminate\Http\JsonResponse;
-use App\Services\GroupService;
+use Illuminate\Auth\Access\AuthorizationException;
+use App\Services\GroupAccessService;
 use App\Services\GroupScheduledPostService;
+use InvalidArgumentException;
 
 class GroupScheduledPostController extends BaseApiController
 {
@@ -19,7 +21,7 @@ class GroupScheduledPostController extends BaseApiController
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
         }
         return $this->successResponse(GroupScheduledPostService::getScheduled($id));
@@ -29,7 +31,7 @@ class GroupScheduledPostController extends BaseApiController
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
         }
         $data = request()->only(['post_type', 'title', 'content', 'scheduled_at', 'is_recurring', 'recurrence_pattern']);
@@ -40,6 +42,10 @@ class GroupScheduledPostController extends BaseApiController
             $postId = GroupScheduledPostService::schedule($id, $userId, $data);
         } catch (SafeguardingPolicyException $e) {
             return $this->safeguardingPolicyError($e);
+        } catch (AuthorizationException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
+        } catch (InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
         return $this->successResponse(['id' => $postId], 201);
     }
@@ -48,10 +54,10 @@ class GroupScheduledPostController extends BaseApiController
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) return $userId;
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canIntegrate($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
         }
-        return GroupScheduledPostService::cancel($id, $postId)
+        return GroupScheduledPostService::cancel($id, $postId, $userId)
             ? $this->successResponse(['message' => __('api_controllers_3.group_scheduled_post.cancelled')])
             : $this->errorResponse(__('api_controllers_3.group_scheduled_post.not_found_or_published'), 404);
     }

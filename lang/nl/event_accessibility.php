@@ -1,0 +1,45 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'form' => [
+        'title' => 'Toegankelijkheid van de locatie',
+        'hint' => 'Leg vast wat op de locatie beschikbaar is. Kies ‘Niet bekend’ als de organisator een voorziening niet heeft gecontroleerd; dit is iets anders dan ‘Nee’.',
+        'parking_details' => 'Parkeren en aankomst',
+        'parking_details_hint' => 'Beschrijf toegankelijke parkeerplaatsen, afzetpunten en de route naar de ingang.',
+        'transit_details' => 'Openbaar vervoer',
+        'transit_details_hint' => 'Beschrijf haltes of stations in de buurt en eventuele obstakels op de route.',
+        'assistance_contact' => 'Contact voor toegankelijkheidshulp',
+        'assistance_contact_hint' => 'Geef een openbaar contact voor vragen over toegang. Vul geen privégegevens van deelnemers in.',
+        'notes' => 'Aanvullende toegangsinformatie',
+        'notes_hint' => 'Vermeld nuttige informatie over ingang, lift, ondergrond, verlichting of prikkelomgeving.',
+        'privacy_note' => 'Deze informatie wordt aan evenementleden getoond. Privéverzoeken om aanpassingen horen in het registratieformulier.',
+    ],
+    'features' => [
+        'step_free_access' => 'Drempelvrije toegang',
+        'accessible_toilet' => 'Toegankelijk toilet',
+        'hearing_loop' => 'Ringleiding',
+        'quiet_space' => 'Prikkelarme ruimte',
+        'seating_available' => 'Zitplaatsen beschikbaar',
+        'accessible_parking' => 'Toegankelijke parkeerplaats',
+    ],
+    'status' => ['yes' => 'Ja', 'no' => 'Nee', 'unknown' => 'Niet bekend'],
+    'filters' => [
+        'step_free_label' => 'Drempelvrije toegang tot de locatie',
+        'step_free_hint' => 'Filter op de door de organisator bevestigde toegankelijkheidsinformatie.',
+        'step_free_options' => ['any' => 'Elke locatie', 'yes' => 'Drempelvrije toegang bevestigd', 'no' => 'Niet drempelvrij', 'unknown' => 'Drempelvrije toegang onbekend'],
+        'step_free_active' => 'Drempelvrije toegang: :value',
+    ],
+    'detail' => [
+        'title' => 'Toegankelijkheid van de locatie',
+        'intro' => 'Toegangsinformatie van de organisator. Neem contact op als je een voorziening wilt bevestigen.',
+        'features_label' => 'Toegankelijkheidsvoorzieningen van de locatie',
+        'parking_details' => 'Parkeren en aankomst',
+        'transit_details' => 'Openbaar vervoer',
+        'assistance_contact' => 'Toegankelijkheidshulp',
+        'notes' => 'Aanvullende toegangsinformatie',
+    ],
+];

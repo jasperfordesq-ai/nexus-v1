@@ -40,6 +40,7 @@ const defaultNotifications: NotificationSettings = {
   email_connections: false,
   email_transactions: true,
   email_reviews: false,
+  email_events: false,
   email_gamification_digest: false,
   email_gamification_milestones: true,
   email_org_payments: false,
@@ -123,6 +124,19 @@ describe('NotificationsTab', () => {
     // The frequency label appears more than once (label + control), so assert
     // at least one rendering.
     expect(screen.getAllByText('match_digest.frequency').length).toBeGreaterThan(0);
+  });
+
+  it('renders and updates the Events email preference', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+    const onNotificationsChange = vi.fn();
+
+    render(<NotificationsTab {...defaultProps} onNotificationsChange={onNotificationsChange} />);
+    await user.click(screen.getByRole('switch', { name: 'notification_prefs.event_emails' }));
+
+    expect(onNotificationsChange).toHaveBeenCalledOnce();
+    const update = onNotificationsChange.mock.calls[0][0];
+    expect(update(defaultNotifications).email_events).toBe(true);
   });
 
   it('calls onSave when save button is clicked', async () => {

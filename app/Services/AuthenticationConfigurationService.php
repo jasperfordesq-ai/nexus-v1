@@ -15,9 +15,9 @@ use InvalidArgumentException;
 /**
  * Typed tenant configuration for TOTP two-factor authentication and passkeys.
  *
- * The feature flags that surface these controls govern new enrolment only.
- * Existing TOTP verification and passkey authentication must remain available
- * so a policy change cannot lock members out of their accounts.
+ * The biometric_login feature is the tenant-wide authentication kill switch.
+ * New passkey enrolment is independently controlled here so administrators can
+ * pause registrations without taking existing passkey sign-in offline.
  */
 class AuthenticationConfigurationService
 {
@@ -25,17 +25,23 @@ class AuthenticationConfigurationService
     public const CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS = 'two_factor.trusted_device_days';
     public const CONFIG_TWO_FACTOR_BACKUP_CODE_COUNT = 'two_factor.backup_code_count';
     public const CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL = 'passkeys.conditional_autofill';
+    public const CONFIG_PASSKEYS_ENROLLMENT_ENABLED = 'passkeys.enrollment_enabled';
+    public const CONFIG_PASSKEYS_MAX_CREDENTIALS = 'passkeys.max_credentials_per_user';
 
     public const TRUSTED_DEVICE_DAYS_MIN = 1;
     public const TRUSTED_DEVICE_DAYS_MAX = 365;
     public const BACKUP_CODE_COUNT_MIN = 1;
     public const BACKUP_CODE_COUNT_MAX = 100;
+    public const PASSKEY_CREDENTIALS_MIN = 1;
+    public const PASSKEY_CREDENTIALS_MAX = 20;
 
     public const DEFAULTS = [
         self::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES => true,
         self::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS => 30,
         self::CONFIG_TWO_FACTOR_BACKUP_CODE_COUNT => 10,
         self::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL => true,
+        self::CONFIG_PASSKEYS_ENROLLMENT_ENABLED => true,
+        self::CONFIG_PASSKEYS_MAX_CREDENTIALS => 10,
     ];
 
     private const CACHE_TTL = 300;
@@ -112,13 +118,17 @@ class AuthenticationConfigurationService
     {
         return match ($key) {
             self::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES,
-            self::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL => is_bool($value),
+            self::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL,
+            self::CONFIG_PASSKEYS_ENROLLMENT_ENABLED => is_bool($value),
             self::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS => is_int($value)
                 && $value >= self::TRUSTED_DEVICE_DAYS_MIN
                 && $value <= self::TRUSTED_DEVICE_DAYS_MAX,
             self::CONFIG_TWO_FACTOR_BACKUP_CODE_COUNT => is_int($value)
                 && $value >= self::BACKUP_CODE_COUNT_MIN
                 && $value <= self::BACKUP_CODE_COUNT_MAX,
+            self::CONFIG_PASSKEYS_MAX_CREDENTIALS => is_int($value)
+                && $value >= self::PASSKEY_CREDENTIALS_MIN
+                && $value <= self::PASSKEY_CREDENTIALS_MAX,
             default => false,
         };
     }

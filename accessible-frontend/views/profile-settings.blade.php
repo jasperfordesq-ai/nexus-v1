@@ -136,6 +136,8 @@
                     'passkey-not-found' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.not_found'), 'anchor' => '#passkeys'],
                     'passkey-last-sign-in-method' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.last_sign_in_method'), 'anchor' => '#passkeys'],
                     'passkey-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.name_required'), 'anchor' => '#passkeys'],
+                    'passkey-password-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_current_required'), 'anchor' => '#passkeys'],
+                    'passkey-password-incorrect' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_current_incorrect'), 'anchor' => '#passkeys'],
                     'personalisation-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.personalisation.saved')],
                     'personalisation-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.personalisation.failed'), 'anchor' => '#personalisation'],
                     'match-prefs-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.match.saved')],
@@ -495,6 +497,10 @@
                                     <label class="govuk-label" for="rename-{{ $loop->index }}">{{ __('govuk_alpha.profile_settings.passkeys.rename_label') }}</label>
                                     <input class="govuk-input govuk-!-width-two-thirds" id="rename-{{ $loop->index }}" name="device_name" type="text" value="{{ $pk['device_name'] ?? '' }}" maxlength="100">
                                 </div>
+                                <div class="govuk-form-group govuk-!-margin-bottom-2">
+                                    <label class="govuk-label" for="rename-password-{{ $loop->index }}">{{ __('govuk_alpha.profile_settings.current_password_label') }}</label>
+                                    <input class="govuk-input govuk-!-width-two-thirds" id="rename-password-{{ $loop->index }}" name="current_password" type="password" autocomplete="current-password" required>
+                                </div>
                                 <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.rename_submit') }}</button>
                             </form>
                             <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
@@ -512,6 +518,10 @@
                                     <form method="post" action="{{ route('govuk-alpha.profile.passkeys.remove', ['tenantSlug' => $tenantSlug]) }}">
                                         @csrf
                                         <input type="hidden" name="credential_id" value="{{ $pk['credential_id'] ?? '' }}">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="remove-password-{{ $loop->index }}">{{ __('govuk_alpha.profile_settings.current_password_label') }}</label>
+                                            <input class="govuk-input govuk-!-width-two-thirds" id="remove-password-{{ $loop->index }}" name="current_password" type="password" autocomplete="current-password" required>
+                                        </div>
                                         <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.remove_submit') }}<span class="govuk-visually-hidden"> {{ $pkName }}</span></button>
                                     </form>
                                 </div>
@@ -599,7 +609,7 @@
                 @php
                     $notifGroups = [
                         'messages' => ['email_messages', 'email_connections', 'caring_smart_nudges', 'federation_notifications_enabled'],
-                        'activity' => ['email_listings', 'email_transactions', 'email_reviews'],
+                        'activity' => ['email_listings', 'email_events', 'email_transactions', 'email_reviews'],
                         'achievements' => ['email_gamification_digest', 'email_gamification_milestones', 'email_digest'],
                         'organisation' => ['email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin'],
                         'push' => ['push_enabled', 'push_campaigns_opted_in'],

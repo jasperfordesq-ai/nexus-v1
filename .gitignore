@@ -61,6 +61,8 @@ CLAUDE.md
 !/scripts/check-docs-hygiene.mjs
 !/scripts/check-version-consistency.mjs
 !/scripts/check-changelog-updated.mjs
+!/scripts/check-events-e2e-quality.mjs
+!/scripts/test-events.mjs
 !/scripts/audit-cache-headers.mjs
 !/scripts/audit-performance-routes.mjs
 !/scripts/check-govuk-alpha-translations.mjs

@@ -11,9 +11,12 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * GroupApprovalWorkflowService — manages group creation approval workflow.
@@ -43,27 +46,40 @@ class GroupApprovalWorkflowService
      */
     public static function submitForApproval(int $groupId, int $userId, string $notes = ''): int
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
 
-        // Check for existing pending request to prevent duplicates
-        $existing = DB::selectOne(
-            "SELECT id FROM group_approval_requests
-             WHERE tenant_id = ? AND group_id = ? AND status = ?",
-            [$tenantId, $groupId, self::STATUS_PENDING]
-        );
+        return DB::transaction(function () use ($groupId, $userId, $notes, $tenantId): int {
+            $group = DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->where('owner_id', $userId)
+                ->where('status', GroupStatus::PendingReview->value)
+                ->lockForUpdate()
+                ->first();
 
-        if ($existing) {
-            return (int) $existing->id;
-        }
+            if ($group === null) {
+                throw new InvalidArgumentException('Only a pending-review group owner can submit approval.');
+            }
 
-        // Insert new approval request
-        DB::insert(
-            "INSERT INTO group_approval_requests (tenant_id, group_id, submitted_by, status, submission_notes, created_at)
-             VALUES (?, ?, ?, ?, ?, NOW())",
-            [$tenantId, $groupId, $userId, self::STATUS_PENDING, $notes]
-        );
+            $existing = DB::table('group_approval_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('group_id', $groupId)
+                ->where('status', self::STATUS_PENDING)
+                ->value('id');
 
-        return (int) DB::getPdo()->lastInsertId();
+            if ($existing !== null) {
+                return (int) $existing;
+            }
+
+            return (int) DB::table('group_approval_requests')->insertGetId([
+                'tenant_id' => $tenantId,
+                'group_id' => $groupId,
+                'submitted_by' => $userId,
+                'status' => self::STATUS_PENDING,
+                'submission_notes' => $notes,
+                'created_at' => now(),
+            ]);
+        });
     }
 
     /**
@@ -97,22 +113,15 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $request = DB::selectOne(
-            "SELECT gar.submitted_by, g.name AS group_name, g.id AS group_id
-             FROM group_approval_requests gar
-             LEFT JOIN `groups` g ON g.id = gar.group_id AND g.tenant_id = gar.tenant_id
-             WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
-            [$requestId, $tenantId, self::STATUS_PENDING]
+        $request = self::reviewRequest(
+            $requestId,
+            $approverId,
+            $notes,
+            self::STATUS_APPROVED,
+            GroupStatus::Active,
         );
 
-        $affected = DB::update(
-            "UPDATE group_approval_requests
-             SET status = ?, reviewed_by = ?, review_notes = ?, reviewed_at = NOW()
-             WHERE id = ? AND tenant_id = ? AND status = ?",
-            [self::STATUS_APPROVED, $approverId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
-        );
-
-        if ($affected > 0 && $request) {
+        if ($request) {
             try {
                 $user = DB::table('users')->where('id', $request->submitted_by)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
@@ -137,7 +146,7 @@ class GroupApprovalWorkflowService
             }
         }
 
-        return $affected > 0;
+        return $request !== null;
     }
 
     /**
@@ -152,22 +161,15 @@ class GroupApprovalWorkflowService
     {
         $tenantId = TenantContext::getId();
 
-        $request = DB::selectOne(
-            "SELECT gar.submitted_by, g.name AS group_name
-             FROM group_approval_requests gar
-             LEFT JOIN `groups` g ON g.id = gar.group_id AND g.tenant_id = gar.tenant_id
-             WHERE gar.id = ? AND gar.tenant_id = ? AND gar.status = ?",
-            [$requestId, $tenantId, self::STATUS_PENDING]
+        $request = self::reviewRequest(
+            $requestId,
+            $rejecterId,
+            $notes,
+            self::STATUS_REJECTED,
+            GroupStatus::Rejected,
         );
 
-        $affected = DB::update(
-            "UPDATE group_approval_requests
-             SET status = ?, reviewed_by = ?, review_notes = ?, reviewed_at = NOW()
-             WHERE id = ? AND tenant_id = ? AND status = ?",
-            [self::STATUS_REJECTED, $rejecterId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
-        );
-
-        if ($affected > 0 && $request) {
+        if ($request) {
             try {
                 $user = DB::table('users')->where('id', $request->submitted_by)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($user && !empty($user->email)) {
@@ -194,7 +196,7 @@ class GroupApprovalWorkflowService
             }
         }
 
-        return $affected > 0;
+        return $request !== null;
     }
 
     /**
@@ -218,5 +220,66 @@ class GroupApprovalWorkflowService
         );
 
         return array_map(fn($r) => (array) $r, $rows);
+    }
+
+    private static function reviewRequest(
+        int $requestId,
+        int $reviewerId,
+        string $notes,
+        string $requestStatus,
+        GroupStatus $groupStatus,
+    ): object|null {
+        $tenantId = (int) TenantContext::getId();
+
+        return DB::transaction(function () use (
+            $requestId,
+            $reviewerId,
+            $notes,
+            $requestStatus,
+            $groupStatus,
+            $tenantId,
+        ): object|null {
+            $request = DB::table('group_approval_requests as gar')
+                ->join('groups as g', function ($join): void {
+                    $join->on('g.id', '=', 'gar.group_id')
+                        ->on('g.tenant_id', '=', 'gar.tenant_id');
+                })
+                ->where('gar.id', $requestId)
+                ->where('gar.tenant_id', $tenantId)
+                ->where('gar.status', self::STATUS_PENDING)
+                ->select([
+                    'gar.submitted_by',
+                    'gar.group_id',
+                    'g.name as group_name',
+                ])
+                ->lockForUpdate()
+                ->first();
+
+            if ($request === null || ! GroupLifecycleService::transition(
+                (int) $request->group_id,
+                $groupStatus->value,
+                $reviewerId,
+                $notes,
+            )) {
+                return null;
+            }
+
+            $affected = DB::table('group_approval_requests')
+                ->where('id', $requestId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', self::STATUS_PENDING)
+                ->update([
+                    'status' => $requestStatus,
+                    'reviewed_by' => $reviewerId,
+                    'review_notes' => $notes,
+                    'reviewed_at' => now(),
+                ]);
+
+            if ($affected !== 1) {
+                throw new RuntimeException('Concurrent group approval review prevented an atomic transition.');
+            }
+
+            return $request;
+        });
     }
 }

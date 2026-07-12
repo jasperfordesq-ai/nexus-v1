@@ -9,7 +9,6 @@ import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Plus from 'lucide-react/icons/plus';
-import Settings from 'lucide-react/icons/settings';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Edit2 from 'lucide-react/icons/pen';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -17,7 +16,6 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupType } from '@/admin/api/types';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import GroupPolicies from './GroupPolicies';
 
 export default function GroupTypes() {
   const { t } = useTranslation('admin_groups');
@@ -37,7 +35,6 @@ export default function GroupTypes() {
 
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
-  const { isOpen: isPoliciesOpen, onOpen: onPoliciesOpen, onClose: onPoliciesClose } = useDisclosure();
 
   const loadTypes = useCallback(async () => {
     try {
@@ -129,11 +126,6 @@ export default function GroupTypes() {
     onEditOpen();
   };
 
-  const openPolicies = (type: GroupType) => {
-    setSelectedType(type);
-    onPoliciesOpen();
-  };
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -154,7 +146,6 @@ export default function GroupTypes() {
             <TableColumn>{t('groups.col_name')}</TableColumn>
             <TableColumn>{t('groups.col_icon')}</TableColumn>
             <TableColumn>{t('groups.col_groups')}</TableColumn>
-            <TableColumn>{t('groups.col_policies')}</TableColumn>
             <TableColumn>{t('groups.col_created')}</TableColumn>
             <TableColumn>{t('groups.col_actions')}</TableColumn>
           </TableHeader>
@@ -183,18 +174,9 @@ export default function GroupTypes() {
                   </div>
                 </TableCell>
                 <TableCell>{type.member_count}</TableCell>
-                <TableCell>{type.policy_count}</TableCell>
                 <TableCell>{new Date(type.created_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="tertiary"
-                      startContent={<Settings className="w-3 h-3" aria-hidden="true" />}
-                      onPress={() => openPolicies(type)}
-                    >
-                      {t('groups.policies')}
-                    </Button>
                     <Button
                       size="sm"
                       variant="tertiary"
@@ -317,16 +299,6 @@ export default function GroupTypes() {
         confirmColor="danger"
         isLoading={deleteLoading}
       />
-
-      {/* Policies Modal */}
-      {selectedType && (
-        <GroupPolicies
-          isOpen={isPoliciesOpen}
-          onClose={onPoliciesClose}
-          typeId={selectedType.id}
-          typeName={selectedType.name}
-        />
-      )}
     </div>
   );
 }

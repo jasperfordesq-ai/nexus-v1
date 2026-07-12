@@ -1,0 +1,73 @@
+{
+  "subject": "Event update: :title",
+  "view_event": "View event",
+  "accept_offer": "Accept your place",
+  "reason": "Reason: :reason",
+  "states": {
+    "invited": "invited",
+    "pending": "pending",
+    "confirmed": "confirmed",
+    "declined": "declined",
+    "cancelled": "cancelled",
+    "waiting": "waiting",
+    "offered": "offered",
+    "accepted": "accepted",
+    "expired": "expired"
+  },
+  "lifecycle": {
+    "published": "The event \u201c:title\u201d has been published.",
+    "postponed": "The event \u201c:title\u201d has been postponed.",
+    "cancelled": "The event \u201c:title\u201d has been cancelled.",
+    "archived": "The event \u201c:title\u201d has been archived.",
+    "restored": "The event \u201c:title\u201d has been restored.",
+    "completed": "The event \u201c:title\u201d has been completed."
+  },
+  "registration": {
+    "invited": "You have been invited to \u201c:title\u201d.",
+    "pending": "Your registration for \u201c:title\u201d is pending.",
+    "confirmed": "Your registration for \u201c:title\u201d is confirmed.",
+    "declined": "Your registration for \u201c:title\u201d was declined.",
+    "cancelled": "Your registration for \u201c:title\u201d was cancelled.",
+    "organizer": ":name\u2019s registration for \u201c:title\u201d is now :state."
+  },
+  "waitlist": {
+    "waiting": "You are on the waitlist for \u201c:title\u201d.",
+    "offered": "A place is available for you at \u201c:title\u201d. Accept it before the offer expires.",
+    "accepted": "You accepted your place at \u201c:title\u201d.",
+    "expired": "Your place offer for \u201c:title\u201d has expired.",
+    "cancelled": "You are no longer on the waitlist for \u201c:title\u201d.",
+    "organizer": ":name\u2019s waitlist status for \u201c:title\u201d is now :state."
+  },
+  "staff_role": {
+    "granted": "You have been assigned the :role role for \u201c:title\u201d.",
+    "revoked": "Your :role role for \u201c:title\u201d has been removed."
+  },
+  "reminder": {
+    "subject": "Event reminder: :title",
+    "message": "\u201c:title\u201d starts in :offset on :when."
+  },
+  "update": {
+    "message": "\u201c:title\u201d changed: :changes.",
+    "separator": ", ",
+    "series_scope": "This change applies to all future occurrences.",
+    "fields": {
+      "title": "title",
+      "time": "date or time",
+      "timezone": "time zone",
+      "all_day": "all-day setting",
+      "venue": "venue",
+      "online_access": "online access",
+      "capacity": "capacity",
+      "accessibility": "venue accessibility",
+      "cancellation_policy": "cancellation policy"
+    }
+  },
+  "roles": {
+    "co_organizer": "co-organiser",
+    "registration_manager": "registration manager",
+    "communications_manager": "communications manager",
+    "check_in_staff": "check-in staff",
+    "finance_manager": "finance manager",
+    "staff": "event staff"
+  }
+}

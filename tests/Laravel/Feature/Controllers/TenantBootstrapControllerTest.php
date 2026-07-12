@@ -307,6 +307,28 @@ class TenantBootstrapControllerTest extends TestCase
         }
     }
 
+    public function test_platform_passkey_emergency_switch_is_exposed_to_login_clients(): void
+    {
+        config(['webauthn.authentication_enabled' => false]);
+        app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+        app(RedisCache::class)->delete('tenants_list_public');
+
+        try {
+            $this->apiGet('/v2/tenant/bootstrap?slug=' . $this->testTenantSlug)
+                ->assertOk()
+                ->assertJsonPath('data.features.biometric_login', false);
+
+            $tenant = collect($this->apiGet('/v2/tenants')->assertOk()->json('data'))
+                ->firstWhere('id', $this->testTenantId);
+            $this->assertNotNull($tenant);
+            $this->assertFalse($tenant['features']['biometric_login']);
+        } finally {
+            config(['webauthn.authentication_enabled' => true]);
+            app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+            app(RedisCache::class)->delete('tenants_list_public');
+        }
+    }
+
     public function test_list_excludes_master_tenant_by_default(): void
     {
         $response = $this->apiGet('/v2/tenants');

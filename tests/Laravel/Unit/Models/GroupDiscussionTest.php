@@ -26,7 +26,7 @@ class GroupDiscussionTest extends TestCase
     {
         $model = new GroupDiscussion();
         $expected = [
-            'tenant_id', 'group_id', 'user_id', 'title', 'is_pinned',
+            'tenant_id', 'group_id', 'user_id', 'title', 'is_pinned', 'is_locked',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }
@@ -38,6 +38,7 @@ class GroupDiscussionTest extends TestCase
         $this->assertEquals('integer', $casts['group_id']);
         $this->assertEquals('integer', $casts['user_id']);
         $this->assertEquals('boolean', $casts['is_pinned']);
+        $this->assertEquals('boolean', $casts['is_locked']);
     }
 
     public function test_uses_has_tenant_scope_trait(): void

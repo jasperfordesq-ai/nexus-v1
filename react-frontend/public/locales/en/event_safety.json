@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "Safety",
+    "overview": "Safety requirements and reviews"
+  },
+  "safety": {
+    "actions": {
+      "retry": "Try again",
+      "save_draft": "Save draft",
+      "publish": "Publish requirements",
+      "archive": "Archive requirements",
+      "cancel": "Cancel",
+      "confirm_archive": "Archive now",
+      "acknowledge": "Acknowledge the code",
+      "withdraw_acknowledgement": "Withdraw acknowledgement",
+      "request_guardian_consent": "Request guardian consent",
+      "withdraw_guardian_consent": "Withdraw consent request",
+      "change_member": "Change member",
+      "save_review": "Save review decision",
+      "cancel_edit": "Cancel edit",
+      "edit_review": "Update decision",
+      "withdraw_review": "Withdraw decision"
+    },
+    "organizer": {
+      "title": "Event safety",
+      "description": "Set versioned participation requirements and keep a controlled, auditable record of safety decisions.",
+      "loading": "Loading event safety",
+      "load_error_title": "Event safety is unavailable",
+      "load_error_description": "The safety policy and review ledger could not be loaded. No safety decision has been changed.",
+      "configuration_invalid": "Safety enforcement is unavailable because its configuration is invalid.",
+      "shadow_title": "Observation mode",
+      "shadow_description": "Requirements are evaluated and recorded, but they do not yet block participation.",
+      "read_only": "You can view this policy but cannot change its requirements.",
+      "action_error": "The safety change could not be saved. Refresh the workspace and try again.",
+      "success": {
+        "saved": "Safety requirements saved as a draft.",
+        "published": "Safety requirements published.",
+        "archived": "Safety requirements archived."
+      }
+    },
+    "attendee": {
+      "title": "Participation requirements",
+      "description": "Complete the applicable safety steps before registering or joining the waitlist.",
+      "loading": "Loading participation requirements",
+      "load_error_title": "Participation requirements are unavailable",
+      "load_error_description": "We could not verify the event's safety requirements. Try again before registering.",
+      "action_error": "That safety step could not be completed. Try again.",
+      "denial_title": "Participation is not currently permitted",
+      "attention_title": "Action is required",
+      "success": {
+        "acknowledge": "Code of conduct acknowledged.",
+        "withdraw_code": "Code acknowledgement withdrawn.",
+        "request_guardian": "Guardian consent request sent.",
+        "withdraw_guardian": "Guardian consent request withdrawn."
+      }
+    },
+    "rollout": {
+      "off": "Enforcement off",
+      "shadow": "Observation mode",
+      "enforce": "Enforcement active"
+    },
+    "requirements": {
+      "title": "Participation policy",
+      "description": "Draft changes are private until published. Publishing creates an immutable version for evidence matching.",
+      "minimum_age": "Minimum age",
+      "minimum_age_hint": "Leave blank when the event has no minimum age.",
+      "guardian_required": "Require guardian consent for minors",
+      "guardian_required_hint": "Consent is bound to the exact published requirement version and event date.",
+      "minor_threshold": "Minor age threshold",
+      "minor_threshold_hint": "Members below this age at the event need consent.",
+      "code_required": "Require code-of-conduct acknowledgement",
+      "code_required_hint": "Attendees must acknowledge the exact published text before participating.",
+      "code_version": "Code text version",
+      "code_version_hint": "Use a meaningful identifier, such as event-conduct-2026-01.",
+      "code_text": "Code of conduct",
+      "code_text_hint": "State the complete terms attendees must read and acknowledge.",
+      "archive_title": "Archive these safety requirements?",
+      "archive_description": "Archived requirements stop being the active participation policy. The evidence and audit history remain retained.",
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived"
+      }
+    },
+    "eligibility": {
+      "allow": "Requirements complete",
+      "deny": "Participation blocked",
+      "unavailable": "Verification unavailable",
+      "not_evaluated": "Not yet evaluated"
+    },
+    "reasons": {
+      "unknown": "A participation requirement still needs attention.",
+      "safeguarding_policy": "Safeguarding policy decision",
+      "minimum_age": "Minimum age requirement",
+      "guardian_consent": "Guardian consent requirement",
+      "code_of_conduct": "Code-of-conduct requirement",
+      "conduct_violation": "Conduct violation",
+      "safety_review": "Safety review decision",
+      "user_block": "A member block prevents participation",
+      "event_safety_unbound_guest_denied": "Sign in to verify the participation requirements.",
+      "event_safety_user_not_active": "Your member account is not currently active.",
+      "event_safety_bilateral_user_block": "A member block prevents participation in this event.",
+      "event_safety_requirements_not_published": "The organizer has not published the safety requirements yet.",
+      "event_safety_requirements_integrity_invalid": "The published safety requirements could not be verified.",
+      "event_safety_requirements_version_unavailable": "The published requirement version is unavailable.",
+      "event_safety_date_of_birth_required": "Add your date of birth so age requirements can be checked.",
+      "event_safety_date_of_birth_invalid": "Your recorded date of birth could not be verified.",
+      "event_safety_minimum_age_not_met": "You do not meet this event's minimum age.",
+      "event_safety_minor_policy_unavailable": "The policy for minor participation is unavailable.",
+      "event_safety_guardian_consent_required": "Valid guardian consent is required.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Acknowledge the current code of conduct.",
+      "event_safety_active_participation_denial": "An active safety decision prevents participation.",
+      "event_safety_safeguarding_policy_denied": "The safeguarding policy does not currently permit participation.",
+      "event_safety_safeguarding_policy_invalid": "The safeguarding decision could not be verified.",
+      "event_safety_safeguarding_policy_unavailable": "Safeguarding verification is temporarily unavailable.",
+      "event_safety_schema_unavailable": "Safety verification is temporarily unavailable.",
+      "event_safety_evaluation_unavailable": "Safety verification is temporarily unavailable.",
+      "event_safety_organizer_not_active": "The event organizer is not currently active.",
+      "event_safety_denial_safeguarding_policy": "A safeguarding policy decision prevents participation."
+    },
+    "code": {
+      "title": "Code of conduct",
+      "confirm_read": "I have read and agree to the complete code of conduct.",
+      "status": {
+        "not_required": "Not required",
+        "required": "Acknowledgement required",
+        "acknowledged": "Acknowledged"
+      }
+    },
+    "guardian": {
+      "title": "Guardian consent",
+      "description": "The guardian receives a private, time-limited link. Their identity and consent token are never shown in the event roster.",
+      "name_label": "Guardian name",
+      "email_label": "Guardian email",
+      "relationship_label": "Relationship to the attendee",
+      "privacy_notice": "The address is encrypted for delivery and removed from the delivery envelope after processing.",
+      "relationships": {
+        "parent": "Parent",
+        "guardian": "Guardian",
+        "legal_guardian": "Legal guardian",
+        "carer": "Carer"
+      },
+      "status": {
+        "not_required": "Not required",
+        "required": "Consent required",
+        "pending": "Awaiting guardian",
+        "active": "Consent granted",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
+      }
+    },
+    "decisions": {
+      "deny": "Deny participation",
+      "remove": "Remove from event"
+    },
+    "review_status": {
+      "active": "Active",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "review_actions": {
+      "recorded": "Decision recorded",
+      "withdrawn": "Decision withdrawn",
+      "expired": "Decision expired"
+    },
+    "reviews": {
+      "title": "Participation reviews",
+      "description": "Record controlled decisions without free-text notes, contact details, or incident records.",
+      "new_title": "Record a decision",
+      "edit_title": "Update this decision",
+      "member_label": "Find a member",
+      "member_hint": "Search by name, then select the correct member.",
+      "member_search_error": "Members could not be searched. Try again.",
+      "decision_label": "Decision",
+      "reason_label": "Controlled reason",
+      "effective_from": "Effective from",
+      "effective_until": "Effective until",
+      "effective_until_hint": "Leave blank when the decision has no scheduled end.",
+      "no_notes_notice": "For privacy, this ledger accepts controlled reason codes only. Record incidents and sensitive evidence in the approved safeguarding system.",
+      "saved": "Participation review saved.",
+      "withdrawn": "Participation review withdrawn.",
+      "action_error": "The participation review could not be changed. Refresh and try again.",
+      "history_title": "Review ledger",
+      "total": "{{count}} recorded decisions",
+      "empty": "No participation reviews have been recorded for this event.",
+      "reviewed_by": "Reviewed by",
+      "version": "Decision version",
+      "audit_history": "Audit history ({{count}} entries)",
+      "pagination": "Participation review pages"
+    },
+    "guardian_grant": {
+      "page_title": "Guardian consent",
+      "title": "Review guardian consent",
+      "description": "Confirm the email address that received this private link, then give consent for the attendee to take part under the event's published safety requirements.",
+      "email_label": "Guardian email address",
+      "email_hint": "Enter the same address that received the consent request.",
+      "confirm_label": "I am the named parent, guardian or carer and I consent to this attendee taking part.",
+      "privacy_notice": "The link is time limited and can be used only for this event and requirement version. The response does not reveal whether an email address is registered.",
+      "submit": "Give consent",
+      "success_title": "Consent recorded",
+      "success_description": "The attendee can now continue once any other event requirements are complete.",
+      "invalid_title": "This consent link cannot be used",
+      "invalid_description": "The link or email address may be incorrect, expired or already completed. Ask the attendee to send a new request.",
+      "browse_events": "Browse events"
+    }
+  },
+  "govuk": {
+    "link": "Safety requirements and reviews",
+    "back": "Back to event",
+    "title": "Event safety",
+    "intro": "Review the participation requirements, complete any steps that apply to you, or manage the event's controlled safety policy.",
+    "updated": "The event safety record has been updated.",
+    "failed": "The safety change could not be completed. Review the current information and try again.",
+    "unavailable_title": "Event safety is unavailable",
+    "unavailable_body": "The participation requirements could not be verified. No safety decision has been changed.",
+    "rollout": {
+      "off": "Enforcement off",
+      "shadow": "Observation mode",
+      "enforce": "Enforcement active"
+    },
+    "requirement_status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "policy_title": "Participation policy",
+    "policy_intro": "Draft changes remain private until published. Each published version is retained for evidence matching.",
+    "minimum_age": "Minimum age",
+    "minimum_age_hint": "Leave blank when the event has no minimum age.",
+    "guardian_policy": "Guardian consent",
+    "guardian_required": "Require guardian consent for minors",
+    "minor_threshold": "Minor age threshold",
+    "minor_threshold_hint": "Members below this age at the event need guardian consent.",
+    "code_policy": "Code of conduct",
+    "code_required": "Require attendees to acknowledge the code of conduct",
+    "code_version": "Code text version",
+    "code_version_hint": "Use a meaningful identifier, such as event-conduct-2026-01.",
+    "code_text": "Complete code-of-conduct text",
+    "save_draft": "Save draft",
+    "publish": "Publish requirements",
+    "archive": "Archive requirements",
+    "archive_warning": "Archived requirements stop being the active policy. Evidence and audit history remain retained.",
+    "confirm_archive": "Archive now",
+    "attendee_title": "Participation requirements",
+    "eligibility": {
+      "allow": "Your applicable requirements are complete.",
+      "deny": "Participation is currently blocked until the listed requirements are resolved.",
+      "unavailable": "The requirements cannot currently be verified. Try again before registering.",
+      "not_evaluated": "The participation requirements have not yet been evaluated."
+    },
+    "action_required": "Action is required before participation",
+    "code_title": "Code of conduct",
+    "confirm_code": "I have read and agree to the complete code of conduct.",
+    "acknowledge": "Acknowledge the code",
+    "withdraw_acknowledgement": "Withdraw acknowledgement",
+    "guardian_title": "Guardian consent",
+    "guardian_status": {
+      "not_required": "Guardian consent is not required.",
+      "required": "A guardian consent request is required.",
+      "pending": "The request is awaiting the guardian's response.",
+      "active": "Guardian consent has been granted.",
+      "withdrawn": "The guardian consent request was withdrawn.",
+      "expired": "The guardian consent request has expired."
+    },
+    "guardian_name": "Guardian name",
+    "guardian_email": "Guardian email address",
+    "guardian_relationship": "Relationship to the attendee",
+    "relationships": {
+      "parent": "Parent",
+      "guardian": "Guardian",
+      "legal_guardian": "Legal guardian",
+      "carer": "Carer"
+    },
+    "guardian_privacy": "The address is encrypted for delivery and removed from the delivery envelope after processing.",
+    "request_guardian": "Send consent request",
+    "withdraw_guardian": "Withdraw consent request",
+    "reviews_title": "Participation reviews",
+    "reviews_intro": "Record controlled decisions without free-text notes, contact details or incident records.",
+    "review_member": "Event participant",
+    "review_member_choose": "Choose a participant",
+    "member_fallback": "Member #:id",
+    "review_decision": "Decision",
+    "decisions": {
+      "deny": "Deny participation",
+      "remove": "Remove from event"
+    },
+    "review_reason": "Controlled reason",
+    "reasons": {
+      "unknown": "A participation requirement still needs attention.",
+      "safeguarding_policy": "Safeguarding policy decision",
+      "minimum_age": "Minimum age requirement",
+      "guardian_consent": "Guardian consent requirement",
+      "code_of_conduct": "Code-of-conduct requirement",
+      "conduct_violation": "Conduct violation",
+      "safety_review": "Safety review decision",
+      "user_block": "A member block prevents participation"
+    },
+    "effective_from": "Effective from",
+    "effective_until": "Effective until",
+    "effective_until_hint": "Leave blank when the decision has no scheduled end.",
+    "no_notes": "For privacy, use controlled reasons only. Keep incidents and sensitive evidence in the approved safeguarding system.",
+    "save_review": "Save review decision",
+    "no_people": "No event participants are available for a new review.",
+    "open_people": "Open the event people workspace",
+    "ledger_title": "Review ledger",
+    "review_status": "Status",
+    "review_states": {
+      "active": "Active",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "reviewed_by": "Reviewed by",
+    "withdraw_review": "Withdraw decision",
+    "ledger_empty": "No participation reviews have been recorded for this event."
+  }
+}

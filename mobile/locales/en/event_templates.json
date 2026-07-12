@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Event templates",
+      "safetyTitle": "Templates copy configuration only",
+      "safetyDescription": "People, registrations, private answers, attendance, tickets, delivery history, federation identifiers and publication state are never copied.",
+      "loading": "Loading event templates",
+      "loadFailedTitle": "Unable to load templates",
+      "loadFailedDescription": "The template library could not be loaded. Try again.",
+      "emptyTitle": "No templates found",
+      "emptyDescription": "Save an event as a template on the web to build a reusable configuration library.",
+      "source": "Source: {{title}}",
+      "versionAndUses": "Version {{version}} · Uses: {{count}}",
+      "useTemplate": "Use template",
+      "scheduleTitle": "Schedule the new event",
+      "scheduleDescription": "Review the title, time zone and future schedule. A fresh draft will be created.",
+      "eventTitle": "Event title",
+      "start": "Start",
+      "end": "End (optional)",
+      "timezone": "Time zone",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Optional YYYY-MM-DDTHH:mm",
+      "validationTitle": "Check the draft details",
+      "validationDescription": "Enter a title, time zone and valid future schedule.",
+      "previewFailedTitle": "Unable to review draft",
+      "previewFailedDescription": "The server could not prepare the safe draft preview.",
+      "review": "Review draft",
+      "reviewTitle": "Review new event draft",
+      "reviewDescription": "Confirm the server checks before creating the draft.",
+      "readyTitle": "Ready to create a draft",
+      "readyDescription": "The current version, safe fields, schedule and creation workflow were verified.",
+      "draftState": "Publication state: Draft",
+      "changeDetails": "Change details",
+      "createDraft": "Create draft",
+      "createdTitle": "Event draft created",
+      "createdDescription": "Review and publish it separately when it is ready.",
+      "createFailedTitle": "Unable to create draft",
+      "createFailedDescription": "The event draft could not be created. Try again."
+    },
+    "checks": {
+      "event_template_check_source_manage": "You still have permission to manage the source event",
+      "event_template_check_allowlist_exact": "Only approved configuration fields are included",
+      "event_template_check_private_records_skipped": "Private and operational records are excluded",
+      "event_template_check_versioned_snapshot": "The configuration is an immutable versioned snapshot",
+      "event_template_check_version_current": "The selected template version is current",
+      "event_template_check_schedule_valid": "The new schedule is valid and in the future",
+      "event_template_check_federation_none": "Federation is disabled for the new draft",
+      "event_template_check_canonical_writer": "The canonical event creation workflow will be used"
+    }
+  }
+}

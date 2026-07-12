@@ -75,24 +75,18 @@ vi.mock('@/components/ideation', () => ({
       />
     );
   },
-  // Export the others so imports from the barrel don't break
+  // Export the sibling task surface so barrel imports remain stable.
   TeamTasks: () => null,
-  TeamDocuments: () => null,
 }));
 
 // ─── Stub GlassCard (it imports @/lib/motion which may not be jsdom-safe) ────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...orig,
-    // Override GlassCard to a plain div wrapper so we keep its children
-    GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-      <div data-testid="glass-card" className={className}>
-        {children}
-      </div>
-    ),
-  };
-});
+vi.mock('@/components/ui/GlassCard', () => ({
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="glass-card" className={className}>
+      {children}
+    </div>
+  ),
+}));
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('GroupChatroomsTab', () => {

@@ -92,6 +92,25 @@ describe('SocialInteractionPanel', () => {
     expect(commentBtn).toBeInTheDocument();
   });
 
+  it('can disable generic comments while preserving the other social actions', async () => {
+    const { SocialInteractionPanel } = await import('./SocialInteractionPanel');
+    render(
+      <SocialInteractionPanel
+        {...defaultProps}
+        targetType="discussion"
+        initialCommentsCount={3}
+        defaultShowComments
+        allowComments={false}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: /toggle like/i })).toBeInTheDocument();
+    expect(screen.getByTestId('share-button')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /comment|open/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('comments-section')).not.toBeInTheDocument();
+    expect(mockApi.get).not.toHaveBeenCalled();
+  });
+
   it('renders Share button for shareable target types', async () => {
     const { SocialInteractionPanel } = await import('./SocialInteractionPanel');
     render(<SocialInteractionPanel {...defaultProps} targetType="post" showShare />);

@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -97,6 +98,80 @@ class NotificationsControllerTest extends TestCase
         $response = $this->apiGet('/v2/notifications/counts');
 
         $response->assertStatus(401);
+    }
+
+    public function test_event_category_includes_namespaced_and_legacy_event_types(): void
+    {
+        $user = $this->authenticatedUser();
+
+        foreach (['event_created', 'event_rsvp_confirm', 'new_event_created', 'message'] as $type) {
+            Notification::factory()->forTenant($this->testTenantId)->create([
+                'user_id' => $user->id,
+                'type' => $type,
+            ]);
+        }
+
+        $response = $this->apiGet('/v2/notifications?type=events');
+
+        $response->assertOk();
+        $this->assertEqualsCanonicalizing(
+            ['event_created', 'event_rsvp_confirm', 'new_event_created'],
+            collect($response->json('data'))->pluck('type')->all()
+        );
+
+        $counts = $this->apiGet('/v2/notifications/counts');
+        $counts->assertOk()->assertJsonPath('data.events', 3);
+    }
+
+    public function test_index_rejects_an_unknown_notification_category(): void
+    {
+        $this->authenticatedUser();
+
+        $this->apiGet('/v2/notifications?type=not-a-category')
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'INVALID_CATEGORY');
+    }
+
+    public function test_grouped_notifications_keep_the_latest_recipient_localized_message(): void
+    {
+        $user = $this->authenticatedUser(['preferred_language' => 'fr']);
+        $firstActor = User::factory()->forTenant($this->testTenantId)->create();
+        $secondActor = User::factory()->forTenant($this->testTenantId)->create();
+        $link = '/events/42';
+
+        DB::table('notifications')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $user->id,
+                'actor_id' => $firstActor->id,
+                'type' => 'event_rsvp',
+                'message' => 'Une personne participe à votre événement.',
+                'link' => $link,
+                'is_read' => false,
+                'created_at' => now()->subMinute(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $user->id,
+                'actor_id' => $secondActor->id,
+                'type' => 'event_rsvp',
+                'message' => 'Deux personnes participent à votre événement.',
+                'link' => $link,
+                'is_read' => true,
+                'created_at' => now(),
+            ],
+        ]);
+
+        $response = $this->apiGet('/v2/notifications/grouped');
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.is_grouped', true)
+            ->assertJsonPath('data.0.group_count', 2)
+            ->assertJsonPath('data.0.all_read', false)
+            ->assertJsonPath('data.0.is_read', false)
+            ->assertJsonPath('data.0.read_at', null)
+            ->assertJsonPath('data.0.message', 'Deux personnes participent à votre événement.')
+            ->assertJsonPath('data.0.body', 'Deux personnes participent à votre événement.');
     }
 
     // ------------------------------------------------------------------
@@ -245,6 +320,47 @@ class NotificationsControllerTest extends TestCase
         $response = $this->apiDelete('/v2/notifications');
 
         $response->assertStatus(401);
+    }
+
+    public function test_destroy_all_events_deletes_every_event_type_and_nothing_else(): void
+    {
+        $user = $this->authenticatedUser();
+        $notifications = [];
+
+        foreach (['event_created', 'event_rsvp_confirm', 'new_event_created', 'message'] as $type) {
+            $notifications[$type] = Notification::factory()->forTenant($this->testTenantId)->create([
+                'user_id' => $user->id,
+                'type' => $type,
+            ]);
+        }
+
+        $response = $this->apiDelete('/v2/notifications?category=events');
+
+        $response->assertOk()->assertJsonPath('data.deleted', 3);
+        foreach (['event_created', 'event_rsvp_confirm', 'new_event_created'] as $type) {
+            $this->assertSoftDeleted('notifications', ['id' => $notifications[$type]->id]);
+        }
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notifications['message']->id,
+            'deleted_at' => null,
+        ]);
+    }
+
+    public function test_destroy_all_rejects_an_unknown_category_without_deleting_rows(): void
+    {
+        $user = $this->authenticatedUser();
+        $notification = Notification::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'type' => 'message',
+        ]);
+
+        $response = $this->apiDelete('/v2/notifications?category=not-a-category');
+
+        $response->assertStatus(422)->assertJsonPath('errors.0.code', 'INVALID_CATEGORY');
+        $this->assertDatabaseHas('notifications', [
+            'id' => $notification->id,
+            'deleted_at' => null,
+        ]);
     }
 
     // ------------------------------------------------------------------

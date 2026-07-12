@@ -8,10 +8,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 
 const mockApiGet = vi.fn();
-const mockApiPost = vi.fn().mockResolvedValue({ success: true });
+const mockApiPost = vi.fn();
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -22,9 +22,13 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
-  resolveThumbnailUrl: (url: string | null) => url || '',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveThumbnailUrl: (url: string | null) => url || '',
+  };
+});
 
 let isAuthenticated = true;
 const stableToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
@@ -38,6 +42,19 @@ vi.mock('@/contexts', () => ({
   useTenant: vi.fn(() => stableTenant),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({ isAuthenticated })),
+}));
+
+vi.mock('@/contexts/ToastContext', () => ({
+  useToast: vi.fn(() => stableToast),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => stableTenant),
+}));
+
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 import { RecommendedGroups } from './RecommendedGroups';
@@ -46,6 +63,10 @@ describe('RecommendedGroups', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     isAuthenticated = true;
+    mockApiPost.mockResolvedValue({
+      success: true,
+      data: { status: 'active', message: 'Joined group' },
+    });
   });
 
   it('renders nothing when the user is not authenticated', () => {
@@ -88,5 +109,66 @@ describe('RecommendedGroups', () => {
       expect(screen.getByText('Garden Crew')).toBeInTheDocument();
     });
     expect(screen.getByText('Book Club')).toBeInTheDocument();
+    expect(mockApiGet).toHaveBeenCalledWith(
+      '/v2/matches/all?modules=groups&limit=3&min_score=50',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
+  });
+
+  it('marks a recommendation joined only after a truthful join response', async () => {
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        matches: [{ module: 'group', group_id: 1, title: 'Garden Crew', match_score: 82 }],
+      },
+    });
+    render(<RecommendedGroups />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^Join$/i }));
+
+    await waitFor(() => expect(stableToast.success).toHaveBeenCalledWith('Joined group'));
+    expect(mockApiPost).toHaveBeenCalledWith('/v2/groups/1/join', {});
+    expect(screen.queryByRole('button', { name: /^Join$/i })).not.toBeInTheDocument();
+  });
+
+  it('reports a pending private-group join as a request, not a completed join', async () => {
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        matches: [{ module: 'group', group_id: 2, title: 'Private Group', match_score: 76 }],
+      },
+    });
+    mockApiPost.mockResolvedValue({
+      success: true,
+      data: { status: 'pending', message: 'Request sent' },
+    });
+    render(<RecommendedGroups />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^Join$/i }));
+
+    await waitFor(() => expect(stableToast.success).toHaveBeenCalledWith('Join request submitted'));
+    expect(stableToast.success).not.toHaveBeenCalledWith('Joined group');
+  });
+
+  it('keeps the Join action available when the API resolves with success:false', async () => {
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        matches: [{ module: 'group', group_id: 1, title: 'Garden Crew', match_score: 82 }],
+      },
+    });
+    mockApiPost.mockResolvedValue({
+      success: false,
+      code: 'HTTP_500',
+      error: 'Raw server copy',
+    });
+    render(<RecommendedGroups />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /^Join$/i }));
+
+    await waitFor(() => expect(stableToast.error).toHaveBeenCalled());
+    expect(stableToast.success).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /^Join$/i })).toBeInTheDocument();
+    expect(screen.queryByText('Raw server copy')).not.toBeInTheDocument();
   });
 });

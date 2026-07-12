@@ -6,6 +6,7 @@
 
 namespace App\Providers;
 
+use App\Core\TenantContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -63,6 +64,47 @@ class RouteServiceProvider extends ServiceProvider
                 $request->user()?->id ? 'user:' . $request->user()->id : 'ip:' . $request->ip()
             );
         });
+
+        RateLimiter::for('groups-join', static fn (Request $request): array => [
+            Limit::perMinute(30)->by(self::groupsRateKey($request, 'join')),
+            Limit::perMinute(120)->by(self::groupsActorRateKey($request, 'join')),
+        ]);
+        RateLimiter::for('groups-invite-read', static fn (Request $request): array => [
+            Limit::perMinute(60)->by(self::groupsRateKey($request, 'invite-read')),
+            Limit::perMinute(180)->by(self::groupsActorRateKey($request, 'invite-read')),
+        ]);
+        RateLimiter::for('groups-invite-write', static fn (Request $request): array => [
+            Limit::perHour(10)->by(self::groupsRateKey($request, 'invite-write')),
+            Limit::perHour(30)->by(self::groupsActorRateKey($request, 'invite-write')),
+        ]);
+        RateLimiter::for('groups-vote', static fn (Request $request): array => [
+            Limit::perMinute(60)->by(self::groupsRateKey($request, 'vote')),
+            Limit::perMinute(180)->by(self::groupsActorRateKey($request, 'vote')),
+        ]);
+        RateLimiter::for('groups-chat-write', static fn (Request $request): array => [
+            Limit::perMinute(30)->by(self::groupsRateKey($request, 'chat-write')),
+            Limit::perMinute(90)->by(self::groupsActorRateKey($request, 'chat-write')),
+        ]);
+        RateLimiter::for('groups-upload', static fn (Request $request): array => [
+            Limit::perMinute(10)->by(self::groupsRateKey($request, 'upload')),
+            Limit::perMinute(30)->by(self::groupsActorRateKey($request, 'upload')),
+        ]);
+        RateLimiter::for('groups-analytics-read', static fn (Request $request): array => [
+            Limit::perMinute(60)->by(self::groupsRateKey($request, 'analytics-read')),
+            Limit::perMinute(180)->by(self::groupsActorRateKey($request, 'analytics-read')),
+        ]);
+        RateLimiter::for('groups-analytics-export', static fn (Request $request): array => [
+            Limit::perMinute(5)->by(self::groupsRateKey($request, 'analytics-export')),
+            Limit::perMinute(15)->by(self::groupsActorRateKey($request, 'analytics-export')),
+        ]);
+        RateLimiter::for('groups-export-write', static fn (Request $request): array => [
+            Limit::perMinute(5)->by(self::groupsRateKey($request, 'export-write')),
+            Limit::perMinute(15)->by(self::groupsActorRateKey($request, 'export-write')),
+        ]);
+        RateLimiter::for('groups-export-read', static fn (Request $request): array => [
+            Limit::perMinute(60)->by(self::groupsRateKey($request, 'export-read')),
+            Limit::perMinute(180)->by(self::groupsActorRateKey($request, 'export-read')),
+        ]);
 
         // Podcast audio streaming — generous because seeking fires bursts of
         // HTTP Range requests (each is a fresh request), but bounded so a
@@ -127,5 +169,27 @@ class RouteServiceProvider extends ServiceProvider
                 require base_path('routes/channels.php');
             }
         });
+    }
+
+    private static function groupsRateKey(Request $request, string $family): string
+    {
+        $groupId = $request->route('id') ?? $request->route('groupId');
+        $token = $request->route('token');
+        $scope = is_scalar($groupId) && (string) $groupId !== ''
+            ? 'group:' . (string) $groupId
+            : (is_scalar($token) && (string) $token !== ''
+                ? 'token:' . hash('sha256', (string) $token)
+                : 'route:' . hash('sha256', $request->path()));
+
+        return self::groupsActorRateKey($request, $family) . ":{$scope}";
+    }
+
+    private static function groupsActorRateKey(Request $request, string $family): string
+    {
+        $tenantId = (int) TenantContext::getId();
+        $userId = $request->user()?->getAuthIdentifier();
+        $actor = $userId !== null ? 'user:' . $userId : 'ip:' . $request->ip();
+
+        return "groups:{$family}:tenant:{$tenantId}:{$actor}:all";
     }
 }

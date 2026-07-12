@@ -5,32 +5,57 @@
 
 /**
  * Admin Events Management
- * Full list view with status filtering, search, cancel, and delete.
+ * Lifecycle-aware list view with moderation, operations, search, and archive controls.
  * Calls GET /api/v2/admin/events for paginated data.
  */
 
 import { getFormattingLocale } from '@/lib/helpers';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type Key } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Calendar from 'lucide-react/icons/calendar';
 import Eye from 'lucide-react/icons/eye';
-import Trash2 from 'lucide-react/icons/trash-2';
 import XCircle from 'lucide-react/icons/circle-x';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
+import MoreVertical from 'lucide-react/icons/more-vertical';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
-import { ConfirmModal } from '../../components/ConfirmModal';
 import { EmptyState } from '../../components/EmptyState';
-import { Button, Chip, Tabs, Tab } from '@/components/ui';
+import {
+  Button,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Tab,
+  Tabs,
+  Textarea,
+} from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
+
+type PublicationState = 'draft' | 'pending_review' | 'published' | 'archived';
+type OperationalState = 'scheduled' | 'postponed' | 'cancelled' | 'completed';
+type LifecycleAction =
+  | 'approve'
+  | 'reject'
+  | 'postpone'
+  | 'cancel'
+  | 'complete'
+  | 'archive'
+  | 'restore';
 
 interface AdminEvent {
   id: number;
@@ -38,11 +63,18 @@ interface AdminEvent {
   description?: string;
   start_date: string;
   end_date?: string;
+  timezone: string;
+  all_day: boolean;
   location?: string;
   organizer_name?: string;
   status: string;
+  publication_state: PublicationState;
+  operational_state: OperationalState;
+  lifecycle_version: number;
   attendees_count?: number;
   max_attendees?: number;
+  waitlist_count: number;
+  attendance_count: number;
   created_at: string;
 }
 
@@ -52,12 +84,26 @@ interface RawAdminEvent {
   description?: string;
   start_date: string;
   end_date?: string;
+  timezone?: string | null;
+  all_day?: boolean;
   location?: string;
   creator_name?: string;
   organizer_name?: string;
   status: string;
+  publication_state?: PublicationState;
+  operational_state?: OperationalState;
+  lifecycle_version?: number;
   attendees_count?: number;
   max_attendees?: number;
+  capacity?: {
+    limit?: number | null;
+    confirmed?: number;
+  };
+  metrics?: {
+    confirmed_count?: number;
+    waitlist_count?: number;
+    attendance_count?: number;
+  };
   created_at: string;
 }
 
@@ -67,6 +113,11 @@ interface RawAdminEvent {
 
 const statusColors: Record<string, 'success' | 'danger' | 'default' | 'warning'> = {
   published: 'success',
+  pending_review: 'warning',
+  archived: 'default',
+  scheduled: 'success',
+  postponed: 'warning',
+  completed: 'default',
   active: 'success',
   cancelled: 'danger',
   canceled: 'danger',
@@ -83,24 +134,40 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
     description: item.description,
     start_date: item.start_date,
     end_date: item.end_date,
+    timezone: item.timezone ?? 'UTC',
+    all_day: Boolean(item.all_day),
     location: item.location,
     organizer_name: item.organizer_name ?? item.creator_name,
     status: item.status,
-    attendees_count: item.attendees_count,
-    max_attendees: item.max_attendees,
+    publication_state: item.publication_state ?? (item.status === 'draft' ? 'draft' : 'published'),
+    operational_state: item.operational_state
+      ?? (item.status === 'cancelled' ? 'cancelled' : item.status === 'completed' ? 'completed' : 'scheduled'),
+    lifecycle_version: item.lifecycle_version ?? 0,
+    attendees_count: item.metrics?.confirmed_count ?? item.capacity?.confirmed ?? item.attendees_count,
+    max_attendees: item.capacity?.limit ?? item.max_attendees,
+    waitlist_count: item.metrics?.waitlist_count ?? 0,
+    attendance_count: item.metrics?.attendance_count ?? 0,
     created_at: item.created_at,
   };
 }
 
-const formatDateTime = (iso: string) => {
+const formatDateTime = (iso: string, timezone: string, allDay: boolean) => {
   const d = new Date(iso);
-  return d.toLocaleDateString(getFormattingLocale(), {
+  const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+    ...(allDay ? {} : {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short',
+    }),
+  };
+  try {
+    return d.toLocaleDateString(getFormattingLocale(), { ...options, timeZone: timezone });
+  } catch {
+    return d.toLocaleDateString(getFormattingLocale(), { ...options, timeZone: 'UTC' });
+  }
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,12 +184,14 @@ export function EventsAdmin() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('all');
+  const [publicationState, setPublicationState] = useState<'all' | PublicationState>('all');
   const [search, setSearch] = useState('');
 
-  // Confirm dialogs
-  const [confirmDelete, setConfirmDelete] = useState<AdminEvent | null>(null);
-  const [confirmCancel, setConfirmCancel] = useState<AdminEvent | null>(null);
+  const [actionModal, setActionModal] = useState<{
+    action: LifecycleAction;
+    event: AdminEvent;
+  } | null>(null);
+  const [actionReason, setActionReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
@@ -133,7 +202,7 @@ export function EventsAdmin() {
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('limit', String(PAGE_SIZE));
-      if (status !== 'all') params.set('status', status);
+      if (publicationState !== 'all') params.set('publication_state', publicationState);
       if (search) params.set('search', search);
 
       const res = await api.get(`/v2/admin/events?${params.toString()}`);
@@ -149,7 +218,7 @@ export function EventsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast, t])
+  }, [page, publicationState, search, toast, t]);
 
 
   useEffect(() => {
@@ -158,44 +227,75 @@ export function EventsAdmin() {
 
   // ── Delete ─────────────────────────────────────────────────────────────────
 
-  const handleDelete = async () => {
-    if (!confirmDelete) return;
-    setActionLoading(true);
-    try {
-      const res = await api.delete(`/v2/admin/events/${confirmDelete.id}`);
-      if (res?.success) {
-        toast.success(t('events.event_deleted_successfully'));
-        loadItems();
-      } else {
-        toast.error(res?.error || t('events.failed_to_delete_event'));
-      }
-    } catch {
-      toast.error(t('events.an_unexpected_error_occurred'));
-    } finally {
-      setActionLoading(false);
-      setConfirmDelete(null);
-    }
+  const closeActionModal = () => {
+    if (actionLoading) return;
+    setActionModal(null);
+    setActionReason('');
+  };
+
+  const openActionModal = (event: AdminEvent, action: LifecycleAction) => {
+    setActionReason('');
+    setActionModal({ event, action });
   };
 
   // ── Cancel ─────────────────────────────────────────────────────────────────
 
-  const handleCancel = async () => {
-    if (!confirmCancel) return;
+  const executeAction = async () => {
+    if (!actionModal) return;
+    const reason = actionReason.trim();
+    const requiresReason = actionModal.action === 'reject' || actionModal.action === 'cancel';
+    if (requiresReason && !reason) return;
+
     setActionLoading(true);
     try {
-      const res = await api.post(`/v2/admin/events/${confirmCancel.id}/cancel`);
+      const res = await api.post(
+        `/v2/admin/events/${actionModal.event.id}/${actionModal.action}`,
+        reason ? { reason } : {},
+      );
       if (res?.success) {
-        toast.success(t('events.event_cancelled_successfully'));
-        loadItems();
+        toast.success(t('events.action_success', {
+          action: t(`events.action_${actionModal.action}`),
+        }));
+        await loadItems();
       } else {
-        toast.error(res?.error || t('events.failed_to_cancel_event'));
+        toast.error(res?.error || t('events.action_failed', {
+          action: t(`events.action_${actionModal.action}`),
+        }));
       }
     } catch {
       toast.error(t('events.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
-      setConfirmCancel(null);
+      setActionModal(null);
+      setActionReason('');
     }
+  };
+
+  const availableActions = (event: AdminEvent): LifecycleAction[] => {
+    const actions: LifecycleAction[] = [];
+    if (event.publication_state === 'draft' || event.publication_state === 'pending_review') {
+      actions.push('approve');
+    }
+    if (event.publication_state === 'pending_review') actions.push('reject');
+    if (event.publication_state === 'published' && event.operational_state === 'scheduled') {
+      actions.push('postpone', 'complete');
+    }
+    if (
+      event.publication_state !== 'archived'
+      && (event.operational_state === 'scheduled' || event.operational_state === 'postponed')
+    ) {
+      actions.push('cancel');
+    }
+    if (
+      event.operational_state === 'postponed'
+      || event.operational_state === 'cancelled'
+      || (event.publication_state === 'archived' && event.operational_state !== 'completed')
+    ) {
+      actions.push('restore');
+    }
+    if (event.publication_state !== 'archived') actions.push('archive');
+
+    return actions;
   };
 
   // ── Columns ────────────────────────────────────────────────────────────────
@@ -214,9 +314,14 @@ export function EventsAdmin() {
       label: t('events.col_date_time'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">
-          {formatDateTime(item.start_date)}
-        </span>
+        <div className="text-sm text-muted">
+          <time dateTime={item.start_date}>
+            {formatDateTime(item.start_date, item.timezone, item.all_day)}
+          </time>
+          {item.all_day && (
+            <span className="mt-0.5 block text-xs">{t('events.all_day')}</span>
+          )}
+        </div>
       ),
     },
     {
@@ -250,14 +355,22 @@ export function EventsAdmin() {
       label: t('events.col_status'),
       sortable: true,
       render: (item) => (
-        <Chip
-          size="sm"
-          variant="soft"
-          color={statusColors[item.status] || 'default'}
-          className="capitalize"
-        >
-          {item.status}
-        </Chip>
+        <div className="flex min-w-[150px] flex-col items-start gap-1">
+          <Chip
+            size="sm"
+            variant="soft"
+            color={statusColors[item.publication_state] || 'default'}
+          >
+            {t(`events.publication_${item.publication_state}`)}
+          </Chip>
+          <Chip
+            size="sm"
+            variant="soft"
+            color={statusColors[item.operational_state] || 'default'}
+          >
+            {t(`events.operational_${item.operational_state}`)}
+          </Chip>
+        </div>
       ),
     },
     {
@@ -265,11 +378,23 @@ export function EventsAdmin() {
       label: t('events.col_attendees'),
       sortable: true,
       render: (item) => (
-        <span className="flex items-center gap-1 text-sm text-muted">
-          <Users size={12} aria-hidden="true" />
-          {item.attendees_count ?? 0}
-          {item.max_attendees ? ` / ${item.max_attendees}` : ''}
-        </span>
+        <div className="text-sm text-muted">
+          <span className="flex items-center gap-1">
+            <Users size={12} aria-hidden="true" />
+            {t('events.confirmed_count', {
+              count: item.attendees_count ?? 0,
+              capacity: item.max_attendees ?? t('events.unlimited_capacity'),
+            })}
+          </span>
+          {(item.waitlist_count > 0 || item.attendance_count > 0) && (
+            <span className="mt-1 block text-xs">
+              {t('events.people_secondary_counts', {
+                waitlist: item.waitlist_count,
+                attended: item.attendance_count,
+              })}
+            </span>
+          )}
+        </div>
       ),
     },
     {
@@ -287,29 +412,38 @@ export function EventsAdmin() {
             variant="tertiary"
             aria-label={t('events.label_view_event')}
           >
-            <Eye size={14} />
+            <Eye size={14} aria-hidden="true" />
           </Button>
-          {item.status !== 'cancelled' && item.status !== 'canceled' && (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="tertiary"
-              color="warning"
-              onPress={() => setConfirmCancel(item)}
-              aria-label={t('events.label_cancel_event')}
-            >
-              <XCircle size={14} />
-            </Button>
+          {availableActions(item).length > 0 && (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="tertiary"
+                  aria-label={t('events.label_event_actions', { title: item.title })}
+                >
+                  <MoreVertical size={14} aria-hidden="true" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label={t('events.label_event_actions', { title: item.title })}
+                onAction={(key: Key) => openActionModal(item, key as LifecycleAction)}
+              >
+                {availableActions(item).map((action) => (
+                  <DropdownItem
+                    key={action}
+                    id={action}
+                    className={['reject', 'cancel', 'archive'].includes(action) ? 'text-danger' : undefined}
+                    variant={['reject', 'cancel', 'archive'].includes(action) ? 'danger' : undefined}
+                    startContent={action === 'cancel' ? <XCircle size={14} aria-hidden="true" /> : undefined}
+                  >
+                    {t(`events.action_${action}`)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
           )}
-          <Button
-            isIconOnly
-            size="sm"
-            variant="danger"
-            onPress={() => setConfirmDelete(item)}
-            aria-label={t('events.label_delete_event')}
-          >
-            <Trash2 size={14} />
-          </Button>
         </div>
       ),
     },
@@ -327,18 +461,19 @@ export function EventsAdmin() {
       <div className="mb-4">
         <Tabs
           aria-label={t('events.tabs_aria')}
-          selectedKey={status}
+          selectedKey={publicationState}
           onSelectionChange={(key) => {
-            setStatus(key as string);
+            setPublicationState(key as 'all' | PublicationState);
             setPage(1);
           }}
           variant="underlined"
           size="sm"
         >
           <Tab key="all" title={t('events.tab_all')} />
-          <Tab key="published" title={t('events.tab_published')} />
-          <Tab key="cancelled" title={t('events.tab_cancelled')} />
           <Tab key="draft" title={t('events.tab_draft')} />
+          <Tab key="pending_review" title={t('events.tab_pending_review')} />
+          <Tab key="published" title={t('events.tab_published')} />
+          <Tab key="archived" title={t('events.tab_archived')} />
         </Tabs>
       </div>
 
@@ -347,7 +482,7 @@ export function EventsAdmin() {
           icon={Calendar}
           title={t('events.no_events_found')}
           description={
-            status === 'all'
+            publicationState === 'all'
               ? t('events.no_events_desc')
               : t('events.no_status_events')
           }
@@ -370,33 +505,52 @@ export function EventsAdmin() {
         />
       )}
 
-      {/* Delete confirmation */}
-      {confirmDelete && (
-        <ConfirmModal
-          isOpen={!!confirmDelete}
-          onClose={() => setConfirmDelete(null)}
-          onConfirm={handleDelete}
-          title={t('events.delete_event')}
-          message={t('events.confirm_delete_event')}
-          confirmLabel={t('events.delete_event')}
-          confirmColor="danger"
-          isLoading={actionLoading}
-        />
-      )}
-
-      {/* Cancel confirmation */}
-      {confirmCancel && (
-        <ConfirmModal
-          isOpen={!!confirmCancel}
-          onClose={() => setConfirmCancel(null)}
-          onConfirm={handleCancel}
-          title={t('events.cancel_event')}
-          message={t('events.confirm_cancel_event')}
-          confirmLabel={t('events.cancel_event')}
-          confirmColor="warning"
-          isLoading={actionLoading}
-        />
-      )}
+      <Modal isOpen={actionModal !== null} onClose={closeActionModal} size="md">
+        <ModalContent>
+          {actionModal && (
+            <>
+              <ModalHeader>
+                {t(`events.action_${actionModal.action}`)}: {actionModal.event.title}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-muted">
+                  {t('events.confirm_action', {
+                    action: t(`events.action_${actionModal.action}`).toLocaleLowerCase(),
+                    title: actionModal.event.title,
+                  })}
+                </p>
+                {actionModal.action !== 'approve' && (
+                  <Textarea
+                    label={t('events.action_reason_label')}
+                    placeholder={t('events.action_reason_placeholder')}
+                    value={actionReason}
+                    onValueChange={setActionReason}
+                    isRequired={actionModal.action === 'reject' || actionModal.action === 'cancel'}
+                    minRows={3}
+                    maxRows={6}
+                  />
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="tertiary" onPress={closeActionModal} isDisabled={actionLoading}>
+                  {t('common.cancel')}
+                </Button>
+                <Button
+                  variant={['reject', 'cancel', 'archive'].includes(actionModal.action) ? 'danger' : 'secondary'}
+                  isLoading={actionLoading}
+                  isDisabled={
+                    (actionModal.action === 'reject' || actionModal.action === 'cancel')
+                    && !actionReason.trim()
+                  }
+                  onPress={executeAction}
+                >
+                  {t(`events.action_${actionModal.action}`)}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

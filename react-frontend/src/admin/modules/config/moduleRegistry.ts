@@ -691,7 +691,9 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     type: 'feature',
     configSource: 'authentication_config',
     configOptions: [
+      { key: 'passkeys.enrollment_enabled', label: 'passkeys.enrollment_enabled', description: 'passkeys.enrollment_enabled', type: 'boolean', defaultValue: true, category: 'access' },
       { key: 'passkeys.conditional_autofill', label: 'passkeys.conditional_autofill', description: 'passkeys.conditional_autofill', type: 'boolean', defaultValue: true, category: 'access' },
+      { key: 'passkeys.max_credentials_per_user', label: 'passkeys.max_credentials_per_user', description: 'passkeys.max_credentials_per_user', type: 'number', defaultValue: 10, category: 'access', min: 1, max: 20 },
     ],
   },
   {

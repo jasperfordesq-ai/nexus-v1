@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Listeners;
 
+use App\Enums\GroupStatus;
 use App\Core\TenantContext;
 use App\Events\GroupCreated;
 use App\Events\GroupUpdated;
@@ -137,6 +138,7 @@ class PushGroupToFederatedPartnersTest extends TestCase
         $group->federated_visibility = $visibility;
         $group->owner_id             = 1;
         $group->tenant_id            = self::TENANT_ID;
+        $group->status               = GroupStatus::Active;
         $group->created_at           = now();
         return $group;
     }
@@ -229,6 +231,39 @@ class PushGroupToFederatedPartnersTest extends TestCase
             $body = $request->data();
             return ($body['action'] ?? '') === 'updated'
                 && ($body['id'] ?? 0) === 2002;
+        });
+    }
+
+    public function test_pending_review_group_is_never_federated_on_creation(): void
+    {
+        $this->enableTenantFeatureFlag();
+        $this->enableTenantFederation();
+        Http::fake(['*' => Http::response(['success' => true], 200)]);
+
+        $group = $this->makeGroup(id: 2010, visibility: 'listed');
+        $group->status = GroupStatus::PendingReview;
+
+        $this->makeListener()->handle(new GroupCreated($group, self::TENANT_ID));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_non_active_update_retracts_a_previously_federated_group(): void
+    {
+        $this->enableTenantFeatureFlag();
+        $this->enableTenantFederation();
+        Http::fake(['*' => Http::response(['success' => true], 200)]);
+
+        $group = $this->makeGroup(id: 2011, visibility: 'none');
+        $group->status = GroupStatus::Archived;
+
+        $this->makeListener()->handle(new GroupUpdated($group, self::TENANT_ID));
+
+        Http::assertSent(static function ($request): bool {
+            $body = $request->data();
+
+            return ($body['action'] ?? null) === 'deleted'
+                && ($body['id'] ?? null) === 2011;
         });
     }
 

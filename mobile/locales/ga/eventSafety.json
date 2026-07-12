@@ -1,0 +1,94 @@
+{
+  "safety": {
+    "actions": {
+      "retry": "Bain triail eile as",
+      "acknowledge": "Admhaigh an cód",
+      "withdraw_acknowledgement": "Admháil a tharraingt siar",
+      "request_guardian_consent": "Iarr toiliú caomhnóra",
+      "withdraw_guardian_consent": "Iarratas ar thoiliú a tharraingt siar"
+    },
+    "attendee": {
+      "title": "Ceanglais rannpháirtíochta",
+      "description": "Críochnaigh na céimeanna sábháilteachta is infheidhme roimh chlárú nó dul isteach ar an liosta feithimh.",
+      "loading": "Riachtanais rannpháirtíochta á lódáil",
+      "load_error_title": "Níl ceanglais rannpháirtíochta ar fáil",
+      "load_error_description": "Níorbh fhéidir linn ceanglais sábháilteachta an imeachta a fhíorú. Bain triail eile as roimh chlárú.",
+      "action_error": "Níorbh fhéidir an chéim sábháilteachta sin a chur i gcrích. Bain triail eile as.",
+      "denial_title": "Ní cheadaítear rannpháirtíocht faoi láthair",
+      "attention_title": "Tá gníomh ag teastáil",
+      "success": {
+        "acknowledge": "Admhaítear an cód iompair.",
+        "withdraw_code": "Aitheantas cód tarraingthe siar.",
+        "request_guardian": "Iarratas um thoiliú caomhnóra seolta.",
+        "withdraw_guardian": "Iarratas ar thoiliú caomhnóra tarraingthe siar."
+      }
+    },
+    "eligibility": {
+      "allow": "Ceanglais curtha i gcrích",
+      "deny": "Rannpháirtíocht bactha",
+      "unavailable": "Níl an fíorú ar fáil",
+      "not_evaluated": "Gan measúnú fós"
+    },
+    "reasons": {
+      "unknown": "Teastaíonn aird fós ar riachtanas rannpháirtíochta.",
+      "safeguarding_policy": "Cinneadh beartais a chosaint",
+      "minimum_age": "Riachtanas aoise íosta",
+      "guardian_consent": "Ceanglas toiliú caomhnóra",
+      "code_of_conduct": "Ceanglas maidir le cód iompair",
+      "conduct_violation": "Sárú iompair",
+      "safety_review": "Cinneadh athbhreithnithe sábháilteachta",
+      "user_block": "Cuireann bloc ball cosc ​​ar rannpháirtíocht",
+      "event_safety_unbound_guest_denied": "Sínigh isteach chun na riachtanais rannpháirtíochta a fhíorú.",
+      "event_safety_user_not_active": "Níl do chuntas ball gníomhach faoi láthair.",
+      "event_safety_bilateral_user_block": "Cuireann bloc ball cosc ​​ar rannpháirtíocht san imeacht seo.",
+      "event_safety_requirements_not_published": "Níl na ceanglais sábháilteachta foilsithe fós ag an eagraí.",
+      "event_safety_requirements_integrity_invalid": "Níorbh fhéidir na ceanglais sábháilteachta foilsithe a fhíorú.",
+      "event_safety_requirements_version_unavailable": "Níl an leagan riachtanas foilsithe ar fáil.",
+      "event_safety_date_of_birth_required": "Cuir do dháta breithe leis ionas gur féidir riachtanais aoise a sheiceáil.",
+      "event_safety_date_of_birth_invalid": "Níorbh fhéidir do dháta breithe taifeadta a fhíorú.",
+      "event_safety_minimum_age_not_met": "Ní shásaíonn tú íosaois na hócáide seo.",
+      "event_safety_minor_policy_unavailable": "Níl an polasaí do mhion-rannpháirtíocht ar fáil.",
+      "event_safety_guardian_consent_required": "Teastaíonn toiliú caomhnóra bailí.",
+      "event_safety_code_of_conduct_acknowledgement_required": "An cód iompair reatha a admháil.",
+      "event_safety_active_participation_denial": "Coscann cinneadh gníomhach sábháilteachta rannpháirtíocht.",
+      "event_safety_safeguarding_policy_denied": "Ní cheadaíonn an beartas cosanta rannpháirtíocht faoi láthair.",
+      "event_safety_safeguarding_policy_invalid": "Níorbh fhéidir an cinneadh coimirce a fhíorú.",
+      "event_safety_safeguarding_policy_unavailable": "Níl fíorú cosanta ar fáil go sealadach.",
+      "event_safety_schema_unavailable": "Níl fíorú sábháilteachta ar fáil go sealadach.",
+      "event_safety_evaluation_unavailable": "Níl fíorú sábháilteachta ar fáil go sealadach.",
+      "event_safety_organizer_not_active": "Níl eagraí an imeachta gníomhach faoi láthair.",
+      "event_safety_denial_safeguarding_policy": "Cuireann cinneadh beartais um chosaint cosc ​​ar rannpháirtíocht."
+    },
+    "code": {
+      "title": "Cód iompair",
+      "confirm_read": "Tá an cód iompair iomlán léite agam agus aontaím leis.",
+      "status": {
+        "not_required": "Ní gá",
+        "required": "Admháil ag teastáil",
+        "acknowledged": "Acknowledged"
+      }
+    },
+    "guardian": {
+      "title": "Toiliú caomhnóra",
+      "description": "Faigheann an caomhnóir nasc príobháideach a bhfuil teorainn ama leis. Ní thaispeántar a n-aitheantas ná a n-chomhartha toilithe ar an uainchlár imeachtaí.",
+      "name_label": "Ainm caomhnóir",
+      "email_label": "Ríomhphost caomhnóra",
+      "relationship_label": "Gaol leis an lucht freastail",
+      "privacy_notice": "Criptítear an seoladh le seachadadh agus baintear é den chlúdach seachadta tar éis a phróiseáil.",
+      "relationships": {
+        "parent": "Parent",
+        "guardian": "Guardian",
+        "legal_guardian": "Caomhnóir dlíthiúil",
+        "carer": "Carer"
+      },
+      "status": {
+        "not_required": "Ní gá",
+        "required": "Toiliú ag teastáil",
+        "pending": "Ag feitheamh le caomhnóir",
+        "active": "Toiliú tugtha",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
+      }
+    }
+  }
+}

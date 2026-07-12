@@ -3,191 +3,167 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * Tests for CreateEventPage
- */
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderEventRoute } from '@/test/events-test-harness';
+import { createMockContexts } from '@/test/mock-contexts';
 
-import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
-
-vi.mock('@/lib/api', () => ({
-  api: {
+const { mockApi, mockToast } = vi.hoisted(() => ({
+  mockApi: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),
     delete: vi.fn(),
     upload: vi.fn(),
   },
+  mockToast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  },
 }));
 
-vi.mock('@/contexts', () => ({
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
-  useTenant: vi.fn(() => ({
-    tenant: { id: 2, slug: 'test' },
-    tenantPath: (p: string) => `/test${p}`,
-    hasFeature: vi.fn(() => true),
-    hasModule: vi.fn(() => true),
-  })),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+vi.mock('@/lib/api', () => ({ api: mockApi }));
 
-  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
-  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
-  usePusher: () => ({ channel: null, isConnected: false }),
-  usePusherOptional: () => null,
-  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
-  readStoredConsent: () => null,
-  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
-  useFeature: vi.fn(() => true),
-  useModule: vi.fn(() => true),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
-}));
-
-vi.mock('@/contexts/ToastContext', () => ({
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+      tenantPath: (path: string) => `/test${path}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
+    useToast: () => mockToast,
+  }),
+);
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
-  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-  resolveAssetUrl: vi.fn((url) => url || null),
-}));
-
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useParams: () => ({ id: undefined }),
-    useNavigate: () => vi.fn(),
-  };
-});
 
 vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
   return framerMotionMock;
 });
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
-
 vi.mock('@/components/navigation', () => ({
-  Breadcrumbs: ({ items }: { items: { label: string }[] }) => (
-    <nav>{items.map((i) => <span key={i.label}>{i.label}</span>)}</nav>
+  Breadcrumbs: ({ items }: { items: Array<{ label: string }> }) => (
+    <nav aria-label="Breadcrumb">
+      {items.map((item) => <span key={item.label}>{item.label}</span>)}
+    </nav>
   ),
 }));
 
 vi.mock('@/components/feedback', () => ({
-  LoadingScreen: ({ message }: { message: string }) => <div data-testid="loading-screen">{message}</div>,
-}));
-
-vi.mock('@/components/location', () => ({
-  PlaceAutocompleteInput: ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
-    <input aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} />
+  LoadingScreen: ({ message }: { message: string }) => (
+    <div role="status" aria-label={message} aria-busy="true" />
   ),
 }));
 
-// Mock HeroUI date components
-vi.mock('@/components/ui', async () => {
-  const actual = await vi.importActual('@/components/ui');
-  return {
-    ...actual,
-    DatePicker: ({ label }: { label: string }) => <input aria-label={label} placeholder={label} />,
-    TimeInput: ({ label }: { label: string }) => <input aria-label={label} placeholder={label} />,
-  };
-});
+vi.mock('@/components/ui/DatePicker', async () => ({
+  DatePicker: (await import('@/test/events-test-harness')).EventDateOrTimeInputStub,
+}));
 
-vi.mock('@internationalized/date', () => ({
-  parseDate: vi.fn((v: string) => v),
-  parseTime: vi.fn((v: string) => v),
-  today: vi.fn(() => '2026-01-01'),
-  getLocalTimeZone: vi.fn(() => 'Europe/Dublin'),
+vi.mock('@/components/ui/TimeInput', async () => ({
+  TimeInput: (await import('@/test/events-test-harness')).EventDateOrTimeInputStub,
+}));
+
+vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
+  PlaceAutocompleteInput: ({
+    label,
+    value,
+    onChange,
+  }: {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+  }) => (
+    <label>
+      {label}
+      <input
+        aria-label={label}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  ),
 }));
 
 import { CreateEventPage } from './CreateEventPage';
 
+async function renderCreateEventPage() {
+  renderEventRoute(<CreateEventPage />, {
+    route: '/test/events/create',
+    path: '/:tenantSlug/events/create',
+  });
+
+  await screen.findByRole('heading', { level: 1, name: 'Create New Event' });
+  await waitFor(() => {
+    expect(mockApi.get).toHaveBeenCalledWith('/v2/polls?status=all&limit=100');
+  });
+}
+
 describe('CreateEventPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it('renders create event form with title heading', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('Create New Event').length).toBeGreaterThanOrEqual(1);
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      value: vi.fn(),
     });
   });
 
-  it('renders title input field', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: /Event Title/i })).toBeInTheDocument();
-    });
+  it('renders the create-event heading', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Create New Event' })).toBeInTheDocument();
   });
 
-  it('renders cancel button', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('Cancel').length).toBeGreaterThanOrEqual(1);
-    });
+  it('renders an accessible title input', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('textbox', { name: 'Event Title' })).toBeInTheDocument();
   });
 
-  it('renders description textarea', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: /Description/i })).toBeInTheDocument();
-    });
+  it('renders a tenant-aware Cancel link', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute('href', '/test/events');
   });
 
-  it('renders start date picker', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: /Start Date/i })).toBeInTheDocument();
-    });
+  it('renders an accessible description textarea', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('textbox', { name: 'Description' })).toBeInTheDocument();
   });
 
-  it('renders max attendees input', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => {
-      expect(screen.getByRole('spinbutton', { name: /Max Attendees/i })).toBeInTheDocument();
-    });
+  it('renders an accessible start-date control', async () => {
+    await renderCreateEventPage();
+
+    expect(screen.getByRole('textbox', { name: 'Start Date' })).toBeInTheDocument();
   });
 
-  it('shows validation errors on empty form submit', async () => {
-    render(<CreateEventPage />);
-    await waitFor(() => screen.getAllByText('Create New Event')[0]);
+  it('renders the max-attendees number input', async () => {
+    await renderCreateEventPage();
 
-    const submitButton = screen.getByRole('button', { name: /create/i });
-    if (submitButton) fireEvent.click(submitButton);
+    expect(screen.getByRole('spinbutton', { name: 'Max Attendees (optional)' })).toBeInTheDocument();
+  });
 
-    await waitFor(() => {
-      // At least one validation error should show
-      const errors = screen.queryAllByText(/required|validation/i);
-      // Just check form is still rendered
-      expect(screen.getAllByText('Create New Event').length).toBeGreaterThanOrEqual(1);
-    });
+  it('shows concrete validation errors and blocks the mutation for an empty form', async () => {
+    await renderCreateEventPage();
+
+    const titleInput = screen.getByRole('textbox', { name: 'Event Title' });
+    const form = titleInput.closest('form');
+    expect(form).not.toBeNull();
+    fireEvent.submit(form!);
+
+    expect(await screen.findByText('Title is required')).toBeInTheDocument();
+    expect(screen.getByText('Description is required')).toBeInTheDocument();
+    expect(screen.getByText('Start date is required')).toBeInTheDocument();
+    expect(screen.getByText('Start time is required')).toBeInTheDocument();
+    expect(mockToast.error).toHaveBeenCalledWith(
+      'Please fix the highlighted fields before saving',
+    );
+    expect(mockApi.post).not.toHaveBeenCalled();
   });
 });

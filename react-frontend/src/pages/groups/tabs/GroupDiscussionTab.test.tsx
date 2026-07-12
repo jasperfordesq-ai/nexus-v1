@@ -12,10 +12,14 @@ import React from 'react';
 // ─── No @/lib/api import in GroupDiscussionTab — it receives data via props ───
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: (url: string | null) => url ?? '',
-  formatRelativeTime: () => 'just now',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: (url: string | null) => url ?? '',
+    formatRelativeTime: () => 'just now',
+  };
+});
 
 // ─── Contexts ────────────────────────────────────────────────────────────────
 const mockToast = {
@@ -25,6 +29,7 @@ const mockToast = {
   warning: vi.fn(),
   showToast: vi.fn(),
 };
+const mockSocialPanel = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts', () =>
   createMockContexts({
@@ -67,7 +72,17 @@ vi.mock('@/components/feedback', () => ({
 }));
 
 vi.mock('@/components/social', () => ({
-  SocialInteractionPanel: () => <div data-testid="social-panel" />,
+  SocialInteractionPanel: (props: Record<string, unknown>) => {
+    mockSocialPanel(props);
+    return <div data-testid="social-panel" />;
+  },
+}));
+
+vi.mock('@/components/social/SocialInteractionPanel', () => ({
+  SocialInteractionPanel: (props: Record<string, unknown>) => {
+    mockSocialPanel(props);
+    return <div data-testid="social-panel" />;
+  },
 }));
 
 vi.mock('@/components/ui/SafeHtml', () => ({
@@ -77,7 +92,9 @@ vi.mock('@/components/ui/SafeHtml', () => ({
 // Stub motion so AnimatePresence/motion.div render immediately in jsdom
 vi.mock('@/lib/motion', () => ({
   motion: {
-    div: ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement>) => <div {...rest}>{children}</div>,
+    div: ({ children, layout: _layout, ...rest }: React.HTMLAttributes<HTMLDivElement> & { layout?: boolean }) => (
+      <div {...rest}>{children}</div>
+    ),
   },
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
@@ -145,6 +162,7 @@ const makeExpandedDiscussion = (
   base: import('./GroupDiscussionTab').Discussion
 ): import('./GroupDiscussionTab').DiscussionDetail => ({
   ...base,
+  messagesHasMore: false,
   messages: [
     {
       id: 100,
@@ -165,12 +183,14 @@ const baseProps = {
   expandedDiscussionId: null as number | null,
   expandedDiscussion: null as import('./GroupDiscussionTab').DiscussionDetail | null,
   expandedLoading: false,
+  loadingEarlierReplies: false,
   replyContent: '',
   sendingReply: false,
   onJoinLeave: vi.fn(),
   onShowNewDiscussion: vi.fn(),
   onExpandDiscussion: vi.fn(),
   onLoadMoreDiscussions: vi.fn(),
+  onLoadEarlierReplies: vi.fn(),
   onReplyContentChange: vi.fn(),
   onSendReply: vi.fn(),
 };
@@ -251,6 +271,13 @@ describe('GroupDiscussionTab', () => {
     expect(screen.getByText('New members intro')).toBeInTheDocument();
   });
 
+  it('renders the discussion reply count', async () => {
+    const { GroupDiscussionTab } = await import('./GroupDiscussionTab');
+    render(<GroupDiscussionTab {...baseProps} discussions={[makeDiscussion({ reply_count: 3 })]} />);
+
+    expect(screen.getByText('3 replies')).toBeInTheDocument();
+  });
+
   it('calls onExpandDiscussion when a discussion is clicked', async () => {
     const onExpandDiscussion = vi.fn();
     const disc = makeDiscussion({ id: 5 });
@@ -289,6 +316,49 @@ describe('GroupDiscussionTab', () => {
     });
   });
 
+  it('renders the root body exactly once and never conflates it with replies', async () => {
+    const disc = makeDiscussion({ id: 3, content: 'Unique root body' });
+    const expanded = makeExpandedDiscussion(disc);
+
+    const { GroupDiscussionTab } = await import('./GroupDiscussionTab');
+    render(
+      <GroupDiscussionTab
+        {...baseProps}
+        discussions={[disc]}
+        expandedDiscussionId={3}
+        expandedDiscussion={expanded}
+      />
+    );
+
+    const rootBodies = screen.getAllByTestId('safe-html')
+      .filter((element) => element.textContent === 'Unique root body');
+    expect(rootBodies).toHaveLength(1);
+  });
+
+  it('loads earlier replies only when the server supplies another reply cursor', async () => {
+    const onLoadEarlierReplies = vi.fn();
+    const disc = makeDiscussion({ id: 3 });
+    const expanded = {
+      ...makeExpandedDiscussion(disc),
+      messagesHasMore: true,
+      messagesNextCursor: 'older-page',
+    };
+
+    const { GroupDiscussionTab } = await import('./GroupDiscussionTab');
+    render(
+      <GroupDiscussionTab
+        {...baseProps}
+        discussions={[disc]}
+        expandedDiscussionId={3}
+        expandedDiscussion={expanded}
+        onLoadEarlierReplies={onLoadEarlierReplies}
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /load earlier replies/i }));
+    expect(onLoadEarlierReplies).toHaveBeenCalledTimes(1);
+  });
+
   it('shows reply messages when discussion is expanded', async () => {
     const disc = makeDiscussion({ id: 3 });
     const expanded = makeExpandedDiscussion(disc);
@@ -307,6 +377,8 @@ describe('GroupDiscussionTab', () => {
     const safeHtmlEls = screen.getAllByTestId('safe-html');
     const contents = safeHtmlEls.map((el) => el.textContent);
     expect(contents.some((c) => c?.includes('Doing great!'))).toBe(true);
+    const replyBody = safeHtmlEls.find((element) => element.textContent?.includes('Doing great!'));
+    expect(replyBody?.closest('.border-s-2')).toHaveClass('ms-3', 'ps-3');
   });
 
   it('shows loading spinner when expandedLoading is true', async () => {
@@ -400,6 +472,7 @@ describe('GroupDiscussionTab', () => {
     );
     const sendBtn = screen.getByRole('button', { name: /send/i });
     expect(sendBtn).not.toBeDisabled();
+    expect(sendBtn).toHaveClass('min-h-11', 'min-w-11');
   });
 
   it('calls onSendReply when send button clicked with content', async () => {
@@ -486,5 +559,10 @@ describe('GroupDiscussionTab', () => {
       />
     );
     expect(screen.getByTestId('social-panel')).toBeInTheDocument();
+    expect(mockSocialPanel).toHaveBeenCalledWith(expect.objectContaining({
+      targetType: 'discussion',
+      targetId: 3,
+      allowComments: false,
+    }));
   });
 });

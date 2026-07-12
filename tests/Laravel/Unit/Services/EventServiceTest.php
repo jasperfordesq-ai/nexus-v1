@@ -6,26 +6,190 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\EventService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Tests\Laravel\TestCase;
 
 class EventServiceTest extends TestCase
 {
-    // EventService uses Eloquent models heavily (Event, EventRsvp) with complex query chains
-    // These are best tested as integration tests with a database
+    use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TenantContext::setById($this->testTenantId);
+    }
+
+    private function user(): User
+    {
+        return User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+    }
+
+    private function event(int $userId, string $startTime, array $overrides = []): int
+    {
+        return (int) DB::table('events')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'title' => 'Event service test ' . uniqid(),
+            'description' => 'Database-backed EventService regression coverage.',
+            'start_time' => $startTime,
+            'end_time' => date('Y-m-d H:i:s', strtotime($startTime) + 3600),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
 
     public function test_getAll_returns_expected_structure(): void
     {
-        $this->markTestIncomplete('Requires integration test with Event model and HasTenantScope trait');
+        $user = $this->user();
+        $eventId = $this->event($user->id, now()->addDay()->format('Y-m-d H:i:s'));
+
+        $result = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'when' => 'upcoming',
+            'limit' => 20,
+        ]);
+
+        $this->assertSame(['items', 'cursor', 'has_more'], array_keys($result));
+        $this->assertSame([$eventId], array_column($result['items'], 'id'));
+        $this->assertNull($result['cursor']);
+        $this->assertFalse($result['has_more']);
     }
 
     public function test_getAll_filters_by_upcoming_by_default(): void
     {
-        $this->markTestIncomplete('Requires integration test with Event model');
+        $user = $this->user();
+        $pastId = $this->event($user->id, now()->subDay()->format('Y-m-d H:i:s'));
+        $futureId = $this->event($user->id, now()->addDay()->format('Y-m-d H:i:s'));
+
+        $result = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+        ]);
+        $ids = array_column($result['items'], 'id');
+
+        $this->assertContains($futureId, $ids);
+        $this->assertNotContains($pastId, $ids);
     }
 
     public function test_getAll_applies_cursor_pagination(): void
     {
-        $this->markTestIncomplete('Requires integration test with Event model');
+        $user = $this->user();
+        $firstId = $this->event($user->id, now()->addDays(1)->format('Y-m-d H:i:s'));
+        $secondId = $this->event($user->id, now()->addDays(2)->format('Y-m-d H:i:s'));
+
+        $pageOne = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'limit' => 1,
+        ]);
+        $this->assertTrue($pageOne['has_more']);
+        $this->assertNotNull($pageOne['cursor']);
+
+        $pageTwo = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'limit' => 1,
+            'cursor' => $pageOne['cursor'],
+        ]);
+        $seen = array_merge(
+            array_column($pageOne['items'], 'id'),
+            array_column($pageTwo['items'], 'id'),
+        );
+
+        $this->assertEqualsCanonicalizing([$firstId, $secondId], $seen);
+        $this->assertCount(2, array_unique($seen));
+    }
+
+    public function test_getAll_filters_each_step_free_accessibility_state(): void
+    {
+        $user = $this->user();
+        $yesId = $this->event($user->id, now()->addDay()->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => true,
+        ]);
+        $noId = $this->event($user->id, now()->addDays(2)->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => false,
+        ]);
+        $unknownId = $this->event($user->id, now()->addDays(3)->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => null,
+        ]);
+
+        foreach ([
+            'yes' => $yesId,
+            'no' => $noId,
+            'unknown' => $unknownId,
+        ] as $stepFree => $expectedId) {
+            $result = EventService::getAll([
+                'viewer_id' => $user->id,
+                'user_id' => $user->id,
+                'step_free' => $stepFree,
+            ]);
+
+            $this->assertSame([$expectedId], array_column($result['items'], 'id'), $stepFree);
+        }
+    }
+
+    public function test_getAll_applies_step_free_filter_inside_series_collapse(): void
+    {
+        $user = $this->user();
+        $inaccessibleRootId = $this->event($user->id, now()->addDay()->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => false,
+        ]);
+        $accessibleOccurrenceId = $this->event($user->id, now()->addDays(2)->format('Y-m-d H:i:s'), [
+            'parent_event_id' => $inaccessibleRootId,
+            'accessibility_step_free' => true,
+        ]);
+
+        $result = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'step_free' => 'yes',
+        ]);
+
+        $this->assertSame([$accessibleOccurrenceId], array_column($result['items'], 'id'));
+    }
+
+    public function test_getAll_cursor_is_bound_to_normalized_step_free_filter(): void
+    {
+        $user = $this->user();
+        $this->event($user->id, now()->addDay()->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => true,
+        ]);
+        $this->event($user->id, now()->addDays(2)->format('Y-m-d H:i:s'), [
+            'accessibility_step_free' => true,
+        ]);
+
+        $pageOne = EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'step_free' => 'yes',
+            'limit' => 1,
+        ]);
+        $this->assertNotNull($pageOne['cursor']);
+
+        $this->expectException(ValidationException::class);
+        EventService::getAll([
+            'viewer_id' => $user->id,
+            'user_id' => $user->id,
+            'step_free' => 'no',
+            'limit' => 1,
+            'cursor' => $pageOne['cursor'],
+        ]);
+    }
+
+    public function test_getAll_rejects_unknown_step_free_filter_values(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        EventService::getAll(['step_free' => 'sometimes']);
     }
 }

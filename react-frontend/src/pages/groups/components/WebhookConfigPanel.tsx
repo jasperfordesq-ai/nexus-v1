@@ -23,23 +23,22 @@ import Webhook from 'lucide-react/icons/webhook';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { formatDateValue } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
+import {
+  createGroupWebhook,
+  deleteGroupWebhook,
+  GroupApiError,
+  listGroupWebhooks,
+  setGroupWebhookActive,
+  type CreateGroupWebhookInput,
+  type GroupWebhook,
+} from '../api';
 
 interface WebhookConfigPanelProps {
   groupId: number;
   isAdmin: boolean;
-}
-
-interface WebhookItem {
-  id: number;
-  url: string;
-  events: string[];
-  is_active: boolean;
-  last_fired_at: string | null;
-  failure_count: number;
 }
 
 const AVAILABLE_EVENTS = [
@@ -47,7 +46,6 @@ const AVAILABLE_EVENTS = [
   'member.left',
   'discussion.created',
   'post.created',
-  'group.updated',
   'file.uploaded',
 ] as const;
 
@@ -56,8 +54,9 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
   const confirm = useConfirm();
   const toast = useToast();
 
-  const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
+  const [webhooks, setWebhooks] = useState<GroupWebhook[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   // Add webhook form state
@@ -66,24 +65,32 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
   const [newSecret, setNewSecret] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const loadWebhooks = useCallback(async () => {
+  const loadWebhooks = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
+    setLoadFailed(false);
     try {
-      const res = await api.get(`/v2/groups/${groupId}/webhooks`);
-      if (res.success && res.data) {
-        const payload = res.data;
-        setWebhooks(Array.isArray(payload) ? payload : []);
-      }
-    } catch {
+      setWebhooks(await listGroupWebhooks(groupId, { signal }));
+    } catch (error) {
+      if (error instanceof GroupApiError && error.isCancellation) return;
+      setLoadFailed(true);
       toast.error(t('webhooks.load_failed'));
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, [groupId, toast, t]);
 
   useEffect(() => {
-    loadWebhooks();
-  }, [loadWebhooks]);
+    if (!isAdmin) {
+      setWebhooks([]);
+      setLoadFailed(false);
+      setLoading(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    void loadWebhooks(controller.signal);
+    return () => controller.abort();
+  }, [isAdmin, loadWebhooks]);
 
   const handleCreate = async () => {
     if (!newUrl.trim()) {
@@ -97,20 +104,16 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
     setCreating(true);
     try {
-      const body: Record<string, unknown> = { url: newUrl.trim(), events: newEvents };
+      const body: CreateGroupWebhookInput = { url: newUrl.trim(), events: newEvents };
       if (newSecret.trim()) {
         body.secret = newSecret.trim();
       }
 
-      const res = await api.post(`/v2/groups/${groupId}/webhooks`, body);
-      if (res.success) {
-        toast.success(t('webhooks.created'));
-        setModalOpen(false);
-        resetForm();
-        await loadWebhooks();
-      } else {
-        toast.error(t('webhooks.create_failed'));
-      }
+      await createGroupWebhook(groupId, body);
+      toast.success(t('webhooks.created'));
+      setModalOpen(false);
+      resetForm();
+      await loadWebhooks();
     } catch {
       toast.error(t('webhooks.create_failed'));
     } finally {
@@ -120,17 +123,10 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
 
   const handleToggle = async (webhookId: number, isActive: boolean) => {
     try {
-      const res = await api.put(
-        `/v2/groups/${groupId}/webhooks/${webhookId}/toggle`,
-        { is_active: isActive }
+      await setGroupWebhookActive(groupId, webhookId, isActive);
+      setWebhooks((prev) =>
+        prev.map((wh) => (wh.id === webhookId ? { ...wh, is_active: isActive } : wh))
       );
-      if (res.success) {
-        setWebhooks((prev) =>
-          prev.map((wh) => (wh.id === webhookId ? { ...wh, is_active: isActive } : wh))
-        );
-      } else {
-        toast.error(t('webhooks.toggle_failed'));
-      }
     } catch {
       toast.error(t('webhooks.toggle_failed'));
     }
@@ -144,13 +140,9 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
     });
     if (!ok) return;
     try {
-      const res = await api.delete(`/v2/groups/${groupId}/webhooks/${webhookId}`);
-      if (res.success) {
-        setWebhooks((prev) => prev.filter((wh) => wh.id !== webhookId));
-        toast.success(t('webhooks.deleted'));
-      } else {
-        toast.error(t('webhooks.delete_failed'));
-      }
+      await deleteGroupWebhook(groupId, webhookId);
+      setWebhooks((prev) => prev.filter((wh) => wh.id !== webhookId));
+      toast.success(t('webhooks.deleted'));
     } catch {
       toast.error(t('webhooks.delete_failed'));
     }
@@ -196,6 +188,10 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
           <Spinner size="md" />
         </div>
+      ) : loadFailed ? (
+        <p role="alert" className="py-6 text-center text-sm text-danger">
+          {t('webhooks.load_failed')}
+        </p>
       ) : webhooks.length === 0 ? (
         <p className="text-sm text-muted text-center py-6">
           {t('webhooks.empty')}

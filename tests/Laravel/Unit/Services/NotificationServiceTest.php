@@ -103,4 +103,25 @@ class NotificationServiceTest extends TestCase
         $this->assertArrayHasKey('total', $result);
         $this->assertSame(0, $result['total']);
     }
+
+    public function test_getCounts_classifies_all_event_namespace_and_legacy_alias_types(): void
+    {
+        $query = Mockery::mock();
+        $query->shouldReceive('where')->andReturnSelf();
+        $query->shouldReceive('unread')->andReturnSelf();
+        $query->shouldReceive('get')->andReturn(collect([
+            (object) ['type' => 'event_created'],
+            (object) ['type' => 'event_rsvp_confirm'],
+            (object) ['type' => 'new_event_created'],
+            (object) ['type' => 'message'],
+        ]));
+        $this->mockNotification->shouldReceive('newQuery')->andReturn($query);
+
+        $result = $this->service->getCounts(1);
+
+        $this->assertSame(4, $result['total']);
+        $this->assertSame(3, $result['events']);
+        $this->assertSame(1, $result['messages']);
+        $this->assertSame(0, $result['other']);
+    }
 }

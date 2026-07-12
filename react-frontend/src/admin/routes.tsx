@@ -105,7 +105,6 @@ const GroupApprovals = lazy(() => import('./modules/groups/GroupApprovals'));
 const GroupModeration = lazy(() => import('./modules/groups/GroupModeration'));
 const GroupTypes = lazy(() => import('./modules/groups/GroupTypes'));
 const GroupDetail = lazy(() => import('./modules/groups/GroupDetail'));
-const GroupEdit = lazy(() => import('./modules/groups/GroupEdit'));
 const GroupRecommendations = lazy(() => import('./modules/groups/GroupRecommendations'));
 const GroupRanking = lazy(() => import('./modules/groups/GroupRanking'));
 const GroupGeocode = lazy(() => import('./modules/groups/GroupGeocode'));
@@ -554,7 +553,7 @@ export function AdminRoutes() {
       <Route path="groups/moderation" element={<Lazy><GroupModeration /></Lazy>} />
       <Route path="groups/types" element={<Lazy><GroupTypes /></Lazy>} />
       <Route path="groups/:id/detail" element={<Lazy><GroupDetail /></Lazy>} />
-      <Route path="groups/:id/edit" element={<Lazy><GroupEdit /></Lazy>} />
+      <Route path="groups/:id/edit" element={<TenantParamRedirect to="/groups/edit/:id" />} />
       <Route path="groups/recommendations" element={<Lazy><GroupRecommendations /></Lazy>} />
       <Route path="groups/ranking" element={<Lazy><GroupRanking /></Lazy>} />
       <Route path="groups/organization" element={<Lazy><GroupOrganization /></Lazy>} />

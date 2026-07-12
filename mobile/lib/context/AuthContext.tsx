@@ -24,6 +24,7 @@ import {
   type LoginUser,
   type LoginPayload,
 } from '@/lib/api/auth';
+import { purgeAllMobileOfflineCheckinData } from '@/lib/eventOfflineCheckinStore';
 import { registerUnauthorizedCallback } from '@/lib/api/client';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
@@ -71,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /** Called by the API client when it receives a 401 response */
   const handleUnauthorized = useCallback(() => {
+    void purgeAllMobileOfflineCheckinData();
     setUser(null);
     setToken(null);
     router.replace('/(auth)/login');
@@ -125,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 storage.remove(STORAGE_KEYS.AUTH_TOKEN),
                 storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
                 storage.remove(STORAGE_KEYS.USER_DATA),
+                purgeAllMobileOfflineCheckinData(),
               ]);
               if (!isMounted) return;
               setToken(null);
@@ -149,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           storage.remove(STORAGE_KEYS.AUTH_TOKEN),
           storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
           storage.remove(STORAGE_KEYS.USER_DATA),
+          purgeAllMobileOfflineCheckinData(),
         ]);
         if (!isMounted) return;
         setToken(null);
@@ -217,6 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       storage.remove(STORAGE_KEYS.AUTH_TOKEN),
       storage.remove(STORAGE_KEYS.REFRESH_TOKEN),
       storage.remove(STORAGE_KEYS.USER_DATA),
+      purgeAllMobileOfflineCheckinData(),
     ]);
 
     setToken(null);

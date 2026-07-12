@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Verificação de crachás concluída para :count utilizador(es)"
     },
     "admin_groups": {
+        "rule_not_found": "Regra não encontrada",
         "group_archived": "Grupo arquivado",
         "group_unarchived": "Grupo retirado do arquivo",
         "ownership_transferred": "Propriedade transferida",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "O seu pedido de eliminação de conta foi submetido. Receberá uma confirmação por e-mail."
     },
     "group_challenge": {
-        "challenge_deleted": "Desafio eliminado"
+        "challenge_deleted": "Desafio eliminado",
+        "challenge_cancelled": "Desafio cancelado",
+        "challenge_immutable": "Os desafios concluídos ou recompensados não podem ser cancelados"
+    },
+    "group_chatroom": {
+        "default_name": "Geral",
+        "default_description": "Sala de conversa predefinida do grupo"
     },
     "group_exchange": {
         "exchange_cancelled": "Troca cancelada",

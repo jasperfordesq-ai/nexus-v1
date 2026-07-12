@@ -30,6 +30,7 @@ import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
 import { queueSentryAuthEvent, queueSentryUser } from '@/lib/telemetryQueue';
+import { purgeAllOfflineCheckinData } from '@/lib/event-offline-checkin-store';
 import type {
   User,
   LoginRequest,
@@ -77,7 +78,7 @@ interface AuthContextValue extends AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<LoginResult>;
-  loginWithBiometric: (email?: string) => Promise<LoginResult>;
+  loginWithBiometric: (email?: string, abortSignal?: AbortSignal) => Promise<LoginResult>;
   verify2FA: (request: TwoFactorVerifyRequest) => Promise<boolean>;
   register: (data: RegisterRequest) => Promise<RegisterResult>;
   logout: () => Promise<void>;
@@ -372,55 +373,83 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Biometric / WebAuthn Login
   // ─────────────────────────────────────────────────────────────────────────
 
-  const loginWithBiometric = useCallback(async (email?: string): Promise<LoginResult> => {
+  const loginWithBiometric = useCallback(async (_email?: string, abortSignal?: AbortSignal): Promise<LoginResult> => {
     setState((prev) => ({ ...prev, status: 'loading', error: null }));
 
-    const { authenticateWithBiometric } = await import('@/lib/webauthn');
-    const result = await authenticateWithBiometric(email);
-
-    if (!result.success || !result.data) {
-      // User cancelled the biometric prompt — return to idle silently
-      const wasCancelled = result.errorCode === 'cancelled' || result.error?.includes('cancelled');
-      setState((prev) => ({
-        ...prev,
-        status: wasCancelled ? 'idle' : 'error',
-        error: wasCancelled ? null : (result.error ?? 'Biometric login failed'),
-      }));
-      return {
-        success: false,
-        requires2FA: false,
-        error: wasCancelled ? undefined : result.error,
-        errorCode: result.errorCode,
-      };
-    }
-
-    const { user, access_token, refresh_token } = result.data;
-
-    tokenManager.setAccessToken(access_token);
-    tokenManager.setRefreshToken(refresh_token);
-
-    // Set Sentry user context
-    setTelemetryUser(user satisfies User);
-    captureTelemetryAuthEvent('biometric_login', user.id);
-
-    wasAuthenticated.current = true;
-
-    // Fetch full user profile (biometric auth response has minimal user data)
     try {
-      const profileRes = await api.get<User>('/v2/users/me');
-      if (profileRes.success && profileRes.data) {
-        if (profileRes.data.preferred_language) {
-          i18n.changeLanguage(profileRes.data.preferred_language);
-        }
-        setState({
-          user: profileRes.data,
-          status: 'authenticated',
+      const { authenticateWithBiometric } = await import('@/lib/webauthn');
+      // Signed-out WebAuthn is deliberately username-less/discoverable. Keep
+      // the legacy positional parameter for caller compatibility, but never
+      // forward account identity to the public challenge endpoint.
+      const result = await authenticateWithBiometric(undefined, abortSignal);
+
+      if (!result.success || !result.data) {
+        // All ceremony failures return to idle; the login page maps stable error codes.
+        setState((prev) => ({
+          ...prev,
+          status: 'idle',
           error: null,
-          twoFactorToken: null,
-          twoFactorMethods: [],
-        });
-      } else {
-        // Token works but profile fetch failed — set minimal user data
+        }));
+        return {
+          success: false,
+          requires2FA: false,
+          error: result.errorCode === 'cancelled' ? undefined : result.error,
+          errorCode: result.errorCode,
+        };
+      }
+
+      if (abortSignal?.aborted) {
+        setState((prev) => ({ ...prev, status: 'idle', error: null }));
+        return { success: false, requires2FA: false, errorCode: 'cancelled' };
+      }
+
+      const { user, access_token, refresh_token, expires_in } = result.data;
+
+      tokenManager.setAccessToken(access_token);
+      tokenManager.setRefreshToken(refresh_token);
+
+      if (abortSignal?.aborted) {
+        tokenManager.clearTokens();
+        setState((prev) => ({ ...prev, status: 'idle', error: null }));
+        return { success: false, requires2FA: false, errorCode: 'cancelled' };
+      }
+
+      // Fetch full user profile (biometric auth response has minimal user data)
+      try {
+        const profileRes = await api.get<User>('/v2/users/me');
+        if (abortSignal?.aborted) {
+          tokenManager.clearTokens();
+          setState((prev) => ({ ...prev, status: 'idle', error: null }));
+          return { success: false, requires2FA: false, errorCode: 'cancelled' };
+        }
+        if (profileRes.success && profileRes.data) {
+          if (profileRes.data.preferred_language) {
+            i18n.changeLanguage(profileRes.data.preferred_language);
+          }
+          setState({
+            user: profileRes.data,
+            status: 'authenticated',
+            error: null,
+            twoFactorToken: null,
+            twoFactorMethods: [],
+          });
+        } else {
+          // Token works but profile fetch failed; use the minimal user data.
+          setState({
+            user: user satisfies User,
+            status: 'authenticated',
+            error: null,
+            twoFactorToken: null,
+            twoFactorMethods: [],
+          });
+        }
+      } catch (err) {
+        if (abortSignal?.aborted) {
+          tokenManager.clearTokens();
+          setState((prev) => ({ ...prev, status: 'idle', error: null }));
+          return { success: false, requires2FA: false, errorCode: 'cancelled' };
+        }
+        logWarn('Passkey login profile fetch failed; using minimal profile', err);
         setState({
           user: user satisfies User,
           status: 'authenticated',
@@ -429,18 +458,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
           twoFactorMethods: [],
         });
       }
-    } catch {
-      setState({
-        user: user satisfies User,
-        status: 'authenticated',
-        error: null,
-        twoFactorToken: null,
-        twoFactorMethods: [],
-      });
-    }
 
-    return { success: true, requires2FA: false };
-  }, []);
+      if (abortSignal?.aborted) {
+        tokenManager.clearTokens();
+        setState((prev) => ({ ...prev, status: 'idle', error: null }));
+        return { success: false, requires2FA: false, errorCode: 'cancelled' };
+      }
+
+      if (Number.isFinite(expires_in) && expires_in > 0) {
+        scheduleSessionWarning(expires_in);
+      }
+      setTelemetryUser(user satisfies User);
+      captureTelemetryAuthEvent('biometric_login', user.id);
+      wasAuthenticated.current = true;
+
+      return { success: true, requires2FA: false };
+    } catch (err) {
+      const cancelled = abortSignal?.aborted === true;
+      if (!cancelled) {
+        logError('Passkey login failed before completion', err);
+      }
+      setState((prev) => ({ ...prev, status: 'idle', error: null }));
+      return {
+        success: false,
+        requires2FA: false,
+        errorCode: cancelled ? 'cancelled' : 'unknown',
+      };
+    }
+  }, [scheduleSessionWarning]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // 2FA Verification
@@ -658,6 +703,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // from a clean platform state and the user explicitly picks a community.
       // Logout preserves trusted device token by design.
       // Call tokenManager.clearTrustedDeviceToken() for an explicit "forget this device" flow.
+      await purgeAllOfflineCheckinData().catch(() => {
+        logWarn('Offline event check-in data purge failed during logout');
+      });
       tokenManager.clearTokens();
       localStorage.removeItem('nexus_tenant_id');
       localStorage.removeItem('nexus_tenant_slug');
@@ -692,6 +740,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const handleSessionExpired = () => {
+      void purgeAllOfflineCheckinData();
       // Cancel any pending warning timer — the session is already gone
       clearSessionWarningTimer();
       // Only set error message if user had an active session — stale tokens
@@ -731,6 +780,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // localStorage 'storage' event only fires in OTHER tabs (not the one that made the change).
       // When access token is removed (logout in another tab), clear state here too.
       if (event.key === 'nexus_access_token' && event.newValue === null && state.status === 'authenticated') {
+        void purgeAllOfflineCheckinData();
         tokenManager.clearTokens();
         // Also clear tenant context so the next login gets a fresh tenant bootstrap.
         // Without this, a stale tenant slug from the previous session could cause

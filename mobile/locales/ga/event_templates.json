@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Teimpléid imeachtaí",
+      "safetyTitle": "Cumraíocht cóipe teimpléid amháin",
+      "safetyDescription": "Ní dhéantar daoine, clárúcháin, freagraí príobháideacha, tinreamh, ticéid, stair seachadta, aitheantóirí cónaidhme agus staid foilseacháin a chóipeáil riamh.",
+      "loading": "Teimpléid imeachtaí á lódáil",
+      "loadFailedTitle": "Ní féidir teimpléid a lódáil",
+      "loadFailedDescription": "Níorbh fhéidir an leabharlann teimpléid a lódáil. Bain triail eile as.",
+      "emptyTitle": "Níor aimsíodh teimpléid",
+      "emptyDescription": "Sábháil imeacht mar theimpléad ar an ngréasán chun leabharlann cumraíochta ath-inúsáidte a thógáil.",
+      "source": "Foinse: {{title}}",
+      "versionAndUses": "Leagan {{version}} · Úsáidí: {{count}}",
+      "useTemplate": "Úsáid teimpléad",
+      "scheduleTitle": "Sceideal an imeacht nua",
+      "scheduleDescription": "Léirmheas an teideal, an crios ama agus an sceideal don todhchaí. Cruthófar dréacht úr.",
+      "eventTitle": "Teideal an imeachta",
+      "start": "Tosaigh",
+      "end": "Deireadh (roghnach)",
+      "timezone": "Crios ama",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Roghnach YYYY-MM-DDTHH:mm",
+      "validationTitle": "Seiceáil sonraí an dréachta",
+      "validationDescription": "Cuir isteach teideal, crios ama agus sceideal bailí don todhchaí.",
+      "previewFailedTitle": "Ní féidir an dréacht a athbhreithniú",
+      "previewFailedDescription": "Níorbh fhéidir leis an bhfreastalaí an dréacht-réamhamharc sábháilte a ullmhú.",
+      "review": "Dréacht athbhreithnithe",
+      "reviewTitle": "Déan athbhreithniú ar dhréacht imeachta nua",
+      "reviewDescription": "Deimhnigh seiceálacha an fhreastalaí roimh chruthú an dréachta.",
+      "readyTitle": "Réidh le dréacht a chruthú",
+      "readyDescription": "Fíoraíodh an leagan reatha, na réimsí sábháilte, an sceideal agus an sreabhadh oibre cruthaithe.",
+      "draftState": "Staid foilseacháin: Dréacht",
+      "changeDetails": "Athrú sonraí",
+      "createDraft": "Cruthaigh dréacht",
+      "createdTitle": "Cruthaíodh dréacht imeachta",
+      "createdDescription": "Déan é a athbhreithniú agus a fhoilsiú ar leithligh nuair a bheidh sé réidh.",
+      "createFailedTitle": "Ní féidir dréacht a chruthú",
+      "createFailedDescription": "Níorbh fhéidir dréacht an imeachta a chruthú. Bain triail eile as."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Tá cead agat fós an t-imeacht foinse a bhainistiú",
+      "event_template_check_allowlist_exact": "Ní áirítear ach réimsí cumraíochta faofa",
+      "event_template_check_private_records_skipped": "Eisiatar taifid phríobháideacha agus oibriúcháin",
+      "event_template_check_versioned_snapshot": "Is pictiúr leagan do-laghdaithe í an chumraíocht",
+      "event_template_check_version_current": "Tá leagan an teimpléid roghnaithe reatha",
+      "event_template_check_schedule_valid": "Tá an sceideal nua bailí agus sa todhchaí",
+      "event_template_check_federation_none": "Tá Cónaidhm díchumasaithe don dréacht nua",
+      "event_template_check_canonical_writer": "Bainfear úsáid as an sreabhadh oibre cruthú imeachtaí canónacha"
+    }
+  }
+}

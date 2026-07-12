@@ -12,13 +12,8 @@ import userEvent from '@testing-library/user-event';
 vi.mock('@/contexts', () => createMockContexts());
 
 // ── location map stub — avoids heavy map dep ──────────────────────────────────
-vi.mock('@/components/location', () => ({
+vi.mock('@/components/location/LocationMapCard', () => ({
   LocationMapCard: () => <div data-testid="location-map" />,
-}));
-
-// ── SafeHtml stub ─────────────────────────────────────────────────────────────
-vi.mock('@/components/ui/SafeHtml', () => ({
-  SafeHtml: ({ content }: { content: string }) => <div>{content}</div>,
 }));
 
 // ── lib/helpers partial mock ──────────────────────────────────────────────────
@@ -93,6 +88,22 @@ describe('GroupHeader', () => {
     expect(screen.getByText('A local help group')).toBeInTheDocument();
   });
 
+  it('keeps malicious group names inert and sanitizes malicious descriptions', () => {
+    const name = '<img src=x onerror="window.__groupNameXss=1"><script>window.__groupNameXss=2</script>';
+    const description = '<script>window.__groupDescriptionXss=1</script><a href="javascript:alert(1)" onclick="alert(2)">Safe description</a>';
+    const { container } = render(
+      <GroupHeader {...defaultProps} group={makeGroup({ name, description })} />,
+    );
+
+    expect(screen.getByText(name, { exact: true })).toBeInTheDocument();
+    expect(screen.getByText('Safe description', { exact: true })).toBeInTheDocument();
+    expect(container.querySelector('script')).toBeNull();
+    expect(container.querySelector('[onerror], [onclick]')).toBeNull();
+    expect(container.innerHTML).not.toContain('javascript:');
+    expect((window as typeof window & { __groupNameXss?: number }).__groupNameXss).toBeUndefined();
+    expect((window as typeof window & { __groupDescriptionXss?: number }).__groupDescriptionXss).toBeUndefined();
+  });
+
   it('renders public chip for public group', () => {
     render(<GroupHeader {...defaultProps} />);
     // The chip label will be a translation key result — check aria-label or text
@@ -132,7 +143,23 @@ describe('GroupHeader', () => {
   });
 
   it('renders Settings + Delete buttons for admin', () => {
-    render(<GroupHeader {...{ ...defaultProps, userIsAdmin: true, userIsMember: true }} />);
+    const group = makeGroup({
+      viewer_membership: {
+        status: 'active',
+        role: 'owner',
+        is_admin: true,
+        capabilities: {
+          can_join: false,
+          can_leave: false,
+          can_cancel_request: false,
+          can_invite: true,
+          can_manage_members: true,
+          can_manage_admins: true,
+          can_delete: true,
+        },
+      },
+    });
+    render(<GroupHeader {...{ ...defaultProps, group, userIsAdmin: true, userIsMember: true }} />);
     const settingsBtn = screen.getAllByRole('button').find((b) => b.textContent?.toLowerCase().includes('setting'));
     const deleteBtn = screen.getAllByRole('button').find((b) => b.textContent?.toLowerCase().includes('delete'));
     expect(settingsBtn).toBeDefined();
@@ -151,7 +178,16 @@ describe('GroupHeader', () => {
 
   it('calls onOpenDelete when Delete clicked', async () => {
     const onOpenDelete = vi.fn();
-    render(<GroupHeader {...{ ...defaultProps, userIsAdmin: true, userIsMember: true, onOpenDelete }} />);
+    const group = makeGroup({
+      viewer_membership: {
+        status: 'active', role: 'owner', is_admin: true,
+        capabilities: {
+          can_join: false, can_leave: false, can_cancel_request: false, can_invite: true,
+          can_manage_members: true, can_manage_admins: true, can_delete: true,
+        },
+      },
+    });
+    render(<GroupHeader {...{ ...defaultProps, group, userIsAdmin: true, userIsMember: true, onOpenDelete }} />);
     const btn = screen.getAllByRole('button').find((b) => b.textContent?.toLowerCase().includes('delete'));
     if (btn) {
       await userEvent.click(btn);
@@ -195,10 +231,9 @@ describe('GroupHeader', () => {
         {...{ ...defaultProps, userIsAdmin: true, isPrivateGroup: true, requestsLoaded: false }}
       />
     );
-    const btn = screen.getAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('pending') || b.textContent?.toLowerCase().includes('request')
-    );
-    expect(btn).toBeDefined();
+    expect(
+      screen.getByRole('button', { name: /view pending join requests/i })
+    ).toBeInTheDocument();
   });
 
   it('calls onLoadJoinRequests when view-pending button is clicked', async () => {
@@ -208,13 +243,10 @@ describe('GroupHeader', () => {
         {...{ ...defaultProps, userIsAdmin: true, isPrivateGroup: true, requestsLoaded: false, onLoadJoinRequests }}
       />
     );
-    const btn = screen.getAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('pending') || b.textContent?.toLowerCase().includes('request')
+    await userEvent.click(
+      screen.getByRole('button', { name: /view pending join requests/i })
     );
-    if (btn) {
-      await userEvent.click(btn);
-      expect(onLoadJoinRequests).toHaveBeenCalledTimes(1);
-    }
+    expect(onLoadJoinRequests).toHaveBeenCalledTimes(1);
   });
 
   it('renders join requests when requestsLoaded=true', () => {
@@ -290,6 +322,104 @@ describe('GroupHeader', () => {
     // Translation key: detail.no_pending_requests
     // In test env key fallback text will be rendered — just check no request rows
     expect(screen.queryByRole('button', { name: /accept/i })).not.toBeInTheDocument();
+  });
+
+  it('applies persisted validated brand colors to the no-cover fallback only', () => {
+    const { rerender } = render(
+      <GroupHeader
+        {...defaultProps}
+        group={makeGroup({ primary_color: '#123456', accent_color: '#ABCDEF' })}
+      />,
+    );
+    const fallback = document.querySelector('[data-group-branding="custom"]') as HTMLElement;
+    expect(fallback).toBeInTheDocument();
+    expect(fallback.style.getPropertyValue('--group-primary-color')).toBe('#123456');
+    expect(fallback.style.getPropertyValue('--group-accent-color')).toBe('#ABCDEF');
+
+    rerender(
+      <GroupHeader
+        {...defaultProps}
+        group={makeGroup({
+          primary_color: '#123456',
+          accent_color: '#ABCDEF',
+          cover_image_url: '/cover.jpg',
+        })}
+      />,
+    );
+    const covered = document.querySelector('[data-group-branding="theme"]') as HTMLElement;
+    expect(covered.style.getPropertyValue('--group-primary-color')).toBe('');
+  });
+
+  it('ignores malformed brand colors in the fallback header', () => {
+    render(<GroupHeader {...defaultProps} group={makeGroup({ primary_color: 'red', accent_color: '#12345G' })} />);
+    expect(document.querySelector('[data-group-branding="theme"]')).toBeInTheDocument();
+  });
+
+  it('shows Cancel Join Request for a pending membership', async () => {
+    const onJoinLeave = vi.fn();
+    const group = makeGroup({
+      viewer_membership: {
+        status: 'pending', role: 'member', is_admin: false,
+        capabilities: {
+          can_join: false, can_leave: false, can_cancel_request: true, can_invite: false,
+          can_manage_members: false, can_manage_admins: false, can_delete: false,
+        },
+      },
+    });
+    render(<GroupHeader {...{ ...defaultProps, group, onJoinLeave }} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /cancel join request/i }));
+    expect(onJoinLeave).toHaveBeenCalledOnce();
+  });
+
+  it('does not offer Leave or Delete to a non-owner group admin', () => {
+    const group = makeGroup({
+      viewer_membership: {
+        status: 'active', role: 'admin', is_admin: true,
+        capabilities: {
+          can_join: false, can_leave: true, can_cancel_request: false, can_invite: true,
+          can_manage_members: true, can_manage_admins: false, can_delete: false,
+        },
+      },
+    });
+    render(<GroupHeader {...{ ...defaultProps, group, userIsAdmin: true, userIsMember: true }} />);
+
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /leave group/i })).toBeInTheDocument();
+  });
+
+  it('does not offer Leave to the group owner', () => {
+    const group = makeGroup({
+      viewer_membership: {
+        status: 'active', role: 'owner', is_admin: true,
+        capabilities: {
+          can_join: false, can_leave: false, can_cancel_request: false, can_invite: true,
+          can_manage_members: true, can_manage_admins: true, can_delete: true,
+        },
+      },
+    });
+    render(<GroupHeader {...{ ...defaultProps, group, userIsAdmin: true, userIsMember: true }} />);
+
+    expect(screen.queryByRole('button', { name: /leave group/i })).not.toBeInTheDocument();
+  });
+
+  it('shows a retryable error instead of claiming there are no pending requests', async () => {
+    const onLoadJoinRequests = vi.fn();
+    render(
+      <GroupHeader
+        {...defaultProps}
+        userIsAdmin
+        isPrivateGroup
+        requestsLoaded
+        requestsError
+        onLoadJoinRequests={onLoadJoinRequests}
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByText('No pending requests')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Try Again' }));
+    expect(onLoadJoinRequests).toHaveBeenCalledOnce();
   });
 
   it('renders spinner inside requests section when requestsLoading', () => {

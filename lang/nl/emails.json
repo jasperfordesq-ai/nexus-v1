@@ -317,6 +317,7 @@
     "intro": "Hier is een samenvatting van wat u heeft gemist op Project NEXUS:",
     "opted_in_notice": "U ontvangt deze e-mail omdat u heeft gekozen voor een {{frequency}} samenvatting.",
     "manage_notifications": "Meldingen beheren",
+    "unsubscribe_events": "Alleen e-mails over evenementen stoppen",
     "view_item": "Bekijken",
     "frequency_instant": "Direct",
     "frequency_daily": "Dagelijks",
@@ -394,6 +395,13 @@
     "updated_subject": "Bijgewerkt: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} uw evenement \"{{title}}\"",
     "view_event": "Evenement bekijken",
+    "broadcast_subject": "Een bericht over {{title}}",
+    "follow_up_subject": "Opvolging na {{title}}",
+    "review_request_subject": "Hoe was {{title}}?",
+    "broadcast_heading": "Een bericht over {{title}}",
+    "follow_up_heading": "Opvolging na {{title}}",
+    "review_request_heading": "Deel uw ervaring met {{title}}",
+    "leave_event_review": "Een beoordeling geven",
     "view_updated_event": "Bijgewerkt evenement bekijken",
     "browse_events": "Evenementen bekijken",
     "new_rsvp_heading": "Nieuwe RSVP!",
@@ -409,6 +417,7 @@
     "updated_heading": "Evenement bijgewerkt",
     "updated_body": "Het evenement <strong>\"{{title}}\"</strong> is bijgewerkt:",
     "change_label_date_time": "Datum/tijd:",
+    "change_label_end_time": "Eindtijd:",
     "change_label_location": "Locatie:",
     "change_label_title": "Titel:",
     "reminder_heading_24h": "Evenement morgen",
@@ -617,6 +626,16 @@
     "impact_minor": "Klein",
     "impact_cosmetic": "Cosmetisch"
   },
+  "event_guardian_consent": {
+    "subject": "Toestemming van een voogd nodig voor :event",
+    "title": "Toestemming beoordelen",
+    "greeting": "Hallo :name,",
+    "introduction": ":minor wil deelnemen aan :event. Bekijk de veiligheidsvereisten van het evenement voordat u toestemming geeft.",
+    "security_notice": "Deze link hoort alleen bij dit toestemmingsverzoek. Stuur of deel de link niet.",
+    "review_button": "Beoordelen en toestemming geven",
+    "expiry_notice": "De link verloopt na het evenement of wanneer het verzoek wordt ingetrokken of vervangen.",
+    "consent_text": "Ik bevestig dat ik bevoegd ben om toestemming te geven voor deelname van de minderjarige aan :event en dat ik de veiligheidsvereisten van het evenement heb bekeken."
+  },
   "donation_admin": {
     "created_subject": "Nieuwe donatie: :amount aan :community",
     "created_title": "Nieuwe donatie ontvangen",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Anoniem",
     "anonymous_note": "(openbaar als anoniem gemarkeerd)",
     "review_cta": "Donaties bekijken"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Gastregistratie geannuleerd: :event",
+    "cancelled_message": "Je gastregistratie voor :event is geannuleerd.",
+    "view_event": "Evenement bekijken"
+  },
+  "event_invitation": {
+    "subject": "Je bent uitgenodigd voor :event",
+    "message": "Je bent uitgenodigd voor :event. Bekijk de evenementdetails en reageer voordat de uitnodiging verloopt.",
+    "expiry": "Deze uitnodiging verloopt op :expiry.",
+    "accept_button": "Uitnodiging bekijken"
   }
 }

@@ -982,14 +982,17 @@ class GamificationService
     private static function checkGroupBadges(int $userId, string $action = 'join'): void
     {
         if ($action === 'join') {
-            $count = GroupMember::where('user_id', $userId)->where('status', 'active')->count();
+            $count = GroupMember::where('user_id', $userId)
+                ->where('status', 'active')
+                ->whereHas('group', static fn ($query) => $query->active())
+                ->count();
             foreach (self::getBadgeDefinitions() as $def) {
                 if ($def['type'] === 'group_join' && $count >= $def['threshold']) {
                     self::awardBadge($userId, $def);
                 }
             }
         } elseif ($action === 'create') {
-            $count = Group::where('owner_id', $userId)->count();
+            $count = Group::where('owner_id', $userId)->active()->count();
             foreach (self::getBadgeDefinitions() as $def) {
                 if ($def['type'] === 'group_create' && $count >= $def['threshold']) {
                     self::awardBadge($userId, $def);

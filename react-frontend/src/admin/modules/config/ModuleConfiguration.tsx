@@ -14,6 +14,7 @@ import { ButtonGroup } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Construction from 'lucide-react/icons/construction';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
@@ -28,7 +29,18 @@ import {
   getFeatureModules,
   type ModuleDefinition,
 } from './moduleRegistry';
-import { Button, Chip, Spinner, Input } from '@/components/ui';
+import {
+  Alert,
+  Button,
+  Chip,
+  Spinner,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from '@/components/ui';
 
 type FilterType = 'all' | 'core' | 'feature';
 
@@ -40,22 +52,31 @@ export default function ModuleConfiguration() {
 
   const [config, setConfig] = useState<TenantConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [toggling, setToggling] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [selectedModule, setSelectedModule] = useState<ModuleDefinition | null>(null);
+  const [pendingPasskeyDisable, setPendingPasskeyDisable] = useState(false);
 
   const coreModules = getCoreModules();
   const featureModules = getFeatureModules();
 
   const loadConfig = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminConfig.get();
       if (res.success && res.data) {
         setConfig(res.data);
+      } else {
+        setConfig(null);
+        setLoadError(true);
+        toast.error(res.error || t('config.module_config_load_failed'));
       }
     } catch {
+      setConfig(null);
+      setLoadError(true);
       toast.error(t('config.module_config_load_failed'));
     } finally {
       setLoading(false);
@@ -69,35 +90,54 @@ export default function ModuleConfiguration() {
 
   // ── Toggle handlers (same pattern as TenantFeatures.tsx) ────────────────
 
-  const handleToggle = async (id: string, enabled: boolean) => {
-    if (!config) return;
+  const applyToggle = async (id: string, enabled: boolean, confirmDisable = false): Promise<boolean> => {
+    if (!config) return false;
 
     // Determine if this is a core module or feature
     const isCore = coreModules.some(m => m.id === id);
     setToggling(id);
 
-    const res = isCore
-      ? await adminConfig.updateModule(id, enabled)
-      : await adminConfig.updateFeature(id, enabled);
+    try {
+      const res = isCore
+        ? await adminConfig.updateModule(id, enabled)
+        : confirmDisable
+          ? await adminConfig.updateFeature(id, enabled, { confirmDisable: true })
+          : await adminConfig.updateFeature(id, enabled);
 
-    if (res.success) {
-      setConfig(prev => {
-        if (!prev) return prev;
-        if (isCore) {
-          return { ...prev, modules: { ...prev.modules, [id]: enabled } };
-        }
-        return { ...prev, features: { ...prev.features, [id]: enabled } };
-      });
-      const mod = [...coreModules, ...featureModules].find(m => m.id === id);
-      const nameKey = mod ? `config.module_name_${mod.id}` : '';
-      const translatedName = nameKey ? t(nameKey) : id;
-      const moduleName = mod && translatedName === nameKey ? mod.name : translatedName;
-      toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: moduleName }));
-      refreshTenant();
-    } else {
+      if (res.success) {
+        setConfig(prev => {
+          if (!prev) return prev;
+          if (isCore) {
+            return { ...prev, modules: { ...prev.modules, [id]: enabled } };
+          }
+          return { ...prev, features: { ...prev.features, [id]: enabled } };
+        });
+        const mod = [...coreModules, ...featureModules].find(m => m.id === id);
+        const nameKey = mod ? `config.module_name_${mod.id}` : '';
+        const translatedName = nameKey ? t(nameKey) : id;
+        const moduleName = mod && translatedName === nameKey ? mod.name : translatedName;
+        toast.success(t(enabled ? 'config.module_enabled' : 'config.module_disabled', { name: moduleName }));
+        refreshTenant();
+        return true;
+      }
+
       toast.error(res.error || t('config.failed_to_update_module'));
+      return false;
+    } catch {
+      toast.error(t('config.failed_to_update_module'));
+      return false;
+    } finally {
+      setToggling(null);
     }
-    setToggling(null);
+  };
+
+  const handleToggle = async (id: string, enabled: boolean) => {
+    if (id === 'biometric_login' && !enabled) {
+      setPendingPasskeyDisable(true);
+      return;
+    }
+
+    await applyToggle(id, enabled);
   };
 
   // ── Filter logic ────────────────────────────────────────────────────────
@@ -129,12 +169,23 @@ export default function ModuleConfiguration() {
   );
 
   function isModuleEnabled(id: string, isCore: boolean): boolean {
-    if (!config) return true; // Default to enabled while loading
+    if (!config) return false;
     if (isCore) {
       return config.modules?.[id] !== false;
     }
     return config.features?.[id] !== false;
   }
+
+  const rawPasskeyImpact = config?.security_impact?.biometric_login;
+  const passkeyImpact = rawPasskeyImpact
+    && Number.isInteger(rawPasskeyImpact.credential_count)
+    && rawPasskeyImpact.credential_count >= 0
+    && Number.isInteger(rawPasskeyImpact.registered_users)
+    && rawPasskeyImpact.registered_users >= 0
+    && Number.isInteger(rawPasskeyImpact.passkey_only_users)
+    && rawPasskeyImpact.passkey_only_users >= 0
+    ? rawPasskeyImpact
+    : null;
 
   // ── Render ──────────────────────────────────────────────────────────────
 
@@ -208,11 +259,24 @@ export default function ModuleConfiguration() {
         </div>
       )}
 
+      {!loading && loadError && (
+        <Alert
+          color="danger"
+          title={t('config.module_config_load_error_title')}
+          description={t('config.module_config_load_error_desc')}
+          endContent={(
+            <Button size="sm" variant="secondary" onPress={loadConfig}>
+              {t('common.retry')}
+            </Button>
+          )}
+        />
+      )}
+
       {/* Core Modules section */}
-      {!loading && filteredCore.length > 0 && (
+      {!loading && !loadError && filteredCore.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-4">{t('config.core_modules')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {filteredCore.map(mod => (
               <ModuleCard
                 key={mod.id}
@@ -228,10 +292,10 @@ export default function ModuleConfiguration() {
       )}
 
       {/* Optional Features section */}
-      {!loading && filteredFeatures.length > 0 && (
+      {!loading && !loadError && filteredFeatures.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-4">{t('config.optional_features')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {filteredFeatures.map(mod => (
               <ModuleCard
                 key={mod.id}
@@ -247,7 +311,7 @@ export default function ModuleConfiguration() {
       )}
 
       {/* No results */}
-      {!loading && filteredCore.length === 0 && filteredFeatures.length === 0 && (
+      {!loading && !loadError && filteredCore.length === 0 && filteredFeatures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-muted">
           <Search size={48} className="mb-4" aria-hidden="true" />
           <p className="text-lg">{t('config.no_modules_match')}</p>
@@ -263,7 +327,7 @@ export default function ModuleConfiguration() {
       )}
 
       {/* Platform Infrastructure — tenant-wide settings that aren't tied to a module */}
-      {!loading && !searchQuery && (
+      {!loading && !loadError && !searchQuery && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-1">{t('config.platform_infrastructure')}</h2>
           <p className="text-sm text-muted mb-4">
@@ -279,6 +343,64 @@ export default function ModuleConfiguration() {
         isOpen={selectedModule !== null}
         onClose={() => setSelectedModule(null)}
       />
+
+      <Modal isOpen={pendingPasskeyDisable} onOpenChange={setPendingPasskeyDisable}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex items-center gap-2">
+                <AlertTriangle className="size-5 text-warning" aria-hidden="true" />
+                {t('config.passkey_disable_title')}
+              </ModalHeader>
+              <ModalBody className="space-y-3">
+                <p>{t('config.passkey_disable_warning')}</p>
+                {passkeyImpact ? (
+                  <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+                    <p>
+                      {t(
+                        passkeyImpact.registered_users === 1
+                          ? 'config.passkey_disable_registered_users_one'
+                          : 'config.passkey_disable_registered_users_other',
+                        { count: passkeyImpact.registered_users },
+                      )}
+                    </p>
+                    <p className="font-semibold text-danger">
+                      {t(
+                        passkeyImpact.passkey_only_users === 1
+                          ? 'config.passkey_disable_passkey_only_users_one'
+                          : 'config.passkey_disable_passkey_only_users_other',
+                        { count: passkeyImpact.passkey_only_users },
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger" role="alert">
+                    {t('config.passkey_disable_impact_unavailable')}
+                  </div>
+                )}
+                <p className="text-sm text-muted">{t('config.passkey_disable_recovery')}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="tertiary" onPress={onClose}>
+                  {t('config.cancel')}
+                </Button>
+                <Button
+                  variant="danger"
+                  isPending={toggling === 'biometric_login'}
+                  isDisabled={!passkeyImpact}
+                  onPress={async () => {
+                    if (await applyToggle('biometric_login', false, true)) {
+                      onClose();
+                    }
+                  }}
+                >
+                  {t('config.passkey_disable_confirm')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

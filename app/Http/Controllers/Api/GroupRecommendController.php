@@ -90,7 +90,13 @@ class GroupRecommendController extends BaseApiController
             );
         }
 
-        $this->groupRecommendationEngine->trackInteraction($userId, $groupId, $action);
+        if (!$this->groupRecommendationEngine->canReferenceGroup($userId, $groupId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+
+        if (!$this->groupRecommendationEngine->trackInteraction($userId, $groupId, $action)) {
+            return $this->respondWithError('TRACK_FAILED', __('api.server_error'), null, 500);
+        }
 
         return $this->respondWithData([
             'tracked' => true,
@@ -133,6 +139,10 @@ class GroupRecommendController extends BaseApiController
         $userId = $this->requireAuth();
 
         $limit = $this->queryInt('limit', 5, 1, 20);
+
+        if (!$this->groupRecommendationEngine->canReferenceGroup($userId, $groupId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
 
         $options = ['exclude_ids' => [$groupId]];
 

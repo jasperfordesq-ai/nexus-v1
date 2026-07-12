@@ -14,7 +14,7 @@ use App\Core\TenantContext;
  */
 class GroupCollectionService
 {
-    public static function getAll(): array
+    public static function getAll(?int $viewerId = null): array
     {
         $tenantId = TenantContext::getId();
         $collections = DB::table('group_collections')
@@ -24,39 +24,78 @@ class GroupCollectionService
             ->get()
             ->toArray();
 
-        foreach ($collections as &$col) {
-            $col = (array) $col;
-            $col['groups'] = DB::table('group_collection_items as gci')
-                ->join('groups as g', 'gci.group_id', '=', 'g.id')
-                ->where('gci.collection_id', $col['id'])
-                ->where('g.tenant_id', $tenantId)
-                ->where('g.is_active', true)
-                ->select('g.id', 'g.name', 'g.image_url', 'g.cached_member_count', 'g.visibility')
-                ->orderBy('gci.sort_order')
-                ->get()
-                ->map(fn ($r) => (array) $r)
-                ->toArray();
+        $visible = [];
+        foreach ($collections as $collection) {
+            $col = (array) $collection;
+            $col['groups'] = self::groupsForCollection((int) $col['id'], $viewerId, false);
+
+            // A collection is only meaningful to the member-facing endpoint
+            // when at least one parent group is itself visible. This avoids
+            // leaking curated metadata for inaccessible lifecycle/tenant rows.
+            if ($viewerId !== null && $col['groups'] === []) {
+                continue;
+            }
+
             $col['group_count'] = count($col['groups']);
+            $visible[] = $col;
         }
 
-        return $collections;
+        return $visible;
     }
 
-    public static function get(int $id): ?array
+    public static function get(int $id, ?int $viewerId = null): ?array
     {
         $tenantId = TenantContext::getId();
-        $col = DB::table('group_collections')
-            ->where('id', $id)->where('tenant_id', $tenantId)->first();
+        $query = DB::table('group_collections')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId);
+
+        if ($viewerId !== null) {
+            $query->where('is_active', true);
+        }
+
+        $col = $query->first();
         if (!$col) return null;
         $col = (array) $col;
-        $col['groups'] = DB::table('group_collection_items as gci')
-            ->join('groups as g', 'gci.group_id', '=', 'g.id')
-            ->where('gci.collection_id', $id)
-            ->where('g.tenant_id', $tenantId)
-            ->select('g.id', 'g.name', 'g.description', 'g.image_url', 'g.cached_member_count', 'g.visibility')
-            ->orderBy('gci.sort_order')
-            ->get()->map(fn ($r) => (array) $r)->toArray();
+        $col['groups'] = self::groupsForCollection($id, $viewerId, true);
+
+        if ($viewerId !== null && $col['groups'] === []) {
+            return null;
+        }
+
+        $col['group_count'] = count($col['groups']);
         return $col;
+    }
+
+    private static function groupsForCollection(int $collectionId, ?int $viewerId, bool $withDescription): array
+    {
+        $tenantId = (int) TenantContext::getId();
+        $columns = ['g.id', 'g.name', 'g.image_url', 'g.cached_member_count', 'g.visibility'];
+        if ($withDescription) {
+            $columns[] = 'g.description';
+        }
+
+        $query = DB::table('group_collection_items as gci')
+            ->join('groups as g', 'gci.group_id', '=', 'g.id')
+            ->where('gci.collection_id', $collectionId)
+            ->where('g.tenant_id', $tenantId)
+            ->select($columns)
+            ->orderBy('gci.sort_order');
+
+        // Admin callers historically omit a viewer ID. Preserve their active
+        // management list, but use the canonical lifecycle column.
+        if ($viewerId === null) {
+            $query->where('g.status', 'active');
+        }
+
+        $groups = $query->get();
+        if ($viewerId !== null) {
+            $groups = $groups->filter(
+                static fn (object $group): bool => GroupAccessService::canViewOverview((int) $group->id, $viewerId),
+            );
+        }
+
+        return $groups->map(static fn (object $group): array => (array) $group)->values()->all();
     }
 
     public static function create(array $data, int $userId): int

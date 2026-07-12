@@ -127,7 +127,7 @@ class MemberSelfServiceTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $data = $response->json('data');
         $this->assertIsArray($data);
-        foreach (['email_messages', 'email_digest', 'push_enabled'] as $key) {
+        foreach (['email_messages', 'email_digest', 'email_events', 'push_enabled'] as $key) {
             $this->assertArrayHasKey($key, $data);
             $this->assertIsBool($data[$key]);
         }
@@ -143,6 +143,60 @@ class MemberSelfServiceTest extends TestCase
         $after = $this->apiGet('/v2/users/me/notifications');
         $this->assertSame(200, $after->getStatusCode());
         $this->assertFalse($after->json('data.email_messages'), 'the toggle must persist and read back false');
+    }
+
+    public function test_partial_notification_update_preserves_events_opt_out(): void
+    {
+        $this->makeMember();
+
+        $this->apiPut('/v2/users/me/notifications', ['email_events' => false])->assertStatus(200);
+        $this->apiPut('/v2/users/me/notifications', ['email_messages' => false])->assertStatus(200);
+
+        $after = $this->apiGet('/v2/users/me/notifications');
+        $after->assertStatus(200);
+        $this->assertFalse($after->json('data.email_events'));
+        $this->assertFalse($after->json('data.email_messages'));
+    }
+
+    public function test_string_false_notification_value_is_normalized_without_becoming_true(): void
+    {
+        $this->makeMember();
+
+        $this->apiPut('/v2/users/me/notifications', ['email_events' => 'false'])
+            ->assertStatus(200);
+
+        $this->apiGet('/v2/users/me/notifications')
+            ->assertStatus(200)
+            ->assertJsonPath('data.email_events', false);
+    }
+
+    public function test_invalid_notification_boolean_is_rejected(): void
+    {
+        $this->makeMember();
+
+        $this->apiPut('/v2/users/me/notifications', ['email_events' => 'definitely'])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+    }
+
+    public function test_atomic_partial_preference_writes_preserve_independent_keys(): void
+    {
+        $this->makeMember();
+
+        $this->apiPut('/v2/users/me/notifications', [
+            'email_events' => false,
+            'email_messages' => true,
+        ])->assertStatus(200);
+        $this->apiPut('/v2/users/me/notifications', [
+            'email_messages' => false,
+            'push_enabled' => false,
+        ])->assertStatus(200);
+
+        $this->apiGet('/v2/users/me/notifications')
+            ->assertStatus(200)
+            ->assertJsonPath('data.email_events', false)
+            ->assertJsonPath('data.email_messages', false)
+            ->assertJsonPath('data.push_enabled', false);
     }
 
     public function test_update_notification_preferences_rejects_an_empty_payload(): void

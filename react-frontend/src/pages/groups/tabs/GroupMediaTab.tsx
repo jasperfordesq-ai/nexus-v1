@@ -6,9 +6,10 @@
 import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalBody } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
@@ -28,28 +29,21 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { formatRelativeTime } from '@/lib/helpers';
+import {
+  deleteGroupMedia,
+  getGroupMediaBlob,
+  listGroupMedia,
+  uploadGroupMedia,
+  type GroupMediaItem,
+  type GroupMediaType,
+} from '../api/media';
+import { GroupApiError } from '../api/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-type MediaType = 'all' | 'image' | 'video';
-
-interface MediaItem {
-  id: number;
-  group_id: number;
-  type: 'image' | 'video';
-  url: string;
-  thumbnail_url: string | null;
-  caption: string | null;
-  uploaded_by: number;
-  uploader_name: string;
-  uploader_avatar: string | null;
-  created_at: string;
-}
 
 interface GroupMediaTabProps {
   groupId: number;
@@ -61,7 +55,7 @@ interface GroupMediaTabProps {
 // Filter chip config
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FILTER_CHIPS: { key: MediaType; labelKey: string; icon?: typeof Camera }[] = [
+const FILTER_CHIPS: { key: GroupMediaType; labelKey: string; icon?: typeof Camera }[] = [
   { key: 'all', labelKey: 'media.filter_all' },
   { key: 'image', labelKey: 'media.filter_photos', icon: Camera },
   { key: 'video', labelKey: 'media.filter_videos', icon: Film },
@@ -71,98 +65,163 @@ const FILTER_CHIPS: { key: MediaType; labelKey: string; icon?: typeof Camera }[]
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaTabProps) {
+export function GroupMediaTab({ groupId, isMember = true }: GroupMediaTabProps) {
   const { t } = useTranslation(['groups', 'common']);
   const confirm = useConfirm();
   const toast = useToast();
   const lightbox = useDisclosure();
+  const uploadModal = useDisclosure();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [items, setItems] = useState<MediaItem[]>([]);
+  const [items, setItems] = useState<GroupMediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadCaption, setUploadCaption] = useState('');
+  const [resolvedUrls, setResolvedUrls] = useState<Record<number, { url: string | null; thumbnail: string | null }>>({});
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
-  const [filter, setFilter] = useState<MediaType>('all');
+  const [filter, setFilter] = useState<GroupMediaType>('all');
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const mediaControllerRef = useRef<AbortController | null>(null);
+  const mediaSequenceRef = useRef(0);
 
   // ───────────────────────────────────────────────────────────────────────
   // Data loading
   // ───────────────────────────────────────────────────────────────────────
 
-  const loadMedia = useCallback(
-    async (reset = false) => {
-      try {
-        if (reset) setLoading(true);
+  const loadMedia = useCallback(async ({
+    reset,
+    requestedCursor = null,
+    type,
+  }: {
+    reset: boolean;
+    requestedCursor?: string | null;
+    type: GroupMediaType;
+  }) => {
+    mediaControllerRef.current?.abort();
+    const controller = new AbortController();
+    const requestId = ++mediaSequenceRef.current;
+    mediaControllerRef.current = controller;
+    setLoading(true);
+    setLoadFailed(false);
 
-        const params = new URLSearchParams({ per_page: '20' });
-        if (!reset && cursor) params.set('cursor', cursor);
-        if (filter !== 'all') params.set('type', filter);
+    try {
+      const page = await listGroupMedia(groupId, {
+        cursor: reset ? null : requestedCursor,
+        type,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || requestId !== mediaSequenceRef.current) return;
 
-        const resp = await api.get(`/v2/groups/${groupId}/media?${params}`);
-        const data = (resp.data ?? {}) as { items?: MediaItem[]; cursor?: string | null; has_more?: boolean };
-
-        if (reset) {
-          setItems(data.items ?? []);
-        } else {
-          setItems((prev) => [...prev, ...(data.items ?? [])]);
-        }
-        setCursor(data.cursor ?? null);
-        setHasMore(data.has_more ?? false);
-      } catch (err) {
-        logError('GroupMediaTab.loadMedia', err);
-      } finally {
+      setItems((previous) => reset ? page.items : [...previous, ...page.items]);
+      setCursor(page.cursor);
+      setHasMore(page.hasMore);
+    } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
+      logError('GroupMediaTab.loadMedia', err);
+      if (!controller.signal.aborted && requestId === mediaSequenceRef.current) {
+        setLoadFailed(true);
+      }
+    } finally {
+      if (!controller.signal.aborted && requestId === mediaSequenceRef.current) {
         setLoading(false);
       }
-    },
-    [groupId, cursor, filter],
-  );
+    }
+  }, [groupId]);
 
   useEffect(() => {
-    loadMedia(true);
-  }, [groupId, filter]); // eslint-disable-line react-hooks/exhaustive-deps
+    void loadMedia({ reset: true, type: filter });
+    return () => mediaControllerRef.current?.abort();
+  }, [filter, groupId, loadMedia]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const createdUrls: string[] = [];
+
+    const resolveUrl = async (url: string | null): Promise<string | null> => {
+      if (!url) return null;
+      if (!url.startsWith('/api/')) return url;
+      try {
+        const blob = await getGroupMediaBlob(url);
+        const objectUrl = URL.createObjectURL(blob);
+        createdUrls.push(objectUrl);
+        return objectUrl;
+      } catch (error) {
+        logError('GroupMediaTab.loadProtectedMedia', error);
+        return null;
+      }
+    };
+
+    void Promise.all(items.map(async (item) => [item.id, {
+      url: await resolveUrl(item.url),
+      thumbnail: await resolveUrl(item.thumbnail_url),
+    }] as const)).then((entries) => {
+      if (!cancelled) setResolvedUrls(Object.fromEntries(entries));
+    });
+
+    return () => {
+      cancelled = true;
+      for (const url of createdUrls) URL.revokeObjectURL(url);
+    };
+  }, [items]);
 
   // ───────────────────────────────────────────────────────────────────────
   // Upload
   // ───────────────────────────────────────────────────────────────────────
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Reset file input so the same file can be re-selected
     e.target.value = '';
 
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
+    const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const allowedVideos = ['video/mp4', 'video/webm', 'video/quicktime'];
+    const isImage = allowedImages.includes(file.type);
+    const isVideo = allowedVideos.includes(file.type);
 
     if (!isImage && !isVideo) {
       toast.error(t('media.invalid_type'));
       return;
     }
 
-    // 50 MB limit for videos, 25 MB for images
-    const maxSize = isVideo ? 50 * 1024 * 1024 : 25 * 1024 * 1024;
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
       toast.error(
         t('media.too_large', {
-          limit: isVideo ? 50 : 25,
+          limit: 50,
         }),
       );
       return;
     }
 
+    setSelectedFile(file);
+    setUploadCaption('');
+    uploadModal.onOpen();
+  };
+
+  const closeUploadModal = (force = false) => {
+    if (uploading && !force) return;
+    setSelectedFile(null);
+    setUploadCaption('');
+    uploadModal.onClose();
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      await api.upload(`/v2/groups/${groupId}/media`, formData);
+      await uploadGroupMedia(groupId, selectedFile, uploadCaption);
 
       toast.success(t('media.upload_success'));
-      loadMedia(true);
+      closeUploadModal(true);
+      void loadMedia({ reset: true, type: filter });
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupMediaTab.upload', err);
       toast.error(t('media.upload_error'));
     } finally {
@@ -184,7 +243,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     if (!ok) return;
     setDeleting(mediaId);
     try {
-      await api.delete(`/v2/groups/${groupId}/media/${mediaId}`);
+      await deleteGroupMedia(groupId, mediaId);
       setItems((prev) => prev.filter((m) => m.id !== mediaId));
       toast.success(t('media.delete_success'));
 
@@ -198,6 +257,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         }
       }
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupMediaTab.delete', err);
       toast.error(t('media.delete_error'));
     } finally {
@@ -224,8 +284,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
   };
 
   const currentItem = items[lightboxIndex] ?? null;
-  const canDelete = (item: MediaItem) =>
-    isAdmin || item.uploaded_by === Number(localStorage.getItem('userId'));
+  const canDelete = (item: GroupMediaItem) => item.capabilities.can_delete;
 
   // ───────────────────────────────────────────────────────────────────────
   // Render
@@ -241,6 +300,22 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
       >
         <Spinner size="lg" />
       </div>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <GlassCard className="p-6">
+        <div role="alert" className="flex flex-col items-center gap-3 text-center">
+          <p className="text-sm text-danger">{t('common:error_title')}</p>
+          <Button
+            variant="flat"
+            onPress={() => void loadMedia({ reset: true, type: filter })}
+          >
+            {t('try_again')}
+          </Button>
+        </div>
+      </GlassCard>
     );
   }
 
@@ -297,11 +372,9 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*,video/*"
+          accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime"
           className="hidden"
           onChange={handleFileSelect}
-          aria-hidden="true"
-          tabIndex={-1}
         />
       </div>
 
@@ -320,23 +393,24 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {items.map((item, index) => (
+          {items.map((item, index) => {
+            const resolved = resolvedUrls[item.id];
+            const mediaUrl = resolved?.url ?? (item.url.startsWith('/api/') ? null : item.url);
+            const thumbnailUrl = resolved?.thumbnail
+              ?? (item.thumbnail_url?.startsWith('/api/') ? null : item.thumbnail_url)
+              ?? (item.type === 'image' ? mediaUrl : null);
+            return (
             <GlassCard
               key={item.id}
-              className="relative group overflow-hidden cursor-pointer border border-border bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-              onClick={() => openLightbox(index)}
+              className="relative group overflow-hidden border border-border bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
             >
-              {/* Thumbnail */}
+              <button type="button" className="block w-full text-left" onClick={() => openLightbox(index)} aria-label={item.caption || (item.type === 'video' ? t('media.video_player') : t('media.photo_alt'))}>
               <div className="aspect-square relative">
                 {item.type === 'video' ? (
                   <div className="w-full h-full bg-surface-secondary flex items-center justify-center">
-                    {item.thumbnail_url ? (
+                    {thumbnailUrl ? (
                       <img
-                        {...responsiveThumbnailProps(item.thumbnail_url, {
-                          width: 640,
-                          height: 640,
-                          sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
-                        })}
+                        src={thumbnailUrl}
                         alt={item.caption || t('media.video_thumbnail')}
                         className="w-full h-full object-cover"
                       />
@@ -350,15 +424,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     </div>
                   </div>
                 ) : (
-                  <img
-                    {...responsiveThumbnailProps(item.thumbnail_url || item.url, {
-                      width: 640,
-                      height: 640,
-                      sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
-                    })}
-                    alt={item.caption || t('media.photo_alt')}
-                    className="w-full h-full object-cover"
-                  />
+                  thumbnailUrl ? <img src={thumbnailUrl} alt={item.caption || t('media.photo_alt')} className="w-full h-full object-cover" /> : <Spinner size="sm" />
                 )}
 
                 {/* Hover overlay with caption + uploader */}
@@ -377,6 +443,8 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                 </div>
 
                 {/* Persistently discoverable on touch; hover/focus reveal on fine pointers. */}
+              </div>
+              </button>
                 {canDelete(item) && (
                   <OverlayActionButton
                     variant="danger"
@@ -394,16 +462,25 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     )}
                   </OverlayActionButton>
                 )}
-              </div>
             </GlassCard>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* Load more */}
       {hasMore && (
         <div className="flex justify-center pt-4">
-          <Button variant="flat" size="sm" onPress={() => loadMedia(false)} isLoading={loading}>
+          <Button
+            variant="flat"
+            size="sm"
+            onPress={() => void loadMedia({
+              reset: false,
+              requestedCursor: cursor,
+              type: filter,
+            })}
+            isLoading={loading}
+          >
             {t('media.load_more')}
           </Button>
         </div>
@@ -471,14 +548,15 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                 <div className="max-h-[80vh] flex items-center justify-center w-full">
                   {currentItem.type === 'video' ? (
                     <video
-                      src={resolveThumbnailUrl(currentItem.thumbnail_url || currentItem.url, { width: 1200, height: 900, fit: 'contain' })}
+                      src={resolvedUrls[currentItem.id]?.url ?? undefined}
+                      poster={resolvedUrls[currentItem.id]?.thumbnail ?? undefined}
                       controls
                       className="max-h-[80vh] max-w-full rounded-lg"
                       aria-label={currentItem.caption || t('media.video_player')}
                     />
                   ) : (
                     <img
-                      src={currentItem.url}
+                      src={resolvedUrls[currentItem.id]?.url ?? undefined}
                       alt={currentItem.caption || t('media.fullsize_alt')}
                       className="max-h-[80vh] max-w-full object-contain rounded-lg"
                     />
@@ -516,6 +594,29 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
               </div>
             </ModalBody>
           )}
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={uploadModal.isOpen} onOpenChange={(open) => { if (!open) closeUploadModal(); }} size="md">
+        <ModalContent aria-label={t('media.upload_title')}>
+          <ModalHeader>{t('media.upload_title')}</ModalHeader>
+          <ModalBody className="gap-4">
+            {selectedFile && (
+              <p className="truncate text-sm text-theme-primary">{selectedFile.name}</p>
+            )}
+            <Textarea
+              label={t('media.caption_label')}
+              placeholder={t('media.caption_placeholder')}
+              value={uploadCaption}
+              onValueChange={setUploadCaption}
+              maxLength={2000}
+              minRows={3}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={() => closeUploadModal()} isDisabled={uploading}>{t('files.cancel')}</Button>
+            <Button color="primary" onPress={handleUpload} isLoading={uploading} isDisabled={!selectedFile}>{t('media.upload')}</Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </div>

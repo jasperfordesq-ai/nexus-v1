@@ -229,6 +229,7 @@
     "new_event_title": "New Community Event",
     "new_event_preview": "A new event has been posted on {{community}}",
     "new_event_bell": "New event posted: {{title}}",
+    "new_event_fallback_title": "無題のイベント",
     "new_event_body": "A new community event has been posted on <strong>{{community}}</strong>.",
     "new_event_by_label": "Created by",
     "new_event_cta": "View Event",

@@ -1,0 +1,45 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'form' => [
+        'title' => 'Barrierefreiheit des Veranstaltungsorts',
+        'hint' => 'Geben Sie an, was am Veranstaltungsort verfügbar ist. Wählen Sie „Nicht bekannt“, wenn eine Eigenschaft nicht geprüft wurde; das ist nicht dasselbe wie „Nein“.',
+        'parking_details' => 'Park- und Ankunftsinformationen',
+        'parking_details_hint' => 'Beschreiben Sie Behindertenparkplätze, Ausstiegsstellen und den Weg zum Eingang.',
+        'transit_details' => 'Informationen zu öffentlichen Verkehrsmitteln',
+        'transit_details_hint' => 'Beschreiben Sie nahe Haltestellen, Bahnhöfe und mögliche Hindernisse auf dem Weg.',
+        'assistance_contact' => 'Kontakt für Unterstützung zur Barrierefreiheit',
+        'assistance_contact_hint' => 'Nennen Sie einen öffentlichen Kontakt für Zugangsfragen. Geben Sie keine privaten Teilnehmerdaten ein.',
+        'notes' => 'Weitere Zugangsinformationen',
+        'notes_hint' => 'Ergänzen Sie Angaben zu Eingang, Aufzug, Boden, Beleuchtung, sensorischen Bedingungen oder anderen hilfreichen Merkmalen.',
+        'privacy_note' => 'Diese Informationen werden Veranstaltungsmitgliedern angezeigt. Private Unterstützungswünsche gehören in das Anmeldeformular, nicht hierher.',
+    ],
+    'features' => [
+        'step_free_access' => 'Stufenloser Zugang',
+        'accessible_toilet' => 'Barrierefreie Toilette',
+        'hearing_loop' => 'Induktionsschleife',
+        'quiet_space' => 'Ruheraum',
+        'seating_available' => 'Sitzplätze vorhanden',
+        'accessible_parking' => 'Barrierefreie Parkplätze',
+    ],
+    'status' => ['yes' => 'Ja', 'no' => 'Nein', 'unknown' => 'Nicht bekannt'],
+    'filters' => [
+        'step_free_label' => 'Stufenloser Zugang am Veranstaltungsort',
+        'step_free_hint' => 'Nach den vom Veranstalter bestätigten Zugangsinformationen filtern.',
+        'step_free_options' => ['any' => 'Alle Veranstaltungsorte', 'yes' => 'Stufenloser Zugang bestätigt', 'no' => 'Nicht stufenlos', 'unknown' => 'Stufenloser Zugang nicht bekannt'],
+        'step_free_active' => 'Stufenloser Zugang: :value',
+    ],
+    'detail' => [
+        'title' => 'Barrierefreiheit des Veranstaltungsorts',
+        'intro' => 'Vom Veranstalter bereitgestellte Zugangsinformationen. Wenden Sie sich an den Veranstalter, wenn Sie eine Vorkehrung bestätigen müssen.',
+        'features_label' => 'Merkmale zur Barrierefreiheit',
+        'parking_details' => 'Parken und Ankunft',
+        'transit_details' => 'Öffentliche Verkehrsmittel',
+        'assistance_contact' => 'Unterstützung zur Barrierefreiheit',
+        'notes' => 'Weitere Zugangsinformationen',
+    ],
+];

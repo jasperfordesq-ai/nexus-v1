@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Analisi degli eventi",
+    "subtitle": "Prestazioni operative, presenze, comunicazioni e metriche di conversione rispettose della privacy.",
+    "generated_at": "Generato {{date}}",
+    "loading": "Caricamento dell'analisi degli eventi",
+    "load_error": "Impossibile caricare l'analisi degli eventi.",
+    "retry": "Riprova",
+    "refresh": "Aggiorna",
+    "export": "Esporta CSV",
+    "exporting": "Esportazione…",
+    "export_started": "Esportazione di analisi preparata.",
+    "download_error": "Impossibile scaricare l'esportazione dell'analisi.",
+    "privacy_title": "Reporting protetto dalla privacy",
+    "privacy_note": "Le metriche facoltative vengono nascoste finché non vengono rappresentate almeno {{count}} persone con consenso.",
+    "consent_bound": "Vincolato al consenso",
+    "suppressed": "Soppresso",
+    "not_limited": "Nessun limite",
+    "finance_redacted": "Limitato dal tuo ruolo",
+    "columns": {
+      "metric": "Metrico",
+      "value": "Valore"
+    },
+    "sections": {
+      "registration": "Registrazione",
+      "acquisition": "Inviti e lista d'attesa",
+      "attendance": "Partecipazione",
+      "communications": "Comunicazioni",
+      "funnel": "Imbuto sicuro per la privacy",
+      "finance": "Biglietti e crediti"
+    },
+    "metrics": {
+      "confirmed": "Iscrizioni confermate",
+      "pending": "Iscrizioni in sospeso",
+      "cancelled": "Iscrizioni cancellate",
+      "capacity_remaining": "Capacità rimanente",
+      "invitations_issued": "Inviti emessi",
+      "invitations_accepted": "Inviti accettati",
+      "invitation_conversion": "Conversione dell'invito",
+      "waitlist_joined": "Si unisce alla lista d'attesa",
+      "waitlist_accepted": "Accettazioni in lista d'attesa",
+      "waitlist_conversion": "Conversione della lista d'attesa",
+      "checked_in": "Attualmente effettuato il check-in",
+      "attended": "Ho partecipato",
+      "no_show": "No-show",
+      "attendance_rate": "Tasso di partecipazione",
+      "delivered": "Notifiche consegnate",
+      "suppressed_deliveries": "Notifiche soppresse",
+      "failed_deliveries": "Notifiche non riuscite",
+      "dead_lettered": "Notifiche che richiedono un intervento",
+      "delivery_rate": "Tasso di consegna",
+      "event_views": "Viste degli eventi",
+      "registration_starts": "Inizia la registrazione",
+      "start_conversion": "Conversione da visualizzazione a registrazione",
+      "finance": "Metriche finanziarie",
+      "ticket_units": "Unità biglietto confermate",
+      "ticket_credit_value": "Valore del credito del biglietto confermato",
+      "completed_credit_claims": "Richieste di credito completate",
+      "failed_credit_claims": "Richieste di credito fallite",
+      "guardian_consents": "Il tutore acconsente"
+    }
+  }
+}

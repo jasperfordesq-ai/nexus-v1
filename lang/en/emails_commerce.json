@@ -23,6 +23,7 @@
     "cta": "Browse Groups"
   },
   "group_promoted": {
+    "role_admin": "Admin",
     "subject": "You're now a {{role}} of {{group_name}} — {{community}}",
     "title": "Role Update",
     "preview": "Congratulations — you've been made a {{role}} of {{group_name}}",

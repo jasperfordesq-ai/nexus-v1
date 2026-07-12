@@ -19,6 +19,10 @@ class AuthenticationConfigurationServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->whereIn('setting_key', array_keys(AuthenticationConfigurationService::DEFAULTS))
+            ->delete();
         AuthenticationConfigurationService::clearCache($this->testTenantId);
     }
 
@@ -35,6 +39,8 @@ class AuthenticationConfigurationServiceTest extends TestCase
             'two_factor.trusted_device_days' => 30,
             'two_factor.backup_code_count' => 10,
             'passkeys.conditional_autofill' => true,
+            'passkeys.enrollment_enabled' => true,
+            'passkeys.max_credentials_per_user' => 10,
         ], AuthenticationConfigurationService::DEFAULTS);
 
         $this->assertSame(
@@ -57,11 +63,21 @@ class AuthenticationConfigurationServiceTest extends TestCase
             AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL,
             false
         );
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED,
+            false
+        );
+        AuthenticationConfigurationService::set(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS,
+            12
+        );
 
         $config = AuthenticationConfigurationService::getAll();
         $this->assertFalse($config[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES]);
         $this->assertSame(45, $config[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS]);
         $this->assertFalse($config[AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL]);
+        $this->assertFalse($config[AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED]);
+        $this->assertSame(12, $config[AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS]);
 
         $rows = DB::table('tenant_settings')
             ->where('tenant_id', $this->testTenantId)
@@ -69,12 +85,16 @@ class AuthenticationConfigurationServiceTest extends TestCase
                 AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES,
                 AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS,
                 AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL,
+                AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED,
+                AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS,
             ])
             ->pluck('setting_type', 'setting_key');
 
         $this->assertSame('boolean', $rows[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_ALLOW_TRUSTED_DEVICES]);
         $this->assertSame('integer', $rows[AuthenticationConfigurationService::CONFIG_TWO_FACTOR_TRUSTED_DEVICE_DAYS]);
         $this->assertSame('boolean', $rows[AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL]);
+        $this->assertSame('boolean', $rows[AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED]);
+        $this->assertSame('integer', $rows[AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS]);
     }
 
     public function test_set_rejects_unknown_keys(): void
@@ -101,6 +121,14 @@ class AuthenticationConfigurationServiceTest extends TestCase
         $this->assertFalse(AuthenticationConfigurationService::isValidValue(
             AuthenticationConfigurationService::CONFIG_PASSKEYS_CONDITIONAL_AUTOFILL,
             'true'
+        ));
+        $this->assertFalse(AuthenticationConfigurationService::isValidValue(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED,
+            1
+        ));
+        $this->assertFalse(AuthenticationConfigurationService::isValidValue(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS,
+            21
         ));
     }
 

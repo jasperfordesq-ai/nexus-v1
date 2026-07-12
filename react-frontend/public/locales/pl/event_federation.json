@@ -1,0 +1,66 @@
+{
+  "manage": {
+    "federation": {
+      "title": "Federacyjne udostępnianie wydarzenia",
+      "tab": "Federacja",
+      "overview": "Sprawdź dostarczanie federacyjne",
+      "description": "Monitoruj udostępnianie wydarzenia społecznościom partnerskim bez ujawniania prywatnych danych uczestników.",
+      "refresh": "Odśwież",
+      "loading": "Wczytywanie stanu federacji...",
+      "load_error_title": "Nie można wczytać stanu federacji",
+      "load_error_description": "Nie udało się wczytać diagnostyki dostarczania. Spróbuj ponownie.",
+      "try_again": "Spróbuj ponownie",
+      "not_configured_title": "Brak skonfigurowanych społeczności partnerskich",
+      "not_configured_description": "To wydarzenie nie jest obecnie dostarczane do żadnego partnera federacyjnego.",
+      "degraded_title": "Niektóre dostarczenia wymagają uwagi",
+      "degraded_description": "Co najmniej jedno dostarczenie osiągnęło limit ponowień. Podaj kod diagnostyczny podczas kontaktu z administratorem.",
+      "metrics": {
+        "configured_partners": "Skonfigurowani partnerzy",
+        "recipient_partners": "Historia dostarczania",
+        "federation_version": "Wersja federacji",
+        "visibility": "Widoczność udostępnienia"
+      },
+      "visibility": {
+        "none": "Nieudostępnione",
+        "listed": "Na liście",
+        "joinable": "Na liście i z możliwością dołączenia"
+      },
+      "delivery_summary": "Podsumowanie dostarczania",
+      "delivery_status": {
+        "pending": "Oczekuje",
+        "retry": "Zaplanowano ponowienie",
+        "processing": "Przetwarzanie",
+        "delivered": "Dostarczono",
+        "dead_letter": "Wymaga uwagi"
+      },
+      "partners_table_aria": "Federacyjne dostarczanie wydarzenia według partnera",
+      "columns": {
+        "partner": "Partner",
+        "action": "Działanie",
+        "delivery": "Dostarczenie",
+        "attempts": "Próby",
+        "activity": "Ostatnia aktywność"
+      },
+      "no_deliveries": "Nie zarejestrowano dostarczeń federacyjnych dla tego wydarzenia.",
+      "removed_partner": "Usunięty partner",
+      "partner_status": {
+        "active": "Aktywny",
+        "pending": "Oczekuje",
+        "suspended": "Zawieszony",
+        "failed": "Niepowodzenie",
+        "removed": "Usunięty",
+        "unknown": "Nieznany stan"
+      },
+      "events_disabled": "Udostępnianie wydarzeń wyłączone",
+      "action": {
+        "upsert": "Opublikuj lub zaktualizuj",
+        "tombstone": "Usuń"
+      },
+      "not_available": "Niedostępne",
+      "error_code": "Kod diagnostyczny: {{code}}",
+      "error_code_unknown": "Kod diagnostyczny niedostępny",
+      "attempt_count": "{{count}} z {{max}}",
+      "generated_at": "Zaktualizowano: {{time}}"
+    }
+  }
+}

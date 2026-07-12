@@ -317,6 +317,7 @@
     "intro": "إليك ملخص ما فاتك على Project NEXUS:",
     "opted_in_notice": "تلقيت هذا البريد الإلكتروني لأنك اخترت ملخصاً {{frequency}}.",
     "manage_notifications": "إدارة الإشعارات",
+    "unsubscribe_events": "إيقاف رسائل الفعاليات فقط",
     "view_item": "عرض",
     "frequency_instant": "فوري",
     "frequency_daily": "يومي",
@@ -394,6 +395,13 @@
     "updated_subject": "تم التحديث: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} فعاليتك \"{{title}}\"",
     "view_event": "عرض الفعالية",
+    "broadcast_subject": "رسالة بخصوص {{title}}",
+    "follow_up_subject": "متابعة بعد {{title}}",
+    "review_request_subject": "كيف كانت {{title}}؟",
+    "broadcast_heading": "رسالة بخصوص {{title}}",
+    "follow_up_heading": "متابعة بعد {{title}}",
+    "review_request_heading": "شارك تجربتك في {{title}}",
+    "leave_event_review": "اترك تقييمًا",
     "view_updated_event": "عرض الفعالية المحدثة",
     "browse_events": "تصفح الفعاليات",
     "new_rsvp_heading": "رد فعالية جديد!",
@@ -409,6 +417,7 @@
     "updated_heading": "تم تحديث الفعالية",
     "updated_body": "تم تحديث الفعالية <strong>\"{{title}}\"</strong>:",
     "change_label_date_time": "التاريخ/الوقت:",
+    "change_label_end_time": "وقت الانتهاء:",
     "change_label_location": "الموقع:",
     "change_label_title": "العنوان:",
     "reminder_heading_24h": "فعالية غداً",
@@ -617,6 +626,16 @@
     "impact_minor": "ثانوي",
     "impact_cosmetic": "شكلي"
   },
+  "event_guardian_consent": {
+    "subject": "مطلوب موافقة ولي الأمر لحضور :event",
+    "title": "مراجعة موافقة ولي الأمر",
+    "greeting": "مرحبًا :name،",
+    "introduction": "طلب :minor حضور :event. يُرجى مراجعة متطلبات سلامة الفعالية قبل اتخاذ قرار الموافقة.",
+    "security_notice": "هذا الرابط مخصص لطلب الموافقة هذا وحده. لا تُعِد توجيهه أو مشاركته.",
+    "review_button": "المراجعة ومنح الموافقة",
+    "expiry_notice": "تنتهي صلاحية الرابط بعد الفعالية أو عند سحب الطلب أو استبداله.",
+    "consent_text": "أؤكد أنني مخول بمنح الموافقة على حضور القاصر لفعالية :event وأنني راجعت متطلبات سلامة الفعالية."
+  },
   "donation_admin": {
     "created_subject": "تبرع جديد: :amount إلى :community",
     "created_title": "تم استلام تبرع جديد",
@@ -631,5 +650,16 @@
     "anonymous_donor": "مجهول",
     "anonymous_note": "(محدد كمجهول للعموم)",
     "review_cta": "عرض التبرعات"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "تم إلغاء تسجيل الضيف: :event",
+    "cancelled_message": "تم إلغاء تسجيلك كضيف في :event.",
+    "view_event": "عرض الفعالية"
+  },
+  "event_invitation": {
+    "subject": "لديك دعوة إلى :event",
+    "message": "تمت دعوتك لحضور :event. راجع تفاصيل الفعالية ورد قبل انتهاء صلاحية الدعوة.",
+    "expiry": "تنتهي صلاحية هذه الدعوة في :expiry.",
+    "accept_button": "مراجعة الدعوة"
   }
 }

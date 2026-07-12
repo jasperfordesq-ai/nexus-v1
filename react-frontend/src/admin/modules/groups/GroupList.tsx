@@ -29,18 +29,54 @@ import { adminGroups } from '../../api/adminApi';
 import { api } from '@/lib/api';
 import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
-import { ConfirmModal } from '../../components/ConfirmModal';
-import type { AdminGroup } from '../../api/types';
+import type { AdminGroup, GroupStatus } from '../../api/types';
 
 import { resolveAssetUrl, getFormattingLocale } from '@/lib/helpers';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
-const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Avatar, Tabs, Tab } from '@/components/ui';
+import { AlertDialog } from '@heroui/react';
+
+const statusColors: Record<GroupStatus, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
-  pending: 'warning',
-  inactive: 'default',
+  pending_review: 'warning',
+  dormant: 'default',
   archived: 'default',
-  suspended: 'danger',
+  rejected: 'danger',
 };
+
+export const GROUP_STATUS_TABS = [
+  'all',
+  'pending_review',
+  'active',
+  'dormant',
+  'archived',
+  'rejected',
+] as const;
+
+type GroupStatusTab = typeof GROUP_STATUS_TABS[number];
+
+export interface GroupStatusTransition {
+  target: GroupStatus;
+  labelKey:
+    | 'groups.transition_pending_review_to_active'
+    | 'groups.transition_active_to_dormant'
+    | 'groups.transition_dormant_to_active'
+    | 'groups.transition_archived_to_active'
+    | 'groups.transition_rejected_to_pending_review';
+}
+
+const GROUP_STATUS_TRANSITIONS: Record<GroupStatus, GroupStatusTransition> = {
+    pending_review: { target: 'active', labelKey: 'groups.transition_pending_review_to_active' },
+    active: { target: 'dormant', labelKey: 'groups.transition_active_to_dormant' },
+    dormant: { target: 'active', labelKey: 'groups.transition_dormant_to_active' },
+    archived: { target: 'active', labelKey: 'groups.transition_archived_to_active' },
+    rejected: { target: 'pending_review', labelKey: 'groups.transition_rejected_to_pending_review' },
+};
+
+export function getGroupStatusTransition(status: GroupStatus): GroupStatusTransition {
+  return GROUP_STATUS_TRANSITIONS[status];
+}
+
+const ARCHIVABLE_STATUSES = new Set<GroupStatus>(['pending_review', 'active', 'dormant']);
 
 const visibilityIcons: Record<string, typeof Eye> = {
   public: Eye,
@@ -59,15 +95,14 @@ export function GroupList() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState('all');
+  const [status, setStatus] = useState<GroupStatusTab>('all');
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<AdminGroup | null>(null);
-  const [cloneTarget, setCloneTarget] = useState<AdminGroup | null>(null);
-  const [cloneName, setCloneName] = useState('');
-  const [cloneLoading, setCloneLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [bulkDeleteConfirmation, setBulkDeleteConfirmation] = useState('');
   const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
 
   const loadItems = useCallback(async () => {
@@ -89,6 +124,8 @@ export function GroupList() {
           setItems(pd.data || []);
           setTotal(pd.meta?.total || 0);
         }
+      } else {
+        toast.error(res.error || t('groups.failed_to_load_groups'));
       }
     } catch {
       toast.error(t('groups.failed_to_load_groups'));
@@ -103,78 +140,46 @@ export function GroupList() {
   }, [loadItems]);
 
   const handleDelete = async () => {
-    if (!confirmDelete) return;
-    setActionLoading(true);
+    if (!confirmDelete || deleteConfirmation !== confirmDelete.name) return;
+    setActionLoadingId(confirmDelete.id);
 
     try {
       const res = await adminGroups.delete(confirmDelete.id);
       if (res?.success) {
         toast.success(t('groups.group_deleted_successfully'));
-        loadItems();
+        setConfirmDelete(null);
+        setDeleteConfirmation('');
+        await loadItems();
       } else {
         toast.error(res?.error || t('groups.failed_to_delete_group'));
       }
     } catch {
       toast.error(t('common.unexpected_error'));
     } finally {
-      setActionLoading(false);
-      setConfirmDelete(null);
+      setActionLoadingId(null);
     }
   };
 
-  const handleStatusToggle = async (item: AdminGroup) => {
-    const newStatus = item.status === 'active' ? 'inactive' : 'active';
+  const handleStatusTransition = async (item: AdminGroup, newStatus: GroupStatus) => {
+    setActionLoadingId(item.id);
     try {
       const res = await adminGroups.updateStatus(item.id, newStatus);
       if (res?.success) {
         toast.success(t('groups.group_status_changed'));
-        loadItems();
+        await loadItems();
       } else {
-        toast.error(t('groups.failed_to_update_group_status'));
+        toast.error(res?.error || t('groups.failed_to_update_group_status'));
       }
     } catch {
       toast.error(t('groups.failed_to_update_group_status'));
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
   const handleArchive = async (item: AdminGroup) => {
-    const action = item.status === 'archived' ? 'unarchive' : 'archive';
-    try {
-      const res = await api.post(`/v2/admin/groups/${item.id}/${action}`);
-      if (res?.success) {
-        toast.success(t('groups.group_action_success'));
-        loadItems();
-      } else {
-        toast.error(res?.error || t('groups.failed_to_action_group'));
-      }
-    } catch {
-      toast.error(t('groups.failed_to_action_group'));
-    }
-  };
-
-  const handleCloneOpen = (item: AdminGroup) => {
-    setCloneTarget(item);
-    setCloneName(t('groups.clone_name_copy', { name: item.name }));
-  };
-
-  const handleCloneConfirm = async () => {
-    if (!cloneTarget || !cloneName.trim()) return;
-    setCloneLoading(true);
-    try {
-      const res = await api.post(`/v2/admin/groups/${cloneTarget.id}/clone`, { name: cloneName.trim(), clone_members: false });
-      if (res?.success) {
-        toast.success(t('groups.group_cloned'));
-        setCloneTarget(null);
-        setCloneName('');
-        loadItems();
-      } else {
-        toast.error(res?.error || t('groups.failed_to_clone_group'));
-      }
-    } catch {
-      toast.error(t('groups.failed_to_clone_group'));
-    } finally {
-      setCloneLoading(false);
-    }
+    if (!ARCHIVABLE_STATUSES.has(item.status)) return;
+    await handleStatusTransition(item, 'archived');
   };
 
   const handleBulkArchive = async () => {
@@ -191,6 +196,8 @@ export function GroupList() {
   };
 
   const handleBulkDelete = async () => {
+    const requiredPhrase = t('groups.bulk_delete_phrase', { count: selectedIds.size });
+    if (bulkDeleteConfirmation !== requiredPhrase || selectedIds.size === 0) return;
     setBulkDeleteLoading(true);
     // Delete one by one (no bulk delete endpoint)
     const failedIds = new Set<number>();
@@ -215,8 +222,15 @@ export function GroupList() {
     setSelectedIds(failedIds);
     setBulkDeleteLoading(false);
     setConfirmBulkDelete(false);
-    loadItems();
+    setBulkDeleteConfirmation('');
+    await loadItems();
   };
+
+  const selectedGroups = items.filter((item) => selectedIds.has(item.id));
+  const canBulkArchive = selectedIds.size > 0
+    && selectedGroups.length === selectedIds.size
+    && selectedGroups.every((item) => ARCHIVABLE_STATUSES.has(item.status));
+  const bulkDeletePhrase = t('groups.bulk_delete_phrase', { count: selectedIds.size });
 
   const columns: Column<AdminGroup>[] = [
     {
@@ -303,23 +317,34 @@ export function GroupList() {
     {
       key: 'actions',
       label: t('groups.col_actions'),
-      render: (item) => (
+      render: (item) => {
+        const transition = getGroupStatusTransition(item.status);
+        return (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('groups.actions')}>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              aria-label={t('groups.actions_for', { name: item.name })}
+              isDisabled={actionLoadingId !== null}
+              isLoading={actionLoadingId === item.id}
+            >
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
             aria-label={t('groups.label_group_actions')}
             onAction={(key) => {
-              if (key === 'view') navigate(tenantPath(`/groups/${item.id}`));
-              else if (key === 'edit') navigate(tenantPath(`/admin/groups/${item.id}/edit`));
-              else if (key === 'toggle-status') handleStatusToggle(item);
+              if (key === 'view') navigate(tenantPath(`/admin/groups/${item.id}/detail`));
+              else if (key === 'edit') navigate(tenantPath(`/groups/edit/${item.id}`));
+              else if (key === 'transition') void handleStatusTransition(item, transition.target);
               else if (key === 'archive') handleArchive(item);
-              else if (key === 'clone') handleCloneOpen(item);
-              else if (key === 'audit') navigate(tenantPath(`/admin/groups/${item.id}?tab=audit`));
-              else if (key === 'delete') setConfirmDelete(item);
+              else if (key === 'audit') navigate(tenantPath(`/admin/groups/${item.id}/detail?tab=audit`));
+              else if (key === 'delete') {
+                setDeleteConfirmation('');
+                setConfirmDelete(item);
+              }
             }}
           >
             <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
@@ -329,21 +354,20 @@ export function GroupList() {
               {t('groups.edit_group')}
             </DropdownItem>
             <DropdownItem
-              key="toggle-status" id="toggle-status"
-              startContent={item.status === 'active' ? <PowerOff size={14} /> : <Power size={14} />}
-              className={item.status === 'active' ? 'text-warning' : 'text-success'}
+              key="transition" id="transition"
+              startContent={transition.target === 'dormant' ? <PowerOff size={14} /> : <Power size={14} />}
+              className={transition.target === 'dormant' ? 'text-warning' : 'text-success'}
             >
-              {item.status === 'active' ? t('groups.deactivate') : t('groups.activate')}
+              {t(transition.labelKey)}
             </DropdownItem>
-            <DropdownItem
-              key="archive" id="archive"
-              startContent={<EyeOff size={14} />}
-            >
-              {item.status === 'archived' ? t('groups.unarchive') : t('groups.archive')}
-            </DropdownItem>
-            <DropdownItem key="clone" id="clone" startContent={<Users size={14} />}>
-              {t('groups.clone_group')}
-            </DropdownItem>
+            {ARCHIVABLE_STATUSES.has(item.status) ? (
+              <DropdownItem
+                key="archive" id="archive"
+                startContent={<EyeOff size={14} />}
+              >
+                {t('groups.archive')}
+              </DropdownItem>
+            ) : null}
             <DropdownItem key="audit" id="audit" startContent={<Eye size={14} />}>
               {t('groups.audit_log_title')}
             </DropdownItem>
@@ -352,7 +376,8 @@ export function GroupList() {
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
-      ),
+        );
+      },
     },
   ];
 
@@ -385,23 +410,41 @@ export function GroupList() {
         <Tabs
           aria-label={t('groups.status_tabs_aria')}
           selectedKey={status}
-          onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
+          onSelectionChange={(key) => {
+            const nextStatus = String(key);
+            if (GROUP_STATUS_TABS.includes(nextStatus as GroupStatusTab)) {
+              setStatus(nextStatus as GroupStatusTab);
+              setPage(1);
+            }
+          }}
           variant="underlined"
           size="sm"
         >
           <Tab key="all" title={t('groups.status_all')} />
+          <Tab key="pending_review" title={t('groups.status_pending_review')} />
           <Tab key="active" title={t('groups.status_active')} />
-          <Tab key="pending" title={t('groups.status_pending')} />
-          <Tab key="inactive" title={t('groups.status_inactive')} />
+          <Tab key="dormant" title={t('groups.status_dormant')} />
           <Tab key="archived" title={t('groups.status_archived')} />
+          <Tab key="rejected" title={t('groups.status_rejected')} />
         </Tabs>
       </div>
 
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 p-3 mb-4 bg-accent/10 rounded-lg">
           <span className="text-sm font-medium">{t('groups.selected_count', { count: selectedIds.size })}</span>
-          <Button size="sm" variant="tertiary" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
-              <Button size="sm" variant="danger" onPress={() => setConfirmBulkDelete(true)}>{t('groups.delete')}</Button>
+          {canBulkArchive && (
+            <Button size="sm" variant="tertiary" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
+          )}
+          <Button
+            size="sm"
+            variant="danger"
+            onPress={() => {
+              setBulkDeleteConfirmation('');
+              setConfirmBulkDelete(true);
+            }}
+          >
+            {t('groups.delete')}
+          </Button>
           <Button size="sm" variant="tertiary" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
         </div>
       )}
@@ -422,57 +465,121 @@ export function GroupList() {
         onSelectionChange={(keys) => setSelectedIds(new Set(Array.from(keys, Number)))}
       />
 
-      {confirmDelete && (
-        <ConfirmModal
-          isOpen={!!confirmDelete}
-          onClose={() => setConfirmDelete(null)}
-          onConfirm={handleDelete}
-          title={t('groups.delete_group')}
-          message={t('groups.confirm_delete_group')}
-          confirmLabel={t('groups.delete')}
-          confirmColor="danger"
-          isLoading={actionLoading}
-        />
-      )}
-
-      <ConfirmModal
-        isOpen={confirmBulkDelete}
-        onClose={() => setConfirmBulkDelete(false)}
-        onConfirm={handleBulkDelete}
-        title={t('groups.delete')}
-        message={t('groups.confirm_bulk_delete')}
-        confirmLabel={t('groups.delete')}
-        confirmColor="danger"
-        isLoading={bulkDeleteLoading}
-      />
-
-      {/* Clone Group Modal */}
-      <Modal
-        isOpen={!!cloneTarget}
-        onClose={() => { setCloneTarget(null); setCloneName(''); }}
-        size="sm"
+      <AlertDialog.Backdrop
+        isOpen={confirmDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && actionLoadingId === null) {
+            setConfirmDelete(null);
+            setDeleteConfirmation('');
+          }
+        }}
       >
-        <ModalContent>
-          <ModalHeader>{t('groups.clone_group_title')}</ModalHeader>
-          <ModalBody>
-            <Input
-              label={t('groups.clone_group_name_label')}
-              value={cloneName}
-              onValueChange={setCloneName}
-              variant="secondary"
-              autoFocus
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="sm:max-w-[480px]">
+            <AlertDialog.CloseTrigger
+              aria-label={t('common.close')}
+              isDisabled={actionLoadingId !== null}
             />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="tertiary" onPress={() => { setCloneTarget(null); setCloneName(''); }} isDisabled={cloneLoading}>
-              {t('groups.edit_cancel')}
-            </Button>
-            <Button onPress={handleCloneConfirm} isLoading={cloneLoading} isDisabled={!cloneName.trim()}>
-              {t('groups.clone_group_confirm')}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>{t('groups.delete_group')}</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body className="space-y-4">
+              <p>{t('groups.delete_group_warning')}</p>
+              <p>{t('groups.delete_group_type_instruction', { name: confirmDelete?.name ?? '' })}</p>
+              <Input
+                label={t('groups.delete_group_confirmation_label')}
+                value={deleteConfirmation}
+                onValueChange={setDeleteConfirmation}
+                autoComplete="off"
+                isDisabled={actionLoadingId !== null}
+              />
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button
+                variant="tertiary"
+                isDisabled={actionLoadingId !== null}
+                onPress={() => {
+                  setConfirmDelete(null);
+                  setDeleteConfirmation('');
+                }}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="danger"
+                isLoading={actionLoadingId !== null}
+                isDisabled={
+                  !confirmDelete
+                  || deleteConfirmation !== confirmDelete.name
+                  || actionLoadingId !== null
+                }
+                onPress={() => void handleDelete()}
+              >
+                {t('groups.delete')}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
+
+      <AlertDialog.Backdrop
+        isOpen={confirmBulkDelete}
+        onOpenChange={(open) => {
+          if (!open && !bulkDeleteLoading) {
+            setConfirmBulkDelete(false);
+            setBulkDeleteConfirmation('');
+          }
+        }}
+      >
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="sm:max-w-[480px]">
+            <AlertDialog.CloseTrigger
+              aria-label={t('common.close')}
+              isDisabled={bulkDeleteLoading}
+            />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="danger" />
+              <AlertDialog.Heading>{t('groups.bulk_delete_title')}</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body className="space-y-4">
+              <p>{t('groups.bulk_delete_warning', { count: selectedIds.size })}</p>
+              <p>{t('groups.bulk_delete_type_instruction', { phrase: bulkDeletePhrase })}</p>
+              <Input
+                label={t('groups.bulk_delete_confirmation_label')}
+                value={bulkDeleteConfirmation}
+                onValueChange={setBulkDeleteConfirmation}
+                autoComplete="off"
+                isDisabled={bulkDeleteLoading}
+              />
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button
+                variant="tertiary"
+                isDisabled={bulkDeleteLoading}
+                onPress={() => {
+                  setConfirmBulkDelete(false);
+                  setBulkDeleteConfirmation('');
+                }}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="danger"
+                isLoading={bulkDeleteLoading}
+                isDisabled={
+                  selectedIds.size === 0
+                  || bulkDeleteConfirmation !== bulkDeletePhrase
+                  || bulkDeleteLoading
+                }
+                onPress={() => void handleBulkDelete()}
+              >
+                {t('groups.delete')}
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </div>
   );
 }

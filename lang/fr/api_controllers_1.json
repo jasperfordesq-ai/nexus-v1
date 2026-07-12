@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Vérification des badges terminée pour :count utilisateur(s)"
     },
     "admin_groups": {
+        "rule_not_found": "Règle introuvable",
         "group_archived": "Groupe archivé",
         "group_unarchived": "Groupe désarchivé",
         "ownership_transferred": "Propriété transférée",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Votre demande de suppression de compte a été soumise. Vous recevrez une confirmation par e-mail."
     },
     "group_challenge": {
-        "challenge_deleted": "Défi supprimé"
+        "challenge_deleted": "Défi supprimé",
+        "challenge_cancelled": "Défi annulé",
+        "challenge_immutable": "Les défis terminés ou récompensés ne peuvent pas être annulés"
+    },
+    "group_chatroom": {
+        "default_name": "Général",
+        "default_description": "Salon de discussion par défaut du groupe"
     },
     "group_exchange": {
         "exchange_cancelled": "Échange annulé",

@@ -1,0 +1,66 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'privacy' => [
+        'title' => 'Check-in privado e resiliente',
+        'body' => 'Os códigos assinados não contêm nomes, endereços de email nem números de telefone. Pode introduzir um código abaixo sem utilizar uma câmara.',
+        'no_wallet' => 'As ações de presença nunca alteram saldos nem atribuem créditos de tempo.',
+    ],
+    'code' => [
+        'title' => 'Introduzir um código de participante assinado',
+        'intro' => 'Use esta alternativa online quando a câmara ou o dispositivo offline da equipa não estiver disponível. A pesquisa manual por nome continua disponível mais abaixo.',
+        'label' => 'Código do participante',
+        'hint' => 'Cole o código completo que começa por nqx2_. O código não é guardado no registo de auditoria.',
+        'action' => 'Ação de presença',
+        'reason' => 'Motivo da correção',
+        'reason_hint' => 'É necessário um motivo para anular uma ação. Não inclua informações sensíveis.',
+        'confirm' => 'Confirmei o participante e selecionei a ação pretendida.',
+        'submit' => 'Aplicar ação com código assinado',
+    ],
+    'actions' => [
+        'check_in' => 'Registar entrada',
+        'check_out' => 'Registar saída',
+        'no_show' => 'Marcar falta',
+        'undo' => 'Anular a última ação',
+    ],
+    'attendee' => [
+        'manage_link' => 'Gerir o meu código de check-in',
+        'title' => 'O seu código de check-in do evento',
+        'intro' => 'Crie um código assinado para mostrar à equipa do evento no ecrã ou numa cópia impressa.',
+        'privacy' => 'O código identifica apenas esta inscrição no evento. Não contém nome, e-mail nem número de telefone.',
+        'notice_issued' => 'O seu novo código de check-in é apresentado abaixo.',
+        'notice_replaced' => 'O seu código anterior deixou de funcionar. O substituto é apresentado abaixo.',
+        'notice_revoked' => 'O seu código de check-in foi revogado.',
+        'notice_already_active' => 'Já existe um código ativo. Substitua-o se não tiver a sua cópia disponível.',
+        'notice_invalid' => 'Confirme a ação pedida e tente novamente.',
+        'notice_failed' => 'Não foi possível alterar o código de check-in. Atualize a página e tente novamente.',
+        'status_heading' => 'Estado do código',
+        'status_active' => 'Ativo',
+        'status_rotated' => 'Substituído',
+        'status_revoked' => 'Revogado',
+        'status_expired' => 'Expirado',
+        'expires' => 'Expira em :date',
+        'one_shot_heading' => 'Guarde este código agora',
+        'one_shot' => 'Por segurança, o código completo só é mostrado quando é criado ou substituído.',
+        'code_label' => 'Código de check-in assinado',
+        'code_hint' => 'Selecione e copie o código completo que começa por nqx2_.',
+        'print_hint' => 'Pode imprimir esta página ou guardar uma cópia acessível. Mantenha o código privado até ao check-in.',
+        'print' => 'Imprimir este código',
+        'issue_confirm' => 'Compreendo que o código completo será mostrado apenas uma vez.',
+        'issue' => 'Criar código de check-in',
+        'replace' => 'Substituir código copiado ou perdido',
+        'replace_hint' => 'A substituição invalida imediatamente todas as cópias guardadas ou impressas.',
+        'replace_confirm' => 'Compreendo que o meu código atual deixará de funcionar.',
+        'revoke' => 'Revogar código',
+        'reason' => 'Motivo da revogação',
+        'reason_hint' => 'Registe um motivo operacional curto sem informações confidenciais.',
+        'revoke_confirm' => 'Compreendo que este código deixará de funcionar imediatamente.',
+    ],
+    'device' => [
+        'lost' => 'Se perder um dispositivo da equipa, revogue-o imediatamente na área de eventos padrão. Continue aqui por nome ou código assinado.',
+    ],
+];

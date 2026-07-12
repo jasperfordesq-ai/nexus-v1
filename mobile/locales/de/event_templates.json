@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Event-Vorlagen",
+      "safetyTitle": "Vorlagen kopieren nur die Konfiguration",
+      "safetyDescription": "Personen, Registrierungen, private Antworten, Anwesenheit, Tickets, Lieferhistorie, Verbandskennungen und Veröffentlichungsstatus werden niemals kopiert.",
+      "loading": "Laden von Veranstaltungsvorlagen",
+      "loadFailedTitle": "Vorlagen können nicht geladen werden",
+      "loadFailedDescription": "Die Vorlagenbibliothek konnte nicht geladen werden. Versuchen Sie es erneut.",
+      "emptyTitle": "Keine Vorlagen gefunden",
+      "emptyDescription": "Speichern Sie ein Ereignis als Vorlage im Web, um eine wiederverwendbare Konfigurationsbibliothek zu erstellen.",
+      "source": "Quelle: {{title}}",
+      "versionAndUses": "Version {{version}} · Verwendung: {{count}}",
+      "useTemplate": "Vorlage verwenden",
+      "scheduleTitle": "Planen Sie die neue Veranstaltung",
+      "scheduleDescription": "Überprüfen Sie den Titel, die Zeitzone und den zukünftigen Zeitplan. Es wird ein neuer Entwurf erstellt.",
+      "eventTitle": "Veranstaltungstitel",
+      "start": "Starten",
+      "end": "Ende (optional)",
+      "timezone": "Zeitzone",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Optional YYYY-MM-DDTHH:mm",
+      "validationTitle": "Überprüfen Sie die Entwurfsdetails",
+      "validationDescription": "Geben Sie einen Titel, eine Zeitzone und einen gültigen zukünftigen Zeitplan ein.",
+      "previewFailedTitle": "Entwurf kann nicht überprüft werden",
+      "previewFailedDescription": "Der Server konnte die Vorschau des sicheren Entwurfs nicht vorbereiten.",
+      "review": "Rezensionsentwurf",
+      "reviewTitle": "Überprüfen Sie den neuen Veranstaltungsentwurf",
+      "reviewDescription": "Bestätigen Sie die Serverprüfungen, bevor Sie den Entwurf erstellen.",
+      "readyTitle": "Bereit, einen Entwurf zu erstellen",
+      "readyDescription": "Die aktuelle Version, sichere Felder, Zeitplan und Erstellungsworkflow wurden überprüft.",
+      "draftState": "Veröffentlichungsstatus: Entwurf",
+      "changeDetails": "Details ändern",
+      "createDraft": "Entwurf erstellen",
+      "createdTitle": "Veranstaltungsentwurf erstellt",
+      "createdDescription": "Überprüfen und veröffentlichen Sie es separat, wenn es fertig ist.",
+      "createFailedTitle": "Entwurf kann nicht erstellt werden",
+      "createFailedDescription": "Der Veranstaltungsentwurf konnte nicht erstellt werden. Versuchen Sie es erneut."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Sie haben weiterhin die Berechtigung, das Quellereignis zu verwalten",
+      "event_template_check_allowlist_exact": "Es sind nur genehmigte Konfigurationsfelder enthalten",
+      "event_template_check_private_records_skipped": "Ausgenommen sind private und betriebliche Aufzeichnungen",
+      "event_template_check_versioned_snapshot": "Die Konfiguration ist ein unveränderlicher versionierter Snapshot",
+      "event_template_check_version_current": "Die ausgewählte Vorlagenversion ist aktuell",
+      "event_template_check_schedule_valid": "Der neue Zeitplan ist gültig und in der Zukunft",
+      "event_template_check_federation_none": "Federation ist für den neuen Entwurf deaktiviert",
+      "event_template_check_canonical_writer": "Es wird der kanonische Workflow zur Ereigniserstellung verwendet"
+    }
+  }
+}

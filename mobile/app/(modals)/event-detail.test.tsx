@@ -27,6 +27,13 @@ jest.mock('react-i18next', () => ({
         'detail.organizer': 'Organizer',
         'detail.ownerTools': 'Event tools',
         'detail.edit': 'Edit',
+        'event_templates:templates.mobile.title': 'Event templates',
+        'event_tickets:tickets.mobile.title': 'Event tickets',
+        'event_tickets:tickets.mobile.gatewayDisabledDescription': 'Free tickets only. No wallet action is taken.',
+        'event_tickets:tickets.mobile.catalogueTitle': 'Available tickets',
+        'event_communications:title': 'Organizer communications',
+        'event_communications:compose_description': 'Choose an exact event audience and delivery channels.',
+        'event_communications:new_message': 'New message',
         'detail.organizerAttendance': 'Organizer attendance',
         'detail.loadingAttendees': 'Loading attendees',
         'detail.attendeesLoadError': 'Could not load attendees.',
@@ -47,10 +54,22 @@ jest.mock('react-i18next', () => ({
         'detail.checkingIn': 'Checking in',
         'detail.checkInError': 'Could not check in attendee.',
         'detail.checkInAttendeeLabel': opts ? `Check in ${String(opts.name ?? '')}` : 'Check in attendee',
+        'attendance.title': 'Event check-in',
+        'attendance.detailCta': 'Open the focused check-in workspace.',
+        'attendance.openWorkspace': 'Open check-in',
+        'allDay': 'All day',
         'detail.joinWaitlist': 'Join waitlist',
         'detail.leaveWaitlist': 'Leave waitlist',
         'detail.joinWaitlistError': 'Could not join the waitlist.',
         'detail.leaveWaitlistError': 'Could not leave the waitlist.',
+        'detail.offerAvailable': 'Place available',
+        'detail.offerTitle': 'A place is available for you',
+        'detail.offerDescription': 'Accept it to confirm your attendance.',
+        'detail.acceptOffer': 'Accept place',
+        'detail.declineOffer': 'Decline place',
+        'detail.offerAccepted': 'Your place at the event is confirmed.',
+        'detail.offerAcceptError': 'Could not accept the place.',
+        'detail.offerDeclineError': 'Could not decline the place.',
         'detail.eventPolls': 'Event polls',
         'detail.loadingPolls': 'Loading polls',
         'detail.pollsLoadError': 'Could not load event polls.',
@@ -59,6 +78,32 @@ jest.mock('react-i18next', () => ({
         'detail.pollOptionResult': opts ? `${String(opts.label ?? '')} - ${String(opts.percent ?? 0)}%` : 'Poll option - 0%',
         'detail.pollTotalVotes': opts ? `${String(opts.count ?? 0)} votes` : '0 votes',
         'detail.communityMember': 'Community member',
+        'agenda.title': 'Agenda',
+        'agenda.loading': 'Loading agenda',
+        'agenda.loadError': 'The event agenda could not be loaded.',
+        'agenda.retry': 'Retry agenda',
+        'agenda.sessionCount': opts ? `${String(opts.count ?? 0)} session` : '0 sessions',
+        'agenda.starts': 'Starts',
+        'agenda.ends': 'Ends',
+        'agenda.track': 'Track',
+        'agenda.room': 'Room',
+        'agenda.speakers': 'Speakers',
+        'agenda.speakerWithRole': opts ? `${String(opts.name ?? '')} — ${String(opts.role ?? '')}` : '',
+        'agenda.speakerFallback': 'Guest speaker',
+        'agenda.sessionAccessibility': opts
+          ? `${String(opts.title ?? '')}. ${String(opts.type ?? '')}. ${String(opts.visibility ?? '')}. Starts ${String(opts.start ?? '')}. Ends ${String(opts.end ?? '')}. ${String(opts.details ?? '')}`
+          : '',
+        'agenda.type.session': 'Session',
+        'agenda.type.keynote': 'Keynote',
+        'agenda.type.workshop': 'Workshop',
+        'agenda.type.panel': 'Panel',
+        'agenda.type.break': 'Break',
+        'agenda.type.networking': 'Networking',
+        'agenda.type.other': 'Other',
+        'agenda.visibility.public': 'Open to event viewers',
+        'agenda.visibility.registered': 'Registered attendees',
+        'agenda.visibility.staff': 'Event staff',
+        'agenda.status.cancelled': 'Cancelled',
         'detail.invalidId': 'Invalid event ID.',
         'detail.notFound': 'Event not found.',
         'detail.goBack': 'Go Back',
@@ -74,7 +119,26 @@ jest.mock('react-i18next', () => ({
         'reminders.option.10080': '1 week before',
         'reminders.saved': 'Reminders updated.',
         'reminders.error': 'Could not update event reminders.',
+        'reminders.enabled': 'Reminders enabled',
+        'reminders.disabled': 'Reminders disabled',
+        'reminders.timing': 'Reminder times',
+        'reminders.customMinutes': 'Custom time in minutes',
+        'reminders.addCustom': 'Add time',
+        'reminders.channels': 'Delivery channels',
+        'reminders.channel.email': 'Email',
+        'reminders.channel.in_app': 'Notification bell',
+        'reminders.channel.web_push': 'Web push',
+        'reminders.channel.fcm': 'Mobile push',
+        'reminders.resolved': opts ? `Reminder availability currently comes from ${String(opts.source ?? '')}.` : '',
+        'reminders.source.event': 'this event',
+        'reminders.save': 'Save reminders',
+        'reminders.reset': 'Reset to defaults',
         'full': 'Full',
+        'postponed': 'Postponed',
+        'completed': 'Completed',
+        'archived': 'Archived',
+        'pendingReview': 'Pending review',
+        'draft': 'Draft',
         'rsvpError': 'Failed to update RSVP.',
         'common:errors.alertTitle': 'Error',
         'common:buttons.cancel': 'Cancel',
@@ -141,15 +205,74 @@ jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
 
+jest.mock('@/components/events/EventSafetyCard', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return function MockEventSafetyCard() {
+    return <Text testID="event-safety-card-stub">Participation requirements</Text>;
+  };
+});
+
+jest.mock('@/components/events/EventAnalyticsSummaryCard', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return {
+    EventAnalyticsSummaryCard: () => <Text testID="event-analytics-card-stub">Event analytics</Text>,
+  };
+});
+
+jest.mock('@/components/events/EventCheckinCredentialCard', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return () => <Text testID="event-checkin-credential-card-stub">Attendee check-in code</Text>;
+});
+
 jest.mock('@/lib/api/events', () => ({
+  acceptEventWaitlistOffer: jest.fn().mockResolvedValue({
+    data: {
+      relationship: {
+        registration: { state: 'confirmed' },
+        waitlist: { state: 'accepted', position: 1, offer_active: false },
+      },
+      mutation: { changed: true, idempotent_replay: false, history_entry_id: 901, next_offer_created: false },
+    },
+  }),
   getEvent: jest.fn(),
-  getEventOnlineLink: (event: { online_link?: string | null; online_url?: string | null; video_url?: string | null }) =>
-    event.online_link ?? event.online_url ?? event.video_url ?? null,
-  rsvpEvent: jest.fn().mockResolvedValue({ data: { rsvp: 'going', rsvp_counts: { going: 1, interested: 0 } } }),
+  getEventAgenda: jest.fn().mockResolvedValue({
+    data: {
+      contract_version: 1,
+      event_id: 7,
+      agenda_version: 0,
+      timezone: 'UTC',
+      permissions: { manage: false },
+      sessions: [],
+    },
+    meta: { base_url: 'https://test.api' },
+  }),
+  getEventOnlineLink: (event: { online_access: { reveal_state: string; join_url: string | null; video_url: string | null } }) =>
+    event.online_access.reveal_state === 'available'
+      ? event.online_access.join_url ?? event.online_access.video_url
+      : null,
+  rsvpEvent: jest.fn().mockResolvedValue({
+    data: {
+      contract_version: 2,
+      event_id: 7,
+      relationship: {
+        engagement: { state: 'none', can_change: true },
+        registration: { state: 'confirmed', waitlist_position: null, can_register: false, can_withdraw: true, can_join_waitlist: false, can_leave_waitlist: false },
+        attendance: { state: 'not_checked_in', checked_in_at: null, checked_out_at: null },
+        capacity: { limit: 20, confirmed: 1, remaining: 19, is_full: false, waitlist_count: 0 },
+      },
+      metrics: { confirmed_count: 1, interested_count: 0, waitlist_count: 0 },
+      status: 'going',
+      rsvp_counts: { going: 1, interested: 0 },
+      waitlist_position: null,
+      message: null,
+    },
+  }),
   removeRsvp: jest.fn().mockResolvedValue(undefined),
   getEventAttendees: jest.fn().mockResolvedValue({ data: [], meta: { per_page: 50, has_more: false, cursor: null } }),
   checkInEventAttendee: jest.fn().mockResolvedValue({ data: { checked_in: true, attendee_id: 22, event_id: 7 } }),
-  getEventWaitlist: jest.fn().mockResolvedValue({ data: [], meta: { has_more: false, user_position: null } }),
   joinEventWaitlist: jest.fn().mockResolvedValue({ data: { waitlisted: true, position: 2 } }),
   leaveEventWaitlist: jest.fn().mockResolvedValue(undefined),
   getEventPolls: jest.fn().mockResolvedValue({ data: [], meta: { per_page: 50, has_more: false, cursor: null } }),
@@ -183,7 +306,7 @@ jest.mock('@/components/ui/useConfirm', () => ({
 // --- Tests ---
 
 import EventDetailScreen from './event-detail';
-import { checkInEventAttendee, joinEventWaitlist, leaveEventWaitlist, rsvpEvent, updateEventReminders, voteEventPoll } from '@/lib/api/events';
+import { acceptEventWaitlistOffer, getEventAgenda, joinEventWaitlist, leaveEventWaitlist, rsvpEvent, updateEventReminders, voteEventPoll } from '@/lib/api/events';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -193,19 +316,126 @@ beforeEach(() => {
   mockRouterPush.mockClear();
 });
 
+const sharedEvent = require('../../../contracts/events/v2/event-detail.json');
+const sharedRosterMember = require('../../../contracts/events/v2/event-roster-item.json');
+const sharedAgenda = require('../../../contracts/events/v2/event-agenda.json');
 const mockEvent = {
+  ...sharedEvent,
   id: 7,
   title: 'Community Skill Share Workshop',
   description: 'Join us for an afternoon of skill sharing and community building.',
-  start_date: '2026-05-15T14:00:00Z',
-  is_online: false,
-  online_url: null,
-  location: 'Community Hall, Main Street',
-  is_full: false,
-  user_rsvp: null,
-  rsvp_counts: { going: 12, interested: 5 },
-  category: { name: 'Education', color: '#f59e0b' },
-  organizer: { id: 3, name: 'Jane Organizer', avatar: null },
+  organizer: { ...sharedEvent.organizer, id: 3, display_name: 'Jane Organizer' },
+  schedule: { ...sharedEvent.schedule, start_at: '2026-05-15T14:00:00Z' },
+  location: { ...sharedEvent.location, label: 'Community Hall, Main Street', mode: 'in_person' },
+  online_access: {
+    ...sharedEvent.online_access,
+    mode: 'in_person',
+    reveal_state: 'not_applicable',
+    join_url: null,
+    video_url: null,
+  },
+  relationship: {
+    engagement: { state: 'none', can_change: true },
+    registration: { state: 'none', waitlist_position: null, can_register: true, can_withdraw: false, can_join_waitlist: false, can_leave_waitlist: false },
+    attendance: { state: 'not_checked_in', checked_in_at: null, checked_out_at: null },
+    capacity: { limit: 20, confirmed: 12, remaining: 8, is_full: false, waitlist_count: 0 },
+  },
+  permissions: { ...sharedEvent.permissions, edit: true, manage_people: true, check_in: true, broadcast: true },
+  metrics: { confirmed_count: 12, interested_count: 5, waitlist_count: 0 },
+};
+
+const emptyAgendaState = {
+  data: {
+    data: {
+      contract_version: 1 as const,
+      event_id: 7,
+      agenda_version: 0,
+      timezone: 'UTC',
+      permissions: { manage: false },
+      sessions: [],
+    },
+    meta: { base_url: 'https://test.api' },
+  },
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
+};
+
+const populatedAgendaState = {
+  data: {
+    data: {
+      ...sharedAgenda,
+      event_id: 7,
+      timezone: 'Pacific/Auckland',
+      permissions: { manage: false },
+      sessions: [{
+        ...sharedAgenda.sessions[0],
+        title: 'Repair skills workshop',
+        type: 'workshop',
+        visibility: 'registered',
+        start_at: '2026-08-09T22:30:00+00:00',
+        end_at: '2026-08-09T23:15:00+00:00',
+        timezone: 'Pacific/Auckland',
+        track: 'Practical skills',
+        room: 'Workshop room',
+        speakers: [{
+          ...sharedAgenda.sessions[0].speakers[0],
+          display_name: 'Alex Morgan',
+          role: 'Facilitator',
+        }],
+      }],
+    },
+    meta: { base_url: 'https://test.api' },
+  },
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
+};
+
+const reminderPreferences = {
+  revision: 3,
+  overrides: {
+    email_enabled: true,
+    in_app_enabled: true,
+    web_push_enabled: false,
+    fcm_enabled: true,
+    realtime_enabled: true,
+    cadence: 'instant' as const,
+    reminders_enabled: true,
+  },
+  rules: [{
+    id: 9,
+    offset_minutes: 1440,
+    enabled: true,
+    rule_version: 2,
+    email_enabled: null,
+    in_app_enabled: null,
+    web_push_enabled: null,
+    fcm_enabled: null,
+    realtime_enabled: null,
+  }],
+  resolved: {
+    channels: { email: true, in_app: true, web_push: false, fcm: true, realtime: true },
+    channel_sources: { email: 'event' },
+    cadence: 'instant' as const,
+    cadence_source: 'event',
+    reminders_enabled: true,
+    reminders_source: 'event',
+  },
+  limits: {
+    minimum_offset_minutes: 5,
+    maximum_offset_minutes: 43_200,
+    maximum_rules: 8,
+    default_offsets_minutes: [10_080, 1_440, 60],
+  },
+  capabilities: { independent_channels: true, diagnostics_supported: false },
+};
+
+const reminderPreferencesState = {
+  data: { data: reminderPreferences },
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
 };
 
 describe('EventDetailScreen', () => {
@@ -214,6 +444,25 @@ describe('EventDetailScreen', () => {
 
     const { toJSON } = render(<EventDetailScreen />);
     expect(toJSON()).toBeTruthy();
+  });
+
+  it('renders private analytics only for event organisers', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const organiser = render(<EventDetailScreen />);
+    expect(organiser.getByTestId('event-analytics-card-stub')).toBeTruthy();
+    expect(organiser.queryByTestId('event-safety-card-stub')).toBeNull();
+    organiser.unmount();
+
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockEvent, permissions: { ...mockEvent.permissions, edit: false } } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    const attendee = render(<EventDetailScreen />);
+    expect(attendee.queryByTestId('event-analytics-card-stub')).toBeNull();
+    expect(attendee.getByTestId('event-safety-card-stub')).toBeTruthy();
   });
 
   it('renders the loading state', () => {
@@ -228,6 +477,53 @@ describe('EventDetailScreen', () => {
 
     const { getByText } = render(<EventDetailScreen />);
     expect(getByText('Community Skill Share Workshop')).toBeTruthy();
+  });
+
+  it('renders translated all-day inclusive dates in the event IANA timezone', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          schedule: {
+            ...mockEvent.schedule,
+            start_at: '2026-08-09T12:00:00Z',
+            end_at: '2026-08-11T12:00:00Z',
+            timezone: 'Pacific/Auckland',
+            all_day: true,
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText, queryByText } = render(<EventDetailScreen />);
+    expect(getByText(/August 10, 2026.*August 11, 2026/)).toBeTruthy();
+    expect(getByText('All day')).toBeTruthy();
+    expect(queryByText(/August 12, 2026/)).toBeNull();
+  });
+
+  it('renders the canonical postponed lifecycle state', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          schedule: {
+            ...mockEvent.schedule,
+            state: 'postponed',
+            operational_state: 'postponed',
+            lifecycle_version: 2,
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<EventDetailScreen />);
+    expect(getByText('Postponed')).toBeTruthy();
   });
 
   it('renders the not found state', () => {
@@ -259,7 +555,19 @@ describe('EventDetailScreen', () => {
   });
 
   it('submits an RSVP and updates the visible attendee count', async () => {
-    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+    let hookIndex = 0;
+    const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? reminderPreferencesState
+          : hookIndex % 5 === 4
+            ? emptyAgendaState
+            : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      hookIndex += 1;
+      return state;
+    });
 
     const { getByText } = render(<EventDetailScreen />);
 
@@ -271,7 +579,7 @@ describe('EventDetailScreen', () => {
     });
   });
 
-  it('opens the edit event route for the organizer', () => {
+  it('opens the edit event route when the server grants edit permission', () => {
     mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<EventDetailScreen />);
@@ -281,15 +589,217 @@ describe('EventDetailScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-event', params: { id: '7' } });
   });
 
-  it('renders organizer attendance and checks in an attendee', async () => {
+  it('opens templates and the bounded ticket catalogue from permitted event tools', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    fireEvent.press(getByText('Event templates'));
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/event-templates');
+
+    fireEvent.press(getByText('Available tickets'));
+    expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/event-tickets', params: { id: '7' } });
+  });
+
+  it('opens organizer communications only when the server grants broadcast permission', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const permitted = render(<EventDetailScreen />);
+    fireEvent.press(permitted.getByText('New message'));
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-communications',
+      params: { id: '7' },
+    });
+    permitted.unmount();
+
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockEvent, permissions: { ...mockEvent.permissions, broadcast: false } } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+    const denied = render(<EventDetailScreen />);
+    expect(denied.queryByText('Organizer communications')).toBeNull();
+  });
+
+  it('uses server permissions instead of deriving organizer tools from the signed-in user', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          permissions: { ...mockEvent.permissions, edit: false, manage_people: false, check_in: false },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { queryByText } = render(<EventDetailScreen />);
+
+    expect(queryByText('Edit')).toBeNull();
+    expect(queryByText('Event templates')).toBeNull();
+    expect(queryByText('Event check-in')).toBeNull();
+  });
+
+  it('offers tickets and the private check-in credential only to confirmed attendees', () => {
+    let hookIndex = 0;
+    const eventState = {
+      data: {
+        data: {
+          ...mockEvent,
+          permissions: { ...mockEvent.permissions, edit: false, manage_people: false, check_in: false, manage_registration: false },
+          relationship: {
+            ...mockEvent.relationship,
+            registration: {
+              ...mockEvent.relationship.registration,
+              state: 'confirmed',
+              can_register: false,
+              can_withdraw: true,
+            },
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? reminderPreferencesState
+          : hookIndex % 5 === 4
+            ? emptyAgendaState
+            : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      hookIndex += 1;
+      return state;
+    });
+
+    const { getByTestId, getByText, queryByText } = render(<EventDetailScreen />);
+
+    expect(getByText('Available tickets')).toBeTruthy();
+    expect(getByTestId('event-checkin-credential-card-stub')).toBeTruthy();
+    expect(queryByText('Event templates')).toBeNull();
+  });
+
+  it('does not expose an attendee credential before registration is confirmed', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockEvent, permissions: { ...mockEvent.permissions, edit: false } } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { queryByTestId } = render(<EventDetailScreen />);
+
+    expect(queryByTestId('event-checkin-credential-card-stub')).toBeNull();
+  });
+
+  it('renders the canonical named series supplied by the server', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    expect(getByText('Repair Together')).toBeTruthy();
+  });
+
+  it('loads and renders a read-only agenda in the event timezone', async () => {
+    let hookIndex = 0;
+    const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    const emptyState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 4
+          ? populatedAgendaState
+          : emptyState;
+      hookIndex += 1;
+      return state;
+    });
+
+    const screen = render(<EventDetailScreen />);
+
+    expect(screen.getByText('Agenda')).toBeTruthy();
+    expect(screen.getByText('Repair skills workshop')).toBeTruthy();
+    expect(screen.getByText('Workshop')).toBeTruthy();
+    expect(screen.getByText('Registered attendees')).toBeTruthy();
+    expect(screen.getByText(/Aug 10.*10:30/)).toBeTruthy();
+    expect(screen.getByText(/Aug 10.*11:15/)).toBeTruthy();
+    expect(screen.getByLabelText(
+      /Repair skills workshop.*Practical skills.*Workshop room.*Alex Morgan — Facilitator/,
+    )).toBeTruthy();
+    expect(screen.queryByText('Edit session')).toBeNull();
+
+    const agendaHook = mockUseApi.mock.calls.find((call) => (
+      Array.isArray(call[1]) && call[1].length === 3 && call[1][0] === 7 && call[1][1] === 7
+    ));
+    expect(agendaHook?.[2]).toEqual({ enabled: true });
+    await agendaHook?.[0]();
+    expect(getEventAgenda).toHaveBeenCalledWith(7);
+  });
+
+  it('does not add an empty agenda card for an event without sessions', () => {
+    let hookIndex = 0;
+    const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? reminderPreferencesState
+          : hookIndex % 5 === 4
+            ? emptyAgendaState
+            : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      hookIndex += 1;
+      return state;
+    });
+
+    const { queryByText } = render(<EventDetailScreen />);
+
+    expect(queryByText('Agenda')).toBeNull();
+  });
+
+  it('offers a compact retry when the agenda cannot be loaded', () => {
+    let hookIndex = 0;
+    const retry = jest.fn();
+    const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    const agendaErrorState = { data: null, isLoading: false, error: 'EVENT_AGENDA_UNAVAILABLE', refresh: retry };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 4
+          ? agendaErrorState
+          : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      hookIndex += 1;
+      return state;
+    });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    expect(getByText('The event agenda could not be loaded.')).toBeTruthy();
+    fireEvent.press(getByText('Retry agenda'));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the bounded attendance workspace instead of mutating the legacy roster inline', () => {
     let hookIndex = 0;
     const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
     const remindersState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     const attendeesState = {
         data: {
           data: [
-            { id: 22, name: 'Mina Member', avatar: null, rsvp_status: 'going', checked_in: false },
-            { id: 23, name: 'Iris Interested', avatar: null, rsvp_status: 'interested', checked_in: false },
+            {
+              ...sharedRosterMember,
+              member: { ...sharedRosterMember.member, id: 22, display_name: 'Mina Member', avatar_url: null },
+              attendance: { state: 'not_checked_in', checked_in_at: null, checked_out_at: null },
+            },
+            {
+              ...sharedRosterMember,
+              member: { ...sharedRosterMember.member, id: 23, display_name: 'Iris Interested', avatar_url: null },
+              engagement: { state: 'interested', can_change: false },
+              registration: { ...sharedRosterMember.registration, state: 'none' },
+              attendance: { state: 'not_checked_in', checked_in_at: null, checked_out_at: null },
+            },
           ],
           meta: { per_page: 50, has_more: false, cursor: null },
         },
@@ -298,22 +808,26 @@ describe('EventDetailScreen', () => {
         refresh: jest.fn(),
       };
     mockUseApi.mockImplementation(() => {
-      const state = hookIndex % 5 === 0 ? eventState : hookIndex % 5 === 1 ? remindersState : hookIndex % 5 === 2 ? attendeesState : hookIndex % 5 === 3 ? { data: { data: [], meta: { user_position: null } }, isLoading: false, error: null, refresh: jest.fn() } : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? remindersState
+          : hookIndex % 5 === 2
+            ? attendeesState
+            : hookIndex % 5 === 3
+              ? { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() }
+              : emptyAgendaState;
       hookIndex += 1;
       return state;
     });
 
-    const { getAllByText, getByLabelText, getByText } = render(<EventDetailScreen />);
+    const { getByText } = render(<EventDetailScreen />);
 
-    expect(getByText('Organizer attendance')).toBeTruthy();
-    expect(getAllByText('Mina Member').length).toBeGreaterThan(0);
-    expect(getByText('0 / 1 checked in')).toBeTruthy();
-
-    fireEvent.press(getByLabelText('Check in Mina Member'));
-
-    await waitFor(() => {
-      expect(checkInEventAttendee).toHaveBeenCalledWith(7, 22);
-      expect(getByText('1 / 1 checked in')).toBeTruthy();
+    expect(getByText('Event check-in')).toBeTruthy();
+    fireEvent.press(getByText('Open check-in'));
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-attendance',
+      params: { id: '7' },
     });
   });
 
@@ -323,10 +837,13 @@ describe('EventDetailScreen', () => {
       data: {
         data: {
           ...mockEvent,
-          is_online: true,
-          online_url: null,
-          online_link: 'https://meet.example/live',
-          location: null,
+          location: { ...mockEvent.location, label: null, mode: 'online' },
+          online_access: {
+            ...mockEvent.online_access,
+            mode: 'online',
+            reveal_state: 'available',
+            join_url: 'https://meet.example/live',
+          },
         },
       },
       isLoading: false,
@@ -345,33 +862,157 @@ describe('EventDetailScreen', () => {
     openUrlSpy.mockRestore();
   });
 
+  it('does not expose a meeting URL when the server marks access as restricted', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          location: { ...mockEvent.location, mode: 'online' },
+          online_access: {
+            ...mockEvent.online_access,
+            mode: 'online',
+            reveal_state: 'restricted',
+            join_url: 'https://meet.example/private',
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { queryByText } = render(<EventDetailScreen />);
+
+    expect(queryByText('Join online')).toBeNull();
+  });
+
   it('joins and leaves the event waitlist when the event is full', async () => {
     let hookIndex = 0;
-    const fullEvent = { ...mockEvent, is_full: true, waitlist_count: 1 };
-    const eventState = { data: { data: fullEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    const refresh = jest.fn();
+    const fullEvent = {
+      ...mockEvent,
+      relationship: {
+        ...mockEvent.relationship,
+        registration: {
+          ...mockEvent.relationship.registration,
+          can_register: false,
+          can_join_waitlist: true,
+        },
+        capacity: { ...mockEvent.relationship.capacity, remaining: 0, is_full: true, waitlist_count: 1 },
+      },
+      metrics: { ...mockEvent.metrics, waitlist_count: 1 },
+    };
+    const eventState = { data: { data: fullEvent }, isLoading: false, error: null, refresh };
     const remindersState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     const attendeesState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
-    const waitlistState = { data: { data: [], meta: { has_more: false, user_position: null } }, isLoading: false, error: null, refresh: jest.fn() };
     mockUseApi.mockImplementation(() => {
-      const state = hookIndex % 5 === 0 ? eventState : hookIndex % 5 === 1 ? remindersState : hookIndex % 5 === 2 ? attendeesState : hookIndex % 5 === 3 ? waitlistState : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? remindersState
+          : hookIndex % 5 === 2
+            ? attendeesState
+            : hookIndex % 5 === 3
+              ? { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() }
+              : emptyAgendaState;
       hookIndex += 1;
       return state;
     });
 
-    const { getByText } = render(<EventDetailScreen />);
+    const firstRender = render(<EventDetailScreen />);
 
-    expect(getByText('1 on the waitlist')).toBeTruthy();
-    fireEvent.press(getByText('Join waitlist'));
+    expect(firstRender.getByText('1 on the waitlist')).toBeTruthy();
+    fireEvent.press(firstRender.getByText('Join waitlist'));
 
     await waitFor(() => {
       expect(joinEventWaitlist).toHaveBeenCalledWith(7);
-      expect(getByText('You are on the waitlist: #2')).toBeTruthy();
+      expect(refresh).toHaveBeenCalled();
     });
+    firstRender.unmount();
 
-    fireEvent.press(getByText('Leave waitlist'));
+    hookIndex = 0;
+    const waitlistedEvent = {
+      ...fullEvent,
+      relationship: {
+        ...fullEvent.relationship,
+        registration: {
+          ...fullEvent.relationship.registration,
+          state: 'waitlisted',
+          waitlist_position: 2,
+          can_join_waitlist: false,
+          can_leave_waitlist: true,
+        },
+      },
+    };
+    const waitlistedState = { data: { data: waitlistedEvent }, isLoading: false, error: null, refresh };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? waitlistedState
+        : hookIndex % 5 === 1
+          ? remindersState
+          : hookIndex % 5 === 2
+            ? attendeesState
+            : hookIndex % 5 === 3
+              ? { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() }
+              : emptyAgendaState;
+      hookIndex += 1;
+      return state;
+    });
+    const secondRender = render(<EventDetailScreen />);
+    expect(secondRender.getByText('You are on the waitlist: #2')).toBeTruthy();
+    fireEvent.press(secondRender.getByText('Leave waitlist'));
 
     await waitFor(() => {
       expect(leaveEventWaitlist).toHaveBeenCalledWith(7);
+    });
+  });
+
+  it('offers canonical accept and decline actions for a live waitlist offer', async () => {
+    let hookIndex = 0;
+    const refresh = jest.fn();
+    const offeredEvent = {
+      ...mockEvent,
+      relationship: {
+        ...mockEvent.relationship,
+        engagement: { ...mockEvent.relationship.engagement, can_change: true },
+        registration: {
+          ...mockEvent.relationship.registration,
+          state: 'offered',
+          waitlist_position: 1,
+          can_register: false,
+          can_withdraw: false,
+          can_join_waitlist: false,
+          can_leave_waitlist: true,
+        },
+        capacity: { ...mockEvent.relationship.capacity, remaining: 0, is_full: true, waitlist_count: 1 },
+      },
+      metrics: { ...mockEvent.metrics, waitlist_count: 1 },
+    };
+    const eventState = { data: { data: offeredEvent }, isLoading: false, error: null, refresh };
+    mockUseApi.mockImplementation(() => {
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? reminderPreferencesState
+          : hookIndex % 5 === 4
+            ? emptyAgendaState
+            : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      hookIndex += 1;
+      return state;
+    });
+
+    const screen = render(<EventDetailScreen />);
+
+    expect(screen.getByText('A place is available for you')).toBeTruthy();
+    expect(screen.queryByLabelText('Going')).toBeNull();
+    expect(screen.queryByLabelText('Interested')).toBeNull();
+    fireEvent.press(screen.getByLabelText('Accept place'));
+
+    await waitFor(() => {
+      expect(acceptEventWaitlistOffer).toHaveBeenCalledWith(7, expect.stringMatching(/^accept-offer-7-/));
+      expect(refresh).toHaveBeenCalled();
+      expect(screen.queryByText('A place is available for you')).toBeNull();
+      expect(screen.getByLabelText('Going')).toBeTruthy();
     });
   });
 
@@ -380,7 +1021,6 @@ describe('EventDetailScreen', () => {
     const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
     const remindersState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     const attendeesState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
-    const waitlistState = { data: { data: [], meta: { has_more: false, user_position: null } }, isLoading: false, error: null, refresh: jest.fn() };
     const pollsState = {
       data: {
         data: [{
@@ -399,7 +1039,15 @@ describe('EventDetailScreen', () => {
       refresh: jest.fn(),
     };
     mockUseApi.mockImplementation(() => {
-      const state = hookIndex % 5 === 0 ? eventState : hookIndex % 5 === 1 ? remindersState : hookIndex % 5 === 2 ? attendeesState : hookIndex % 5 === 3 ? waitlistState : pollsState;
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? remindersState
+          : hookIndex % 5 === 2
+            ? attendeesState
+            : hookIndex % 5 === 3
+              ? pollsState
+              : emptyAgendaState;
       hookIndex += 1;
       return state;
     });
@@ -417,16 +1065,31 @@ describe('EventDetailScreen', () => {
 
   it('renders and updates per-event reminders', async () => {
     let hookIndex = 0;
-    const eventState = { data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() };
-    const remindersState = {
-        data: { data: [{ remind_before_minutes: 1440, reminder_type: 'both', status: 'pending', scheduled_for: '2026-05-14T14:00:00Z' }] },
-        isLoading: false,
-        error: null,
-        refresh: jest.fn(),
-      };
+    const confirmedEvent = {
+      ...mockEvent,
+      relationship: {
+        ...mockEvent.relationship,
+        registration: {
+          ...mockEvent.relationship.registration,
+          state: 'confirmed',
+          can_register: false,
+          can_withdraw: true,
+        },
+      },
+    };
+    const eventState = { data: { data: confirmedEvent }, isLoading: false, error: null, refresh: jest.fn() };
+    const remindersState = reminderPreferencesState;
     const attendeesState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     mockUseApi.mockImplementation(() => {
-      const state = hookIndex % 5 === 0 ? eventState : hookIndex % 5 === 1 ? remindersState : hookIndex % 5 === 2 ? attendeesState : hookIndex % 5 === 3 ? { data: { data: [], meta: { user_position: null } }, isLoading: false, error: null, refresh: jest.fn() } : { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      const state = hookIndex % 5 === 0
+        ? eventState
+        : hookIndex % 5 === 1
+          ? remindersState
+          : hookIndex % 5 === 2
+            ? attendeesState
+            : hookIndex % 5 === 3
+              ? { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() }
+              : emptyAgendaState;
       hookIndex += 1;
       return state;
     });
@@ -435,12 +1098,33 @@ describe('EventDetailScreen', () => {
 
     expect(getByText('Reminders')).toBeTruthy();
     fireEvent.press(getByText('1 hour before'));
+    fireEvent.press(getByText('Save reminders'));
 
     await waitFor(() => {
-      expect(updateEventReminders).toHaveBeenCalledWith(7, [
-        { minutes: 1440, type: 'both' },
-        { minutes: 60, type: 'both' },
-      ]);
+      expect(updateEventReminders).toHaveBeenCalledWith(7, {
+        expected_revision: 3,
+        overrides: reminderPreferences.overrides,
+        rules: [
+          {
+            offset_minutes: 1440,
+            enabled: true,
+            email_enabled: null,
+            in_app_enabled: null,
+            web_push_enabled: null,
+            fcm_enabled: null,
+            realtime_enabled: null,
+          },
+          {
+            offset_minutes: 60,
+            enabled: true,
+            email_enabled: null,
+            in_app_enabled: null,
+            web_push_enabled: null,
+            fcm_enabled: null,
+            realtime_enabled: null,
+          },
+        ],
+      });
     });
   });
 });

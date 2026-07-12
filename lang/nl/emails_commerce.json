@@ -23,6 +23,7 @@
     "cta": "Groepen Bekijken"
   },
   "group_promoted": {
+    "role_admin": "beheerder",
     "subject": "U bent nu een {{role}} van {{group_name}} — {{community}}",
     "title": "Rol Update",
     "preview": "Gefeliciteerd — u bent benoemd tot {{role}} van {{group_name}}",

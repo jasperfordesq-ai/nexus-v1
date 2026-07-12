@@ -161,6 +161,9 @@ function RootNavigator() {
     'common',
     'endorsements',
     'events',
+    'event_templates',
+    'event_tickets',
+    'event_communications',
     'exchanges',
     'federation',
     'gamification',
@@ -337,6 +340,22 @@ function RootNavigator() {
       <Stack.Screen
         name="(modals)/event-detail"
         options={{ ...modalOptions, headerShown: false, title: t('events:detailTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-attendance"
+        options={{ ...modalOptions, headerShown: false, title: t('events:attendance.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-templates"
+        options={{ ...modalOptions, headerShown: false, title: t('event_templates:templates.mobile.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-tickets"
+        options={{ ...modalOptions, headerShown: false, title: t('event_tickets:tickets.mobile.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/event-communications"
+        options={{ ...modalOptions, headerShown: false, title: t('event_communications:title') }}
       />
       <Stack.Screen
         name="(modals)/members"

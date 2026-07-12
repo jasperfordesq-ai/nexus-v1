@@ -1,0 +1,73 @@
+{
+  "subject": "イベント更新: :title",
+  "view_event": "イベントを表示",
+  "accept_offer": "参加枠を受ける",
+  "reason": "理由: :reason",
+  "states": {
+    "invited": "招待済み",
+    "pending": "保留中",
+    "confirmed": "確定",
+    "declined": "却下",
+    "cancelled": "キャンセル",
+    "waiting": "キャンセル待ち",
+    "offered": "案内済み",
+    "accepted": "受諾済み",
+    "expired": "期限切れ"
+  },
+  "lifecycle": {
+    "published": "イベント「:title」が公開されました。",
+    "postponed": "イベント「:title」が延期されました。",
+    "cancelled": "イベント「:title」が中止されました。",
+    "archived": "イベント「:title」がアーカイブされました。",
+    "restored": "イベント「:title」が復元されました。",
+    "completed": "イベント「:title」が終了しました。"
+  },
+  "registration": {
+    "invited": "「:title」に招待されました。",
+    "pending": "「:title」への申し込みは保留中です。",
+    "confirmed": "「:title」への申し込みが確定しました。",
+    "declined": "「:title」への申し込みが却下されました。",
+    "cancelled": "「:title」への申し込みがキャンセルされました。",
+    "organizer": ":name さんの「:title」への申し込みは現在 :state です。"
+  },
+  "waitlist": {
+    "waiting": "「:title」のキャンセル待ちに登録されています。",
+    "offered": "「:title」に空きが出ました。期限前に受けてください。",
+    "accepted": "「:title」の参加枠を受けました。",
+    "expired": "「:title」の参加枠の案内は期限切れです。",
+    "cancelled": "「:title」のキャンセル待ちから外れました。",
+    "organizer": ":name さんの「:title」の待機状態は現在 :state です。"
+  },
+  "staff_role": {
+    "granted": "「:title」の :role に割り当てられました。",
+    "revoked": "「:title」の :role から解任されました。"
+  },
+  "reminder": {
+    "subject": "イベントのリマインダー: :title",
+    "message": "「:title」は:whenに開始します（あと:offset）。"
+  },
+  "update": {
+    "message": "「:title」が変更されました: :changes。",
+    "separator": "、",
+    "series_scope": "この変更は今後のすべての開催回に適用されます。",
+    "fields": {
+      "title": "タイトル",
+      "time": "日付または時刻",
+      "timezone": "タイムゾーン",
+      "all_day": "終日設定",
+      "venue": "会場",
+      "online_access": "オンラインアクセス",
+      "capacity": "定員",
+      "accessibility": "会場のアクセシビリティ",
+      "cancellation_policy": "キャンセルポリシー"
+    }
+  },
+  "roles": {
+    "co_organizer": "共同主催者",
+    "registration_manager": "申込管理者",
+    "communications_manager": "広報管理者",
+    "check_in_staff": "受付スタッフ",
+    "finance_manager": "会計管理者",
+    "staff": "イベントスタッフ"
+  }
+}

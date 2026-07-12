@@ -8,6 +8,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
 const mockGetEvent = jest.fn();
+const mockGetEventCategories = jest.fn();
 const mockUpdateEvent = jest.fn().mockResolvedValue({ data: { id: 7 } });
 const mockUploadEventImage = jest.fn();
 const mockLaunchImageLibraryAsync = jest.fn();
@@ -107,8 +108,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 jest.mock('@/lib/api/events', () => ({
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
   getEvent: (...args: unknown[]) => mockGetEvent(...args),
-  getEventOnlineLink: (event: { online_link?: string | null; online_url?: string | null; video_url?: string | null }) =>
-    event.online_link ?? event.online_url ?? event.video_url ?? null,
+  getEventCategories: (...args: unknown[]) => mockGetEventCategories(...args),
   updateEvent: (...args: unknown[]) => mockUpdateEvent(...args),
   uploadEventImage: (...args: unknown[]) => mockUploadEventImage(...args),
 }));
@@ -191,6 +191,38 @@ import NewEventRoute from './new-event';
 import { useAppToast } from '@/components/ui/AppToast';
 
 const showToast = useAppToast().show as jest.Mock;
+const sharedEvent = require('../../../contracts/events/v2/event-detail.json');
+const canonicalEditEvent = {
+  ...sharedEvent,
+  id: 7,
+  title: 'Existing workshop',
+  description: 'Existing details for attendees.',
+  schedule: {
+    ...sharedEvent.schedule,
+    start_at: '2099-01-02T12:00:00.000Z',
+    end_at: '2099-01-02T13:00:00.000Z',
+  },
+  location: {
+    ...sharedEvent.location,
+    label: 'Old hall',
+    latitude: 51.5,
+    longitude: -0.12,
+    mode: 'hybrid',
+  },
+  online_access: {
+    ...sharedEvent.online_access,
+    mode: 'hybrid',
+    reveal_state: 'available',
+    join_url: 'https://meet.example/old',
+  },
+  relationship: {
+    ...sharedEvent.relationship,
+    capacity: { ...sharedEvent.relationship.capacity, limit: 25 },
+  },
+  category: { id: 4, name: 'Workshop', slug: 'workshop', colour: '#f59e0b' },
+  permissions: { ...sharedEvent.permissions, edit: true },
+  federated_visibility: 'listed',
+};
 
 describe('NewEventRoute', () => {
   beforeEach(() => {
@@ -198,6 +230,7 @@ describe('NewEventRoute', () => {
     mockSearchParams = {};
     mockCreateEvent.mockClear();
     mockGetEvent.mockReset();
+    mockGetEventCategories.mockReset().mockReturnValue(new Promise(() => undefined));
     mockUpdateEvent.mockClear();
     mockUploadEventImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/events/cover.jpg' } });
     mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({
@@ -300,12 +333,13 @@ describe('NewEventRoute', () => {
 
     await waitFor(() => {
       expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({
+        category_id: null,
         category_name: 'workshop',
         location: 'Community hall',
         latitude: 51.501,
         longitude: -0.125,
         is_online: true,
-        online_link: 'https://meet.example/workshop',
+        video_url: 'https://meet.example/workshop',
       }));
     });
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } }));
@@ -329,32 +363,7 @@ describe('NewEventRoute', () => {
 
   it('hydrates an existing event and updates it in edit mode', async () => {
     mockSearchParams = { id: '7' };
-    mockGetEvent.mockResolvedValueOnce({
-      data: {
-        id: 7,
-        title: 'Existing workshop',
-        description: 'Existing details for attendees.',
-        start_date: '2099-01-02T12:00:00.000Z',
-        end_date: '2099-01-02T13:00:00.000Z',
-        location: 'Old hall',
-        latitude: 51.5,
-        longitude: -0.12,
-        is_online: true,
-        online_url: null,
-        online_link: 'https://meet.example/old',
-        max_attendees: 25,
-        organizer: { id: 3, name: 'Jane Organizer', avatar: null },
-        category: { id: 2, name: 'workshop', color: '#f59e0b' },
-        rsvp_counts: { going: 0, interested: 0 },
-        attendees_count: 0,
-        spots_left: 25,
-        is_full: false,
-        status: 'published',
-        federated_visibility: 'listed',
-        user_rsvp: null,
-        cover_image: null,
-      },
-    });
+    mockGetEvent.mockResolvedValueOnce({ data: canonicalEditEvent });
 
     const { getByDisplayValue, getByText } = render(<NewEventRoute />);
 
@@ -369,9 +378,11 @@ describe('NewEventRoute', () => {
         location: 'Old hall',
         latitude: 51.5,
         longitude: -0.12,
-        category_name: 'workshop',
+        category_id: 4,
+        category_name: null,
+        series_id: 12,
         is_online: true,
-        online_link: 'https://meet.example/old',
+        video_url: 'https://meet.example/old',
         max_attendees: 25,
         federated_visibility: 'listed',
       }));
@@ -380,29 +391,63 @@ describe('NewEventRoute', () => {
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '7' } }));
   });
 
+  it('does not submit a deep-linked edit when the server denies edit permission', async () => {
+    mockSearchParams = { id: '7' };
+    mockGetEvent.mockResolvedValueOnce({
+      data: {
+        ...canonicalEditEvent,
+        permissions: { ...canonicalEditEvent.permissions, edit: false },
+      },
+    });
+
+    const { getByText } = render(<NewEventRoute />);
+
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith(expect.objectContaining({
+      description: 'Could not load event.',
+      variant: 'danger',
+    })));
+    fireEvent.press(getByText('Update event'));
+
+    expect(mockUpdateEvent).not.toHaveBeenCalled();
+  });
+
+  it('does not silently disable federation when v2 omits legacy visibility state', async () => {
+    mockSearchParams = { id: '7' };
+    const eventWithoutFederation: Partial<typeof canonicalEditEvent> = { ...canonicalEditEvent };
+    delete eventWithoutFederation.federated_visibility;
+    mockGetEvent.mockResolvedValueOnce({ data: eventWithoutFederation });
+
+    const { getByDisplayValue, getByText } = render(<NewEventRoute />);
+
+    await waitFor(() => expect(getByDisplayValue('Existing workshop')).toBeTruthy());
+    fireEvent.press(getByText('Update event'));
+
+    await waitFor(() => expect(mockUpdateEvent).toHaveBeenCalled());
+    expect(mockUpdateEvent.mock.calls[0][1]).not.toEqual(expect.objectContaining({
+      federated_visibility: 'none',
+    }));
+  });
+
   it('shows an existing cover image and uploads a replacement in edit mode', async () => {
     mockSearchParams = { id: '7' };
     mockGetEvent.mockResolvedValueOnce({
       data: {
-        id: 7,
-        title: 'Existing workshop',
-        description: 'Existing details for attendees.',
-        start_date: '2099-01-02T12:00:00.000Z',
-        end_date: null,
-        location: 'Old hall',
-        is_online: false,
-        online_url: null,
-        max_attendees: null,
-        organizer: { id: 3, name: 'Jane Organizer', avatar: null },
-        category: { id: 2, name: 'workshop', color: '#f59e0b' },
-        rsvp_counts: { going: 0, interested: 0 },
-        attendees_count: 0,
-        spots_left: 25,
-        is_full: false,
-        status: 'published',
+        ...canonicalEditEvent,
+        schedule: { ...canonicalEditEvent.schedule, end_at: null },
+        location: { ...canonicalEditEvent.location, mode: 'in_person' },
+        online_access: {
+          ...canonicalEditEvent.online_access,
+          mode: 'in_person',
+          reveal_state: 'not_applicable',
+          join_url: null,
+          video_url: null,
+        },
+        relationship: {
+          ...canonicalEditEvent.relationship,
+          capacity: { ...canonicalEditEvent.relationship.capacity, limit: null },
+        },
         federated_visibility: 'none',
-        user_rsvp: null,
-        cover_image: '/uploads/events/existing.jpg',
+        primary_image: { url: '/uploads/events/existing.jpg', alt_text: 'Existing workshop' },
       },
     });
 

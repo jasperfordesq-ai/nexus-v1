@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\Models\Comment;
 use App\Models\Connection;
 use App\Models\EventRsvp;
@@ -354,8 +355,10 @@ class MemberActivityService
         $groups = DB::table('group_members as gm')
             ->join('groups as g', 'gm.group_id', '=', 'g.id')
             ->where('gm.user_id', $userId)
+            ->where('gm.tenant_id', TenantContext::getId())
             ->where('g.tenant_id', TenantContext::getId())
             ->where('gm.status', 'active')
+            ->where('g.status', GroupStatus::Active->value)
             ->count();
 
         return [

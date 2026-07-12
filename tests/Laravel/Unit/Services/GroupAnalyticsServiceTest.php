@@ -84,6 +84,13 @@ class GroupAnalyticsServiceTest extends TestCase
                 (object) ['id' => 4, 'cached_member_count' => 20],
             ]));
 
+        DB::shouldReceive('table->where->whereIn->where->selectRaw->groupBy->pluck')
+            ->once()
+            ->andReturn(collect([1 => 3, 2 => 1, 3 => 2, 4 => 4]));
+        DB::shouldReceive('table->join->where->where->whereIn->where->selectRaw->groupBy->pluck')
+            ->once()
+            ->andReturn(collect([1 => 2, 2 => 1, 3 => 2, 4 => 5]));
+
         $result = GroupAnalyticsService::getComparativeAnalytics(1);
 
         $this->assertArrayHasKey('group_members', $result);
@@ -95,6 +102,8 @@ class GroupAnalyticsServiceTest extends TestCase
         $this->assertEquals(4, $result['total_groups']);
         // 2 groups below 15 (5 and 10), so percentile = (2/4)*100 = 50
         $this->assertEquals(50, $result['percentile']);
+        $this->assertEquals(5, $result['your_activity']);
+        $this->assertEquals(5.0, $result['avg_activity']);
     }
 
     public function test_getDashboard_returns_all_expected_keys(): void

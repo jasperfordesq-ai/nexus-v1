@@ -16,6 +16,21 @@ use Illuminate\Support\Facades\DB;
  */
 class TeamTaskService
 {
+    /** @var list<string> */
+    private const STATUSES = ['todo', 'in_progress', 'done'];
+
+    /** @var list<string> */
+    private const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
+
+    /** @var list<string> */
+    private const MANAGER_FIELDS = [
+        'title',
+        'description',
+        'assigned_to',
+        'priority',
+        'due_date',
+    ];
+
     private array $errors = [];
 
     public function getErrors(): array
@@ -32,13 +47,9 @@ class TeamTaskService
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
-        $limit = $filters['limit'] ?? 50;
+        $limit = min(max((int) ($filters['limit'] ?? 50), 1), 100);
 
-        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_view_discussions'),
-            ];
+        if (!$this->authorizeParent($groupId, $userId, false)) {
             return ['items' => [], 'cursor' => null, 'has_more' => false];
         }
 
@@ -68,7 +79,17 @@ class TeamTaskService
             array_pop($tasks);
         }
 
-        $items = array_map(fn ($row) => (array) $row, $tasks);
+        $capabilityContext = $this->taskCapabilityContext($groupId, (int) $userId);
+        $assignees = $this->loadAssignees($tasks, (int) $tenantId);
+        $items = array_map(
+            fn ($row) => $this->presentTask(
+                $row,
+                (int) $userId,
+                $capabilityContext,
+                $assignees[(int) ($row->assigned_to ?? 0)] ?? null,
+            ),
+            $tasks,
+        );
         $cursor = !empty($items) ? (string) end($items)['id'] : null;
 
         return [
@@ -95,15 +116,18 @@ class TeamTaskService
             return null;
         }
 
-        if ($userId !== null && !$this->isActiveGroupMember((int) $task->group_id, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_view_discussions'),
-            ];
+        if (!$this->authorizeParent((int) $task->group_id, $userId, false)) {
             return null;
         }
 
-        return (array) $task;
+        $assignees = $this->loadAssignees([$task], (int) $tenantId);
+
+        return $this->presentTask(
+            $task,
+            (int) $userId,
+            $this->taskCapabilityContext((int) $task->group_id, (int) $userId),
+            $assignees[(int) ($task->assigned_to ?? 0)] ?? null,
+        );
     }
 
     /**
@@ -113,6 +137,10 @@ class TeamTaskService
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if (!$this->authorizeParent($groupId, $userId, true)) {
+            return null;
+        }
 
         $title = trim($data['title'] ?? '');
         if ($title === '') {
@@ -125,9 +153,8 @@ class TeamTaskService
         }
 
         // Validate status if provided
-        $validStatuses = ['todo', 'in_progress', 'done'];
         $status = $data['status'] ?? 'todo';
-        if (!in_array($status, $validStatuses, true)) {
+        if (!in_array($status, self::STATUSES, true)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
                 'message' => __('svc_notifications_2.team_task.invalid_status'),
@@ -136,9 +163,8 @@ class TeamTaskService
             return null;
         }
 
-        $validPriorities = ['low', 'medium', 'high', 'urgent'];
         $priority = $data['priority'] ?? 'medium';
-        if (!in_array($priority, $validPriorities, true)) {
+        if (!in_array($priority, self::PRIORITIES, true)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
                 'message' => __('svc_notifications_2.team_task.invalid_priority'),
@@ -147,24 +173,19 @@ class TeamTaskService
             return null;
         }
 
-        if (!$this->isActiveGroupMember($groupId, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_post'),
-                'field' => 'group_id',
-            ];
+        $assignedTo = $this->resolveAssignee($groupId, $data);
+        if ($assignedTo === false) {
             return null;
         }
 
         $now = now();
-        $assignedTo = isset($data['assigned_to']) ? (int) $data['assigned_to'] : null;
         GroupService::assertSafeguardingBroadcastAllowed(
             $groupId,
             $userId,
             (int) $tenantId,
             'team_task_create',
             trim($title . ' ' . (string) ($data['description'] ?? '')),
-            $assignedTo !== null && $assignedTo > 0 ? [$assignedTo] : [],
+            is_int($assignedTo) && $assignedTo > 0 ? [$assignedTo] : [],
         );
 
         $id = DB::table('team_tasks')->insertGetId([
@@ -205,12 +226,21 @@ class TeamTaskService
             return false;
         }
 
-        if (!$this->isActiveGroupMember((int) $task->group_id, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_post'),
-            ];
+        $groupId = (int) $task->group_id;
+        if (!$this->authorizeParent($groupId, $userId, true)) {
             return false;
+        }
+
+        $isManager = GroupAccessService::canManage($groupId, $userId);
+        $isCreator = (int) ($task->created_by ?? 0) === $userId;
+        $isAssignee = (int) ($task->assigned_to ?? 0) === $userId;
+
+        $changesManagerField = array_intersect(self::MANAGER_FIELDS, array_keys($data)) !== [];
+        if ($changesManagerField && !$isCreator && !$isManager) {
+            return $this->forbid();
+        }
+        if (array_key_exists('status', $data) && !$isAssignee && !$isCreator && !$isManager) {
+            return $this->forbid();
         }
 
         $update = [];
@@ -233,12 +263,15 @@ class TeamTaskService
         }
 
         if (array_key_exists('assigned_to', $data)) {
-            $update['assigned_to'] = $data['assigned_to'] !== null ? (int) $data['assigned_to'] : null;
+            $assignedTo = $this->resolveAssignee($groupId, $data);
+            if ($assignedTo === false) {
+                return false;
+            }
+            $update['assigned_to'] = $assignedTo;
         }
 
         if (array_key_exists('status', $data)) {
-            $validStatuses = ['todo', 'in_progress', 'done'];
-            if (!in_array($data['status'], $validStatuses, true)) {
+            if (!in_array($data['status'], self::STATUSES, true)) {
                 $this->errors[] = [
                     'code' => 'VALIDATION_ERROR',
                     'message' => __('svc_notifications_2.team_task.invalid_status'),
@@ -257,8 +290,7 @@ class TeamTaskService
         }
 
         if (array_key_exists('priority', $data)) {
-            $validPriorities = ['low', 'medium', 'high', 'urgent'];
-            if (!in_array($data['priority'], $validPriorities, true)) {
+            if (!in_array($data['priority'], self::PRIORITIES, true)) {
                 $this->errors[] = [
                     'code' => 'VALIDATION_ERROR',
                     'message' => __('svc_notifications_2.team_task.invalid_priority'),
@@ -311,33 +343,58 @@ class TeamTaskService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        $task = DB::table('team_tasks')
-            ->where('id', $taskId)
-            ->where('tenant_id', $tenantId)
-            ->first();
+        return DB::transaction(function () use ($taskId, $userId, $tenantId): bool {
+            $task = DB::table('team_tasks')
+                ->where('id', $taskId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
 
-        if (!$task) {
-            $this->errors[] = [
-                'code' => 'RESOURCE_NOT_FOUND',
-                'message' => __('svc_notifications_2.team_task.task_not_found'),
-            ];
-            return false;
-        }
+            if (!$task) {
+                $this->errors[] = [
+                    'code' => 'RESOURCE_NOT_FOUND',
+                    'message' => __('svc_notifications_2.team_task.task_not_found'),
+                ];
+                return false;
+            }
 
-        if (!$this->isActiveGroupMember((int) $task->group_id, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_post'),
-            ];
-            return false;
-        }
+            $groupId = (int) $task->group_id;
+            if (!$this->authorizeParent($groupId, $userId, true)) {
+                return false;
+            }
 
-        DB::table('team_tasks')
-            ->where('id', $taskId)
-            ->where('tenant_id', $tenantId)
-            ->delete();
+            $isCreator = (int) ($task->created_by ?? 0) === $userId;
+            if (!$isCreator && !GroupAccessService::canManage($groupId, $userId)) {
+                return $this->forbid();
+            }
 
-        return true;
+            $deleted = DB::table('team_tasks')
+                ->where('id', $taskId)
+                ->where('tenant_id', $tenantId)
+                ->where('group_id', $groupId)
+                ->delete();
+            if ($deleted !== 1) {
+                $this->errors[] = [
+                    'code' => 'RESOURCE_NOT_FOUND',
+                    'message' => __('svc_notifications_2.team_task.task_not_found'),
+                ];
+                return false;
+            }
+
+            GroupAuditService::log(
+                GroupAuditService::ACTION_TEAM_TASK_DELETED,
+                $groupId,
+                $userId,
+                [
+                    'task_id' => $taskId,
+                    'title' => (string) $task->title,
+                    'target_user_id' => (int) ($task->created_by ?? 0),
+                    'assigned_to' => (int) ($task->assigned_to ?? 0) ?: null,
+                ],
+            );
+
+            return true;
+        });
     }
 
     /**
@@ -348,11 +405,7 @@ class TeamTaskService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_view_discussions'),
-            ];
+        if (!$this->authorizeParent($groupId, $userId, false)) {
             return ['total' => 0, 'todo' => 0, 'in_progress' => 0, 'done' => 0, 'overdue' => 0];
         }
 
@@ -377,12 +430,162 @@ class TeamTaskService
         ];
     }
 
-    private function isActiveGroupMember(int $groupId, int $userId): bool
+    private function authorizeParent(int $groupId, ?int $userId, bool $write): bool
     {
-        return DB::table('group_members')
+        $tenantId = (int) TenantContext::getId();
+        if (!DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->exists()) {
+            $this->errors[] = [
+                'code' => 'RESOURCE_NOT_FOUND',
+                'message' => __('api.group_not_found'),
+            ];
+            return false;
+        }
+
+        $allowed = $userId !== null && ($write
+            ? GroupAccessService::canWriteContent($groupId, $userId)
+            : GroupAccessService::canViewMemberContent($groupId, $userId));
+        if (!$allowed) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => $write
+                    ? __('api.group_member_required_post')
+                    : __('api.group_member_required_view_discussions'),
+            ];
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Resolve an optional assignee while ensuring the target participates in
+     * this exact tenant/group. False signals a validation failure.
+     */
+    private function resolveAssignee(int $groupId, array $data): int|null|false
+    {
+        if (!array_key_exists('assigned_to', $data) || $data['assigned_to'] === null || $data['assigned_to'] === '') {
+            return null;
+        }
+
+        $value = $data['assigned_to'];
+        $assigneeId = is_int($value)
+            ? $value
+            : (is_string($value) && ctype_digit($value) ? (int) $value : 0);
+        if ($assigneeId <= 0 || !$this->isAssignableGroupMember($groupId, $assigneeId)) {
+            $this->errors[] = [
+                'code' => 'VALIDATION_ERROR',
+                'message' => __('validation.exists', ['attribute' => 'assigned_to']),
+                'field' => 'assigned_to',
+            ];
+            return false;
+        }
+
+        return $assigneeId;
+    }
+
+    private function isAssignableGroupMember(int $groupId, int $userId): bool
+    {
+        $tenantId = (int) TenantContext::getId();
+        $isTenantUser = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$isTenantUser) {
+            return false;
+        }
+
+        $isOwner = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('owner_id', $userId)
+            ->exists();
+
+        return $isOwner || DB::table('group_members')
+            ->where('tenant_id', $tenantId)
             ->where('group_id', $groupId)
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->exists();
+    }
+
+    /** @return array{can_write: bool, is_manager: bool} */
+    private function taskCapabilityContext(int $groupId, int $viewerId): array
+    {
+        $canWrite = $groupId > 0 && GroupAccessService::canWriteContent($groupId, $viewerId);
+
+        return [
+            'can_write' => $canWrite,
+            'is_manager' => $canWrite && GroupAccessService::canManage($groupId, $viewerId),
+        ];
+    }
+
+    /**
+     * @param array<int, object> $tasks
+     * @return array<int, array{id: int, name: string, avatar_url: string|null}>
+     */
+    private function loadAssignees(array $tasks, int $tenantId): array
+    {
+        $assigneeIds = array_values(array_unique(array_filter(array_map(
+            static fn (object $task): int => (int) ($task->assigned_to ?? 0),
+            $tasks,
+        ))));
+        if ($assigneeIds === []) {
+            return [];
+        }
+
+        $users = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $assigneeIds)
+            ->get(['id', 'name', 'first_name', 'last_name', 'avatar_url']);
+
+        $result = [];
+        foreach ($users as $user) {
+            $result[(int) $user->id] = [
+                'id' => (int) $user->id,
+                'name' => trim((string) ($user->name
+                    ?: trim((string) $user->first_name . ' ' . (string) $user->last_name))),
+                'avatar_url' => $user->avatar_url !== null ? (string) $user->avatar_url : null,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array{can_write: bool, is_manager: bool} $context
+     * @param array{id: int, name: string, avatar_url: string|null}|null $assignee
+     * @return array<string, mixed>
+     */
+    private function presentTask(
+        object|array $task,
+        int $viewerId,
+        array $context,
+        ?array $assignee,
+    ): array
+    {
+        $data = (array) $task;
+        $isManager = $context['is_manager'];
+        $isCreator = $context['can_write'] && (int) ($data['created_by'] ?? 0) === $viewerId;
+        $isAssignee = $context['can_write'] && (int) ($data['assigned_to'] ?? 0) === $viewerId;
+
+        $data['can_update_status'] = $isAssignee || $isCreator || $isManager;
+        $data['can_edit'] = $isCreator || $isManager;
+        $data['can_delete'] = $isCreator || $isManager;
+        $data['assignee'] = $assignee;
+
+        return $data;
+    }
+
+    private function forbid(): false
+    {
+        $this->errors[] = [
+            'code' => 'FORBIDDEN',
+            'message' => __('api.forbidden'),
+        ];
+
+        return false;
     }
 }

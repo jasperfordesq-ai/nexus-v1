@@ -11,17 +11,21 @@ use App\Core\EmailTemplateBuilder;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\AuthenticationConfigurationService;
 use App\Services\EmailDispatchService;
 use App\Services\Auth\AuthenticationMethodGuard;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
+use App\Services\TotpService;
+use App\Services\WebAuthnCeremonyVerifier;
 use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\QueryException;
 use App\Core\ApiErrorCodes;
 use App\Core\TenantContext;
-use lbuchs\WebAuthn\WebAuthn;
 use lbuchs\WebAuthn\WebAuthnException;
 
 /**
@@ -31,9 +35,18 @@ class WebAuthnController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    private const MAX_CREDENTIALS_PER_USER = 20;
+    private const MAX_CREDENTIAL_ID_BYTES = 1023;
+    private const MAX_CLIENT_DATA_BYTES = 8192;
+    private const MAX_ATTESTATION_BYTES = 1048576;
+    private const MAX_AUTHENTICATOR_DATA_BYTES = 4096;
+    private const MAX_SIGNATURE_BYTES = 16384;
+    private const ALLOWED_TRANSPORTS = ['usb', 'nfc', 'ble', 'smart-card', 'hybrid', 'internal'];
+
     public function __construct(
         private readonly TenantSettingsService $tenantSettingsService,
         private readonly WebAuthnChallengeStore $webAuthnChallengeStore,
+        private readonly WebAuthnCeremonyVerifier $ceremonyVerifier,
         private readonly TokenService $tokenService,
     ) {}
 
@@ -43,8 +56,13 @@ class WebAuthnController extends BaseApiController
         $this->rateLimit('webauthn_register_challenge', 10, 60);
 
         $userId = $this->requireAuth();
-        if (!TenantContext::hasFeature('biometric_login')) {
+        if (!$this->passkeyAuthenticationEnabled() || !$this->passkeyEnrollmentEnabled()) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
+        }
+        $registrationInput = $this->getAllInput();
+        $confirmationError = $this->requireSecurityConfirmation($userId, TenantContext::getId(), $registrationInput);
+        if ($confirmationError !== null) {
+            return $confirmationError;
         }
 
         // Per-user rate limit on challenge generation. Generous enough that a
@@ -57,30 +75,36 @@ class WebAuthnController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 404);
         }
 
-        // Generate random challenge
-        $challenge = random_bytes(32);
-        $challengeB64 = $this->base64UrlEncode($challenge);
-
-        // Store challenge for stateless verification
-        $challengeId = $this->webAuthnChallengeStore->create(
-            $challengeB64,
-            $userId,
-            'register',
-            ['email' => $user['email']]
-        );
-
-        // Also store in session for backward compatibility
-        if ($this->startNativeSessionIfPossible()) {
-            $_SESSION['webauthn_challenge'] = $challengeB64;
-            $_SESSION['webauthn_challenge_expires'] = time() + 120;
+        $context = $this->resolveWebAuthnContext();
+        if ($context === null) {
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED',
+                __('api.webauthn_registration_failed'),
+                null,
+                400
+            ));
         }
 
         // Get existing credentials to exclude (prevent re-registration)
         $tenantId = TenantContext::getId();
         $existingCredentials = DB::select(
-            "SELECT credential_id FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
+            "SELECT credential_id FROM webauthn_credentials
+             WHERE user_id = ? AND tenant_id = ? AND (rp_id = ? OR rp_id IS NULL)",
+            [$userId, $tenantId, $context['rp_id']]
         );
+
+        $credentialCount = (int) DB::table('webauthn_credentials')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->count();
+        if ($credentialCount >= $this->maxCredentialsPerUser()) {
+            return $this->noStore($this->respondWithError(
+                'WEBAUTHN_CREDENTIAL_LIMIT',
+                __('api.validation_failed'),
+                null,
+                409
+            ));
+        }
 
         $excludeCredentials = array_map(function ($row) {
             return [
@@ -89,17 +113,45 @@ class WebAuthnController extends BaseApiController
             ];
         }, $existingCredentials);
 
-        // Generate stable user handle (opaque, unique per user+tenant)
-        $userHandle = $this->base64UrlEncode(
-            hash('sha256', $userId . ':' . $tenantId, true)
-        );
+        // Stable, secret-derived opaque handle. It is persisted with the
+        // credential, so a future application-key rotation cannot strand it.
+        $userHandle = $this->createUserHandle($userId, $tenantId);
+
+        $challenge = random_bytes(32);
+        $challengeB64 = $this->base64UrlEncode($challenge);
+        try {
+            $challengeId = $this->webAuthnChallengeStore->create(
+                $challengeB64,
+                $userId,
+                'register',
+                [
+                    'origin' => $context['origin'],
+                    'rp_id' => $context['rp_id'],
+                    'user_handle' => $userHandle,
+                    'routing_fingerprint' => $this->currentTenantRoutingFingerprint($tenantId),
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Challenge storage unavailable', [
+                'tenant_id' => $tenantId,
+                'ceremony' => 'register',
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_UNAVAILABLE',
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
+        }
 
         $options = [
             'challenge' => $challengeB64,
             'challenge_id' => $challengeId,
             'rp' => [
                 'name' => TenantContext::get()['name'] ?? 'Project NEXUS',
-                'id' => $this->getRpId(),
+                'id' => $context['rp_id'],
             ],
             'user' => [
                 'id' => $userHandle,
@@ -108,110 +160,279 @@ class WebAuthnController extends BaseApiController
             ],
             'pubKeyCredParams' => [
                 ['type' => 'public-key', 'alg' => -7],   // ES256
+                ['type' => 'public-key', 'alg' => -8],   // EdDSA
                 ['type' => 'public-key', 'alg' => -257],  // RS256
             ],
             'authenticatorSelection' => [
-                'userVerification' => 'preferred',
-                'residentKey' => 'preferred',
-                'requireResidentKey' => false,
+                'userVerification' => 'required',
+                'residentKey' => 'required',
+                'requireResidentKey' => true,
             ],
             'timeout' => 60000,
             'attestation' => 'none',
             'excludeCredentials' => $excludeCredentials,
         ];
 
-        return $this->respondWithData($options);
+        return $this->noStore($this->respondWithData($options));
     }
 
     /** POST /api/webauthn/register-verify */
     public function registerVerify(): JsonResponse
     {
+        $this->rateLimit('webauthn_register_verify', 10, 60);
+
         $userId = $this->requireAuth();
-        if (!TenantContext::hasFeature('biometric_login')) {
+        if (!$this->passkeyAuthenticationEnabled() || !$this->passkeyEnrollmentEnabled()) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
         }
         $input = $this->getAllInput();
-
-        // Retrieve the stored challenge
-        $storedChallenge = $this->getStoredChallenge($input, 'register', $userId);
-        if ($storedChallenge instanceof JsonResponse) {
-            return $storedChallenge;
+        $confirmationError = $this->requireSecurityConfirmation($userId, TenantContext::getId(), $input);
+        if ($confirmationError !== null) {
+            return $confirmationError;
         }
 
-        if (empty($input['id']) || empty($input['response']['clientDataJSON']) || empty($input['response']['attestationObject'])) {
+        try {
+            $credentialId = $this->decodeCredentialId($input['id'] ?? null);
+            $rawCredentialId = $this->decodeCredentialId($input['rawId'] ?? null);
+            if (!hash_equals($credentialId, $rawCredentialId)) {
+                throw new \InvalidArgumentException('Credential id/rawId mismatch');
+            }
+            if (($input['type'] ?? null) !== 'public-key' || !is_array($input['response'] ?? null)) {
+                throw new \InvalidArgumentException('Invalid credential type');
+            }
+            $clientDataJson = $this->decodeBase64UrlField(
+                $input['response']['clientDataJSON'] ?? null,
+                self::MAX_CLIENT_DATA_BYTES
+            );
+            $attestationObject = $this->decodeBase64UrlField(
+                $input['response']['attestationObject'] ?? null,
+                self::MAX_ATTESTATION_BYTES
+            );
+        } catch (\InvalidArgumentException) {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, __('api.webauthn_invalid_credential'), null, 400);
         }
 
-        // Decode the raw binary data from base64url
-        $clientDataJSON = $this->base64UrlDecode($input['response']['clientDataJSON']);
-        $attestationObject = $this->base64UrlDecode($input['response']['attestationObject']);
-
-        // Decode the stored challenge back to raw bytes
-        $challengeBytes = $this->base64UrlDecode($storedChallenge);
-
-        // Use lbuchs/WebAuthn for proper verification
-        $rpId = $this->getRpId();
-        $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
-
-        $data = null;
-        try {
-            $webAuthn = new WebAuthn($rpName, $rpId, ['none'], true);
-
-            $data = $webAuthn->processCreate(
-                $clientDataJSON,
-                $attestationObject,
-                $challengeBytes,
-                false,  // requireUserVerification
-                true,   // requireUserPresent
-                false,  // failIfRootMismatch
-                false   // requireCtsProfileMatch
-            );
-        } catch (WebAuthnException $e) {
-            \Illuminate\Support\Facades\Log::warning('[WebAuthn] Registration verification failed: ' . $e->getMessage());
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_registration_failed'), null, 400);
+        // Atomically pull before verification. A second request using the same
+        // ceremony is rejected even for synced credentials whose counter is 0.
+        $challengeData = $this->pullStoredChallenge($input, 'register', $userId);
+        if ($challengeData instanceof JsonResponse) {
+            return $challengeData;
         }
 
-        // Store the credential
-        $credentialIdB64 = $input['id'];
-        $publicKeyPem = $data->credentialPublicKey;
-        $signCount = $data->signatureCounter ?? 0;
+        $context = $this->validateChallengeContext($challengeData);
+        if ($context instanceof JsonResponse) {
+            return $context;
+        }
+
+        if (!$this->clientDataMatches($clientDataJson, 'webauthn.create', $context['origin'])) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
+                __('api.webauthn_registration_failed'),
+                null,
+                400
+            ));
+        }
+
+        try {
+            $challengeBytes = $this->decodeBase64UrlField($challengeData['challenge'] ?? null, 64);
+        } catch (\InvalidArgumentException) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
+                __('api.webauthn_challenge_expired'),
+                null,
+                401
+            ));
+        }
+
+        $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
+
+        try {
+            $verified = $this->ceremonyVerifier->verifyRegistration(
+                $rpName,
+                $context['rp_id'],
+                $clientDataJson,
+                $attestationObject,
+                $challengeBytes
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[WebAuthn] Registration verification failed', [
+                'tenant_id' => TenantContext::getId(),
+                'user_id' => $userId,
+                'reason' => $e instanceof WebAuthnException ? 'verification_rejected' : 'verifier_error',
+            ]);
+            return $this->noStore($this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_registration_failed'), null, 400));
+        }
+
+        if (
+            !hash_equals($credentialId, $verified['credential_id'])
+            || !$verified['user_verified']
+            || ($verified['backup_state'] && !$verified['backup_eligible'])
+        ) {
+            return $this->noStore($this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_registration_failed'), null, 400));
+        }
+
+        $credentialIdB64 = $this->base64UrlEncode($verified['credential_id']);
 
         // Transport hints for future allowCredentials
         $transports = null;
         $transportData = $input['transports'] ?? $input['response']['transports'] ?? null;
-        if (!empty($transportData) && is_array($transportData)) {
-            $transports = json_encode($transportData);
+        if (is_array($transportData)) {
+            $transportData = array_values(array_unique(array_filter(
+                $transportData,
+                static fn (mixed $value): bool => is_string($value) && in_array($value, self::ALLOWED_TRANSPORTS, true)
+            )));
+            if ($transportData !== []) {
+                $transports = json_encode($transportData, JSON_THROW_ON_ERROR);
+            }
         }
 
         // Device name from client
         $deviceName = null;
         if (!empty($input['device_name']) && is_string($input['device_name'])) {
             $deviceName = mb_substr(trim($input['device_name']), 0, 100);
+            if ($deviceName === '' || preg_match('/[\x00-\x1F\x7F]/u', $deviceName)) {
+                $deviceName = null;
+            }
         }
 
         // Authenticator attachment type
         $authenticatorType = $input['authenticatorAttachment'] ?? null;
+        if (!in_array($authenticatorType, ['platform', 'cross-platform'], true)) {
+            $authenticatorType = null;
+        }
 
         $tenantId = TenantContext::getId();
-
-        DB::insert(
-            "INSERT INTO webauthn_credentials
-                (user_id, tenant_id, credential_id, public_key, sign_count, transports, device_name, authenticator_type, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-            [
+        $maxCredentials = $this->maxCredentialsPerUser();
+        try {
+            DB::transaction(function () use (
                 $userId,
                 $tenantId,
+                $maxCredentials,
                 $credentialIdB64,
-                $publicKeyPem,
-                $signCount,
+                $verified,
                 $transports,
                 $deviceName,
                 $authenticatorType,
-            ]
-        );
+                $context,
+                $challengeData
+            ): void {
+                // Routing mutations lock this tenant boundary before they
+                // re-check RP impact. Taking the same lock first prevents a
+                // registration from committing in the gap between a mutation's
+                // safety check and its parent/domain update.
+                $routingTenant = DB::table('tenants')
+                    ->where('id', $tenantId)
+                    ->lockForUpdate()
+                    ->first(['id']);
+                $storedRoutingFingerprint = $challengeData['metadata']['routing_fingerprint'] ?? null;
+                if (
+                    $routingTenant === null
+                    || !is_string($storedRoutingFingerprint)
+                    || strlen($storedRoutingFingerprint) !== 64
+                    || !hash_equals(
+                        $storedRoutingFingerprint,
+                        $this->currentTenantRoutingFingerprint($tenantId)
+                    )
+                ) {
+                    throw new \UnexpectedValueException('WebAuthn registration routing changed.');
+                }
 
-        // Consume the challenge (single-use)
-        $this->consumeChallenge($input);
+                // Serialize registrations on the user row. The challenge-time
+                // count is only an early UX guard; without this second check,
+                // parallel ceremonies could exceed the configured limit.
+                $userExists = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first(['id']);
+                if ($userExists === null) {
+                    throw new \RuntimeException('WebAuthn registration user no longer exists.');
+                }
+
+                $credentialCount = DB::table('webauthn_credentials')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->count();
+                if ($credentialCount >= $maxCredentials) {
+                    throw new \OverflowException('WebAuthn credential limit reached.');
+                }
+
+                DB::insert(
+                    "INSERT INTO webauthn_credentials
+                        (user_id, tenant_id, credential_id, public_key, sign_count, transports,
+                         device_name, authenticator_type, attestation_type, rp_id,
+                         registration_origin, user_handle, aaguid, backup_eligible,
+                         backup_state, user_verified, credential_discoverable, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                    [
+                        $userId,
+                        $tenantId,
+                        $credentialIdB64,
+                        $verified['public_key'],
+                        $verified['sign_count'],
+                        $transports,
+                        $deviceName,
+                        $authenticatorType,
+                        $verified['attestation_format'],
+                        $context['rp_id'],
+                        $context['origin'],
+                        (string) ($challengeData['metadata']['user_handle'] ?? ''),
+                        $verified['aaguid'],
+                        $verified['backup_eligible'] ? 1 : 0,
+                        $verified['backup_state'] ? 1 : 0,
+                        1,
+                        1,
+                    ]
+                );
+            });
+        } catch (\OverflowException) {
+            return $this->noStore($this->respondWithError(
+                'WEBAUTHN_CREDENTIAL_LIMIT',
+                __('api.validation_failed'),
+                null,
+                409
+            ));
+        } catch (\UnexpectedValueException) {
+            Log::notice('[WebAuthn] Registration rejected after routing changed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
+                __('api.webauthn_registration_failed'),
+                null,
+                409
+            ));
+        } catch (QueryException $e) {
+            $duplicate = (int) ($e->errorInfo[1] ?? 0) === 1062
+                || str_contains(strtolower($e->getMessage()), 'duplicate entry');
+            Log::notice('[WebAuthn] Credential persistence rejected', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'duplicate' => $duplicate,
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                $duplicate ? 'WEBAUTHN_CREDENTIAL_EXISTS' : ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
+                __('api.webauthn_registration_failed'),
+                null,
+                $duplicate ? 409 : 400
+            ));
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Credential persistence failed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'exception' => $e::class,
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
+        }
 
         // Security notification + email — both rendered in user's preferred_language.
         try {
@@ -259,7 +480,15 @@ class WebAuthnController extends BaseApiController
             \Illuminate\Support\Facades\Log::warning("Failed to send passkey registered email: " . $e->getMessage());
         }
 
-        return $this->respondWithData(['message' => __('api_controllers_2.webauthn.passkey_registered')]);
+        Log::info('[WebAuthn] Passkey registered', [
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'credential_ref' => $this->credentialReference($credentialIdB64),
+            'rp_id' => $context['rp_id'],
+            'backup_eligible' => $verified['backup_eligible'],
+        ]);
+
+        return $this->noStore($this->respondWithData(['message' => __('api_controllers_2.webauthn.passkey_registered')]));
     }
 
     /** POST /api/webauthn/auth-challenge */
@@ -267,15 +496,44 @@ class WebAuthnController extends BaseApiController
     {
         $this->rateLimit('webauthn_auth_challenge', 10, 60);
 
-        $input = $this->getAllInput();
+        if (!$this->passkeyAuthenticationEnabled()) {
+            return $this->noStore($this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403));
+        }
 
-        // Generate random challenge
-        $challenge = random_bytes(32);
-        $challengeB64 = $this->base64UrlEncode($challenge);
+        $input = $this->getAllInput();
+        $context = $this->resolveWebAuthnContext();
+        if ($context === null) {
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED',
+                __('api.webauthn_auth_failed'),
+                null,
+                400
+            ));
+        }
 
         // Determine user context (may be null for discoverable credential flow)
         $userId = null;
         $email = $input['email'] ?? null;
+        if ($email !== null && !is_string($email)) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.validation_failed'),
+                'email',
+                400
+            ));
+        }
+        $email = is_string($email) ? mb_strtolower(trim($email)) : null;
+        if ($email === '') {
+            $email = null;
+        }
+        if ($email !== null && (mb_strlen($email) > 254 || filter_var($email, FILTER_VALIDATE_EMAIL) === false)) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.validation_failed'),
+                'email',
+                400
+            ));
+        }
 
         // Check if user is already authenticated (re-auth scenario)
         $authUserId = $this->getOptionalUserId();
@@ -287,56 +545,66 @@ class WebAuthnController extends BaseApiController
         if ($authUserId) {
             $userId = $authUserId;
             $credentials = DB::select(
-                "SELECT credential_id, transports FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
-                [$userId, $tenantId]
+                "SELECT credential_id, transports FROM webauthn_credentials
+                 WHERE user_id = ? AND tenant_id = ? AND (rp_id = ? OR rp_id IS NULL)",
+                [$userId, $tenantId, $context['rp_id']]
             );
 
             $allowCredentials = $this->formatAllowCredentials(array_map(fn($r) => (array)$r, $credentials));
-        } elseif ($email) {
-            $results = DB::select(
-                "SELECT wc.credential_id, wc.transports, u.id as user_id
-                 FROM webauthn_credentials wc
-                 JOIN users u ON wc.user_id = u.id
-                 WHERE u.email = ? AND u.tenant_id = ?",
-                [$email, $tenantId]
-            );
-
-            if (!empty($results)) {
-                $userId = $results[0]->user_id;
-                $allowCredentials = $this->formatAllowCredentials(array_map(fn($r) => (array)$r, $results));
-            }
         }
 
-        // Store challenge
-        $challengeId = $this->webAuthnChallengeStore->create(
-            $challengeB64,
-            $userId,
-            'authenticate',
-            ['email' => $email]
+        $realAllowedIds = array_map(
+            static fn (array $credential): string => (string) $credential['id'],
+            $authUserId ? $allowCredentials : []
         );
 
-        // Session backup
-        if ($this->startNativeSessionIfPossible()) {
-            $_SESSION['webauthn_auth_challenge'] = $challengeB64;
-            $_SESSION['webauthn_auth_challenge_expires'] = time() + 120;
-            if ($email) {
-                $_SESSION['webauthn_auth_email'] = $email;
-            }
+        $challengeB64 = $this->base64UrlEncode(random_bytes(32));
+        try {
+            $challengeId = $this->webAuthnChallengeStore->create(
+                $challengeB64,
+                $userId,
+                'authenticate',
+                [
+                    'origin' => $context['origin'],
+                    'rp_id' => $context['rp_id'],
+                    'allowed_credential_ids' => $realAllowedIds,
+                    // Signed-out login always uses resident/discoverable
+                    // credentials. Looking up descriptor IDs by email creates
+                    // an unavoidable timing distinction between real IDs and
+                    // decoys during verification, so public challenges never
+                    // bind to or reveal an account.
+                    'account_bound' => $authUserId !== null,
+                    'discoverable' => $authUserId === null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Challenge storage unavailable', [
+                'tenant_id' => $tenantId,
+                'ceremony' => 'authenticate',
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_UNAVAILABLE',
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
         }
 
         $options = [
             'challenge' => $challengeB64,
             'challenge_id' => $challengeId,
-            'rpId' => $this->getRpId(),
+            'rpId' => $context['rp_id'],
             'timeout' => 60000,
-            'userVerification' => 'preferred',
+            'userVerification' => 'required',
         ];
 
         if (!empty($allowCredentials)) {
             $options['allowCredentials'] = $allowCredentials;
         }
 
-        return $this->respondWithData($options);
+        return $this->noStore($this->respondWithData($options));
     }
 
     /** POST /api/webauthn/auth-verify */
@@ -344,130 +612,281 @@ class WebAuthnController extends BaseApiController
     {
         $this->rateLimit('webauthn_auth_verify', 10, 60);
 
-        $input = $this->getAllInput();
-
-        // Retrieve stored challenge
-        $storedChallenge = $this->getStoredAuthChallenge($input);
-        if ($storedChallenge instanceof JsonResponse) {
-            return $storedChallenge;
+        if (!$this->passkeyAuthenticationEnabled()) {
+            return $this->noStore($this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403));
         }
 
-        if (empty($input['id']) || empty($input['response']['clientDataJSON']) ||
-            empty($input['response']['authenticatorData']) || empty($input['response']['signature'])) {
+        $input = $this->getAllInput();
+
+        try {
+            $credentialIdBytes = $this->decodeCredentialId($input['id'] ?? null);
+            $rawCredentialId = $this->decodeCredentialId($input['rawId'] ?? null);
+            if (!hash_equals($credentialIdBytes, $rawCredentialId)) {
+                throw new \InvalidArgumentException('Credential id/rawId mismatch');
+            }
+            if (($input['type'] ?? null) !== 'public-key' || !is_array($input['response'] ?? null)) {
+                throw new \InvalidArgumentException('Invalid assertion type');
+            }
+            $clientDataJson = $this->decodeBase64UrlField(
+                $input['response']['clientDataJSON'] ?? null,
+                self::MAX_CLIENT_DATA_BYTES
+            );
+            $authenticatorData = $this->decodeBase64UrlField(
+                $input['response']['authenticatorData'] ?? null,
+                self::MAX_AUTHENTICATOR_DATA_BYTES
+            );
+            $signature = $this->decodeBase64UrlField(
+                $input['response']['signature'] ?? null,
+                self::MAX_SIGNATURE_BYTES
+            );
+            if (strlen($authenticatorData) < 37) {
+                throw new \InvalidArgumentException('Authenticator data too short');
+            }
+        } catch (\InvalidArgumentException) {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, __('api.webauthn_invalid_assertion'), null, 400);
         }
 
-        // Find credential by ID
-        $tenantId = TenantContext::getId();
-        $credentialRow = DB::selectOne(
-            "SELECT wc.*, u.id as uid, u.first_name, u.last_name, u.email, u.role, u.tenant_id
-             FROM webauthn_credentials wc
-             JOIN users u ON wc.user_id = u.id
-             WHERE wc.credential_id = ? AND wc.tenant_id = ?",
-            [$input['id'], $tenantId]
-        );
-
-        if (!$credentialRow) {
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND, __('api.webauthn_credential_not_found'), null, 401);
+        $challengeData = $this->pullStoredChallenge($input, 'authenticate', null);
+        if ($challengeData instanceof JsonResponse) {
+            return $challengeData;
         }
 
-        $credential = (array)$credentialRow;
+        $context = $this->validateChallengeContext($challengeData);
+        if ($context instanceof JsonResponse) {
+            return $context;
+        }
 
-        // Decode binary data from base64url
-        $clientDataJSON = $this->base64UrlDecode($input['response']['clientDataJSON']);
-        $authenticatorData = $this->base64UrlDecode($input['response']['authenticatorData']);
-        $signature = $this->base64UrlDecode($input['response']['signature']);
-        $challengeBytes = $this->base64UrlDecode($storedChallenge);
+        if (!$this->clientDataMatches($clientDataJson, 'webauthn.get', $context['origin'])) {
+            return $this->authVerificationFailed();
+        }
 
-        // Use lbuchs/WebAuthn for proper signature verification
-        $rpId = $this->getRpId();
+        try {
+            $challengeBytes = $this->decodeBase64UrlField($challengeData['challenge'] ?? null, 64);
+        } catch (\InvalidArgumentException) {
+            return $this->authVerificationFailed();
+        }
+
+        $credentialId = $this->base64UrlEncode($credentialIdBytes);
+        $metadata = is_array($challengeData['metadata'] ?? null) ? $challengeData['metadata'] : [];
+        $allowedIds = is_array($metadata['allowed_credential_ids'] ?? null)
+            ? array_values(array_filter($metadata['allowed_credential_ids'], 'is_string'))
+            : [];
+        $accountBound = ($metadata['account_bound'] ?? false) === true;
+        if (($accountBound && $allowedIds === []) || ($allowedIds !== [] && !in_array($credentialId, $allowedIds, true))) {
+            return $this->authVerificationFailed();
+        }
+
+        $tenantId = TenantContext::getId();
         $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
-        $webAuthn = null;
         try {
-            $webAuthn = new WebAuthn($rpName, $rpId, ['none'], true);
-
-            $webAuthn->processGet(
-                $clientDataJSON,
+            $result = DB::transaction(function () use (
+                $tenantId,
+                $credentialId,
+                $challengeData,
+                $metadata,
+                $input,
+                $rpName,
+                $context,
+                $clientDataJson,
                 $authenticatorData,
                 $signature,
-                $credential['public_key'],
-                $challengeBytes,
-                (int)$credential['sign_count'],
-                false,
-                true
-            );
-        } catch (WebAuthnException $e) {
-            \Illuminate\Support\Facades\Log::warning('[WebAuthn] Authentication verification failed: ' . $e->getMessage());
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, __('api.webauthn_auth_failed'), null, 401);
+                $challengeBytes
+            ): array {
+                $row = DB::table('webauthn_credentials as wc')
+                    ->join('users as u', function ($join): void {
+                        $join->on('u.id', '=', 'wc.user_id')
+                            ->on('u.tenant_id', '=', 'wc.tenant_id');
+                    })
+                    ->where('wc.credential_id', $credentialId)
+                    ->where('wc.tenant_id', $tenantId)
+                    ->where(function ($query) use ($context): void {
+                        $query->where('wc.rp_id', $context['rp_id'])
+                            ->orWhereNull('wc.rp_id');
+                    })
+                    ->select([
+                        'wc.id as credential_row_id',
+                        'wc.user_id as credential_user_id',
+                        'wc.tenant_id as credential_tenant_id',
+                        'wc.credential_id',
+                        'wc.public_key',
+                        'wc.sign_count',
+                        'wc.rp_id',
+                        'wc.user_handle',
+                        'wc.backup_eligible',
+                        'wc.user_verified',
+                        'u.id as user_id',
+                        'u.first_name',
+                        'u.last_name',
+                        'u.email',
+                        'u.role',
+                        'u.tenant_id as tenant_id',
+                        'u.tenant_id as user_tenant_id',
+                        'u.is_super_admin',
+                        'u.is_tenant_super_admin',
+                        'u.is_god',
+                        'u.status',
+                        'u.verification_status',
+                        'u.email_verified_at',
+                        'u.is_approved',
+                    ])
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($row === null) {
+                    return ['failed' => true];
+                }
+
+                $credential = (array) $row;
+                $boundUserId = $challengeData['user_id'] ?? null;
+                if ($boundUserId !== null && (int) $boundUserId !== (int) $credential['user_id']) {
+                    return ['failed' => true];
+                }
+
+                $discoverable = ($metadata['discoverable'] ?? false) === true;
+                $responseUserHandle = $input['response']['userHandle'] ?? null;
+                if ($discoverable && (!is_string($responseUserHandle) || $responseUserHandle === '')) {
+                    return ['failed' => true];
+                }
+                if ($responseUserHandle !== null) {
+                    try {
+                        $returnedHandle = $this->decodeBase64UrlField($responseUserHandle, 64);
+                        $storedHandle = $this->decodeBase64UrlField($credential['user_handle'] ?? null, 64);
+                    } catch (\InvalidArgumentException) {
+                        return ['failed' => true];
+                    }
+                    if (!hash_equals($storedHandle, $returnedHandle)) {
+                        return ['failed' => true];
+                    }
+                }
+
+                $newSignCount = $this->ceremonyVerifier->verifyAuthentication(
+                    $rpName,
+                    $context['rp_id'],
+                    $clientDataJson,
+                    $authenticatorData,
+                    $signature,
+                    (string) $credential['public_key'],
+                    $challengeBytes,
+                    (int) $credential['sign_count']
+                );
+
+                $flags = ord($authenticatorData[32]);
+                $backupEligible = ($flags & 0x08) !== 0;
+                $backupState = ($flags & 0x10) !== 0;
+                if ($backupState && !$backupEligible) {
+                    return ['failed' => true];
+                }
+                // The BE flag is fixed when a credential is created. A change
+                // is an authenticator-state inconsistency and must fail. Legacy
+                // rows have user_verified=NULL/0 until their first hardened UV
+                // assertion establishes trustworthy metadata.
+                if (
+                    (bool) ($credential['user_verified'] ?? false)
+                    && $backupEligible !== (bool) ($credential['backup_eligible'] ?? false)
+                ) {
+                    return ['failed' => true];
+                }
+
+                // Verify possession before evaluating account policy. Email-bound
+                // challenges intentionally contain padded credential IDs; returning
+                // a gate-specific response for the real ID before signature
+                // verification would turn those IDs into an account-enumeration
+                // oracle. A valid assertion may receive the applicable gate, but an
+                // invalid assertion always receives the generic WebAuthn failure.
+                $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($credential);
+                if ($gateBlock !== null) {
+                    return ['gate' => $gateBlock];
+                }
+
+                DB::table('webauthn_credentials')
+                    ->where('id', (int) $credential['credential_row_id'])
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'sign_count' => $newSignCount,
+                        'last_used_at' => now(),
+                        'backup_eligible' => $backupEligible ? 1 : 0,
+                        'backup_state' => $backupState ? 1 : 0,
+                        'user_verified' => 1,
+                        'rp_id' => $context['rp_id'],
+                        'updated_at' => now(),
+                    ]);
+
+                DB::table('users')
+                    ->where('id', (int) $credential['user_id'])
+                    ->where('tenant_id', $tenantId)
+                    ->update(['last_login_at' => now()]);
+
+                return ['credential' => $credential];
+            });
+        } catch (\Throwable $e) {
+            Log::warning('[WebAuthn] Authentication verification failed', [
+                'tenant_id' => $tenantId,
+                'credential_ref' => $this->credentialReference($credentialId),
+                'reason' => $e instanceof WebAuthnException ? 'verification_rejected' : 'verification_error',
+            ]);
+
+            return $this->authVerificationFailed();
         }
 
-        // Update sign count
-        $newSignCount = $webAuthn->getSignatureCounter();
-        DB::update(
-            "UPDATE webauthn_credentials SET sign_count = ?, last_used_at = NOW() WHERE id = ? AND tenant_id = ?",
-            [$newSignCount ?? 0, $credential['id'], $tenantId]
-        );
-
-        // Consume challenge
-        $this->consumeChallenge($input);
-        unset(
-            $_SESSION['webauthn_auth_challenge'],
-            $_SESSION['webauthn_auth_challenge_expires'],
-            $_SESSION['webauthn_auth_email']
-        );
-
-        // Enforce login gates (email verified, approved, etc.)
-        $webauthnUser = DB::selectOne(
-            "SELECT id, role, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
-            [(int)$credential['uid'], (int)$credential['tenant_id']]
-        );
-
-        if ($webauthnUser) {
-            $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser((array)$webauthnUser);
-            if ($gateBlock) {
-                return $this->respondWithError($gateBlock['code'], $gateBlock['message'], null, 403);
-            }
+        if (isset($result['gate']) && is_array($result['gate'])) {
+            return $this->noStore($this->respondWithError(
+                (string) $result['gate']['code'],
+                (string) $result['gate']['message'],
+                null,
+                403
+            ));
         }
+        if (!isset($result['credential']) || !is_array($result['credential'])) {
+            return $this->authVerificationFailed();
+        }
+
+        $credential = $result['credential'];
 
         // Generate auth tokens
-        $isMobile = $this->tokenService->isMobileRequest();
+        // Native passkeys are not implemented in the mobile client yet. Do not
+        // let spoofable public headers upgrade this browser ceremony to a
+        // 30-day access token / five-year refresh token.
+        $isMobile = false;
         $accessToken = $this->tokenService->generateToken(
-            (int)$credential['uid'],
-            (int)$credential['tenant_id'],
-            ['role' => $credential['role'], 'email' => $credential['email']],
+            (int)$credential['user_id'],
+            (int)$credential['user_tenant_id'],
+            [
+                'role' => $credential['role'],
+                'email' => $credential['email'],
+                'is_super_admin' => !empty($credential['is_super_admin']),
+                'is_tenant_super_admin' => !empty($credential['is_tenant_super_admin']),
+                'is_god' => !empty($credential['is_god']),
+                'amr' => ['passkey', 'user_verification'],
+                'acr' => 'urn:nexus:aal2',
+                'credential_ref' => $this->credentialReference($credentialId),
+            ],
             $isMobile
         );
         $refreshToken = $this->tokenService->generateRefreshToken(
-            (int)$credential['uid'],
-            (int)$credential['tenant_id'],
+            (int)$credential['user_id'],
+            (int)$credential['user_tenant_id'],
             $isMobile
         );
+        $securityConfirmationToken = $this->tokenService->generateSecurityConfirmationToken(
+            (int) $credential['user_id'],
+            (int) $credential['user_tenant_id'],
+            'passkey_uv'
+        );
 
-        // Set up session for browser clients
-        $wantsStateless = $this->tokenService->isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
-        if (!$wantsStateless) {
-            // Ensure a PHP session is active before accessing $_SESSION
-            if ($this->startNativeSessionIfPossible()) {
-                $currentSessionUser = $_SESSION['user_id'] ?? null;
-                if ($currentSessionUser === null) {
-                    $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-                    if (session_status() === PHP_SESSION_ACTIVE) {
-                        session_regenerate_id(true);
-                    }
-                    if ($preservedLayout) {
-                        $_SESSION['nexus_active_layout'] = $preservedLayout;
-                        $_SESSION['nexus_layout'] = $preservedLayout;
-                    }
-                    $_SESSION['user_id'] = $credential['uid'];
-                    $_SESSION['user_name'] = trim($credential['first_name'] . ' ' . $credential['last_name']);
-                    $_SESSION['user_email'] = $credential['email'];
-                    $_SESSION['user_role'] = $credential['role'];
-                    $_SESSION['tenant_id'] = $credential['tenant_id'];
-                    $_SESSION['is_logged_in'] = true;
-                }
-            }
-        }
+        // Keep passkey authentication on the frontend's established JWT token
+        // family. Issuing a second Sanctum bearer plus a raw PHP session would
+        // multiply revocation surfaces for the same ceremony. The response key
+        // remains for backwards-compatible clients, but is deliberately null.
+        $sanctumToken = null;
+
+        Log::info('[WebAuthn] Passkey authentication succeeded', [
+            'tenant_id' => $tenantId,
+            'user_id' => (int) $credential['user_id'],
+            'credential_ref' => $this->credentialReference($credentialId),
+            'rp_id' => $context['rp_id'],
+            'user_verified' => true,
+        ]);
 
         // Auth success response — follows the same contract as AuthController/TotpController
         // (success, user, tokens). Frontend explicitly handles this shape.
@@ -475,17 +894,119 @@ class WebAuthnController extends BaseApiController
             'success' => true,
             'message' => __('api_controllers_2.webauthn.auth_successful'),
             'user' => [
-                'id' => $credential['uid'],
+                'id' => $credential['user_id'],
                 'first_name' => $credential['first_name'],
                 'last_name' => $credential['last_name'],
                 'email' => $credential['email'],
             ],
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
+            'sanctum_token' => $sanctumToken,
+            'security_confirmation_token' => $securityConfirmationToken,
+            'security_confirmation_expires_in' => 300,
             'token_type' => 'Bearer',
             'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
+        ])->withHeaders([
+            'Cache-Control' => 'no-store, private',
+            'Pragma' => 'no-cache',
         ]);
+    }
+
+    /** POST /api/webauthn/security-confirm */
+    public function confirmSecurityAction(): JsonResponse
+    {
+        $this->rateLimit('webauthn_security_confirm', 10, 600);
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
+        $input = $this->getAllInput();
+        $method = null;
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['password_hash', 'status'])
+            ->first();
+        if ($user === null || strtolower((string) $user->status) !== 'active') {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
+                __('api.account_suspended'),
+                null,
+                403
+            ));
+        }
+
+        $password = $input['current_password'] ?? null;
+        $totpCode = $input['totp_code'] ?? null;
+        $backupCode = $input['backup_code'] ?? null;
+
+        if (is_string($password) && $password !== '') {
+            $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$V1Jna0owWXBLNC55ajFQRQ$h0+cXUsJzOi6TzES3RPuquTJpwPbpYmVHS4A3ArHHXo';
+            if (!password_verify($password, $user->password_hash ?: $dummyHash)) {
+                return $this->securityConfirmationFailed();
+            }
+            $method = 'password';
+        } elseif (is_string($totpCode) && $totpCode !== '') {
+            $verified = TotpService::verifyLogin($userId, preg_replace('/\s+/', '', $totpCode));
+            if (($verified['success'] ?? false) !== true) {
+                return $this->securityConfirmationFailed();
+            }
+            $method = 'totp';
+        } elseif (is_string($backupCode) && $backupCode !== '') {
+            $verified = TotpService::verifyBackupCode($userId, $backupCode);
+            if (($verified['success'] ?? false) !== true) {
+                return $this->securityConfirmationFailed();
+            }
+            $method = 'backup_code';
+        } else {
+            // A UV passkey sign-in already proved possession plus local user
+            // verification. Honour that proof for its original five-minute
+            // security-confirmation window without prompting for a password
+            // the member may not have.
+            $bearerToken = request()->bearerToken();
+            $jwtPayload = is_string($bearerToken) && $bearerToken !== ''
+                ? $this->tokenService->validateToken($bearerToken)
+                : null;
+            $amr = is_array($jwtPayload['amr'] ?? null) ? $jwtPayload['amr'] : [];
+            $issuedAt = (int) ($jwtPayload['iat'] ?? 0);
+            $isRecentPasskey = is_array($jwtPayload)
+                && (int) ($jwtPayload['user_id'] ?? 0) === $userId
+                && (int) ($jwtPayload['tenant_id'] ?? 0) === $tenantId
+                && in_array('passkey', $amr, true)
+                && in_array('user_verification', $amr, true)
+                && $issuedAt >= time() - 300
+                && $issuedAt <= time() + 30;
+
+            if ($isRecentPasskey) {
+                $method = 'passkey_uv';
+            }
+
+            $accessToken = request()->user()?->currentAccessToken();
+            $tokenName = strtolower((string) ($accessToken->name ?? ''));
+            $createdAt = $accessToken->created_at ?? null;
+            $isRecentFederated = $createdAt !== null
+                && $createdAt->greaterThanOrEqualTo(now()->subMinutes(5))
+                && (str_starts_with($tokenName, 'oauth-')
+                    || str_starts_with($tokenName, 'sso-')
+                    || str_starts_with($tokenName, 'oidc-'));
+            if ($method === null && !$isRecentFederated) {
+                return $this->securityConfirmationFailed();
+            }
+            $method ??= 'federated_login';
+        }
+
+        $token = $this->tokenService->generateSecurityConfirmationToken($userId, $tenantId, $method);
+
+        Log::info('[WebAuthn] Security action confirmed', [
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'method' => $method,
+        ]);
+
+        return $this->noStore($this->respondWithData([
+            'security_confirmation_token' => $token,
+            'expires_in' => 300,
+        ]));
     }
 
     /** POST /api/webauthn/remove */
@@ -493,6 +1014,11 @@ class WebAuthnController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $input = $this->getAllInput();
+        $tenantId = TenantContext::getId();
+        $confirmationError = $this->requireSecurityConfirmation($userId, $tenantId, $input);
+        if ($confirmationError !== null) {
+            return $confirmationError;
+        }
         $credentialId = $input['credential_id'] ?? null;
         if (!is_string($credentialId) || trim($credentialId) === '') {
             return $this->respondWithError(
@@ -502,39 +1028,60 @@ class WebAuthnController extends BaseApiController
                 422
             );
         }
-        $credentialId = trim($credentialId);
-        $tenantId = TenantContext::getId();
-        $result = DB::transaction(function () use ($credentialId, $tenantId, $userId): array {
-            // Lock the user first so passkey removal and OAuth unlinking cannot
-            // concurrently delete the two methods after each sees the other.
-            $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
-                $userId,
-                $tenantId,
-                true
-            );
+        try {
+            $credentialId = $this->base64UrlEncode($this->decodeCredentialId(trim($credentialId)));
+        } catch (\InvalidArgumentException) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.webauthn_invalid_credential'), 'credential_id', 422);
+        }
+        try {
+            $result = DB::transaction(function () use ($credentialId, $tenantId, $userId): array {
+                // Lock the user first so passkey removal and OAuth unlinking cannot
+                // concurrently delete the two methods after each sees the other.
+                $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
+                    $userId,
+                    $tenantId,
+                    true
+                );
 
-            $credentials = DB::table('webauthn_credentials')
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->lockForUpdate()
-                ->pluck('credential_id');
+                $credentials = DB::table('webauthn_credentials')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->pluck('credential_id');
 
-            if (!$credentials->contains($credentialId)) {
-                return ['deleted' => 0, 'blocked' => false];
-            }
+                if (!$credentials->contains($credentialId)) {
+                    return ['deleted' => 0, 'blocked' => false];
+                }
 
-            if ($credentials->count() === 1 && !$hasAlternative) {
-                return ['deleted' => 0, 'blocked' => true];
-            }
+                if ($credentials->count() === 1 && !$hasAlternative) {
+                    return ['deleted' => 0, 'blocked' => true];
+                }
 
-            $deleted = DB::table('webauthn_credentials')
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->where('credential_id', $credentialId)
-                ->delete();
+                $deleted = DB::table('webauthn_credentials')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('credential_id', $credentialId)
+                    ->delete();
+                if ($deleted > 0) {
+                    $this->revokeSessionsAfterFactorRemoval($userId);
+                }
 
-            return ['deleted' => $deleted, 'blocked' => false];
-        });
+                return ['deleted' => $deleted, 'blocked' => false];
+            });
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Passkey removal transaction failed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'exception' => $e::class,
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_UNAVAILABLE',
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
+        }
 
         if ($result['blocked']) {
             return $this->respondWithError(
@@ -597,7 +1144,10 @@ class WebAuthnController extends BaseApiController
             Log::warning('[WebAuthn] Failed to send passkey removed email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
-        return $this->respondWithData(['message' => __('api_controllers_2.webauthn.credentials_removed')]);
+        return $this->respondWithData([
+            'message' => __('api_controllers_2.webauthn.credentials_removed'),
+            'sessions_revoked' => true,
+        ]);
     }
 
     /** POST /api/webauthn/rename */
@@ -605,19 +1155,29 @@ class WebAuthnController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $input = $this->getAllInput();
+        $tenantId = TenantContext::getId();
+        $confirmationError = $this->requireSecurityConfirmation($userId, $tenantId, $input);
+        if ($confirmationError !== null) {
+            return $confirmationError;
+        }
         $credentialId = $input['credential_id'] ?? null;
         $newName = $input['device_name'] ?? null;
 
-        if (!$credentialId || !$newName) {
+        if (!is_string($credentialId) || !is_string($newName) || trim($credentialId) === '' || trim($newName) === '') {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.webauthn_name_fields_required'), null, 400);
         }
 
+        try {
+            $credentialId = $this->base64UrlEncode($this->decodeCredentialId(trim($credentialId)));
+        } catch (\InvalidArgumentException) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.webauthn_invalid_credential'), 'credential_id', 422);
+        }
+
         $newName = mb_substr(trim($newName), 0, 100);
-        if (empty($newName)) {
+        if ($newName === '' || preg_match('/[\x00-\x1F\x7F]/u', $newName)) {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.webauthn_name_empty'), 'device_name', 400);
         }
 
-        $tenantId = TenantContext::getId();
         $affected = DB::update(
             "UPDATE webauthn_credentials SET device_name = ? WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
             [$newName, $credentialId, $userId, $tenantId]
@@ -635,30 +1195,53 @@ class WebAuthnController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
-        $result = DB::transaction(function () use ($tenantId, $userId): array {
-            $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
-                $userId,
-                $tenantId,
-                true
-            );
-            $credentialIds = DB::table('webauthn_credentials')
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->lockForUpdate()
-                ->pluck('credential_id');
-            $count = $credentialIds->count();
+        $input = $this->getAllInput();
+        $confirmationError = $this->requireSecurityConfirmation($userId, $tenantId, $input);
+        if ($confirmationError !== null) {
+            return $confirmationError;
+        }
+        try {
+            $result = DB::transaction(function () use ($tenantId, $userId): array {
+                $hasAlternative = AuthenticationMethodGuard::hasAlternativeToPasskeys(
+                    $userId,
+                    $tenantId,
+                    true
+                );
+                $credentialIds = DB::table('webauthn_credentials')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->pluck('credential_id');
+                $count = $credentialIds->count();
 
-            if ($count > 0 && !$hasAlternative) {
-                return ['count' => $count, 'blocked' => true];
-            }
+                if ($count > 0 && !$hasAlternative) {
+                    return ['count' => $count, 'blocked' => true];
+                }
 
-            DB::table('webauthn_credentials')
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->delete();
+                DB::table('webauthn_credentials')
+                    ->where('user_id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
+                if ($count > 0) {
+                    $this->revokeSessionsAfterFactorRemoval($userId);
+                }
 
-            return ['count' => $count, 'blocked' => false];
-        });
+                return ['count' => $count, 'blocked' => false];
+            });
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Remove-all transaction failed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'exception' => $e::class,
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_UNAVAILABLE',
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
+        }
 
         if ($result['blocked']) {
             return $this->respondWithError(
@@ -723,6 +1306,7 @@ class WebAuthnController extends BaseApiController
         return $this->respondWithData([
             'message' => __('api_controllers_2.webauthn.all_removed', ['count' => $count]),
             'removed_count' => $count,
+            'sessions_revoked' => $count > 0,
         ]);
     }
 
@@ -733,13 +1317,24 @@ class WebAuthnController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $results = DB::select(
-            "SELECT credential_id, device_name, authenticator_type, created_at, last_used_at
+            "SELECT credential_id, device_name, authenticator_type, rp_id, aaguid,
+                    backup_eligible, backup_state, user_verified,
+                    credential_discoverable, created_at, last_used_at
              FROM webauthn_credentials
              WHERE user_id = ? AND tenant_id = ?
              ORDER BY created_at DESC",
             [$userId, $tenantId]
         );
-        $credentials = array_map(fn($r) => (array)$r, $results);
+        $credentials = array_map(static function (object $row): array {
+            $credential = (array) $row;
+            foreach (['backup_eligible', 'backup_state', 'user_verified', 'credential_discoverable'] as $field) {
+                if (array_key_exists($field, $credential) && $credential[$field] !== null) {
+                    $credential[$field] = (bool) $credential[$field];
+                }
+            }
+
+            return $credential;
+        }, $results);
 
         return $this->respondWithData([
             'credentials' => $credentials,
@@ -751,9 +1346,17 @@ class WebAuthnController extends BaseApiController
     public function status(): JsonResponse
     {
         $userId = $this->getOptionalUserId();
+        $context = $this->resolveWebAuthnContext();
 
         if (!$userId) {
-            return $this->respondWithData(['registered' => false, 'count' => 0]);
+            return $this->respondWithData([
+                'registered' => false,
+                'count' => 0,
+                'authentication_allowed' => $this->passkeyAuthenticationEnabled(),
+                'enrollment_allowed' => false,
+                'current_rp_id' => $context['rp_id'] ?? null,
+                'max_credentials' => $this->maxCredentialsPerUser(),
+            ]);
         }
 
         $tenantId = TenantContext::getId();
@@ -761,11 +1364,30 @@ class WebAuthnController extends BaseApiController
             "SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
+        $hasPassword = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->whereNotNull('password_hash')
+            ->where('password_hash', '!=', '')
+            ->exists();
+        $hasTotp = Schema::hasTable('user_totp_settings') && DB::table('user_totp_settings')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('is_enabled', 1)
+            ->exists();
 
         return $this->respondWithData([
             'registered' => $result->count > 0,
             'count' => (int)$result->count,
-            'enrollment_allowed' => TenantContext::hasFeature('biometric_login'),
+            'authentication_allowed' => $this->passkeyAuthenticationEnabled(),
+            'enrollment_allowed' => $this->passkeyAuthenticationEnabled() && $this->passkeyEnrollmentEnabled(),
+            'current_rp_id' => $context['rp_id'] ?? null,
+            'max_credentials' => $this->maxCredentialsPerUser(),
+            'confirmation_methods' => [
+                'password' => $hasPassword,
+                'passkey' => (int) $result->count > 0 && $this->passkeyAuthenticationEnabled(),
+                'totp' => $hasTotp,
+            ],
         ]);
     }
 
@@ -782,131 +1404,222 @@ class WebAuthnController extends BaseApiController
         return $row ? (array)$row : null;
     }
 
-    /**
-     * Get the Relying Party ID (domain) for the current request.
-     *
-     * Multi-tenant: tenants can serve the React frontend from their own custom
-     * domain (tenants.domain, e.g. hour-timebank.ie). WebAuthn requires the RP
-     * ID to be a registrable suffix of the page's domain, so the platform-wide
-     * WEBAUTHN_RP_ID (project-nexus.ie) is only valid on *.project-nexus.ie —
-     * on a custom domain the browser rejects the ceremony before it starts.
-     * Derive the RP ID from the request's Origin header, validated against the
-     * domains registered for this tenant plus the platform default.
-     *
-     * A forged Origin header cannot be abused to mint tokens: the browser
-     * enforces that the RP ID is a suffix of the page's real domain, and at
-     * verify time lbuchs/WebAuthn checks the browser-signed clientDataJSON
-     * origin against this same RP ID. Credentials are additionally scoped to
-     * the RP ID they were registered under.
-     */
-    private function getRpId(): string
+    /** @return array{origin: string, rp_id: string}|null */
+    private function resolveWebAuthnContext(): ?array
     {
-        $originHost = $this->getRequestOriginHost();
-        if ($originHost !== null) {
-            foreach ($this->allowedRpIds() as $candidate) {
-                if ($originHost === $candidate || str_ends_with($originHost, '.' . $candidate)) {
-                    return $candidate;
-                }
+        $originValue = request()->headers->get('Origin');
+        if (!is_string($originValue) || $originValue === '') {
+            $host = strtolower((string) request()->getHost());
+            if (!app()->environment('testing') && !in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+                return null;
+            }
+            $originValue = request()->getSchemeAndHttpHost();
+        }
+
+        $origin = $this->normalizeOrigin($originValue);
+
+        return $origin === null ? null : ($this->allowedOriginMap()[$origin] ?? null);
+    }
+
+    /** @return array<string, array{origin: string, rp_id: string}> */
+    private function allowedOriginMap(): array
+    {
+        $map = [];
+        $tenant = TenantContext::get() ?? [];
+        $tenantHosts = [$tenant['domain'] ?? null, $tenant['accessible_domain'] ?? null];
+
+        if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
+            $parent = DB::selectOne(
+                'SELECT domain, accessible_domain FROM tenants WHERE id = ? AND is_active = 1',
+                [(int) $tenant['parent_id']]
+            );
+            if ($parent !== null) {
+                $tenantHosts[] = $parent->domain;
+                $tenantHosts[] = $parent->accessible_domain;
             }
         }
 
-        // config() (not $_ENV/getenv): direct superglobal reads come back
-        // empty under config:cache and under SAPIs that don't populate $_ENV,
-        // silently shifting the RP ID to the HTTP_HOST fallback.
-        $envRpId = config('webauthn.rp_id');
-        if (is_string($envRpId) && $envRpId !== '') {
-            return $envRpId;
-        }
-
-        // Deliberately fall back to HTTP_HOST (validated by web server against
-        // configured server_name / ServerName) rather than HTTP_ORIGIN which is
-        // client-controlled. If WEBAUTHN_RP_ID is unset, log a warning so ops
-        // can fix prod config; the prod env SHOULD always set this var.
-        \Log::warning('[WebAuthn] WEBAUTHN_RP_ID not configured — falling back to HTTP_HOST');
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-        $host = preg_replace('/:\d+$/', '', $host);
-
-        if ($host !== 'localhost' && $host !== '127.0.0.1' && substr_count($host, '.') >= 2) {
-            $parts = explode('.', $host);
-            if (count($parts) >= 3) {
-                return implode('.', array_slice($parts, -2));
+        foreach ($tenantHosts as $host) {
+            if (!is_string($host) || trim($host) === '') {
+                continue;
+            }
+            $host = strtolower(rtrim(trim($host), '.'));
+            $origin = $this->normalizeOrigin('https://' . $host);
+            if ($origin !== null) {
+                $map[$origin] = ['origin' => $origin, 'rp_id' => $host];
             }
         }
 
-        return $host;
+        $platformRpId = strtolower(rtrim(trim((string) config('webauthn.rp_id', '')), '.'));
+        $configuredOrigins = config('webauthn.allowed_origins', []);
+        if (!is_array($configuredOrigins)) {
+            $configuredOrigins = [];
+        }
+        $configuredOrigins[] = config('app.frontend_url');
+        $configuredOrigins[] = config('app.accessible_frontend_url');
+        if (app()->environment(['local', 'development', 'testing'])) {
+            $configuredOrigins = array_merge($configuredOrigins, [
+                'http://localhost',
+                'http://localhost:5173',
+                'http://localhost:8090',
+                'http://127.0.0.1',
+                'http://127.0.0.1:5173',
+                'http://127.0.0.1:8090',
+            ]);
+        }
+
+        foreach ($configuredOrigins as $configuredOrigin) {
+            if (!is_string($configuredOrigin)) {
+                continue;
+            }
+            $origin = $this->normalizeOrigin($configuredOrigin);
+            if ($origin === null) {
+                continue;
+            }
+            $host = strtolower((string) parse_url($origin, PHP_URL_HOST));
+            $isLoopback = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+            if ($isLoopback && !app()->environment(['local', 'development', 'testing'])) {
+                continue;
+            }
+            $rpId = $isLoopback ? 'localhost' : $platformRpId;
+            if ($rpId !== '' && ($host === $rpId || str_ends_with($host, '.' . $rpId))) {
+                $map[$origin] = ['origin' => $origin, 'rp_id' => $rpId];
+            }
+        }
+
+        return $map;
     }
 
     /**
-     * Host component of the request's Origin header, lowercased.
-     * Browsers always send Origin on the (POST) WebAuthn endpoints.
+     * Bind a registration challenge to the tenant routing state that selected
+     * its RP ID. The lineage is included for domain-inheriting tenants, and the
+     * platform inputs cover the shared application origins. A hierarchy/domain
+     * mutation during the ceremony therefore invalidates the stale challenge
+     * after the tenant-row lock is acquired and before a credential is inserted.
      */
-    private function getRequestOriginHost(): ?string
+    private function currentTenantRoutingFingerprint(int $tenantId): string
     {
-        $origin = request()->headers->get('Origin');
-        if (!is_string($origin) || $origin === '') {
+        $lineage = [];
+        $visited = [];
+        $currentId = $tenantId;
+
+        while ($currentId > 0 && !isset($visited[$currentId]) && count($lineage) < 32) {
+            $visited[$currentId] = true;
+            $tenant = DB::table('tenants')
+                ->where('id', $currentId)
+                ->first(['id', 'parent_id', 'domain', 'accessible_domain', 'is_active', 'updated_at']);
+            if ($tenant === null) {
+                break;
+            }
+
+            $domain = strtolower(rtrim(trim((string) ($tenant->domain ?? '')), '.'));
+            $lineage[] = [
+                'id' => (int) $tenant->id,
+                'parent_id' => $tenant->parent_id === null ? null : (int) $tenant->parent_id,
+                'domain' => $domain,
+                'accessible_domain' => strtolower(rtrim(trim((string) ($tenant->accessible_domain ?? '')), '.')),
+                'is_active' => (int) ($tenant->is_active ?? 0),
+                'updated_at' => (string) ($tenant->updated_at ?? ''),
+            ];
+
+            if ($domain !== '' || empty($tenant->parent_id)) {
+                break;
+            }
+            $currentId = (int) $tenant->parent_id;
+        }
+
+        return hash('sha256', json_encode([
+            'tenant_id' => $tenantId,
+            'lineage' => $lineage,
+            'platform_rp_id' => strtolower(rtrim(trim((string) config('webauthn.rp_id', '')), '.')),
+            'allowed_origins' => array_values(array_filter(
+                (array) config('webauthn.allowed_origins', []),
+                'is_string'
+            )),
+            'frontend_url' => (string) config('app.frontend_url', ''),
+            'accessible_frontend_url' => (string) config('app.accessible_frontend_url', ''),
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    private function normalizeOrigin(string $value): ?string
+    {
+        if ($value === '' || $value === 'null') {
+            return null;
+        }
+        $parts = parse_url($value);
+        if (
+            !is_array($parts)
+            || !isset($parts['scheme'], $parts['host'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || isset($parts['query'])
+            || isset($parts['fragment'])
+            || (isset($parts['path']) && !in_array($parts['path'], ['', '/'], true))
+        ) {
             return null;
         }
 
-        $host = parse_url($origin, PHP_URL_HOST);
+        $scheme = strtolower((string) $parts['scheme']);
+        $host = strtolower(rtrim((string) $parts['host'], '.'));
+        $isLoopback = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+        if ($scheme !== 'https' && !($scheme === 'http' && $isLoopback)) {
+            return null;
+        }
 
-        return is_string($host) && $host !== '' ? strtolower($host) : null;
+        $displayHost = str_contains($host, ':') ? '[' . $host . ']' : $host;
+        $port = isset($parts['port']) ? (int) $parts['port'] : null;
+        $includePort = $port !== null
+            && !(($scheme === 'https' && $port === 443) || ($scheme === 'http' && $port === 80));
+
+        return $scheme . '://' . $displayHost . ($includePort ? ':' . $port : '');
     }
 
-    /**
-     * RP IDs the current tenant is allowed to use, most specific first.
-     * Tenant custom domains take priority so their credentials are scoped to
-     * their own domain rather than the shared platform domain.
-     *
-     * @return list<string>
-     */
-    private function allowedRpIds(): array
+    private function decodeBase64UrlField(mixed $data, int $maxBytes): string
     {
-        $tenant = TenantContext::get() ?? [];
-
-        $candidates = [
-            $tenant['domain'] ?? null,
-            $tenant['accessible_domain'] ?? null,
-        ];
-
-        // Slug-only sub-tenants (tenants.parent_id set, no domain of their own)
-        // are served at the PARENT's custom domain (e.g. tenant `stratford` at
-        // uk.timebank.global/stratford), so the parent's domains are valid RP
-        // IDs for them too. Mirrors TenantContext::getFrontendUrl()'s parent
-        // lookup. Credentials stay tenant-scoped in webauthn_credentials, so
-        // sharing the parent's RP ID cannot cross-authenticate tenants.
-        if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
-            $parent = DB::selectOne(
-                "SELECT domain, accessible_domain FROM tenants WHERE id = ? AND is_active = 1",
-                [(int) $tenant['parent_id']]
-            );
-            if ($parent) {
-                $candidates[] = $parent->domain;
-                $candidates[] = $parent->accessible_domain;
-            }
+        if (!is_string($data) || $data === '' || strlen($data) > (int) ceil($maxBytes * 4 / 3) + 4) {
+            throw new \InvalidArgumentException('Invalid base64url value');
+        }
+        if (!preg_match('/^[A-Za-z0-9_-]+$/', $data)) {
+            throw new \InvalidArgumentException('Invalid base64url alphabet');
         }
 
-        $candidates[] = config('webauthn.rp_id');
-        $candidates[] = 'localhost';
-
-        $rpIds = [];
-        foreach ($candidates as $candidate) {
-            if (is_string($candidate) && $candidate !== '') {
-                $rpIds[] = strtolower($candidate);
-            }
+        $decoded = base64_decode(
+            strtr($data, '-_', '+/') . str_repeat('=', (4 - strlen($data) % 4) % 4),
+            true
+        );
+        if (!is_string($decoded) || $decoded === '' || strlen($decoded) > $maxBytes) {
+            throw new \InvalidArgumentException('Invalid base64url length');
+        }
+        if (!hash_equals($data, $this->base64UrlEncode($decoded))) {
+            throw new \InvalidArgumentException('Non-canonical base64url value');
         }
 
-        return array_values(array_unique($rpIds));
+        return $decoded;
+    }
+
+    private function decodeCredentialId(mixed $value): string
+    {
+        return $this->decodeBase64UrlField($value, self::MAX_CREDENTIAL_ID_BYTES);
+    }
+
+    private function createUserHandle(int $userId, int $tenantId): string
+    {
+        $secret = (string) config('app.key');
+        if ($secret === '') {
+            throw new \RuntimeException('APP_KEY is required for passkey user handles');
+        }
+
+        return $this->base64UrlEncode(hash_hmac(
+            'sha256',
+            "nexus-webauthn-user-handle:{$tenantId}:{$userId}",
+            $secret,
+            true
+        ));
     }
 
     private function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
-
-    private function base64UrlDecode(string $data): string
-    {
-        return base64_decode(strtr($data, '-_', '+/') . str_repeat('=', (4 - strlen($data) % 4) % 4));
     }
 
     /**
@@ -920,116 +1633,236 @@ class WebAuthnController extends BaseApiController
                 'id' => $row['credential_id'],
             ];
             if (!empty($row['transports'])) {
-                $cred['transports'] = json_decode($row['transports'], true);
+                $decoded = json_decode($row['transports'], true);
+                if (is_array($decoded)) {
+                    $transports = array_values(array_unique(array_filter(
+                        $decoded,
+                        static fn (mixed $value): bool => is_string($value)
+                            && in_array($value, self::ALLOWED_TRANSPORTS, true)
+                    )));
+                    if ($transports !== []) {
+                        $cred['transports'] = $transports;
+                    }
+                }
             }
             return $cred;
         }, $credentials);
     }
 
-    /**
-     * Get stored challenge for registration verification.
-     * Returns challenge string on success, or JsonResponse on error.
-     *
-     * @return string|JsonResponse
-     */
-    private function getStoredChallenge(array $input, string $expectedType, int $userId)
+    /** @return array<string, mixed>|JsonResponse */
+    private function pullStoredChallenge(array $input, string $expectedType, ?int $expectedUserId): array|JsonResponse
     {
         $challengeId = $input['challenge_id'] ?? null;
-
-        if ($challengeId) {
-            $challengeData = $this->webAuthnChallengeStore->get($challengeId);
-            if (!$challengeData) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, __('api.webauthn_challenge_expired'), null, 401);
-            }
-            if ($challengeData['user_id'] !== $userId) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, __('api.webauthn_challenge_user_mismatch'), null, 401);
-            }
-            if ($challengeData['type'] !== $expectedType) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, __('api.webauthn_challenge_invalid_type'), null, 401);
-            }
-            // SECURITY: Verify challenge belongs to current tenant to prevent cross-tenant replay
-            $currentTenantId = TenantContext::getId();
-            if (!empty($challengeData['tenant_id']) && (int)$challengeData['tenant_id'] !== (int)$currentTenantId) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, __('api.webauthn_challenge_tenant_mismatch'), null, 401);
-            }
-            return $challengeData['challenge'];
+        if (!is_string($challengeId) || !preg_match('/^[a-f0-9]{64}$/', $challengeId)) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
+                __('api.webauthn_challenge_expired'),
+                null,
+                401
+            ));
         }
 
-        // Session fallback
-        $this->startNativeSessionIfPossible();
-        if (empty($_SESSION['webauthn_challenge']) ||
-            empty($_SESSION['webauthn_challenge_expires']) ||
-            time() > $_SESSION['webauthn_challenge_expires']) {
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, __('api.webauthn_challenge_expired_simple'), null, 401);
+        try {
+            $challengeData = $this->webAuthnChallengeStore->pull($challengeId);
+        } catch (\Throwable $e) {
+            Log::error('[WebAuthn] Challenge retrieval unavailable', [
+                'tenant_id' => TenantContext::getId(),
+                'ceremony' => $expectedType,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_UNAVAILABLE',
+                __('api.service_unavailable'),
+                null,
+                503
+            ));
         }
-        return $_SESSION['webauthn_challenge'];
+
+        if (!is_array($challengeData)) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED,
+                __('api.webauthn_challenge_expired'),
+                null,
+                401
+            ));
+        }
+        if (($challengeData['type'] ?? null) !== $expectedType) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
+                __('api.webauthn_challenge_invalid_type'),
+                null,
+                401
+            ));
+        }
+        if (!isset($challengeData['tenant_id']) || (int) $challengeData['tenant_id'] !== TenantContext::getId()) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
+                __('api.webauthn_challenge_tenant_mismatch'),
+                null,
+                401
+            ));
+        }
+        if ($expectedUserId !== null && (int) ($challengeData['user_id'] ?? 0) !== $expectedUserId) {
+            return $this->noStore($this->respondWithError(
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
+                __('api.webauthn_challenge_user_mismatch'),
+                null,
+                401
+            ));
+        }
+
+        return $challengeData;
     }
 
-    /**
-     * Get stored challenge for authentication verification.
-     * Returns challenge string on success, or JsonResponse on error.
-     *
-     * @return string|JsonResponse
-     */
-    private function getStoredAuthChallenge(array $input)
+    /** @return array{origin: string, rp_id: string}|JsonResponse */
+    private function validateChallengeContext(array $challengeData): array|JsonResponse
     {
-        $challengeId = $input['challenge_id'] ?? null;
+        $metadata = is_array($challengeData['metadata'] ?? null) ? $challengeData['metadata'] : [];
+        $storedOrigin = $metadata['origin'] ?? null;
+        $storedRpId = $metadata['rp_id'] ?? null;
+        $requestContext = $this->resolveWebAuthnContext();
 
-        if ($challengeId) {
-            $challengeData = $this->webAuthnChallengeStore->get($challengeId);
-            if (!$challengeData) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, __('api.webauthn_challenge_expired'), null, 401);
-            }
-            if ($challengeData['type'] !== 'authenticate') {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, __('api.webauthn_challenge_invalid_type'), null, 401);
-            }
-            // SECURITY: Verify challenge belongs to current tenant to prevent cross-tenant replay
-            $currentTenantId = TenantContext::getId();
-            if (!empty($challengeData['tenant_id']) && (int)$challengeData['tenant_id'] !== (int)$currentTenantId) {
-                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, __('api.webauthn_challenge_tenant_mismatch'), null, 401);
-            }
-            return $challengeData['challenge'];
+        if (
+            !is_string($storedOrigin)
+            || !is_string($storedRpId)
+            || $requestContext === null
+            || !hash_equals($storedOrigin, $requestContext['origin'])
+            || !hash_equals($storedRpId, $requestContext['rp_id'])
+        ) {
+            return $this->noStore($this->respondWithError(
+                'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED',
+                __('api.webauthn_auth_failed'),
+                null,
+                401
+            ));
         }
 
-        // Session fallback
-        $this->startNativeSessionIfPossible();
-        if (empty($_SESSION['webauthn_auth_challenge']) ||
-            empty($_SESSION['webauthn_auth_challenge_expires']) ||
-            time() > $_SESSION['webauthn_auth_challenge_expires']) {
-            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, __('api.webauthn_challenge_expired_simple'), null, 401);
-        }
-        return $_SESSION['webauthn_auth_challenge'];
+        return $requestContext;
     }
 
-    /**
-     * Consume (delete) a challenge after successful verification
-     */
-    private function consumeChallenge(array $input): void
+    private function clientDataMatches(string $clientDataJson, string $expectedType, string $expectedOrigin): bool
     {
-        $challengeId = $input['challenge_id'] ?? null;
-        if ($challengeId) {
-            $this->webAuthnChallengeStore->consume($challengeId);
+        try {
+            $data = json_decode($clientDataJson, true, 16, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return false;
         }
-        unset($_SESSION['webauthn_challenge'], $_SESSION['webauthn_challenge_expires']);
-    }
-
-    private function startNativeSessionIfPossible(): bool
-    {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            return true;
-        }
-
-        if (headers_sent()) {
+        if (!is_array($data) || ($data['type'] ?? null) !== $expectedType) {
             return false;
         }
 
-        set_error_handler(static fn () => true);
-        try {
-            session_start();
-        } finally {
-            restore_error_handler();
+        $signedOrigin = isset($data['origin']) && is_string($data['origin'])
+            ? $this->normalizeOrigin($data['origin'])
+            : null;
+
+        return $signedOrigin !== null
+            && hash_equals($expectedOrigin, $signedOrigin)
+            && ($data['crossOrigin'] ?? false) === false
+            && !array_key_exists('topOrigin', $data);
+    }
+
+    private function authVerificationFailed(): JsonResponse
+    {
+        return $this->noStore($this->respondWithError(
+            ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
+            __('api.webauthn_auth_failed'),
+            null,
+            401
+        ));
+    }
+
+    private function noStore(JsonResponse $response): JsonResponse
+    {
+        $response->headers->set('Cache-Control', 'no-store, private');
+        $response->headers->set('Pragma', 'no-cache');
+
+        return $response;
+    }
+
+    private function credentialReference(string $credentialId): string
+    {
+        $key = (string) config('app.key', 'nexus');
+
+        return substr(hash_hmac('sha256', $credentialId, $key), 0, 16);
+    }
+
+    private function passkeyAuthenticationEnabled(): bool
+    {
+        return (bool) config('webauthn.authentication_enabled', true)
+            && TenantContext::hasFeature('biometric_login');
+    }
+
+    private function passkeyEnrollmentEnabled(): bool
+    {
+        return AuthenticationConfigurationService::get(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED,
+            true,
+            TenantContext::getId()
+        ) === true;
+    }
+
+    private function maxCredentialsPerUser(): int
+    {
+        $configured = (int) AuthenticationConfigurationService::get(
+            AuthenticationConfigurationService::CONFIG_PASSKEYS_MAX_CREDENTIALS,
+            10,
+            TenantContext::getId()
+        );
+
+        return max(1, min(self::MAX_CREDENTIALS_PER_USER, $configured));
+    }
+
+    private function requireSecurityConfirmation(int $userId, int $tenantId, array $input): ?JsonResponse
+    {
+        $token = $input['security_confirmation_token']
+            ?? request()->headers->get('X-Security-Confirmation');
+        if (!is_string($token) || $token === '') {
+            return $this->securityConfirmationFailed();
         }
 
-        return session_status() === PHP_SESSION_ACTIVE;
+        return $this->tokenService->validateSecurityConfirmationToken($token, $userId, $tenantId) === null
+            ? $this->securityConfirmationFailed()
+            : null;
     }
+
+    private function securityConfirmationFailed(): JsonResponse
+    {
+        return $this->noStore($this->respondWithError(
+            'SECURITY_CONFIRMATION_REQUIRED',
+            __('api.validation_failed'),
+            'security_confirmation',
+            403
+        ));
+    }
+
+    private function revokeSessionsAfterFactorRemoval(int $userId): void
+    {
+        if ($this->tokenService->revokeAllTokensForUser($userId) < 1) {
+            throw new \RuntimeException('Unable to revoke legacy sessions after passkey removal.');
+        }
+        $user = User::withoutGlobalScopes()
+            ->whereKey($userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
+        if ($user === null) {
+            throw new \RuntimeException('Unable to resolve user for session revocation.');
+        }
+        $user->tokens()->delete();
+
+        if (session_status() === PHP_SESSION_ACTIVE && (int) ($_SESSION['user_id'] ?? 0) === $userId) {
+            $_SESSION = [];
+            session_regenerate_id(true);
+        }
+        if (request()->hasSession()) {
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+        }
+
+        Log::notice('[WebAuthn] Sessions revoked after passkey removal', [
+            'user_id' => $userId,
+            'tenant_id' => TenantContext::getId(),
+        ]);
+    }
+
 }

@@ -150,6 +150,8 @@
                     </div>
                 </fieldset>
 
+                @include('accessible-frontend::partials.event-venue-accessibility-fields', ['venueAccess' => []])
+
                 <fieldset class="govuk-fieldset govuk-!-margin-top-7">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_capacity_title') }}</h2>

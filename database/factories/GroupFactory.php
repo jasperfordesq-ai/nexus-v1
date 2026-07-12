@@ -6,6 +6,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\GroupStatus;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -34,6 +35,8 @@ class GroupFactory extends Factory
             'latitude'    => fake()->optional()->latitude(),
             'longitude'   => fake()->optional()->longitude(),
             'is_featured' => fake()->boolean(10),
+            'status'      => GroupStatus::Active->value,
+            'is_active'   => true,
             'cached_member_count' => fake()->numberBetween(1, 50),
             'created_at'  => fake()->dateTimeBetween('-1 year'),
         ];

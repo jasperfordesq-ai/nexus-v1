@@ -31,6 +31,7 @@ export interface SocialInteractionPanelProps {
   title?: string;
   description?: string | null;
   showShare?: boolean;
+  allowComments?: boolean;
   targetOwnerId?: number | string | null;
   defaultShowComments?: boolean;
   className?: string;
@@ -73,6 +74,7 @@ export function SocialInteractionPanel({
   title,
   description,
   showShare = true,
+  allowComments = true,
   targetOwnerId,
   defaultShowComments = false,
   className,
@@ -81,7 +83,9 @@ export function SocialInteractionPanel({
 }: SocialInteractionPanelProps) {
   const { t } = useTranslation('social');
   const { user, isAuthenticated } = useAuth();
-  const [showComments, setShowComments] = useState(defaultShowComments || hasCommentHash());
+  const [showComments, setShowComments] = useState(
+    allowComments && (defaultShowComments || hasCommentHash()),
+  );
   const [isLikersOpen, setIsLikersOpen] = useState(false);
 
   const social = useSocialInteractions({
@@ -95,14 +99,14 @@ export function SocialInteractionPanel({
   const { commentsLoaded, commentsLoading, loadComments } = social;
 
   useEffect(() => {
-    setShowComments(defaultShowComments || hasCommentHash());
-  }, [targetType, targetId, defaultShowComments]);
+    setShowComments(allowComments && (defaultShowComments || hasCommentHash()));
+  }, [targetType, targetId, defaultShowComments, allowComments]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
     const handleHashChange = () => {
-      if (hasCommentHash()) {
+      if (allowComments && hasCommentHash()) {
         setShowComments(true);
       }
     };
@@ -110,18 +114,18 @@ export function SocialInteractionPanel({
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [targetType, targetId]);
+  }, [targetType, targetId, allowComments]);
 
   useEffect(() => {
-    if (isAuthenticated && showComments && !commentsLoaded && !commentsLoading) {
+    if (allowComments && isAuthenticated && showComments && !commentsLoaded && !commentsLoading) {
       void loadComments();
     }
-  }, [isAuthenticated, showComments, commentsLoaded, commentsLoading, loadComments]);
+  }, [allowComments, isAuthenticated, showComments, commentsLoaded, commentsLoading, loadComments]);
 
   const toggleComments = useCallback(() => {
-    if (!isAuthenticated) return;
+    if (!allowComments || !isAuthenticated) return;
     setShowComments((current) => !current);
-  }, [isAuthenticated]);
+  }, [allowComments, isAuthenticated]);
 
   const currentUserName = getUserName(user, t('you'));
   const currentUserAvatar = user?.avatar_url ?? user?.avatar ?? undefined;
@@ -129,7 +133,7 @@ export function SocialInteractionPanel({
 
   return (
     <div className={cn('space-y-3', className)}>
-      {(social.likesCount > 0 || social.commentsCount > 0) && (
+      {(social.likesCount > 0 || (allowComments && social.commentsCount > 0)) && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-theme-subtle">
           <div>
             {social.likesCount > 0 && (
@@ -153,7 +157,7 @@ export function SocialInteractionPanel({
             )}
           </div>
 
-          {social.commentsCount > 0 && (
+          {allowComments && social.commentsCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
@@ -195,21 +199,23 @@ export function SocialInteractionPanel({
           {social.isLiked ? t('liked') : t('like')}
         </Button>
 
-        <Button
-          variant="light"
-          size={compact ? 'sm' : 'md'}
-          className={cn(
-            'flex-1 min-w-[7rem] text-theme-muted hover:bg-accent/10 hover:text-accent',
-            showComments && 'bg-accent/10 text-accent',
-          )}
-          startContent={<MessageCircle className="h-4 w-4" aria-hidden="true" />}
-          aria-expanded={isAuthenticated && showComments}
-          aria-label={isAuthenticated && showComments ? t('close_comments') : t('open_comments')}
-          isDisabled={!isAuthenticated}
-          onPress={toggleComments}
-        >
-          {t('comment_action')}
-        </Button>
+        {allowComments && (
+          <Button
+            variant="light"
+            size={compact ? 'sm' : 'md'}
+            className={cn(
+              'flex-1 min-w-[7rem] text-theme-muted hover:bg-accent/10 hover:text-accent',
+              showComments && 'bg-accent/10 text-accent',
+            )}
+            startContent={<MessageCircle className="h-4 w-4" aria-hidden="true" />}
+            aria-expanded={isAuthenticated && showComments}
+            aria-label={isAuthenticated && showComments ? t('close_comments') : t('open_comments')}
+            isDisabled={!isAuthenticated}
+            onPress={toggleComments}
+          >
+            {t('comment_action')}
+          </Button>
+        )}
 
         {showShare && SHAREABLE_TARGET_TYPES.has(targetType) && (
           <ShareButton
@@ -225,7 +231,7 @@ export function SocialInteractionPanel({
       </div>
 
       <AnimatePresence initial={false}>
-        {isAuthenticated && showComments && (
+        {allowComments && isAuthenticated && showComments && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}

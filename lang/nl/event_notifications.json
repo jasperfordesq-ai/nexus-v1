@@ -1,0 +1,73 @@
+{
+  "subject": "Evenementupdate: :title",
+  "view_event": "Evenement bekijken",
+  "accept_offer": "Je plaats accepteren",
+  "reason": "Reden: :reason",
+  "states": {
+    "invited": "uitgenodigd",
+    "pending": "in behandeling",
+    "confirmed": "bevestigd",
+    "declined": "afgewezen",
+    "cancelled": "geannuleerd",
+    "waiting": "op de wachtlijst",
+    "offered": "aangeboden",
+    "accepted": "geaccepteerd",
+    "expired": "verlopen"
+  },
+  "lifecycle": {
+    "published": "Het evenement ‘:title’ is gepubliceerd.",
+    "postponed": "Het evenement ‘:title’ is uitgesteld.",
+    "cancelled": "Het evenement ‘:title’ is geannuleerd.",
+    "archived": "Het evenement ‘:title’ is gearchiveerd.",
+    "restored": "Het evenement ‘:title’ is hersteld.",
+    "completed": "Het evenement ‘:title’ is voltooid."
+  },
+  "registration": {
+    "invited": "Je bent uitgenodigd voor ‘:title’.",
+    "pending": "Je inschrijving voor ‘:title’ is in behandeling.",
+    "confirmed": "Je inschrijving voor ‘:title’ is bevestigd.",
+    "declined": "Je inschrijving voor ‘:title’ is afgewezen.",
+    "cancelled": "Je inschrijving voor ‘:title’ is geannuleerd.",
+    "organizer": "De inschrijving van :name voor ‘:title’ is nu :state."
+  },
+  "waitlist": {
+    "waiting": "Je staat op de wachtlijst voor ‘:title’.",
+    "offered": "Er is een plaats voor je vrij bij ‘:title’. Accepteer die voordat het aanbod verloopt.",
+    "accepted": "Je hebt je plaats bij ‘:title’ geaccepteerd.",
+    "expired": "Je plaatsaanbod voor ‘:title’ is verlopen.",
+    "cancelled": "Je staat niet meer op de wachtlijst voor ‘:title’.",
+    "organizer": "De wachtlijststatus van :name voor ‘:title’ is nu :state."
+  },
+  "staff_role": {
+    "granted": "Je hebt de rol :role gekregen voor ‘:title’.",
+    "revoked": "Je rol :role voor ‘:title’ is verwijderd."
+  },
+  "reminder": {
+    "subject": "Evenementherinnering: :title",
+    "message": "‘:title’ begint over :offset op :when."
+  },
+  "update": {
+    "message": "‘:title’ is gewijzigd: :changes.",
+    "separator": ", ",
+    "series_scope": "Deze wijziging geldt voor alle toekomstige momenten.",
+    "fields": {
+      "title": "titel",
+      "time": "datum of tijd",
+      "timezone": "tijdzone",
+      "all_day": "instelling voor de hele dag",
+      "venue": "locatie",
+      "online_access": "online toegang",
+      "capacity": "capaciteit",
+      "accessibility": "toegankelijkheid van de locatie",
+      "cancellation_policy": "annuleringsbeleid"
+    }
+  },
+  "roles": {
+    "co_organizer": "medeorganisator",
+    "registration_manager": "inschrijvingsbeheerder",
+    "communications_manager": "communicatiebeheerder",
+    "check_in_staff": "incheckmedewerker",
+    "finance_manager": "financieel beheerder",
+    "staff": "evenementmedewerker"
+  }
+}

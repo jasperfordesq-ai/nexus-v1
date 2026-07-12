@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -14,6 +15,9 @@ use App\Core\TenantContext;
  */
 class GroupNotificationPreferenceService
 {
+    private const FREQUENCIES = ['instant', 'digest', 'muted'];
+
+    /** @return array{frequency: string, email_enabled: bool, push_enabled: bool, updated_at: string|null} */
     public static function get(int $userId, int $groupId): array
     {
         $tenantId = TenantContext::getId();
@@ -23,26 +27,105 @@ class GroupNotificationPreferenceService
             ->where('tenant_id', $tenantId)
             ->first();
 
-        return $pref ? (array) $pref : [
-            'frequency' => 'instant',
-            'email_enabled' => true,
-            'push_enabled' => true,
-        ];
+        return self::formatPreference($pref);
     }
 
-    public static function set(int $userId, int $groupId, array $data): void
+    /**
+     * @param list<int> $userIds
+     * @return array<int, array{frequency: string, email_enabled: bool, push_enabled: bool, updated_at: string|null}>
+     */
+    public static function getForUsers(array $userIds, int $groupId): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
+        $userIds = array_values(array_unique(array_filter(
+            array_map('intval', $userIds),
+            static fn (int $userId): bool => $userId > 0,
+        )));
+        if ($userIds === []) {
+            return [];
+        }
+
+        $preferences = [];
+        foreach ($userIds as $userId) {
+            $preferences[$userId] = self::formatPreference(null);
+        }
+
+        $rows = DB::table('group_notification_preferences')
+            ->where('tenant_id', $tenantId)
+            ->where('group_id', $groupId)
+            ->whereIn('user_id', $userIds)
+            ->get();
+        foreach ($rows as $row) {
+            $preferences[(int) $row->user_id] = self::formatPreference($row);
+        }
+
+        return $preferences;
+    }
+
+    /** @return array{frequency: string, email_enabled: bool, push_enabled: bool, updated_at: string|null} */
+    public static function set(int $userId, int $groupId, array $data): array
+    {
+        $tenantId = (int) TenantContext::getId();
+        $frequency = $data['frequency'] ?? null;
+        if (! is_string($frequency) || ! in_array($frequency, self::FREQUENCIES, true)) {
+            throw new \InvalidArgumentException('Invalid group notification frequency');
+        }
+        $emailEnabled = self::requiredBoolean($data['email_enabled'] ?? null);
+        $pushEnabled = self::requiredBoolean($data['push_enabled'] ?? null);
+
         DB::table('group_notification_preferences')->updateOrInsert(
-            ['user_id' => $userId, 'group_id' => $groupId],
+            ['tenant_id' => $tenantId, 'user_id' => $userId, 'group_id' => $groupId],
             [
-                'tenant_id' => $tenantId,
-                'frequency' => $data['frequency'] ?? 'instant',
-                'email_enabled' => $data['email_enabled'] ?? true,
-                'push_enabled' => $data['push_enabled'] ?? true,
+                'frequency' => $frequency,
+                'email_enabled' => $emailEnabled,
+                'push_enabled' => $pushEnabled,
                 'updated_at' => now(),
             ]
         );
+
+        return self::get($userId, $groupId);
+    }
+
+    /** @return array{frequency: string, email_enabled: bool, push_enabled: bool, updated_at: string|null} */
+    private static function formatPreference(?object $pref): array
+    {
+        if ($pref === null) {
+            return [
+                'frequency' => 'instant',
+                'email_enabled' => true,
+                'push_enabled' => true,
+                'updated_at' => null,
+            ];
+        }
+
+        $frequency = is_string($pref->frequency ?? null)
+            && in_array($pref->frequency, self::FREQUENCIES, true)
+            ? $pref->frequency
+            : 'instant';
+        $updatedAt = null;
+        if (($pref->updated_at ?? null) !== null) {
+            try {
+                $updatedAt = CarbonImmutable::parse((string) $pref->updated_at)->utc()->toISOString();
+            } catch (\Throwable) {
+                $updatedAt = null;
+            }
+        }
+
+        return [
+            'frequency' => $frequency,
+            'email_enabled' => (bool) ($pref->email_enabled ?? true),
+            'push_enabled' => (bool) ($pref->push_enabled ?? true),
+            'updated_at' => $updatedAt,
+        ];
+    }
+
+    private static function requiredBoolean(mixed $value): bool
+    {
+        return match ($value) {
+            true, 1, '1' => true,
+            false, 0, '0' => false,
+            default => throw new \InvalidArgumentException('Invalid group notification channel flag'),
+        };
     }
 
     /**
@@ -69,7 +152,13 @@ class GroupNotificationPreferenceService
             ->where('gnp.tenant_id', $tenantId)
             ->select('gnp.*', 'g.name as group_name')
             ->get()
-            ->map(fn ($r) => (array) $r)
+            ->map(static function (object $row): array {
+                return [
+                    'group_id' => (int) $row->group_id,
+                    'group_name' => (string) $row->group_name,
+                    ...self::formatPreference($row),
+                ];
+            })
             ->toArray();
     }
 }

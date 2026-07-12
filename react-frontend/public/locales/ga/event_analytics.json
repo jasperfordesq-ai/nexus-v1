@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Anailísíocht imeachtaí",
+    "subtitle": "Feidhmíocht oibriúcháin, tinreamh, cumarsáid agus méadracht tiontaithe atá sábháilte ó thaobh príobháideachta.",
+    "generated_at": "Gineadh {{date}}",
+    "loading": "Anailísíocht imeachtaí á lódáil",
+    "load_error": "Níorbh fhéidir anailísíocht imeachtaí a lódáil.",
+    "retry": "Bain triail eile as",
+    "refresh": "Athnuaigh",
+    "export": "Easpórtáil CSV",
+    "exporting": "Á easpórtáil…",
+    "export_started": "Easpórtáil Analytics ullmhaithe.",
+    "download_error": "Níorbh fhéidir easpórtáil na hanailíse a íoslódáil.",
+    "privacy_title": "Tuairisciú faoi chosaint príobháideachta",
+    "privacy_note": "Tá méadracht roghnach i bhfolach go dtí go ndéantar ionadaíocht ar a laghad {{count}} duine thoilithe.",
+    "consent_bound": "Toiliú faoi cheangal",
+    "suppressed": "faoi chois",
+    "not_limited": "Gan teorainn",
+    "finance_redacted": "Srianta ag do ról",
+    "columns": {
+      "metric": "méadrach",
+      "value": "Luach"
+    },
+    "sections": {
+      "registration": "Clárú",
+      "acquisition": "Cuirí agus liosta feithimh",
+      "attendance": "Tinreamh",
+      "communications": "Cumarsáid",
+      "funnel": "Tonnadóir príobháideachta-sábháilte",
+      "finance": "Ticéid agus creidmheasanna"
+    },
+    "metrics": {
+      "confirmed": "Clárúcháin deimhnithe",
+      "pending": "Clárúcháin ar feitheamh",
+      "cancelled": "Clárúcháin cealaithe",
+      "capacity_remaining": "Cumas fágtha",
+      "invitations_issued": "Cuirí eisithe",
+      "invitations_accepted": "Glacadh le cuirí",
+      "invitation_conversion": "Comhshó cuireadh",
+      "waitlist_joined": "Tagann an liosta feithimh",
+      "waitlist_accepted": "Glacadh le liosta feithimh",
+      "waitlist_conversion": "Comhshó liosta feithimh",
+      "checked_in": "Seiceáilte isteach faoi láthair",
+      "attended": "D'fhreastal",
+      "no_show": "Uimh-seónna",
+      "attendance_rate": "Ráta freastail",
+      "delivered": "Fógraí seachadta",
+      "suppressed_deliveries": "Fógraí faoi chois",
+      "failed_deliveries": "Theip ar fhógraí",
+      "dead_lettered": "Fógraí óna dteastaíonn idirghabháil",
+      "delivery_rate": "Ráta seachadta",
+      "event_views": "Radhairc imeachtaí",
+      "registration_starts": "Tosaíonn clárú",
+      "start_conversion": "Amharc-le-clárú chomhshó",
+      "finance": "Méadracht airgeadais",
+      "ticket_units": "Aonaid ticéad deimhnithe",
+      "ticket_credit_value": "Luach creidmheas ticéad deimhnithe",
+      "completed_credit_claims": "Éilimh chreidmheasa comhlánaithe",
+      "failed_credit_claims": "Éilimh chreidmheasa theipthe",
+      "guardian_consents": "Aontaíonn caomhnóir"
+    }
+  }
+}

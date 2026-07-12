@@ -31,6 +31,7 @@ const PricingPage = lazyWithRetry(() => import('@/pages/premium/PricingPage'));
 const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community/CaringCommunityPage'));
 const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-community/InviteRedemptionPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
+const EventGuardianConsentPage = lazyWithRetry(() => import('@/pages/events/EventGuardianConsentPage'));
 const NotFoundPage = lazyWithRetry(() => import('@/pages/errors/NotFoundPage'));
 const ComingSoonPage = lazyWithRetry(() => import('@/pages/errors/ComingSoonPage'));
 
@@ -121,6 +122,7 @@ export function PublicAppRoutes() {
         <Route path="regional-analytics" element={<ErrorBoundary><RegionalAnalyticsLandingPage /></ErrorBoundary>} />
         <Route path="partner-analytics/dashboard" element={<ErrorBoundary><PartnerDashboardPage /></ErrorBoundary>} />
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
+        <Route path="events/:id/guardian-consent" element={<ErrorBoundary><EventGuardianConsentPage /></ErrorBoundary>} />
         {renderSharedPublicFeatureRoutes()}
         <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />
         <Route path="social-prescribing" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate></ErrorBoundary>} />

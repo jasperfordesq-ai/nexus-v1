@@ -17,6 +17,7 @@ const { mockApi } = vi.hoisted(() => ({
     patch: vi.fn(),
     delete: vi.fn(),
     upload: vi.fn(),
+    download: vi.fn(),
   },
 }));
 
@@ -27,12 +28,16 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
-  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-  formatRelativeTime: () => '2 days ago',
-  responsiveThumbnailProps: (url: string) => ({ src: url }),
-  resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+    formatRelativeTime: () => '2 days ago',
+    responsiveThumbnailProps: (url: string) => ({ src: url }),
+    resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
+  };
+});
 
 // ── Contexts ──────────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
@@ -50,11 +55,14 @@ vi.mock('@/components/ui/ConfirmDialog', async (importOriginal) => ({
 }));
 
 vi.mock('@/components/ui/useDisclosure', () => ({
-  useDisclosure: () => ({
-    isOpen: false,
-    onOpen: vi.fn(),
-    onClose: vi.fn(),
-  }),
+  useDisclosure: () => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    return {
+      isOpen,
+      onOpen: () => setIsOpen(true),
+      onClose: () => setIsOpen(false),
+    };
+  },
 }));
 
 vi.mock('@/components/ui/Button', () => ({
@@ -99,7 +107,9 @@ vi.mock('@/components/ui/Modal', () => ({
   Modal: ({ children, isOpen }: { children?: React.ReactNode; isOpen?: boolean }) =>
     isOpen ? <div role="dialog" aria-label="Dialog">{children}</div> : null,
   ModalContent: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  ModalHeader: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
   ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  ModalFooter: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/components/ui/Spinner', () => ({
@@ -147,7 +157,9 @@ vi.mock('@/components/ui', async (importOriginal) => {
     Modal: ({ children, isOpen }: { children?: React.ReactNode; isOpen?: boolean }) =>
       isOpen ? <div role="dialog" aria-label="Dialog">{children as React.ReactNode}</div> : null,
     ModalContent: ({ children }: { children?: React.ReactNode }) => <>{children as React.ReactNode}</>,
+    ModalHeader: ({ children }: { children?: React.ReactNode }) => <div>{children as React.ReactNode}</div>,
     ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children as React.ReactNode}</div>,
+    ModalFooter: ({ children }: { children?: React.ReactNode }) => <div>{children as React.ReactNode}</div>,
     // ToggleButtonGroup stub
     ToggleButtonGroup: ({ children, onSelectionChange, selectedKeys }: {
       children?: React.ReactNode;
@@ -208,19 +220,31 @@ vi.mock('@/components/feedback', () => ({
 }));
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
-const makeMediaItem = (overrides = {}) => ({
+const makeMediaItem = (overrides: Record<string, unknown> = {}) => {
+  const uploadedBy = typeof overrides.uploaded_by === 'number' ? overrides.uploaded_by : 99;
+  const uploaderName = typeof overrides.uploader_name === 'string' ? overrides.uploader_name : 'Alice';
+  return ({
   id: 1,
   group_id: 42,
   type: 'image' as const,
+  original_name: 'photo.jpg',
+  mime_type: 'image/jpeg',
   url: 'https://cdn.example.com/photo.jpg',
   thumbnail_url: 'https://cdn.example.com/thumb.jpg',
   caption: 'A test photo',
-  uploaded_by: 99,
-  uploader_name: 'Alice',
+  file_size: 1024,
+  width: 640,
+  height: 480,
+  uploaded_by: uploadedBy,
+  uploader_name: uploaderName,
   uploader_avatar: null,
+  uploader: { id: uploadedBy, name: uploaderName, avatar_url: null },
   created_at: '2025-06-01T10:00:00Z',
+  updated_at: '2025-06-01T10:00:00Z',
+  capabilities: { can_view: true, can_delete: true },
   ...overrides,
-});
+  });
+};
 
 const makeMediaResponse = (items = [] as ReturnType<typeof makeMediaItem>[], extras = {}) => ({
   success: true,
@@ -238,6 +262,9 @@ describe('GroupMediaTab', () => {
     vi.resetAllMocks();
     mockConfirm.mockResolvedValue(true);
     mockApi.get.mockResolvedValue(makeMediaResponse());
+    mockApi.upload.mockResolvedValue({ success: true, data: { id: 22 } });
+    mockApi.delete.mockResolvedValue({ success: true, data: { message: 'deleted' } });
+    mockApi.download.mockResolvedValue(new Blob(['media']));
   });
 
   it('shows loading spinner while media fetches', async () => {
@@ -289,12 +316,11 @@ describe('GroupMediaTab', () => {
     const { GroupMediaTab } = await import('./GroupMediaTab');
     render(<GroupMediaTab groupId={42} isAdmin={false} isMember={true} />);
 
-    await waitFor(() => {
-      const uploadBtn = screen.getAllByRole('button').find(
-        (b) => b.getAttribute('aria-label')?.toLowerCase().includes('upload')
-      );
-      expect(uploadBtn).toBeDefined();
-    });
+    const uploadButton = await screen.findByRole('button', { name: 'Upload photo or video' });
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const inputClick = vi.spyOn(input, 'click');
+    fireEvent.click(uploadButton);
+    expect(inputClick).toHaveBeenCalled();
   });
 
   it('does not render upload button for non-members', async () => {
@@ -311,6 +337,58 @@ describe('GroupMediaTab', () => {
     expect(uploadBtn).toBeUndefined();
   });
 
+  it('uploads a valid selected image and only then shows success', async () => {
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={false} isMember={true} />);
+    await screen.findByTestId('empty-state');
+
+    const file = new File(['photo'], 'photo.jpg', { type: 'image/jpeg' });
+    fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+      target: { files: [file] },
+    });
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Upload' }));
+
+    await waitFor(() => expect(mockApi.upload).toHaveBeenCalledWith(
+      '/v2/groups/42/media',
+      expect.any(FormData),
+    ));
+    expect((mockApi.upload.mock.calls[0]?.[1] as FormData).get('file')).toBe(file);
+    expect(mockToast.success).toHaveBeenCalled();
+  });
+
+  it('rejects unsupported upload types before calling the API', async () => {
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={false} isMember={true} />);
+    await screen.findByTestId('empty-state');
+
+    const file = new File(['text'], 'notes.txt', { type: 'text/plain' });
+    fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+      target: { files: [file] },
+    });
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    expect(mockApi.upload).not.toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('rejects media over its type-specific size limit before uploading', async () => {
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={false} isMember={true} />);
+    await screen.findByTestId('empty-state');
+
+    const file = new File(['video'], 'video.mp4', { type: 'video/mp4' });
+    Object.defineProperty(file, 'size', { value: 50 * 1024 * 1024 + 1 });
+    fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+      target: { files: [file] },
+    });
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    expect(mockApi.upload).not.toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
   it('renders filter toggle buttons', async () => {
     const { GroupMediaTab } = await import('./GroupMediaTab');
     render(<GroupMediaTab groupId={42} isAdmin={true} />);
@@ -323,18 +401,20 @@ describe('GroupMediaTab', () => {
   });
 
   it('shows load more button when has_more is true', async () => {
-    mockApi.get.mockResolvedValue(
-      makeMediaResponse([makeMediaItem()], { has_more: true, cursor: 'abc' })
-    );
+    mockApi.get
+      .mockResolvedValueOnce(makeMediaResponse(
+        [makeMediaItem({ id: 1 })],
+        { has_more: true, cursor: 'abc' },
+      ))
+      .mockResolvedValueOnce(makeMediaResponse([makeMediaItem({ id: 2 })]));
     const { GroupMediaTab } = await import('./GroupMediaTab');
     render(<GroupMediaTab groupId={42} isAdmin={true} />);
 
-    await waitFor(() => {
-      const loadMoreBtn = screen.getAllByRole('button').find(
-        (b) => b.textContent?.toLowerCase().includes('more') || b.textContent?.toLowerCase().includes('load')
-      );
-      expect(loadMoreBtn).toBeDefined();
-    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Load More' }));
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledWith(
+      expect.stringContaining('cursor=abc'),
+      { signal: expect.any(AbortSignal) },
+    ));
   });
 
   it('renders delete button for admin', async () => {
@@ -358,9 +438,41 @@ describe('GroupMediaTab', () => {
     });
   });
 
+  it('shows a retryable read error instead of a false empty gallery', async () => {
+    mockApi.get
+      .mockResolvedValueOnce({ success: false, code: 'HTTP_500' })
+      .mockResolvedValueOnce(makeMediaResponse([makeMediaItem({ caption: 'Recovered photo' })]));
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={true} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong');
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Try Again' }));
+    expect(await screen.findByAltText('Recovered photo')).toBeInTheDocument();
+  });
+
+  it('ignores a stale media page after the group changes', async () => {
+    let resolveFirst: ((value: ReturnType<typeof makeMediaResponse>) => void) | undefined;
+    const firstPage = new Promise<ReturnType<typeof makeMediaResponse>>((resolve) => {
+      resolveFirst = resolve;
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/groups/42/')) return firstPage;
+      return Promise.resolve(makeMediaResponse([makeMediaItem({ caption: 'Current group photo' })]));
+    });
+
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    const { rerender } = render(<GroupMediaTab groupId={42} isAdmin={true} />);
+    rerender(<GroupMediaTab groupId={43} isAdmin={true} />);
+
+    expect(await screen.findByAltText('Current group photo')).toBeInTheDocument();
+    resolveFirst?.(makeMediaResponse([makeMediaItem({ caption: 'Stale group photo' })]));
+    await waitFor(() => expect(screen.queryByAltText('Stale group photo')).not.toBeInTheDocument());
+  });
+
   it('calls DELETE api after confirm on delete click', async () => {
     mockApi.get.mockResolvedValue(makeMediaResponse([makeMediaItem({ id: 5 })]));
-    mockApi.delete.mockResolvedValue({ success: true });
+    mockApi.delete.mockResolvedValue({ success: true, data: { message: 'deleted' } });
     mockConfirm.mockResolvedValue(true);
 
     const { GroupMediaTab } = await import('./GroupMediaTab');
@@ -381,7 +493,7 @@ describe('GroupMediaTab', () => {
 
   it('shows success toast after delete', async () => {
     mockApi.get.mockResolvedValue(makeMediaResponse([makeMediaItem({ id: 5 })]));
-    mockApi.delete.mockResolvedValue({ success: true });
+    mockApi.delete.mockResolvedValue({ success: true, data: { message: 'deleted' } });
     mockConfirm.mockResolvedValue(true);
 
     const { GroupMediaTab } = await import('./GroupMediaTab');
@@ -420,7 +532,45 @@ describe('GroupMediaTab', () => {
     }
   });
 
-  it('changes filter when Photos tab clicked', async () => {
+  it('keeps media visible and avoids success for a resolved delete failure', async () => {
+    mockApi.get.mockResolvedValue(makeMediaResponse([makeMediaItem({ id: 5 })]));
+    mockApi.delete.mockResolvedValue({ success: false, code: 'HTTP_500' });
+    mockConfirm.mockResolvedValue(true);
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={true} />);
+
+    const deleteBtn = (await screen.findAllByRole('button')).find(
+      (button) => button.getAttribute('aria-label')?.toLowerCase().includes('delete'),
+    );
+    expect(deleteBtn).toBeDefined();
+    fireEvent.click(deleteBtn as HTMLButtonElement);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    expect(screen.getByTestId('glass-card')).toBeInTheDocument();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('opens the lightbox and exercises next, previous, and close controls', async () => {
+    mockApi.get.mockResolvedValue(makeMediaResponse([
+      makeMediaItem({ id: 1, caption: 'First photo' }),
+      makeMediaItem({ id: 2, caption: 'Second photo' }),
+    ]));
+    const { GroupMediaTab } = await import('./GroupMediaTab');
+    render(<GroupMediaTab groupId={42} isAdmin={false} isMember={false} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'First photo' }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getAllByAltText('First photo')).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(screen.getAllByAltText('Second photo')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
+    expect(screen.getAllByAltText('First photo')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('changes between photo, video, and all filters', async () => {
     const { GroupMediaTab } = await import('./GroupMediaTab');
     render(<GroupMediaTab groupId={42} isAdmin={true} />);
 
@@ -434,5 +584,16 @@ describe('GroupMediaTab', () => {
       const imageCall = calls.find(([url]: [string]) => url.includes('type=image'));
       expect(imageCall).toBeDefined();
     });
+
+    fireEvent.click(screen.getByTestId('filter-video'));
+    await waitFor(() => expect(mockApi.get.mock.calls.some(
+      ([url]: [string]) => url.includes('type=video'),
+    )).toBe(true));
+
+    const callCount = mockApi.get.mock.calls.length;
+    fireEvent.click(screen.getByTestId('filter-all'));
+    await waitFor(() => expect(mockApi.get.mock.calls.length).toBeGreaterThan(callCount));
+    const latestUrl = mockApi.get.mock.calls.at(-1)?.[0] as string;
+    expect(latestUrl).not.toContain('type=');
   });
 });

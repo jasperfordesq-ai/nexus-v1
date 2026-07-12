@@ -23,6 +23,7 @@
     "cta": "تصفح المجموعات"
   },
   "group_promoted": {
+    "role_admin": "مسؤول",
     "subject": "أصبحت الآن {{role}} في {{group_name}} — {{community}}",
     "title": "تحديث الدور",
     "preview": "تهانينا — لقد أصبحت {{role}} في {{group_name}}",

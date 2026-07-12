@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Pusher\Pusher;
@@ -319,6 +320,8 @@ class PusherService
         return DB::table('group_members as gm')
             ->join('groups as g', 'g.id', '=', 'gm.group_id')
             ->where('g.tenant_id', $tenantId)
+            ->where('g.status', GroupStatus::Active->value)
+            ->where('gm.tenant_id', $tenantId)
             ->where('gm.group_id', $groupId)
             ->where('gm.user_id', $userId)
             ->where('gm.status', 'active')

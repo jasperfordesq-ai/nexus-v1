@@ -10,10 +10,15 @@ import { Image } from 'expo-image';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Chip, Separator, Spinner, Surface, Tabs } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Select, Separator, Spinner, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
-import { getEvents, type Event, type EventsResponse } from '@/lib/api/events';
+import {
+  getCanonicalEvents,
+  type CanonicalEvent,
+  type CanonicalEventsResponse,
+  type EventStepFreeFilter,
+} from '@/lib/api/events';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -22,31 +27,41 @@ import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
 import NativePressable from '@/components/ui/NativePressable';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatEventSchedule } from '@/lib/utils/eventDateTime';
 
-function extractEventsPage(r: EventsResponse) {
+function extractEventsPage(r: CanonicalEventsResponse) {
   return {
     items: r.data,
-    cursor: r.meta.cursor,
+    cursor: r.meta.cursor ?? null,
     hasMore: r.meta.has_more,
   };
 }
 
 type EventTab = 'upcoming' | 'past';
+type StepFreeSelection = 'any' | EventStepFreeFilter;
 type TFunction = (key: string, options?: Record<string, unknown>) => string;
+const STEP_FREE_OPTIONS: readonly StepFreeSelection[] = ['any', 'yes', 'no', 'unknown'];
+
+function isStepFreeSelection(value: unknown): value is StepFreeSelection {
+  return typeof value === 'string' && STEP_FREE_OPTIONS.includes(value as StepFreeSelection);
+}
 
 export default function EventsScreen() {
   const { t } = useTranslation(['events', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [when, setWhen] = useState<EventTab>('upcoming');
+  const [stepFree, setStepFree] = useState<StepFreeSelection>('any');
 
   const fetcher = useCallback(
-    (cursor: string | null) => getEvents(when, cursor),
-    [when],
+    (cursor: string | null) => getCanonicalEvents(when, cursor, 20, {
+      stepFree: stepFree === 'any' ? null : stepFree,
+    }),
+    [when, stepFree],
   );
 
   const { items, isLoading, isLoadingMore, hasMore, refresh, loadMore, error } =
-    usePaginatedApi<Event, EventsResponse>(fetcher, extractEventsPage, [when]);
+    usePaginatedApi<CanonicalEvent, CanonicalEventsResponse>(fetcher, extractEventsPage, [when, stepFree]);
 
   function handleTabChange(tab: EventTab) {
     if (tab !== when) {
@@ -59,7 +74,7 @@ export default function EventsScreen() {
     <SafeAreaView className="flex-1 bg-background">
       {error ? (
         <View className="flex-1">
-          <EventsHeader t={t} primary={primary} theme={theme} when={when} onTabChange={handleTabChange} count={items.length} isLoading={isLoading} />
+          <EventsHeader t={t} primary={primary} theme={theme} when={when} onTabChange={handleTabChange} stepFree={stepFree} onStepFreeChange={setStepFree} count={items.length} isLoading={isLoading} />
           <HeroCard variant="secondary" className="mx-4 my-8">
             <HeroCard.Body className="items-center gap-4">
               <Ionicons name="warning-outline" size={30} color={primary} />
@@ -95,7 +110,7 @@ export default function EventsScreen() {
           onEndReached={() => { if (hasMore) void loadMore(); }}
           onEndReachedThreshold={0.4}
           ListHeaderComponent={
-            <EventsHeader t={t} primary={primary} theme={theme} when={when} onTabChange={handleTabChange} count={items.length} isLoading={isLoading} />
+            <EventsHeader t={t} primary={primary} theme={theme} when={when} onTabChange={handleTabChange} stepFree={stepFree} onStepFreeChange={setStepFree} count={items.length} isLoading={isLoading} />
           }
           ListEmptyComponent={
             isLoading ? (
@@ -136,6 +151,8 @@ function EventsHeader({
   theme,
   when,
   onTabChange,
+  stepFree,
+  onStepFreeChange,
   count,
   isLoading,
 }: {
@@ -144,6 +161,8 @@ function EventsHeader({
   theme: Theme;
   when: EventTab;
   onTabChange: (tab: EventTab) => void;
+  stepFree: StepFreeSelection;
+  onStepFreeChange: (value: StepFreeSelection) => void;
   count: number;
   isLoading: boolean;
 }) {
@@ -214,6 +233,46 @@ function EventsHeader({
             </Tabs.Trigger>
           </Tabs.List>
         </Tabs>
+
+        <View className="gap-1.5">
+          <Text className="text-sm font-medium" style={{ color: theme.text }}>
+            {t('accessibilityFilter.label')}
+          </Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
+            {t('accessibilityFilter.hint')}
+          </Text>
+          <Select
+            testID="events-step-free-select"
+            value={{ value: stepFree, label: t(`accessibilityFilter.options.${stepFree}`) }}
+            onValueChange={(option) => {
+              const selected = Array.isArray(option) ? option[0] : option;
+              if (isStepFreeSelection(selected?.value)) onStepFreeChange(selected.value);
+            }}
+            presentation="bottom-sheet"
+          >
+            <Select.Trigger testID="events-step-free-filter" accessibilityLabel={t('accessibilityFilter.label')}>
+              <Select.Value placeholder={t('accessibilityFilter.options.any')} />
+              <Select.TriggerIndicator />
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Overlay />
+              <Select.Content presentation="bottom-sheet" snapPoints={['42%']}>
+                <Select.ListLabel>{t('accessibilityFilter.label')}</Select.ListLabel>
+                {STEP_FREE_OPTIONS.map((option) => (
+                  <Select.Item
+                    key={option}
+                    value={option}
+                    label={t(`accessibilityFilter.options.${option}`)}
+                    testID={`events-step-free-${option}`}
+                  >
+                    <Select.ItemLabel />
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Portal>
+          </Select>
+        </View>
       </Surface>
     </View>
   );
@@ -225,21 +284,28 @@ function EventCard({
   t,
   onPress,
 }: {
-  event: Event;
+  event: CanonicalEvent;
   primary: string;
   t: TFunction;
   onPress: () => void;
 }) {
   const theme = useTheme();
-  const start = event.start_date ? new Date(event.start_date) : null;
-  const isValidDate = start && !isNaN(start.getTime());
-  const month = isValidDate ? start.toLocaleString(dateLocale(), { month: 'short' }) : '-';
-  const day = isValidDate ? String(start.getDate()) : '-';
-  const weekday = isValidDate ? start.toLocaleString(dateLocale(), { weekday: 'short' }) : '';
-  const time = isValidDate ? start.toLocaleTimeString(dateLocale(), { hour: '2-digit', minute: '2-digit' }) : '-';
-  const coverImage = resolveImageUrl(event.cover_image);
-  const accent = event.category?.color ?? '#F59E0B';
-  const isCancelled = event.status === 'cancelled';
+  const schedule = formatEventSchedule(event.schedule, dateLocale());
+  const month = schedule.monthLabel ?? '-';
+  const day = schedule.dayLabel ?? '-';
+  const weekday = schedule.weekdayLabel ?? '';
+  const time = schedule.allDay ? t('allDay') : schedule.timeLabel ?? '-';
+  const coverImage = resolveImageUrl(event.primary_image?.url);
+  const accent = event.category?.colour ?? '#F59E0B';
+  const lifecycleChip = event.schedule.operational_state === 'cancelled'
+    ? { label: t('cancelled'), color: 'danger' as const }
+    : event.schedule.operational_state === 'postponed'
+      ? { label: t('postponed'), color: 'warning' as const }
+      : event.schedule.operational_state === 'completed'
+        ? { label: t('completed'), color: 'success' as const }
+        : null;
+  const isRemote = event.online_access.mode !== 'in_person';
+  const locationLabel = event.online_access.mode === 'online' ? t('online') : event.location.label;
 
   return (
     <NativePressable
@@ -273,17 +339,26 @@ function EventCard({
                     <Chip.Label>{event.category.name}</Chip.Label>
                   </Chip>
                 ) : null}
-                {isCancelled ? (
-                  <Chip size="sm" variant="soft" color="danger">
-                    <Chip.Label>{t('cancelled')}</Chip.Label>
+                {lifecycleChip ? (
+                  <Chip size="sm" variant="soft" color={lifecycleChip.color}>
+                    <Chip.Label>{lifecycleChip.label}</Chip.Label>
                   </Chip>
-                ) : event.is_full ? (
+                ) : event.relationship.capacity.is_full ? (
                   <Chip size="sm" variant="soft" color="danger">
                     <Chip.Label>{t('full')}</Chip.Label>
                   </Chip>
-                ) : event.user_rsvp === 'going' ? (
+                ) : event.relationship.registration.state === 'confirmed' ? (
                   <Chip size="sm" variant="soft" color="success">
                     <Chip.Label>{t('going')}</Chip.Label>
+                  </Chip>
+                ) : event.relationship.engagement.state === 'interested' ? (
+                  <Chip size="sm" variant="soft" color="warning">
+                    <Chip.Label>{t('interested')}</Chip.Label>
+                  </Chip>
+                ) : null}
+                {event.series.named?.title ? (
+                  <Chip size="sm" variant="soft" color="default">
+                    <Chip.Label>{event.series.named.title}</Chip.Label>
                   </Chip>
                 ) : null}
               </View>
@@ -303,11 +378,11 @@ function EventCard({
               <Ionicons name="time-outline" size={14} color={theme.textMuted} />
               <Text className="text-xs" style={{ color: theme.textSecondary }}>{time}</Text>
             </Surface>
-            {event.location || event.is_online ? (
+            {locationLabel || isRemote ? (
               <Surface variant="secondary" className="flex-row max-w-full items-center gap-1 rounded-full px-3 py-1.5">
-                <Ionicons name={event.is_online ? 'videocam-outline' : 'location-outline'} size={14} color={theme.textMuted} />
+                <Ionicons name={isRemote ? 'videocam-outline' : 'location-outline'} size={14} color={theme.textMuted} />
                 <Text className="max-w-[220px] text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                  {event.is_online ? t('online') : event.location}
+                  {locationLabel ?? t('online')}
                 </Text>
               </Surface>
             ) : null}
@@ -321,7 +396,7 @@ function EventCard({
           <View className="flex-row items-center gap-2">
             <Ionicons name="people-outline" size={16} color={theme.textMuted} />
             <Text className="text-sm" style={{ color: theme.textSecondary }}>
-              {t('attendees', { going: event.rsvp_counts?.going ?? event.attendees_count ?? 0, interested: event.rsvp_counts?.interested ?? 0 })}
+              {t('attendees', { going: event.metrics.confirmed_count, interested: event.metrics.interested_count })}
             </Text>
           </View>
           <Ionicons name="arrow-forward" size={17} color={primary} />

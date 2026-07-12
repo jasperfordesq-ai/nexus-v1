@@ -31,8 +31,28 @@ class GroupNotificationPrefController extends BaseApiController
         if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_notification_member_required'), null, 403);
         }
-        $data = request()->only(['frequency', 'email_enabled', 'push_enabled']);
-        GroupNotificationPreferenceService::set($userId, $id, $data);
-        return $this->successResponse(['message' => __('api_controllers_3.group_notification_pref.preferences_updated')]);
+        $frequency = request()->input('frequency');
+        if (! is_string($frequency) || ! in_array($frequency, ['instant', 'digest', 'muted'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_frequency'), 'frequency', 422);
+        }
+
+        $emailEnabled = request()->input('email_enabled');
+        if (! in_array($emailEnabled, [true, false, 0, 1, '0', '1'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'email_enabled', 422);
+        }
+        $pushEnabled = request()->input('push_enabled');
+        if (! in_array($pushEnabled, [true, false, 0, 1, '0', '1'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'push_enabled', 422);
+        }
+
+        $preferences = GroupNotificationPreferenceService::set($userId, $id, [
+            'frequency' => $frequency,
+            'email_enabled' => $emailEnabled,
+            'push_enabled' => $pushEnabled,
+        ]);
+        return $this->successResponse([
+            'message' => __('api_controllers_3.group_notification_pref.preferences_updated'),
+            'preferences' => $preferences,
+        ]);
     }
 }

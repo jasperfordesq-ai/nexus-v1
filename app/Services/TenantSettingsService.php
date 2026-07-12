@@ -181,7 +181,7 @@ class TenantSettingsService
     /**
      * Check login gates for a user array.
      *
-     * Suspended/banned/pending account states are blocked for every role.
+     * Every non-active account state is blocked for every role.
      * Admins and super admins otherwise pass policy gates. Regular members may be blocked by:
      * - Pending/failed identity verification
      * - Unapproved account
@@ -221,6 +221,14 @@ class TenantSettingsService
                 'code' => ApiErrorCodes::AUTH_ACCOUNT_PENDING_APPROVAL,
                 'message' => __('svc_notifications_2.tenant_settings.pending_admin_approval'),
                 'extra' => ['pending_approval' => true],
+            ];
+        }
+
+        if ($status !== 'active') {
+            return [
+                'code' => ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
+                'message' => __('api.account_suspended'),
+                'extra' => ['account_suspended' => true],
             ];
         }
 

@@ -280,42 +280,6 @@ export const transferResponseSchema = z.object({
 }).passthrough();
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Event Schemas
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Validates an Event object.
- * Covers the essential required fields returned by GET /api/v2/events and
- * GET /api/v2/events/:id.
- */
-export const eventSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  description: z.string(),
-  start_date: z.string(),
-  is_online: z.boolean(),
-  organizer: z.object({
-    id: z.number(),
-    first_name: z.string(),
-    last_name: z.string(),
-  }).passthrough(),
-  attendees_count: z.number(),
-  created_at: z.string(),
-}).passthrough();
-
-/**
- * Validates an RSVP response.
- * Returned by POST /api/v2/events/:id/rsvp.
- */
-export const rsvpResponseSchema = z.object({
-  status: z.enum(['attending', 'maybe', 'not_attending', 'waitlisted']),
-  rsvp_counts: z.object({
-    going: z.number(),
-    interested: z.number(),
-  }),
-}).passthrough();
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Group Schema
 // ─────────────────────────────────────────────────────────────────────────────
 

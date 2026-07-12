@@ -176,7 +176,7 @@ class TenantBootstrapController extends BaseApiController
         }
 
         $query = DB::table('tenants')
-            ->select('id', 'name', 'slug', 'domain', 'tagline')
+            ->select('id', 'name', 'slug', 'domain', 'tagline', 'features')
             ->where('is_active', 1);
 
         if (!$includeMaster) {
@@ -192,6 +192,9 @@ class TenantBootstrapController extends BaseApiController
 
         $data = [];
         foreach ($tenants as $tenant) {
+            $tenantFeatures = !empty($tenant->features)
+                ? (json_decode((string) $tenant->features, true) ?: [])
+                : [];
             $item = [
                 'id' => (int) $tenant->id,
                 'name' => $tenant->name,
@@ -200,6 +203,12 @@ class TenantBootstrapController extends BaseApiController
                     'passkeys.conditional_autofill' => isset($conditionalAutofill[$tenant->id])
                         ? filter_var($conditionalAutofill[$tenant->id], FILTER_VALIDATE_BOOLEAN)
                         : true,
+                ],
+                'features' => [
+                    'biometric_login' => array_key_exists('biometric_login', $tenantFeatures)
+                        ? ((bool) $tenantFeatures['biometric_login'] && (bool) config('webauthn.authentication_enabled', true))
+                        : ((bool) (TenantFeatureConfig::FEATURE_DEFAULTS['biometric_login'] ?? true)
+                            && (bool) config('webauthn.authentication_enabled', true)),
                 ],
             ];
 
@@ -357,6 +366,8 @@ class TenantBootstrapController extends BaseApiController
         $data['default_layout'] = $tenant['default_layout'] ?? 'modern';
         $data['branding'] = $this->buildBrandingData($tenant, $config);
         $data['features'] = $this->buildFeaturesData($features);
+        $data['features']['biometric_login'] = ($data['features']['biometric_login'] ?? true)
+            && (bool) config('webauthn.authentication_enabled', true);
         $data['modules'] = $this->buildModulesData($config);
         $data['authentication_config'] = $this->authenticationConfigurationService->getAll((int) $tenant['id']);
         $data['seo'] = $this->buildSeoData($tenant);

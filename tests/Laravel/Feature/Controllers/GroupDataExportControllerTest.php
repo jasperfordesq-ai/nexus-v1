@@ -6,6 +6,8 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Http\Controllers\Api\GroupDataExportController;
+use ReflectionMethod;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
@@ -35,10 +37,29 @@ class GroupDataExportControllerTest extends TestCase
         $this->apiGet('/v2/groups/1/export')->assertStatus(401);
     }
 
-    public function test_export_all_returns_non_5xx_when_authenticated(): void
+    public function test_synchronous_export_is_retired_with_an_explicit_gone_response(): void
     {
         $this->authenticatedUser();
-        $response = $this->apiGet('/v2/groups/1/export');
-        $this->assertTrue($response->status() < 500, "Got 5xx: {$response->status()}");
+
+        $this->apiGet('/v2/groups/1/export')
+            ->assertStatus(410)
+            ->assertJsonPath('errors.0.code', 'CAPABILITY_RETIRED');
+    }
+
+    public function test_retired_endpoint_cannot_invoke_the_full_manifest_builder(): void
+    {
+        $method = new ReflectionMethod(GroupDataExportController::class, 'exportAll');
+        $fileName = $method->getFileName();
+        self::assertIsString($fileName);
+        $source = file($fileName, FILE_IGNORE_NEW_LINES);
+        self::assertIsArray($source);
+        $body = implode("\n", array_slice(
+            $source,
+            $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1,
+        ));
+
+        self::assertStringNotContainsString('GroupDataExportService::exportAll', $body);
+        self::assertStringContainsString('CAPABILITY_RETIRED', $body);
     }
 }

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\Notification;
+use App\Support\Events\EventNotificationType;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -25,8 +26,10 @@ class NotificationService
         'reviews'      => ['review', 'new_review', 'review_received'],
         'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received', 'federation_transaction'],
         'social'       => ['like', 'comment', 'comment_reply', 'reaction', 'mention', 'post_like', 'post_comment'],
-        'events'       => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
-        'groups'       => ['group_invite', 'group_join', 'group_post', 'federation_group_join'],
+        'groups'       => [
+            'group_invite', 'group_join', 'group_join_request', 'group_join_rejected',
+            'group_post', 'new_topic', 'new_reply', 'federation_group_join',
+        ],
         'listings'     => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
         'jobs'         => ['job_application', 'job_application_status'],
         'safeguarding' => ['safeguarding_flag', 'safeguarding_assignment', 'broker_review', 'safeguarding_incident'],
@@ -57,8 +60,8 @@ class NotificationService
             $query->unread();
         }
 
-        if (! empty($filters['type']) && isset(self::TYPE_CATEGORIES[$filters['type']])) {
-            $query->whereIn('type', self::TYPE_CATEGORIES[$filters['type']]);
+        if (! empty($filters['type'])) {
+            $this->applyCategoryFilter($query, (string) $filters['type']);
         }
 
         if ($cursor !== null) {
@@ -102,8 +105,8 @@ class NotificationService
         if (! empty($filters['unread_only'])) {
             $query->unread();
         }
-        if (! empty($filters['type']) && isset(self::TYPE_CATEGORIES[$filters['type']])) {
-            $query->whereIn('type', self::TYPE_CATEGORIES[$filters['type']]);
+        if (! empty($filters['type'])) {
+            $this->applyCategoryFilter($query, (string) $filters['type']);
         }
         if ($cursor !== null) {
             $cursorId = base64_decode((string) $cursor, true);
@@ -197,6 +200,11 @@ class NotificationService
             $item['actors'] = $actors;
             $item['remaining_count'] = max(0, $count - count($actors));
             $item['all_read'] = $allRead;
+            $item['is_read'] = $allRead;
+            $item['read_at'] = $allRead
+                ? ($latest->created_at?->toIso8601String() ?? now()->toIso8601String())
+                : null;
+            $item['latest_at'] = $latest->created_at?->toIso8601String();
             $item['notification_ids'] = array_map(static fn ($r) => (int) $r->id, $rows);
             $result[] = $item;
         }
@@ -280,11 +288,18 @@ class NotificationService
             $counts['total']++;
             $categorized = false;
 
-            foreach (self::TYPE_CATEGORIES as $category => $types) {
-                if (in_array($notification->type, $types, true)) {
-                    $counts[$category]++;
-                    $categorized = true;
-                    break;
+            if (EventNotificationType::matches($notification->type)) {
+                $counts['events']++;
+                $categorized = true;
+            }
+
+            if (! $categorized) {
+                foreach (self::TYPE_CATEGORIES as $category => $types) {
+                    if (in_array($notification->type, $types, true)) {
+                        $counts[$category]++;
+                        $categorized = true;
+                        break;
+                    }
                 }
             }
 
@@ -340,5 +355,55 @@ class NotificationService
         }
 
         return (bool) $notification->delete();
+    }
+
+    /**
+     * Delete every notification in an optional supported category.
+     *
+     * Invalid categories are rejected by returning zero rather than falling
+     * through to an unfiltered destructive query.
+     */
+    public function deleteAll(int $userId, ?string $category = null): int
+    {
+        $query = $this->notification->newQuery()
+            ->where('tenant_id', \App\Core\TenantContext::getId())
+            ->where('user_id', $userId);
+
+        if ($category !== null && $category !== '') {
+            if (! $this->applyCategoryFilter($query, $category)) {
+                return 0;
+            }
+        }
+
+        return (int) $query->delete();
+    }
+
+    public function supportsCategory(string $category): bool
+    {
+        return $category === 'events' || isset(self::TYPE_CATEGORIES[$category]);
+    }
+
+    /** @return list<string> */
+    public function categoryNames(): array
+    {
+        return array_merge(array_keys(self::TYPE_CATEGORIES), ['events']);
+    }
+
+    private function applyCategoryFilter(Builder $query, string $category): bool
+    {
+        if ($category === 'events') {
+            EventNotificationType::applyTo($query);
+
+            return true;
+        }
+
+        $types = self::TYPE_CATEGORIES[$category] ?? null;
+        if ($types === null) {
+            return false;
+        }
+
+        $query->whereIn('type', $types);
+
+        return true;
     }
 }

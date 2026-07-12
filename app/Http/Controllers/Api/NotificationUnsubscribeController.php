@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,7 @@ use Illuminate\Support\Facades\Log;
  *   transactions     → email_transactions
  *   reviews          → email_reviews
  *   listings         → email_listings
+ *   events           → email_events
  *   digest           → email_digest
  *   gamification     → email_gamification_digest + email_gamification_milestones
  *   org              → email_org_payments + email_org_transfers + email_org_membership + email_org_admin
@@ -57,6 +59,7 @@ class NotificationUnsubscribeController extends BaseApiController
         'email_connections',
         'email_transactions',
         'email_reviews',
+        'email_events',
         'email_gamification_digest',
         'email_gamification_milestones',
         'email_org_payments',
@@ -73,6 +76,7 @@ class NotificationUnsubscribeController extends BaseApiController
         'transactions'  => ['email_transactions'],
         'reviews'       => ['email_reviews'],
         'listings'      => ['email_listings'],
+        'events'        => ['email_events'],
         'digest'        => ['email_digest'],
         'gamification'  => ['email_gamification_digest', 'email_gamification_milestones'],
         'org'           => ['email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin'],
@@ -100,7 +104,14 @@ class NotificationUnsubscribeController extends BaseApiController
     {
         $result = $this->processToken((string) $request->query('token', ''));
         $status = $result['status']; // 'ok' | 'invalid' | 'already'
-        $html   = $this->renderConfirmationHtml($status, $result['category'] ?? null);
+        $html = LocaleContext::withLocale(
+            $result['locale'] ?? null,
+            fn (): string => $this->renderConfirmationHtml(
+                $status,
+                $result['tenant_name'] ?? null,
+                $result['locale'] ?? null,
+            ),
+        );
         return response($html, $status === 'invalid' ? 400 : 200)
             ->header('Content-Type', 'text/html; charset=utf-8')
             ->header('Cache-Control', 'no-store');
@@ -114,14 +125,15 @@ class NotificationUnsubscribeController extends BaseApiController
         $token = (string) ($request->input('token') ?? $request->query('token', ''));
         $result = $this->processToken($token);
         if ($result['status'] === 'invalid') {
-            return $this->respondWithError('INVALID_TOKEN', 'Unsubscribe token is invalid or expired.', null, 400);
+            return $this->respondWithError('INVALID_TOKEN', __('api.notification_unsubscribe.invalid_token'), null, 400);
         }
         return $this->respondWithData(['unsubscribed' => true, 'category' => $result['category'] ?? 'all']);
     }
 
     /**
      * Verify token and flip the relevant preferences. Returns:
-     *   ['status' => 'ok'|'already'|'invalid', 'category' => ?string]
+     *   ['status' => 'ok'|'already'|'invalid', 'category' => ?string,
+     *    'tenant_name' => ?string, 'locale' => ?string]
      */
     private function processToken(string $token): array
     {
@@ -158,78 +170,104 @@ class NotificationUnsubscribeController extends BaseApiController
         TenantContext::setById($tenantId);
 
         try {
-            $user = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->first(['id', 'notification_preferences', 'federation_notifications_enabled']);
-            if (!$user) {
-                return ['status' => 'invalid'];
-            }
-
-            // 'federation' category: flip a column, not the JSON.
-            if ($category === 'federation') {
-                if ((int) ($user->federation_notifications_enabled ?? 1) === 0) {
-                    return ['status' => 'already', 'category' => $category];
+            return DB::transaction(function () use ($userId, $tenantId, $category): array {
+                // Serialize with settings writes so an unsubscribe can never
+                // overwrite a concurrent toggle (or be overwritten by one).
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first(['id', 'notification_preferences', 'federation_notifications_enabled', 'preferred_language']);
+                if (!$user) {
+                    return ['status' => 'invalid'];
                 }
-                DB::table('users')->where('id', $userId)->update([
-                    'federation_notifications_enabled' => 0,
-                    'updated_at' => now(),
-                ]);
-                Log::info('NotificationUnsubscribe: federation flipped off', [
+
+                $tenant = TenantContext::get();
+                $resultContext = [
+                    'category' => $category,
+                    'tenant_name' => (string) ($tenant['name'] ?? ''),
+                    'locale' => (string) ($user->preferred_language ?? config('app.locale', 'en')),
+                ];
+
+                // 'federation' category: flip a column, not the JSON.
+                if ($category === 'federation') {
+                    if ((int) ($user->federation_notifications_enabled ?? 1) === 0) {
+                        return array_merge(['status' => 'already'], $resultContext);
+                    }
+                    DB::table('users')
+                        ->where('id', $userId)
+                        ->where('tenant_id', $tenantId)
+                        ->update([
+                            'federation_notifications_enabled' => 0,
+                            'updated_at' => now(),
+                        ]);
+                    Log::info('NotificationUnsubscribe: federation flipped off', [
+                        'user_id'   => $userId,
+                        'tenant_id' => $tenantId,
+                    ]);
+                    return array_merge(['status' => 'ok'], $resultContext);
+                }
+
+                $prefs = json_decode($user->notification_preferences ?? '{}', true) ?: [];
+                $keysToFlip = self::CATEGORY_TO_KEYS[$category];
+                $alreadyAllOff = true;
+                foreach ($keysToFlip as $key) {
+                    if (($prefs[$key] ?? 1) !== false && (int) ($prefs[$key] ?? 1) !== 0) {
+                        $alreadyAllOff = false;
+                    }
+                    $prefs[$key] = false;
+                }
+                if ($alreadyAllOff) {
+                    return array_merge(['status' => 'already'], $resultContext);
+                }
+
+                DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'notification_preferences' => json_encode($prefs, JSON_THROW_ON_ERROR),
+                        'updated_at' => now(),
+                    ]);
+
+                Log::info('NotificationUnsubscribe: preferences flipped off', [
                     'user_id'   => $userId,
                     'tenant_id' => $tenantId,
+                    'category'  => $category,
+                    'keys'      => $keysToFlip,
                 ]);
-                return ['status' => 'ok', 'category' => $category];
-            }
 
-            $prefs = json_decode($user->notification_preferences ?? '{}', true) ?: [];
-            $keysToFlip = self::CATEGORY_TO_KEYS[$category];
-            $alreadyAllOff = true;
-            foreach ($keysToFlip as $k) {
-                if (($prefs[$k] ?? 1) !== false && (int) ($prefs[$k] ?? 1) !== 0) {
-                    $alreadyAllOff = false;
-                }
-                $prefs[$k] = false;
-            }
-            if ($alreadyAllOff) {
-                return ['status' => 'already', 'category' => $category];
-            }
-
-            DB::table('users')->where('id', $userId)->update([
-                'notification_preferences' => json_encode($prefs),
-                'updated_at' => now(),
-            ]);
-
-            Log::info('NotificationUnsubscribe: preferences flipped off', [
-                'user_id'   => $userId,
-                'tenant_id' => $tenantId,
-                'category'  => $category,
-                'keys'      => $keysToFlip,
-            ]);
-
-            return ['status' => 'ok', 'category' => $category];
+                return array_merge(['status' => 'ok'], $resultContext);
+            }, 3);
         } finally {
             TenantContext::reset();
         }
     }
 
-    private function renderConfirmationHtml(string $status, ?string $category): string
+    private function renderConfirmationHtml(string $status, ?string $tenantName, ?string $locale): string
     {
-        $tenantName = htmlspecialchars((string) (TenantContext::getSetting('site_name') ?? 'Project NEXUS'), ENT_QUOTES, 'UTF-8');
-        $cat = htmlspecialchars((string) $category, ENT_QUOTES, 'UTF-8');
-        $title = match ($status) {
-            'ok'      => 'You have been unsubscribed',
-            'already' => 'You were already unsubscribed',
-            default   => 'Unsubscribe link invalid',
+        $tenant = htmlspecialchars(
+            $tenantName !== null && $tenantName !== ''
+                ? $tenantName
+                : __('api.notification_unsubscribe.fallback_tenant'),
+            ENT_QUOTES,
+            'UTF-8',
+        );
+        $titleText = match ($status) {
+            'ok' => __('api.notification_unsubscribe.title_unsubscribed'),
+            'already' => __('api.notification_unsubscribe.title_already'),
+            default => __('api.notification_unsubscribe.title_invalid'),
         };
         $body = match ($status) {
-            'ok' => "You will no longer receive <strong>{$cat}</strong> emails from {$tenantName}. You can re-enable them from your account's notification settings at any time.",
-            'already' => "Your <strong>{$cat}</strong> emails were already turned off for {$tenantName}. No further action is needed.",
-            default => "This unsubscribe link is invalid or has expired. Please update your preferences directly from your account's notification settings.",
+            'ok' => __('api.notification_unsubscribe.body_unsubscribed', ['tenant' => $tenant]),
+            'already' => __('api.notification_unsubscribe.body_already', ['tenant' => $tenant]),
+            default => __('api.notification_unsubscribe.body_invalid'),
         };
+        $title = htmlspecialchars((string) $titleText, ENT_QUOTES, 'UTF-8');
+        $htmlLocale = htmlspecialchars((string) ($locale ?: config('app.locale', 'en')), ENT_QUOTES, 'UTF-8');
+        $direction = str_starts_with(strtolower($htmlLocale), 'ar') ? 'rtl' : 'ltr';
         return <<<HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{$htmlLocale}" dir="{$direction}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

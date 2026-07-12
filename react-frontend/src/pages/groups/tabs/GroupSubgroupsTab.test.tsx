@@ -37,15 +37,11 @@ vi.mock('@/contexts', () =>
 );
 
 // ─── Stub GlassCard to avoid HeroUI Card in jsdom ─────────────────────────────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...orig,
-    GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-      <div data-testid="glass-card" className={className}>{children}</div>
-    ),
-  };
-});
+vi.mock('@/components/ui/GlassCard', () => ({
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="glass-card" className={className}>{children}</div>
+  ),
+}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 const makeSubGroup = (overrides = {}): { id: number; name: string; member_count: number } => ({
@@ -90,6 +86,17 @@ describe('GroupSubgroupsTab', () => {
     const { GroupSubgroupsTab } = await import('./GroupSubgroupsTab');
     render(<GroupSubgroupsTab subGroups={[makeSubGroup({ name: 'Youth Group' })]} />);
     expect(screen.getByText('Youth Group')).toBeInTheDocument();
+  });
+
+  it('constrains long subgroup names without removing their full accessible text', async () => {
+    const longName = 'A very long subgroup name that must not force the mobile card beyond the viewport';
+    const { GroupSubgroupsTab } = await import('./GroupSubgroupsTab');
+    render(<GroupSubgroupsTab subGroups={[makeSubGroup({ name: longName })]} />);
+
+    const name = screen.getByText(longName);
+    expect(name).toHaveClass('truncate');
+    expect(name).toHaveAttribute('title', longName);
+    expect(screen.getByRole('link')).toHaveClass('min-w-0');
   });
 
   it('renders all subgroup names when multiple subgroups are passed', async () => {

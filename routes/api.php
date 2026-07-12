@@ -98,14 +98,25 @@ Route::middleware('auth:sanctum')->group(function () {
 // ============================================
 Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
     $type = $request->query('type', 'listing');
-    $allowed = ['listing', 'event', 'volunteering', 'resource'];
+    $allowed = ['listing', 'event', 'events', 'volunteering', 'resource'];
     if (!in_array($type, $allowed, true)) {
         $type = 'listing';
     }
-    $categories = \App\Models\Category::where('type', $type)
+    $categoryTypes = in_array($type, ['event', 'events'], true)
+        ? ['event', 'events']
+        : [$type];
+    $canonicalType = in_array($type, ['event', 'events'], true) ? 'event' : $type;
+    $categories = \App\Models\Category::whereIn('type', $categoryTypes)
         ->where('tenant_id', \App\Core\TenantContext::getId())
+        ->where('is_active', 1)
         ->orderBy('name')
-        ->get();
+        ->orderBy('id')
+        ->get()
+        ->map(function (\App\Models\Category $category) use ($canonicalType) {
+            $category->setAttribute('type', $canonicalType);
+
+            return $category;
+        });
     $response = response()->json(['data' => $categories], 200, [], JSON_UNESCAPED_UNICODE);
     $etag = '"' . sha1((string) $response->getContent()) . '"';
     $response->headers->set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
@@ -124,13 +135,16 @@ Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
 });
 
 // ============================================
-// Public group routes (optional auth — viewer_membership populated when Bearer token present)
-// These are outside the auth:sanctum group so Sanctum middleware doesn't interfere.
+// Authenticated Groups discovery boundary. Member identity and aggregate group
+// data are never exposed anonymously; the tenant feature flag fails closed.
 // ============================================
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'feature:groups'])
+    ->where(['id' => '[0-9]+'])
+    ->group(function () {
     Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
+    Route::get('/v2/groups/form-capabilities', [\App\Http\Controllers\Api\GroupsController::class, 'formCapabilities']);
     Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show']);
-    Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
+    Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members'])->middleware('group.tab:members');
 });
 
 // ============================================
@@ -141,6 +155,27 @@ Route::post('/v2/provisioning-requests', [\App\Http\Controllers\Api\TenantProvis
     ->middleware('throttle:5,60');
 Route::get('/v2/provisioning-requests/check-slug/{slug}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'checkSlug']);
 Route::get('/v2/provisioning-requests/status/{token}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'status']);
+
+// Revocable, capability-URL calendar subscription. The controller resolves
+// the tenant from the signed-looking opaque path and verifies only a stored
+// SHA-256 token hash; no member identity or restricted access data is emitted.
+Route::get('/v2/events/calendar/personal/{tenantSlug}/{secret}.ics', [
+    \App\Http\Controllers\Api\EventCalendarController::class,
+    'personalFeed',
+])
+    ->where('tenantSlug', '[a-z0-9][a-z0-9-]{0,99}')
+    ->where('secret', 'nxc_[a-f0-9]{64}')
+    ->middleware([
+        \App\Http\Middleware\RedactEventCalendarFeedSecret::class,
+        'throttle:60,1',
+    ]);
+
+// One-use external guardian capability. Tenant scope still comes from the
+// request host/header; authentication is optional and the token is never logged.
+Route::post('/v2/events/safety/guardian-consents/grant', [
+    \App\Http\Controllers\Api\EventSafetyController::class,
+    'grantGuardianConsent',
+])->middleware(['feature:events', 'throttle:10,1']);
 
 // ============================================
 // Authenticated routes — Sanctum token authentication required
@@ -189,20 +224,277 @@ Route::get('/v2/presence/online-count', [\App\Http\Controllers\Api\PresenceContr
 // MIGRATED ROUTES — Events
 // Source: httpdocs/routes/events.php
 // ============================================
-Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
-Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby']);
-Route::post('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'store']);
-Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show']);
-Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update']);
-Route::delete('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'destroy']);
-Route::post('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp']);
-Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'removeRsvp']);
-Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees']);
-Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Controllers\Api\EventsController::class, 'checkIn']);
-Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
-Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist']);
-Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist']);
-Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage'])->middleware('throttle:20,1');
+Route::middleware('feature:events')->group(function () {
+    Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
+    Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby']);
+    Route::get('/v2/events/calendar', [\App\Http\Controllers\Api\EventCalendarController::class, 'index']);
+    Route::get('/v2/events/calendar/feed.ics', [\App\Http\Controllers\Api\EventCalendarController::class, 'tenantFeed']);
+    Route::get('/v2/events/calendar/feed-tokens', [\App\Http\Controllers\Api\EventCalendarController::class, 'tokens']);
+    Route::post('/v2/events/calendar/feed-tokens', [\App\Http\Controllers\Api\EventCalendarController::class, 'createToken'])
+        ->middleware('throttle:10,1');
+    Route::delete('/v2/events/calendar/feed-tokens/{tokenId}', [\App\Http\Controllers\Api\EventCalendarController::class, 'revokeToken'])
+        ->whereNumber('tokenId');
+    Route::post('/v2/events/recurring', [\App\Http\Controllers\Api\EventsController::class, 'createRecurring']);
+    Route::get('/v2/events/series', [\App\Http\Controllers\Api\EventsController::class, 'listSeries']);
+    Route::post('/v2/events/series', [\App\Http\Controllers\Api\EventsController::class, 'createSeries']);
+    Route::get('/v2/events/series/{seriesId}', [\App\Http\Controllers\Api\EventsController::class, 'showSeries'])->whereNumber('seriesId');
+    Route::get('/v2/event-templates', [\App\Http\Controllers\Api\EventTemplateController::class, 'index']);
+    Route::get('/v2/event-templates/{templateId}', [\App\Http\Controllers\Api\EventTemplateController::class, 'show'])
+        ->whereNumber('templateId');
+    Route::get('/v2/event-templates/{templateId}/history', [\App\Http\Controllers\Api\EventTemplateController::class, 'history'])
+        ->whereNumber('templateId');
+    Route::post('/v2/events/{sourceEventId}/template-preview', [\App\Http\Controllers\Api\EventTemplateController::class, 'previewCapture'])
+        ->whereNumber('sourceEventId')->middleware('throttle:60,1');
+    Route::post('/v2/events/{sourceEventId}/templates', [\App\Http\Controllers\Api\EventTemplateController::class, 'capture'])
+        ->whereNumber('sourceEventId')->middleware('throttle:20,1');
+    Route::post('/v2/event-templates/{templateId}/revisions', [\App\Http\Controllers\Api\EventTemplateController::class, 'revise'])
+        ->whereNumber('templateId')->middleware('throttle:20,1');
+    Route::post('/v2/event-templates/{templateId}/archive', [\App\Http\Controllers\Api\EventTemplateController::class, 'archive'])
+        ->whereNumber('templateId')->middleware('throttle:20,1');
+    Route::post('/v2/event-templates/{templateId}/materialization-preview', [\App\Http\Controllers\Api\EventTemplateController::class, 'previewMaterialization'])
+        ->whereNumber('templateId')->middleware('throttle:60,1');
+    Route::post('/v2/event-templates/{templateId}/materializations', [\App\Http\Controllers\Api\EventTemplateController::class, 'materialize'])
+        ->whereNumber('templateId')->middleware('throttle:20,1');
+    Route::post('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'store']);
+    Route::get('/v2/events/{id}/calendar.ics', [\App\Http\Controllers\Api\EventCalendarController::class, 'eventFeed'])
+        ->whereNumber('id');
+    Route::get('/v2/events/{id}/calendar-actions', [\App\Http\Controllers\Api\EventCalendarController::class, 'actions'])
+        ->whereNumber('id');
+    Route::get('/v2/events/{id}/federation-status', [\App\Http\Controllers\Api\EventFederationStatusController::class, 'show'])
+        ->whereNumber('id');
+    Route::get('/v2/events/{id}/analytics', [\App\Http\Controllers\Api\EventAnalyticsController::class, 'show'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/analytics/export.csv', [\App\Http\Controllers\Api\EventAnalyticsController::class, 'export'])
+        ->whereNumber('id')->middleware('throttle:10,1');
+    Route::get('/v2/events/{id}/tickets', [\App\Http\Controllers\Api\EventTicketController::class, 'index'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/tickets/reconciliation', [\App\Http\Controllers\Api\EventTicketController::class, 'reconcile'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/tickets/{ticketTypeId}/quote', [\App\Http\Controllers\Api\EventTicketController::class, 'quote'])
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:120,1');
+    Route::post('/v2/events/{id}/ticket-types', [\App\Http\Controllers\Api\EventTicketController::class, 'createType'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::put('/v2/events/{id}/ticket-types/{ticketTypeId}', [\App\Http\Controllers\Api\EventTicketController::class, 'updateType'])
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/ticket-types/{ticketTypeId}/{action}', [\App\Http\Controllers\Api\EventTicketController::class, 'transitionType'])
+        ->whereNumber('id')->whereNumber('ticketTypeId')->whereIn('action', ['activate', 'pause', 'archive'])
+        ->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/tickets/{ticketTypeId}/allocate', [\App\Http\Controllers\Api\EventTicketController::class, 'allocateSelf'])
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/tickets/{ticketTypeId}/allocate/{userId}', [\App\Http\Controllers\Api\EventTicketController::class, 'allocateForMember'])
+        ->whereNumber('id')->whereNumber('ticketTypeId')->whereNumber('userId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/ticket-entitlements/{entitlementId}/cancel', [\App\Http\Controllers\Api\EventTicketController::class, 'cancelEntitlement'])
+        ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:30,1');
+    Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show'])->whereNumber('id');
+    Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update'])->whereNumber('id');
+    Route::delete('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'destroy'])->whereNumber('id');
+    Route::post('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp'])->whereNumber('id');
+    Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'removeRsvp'])->whereNumber('id');
+    Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees'])->whereNumber('id');
+    Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Controllers\Api\EventsController::class, 'checkIn'])
+        ->whereNumber('id')->whereNumber('attendeeId');
+    Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel'])->whereNumber('id');
+    Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist'])->whereNumber('id');
+    Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist'])->whereNumber('id');
+    Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::put('/v2/events/{id}/recurring', [\App\Http\Controllers\Api\EventsController::class, 'updateRecurring'])->whereNumber('id');
+    Route::get('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist'])->whereNumber('id');
+    Route::get('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'getReminders'])->whereNumber('id');
+    Route::put('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'updateReminders'])->whereNumber('id');
+    Route::delete('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'deleteReminders'])->whereNumber('id');
+    Route::get('/v2/events/{id}/safety', [\App\Http\Controllers\Api\EventSafetyController::class, 'show'])->whereNumber('id');
+    Route::put('/v2/events/{id}/safety/requirements', [\App\Http\Controllers\Api\EventSafetyController::class, 'saveRequirements'])->whereNumber('id');
+    Route::post('/v2/events/{id}/safety/requirements/publish', [\App\Http\Controllers\Api\EventSafetyController::class, 'publishRequirements'])->whereNumber('id');
+    Route::post('/v2/events/{id}/safety/requirements/archive', [\App\Http\Controllers\Api\EventSafetyController::class, 'archiveRequirements'])->whereNumber('id');
+    Route::post('/v2/events/{id}/safety/code-of-conduct/acknowledgements', [\App\Http\Controllers\Api\EventSafetyController::class, 'acknowledgeCode'])->whereNumber('id');
+    Route::delete('/v2/events/{id}/safety/code-of-conduct/acknowledgements/{acknowledgementId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawCode'])->whereNumber('id')->whereNumber('acknowledgementId');
+    Route::post('/v2/events/{id}/safety/guardian-consents', [\App\Http\Controllers\Api\EventSafetyController::class, 'requestGuardianConsent'])->whereNumber('id')->middleware('throttle:5,1');
+    Route::delete('/v2/events/{id}/safety/guardian-consents/{consentId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawGuardianConsent'])->whereNumber('id')->whereNumber('consentId');
+    Route::get('/v2/events/{id}/safety/reviews', [\App\Http\Controllers\Api\EventSafetyController::class, 'reviews'])->whereNumber('id');
+    Route::post('/v2/events/{id}/safety/reviews', [\App\Http\Controllers\Api\EventSafetyController::class, 'recordReview'])->whereNumber('id')->middleware('throttle:30,1');
+    Route::delete('/v2/events/{id}/safety/reviews/{denialId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawReview'])->whereNumber('id')->whereNumber('denialId');
+    Route::get('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'getAttendance'])->whereNumber('id');
+    Route::post('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'markAttendance'])->whereNumber('id');
+    Route::post('/v2/events/{id}/attendance/bulk', [\App\Http\Controllers\Api\EventsController::class, 'bulkMarkAttendance'])->whereNumber('id');
+    Route::post('/v2/events/{id}/series', [\App\Http\Controllers\Api\EventsController::class, 'linkToSeries'])->whereNumber('id');
+    Route::get('/v2/events/{id}/staff', [\App\Http\Controllers\Api\EventStaffController::class, 'index'])
+        ->whereNumber('id');
+    Route::post('/v2/events/{id}/staff', [\App\Http\Controllers\Api\EventStaffController::class, 'store'])
+        ->whereNumber('id');
+    Route::delete('/v2/events/{id}/staff/{assignmentId}', [\App\Http\Controllers\Api\EventStaffController::class, 'destroy'])
+        ->whereNumber('id')->whereNumber('assignmentId');
+    Route::get('/v2/events/{id}/agenda', [\App\Http\Controllers\Api\EventAgendaController::class, 'index'])
+        ->whereNumber('id');
+    Route::post('/v2/events/{id}/agenda/sessions', [\App\Http\Controllers\Api\EventAgendaController::class, 'store'])
+        ->whereNumber('id')->middleware('throttle:60,1');
+    Route::put('/v2/events/{id}/agenda/order', [\App\Http\Controllers\Api\EventAgendaController::class, 'reorder'])
+        ->whereNumber('id')->middleware('throttle:60,1');
+    Route::put('/v2/events/{id}/agenda/sessions/{sessionId}', [\App\Http\Controllers\Api\EventAgendaController::class, 'update'])
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:60,1');
+    Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/cancel', [\App\Http\Controllers\Api\EventAgendaController::class, 'cancel'])
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/registration', [\App\Http\Controllers\Api\EventAgendaController::class, 'register'])
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/registration/withdraw', [\App\Http\Controllers\Api\EventAgendaController::class, 'withdraw'])
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+    Route::get('/v2/events/{id}/offline-checkin', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'workspace'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/offline-checkin/credentials/me', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'myCredential'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::post('/v2/events/{id}/offline-checkin/credentials', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'issueCredential'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/credentials/{credentialId}/rotate', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'rotateCredential'])
+        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/credentials/{credentialId}/revoke', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'revokeCredential'])
+        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/devices', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'registerDevice'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/devices/{deviceId}/rotate', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'rotateDevice'])
+        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/devices/{deviceId}/revoke', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'revokeDevice'])
+        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/offline-checkin/manifest', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'manifest'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/offline-checkin/sync', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'stage'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/offline-checkin/batches/{batchId}', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'batch'])
+        ->whereNumber('id')->whereNumber('batchId')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/offline-checkin/conflicts', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'conflicts'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::post('/v2/events/{id}/offline-checkin/conflicts/{itemId}', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'resolveConflict'])
+        ->whereNumber('id')->whereNumber('itemId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/offline-checkin/scan', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'scan'])
+        ->whereNumber('id')->middleware('throttle:300,1');
+    Route::get('/v2/events/{eventId}/broadcasts', [\App\Http\Controllers\Api\EventBroadcastController::class, 'index'])
+        ->whereNumber('eventId')->middleware('throttle:120,1');
+    Route::post('/v2/events/{eventId}/broadcasts/preview', [\App\Http\Controllers\Api\EventBroadcastController::class, 'preview'])
+        ->whereNumber('eventId')->middleware('throttle:60,1');
+    Route::post('/v2/events/{eventId}/broadcasts', [\App\Http\Controllers\Api\EventBroadcastController::class, 'store'])
+        ->whereNumber('eventId')->middleware('throttle:20,1');
+    Route::get('/v2/event-broadcasts/{broadcastId}', [\App\Http\Controllers\Api\EventBroadcastController::class, 'show'])
+        ->whereNumber('broadcastId')->middleware('throttle:120,1');
+    Route::post('/v2/event-broadcasts/{broadcastId}/revisions', [\App\Http\Controllers\Api\EventBroadcastController::class, 'revise'])
+        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+    Route::post('/v2/event-broadcasts/{broadcastId}/schedule', [\App\Http\Controllers\Api\EventBroadcastController::class, 'schedule'])
+        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+    Route::post('/v2/event-broadcasts/{broadcastId}/cancel', [\App\Http\Controllers\Api\EventBroadcastController::class, 'cancel'])
+        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+    Route::post('/v2/event-broadcasts/{broadcastId}/retry', [\App\Http\Controllers\Api\EventBroadcastController::class, 'retry'])
+        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+    Route::get('/v2/events/{id}/registration-product', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'attendeeState'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::get('/v2/events/{id}/registration-product/manage', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'organizerOverview'])
+        ->whereNumber('id')->middleware('throttle:120,1');
+    Route::put('/v2/events/{id}/registration-product/settings', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'saveSettings'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/settings/publish', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'publishSettings'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/forms', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'createForm'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::put('/v2/events/{id}/registration-product/forms/{formId}', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'updateForm'])
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/forms/{formId}/fork', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'forkForm'])
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/forms/{formId}/publish', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'publishForm'])
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/submissions', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'saveSubmission'])
+        ->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/submit', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'submit'])
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/amend', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'amend'])
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/answers', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'answers'])
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:60,1');
+    Route::post('/v2/events/{id}/registration-product/submissions/export', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'export'])
+        ->whereNumber('id')->middleware('throttle:10,1');
+    Route::post('/v2/events/{id}/registration-product/campaigns/preview', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'previewCampaign'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/schedule', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'scheduleCampaign'])
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:10,1');
+    Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/issue', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'issueCampaign'])
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:10,1');
+    Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/cancel', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'cancelCampaign'])
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/invitations/{invitationId}/revoke', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'revokeInvitation'])
+        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/invitations/accept', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'acceptInvitation'])
+        ->whereNumber('id')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/invitations/{invitationId}/accept', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'acceptMemberInvitation'])
+        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/registrations/{registrationId}/guests', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'captureGuest'])
+        ->whereNumber('id')->whereNumber('registrationId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/guests/{guestId}/cancel', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'cancelGuest'])
+        ->whereNumber('id')->whereNumber('guestId')->middleware('throttle:20,1');
+    Route::post('/v2/events/{id}/registration-product/guests/{guestId}/attendance/{action}', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'transitionGuestAttendance'])
+        ->whereNumber('id')->whereNumber('guestId')->whereIn('action', ['check_in', 'check_out', 'no_show', 'undo'])
+        ->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/registration-product/retention/dry-run', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'retentionDryRun'])
+        ->whereNumber('id')->middleware('throttle:10,1');
+    Route::post('/v2/events/{id}/registration-product/retention/{dryRunId}/apply', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'retentionApply'])
+        ->whereNumber('id')->whereNumber('dryRunId')->middleware('throttle:5,1');
+});
+
+// Canonical registration/People API. Legacy RSVP and waitlist endpoints above
+// remain authoritative for existing clients during the dual-write window.
+Route::middleware(['auth:sanctum', 'feature:events'])->group(function () {
+    Route::get('/v2/events/{id}/relationship', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'show',
+    ])->whereNumber('id');
+    Route::post('/v2/events/{id}/registration/confirm', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'confirm',
+    ])->whereNumber('id');
+    Route::post('/v2/events/{id}/registration/withdraw', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'withdraw',
+    ])->whereNumber('id');
+    Route::post('/v2/events/{id}/registration/waitlist', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'joinWaitlist',
+    ])->whereNumber('id');
+    Route::post('/v2/events/{id}/registration/waitlist/leave', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'leaveWaitlist',
+    ])->whereNumber('id');
+    Route::post('/v2/events/{id}/registration/waitlist/accept', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'acceptOffer',
+    ])->whereNumber('id');
+    Route::get('/v2/events/{id}/people', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'people',
+    ])->whereNumber('id');
+    Route::get('/v2/events/{id}/people/export.csv', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'exportPeople',
+    ])->whereNumber('id')->middleware('throttle:10,1');
+    Route::post('/v2/events/{id}/people/bulk', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'bulk',
+    ])->whereNumber('id')->middleware('throttle:30,1');
+    Route::get('/v2/events/{id}/people/{userId}/history', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'history',
+    ])->whereNumber('id')->whereNumber('userId');
+    Route::post('/v2/events/{id}/people/{userId}/attendance', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'attendance',
+    ])->whereNumber('id')->whereNumber('userId')->middleware('throttle:60,1');
+    Route::post('/v2/events/{id}/people/{userId}/approve', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'approve',
+    ])->whereNumber('id')->whereNumber('userId');
+    Route::post('/v2/events/{id}/people/{userId}/reject', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'reject',
+    ])->whereNumber('id')->whereNumber('userId');
+    Route::post('/v2/events/{id}/people/{userId}/cancel', [
+        \App\Http\Controllers\Api\EventRegistrationController::class,
+        'cancel',
+    ])->whereNumber('id')->whereNumber('userId');
+});
 
 // ============================================
 // MIGRATED ROUTES — Listings (controller routes only)
@@ -263,6 +555,12 @@ Route::get('/v2/messages/reactions/batch', [\App\Http\Controllers\Api\MessagesCo
 // ============================================
 // Group Conversations (Group DMs)
 // ============================================
+Route::middleware('feature:groups')
+    ->where([
+        'id' => '[0-9]+',
+        'userId' => '[0-9]+',
+    ])
+    ->group(function () {
 Route::post('/v2/conversations/groups', [\App\Http\Controllers\Api\GroupConversationController::class, 'store']);
 Route::get('/v2/conversations/groups', [\App\Http\Controllers\Api\GroupConversationController::class, 'index']);
 Route::get('/v2/conversations/{id}/participants', [\App\Http\Controllers\Api\GroupConversationController::class, 'participants']);
@@ -271,6 +569,7 @@ Route::delete('/v2/conversations/{id}/participants/{userId}', [\App\Http\Control
 Route::patch('/v2/conversations/{id}/group', [\App\Http\Controllers\Api\GroupConversationController::class, 'updateGroup']);
 Route::get('/v2/conversations/{id}/messages', [\App\Http\Controllers\Api\GroupConversationController::class, 'messages']);
 Route::post('/v2/conversations/{id}/messages', [\App\Http\Controllers\Api\GroupConversationController::class, 'sendMessage']);
+});
 
 // ============================================
 // MIGRATED ROUTES — Groups & Connections
@@ -280,68 +579,92 @@ Route::get('/v2/connections/status/me', function () {
 }); // Guard: reject literal "me" before {userId} param
 // ============================================
 // NOTE: GET /v2/groups, /v2/groups/{id}, /v2/groups/{id}/members are registered
-// as public routes ABOVE this auth group (with optional auth in the controller).
+// in the authenticated feature-gated group above.
+Route::middleware('feature:groups')
+    ->where([
+        'id' => '[0-9]+',
+        'userId' => '[0-9]+',
+        'discussionId' => '[0-9]+',
+        'announcementId' => '[0-9]+',
+        'fileId' => '[0-9]+',
+        'inviteId' => '[0-9]+',
+        'questionId' => '[0-9]+',
+        'answerId' => '[0-9]+',
+        'pageId' => '[0-9]+',
+        'mediaId' => '[0-9]+',
+        'webhookId' => '[0-9]+',
+        'challengeId' => '[0-9]+',
+        'postId' => '[0-9]+',
+    ])
+    ->group(function () {
 Route::post('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'store']);
 Route::get('/v2/groups/recommendations', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
 Route::post('/v2/groups/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/v2/groups/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
 Route::put('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'update']);
+Route::post('/v2/groups/{id}/settings', [\App\Http\Controllers\Api\GroupsController::class, 'updateForm'])->middleware('throttle:20,1');
 Route::delete('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'destroy']);
 Route::get('/v2/groups/{id}/similar', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
-Route::post('/v2/groups/{id}/join', [\App\Http\Controllers\Api\GroupsController::class, 'join']);
+Route::post('/v2/groups/{id}/join', [\App\Http\Controllers\Api\GroupsController::class, 'join'])->middleware('throttle:groups-join');
 Route::delete('/v2/groups/{id}/membership', [\App\Http\Controllers\Api\GroupsController::class, 'leave']);
 Route::put('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateMember']);
 Route::delete('/v2/groups/{id}/members/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'removeMember']);
 Route::get('/v2/groups/{id}/requests', [\App\Http\Controllers\Api\GroupsController::class, 'pendingRequests']);
-Route::post('/v2/groups/{id}/requests/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'handleRequest']);
-Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions']);
-Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'createDiscussion']);
-Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages']);
-Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion']);
-Route::post('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'uploadImage'])->middleware('throttle:20,1');
-Route::get('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'announcements']);
-Route::post('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'createAnnouncement']);
-Route::put('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateAnnouncement']);
-Route::delete('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'deleteAnnouncement']);
-Route::get('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'index']);
-Route::post('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'store']);
-Route::get('/v2/groups/{id}/files/folders', [\App\Http\Controllers\Api\GroupFilesController::class, 'folders']);
-Route::get('/v2/groups/{id}/files/stats', [\App\Http\Controllers\Api\GroupFilesController::class, 'stats']);
-Route::get('/v2/groups/{id}/files/{fileId}/download', [\App\Http\Controllers\Api\GroupFilesController::class, 'download']);
-Route::delete('/v2/groups/{id}/files/{fileId}', [\App\Http\Controllers\Api\GroupFilesController::class, 'destroy']);
-Route::get('/v2/groups/{id}/analytics', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'dashboard']);
-Route::get('/v2/groups/{id}/analytics/growth', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'growth']);
-Route::get('/v2/groups/{id}/analytics/engagement', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'engagement']);
-Route::get('/v2/groups/{id}/analytics/contributors', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'contributors']);
-Route::get('/v2/groups/{id}/analytics/retention', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'retention']);
-Route::get('/v2/groups/{id}/analytics/comparative', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'comparative']);
-Route::get('/v2/groups/{id}/analytics/export/members', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportMembers']);
-Route::get('/v2/groups/{id}/analytics/export/activity', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportActivity']);
-Route::get('/v2/groups/{id}/invites', [\App\Http\Controllers\Api\GroupInviteController::class, 'index']);
-Route::post('/v2/groups/{id}/invites/link', [\App\Http\Controllers\Api\GroupInviteController::class, 'createLink']);
-Route::post('/v2/groups/{id}/invites/email', [\App\Http\Controllers\Api\GroupInviteController::class, 'sendEmails']);
-Route::delete('/v2/groups/{id}/invites/{inviteId}', [\App\Http\Controllers\Api\GroupInviteController::class, 'revoke']);
-Route::post('/v2/groups/invite/{token}/accept', [\App\Http\Controllers\Api\GroupInviteController::class, 'accept']);
+Route::post('/v2/groups/{id}/requests/{userId}', [\App\Http\Controllers\Api\GroupsController::class, 'handleRequest'])->middleware('throttle:groups-join');
+Route::get('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'discussions'])->middleware('group.tab:discussion');
+Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsController::class, 'createDiscussion'])->middleware('group.tab:discussion');
+Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages'])->middleware('group.tab:discussion');
+Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion'])->middleware('group.tab:discussion');
+Route::post('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'uploadImage'])->middleware('throttle:groups-upload');
+Route::delete('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'removeImage'])->middleware('throttle:20,1');
+Route::get('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'announcements'])->middleware('group.tab:announcements');
+Route::post('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'createAnnouncement'])->middleware('group.tab:announcements');
+Route::put('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateAnnouncement'])->middleware('group.tab:announcements');
+Route::delete('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'deleteAnnouncement'])->middleware('group.tab:announcements');
+Route::get('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'index'])->middleware('group.tab:files');
+Route::post('/v2/groups/{id}/files', [\App\Http\Controllers\Api\GroupFilesController::class, 'store'])->middleware(['throttle:groups-upload', 'group.tab:files']);
+Route::get('/v2/groups/{id}/files/folders', [\App\Http\Controllers\Api\GroupFilesController::class, 'folders'])->middleware('group.tab:files');
+Route::get('/v2/groups/{id}/files/stats', [\App\Http\Controllers\Api\GroupFilesController::class, 'stats'])->middleware('group.tab:files');
+Route::get('/v2/groups/{id}/files/{fileId}/download', [\App\Http\Controllers\Api\GroupFilesController::class, 'download'])->middleware('group.tab:files');
+Route::delete('/v2/groups/{id}/files/{fileId}', [\App\Http\Controllers\Api\GroupFilesController::class, 'destroy'])->middleware('group.tab:files');
+Route::get('/v2/groups/{id}/analytics', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'dashboard'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/growth', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'growth'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/engagement', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'engagement'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/contributors', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'contributors'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/retention', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'retention'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/comparative', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'comparative'])->middleware(['throttle:groups-analytics-read', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/export/members', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportMembers'])->middleware(['throttle:groups-analytics-export', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/analytics/export/activity', [\App\Http\Controllers\Api\GroupAnalyticsController::class, 'exportActivity'])->middleware(['throttle:groups-analytics-export', 'group.tab:analytics']);
+Route::get('/v2/groups/{id}/invites', [\App\Http\Controllers\Api\GroupInviteController::class, 'index'])->middleware('throttle:groups-invite-read');
+Route::post('/v2/groups/{id}/invites/link', [\App\Http\Controllers\Api\GroupInviteController::class, 'createLink'])->middleware('throttle:groups-invite-write');
+Route::post('/v2/groups/{id}/invites/email', [\App\Http\Controllers\Api\GroupInviteController::class, 'sendEmails'])->middleware('throttle:groups-invite-write');
+Route::delete('/v2/groups/{id}/invites/{inviteId}', [\App\Http\Controllers\Api\GroupInviteController::class, 'revoke'])->middleware('throttle:groups-invite-write');
+Route::get('/v2/groups/invite/{token}', [\App\Http\Controllers\Api\GroupInviteController::class, 'show'])->middleware('throttle:groups-invite-read');
+Route::post('/v2/groups/invite/{token}/accept', [\App\Http\Controllers\Api\GroupInviteController::class, 'accept'])->middleware('throttle:groups-invite-write');
 Route::get('/v2/groups/{id}/tags', [\App\Http\Controllers\Api\GroupTagController::class, 'index']);
 Route::put('/v2/groups/{id}/tags', [\App\Http\Controllers\Api\GroupTagController::class, 'update']);
 Route::get('/v2/group-tags', [\App\Http\Controllers\Api\GroupTagController::class, 'allTags']);
 Route::get('/v2/group-tags/popular', [\App\Http\Controllers\Api\GroupTagController::class, 'popular']);
 Route::get('/v2/group-tags/suggest', [\App\Http\Controllers\Api\GroupTagController::class, 'suggest']);
-Route::get('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'index']);
-Route::post('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'ask']);
-Route::get('/v2/groups/{id}/questions/{questionId}', [\App\Http\Controllers\Api\GroupQAController::class, 'show']);
-Route::post('/v2/groups/{id}/questions/{questionId}/answers', [\App\Http\Controllers\Api\GroupQAController::class, 'answer']);
-Route::post('/v2/groups/{id}/answers/{answerId}/accept', [\App\Http\Controllers\Api\GroupQAController::class, 'accept']);
-Route::post('/v2/groups/{id}/qa/vote', [\App\Http\Controllers\Api\GroupQAController::class, 'vote']);
-Route::get('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'index']);
-Route::post('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'create']);
-Route::get('/v2/groups/{id}/wiki/{slug}', [\App\Http\Controllers\Api\GroupWikiController::class, 'show']);
-Route::put('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'update']);
-Route::delete('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'destroy']);
-Route::get('/v2/groups/{id}/wiki/{pageId}/revisions', [\App\Http\Controllers\Api\GroupWikiController::class, 'revisions']);
-Route::get('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'index']);
-Route::post('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'upload'])->middleware('throttle:20,1');
-Route::delete('/v2/groups/{id}/media/{mediaId}', [\App\Http\Controllers\Api\GroupMediaController::class, 'destroy']);
+Route::get('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'index'])->middleware('group.tab:qa');
+Route::post('/v2/groups/{id}/questions', [\App\Http\Controllers\Api\GroupQAController::class, 'ask'])->middleware('group.tab:qa');
+Route::get('/v2/groups/{id}/questions/{questionId}', [\App\Http\Controllers\Api\GroupQAController::class, 'show'])->middleware('group.tab:qa');
+Route::put('/v2/groups/{id}/questions/{questionId}', [\App\Http\Controllers\Api\GroupQAController::class, 'updateQuestion'])->middleware('group.tab:qa');
+Route::delete('/v2/groups/{id}/questions/{questionId}', [\App\Http\Controllers\Api\GroupQAController::class, 'destroyQuestion'])->middleware('group.tab:qa');
+Route::post('/v2/groups/{id}/questions/{questionId}/answers', [\App\Http\Controllers\Api\GroupQAController::class, 'answer'])->middleware('group.tab:qa');
+Route::put('/v2/groups/{id}/answers/{answerId}', [\App\Http\Controllers\Api\GroupQAController::class, 'updateAnswer'])->middleware('group.tab:qa');
+Route::delete('/v2/groups/{id}/answers/{answerId}', [\App\Http\Controllers\Api\GroupQAController::class, 'destroyAnswer'])->middleware('group.tab:qa');
+Route::post('/v2/groups/{id}/answers/{answerId}/accept', [\App\Http\Controllers\Api\GroupQAController::class, 'accept'])->middleware('group.tab:qa');
+Route::post('/v2/groups/{id}/qa/vote', [\App\Http\Controllers\Api\GroupQAController::class, 'vote'])->middleware(['throttle:groups-vote', 'group.tab:qa']);
+Route::get('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'index'])->middleware('group.tab:wiki');
+Route::post('/v2/groups/{id}/wiki', [\App\Http\Controllers\Api\GroupWikiController::class, 'create'])->middleware('group.tab:wiki');
+Route::get('/v2/groups/{id}/wiki/{slug}', [\App\Http\Controllers\Api\GroupWikiController::class, 'show'])->middleware('group.tab:wiki');
+Route::put('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'update'])->middleware('group.tab:wiki');
+Route::delete('/v2/groups/{id}/wiki/{pageId}', [\App\Http\Controllers\Api\GroupWikiController::class, 'destroy'])->middleware('group.tab:wiki');
+Route::get('/v2/groups/{id}/wiki/{pageId}/revisions', [\App\Http\Controllers\Api\GroupWikiController::class, 'revisions'])->middleware('group.tab:wiki');
+Route::get('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'index'])->middleware('group.tab:media');
+Route::post('/v2/groups/{id}/media', [\App\Http\Controllers\Api\GroupMediaController::class, 'upload'])->middleware(['throttle:groups-upload', 'group.tab:media']);
+Route::delete('/v2/groups/{id}/media/{mediaId}', [\App\Http\Controllers\Api\GroupMediaController::class, 'destroy'])->middleware('group.tab:media');
 Route::get('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'index']);
 Route::post('/v2/groups/{id}/webhooks', [\App\Http\Controllers\Api\GroupWebhookController::class, 'store']);
 Route::delete('/v2/groups/{id}/webhooks/{webhookId}', [\App\Http\Controllers\Api\GroupWebhookController::class, 'destroy']);
@@ -351,18 +674,22 @@ Route::put('/v2/groups/{id}/welcome', [\App\Http\Controllers\Api\GroupWelcomeCon
 Route::get('/v2/group-templates', [\App\Http\Controllers\Api\GroupTemplateController::class, 'index']);
 Route::get('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'getValues']);
 Route::put('/v2/groups/{id}/custom-fields', [\App\Http\Controllers\Api\GroupCustomFieldController::class, 'setValues']);
-Route::get('/v2/groups/{id}/export', [\App\Http\Controllers\Api\GroupDataExportController::class, 'exportAll']);
-Route::get('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'index']);
-Route::post('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'store']);
-Route::delete('/v2/groups/{id}/challenges/{challengeId}', [\App\Http\Controllers\Api\GroupChallengeController::class, 'destroy']);
-Route::get('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'index']);
-Route::post('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'store']);
-Route::delete('/v2/groups/{id}/scheduled-posts/{postId}', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'cancel']);
+Route::get('/v2/groups/{id}/export', [\App\Http\Controllers\Api\GroupDataExportController::class, 'exportAll'])->middleware('throttle:groups-export-write');
+Route::post('/v2/groups/{id}/exports', [\App\Http\Controllers\Api\GroupDataExportController::class, 'requestExport'])->middleware('throttle:groups-export-write');
+Route::get('/v2/groups/{id}/exports/{exportId}', [\App\Http\Controllers\Api\GroupDataExportController::class, 'exportStatus'])->whereUuid('exportId')->middleware('throttle:groups-export-read');
+Route::get('/v2/groups/{id}/exports/{exportId}/download', [\App\Http\Controllers\Api\GroupDataExportController::class, 'downloadExport'])->whereUuid('exportId')->middleware('throttle:groups-export-read');
+Route::get('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'index'])->middleware('group.tab:challenges');
+Route::post('/v2/groups/{id}/challenges', [\App\Http\Controllers\Api\GroupChallengeController::class, 'store'])->middleware('group.tab:challenges');
+Route::delete('/v2/groups/{id}/challenges/{challengeId}', [\App\Http\Controllers\Api\GroupChallengeController::class, 'destroy'])->middleware('group.tab:challenges');
+Route::get('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'index'])->middleware('group.tab:announcements');
+Route::post('/v2/groups/{id}/scheduled-posts', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'store'])->middleware('group.tab:announcements');
+Route::delete('/v2/groups/{id}/scheduled-posts/{postId}', [\App\Http\Controllers\Api\GroupScheduledPostController::class, 'cancel'])->middleware('group.tab:announcements');
 Route::get('/v2/groups/{id}/notification-prefs', [\App\Http\Controllers\Api\GroupNotificationPrefController::class, 'get']);
 Route::put('/v2/groups/{id}/notification-prefs', [\App\Http\Controllers\Api\GroupNotificationPrefController::class, 'set']);
 Route::get('/v2/group-collections', [\App\Http\Controllers\Api\GroupCollectionController::class, 'index']);
 Route::get('/v2/group-collections/{id}', [\App\Http\Controllers\Api\GroupCollectionController::class, 'show']);
 Route::get('/v2/groups/{id}/mentions/suggest', [\App\Http\Controllers\Api\GroupMentionController::class, 'suggestions']);
+});
 Route::get('/v2/connections', [\App\Http\Controllers\Api\ConnectionsController::class, 'index']);
 Route::get('/v2/connections/pending', [\App\Http\Controllers\Api\ConnectionsController::class, 'pendingCounts']);
 Route::get('/v2/connections/status/{userId}', [\App\Http\Controllers\Api\ConnectionsController::class, 'status']);
@@ -998,8 +1325,10 @@ Route::get('/v2/marketplace/listings/{id}/promotion', [\App\Http\Controllers\Api
 Route::get('/v2/marketplace/promotions/mine', [\App\Http\Controllers\Api\MarketplacePromotionController::class, 'myPromotions']);
 
 // Marketplace Group — Group-scoped marketplace (MKT37)
-Route::get('/v2/marketplace/groups/{groupId}/listings', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'listings']);
-Route::get('/v2/marketplace/groups/{groupId}/stats', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'stats']);
+Route::get('/v2/marketplace/groups/{groupId}/listings', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'listings'])
+    ->whereNumber('groupId')->middleware('feature:groups');
+Route::get('/v2/marketplace/groups/{groupId}/stats', [\App\Http\Controllers\Api\MarketplaceGroupController::class, 'stats'])
+    ->whereNumber('groupId')->middleware('feature:groups');
 
 // Marketplace Community Delivery — Peer-to-peer delivery for time credits (MKT39)
 Route::post('/v2/marketplace/orders/{orderId}/delivery-offers', [\App\Http\Controllers\Api\MarketplaceCommunityDeliveryController::class, 'store']);
@@ -1128,10 +1457,10 @@ Route::put('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\A
 Route::delete('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\CourseContentController::class, 'deleteLesson'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
 
 // Group linkage
-Route::get('/v2/groups/{groupId}/courses', [\App\Http\Controllers\Api\CourseGroupController::class, 'forGroup'])->where('groupId', '[0-9]+');
-Route::get('/v2/courses/{courseId}/groups', [\App\Http\Controllers\Api\CourseGroupController::class, 'groupsForCourse'])->where('courseId', '[0-9]+');
-Route::post('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'attach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+']);
-Route::delete('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'detach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+']);
+Route::get('/v2/groups/{groupId}/courses', [\App\Http\Controllers\Api\CourseGroupController::class, 'forGroup'])->where('groupId', '[0-9]+')->middleware('feature:groups');
+Route::get('/v2/courses/{courseId}/groups', [\App\Http\Controllers\Api\CourseGroupController::class, 'groupsForCourse'])->where('courseId', '[0-9]+')->middleware('feature:groups');
+Route::post('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'attach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+'])->middleware('feature:groups');
+Route::delete('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'detach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+'])->middleware('feature:groups');
 
 // Grading (instructor/admin)
 Route::get('/v2/courses/{courseId}/grading', [\App\Http\Controllers\Api\CourseQuizController::class, 'gradingQueue'])->where('courseId', '[0-9]+');
@@ -1920,6 +2249,12 @@ Route::post('/v2/admin/gamification/bulk-award', [\App\Http\Controllers\Api\Admi
 Route::get('/v2/admin/gamification/badge-config', [\App\Http\Controllers\Api\AdminGamificationController::class, 'getBadgeConfig']);
 Route::put('/v2/admin/gamification/badge-config/{badgeKey}', [\App\Http\Controllers\Api\AdminGamificationController::class, 'updateBadgeConfig']);
 Route::post('/v2/admin/gamification/badge-config/{badgeKey}/reset', [\App\Http\Controllers\Api\AdminGamificationController::class, 'resetBadgeConfig']);
+Route::where([
+    'id' => '[0-9]+',
+    'groupId' => '[0-9]+',
+    'userId' => '[0-9]+',
+    'tagId' => '[0-9]+',
+])->group(function () {
 Route::get('/v2/admin/groups', [\App\Http\Controllers\Api\AdminGroupsController::class, 'index']);
 Route::get('/v2/admin/groups/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'analytics']);
 Route::get('/v2/admin/groups/approvals', [\App\Http\Controllers\Api\AdminGroupsController::class, 'approvals']);
@@ -1930,8 +2265,6 @@ Route::get('/v2/admin/groups/types', [\App\Http\Controllers\Api\AdminGroupsContr
 Route::post('/v2/admin/groups/types', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createGroupType']);
 Route::put('/v2/admin/groups/types/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'updateGroupType']);
 Route::delete('/v2/admin/groups/types/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteGroupType']);
-Route::get('/v2/admin/groups/types/{id}/policies', [\App\Http\Controllers\Api\AdminGroupsController::class, 'getPolicies']);
-Route::put('/v2/admin/groups/types/{id}/policies', [\App\Http\Controllers\Api\AdminGroupsController::class, 'setPolicy']);
 Route::post('/v2/admin/groups/batch-geocode', [\App\Http\Controllers\Api\AdminGroupsController::class, 'batchGeocode']);
 Route::get('/v2/admin/groups/recommendations', [\App\Http\Controllers\Api\AdminGroupsController::class, 'getRecommendationData']);
 Route::get('/v2/admin/groups/featured', [\App\Http\Controllers\Api\AdminGroupsController::class, 'getFeaturedGroups']);
@@ -1964,7 +2297,9 @@ Route::delete('/v2/admin/group-collections/{id}', [\App\Http\Controllers\Api\Adm
 Route::put('/v2/admin/group-collections/{id}/groups', [\App\Http\Controllers\Api\AdminGroupsController::class, 'setCollectionGroups']);
 Route::get('/v2/admin/group-auto-assign-rules', [\App\Http\Controllers\Api\AdminGroupsController::class, 'listAutoAssignRules']);
 Route::post('/v2/admin/group-auto-assign-rules', [\App\Http\Controllers\Api\AdminGroupsController::class, 'createAutoAssignRule']);
+Route::put('/v2/admin/group-auto-assign-rules/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'updateAutoAssignRule']);
 Route::delete('/v2/admin/group-auto-assign-rules/{id}', [\App\Http\Controllers\Api\AdminGroupsController::class, 'deleteAutoAssignRule']);
+});
 Route::get('/v2/admin/timebanking/stats', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'stats']);
 Route::get('/v2/admin/timebanking/alerts', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'alerts']);
 Route::put('/v2/admin/timebanking/alerts/{id}', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'updateAlert']);
@@ -2212,10 +2547,19 @@ Route::get('/v2/admin/volunteering/donations', [\App\Http\Controllers\Api\Volunt
 Route::get('/v2/admin/volunteering/donations/export', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'exportDonations']);
 Route::post('/v2/admin/volunteering/donations/{id}/complete', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'completeDonation']);
 Route::post('/v2/admin/donations/{id}/refund', [\App\Http\Controllers\Api\DonationPaymentController::class, 'adminRefund']);
-Route::get('/v2/admin/events', [\App\Http\Controllers\Api\AdminEventsController::class, 'index']);
-Route::get('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'show']);
-Route::delete('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'destroy']);
-Route::post('/v2/admin/events/{id}/cancel', [\App\Http\Controllers\Api\AdminEventsController::class, 'cancel']);
+Route::middleware('feature:events')->group(function () {
+    Route::get('/v2/admin/events', [\App\Http\Controllers\Api\AdminEventsController::class, 'index']);
+    Route::get('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'show'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/approve', [\App\Http\Controllers\Api\AdminEventsController::class, 'approve'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/reject', [\App\Http\Controllers\Api\AdminEventsController::class, 'reject'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/postpone', [\App\Http\Controllers\Api\AdminEventsController::class, 'postpone'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/cancel', [\App\Http\Controllers\Api\AdminEventsController::class, 'cancel'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/complete', [\App\Http\Controllers\Api\AdminEventsController::class, 'complete'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/archive', [\App\Http\Controllers\Api\AdminEventsController::class, 'archive'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/restore', [\App\Http\Controllers\Api\AdminEventsController::class, 'restore'])->whereNumber('id');
+    Route::post('/v2/admin/events/{id}/reschedule', [\App\Http\Controllers\Api\AdminEventsController::class, 'reschedule'])->whereNumber('id');
+    Route::delete('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'destroy'])->whereNumber('id');
+});
 Route::get('/v2/admin/polls', [\App\Http\Controllers\Api\AdminPollsController::class, 'index']);
 Route::get('/v2/admin/polls/{id}', [\App\Http\Controllers\Api\AdminPollsController::class, 'show']);
 Route::delete('/v2/admin/polls/{id}', [\App\Http\Controllers\Api\AdminPollsController::class, 'destroy']);
@@ -2795,8 +3139,9 @@ Route::get('/v2/pusher/config', [\App\Http\Controllers\Api\PusherController::cla
 // in the public auth group above.
 Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge'])->middleware('throttle:10,1');
 Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify'])->middleware('throttle:10,1');
-// NOTE: POST /webauthn/auth-challenge, /webauthn/auth-verify, /webauthn/login/options, /webauthn/login/verify
-// are public routes (registered above auth group) — they're pre-login flows
+Route::post('/webauthn/security-confirm', [\App\Http\Controllers\Api\WebAuthnController::class, 'confirmSecurityAction'])->middleware('throttle:10,1');
+// NOTE: POST /webauthn/auth-challenge and /webauthn/auth-verify are public
+// routes (registered above this auth group) because they are pre-login flows.
 Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove'])->middleware('throttle:10,1');
 Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename'])->middleware('throttle:10,1');
 Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll'])->middleware('throttle:10,1');
@@ -2824,11 +3169,14 @@ Route::post('/menus/clear-cache', [\App\Http\Controllers\Api\MenuController::cla
 // NOTE: GET /menus, /menus/config, /menus/mobile, /menus/{slug} are public routes (registered above auth group)
 // NOTE: POST /v2/contact is a public route (registered above auth group)
 Route::post('/help/feedback', [\App\Http\Controllers\Api\HelpController::class, 'feedback']);
-Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData'])->middleware(['auth:sanctum', 'admin']);
-Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
-Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
-Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
-Route::get('/recommendations/similar/{id}', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
+Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData'])
+    ->whereNumber('id')->middleware(['feature:groups', 'auth:sanctum', 'admin']);
+Route::middleware('feature:groups')->whereNumber('id')->group(function () {
+    Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
+    Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
+    Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
+    Route::get('/recommendations/similar/{id}', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
+});
 Route::get('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'getSettings']);
 Route::post('/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'updateSettings']);
 
@@ -2898,6 +3246,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding'])->middleware('throttle:5,1');
     Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete'])->middleware('throttle:5,1');
 });
+Route::middleware('feature:groups')
+    ->where([
+        'id' => '[0-9]+',
+        'userId' => '[0-9]+',
+    ])
+    ->group(function () {
 Route::get('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'index']);
 Route::post('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'store']);
 Route::get('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'show']);
@@ -2908,6 +3262,7 @@ Route::delete('/v2/group-exchanges/{id}/participants/{userId}', [\App\Http\Contr
 Route::post('/v2/group-exchanges/{id}/start', [\App\Http\Controllers\Api\GroupExchangeController::class, 'start']);
 Route::post('/v2/group-exchanges/{id}/confirm', [\App\Http\Controllers\Api\GroupExchangeController::class, 'confirm']);
 Route::post('/v2/group-exchanges/{id}/complete', [\App\Http\Controllers\Api\GroupExchangeController::class, 'complete']);
+});
 Route::get('/v2/wallet/statement', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'statement']);
 Route::get('/v2/wallet/categories', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'listCategories']);
 Route::post('/v2/wallet/categories', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'createCategory']);
@@ -2925,20 +3280,6 @@ Route::put('/v2/wallet/starting-balance', [\App\Http\Controllers\Api\WalletFeatu
 Route::post('/v2/exchanges/{id}/rate', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'rateExchange']);
 Route::get('/v2/exchanges/{id}/ratings', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'exchangeRatings']);
 Route::get('/v2/users/{id}/rating', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'userRating']);
-Route::post('/v2/events/recurring', [\App\Http\Controllers\Api\EventsController::class, 'createRecurring']);
-Route::get('/v2/events/series', [\App\Http\Controllers\Api\EventsController::class, 'listSeries']);
-Route::post('/v2/events/series', [\App\Http\Controllers\Api\EventsController::class, 'createSeries']);
-Route::get('/v2/events/series/{seriesId}', [\App\Http\Controllers\Api\EventsController::class, 'showSeries']);
-Route::put('/v2/events/{id}/recurring', [\App\Http\Controllers\Api\EventsController::class, 'updateRecurring']);
-// cancel duplicate removed — registered at line 86
-Route::get('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist']);
-// POST/DELETE waitlist duplicates removed — registered at lines 87-88
-Route::get('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'getReminders']);
-Route::put('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'updateReminders']);
-Route::get('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'getAttendance']);
-Route::post('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'markAttendance']);
-Route::post('/v2/events/{id}/attendance/bulk', [\App\Http\Controllers\Api\EventsController::class, 'bulkMarkAttendance']);
-Route::post('/v2/events/{id}/series', [\App\Http\Controllers\Api\EventsController::class, 'linkToSeries']);
 Route::get('/v2/volunteering/recommended-shifts', [\App\Http\Controllers\Api\VolunteerController::class, 'recommendedShifts']);
 Route::get('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCertificates']);
 Route::post('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'generateCertificate']);
@@ -3034,24 +3375,33 @@ Route::get('/v2/ideation-challenges/{id}/outcome', [\App\Http\Controllers\Api\Id
 Route::put('/v2/ideation-challenges/{id}/outcome', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'upsertOutcome']);
 Route::get('/v2/ideation-outcomes/dashboard', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'outcomesDashboard']);
 Route::get('/v2/ideation-challenges/{id}/team-links', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'getTeamLinks']);
-Route::get('/v2/groups/{id}/chatrooms', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listChatrooms']);
-Route::post('/v2/groups/{id}/chatrooms', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createChatroom']);
-Route::delete('/v2/group-chatrooms/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteChatroom']);
-Route::get('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'chatroomMessages']);
-Route::post('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'postChatroomMessage']);
-Route::delete('/v2/group-chatroom-messages/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteChatroomMessage']);
-Route::post('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinChatroomMessage']);
-Route::delete('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'unpinChatroomMessage']);
-Route::get('/v2/groups/{groupId}/chatrooms/{chatroomId}/pinned', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinnedChatroomMessages']);
-Route::get('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listTasks']);
-Route::post('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createTask']);
-Route::get('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showTask']);
-Route::put('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateTask']);
-Route::delete('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteTask']);
-Route::get('/v2/groups/{id}/task-stats', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'taskStats']);
-Route::get('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listDocuments']);
-Route::post('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'uploadDocument']);
-Route::delete('/v2/team-documents/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteDocument']);
+Route::middleware('feature:groups')
+    ->where([
+        'id' => '[0-9]+',
+        'groupId' => '[0-9]+',
+        'chatroomId' => '[0-9]+',
+        'messageId' => '[0-9]+',
+    ])
+    ->group(function () {
+Route::get('/v2/groups/{id}/chatrooms', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listChatrooms'])->middleware('group.tab:chatrooms');
+Route::post('/v2/groups/{id}/chatrooms', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createChatroom'])->middleware('group.tab:chatrooms');
+Route::delete('/v2/group-chatrooms/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteChatroom'])->middleware('group.tab:chatrooms');
+Route::get('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'chatroomMessages'])->middleware('group.tab:chatrooms');
+Route::post('/v2/group-chatrooms/{id}/messages', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'postChatroomMessage'])->middleware(['throttle:groups-chat-write', 'group.tab:chatrooms']);
+Route::delete('/v2/group-chatroom-messages/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteChatroomMessage'])->middleware('group.tab:chatrooms');
+Route::post('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinChatroomMessage'])->middleware('group.tab:chatrooms');
+Route::delete('/v2/groups/{groupId}/chatrooms/{chatroomId}/pin/{messageId}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'unpinChatroomMessage'])->middleware('group.tab:chatrooms');
+Route::get('/v2/groups/{groupId}/chatrooms/{chatroomId}/pinned', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'pinnedChatroomMessages'])->middleware('group.tab:chatrooms');
+Route::get('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listTasks'])->middleware('group.tab:tasks');
+Route::post('/v2/groups/{id}/tasks', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'createTask'])->middleware('group.tab:tasks');
+Route::get('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showTask'])->middleware('group.tab:tasks');
+Route::put('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateTask'])->middleware('group.tab:tasks');
+Route::delete('/v2/team-tasks/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteTask'])->middleware('group.tab:tasks');
+Route::get('/v2/groups/{id}/task-stats', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'taskStats'])->middleware('group.tab:tasks');
+Route::get('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listDocuments'])->middleware('group.tab:files');
+Route::post('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'uploadDocument'])->middleware(['throttle:groups-upload', 'group.tab:files']);
+Route::delete('/v2/team-documents/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteDocument'])->middleware('group.tab:files');
+});
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/members/inactive', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'inactiveMembers']);
     Route::post('/v2/admin/members/inactive/detect', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'detectInactive']);
@@ -3099,8 +3449,8 @@ Route::post('/polls/vote', [\App\Http\Controllers\Api\PollsController::class, 'v
 Route::get('/goals', [\App\Http\Controllers\Api\GoalsController::class, 'index']);
 // Legacy routes removed: /goals/update and /goals/offer-buddy — use V2 endpoints instead
 Route::get('/vol_opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'index']);
-Route::get('/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
-Route::post('/events/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp']);
+Route::get('/events', [\App\Http\Controllers\Api\EventsController::class, 'index'])->middleware('feature:events');
+// Legacy POST /events/rsvp removed: it had no {id} route parameter and no callers.
 Route::get('/wallet/balance', [\App\Http\Controllers\Api\WalletController::class, 'balance']);
 Route::get('/cookie-consent', [\App\Http\Controllers\Api\CookieConsentController::class, 'show']);
 Route::post('/cookie-consent', [\App\Http\Controllers\Api\CookieConsentController::class, 'store']);
@@ -3122,7 +3472,7 @@ Route::post('/wallet/transfer', [\App\Http\Controllers\Api\WalletController::cla
 Route::post('/wallet/user-search', [\App\Http\Controllers\Api\WalletController::class, 'userSearch']);
 Route::get('/members', [\App\Http\Controllers\Api\CoreController::class, 'members']);
 Route::get('/listings', [\App\Http\Controllers\Api\CoreController::class, 'listings']);
-Route::get('/groups', [\App\Http\Controllers\Api\CoreController::class, 'groups']);
+Route::get('/groups', [\App\Http\Controllers\Api\CoreController::class, 'groups'])->middleware('feature:groups');
 // Legacy GET /messages removed — all clients use /v2/messages (MessagesController)
 Route::get('/notifications', [\App\Http\Controllers\Api\CoreController::class, 'notifications']);
 Route::get('/notifications/check', [\App\Http\Controllers\Api\CoreController::class, 'checkNotifications']);
@@ -3212,12 +3562,12 @@ Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
     Route::post('/v2/federation/cc/transactions/{uuid}/commit', [\App\Http\Controllers\Api\FederationCreditCommonsController::class, 'commitTransaction']);
 
     // --- Nexus Native V2 inbound entity push (REST) ---
-    // Partners using the Nexus protocol POST entities here; persistence is
-    // handled downstream by dedicated listeners (see FederationNativeIngestController).
+    // Partners using the Nexus protocol POST entities here. Event facts use a
+    // strict versioned projection with signature, replay, stale, and conflict handling.
     // Namespaced under /ingest/ to avoid colliding with user-facing FederationV2Controller routes
     Route::post('/v2/federation/ingest/reviews', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'reviews']);
     Route::post('/v2/federation/ingest/listings', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'listings']);
-    Route::post('/v2/federation/ingest/events', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'events']);
+    Route::post('/v2/federation/ingest/events', [\App\Http\Controllers\Api\EventFederationInboundController::class, 'apply']);
     Route::post('/v2/federation/ingest/groups', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'groups']);
     Route::post('/v2/federation/ingest/connections', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'connections']);
     Route::post('/v2/federation/ingest/volunteering', [\App\Http\Controllers\Api\FederationNativeIngestController::class, 'volunteering']);

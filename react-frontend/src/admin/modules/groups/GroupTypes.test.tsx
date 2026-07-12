@@ -38,12 +38,6 @@ vi.mock('@/contexts', () =>
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 
-// Stub GroupPolicies so it doesn't pull in more heavy deps
-vi.mock('./GroupPolicies', () => ({
-  default: ({ isOpen, typeName }: { isOpen: boolean; typeName: string }) =>
-    isOpen ? <div data-testid="group-policies">{typeName}</div> : null,
-}));
-
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
 const makeGroupType = (overrides: Partial<{
@@ -53,7 +47,6 @@ const makeGroupType = (overrides: Partial<{
   icon: string;
   color: string;
   member_count: number;
-  policy_count: number;
   created_at: string;
 }> = {}) => ({
   id: 1,
@@ -62,7 +55,6 @@ const makeGroupType = (overrides: Partial<{
   icon: 'fa-users',
   color: '#6366f1',
   member_count: 5,
-  policy_count: 2,
   created_at: '2024-01-15T10:00:00Z',
   ...overrides,
 });
@@ -110,6 +102,17 @@ describe('GroupTypes', () => {
       expect(screen.getByText('Community')).toBeInTheDocument();
       expect(screen.getByText('Neighbourhood')).toBeInTheDocument();
     });
+  });
+
+  it('does not advertise tenant-wide policies as per-type controls', async () => {
+    mockAdminGroups.getGroupTypes.mockResolvedValueOnce({
+      data: [makeGroupType()],
+    });
+    render(<GroupTypes />);
+
+    await waitFor(() => expect(screen.getByText('Community')).toBeInTheDocument());
+    expect(screen.queryByRole('columnheader', { name: /policies/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /policies/i })).not.toBeInTheDocument();
   });
 
   it('renders a "Create type" button', async () => {

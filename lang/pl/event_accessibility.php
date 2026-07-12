@@ -1,0 +1,45 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'form' => [
+        'title' => 'Dostępność miejsca',
+        'hint' => 'Podaj, co jest dostępne w miejscu wydarzenia. Wybierz „Nie wiadomo”, jeśli organizator nie potwierdził danej cechy; to nie oznacza „Nie”.',
+        'parking_details' => 'Parking i dotarcie na miejsce',
+        'parking_details_hint' => 'Opisz dostępne miejsca parkingowe, punkty wysiadania i drogę do wejścia.',
+        'transit_details' => 'Transport publiczny',
+        'transit_details_hint' => 'Opisz pobliskie przystanki lub stacje oraz przeszkody na trasie.',
+        'assistance_contact' => 'Kontakt w sprawie dostępności',
+        'assistance_contact_hint' => 'Podaj publiczny kontakt do pytań o dostępność. Nie wpisuj prywatnych danych uczestników.',
+        'notes' => 'Dodatkowe informacje o dostępności',
+        'notes_hint' => 'Dodaj przydatne informacje o wejściu, windzie, nawierzchni, oświetleniu lub warunkach sensorycznych.',
+        'privacy_note' => 'Te informacje są widoczne dla członków wydarzenia. Prywatne prośby o dostosowania należy podać w formularzu rejestracyjnym.',
+    ],
+    'features' => [
+        'step_free_access' => 'Dostęp bez stopni',
+        'accessible_toilet' => 'Dostępna toaleta',
+        'hearing_loop' => 'Pętla indukcyjna',
+        'quiet_space' => 'Ciche miejsce',
+        'seating_available' => 'Dostępne miejsca siedzące',
+        'accessible_parking' => 'Dostępny parking',
+    ],
+    'status' => ['yes' => 'Tak', 'no' => 'Nie', 'unknown' => 'Nie wiadomo'],
+    'filters' => [
+        'step_free_label' => 'Dostęp bez stopni do miejsca',
+        'step_free_hint' => 'Filtruj według informacji o dostępie potwierdzonych przez organizatora.',
+        'step_free_options' => ['any' => 'Dowolne miejsce', 'yes' => 'Potwierdzony dostęp bez stopni', 'no' => 'Brak dostępu bez stopni', 'unknown' => 'Nie wiadomo, czy jest dostęp bez stopni'],
+        'step_free_active' => 'Dostęp bez stopni: :value',
+    ],
+    'detail' => [
+        'title' => 'Dostępność miejsca',
+        'intro' => 'Informacje o dostępności przekazane przez organizatora. Skontaktuj się z nim, jeśli musisz potwierdzić udogodnienie.',
+        'features_label' => 'Udogodnienia dostępności w miejscu wydarzenia',
+        'parking_details' => 'Parking i dotarcie na miejsce',
+        'transit_details' => 'Transport publiczny',
+        'assistance_contact' => 'Pomoc w zakresie dostępności',
+        'notes' => 'Dodatkowe informacje o dostępności',
+    ],
+];

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -20,6 +21,15 @@ class GroupWelcomeService
     const SETTING_KEY = 'welcome_message';
     const ENABLED_KEY = 'welcome_message_enabled';
 
+    /** @return list<string> */
+    public static function policyKeysForGroup(int $groupId): array
+    {
+        return [
+            self::SETTING_KEY . '_' . $groupId,
+            self::ENABLED_KEY . '_' . $groupId,
+        ];
+    }
+
     /**
      * Get the welcome message config for a group.
      */
@@ -29,7 +39,7 @@ class GroupWelcomeService
 
         $config = DB::table('group_policies')
             ->where('tenant_id', $tenantId)
-            ->whereIn('policy_key', [self::SETTING_KEY . '_' . $groupId, self::ENABLED_KEY . '_' . $groupId])
+            ->whereIn('policy_key', self::policyKeysForGroup($groupId))
             ->pluck('policy_value', 'policy_key')
             ->toArray();
 
@@ -82,6 +92,10 @@ class GroupWelcomeService
     public static function sendWelcome(int $groupId, int $userId): bool
     {
         $tenantId = TenantContext::getId();
+        if (! GroupAccessService::canViewMemberContent($groupId, $userId)) {
+            return false;
+        }
+
         $config = self::getConfig($groupId);
 
         if (!$config['enabled'] || empty($config['message'])) {
@@ -89,7 +103,11 @@ class GroupWelcomeService
         }
 
         $user = DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->first();
-        $group = DB::table('groups')->where('id', $groupId)->where('tenant_id', $tenantId)->first();
+        $group = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', \App\Enums\GroupStatus::Active->value)
+            ->first();
 
         if (!$user || !$group) {
             return false;
@@ -110,17 +128,20 @@ class GroupWelcomeService
 
         // Create notification via the notification dispatcher
         try {
-            DB::table('notifications')->insert([
-                'tenant_id' => $tenantId,
-                'user_id' => $userId,
-                'type' => 'group_welcome',
-                'title' => __('api.group_welcome_notification_title', ['group' => $group->name]),
-                'message' => $message,
-                'link' => '/groups/' . $groupId,
-                'is_read' => 0,
-                'created_at' => now(),
-            ]);
-            return true;
+            return LocaleContext::withLocale($user, function () use ($tenantId, $userId, $groupId, $group, $message): bool {
+                DB::table('notifications')->insert([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'type' => 'group_welcome',
+                    'title' => __('api.group_welcome_notification_title', ['group' => $group->name]),
+                    'message' => $message,
+                    'link' => '/groups/' . $groupId,
+                    'is_read' => 0,
+                    'created_at' => now(),
+                ]);
+
+                return true;
+            });
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('[GroupWelcome] Failed to send welcome notification: ' . $e->getMessage());
             return false;

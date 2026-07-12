@@ -6,12 +6,15 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Models\User;
 use App\Services\GroupExchangeService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Laravel\TestCase;
 
 class GroupExchangeServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private GroupExchangeService $service;
 
     protected function setUp(): void
@@ -22,31 +25,28 @@ class GroupExchangeServiceTest extends TestCase
 
     public function test_create_returns_id(): void
     {
-        $users = \Mockery::mock();
-        $users->shouldReceive('where')->twice()->andReturnSelf();
-        $users->shouldReceive('whereIn')->with('id', [5])->once()->andReturnSelf();
-        $users->shouldReceive('count')->once()->andReturn(1);
-        DB::shouldReceive('table')->with('users')->once()->andReturn($users);
+        $organizer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
 
-        $exchanges = \Mockery::mock();
-        $exchanges->shouldReceive('insertGetId')->once()->andReturn(42);
-        DB::shouldReceive('table')->with('group_exchanges')->once()->andReturn($exchanges);
-        DB::shouldReceive('transaction')
-            ->once()
-            ->andReturnUsing(static fn (callable $callback): mixed => $callback());
-
-        $result = $this->service->create(5, [
+        $result = $this->service->create((int) $organizer->id, [
             'title' => 'Group Exchange',
             'total_hours' => 10,
             'split_type' => 'equal',
         ]);
-        $this->assertEquals(42, $result);
+
+        $this->assertIsInt($result);
+        $this->assertGreaterThan(0, $result);
+        $this->assertDatabaseHas('group_exchanges', [
+            'id' => $result,
+            'tenant_id' => $this->testTenantId,
+            'organizer_id' => $organizer->id,
+            'title' => 'Group Exchange',
+        ]);
     }
 
     public function test_get_returns_null_when_not_found(): void
     {
-        DB::shouldReceive('table->where->where->first')->andReturn(null);
-
         $this->assertNull($this->service->get(999));
     }
 }

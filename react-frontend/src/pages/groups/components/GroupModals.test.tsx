@@ -56,6 +56,11 @@ vi.mock('@/admin/components/RichTextEditor', () => ({
 }));
 
 vi.mock('@/contexts', () => createMockContexts());
+vi.mock('./GroupBrandingPicker', () => ({
+  GroupBrandingPicker: ({ onChange }: { onChange: (primary: string | null, accent: string | null) => void }) => (
+    <button type="button" onClick={() => onChange('#123456', '#ABCDEF')}>Group Branding</button>
+  ),
+}));
 
 // ─── Mock Group fixture ────────────────────────────────────────────────────────
 const mockGroup = {
@@ -203,17 +208,24 @@ describe('GroupModals', () => {
       isOpen: true,
       onOpenChange: vi.fn(),
       group: mockGroup as unknown as import('@/types/api').Group,
-      settingsName: 'Test Group',
-      settingsDescription: 'Test description',
-      settingsPrivate: false,
-      settingsLocation: '',
-      uploadingImage: false,
+      draft: {
+        name: 'Test Group',
+        description: 'Test description',
+        visibility: 'public' as const,
+        location: { label: '', latitude: null, longitude: null },
+        typeId: null,
+        parentId: null,
+        templateId: null,
+        primaryColor: null,
+        accentColor: null,
+        avatar: { action: 'keep' as const, file: null, previewUrl: null, existingUrl: null },
+        cover: { action: 'keep' as const, file: null, previewUrl: null, existingUrl: null },
+      },
+      capabilities: null,
       savingSettings: false,
-      onNameChange: vi.fn(),
-      onDescriptionChange: vi.fn(),
-      onPrivateChange: vi.fn(),
-      onLocationChange: vi.fn(),
+      onDraftChange: vi.fn(),
       onImageUpload: vi.fn(),
+      onImageRemove: vi.fn(),
       onSave: vi.fn(),
     };
 
@@ -232,7 +244,7 @@ describe('GroupModals', () => {
 
     it('renders name input with current value', async () => {
       const { GroupSettingsModal } = await import('./GroupModals');
-      render(<GroupSettingsModal {...defaultProps} settingsName="My Group Name" />);
+      render(<GroupSettingsModal {...defaultProps} draft={{ ...defaultProps.draft, name: 'My Group Name' }} />);
 
       await waitFor(() => {
         const inputs = screen.getAllByRole('textbox');
@@ -243,7 +255,7 @@ describe('GroupModals', () => {
 
     it('save button is disabled when name is empty', async () => {
       const { GroupSettingsModal } = await import('./GroupModals');
-      render(<GroupSettingsModal {...defaultProps} settingsName="" />);
+      render(<GroupSettingsModal {...defaultProps} draft={{ ...defaultProps.draft, name: '' }} />);
 
       await waitFor(() => {
         const saveBtn = screen.getAllByRole('button').find((b) =>
@@ -261,7 +273,7 @@ describe('GroupModals', () => {
 
     it('save button is enabled when name is non-empty', async () => {
       const { GroupSettingsModal } = await import('./GroupModals');
-      render(<GroupSettingsModal {...defaultProps} settingsName="Valid Name" />);
+      render(<GroupSettingsModal {...defaultProps} draft={{ ...defaultProps.draft, name: 'Valid Name' }} />);
 
       await waitFor(() => {
         const saveBtn = screen.getAllByRole('button').find((b) =>
@@ -277,20 +289,19 @@ describe('GroupModals', () => {
       });
     });
 
-    it('renders private/public switch', async () => {
+    it('renders the exact visibility selector', async () => {
       const { GroupSettingsModal } = await import('./GroupModals');
       render(<GroupSettingsModal {...defaultProps} />);
 
       await waitFor(() => {
-        const switches = screen.getAllByRole('switch');
-        expect(switches.length).toBeGreaterThan(0);
+        expect(screen.getByText('Visibility')).toBeInTheDocument();
       });
     });
 
     it('calls onSave when save button is clicked', async () => {
       const onSave = vi.fn();
       const { GroupSettingsModal } = await import('./GroupModals');
-      render(<GroupSettingsModal {...defaultProps} settingsName="Valid" onSave={onSave} />);
+      render(<GroupSettingsModal {...defaultProps} draft={{ ...defaultProps.draft, name: 'Valid' }} onSave={onSave} />);
 
       await waitFor(() => {
         const saveBtn = screen.getAllByRole('button').find((b) =>
@@ -301,6 +312,33 @@ describe('GroupModals', () => {
           expect(onSave).toHaveBeenCalled();
         }
       });
+    });
+
+    it('mounts branding from capabilities and writes it into the transactional draft', async () => {
+      const onDraftChange = vi.fn();
+      const { GroupSettingsModal } = await import('./GroupModals');
+      render(
+        <GroupSettingsModal
+          {...defaultProps}
+          onDraftChange={onDraftChange}
+          capabilities={{
+            allowedVisibility: ['public', 'private', 'secret'],
+            limits: { nameMin: 3, nameMax: 255, descriptionMin: 1, descriptionMax: 2000, locationMax: 255, imageMaxBytes: 8 * 1024 * 1024 },
+            templates: [],
+            groupTypes: [],
+            parentCandidates: [],
+            fields: { type: false, parent: false, location: true, avatar: true, cover: true, branding: true },
+            canCreate: true,
+          }}
+        />,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Group Branding' }));
+      const updater = onDraftChange.mock.calls[0]?.[0] as (draft: typeof defaultProps.draft) => typeof defaultProps.draft;
+      expect(updater(defaultProps.draft)).toEqual(expect.objectContaining({
+        primaryColor: '#123456',
+        accentColor: '#ABCDEF',
+      }));
     });
   });
 
@@ -350,6 +388,14 @@ describe('GroupModals', () => {
         expect(onConfirm).toHaveBeenCalled();
       });
     });
+
+    it('renders the cancel-request confirmation variant', async () => {
+      const { GroupLeaveModal } = await import('./GroupModals');
+      render(<GroupLeaveModal {...defaultProps} mode="cancel_request" />);
+
+      expect(await screen.findByRole('button', { name: /cancel join request/i })).toBeInTheDocument();
+      expect(screen.getByText(/cancel your request to join/i)).toBeInTheDocument();
+    });
   });
 
   // ── GroupDeleteModal ───────────────────────────────────────────────────────
@@ -371,23 +417,28 @@ describe('GroupModals', () => {
       render(<GroupDeleteModal {...defaultProps} />);
 
       await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+        expect(document.querySelector('[role="alertdialog"]')).toBeTruthy();
       });
     });
 
-    it('calls onConfirm when delete button is clicked', async () => {
+    it('requires the exact group name before allowing permanent deletion', async () => {
       const onConfirm = vi.fn();
       const { GroupDeleteModal } = await import('./GroupModals');
       render(<GroupDeleteModal {...defaultProps} onConfirm={onConfirm} />);
 
-      await waitFor(() => {
-        const deleteBtn = screen.getAllByRole('button').find((b) =>
-          b.textContent?.toLowerCase().includes('delete')
-        );
-        expect(deleteBtn).toBeDefined();
-        if (deleteBtn) fireEvent.click(deleteBtn);
-        expect(onConfirm).toHaveBeenCalled();
-      });
+      const deleteBtn = await screen.findByRole('button', { name: 'Delete Group' });
+      const confirmation = screen.getByRole('textbox', { name: 'Group name' });
+
+      expect(deleteBtn).toBeDisabled();
+      await userEvent.type(confirmation, 'delete me group');
+      expect(deleteBtn).toBeDisabled();
+      expect(onConfirm).not.toHaveBeenCalled();
+
+      await userEvent.clear(confirmation);
+      await userEvent.type(confirmation, 'Delete Me Group');
+      expect(deleteBtn).toBeEnabled();
+      await userEvent.click(deleteBtn);
+      expect(onConfirm).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -400,11 +451,16 @@ describe('GroupModals', () => {
       inviteEmails: '',
       inviteMessage: '',
       sendingInvites: false,
+      pendingInvites: [],
+      inviteResults: [],
+      invitesLoading: false,
+      revokingInvite: null,
       onGenerateLink: vi.fn(),
       onEmailsChange: vi.fn(),
       onMessageChange: vi.fn(),
       onSendInvites: vi.fn(),
       onCopyLink: vi.fn(),
+      onRevokeInvite: vi.fn(),
     };
 
     beforeEach(() => {
@@ -483,6 +539,55 @@ describe('GroupModals', () => {
         if (genBtn) fireEvent.click(genBtn);
         expect(onGenerateLink).toHaveBeenCalled();
       });
+    });
+
+    it('renders pending email and link invitations and allows revocation', async () => {
+      const onRevokeInvite = vi.fn();
+      const { GroupInviteModal } = await import('./GroupModals');
+      render(
+        <GroupInviteModal
+          {...defaultProps}
+          pendingInvites={[
+            {
+              id: 4,
+              type: 'email',
+              email: 'member@example.test',
+              status: 'pending',
+              expires_at: '2026-07-20T00:00:00Z',
+            },
+            {
+              id: 5,
+              type: 'link',
+              status: 'pending',
+              invite_url: 'https://example.test/groups/invite/token',
+              expires_at: '2026-07-20T00:00:00Z',
+            },
+          ]}
+          onRevokeInvite={onRevokeInvite}
+        />,
+      );
+
+      expect(screen.getByText('member@example.test')).toBeInTheDocument();
+      expect(screen.getByText('Share link')).toBeInTheDocument();
+      const revokeButtons = screen.getAllByRole('button', { name: /revoke invitation/i });
+      fireEvent.click(revokeButtons[0]);
+      expect(onRevokeInvite).toHaveBeenCalledWith(4);
+    });
+
+    it('shows durable invite delivery results without claiming failed email delivery succeeded', async () => {
+      const { GroupInviteModal } = await import('./GroupModals');
+      render(
+        <GroupInviteModal
+          {...defaultProps}
+          inviteResults={[
+            { email: 'ok@example.test', status: 'sent', email_delivered: true },
+            { email: 'failed@example.test', status: 'sent', email_delivered: false },
+          ]}
+        />,
+      );
+
+      expect(screen.getByText('Sent')).toBeInTheDocument();
+      expect(screen.getByText('Invitation saved, but email delivery failed')).toBeInTheDocument();
     });
   });
 

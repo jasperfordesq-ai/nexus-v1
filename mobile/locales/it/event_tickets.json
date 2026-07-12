@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Biglietti per eventi",
+      "gatewayDisabledTitle": "Il pagamento a pagamento e il pagamento con credito temporale sono disabilitati",
+      "gatewayDisabledDescription": "Questo flusso mobile supporta solo l'assegnazione gratuita dei biglietti. Non addebita mai denaro o crediti di tempo e non cambia il tuo portafoglio.",
+      "loading": "Caricamento dei biglietti per gli eventi",
+      "loadFailedTitle": "Impossibile caricare i biglietti",
+      "loadFailedDescription": "Impossibile caricare il catalogo dei biglietti dell'evento. Riprova.",
+      "myTicketsTitle": "I miei biglietti",
+      "noTickets": "Non hai un biglietto per questo evento.",
+      "ticketFallback": "Biglietto per eventi",
+      "entitlementSummary": "biglietto {{count}} · {{status}}",
+      "entitlementSummary_other": "{{count}} biglietti · {{status}}",
+      "cancelTicket": "Annulla biglietto",
+      "timeCreditCancelDisabled": "L'annullamento del biglietto con credito temporale non è disponibile in questo flusso solo gratuito. Non è stata intrapresa alcuna azione sul portafoglio.",
+      "cancelTitle": "Annullare questo biglietto gratuito?",
+      "cancelDescription": "Fornisci una breve motivazione. La quantità tornerà all'assegnazione gratuita.",
+      "reasonLabel": "Motivo della cancellazione",
+      "confirmCancellation": "Conferma la cancellazione",
+      "reasonInvalidTitle": "Controlla il motivo della cancellazione",
+      "reasonInvalidDescription": "Inserisci un motivo di non più di 500 caratteri.",
+      "cancelledTitle": "Biglietto gratuito annullato",
+      "cancelledDescription": "La quantità è stata restituita all'assegnazione gratuita.",
+      "cancelFailedTitle": "Impossibile annullare il biglietto",
+      "cancelFailedDescription": "Aggiorna il catalogo e riprova.",
+      "catalogueTitle": "Biglietti disponibili",
+      "catalogueEmpty": "Non sono disponibili tipologie di biglietto per questo evento.",
+      "free": "Gratuito",
+      "timeCreditPrice": "{{credits}} crediti temporali",
+      "remaining": "{{count}} rimanente",
+      "remaining_other": "{{count}} rimanente",
+      "timeCreditDisabledTitle": "Pagamento del credito temporizzato non disponibile",
+      "timeCreditDisabledDescription": "Il gateway del portafoglio approvato non è connesso. Nessun credito può essere addebitato da questa schermata.",
+      "unitsLabel": "Quantità (fino a {{count}})",
+      "registrationRequired": "Prima di richiedere un biglietto gratuito è necessaria la registrazione confermata dell'evento.",
+      "notEligible": "Al momento non soddisfi le regole di idoneità di questo tipo di biglietto.",
+      "salesClosed": "Questo tipo di biglietto non è attualmente disponibile per l'assegnazione.",
+      "soldOut": "Non ti restano biglietti gratuiti in questa allocazione.",
+      "claimFreeTicket": "Richiedi il biglietto gratuito",
+      "unitsInvalidTitle": "Controlla la quantità",
+      "unitsInvalidDescription": "Inserisci un numero intero compreso tra 1 e {{count}}.",
+      "allocatedTitle": "Biglietto gratuito assegnato",
+      "allocatedDescription": "Il tuo biglietto è ora confermato.",
+      "allocateFailedTitle": "Impossibile assegnare il biglietto",
+      "allocateFailedDescription": "Controlla la tua registrazione, l'idoneità e l'allocazione rimanente, quindi riprova."
+    },
+    "status": {
+      "confirmed": "Confermato",
+      "cancelled": "Annullato"
+    }
+  }
+}

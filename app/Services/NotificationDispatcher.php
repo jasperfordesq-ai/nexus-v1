@@ -56,8 +56,22 @@ class NotificationDispatcher
      * @param string|null $htmlContent Full HTML content for Instant Emails
      * @param bool        $isOrganizer If true, applies strict Organizer Priority rules
      * @param int|null    $fromUserId  The actor sending this notification (used for mute check)
+     * @param array{frequency?: string, in_app_enabled?: bool, email_enabled?: bool, push_enabled?: bool}|null $deliveryPolicy
+     *        Optional resolved per-context channel policy. Group notifications
+     *        use this to consume group_notification_preferences directly.
      */
-    public static function dispatch($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): bool
+    public static function dispatch(
+        $userId,
+        $contextType,
+        $contextId,
+        $activityType,
+        $content,
+        $link,
+        $htmlContent,
+        $isOrganizer = false,
+        ?int $fromUserId = null,
+        ?array $deliveryPolicy = null,
+    ): bool
     {
         $recipientTenantId = self::resolveTenantIdForQueue((int) $userId);
         if ($recipientTenantId === null) {
@@ -68,12 +82,23 @@ class NotificationDispatcher
             return false;
         }
 
-        return TenantContext::runForTenant($recipientTenantId, function () use ($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId): bool {
-            return self::dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId);
+        return TenantContext::runForTenant($recipientTenantId, function () use ($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId, $deliveryPolicy): bool {
+            return self::dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer, $fromUserId, $deliveryPolicy);
         });
     }
 
-    private static function dispatchForResolvedTenant($userId, $contextType, $contextId, $activityType, $content, $link, $htmlContent, $isOrganizer = false, ?int $fromUserId = null): bool
+    private static function dispatchForResolvedTenant(
+        $userId,
+        $contextType,
+        $contextId,
+        $activityType,
+        $content,
+        $link,
+        $htmlContent,
+        $isOrganizer = false,
+        ?int $fromUserId = null,
+        ?array $deliveryPolicy = null,
+    ): bool
     {
         // 1. Create In-App Notification (The "Bell") with 60-second deduplication window
         $tenantId = TenantContext::currentId();
@@ -102,12 +127,22 @@ class NotificationDispatcher
                 return true;
             }
         }
+        $policyFrequency = is_string($deliveryPolicy['frequency'] ?? null)
+            ? $deliveryPolicy['frequency']
+            : null;
+        $policyMuted = in_array($policyFrequency, ['muted', 'off'], true);
+        $inAppEnabled = (bool) ($deliveryPolicy['in_app_enabled'] ?? true);
+        $emailEnabled = (bool) ($deliveryPolicy['email_enabled'] ?? true);
+        $pushEnabled = (bool) ($deliveryPolicy['push_enabled'] ?? true);
         $dedupKey = "notif_dedup:{$tenantId}:{$userId}:{$activityType}:" . md5($link ?? '');
         $isDuplicateBell = false;
         $bellCreated = false;
         $bellId = null;
 
-        if (Cache::has($dedupKey)) {
+        if (! $inAppEnabled || $policyMuted) {
+            // An explicit per-context mute suppresses the bell as well as all
+            // outbound channels. Global digest "off" remains bell-only.
+        } elseif (Cache::has($dedupKey)) {
             // Duplicate within 60s window — skip in-app creation but still process email
             Log::debug('NotificationDispatcher: deduplicated', ['user' => $userId, 'type' => $activityType]);
             $isDuplicateBell = true;
@@ -125,7 +160,14 @@ class NotificationDispatcher
         }
 
         // 2. CHECK Notification Settings Hierarchy
-        $frequency = self::getFrequencySetting($userId, $contextType, $contextId);
+        $frequency = $policyFrequency === null
+            ? self::getFrequencySetting($userId, $contextType, $contextId)
+            : match ($policyFrequency) {
+                'digest' => 'daily',
+                'muted' => 'off',
+                'weekly' => 'monthly',
+                default => $policyFrequency,
+            };
 
         // 3. APPLY "Organizer Rule" (Set in Stone)
         if ($isOrganizer && $activityType === 'new_topic') {
@@ -167,7 +209,7 @@ class NotificationDispatcher
             // OR push. Marking it instant delivers both (push uses the generic title).
             'vol_waitlist_spot',
         ];
-        if (in_array($activityType, $criticalInstantTypes, true)) {
+        if (! $policyMuted && in_array($activityType, $criticalInstantTypes, true)) {
             $frequency = 'instant';
         }
 
@@ -180,13 +222,13 @@ class NotificationDispatcher
         // connection_request, etc. pushed even though they have no curated title.
         // For digest frequencies push only curated push-title types, so routine
         // digest items don't all turn into device push. Deduped 60s in fanOutPush().
-        if ($bellCreated && !$isDuplicateBell) {
+        if ($pushEnabled && ! $policyMuted && $bellCreated && !$isDuplicateBell) {
             self::fanOutPush((int) $userId, (string) $activityType, (string) $content, $link, $frequency !== 'instant');
         }
 
         // 6. TRAFFIC LIGHT LOGIC
         $queueSucceeded = true;
-        switch ($frequency) {
+        switch ($emailEnabled && ! $policyMuted ? $frequency : 'off') {
             case 'instant':
                 // Device push is NOT fired here anymore. It used to live inside
                 // this 'instant' email branch, which coupled push to the email

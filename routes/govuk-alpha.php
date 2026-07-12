@@ -94,16 +94,35 @@ $alphaRoutes = function (bool $hostMode) {
         // before controllers/services can load any account-derived identity.
         Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
+        Route::get('/events/calendar.ics', [AlphaController::class, 'eventsCalendarFeed'])->name('events.calendar.feed');
+        Route::get('/events/calendar-subscriptions', [AlphaController::class, 'eventsCalendarSubscriptions'])->name('events.calendar.subscriptions');
+        Route::post('/events/calendar-subscriptions', [AlphaController::class, 'eventsCreateCalendarSubscription'])->middleware('throttle:10,1')->name('events.calendar.subscriptions.create');
+        Route::get('/events/calendar-subscriptions/{tokenId}/revoke', [AlphaController::class, 'eventsConfirmCalendarSubscriptionRevoke'])->whereNumber('tokenId')->name('events.calendar.subscriptions.revoke.confirm');
+        Route::post('/events/calendar-subscriptions/{tokenId}/revoke', [AlphaController::class, 'eventsRevokeCalendarSubscription'])->whereNumber('tokenId')->middleware('throttle:10,1')->name('events.calendar.subscriptions.revoke');
         Route::get('/events/new', [AlphaController::class, 'createEvent'])->name('events.create');
         Route::post('/events/new', [AlphaController::class, 'storeEvent'])->middleware('throttle:10,1')->name('events.store');
         Route::get('/events/{id}/edit', [AlphaController::class, 'editEvent'])->whereNumber('id')->name('events.edit');
         Route::post('/events/{id}/edit', [AlphaController::class, 'updateEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.update');
         Route::post('/events/{id}/cancel', [AlphaController::class, 'cancelEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.cancel');
         Route::post('/events/{id}/delete', [AlphaController::class, 'deleteEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.delete');
+        Route::get('/events/{id}/calendar', [AlphaController::class, 'eventsCalendarActions'])->whereNumber('id')->name('events.calendar.actions');
+        Route::get('/events/{id}/calendar.ics', [AlphaController::class, 'eventsCalendarDownload'])->whereNumber('id')->name('events.calendar.download');
+        Route::get('/events/{id}/people', [AlphaController::class, 'eventsPeople'])->whereNumber('id')->name('events.people');
+        Route::post('/events/{id}/people', [AlphaController::class, 'eventsUpdatePeople'])->whereNumber('id')->middleware('throttle:30,1')->name('events.people.update');
+        Route::get('/events/{id}/check-in', [AlphaController::class, 'eventsCheckIn'])->whereNumber('id')->name('events.check-in');
+        Route::post('/events/{id}/check-in/{userId}', [AlphaController::class, 'eventsUpdateAttendance'])->whereNumber('id')->whereNumber('userId')->middleware('throttle:60,1')->name('events.check-in.update');
+        Route::get('/events/{id}/agenda', [AlphaController::class, 'eventsAgenda'])->whereNumber('id')->name('events.agenda');
+        Route::post('/events/{id}/agenda', [AlphaController::class, 'eventsUpdateAgenda'])->whereNumber('id')->middleware('throttle:30,1')->name('events.agenda.update');
+        Route::get('/events/{id}/reminders', [AlphaController::class, 'eventsReminders'])->whereNumber('id')->name('events.reminders');
+        Route::post('/events/{id}/reminders', [AlphaController::class, 'eventsUpdateReminders'])->whereNumber('id')->middleware('throttle:20,1')->name('events.reminders.update');
+        Route::post('/events/{id}/reminders/reset', [AlphaController::class, 'eventsResetReminders'])->whereNumber('id')->middleware('throttle:20,1')->name('events.reminders.reset');
+        Route::get('/events/{id}/safety', [AlphaController::class, 'eventsSafety'])->whereNumber('id')->name('events.safety');
+        Route::post('/events/{id}/safety', [AlphaController::class, 'eventsUpdateSafety'])->whereNumber('id')->middleware('throttle:20,1')->name('events.safety.update');
         Route::get('/events/{id}', [AlphaController::class, 'event'])->whereNumber('id')->name('events.show');
         Route::post('/events/{id}/rsvp', [AlphaController::class, 'storeEventRsvp'])->whereNumber('id')->name('events.rsvp.store');
         Route::post('/events/{id}/waitlist', [AlphaController::class, 'joinEventWaitlist'])->whereNumber('id')->middleware('throttle:30,1')->name('events.waitlist.join');
         Route::post('/events/{id}/waitlist/leave', [AlphaController::class, 'leaveEventWaitlist'])->whereNumber('id')->middleware('throttle:30,1')->name('events.waitlist.leave');
+        Route::post('/events/{id}/waitlist/accept', [AlphaController::class, 'eventsAcceptWaitlistOffer'])->whereNumber('id')->middleware('throttle:30,1')->name('events.waitlist.accept');
         Route::post('/events/{id}/polls/{pollId}/vote', [AlphaController::class, 'storeEventPollVote'])->whereNumber('id')->whereNumber('pollId')->middleware('throttle:30,1')->name('events.polls.vote');
         // ===== WAVE NIGHT-EVENTS: organiser check-in =====
         Route::post('/events/{id}/attendees/{attendeeId}/check-in', [AlphaController::class, 'storeEventCheckin'])->whereNumber('id')->whereNumber('attendeeId')->middleware('throttle:30,1')->name('events.checkin');

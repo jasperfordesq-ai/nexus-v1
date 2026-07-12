@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\GroupStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -163,6 +164,7 @@ class CoreController extends BaseApiController
         $groups = DB::table('groups')
             ->select('id', 'name', 'description', 'image_url as image')
             ->where('tenant_id', $this->getTenantId())
+            ->where('status', GroupStatus::Active->value)
             ->get()
             ->map(fn ($g) => (array) $g)
             ->all();
@@ -170,6 +172,8 @@ class CoreController extends BaseApiController
         foreach ($groups as &$g) {
             $g['members'] = (int) DB::table('group_members')
                 ->where('group_id', $g['id'])
+                ->where('tenant_id', $this->getTenantId())
+                ->where('status', 'active')
                 ->count();
         }
 

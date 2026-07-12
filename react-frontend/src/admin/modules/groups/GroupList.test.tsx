@@ -5,8 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor, within } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
+import type { AdminGroup } from '@/admin/api/types';
 
 // ── Hoist mock data ───────────────────────────────────────────────────────────
 const { mockAdminGroups, mockApi } = vi.hoisted(() => ({
@@ -60,23 +62,63 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ── Stub heavy children ───────────────────────────────────────────────────────
-vi.mock('@/admin/components', async () => ({
-  DataTable: ({ data, isLoading, onSearch }: { data: unknown[]; isLoading: boolean; onSearch?: (q: string) => void }) => (
+vi.mock('../../components/DataTable', () => ({
+  DataTable: ({
+    columns,
+    data,
+    isLoading,
+    onSearch,
+    selectedKeys = new Set<string>(),
+    onSelectionChange,
+  }: {
+    columns: Array<{ key: string; render?: (item: AdminGroup) => React.ReactNode }>;
+    data: AdminGroup[];
+    isLoading: boolean;
+    onSearch?: (q: string) => void;
+    selectedKeys?: Set<string>;
+    onSelectionChange?: (keys: Set<string>) => void;
+  }) => (
     <div data-testid="data-table" data-loading={String(isLoading)}>
-      {(data as Array<{ id: number; name: string }>).map((g) => (
-        <div key={g.id} data-testid="group-row">{g.name}</div>
+      {data.map((group) => (
+        <div key={group.id} data-testid="group-row">
+          <button
+            type="button"
+            aria-label={`Select ${group.name}`}
+            aria-pressed={selectedKeys.has(String(group.id))}
+            onClick={() => {
+              const next = new Set(selectedKeys);
+              const key = String(group.id);
+              if (next.has(key)) next.delete(key);
+              else next.add(key);
+              onSelectionChange?.(next);
+            }}
+          >
+            Select
+          </button>
+          {columns.map((column) => (
+            <div key={column.key} data-testid={`cell-${group.id}-${column.key}`}>
+              {column.render?.(group)}
+            </div>
+          ))}
+        </div>
       ))}
       {onSearch && (
         <input data-testid="search-input" onChange={(e) => onSearch(e.target.value)} />
       )}
     </div>
   ),
+}));
+
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div>
       <h1>{title}</h1>
       {actions}
     </div>
   ),
+}));
+
+vi.mock('../../components/ConfirmModal', () => ({
   ConfirmModal: ({ isOpen, onConfirm, onClose, title }: { isOpen: boolean; onConfirm: () => void; onClose: () => void; title: string }) =>
     isOpen ? (
       <div role="dialog" aria-label={title}>
@@ -92,7 +134,7 @@ vi.mock('@/lib/helpers', async (importOriginal) => {
 });
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
-const makeGroup = (overrides = {}) => ({
+const makeGroup = (overrides: Partial<AdminGroup> = {}): AdminGroup => ({
   id: 1,
   name: 'Test Group',
   description: 'A description',
@@ -105,7 +147,7 @@ const makeGroup = (overrides = {}) => ({
   ...overrides,
 });
 
-const makeListResponse = (groups = [] as ReturnType<typeof makeGroup>[]) => ({
+const makeListResponse = (groups: AdminGroup[] = []) => ({
   success: true,
   data: groups,
   meta: { total: groups.length },
@@ -154,52 +196,39 @@ describe('GroupList', () => {
     });
   });
 
-  it('calls delete API and shows success toast after confirm', async () => {
+  it('requests the first page when the list mounts', async () => {
     mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup()]));
-    mockAdminGroups.delete.mockResolvedValue({ success: true });
-    // Re-mock list after delete to return empty
-    mockAdminGroups.list
-      .mockResolvedValueOnce(makeListResponse([makeGroup()]))
-      .mockResolvedValue(makeListResponse());
 
     const { GroupList } = await import('./GroupList');
     render(<GroupList />);
 
     await waitFor(() => expect(screen.getByText('Test Group')).toBeInTheDocument());
 
-    // Simulate delete by directly calling the delete through DOM (table is stubbed)
-    // We test by checking that list was called on mount
     expect(mockAdminGroups.list).toHaveBeenCalledWith(
       expect.objectContaining({ page: 1 })
     );
   });
 
   it('navigates to analytics when Analytics button is clicked', async () => {
+    const user = userEvent.setup();
     const { GroupList } = await import('./GroupList');
     render(<GroupList />);
     await waitFor(() => screen.getByTestId('data-table'));
 
-    const analyticsBtn = screen.getAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('analytic')
-    );
-    if (analyticsBtn) fireEvent.click(analyticsBtn);
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('analytics'));
-    });
+    await user.click(screen.getByRole('button', { name: 'Analytics' }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/test/admin/groups/analytics');
   });
 
   it('navigates to approvals when Approvals button is clicked', async () => {
+    const user = userEvent.setup();
     const { GroupList } = await import('./GroupList');
     render(<GroupList />);
     await waitFor(() => screen.getByTestId('data-table'));
 
-    const approvalsBtn = screen.getAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('approval')
-    );
-    if (approvalsBtn) fireEvent.click(approvalsBtn);
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('approval'));
-    });
+    await user.click(screen.getByRole('button', { name: 'Approvals' }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/test/admin/groups/approvals');
   });
 
   it('reloads list when API returns array format (legacy)', async () => {
@@ -213,5 +242,201 @@ describe('GroupList', () => {
     await waitFor(() => {
       expect(screen.getByText('Legacy Group')).toBeInTheDocument();
     });
+  });
+
+  it('exposes the canonical status tabs and their exact API filters', async () => {
+    const user = userEvent.setup();
+    const { GroupList, GROUP_STATUS_TABS } = await import('./GroupList');
+    render(<GroupList />);
+
+    const expected: Array<[typeof GROUP_STATUS_TABS[number], string]> = [
+      ['all', 'All'],
+      ['pending_review', 'Pending review'],
+      ['active', 'Active'],
+      ['dormant', 'Dormant'],
+      ['archived', 'Archived'],
+      ['rejected', 'Rejected'],
+    ];
+
+    expect(GROUP_STATUS_TABS).toEqual(expected.map(([key]) => key));
+    for (const [key, label] of expected) {
+      const tab = screen.getByRole('tab', { name: label });
+      await user.click(tab);
+      await waitFor(() => {
+        expect(mockAdminGroups.list).toHaveBeenLastCalledWith({
+          page: 1,
+          search: undefined,
+          status: key === 'all' ? undefined : key,
+        });
+      });
+    }
+  });
+
+  it('maps every canonical lifecycle status to a valid transition', async () => {
+    const { getGroupStatusTransition } = await import('./GroupList');
+
+    expect(getGroupStatusTransition('pending_review')).toEqual({
+      target: 'active',
+      labelKey: 'groups.transition_pending_review_to_active',
+    });
+    expect(getGroupStatusTransition('active')).toEqual({
+      target: 'dormant',
+      labelKey: 'groups.transition_active_to_dormant',
+    });
+    expect(getGroupStatusTransition('dormant')).toEqual({
+      target: 'active',
+      labelKey: 'groups.transition_dormant_to_active',
+    });
+    expect(getGroupStatusTransition('archived')).toEqual({
+      target: 'active',
+      labelKey: 'groups.transition_archived_to_active',
+    });
+    expect(getGroupStatusTransition('rejected')).toEqual({
+      target: 'pending_review',
+      labelKey: 'groups.transition_rejected_to_pending_review',
+    });
+  });
+
+  it.each([
+    ['pending_review', 'Approve and activate', 'active'],
+    ['active', 'Set as dormant', 'dormant'],
+    ['dormant', 'Reactivate', 'active'],
+    ['archived', 'Restore to active', 'active'],
+    ['rejected', 'Return to review', 'pending_review'],
+  ] as const)(
+    'reports a resolved %s transition failure without claiming success',
+    async (status, actionLabel, target) => {
+    const user = userEvent.setup();
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup({ status })]));
+    mockAdminGroups.updateStatus.mockResolvedValue({ success: false, error: 'Transition blocked' });
+    const { GroupList } = await import('./GroupList');
+    render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Actions for Test Group' }));
+    await user.click(await screen.findByRole('menuitem', { name: actionLabel }));
+
+    await waitFor(() => {
+      expect(mockAdminGroups.updateStatus).toHaveBeenCalledWith(1, target);
+      expect(mockToast.error).toHaveBeenCalledWith('Transition blocked');
+    });
+    expect(mockToast.success).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports a resolved archive failure and never offers archive for terminal statuses', async () => {
+    const user = userEvent.setup();
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup()]));
+    mockAdminGroups.updateStatus.mockResolvedValue({ success: false, error: 'Archive blocked' });
+    const { GroupList } = await import('./GroupList');
+    const view = render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Actions for Test Group' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Archive' }));
+    await waitFor(() => {
+      expect(mockAdminGroups.updateStatus).toHaveBeenCalledWith(1, 'archived');
+      expect(mockToast.error).toHaveBeenCalledWith('Archive blocked');
+    });
+    expect(mockToast.success).not.toHaveBeenCalled();
+
+    view.unmount();
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup({ status: 'archived' })]));
+    render(<GroupList />);
+    await user.click(await screen.findByRole('button', { name: 'Actions for Test Group' }));
+    expect(screen.queryByRole('menuitem', { name: 'Archive' })).not.toBeInTheDocument();
+  });
+
+  it('uses the canonical edit route and exposes no clone action', async () => {
+    const user = userEvent.setup();
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup()]));
+    const { GroupList } = await import('./GroupList');
+    render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Actions for Test Group' }));
+    expect(screen.queryByRole('menuitem', { name: /clone/i })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole('menuitem', { name: 'Edit Group' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/test/groups/edit/1');
+  });
+
+  it('requires the exact case-sensitive group name and keeps a failed delete dialog open', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: ((value: { success: false; error: string }) => void) | undefined;
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup()]));
+    mockAdminGroups.delete.mockImplementation(() => new Promise((resolve) => {
+      resolveDelete = resolve;
+    }));
+    const { GroupList } = await import('./GroupList');
+    render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Actions for Test Group' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    const dialog = await screen.findByRole('alertdialog', { name: 'Delete Group' });
+    const input = within(dialog).getByRole('textbox', { name: 'Group name' });
+    const deleteButton = within(dialog).getByRole('button', { name: 'Delete' });
+    expect(deleteButton).toBeDisabled();
+    fireEvent.change(input, { target: { value: 'test group' } });
+    expect(deleteButton).toBeDisabled();
+    fireEvent.change(input, { target: { value: 'Test Group' } });
+    expect(deleteButton).toBeEnabled();
+
+    await user.click(deleteButton);
+    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    expect(input).toBeDisabled();
+    resolveDelete?.({ success: false, error: 'Delete blocked' });
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Delete blocked'));
+    expect(screen.getByRole('alertdialog', { name: 'Delete Group' })).toBeInTheDocument();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('keeps only failed ids selected after a partially successful typed bulk delete', async () => {
+    const user = userEvent.setup();
+    const groups = [
+      makeGroup({ id: 1, name: 'Alpha Group' }),
+      makeGroup({ id: 2, name: 'Beta Group' }),
+    ];
+    mockAdminGroups.list.mockResolvedValue(makeListResponse(groups));
+    mockAdminGroups.delete.mockImplementation(async (id: number) => (
+      id === 1 ? { success: true } : { success: false, error: 'Beta retained' }
+    ));
+    const { GroupList } = await import('./GroupList');
+    render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Select Alpha Group' }));
+    await user.click(screen.getByRole('button', { name: 'Select Beta Group' }));
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    const dialog = await screen.findByRole('alertdialog', { name: 'Delete selected groups' });
+    const input = within(dialog).getByRole('textbox', { name: 'Confirmation phrase' });
+    const deleteButton = within(dialog).getByRole('button', { name: 'Delete' });
+    expect(deleteButton).toBeDisabled();
+    await user.type(input, 'DELETE 2 GROUPS');
+    await user.click(deleteButton);
+
+    await waitFor(() => expect(screen.getByText('1 selected')).toBeInTheDocument());
+    expect(mockAdminGroups.delete.mock.calls.map(([id]) => id)).toEqual([1, 2]);
+    expect(screen.getByRole('button', { name: 'Select Alpha Group' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Select Beta Group' })).toHaveAttribute('aria-pressed', 'true');
+    expect(mockToast.error).toHaveBeenCalledWith('Beta retained');
+    expect(screen.queryByRole('alertdialog', { name: 'Delete selected groups' })).not.toBeInTheDocument();
+  });
+
+  it('reports a resolved bulk archive failure without clearing selection', async () => {
+    const user = userEvent.setup();
+    mockAdminGroups.list.mockResolvedValue(makeListResponse([makeGroup()]));
+    mockApi.post.mockResolvedValue({ success: false, error: 'Bulk archive blocked' });
+    const { GroupList } = await import('./GroupList');
+    render(<GroupList />);
+
+    await user.click(await screen.findByRole('button', { name: 'Select Test Group' }));
+    await user.click(screen.getByRole('button', { name: 'Archive' }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/groups/bulk-archive', { group_ids: [1] });
+      expect(mockToast.error).toHaveBeenCalledWith('Bulk archive blocked');
+    });
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(mockToast.success).not.toHaveBeenCalled();
   });
 });

@@ -144,127 +144,25 @@ class EventNotificationService
      */
     public function sendReminder(int $tenantId, int $eventId): int
     {
-        try {
-            $event = DB::table('events')
-                ->where('id', $eventId)
-                ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'location', 'is_online', 'online_link'])
-                ->first();
-
-            if (!$event) {
-                return 0;
-            }
-
-            $sent = 0;
-            $reminderTypes = ['24h' => 24, '1h' => 1];
-
-            foreach ($reminderTypes as $type => $hoursBeforeEvent) {
-                // Get attendees who haven't been reminded for this type
-                $attendees = DB::table('event_rsvps as r')
-                    ->join('users as u', function ($join) use ($tenantId) {
-                        $join->on('r.user_id', '=', 'u.id')
-                            ->where('u.tenant_id', '=', $tenantId);
-                    })
-                    ->leftJoin('event_reminder_sent as ers', function ($join) use ($type, $tenantId) {
-                        $join->on('ers.event_id', '=', 'r.event_id')
-                            ->on('ers.user_id', '=', 'r.user_id')
-                            ->where('ers.reminder_type', '=', $type)
-                            ->where('ers.tenant_id', '=', $tenantId);
-                    })
-                    ->where('r.event_id', $eventId)
-                    ->whereIn('r.status', ['going', 'interested'])
-                    ->whereNull('ers.id')
-                    ->select(['r.user_id', 'u.name', 'u.first_name', 'u.last_name', 'u.email', 'u.preferred_language'])
-                    ->get();
-
-                foreach ($attendees as $attendee) {
-                    $userId = (int) $attendee->user_id;
-
-                    try {
-                        if (!EventReminderService::claimReminderDelivery($tenantId, $eventId, $userId, $type)) {
-                            continue;
-                        }
-
-                        $emailAccepted = false;
-
-                        // Wrap the bell + email render under the recipient's locale so
-                        // the stored bell text AND email subject/body both render in
-                        // THEIR preferred_language, not the caller's.
-                        LocaleContext::withLocale($attendee, function () use ($attendee, $event, $type, $userId, $tenantId, $eventId, &$sent, &$emailAccepted) {
-                            $message = $this->buildReminderMessage($event, $type);
-
-                            // Send reminder email
-                            try {
-                                $eventTitle = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-                                $subject = $type === '24h'
-                                    ? __('notifications.event_reminder_subject_24h', ['title' => $eventTitle])
-                                    : __('notifications.event_reminder_subject_1h', ['title' => $eventTitle]);
-
-                                $emailOk = $this->sendEventEmail(
-                                    $attendee,
-                                    $subject,
-                                    $message,
-                                    '/events/' . $eventId,
-                                    'event_reminder',
-                                    $this->buildReminderEmailHtml($event, $type, $attendee)
-                                );
-
-                                if ($emailOk) {
-                                    $emailAccepted = true;
-                                    $markedSent = EventReminderService::markReminderDeliverySent($tenantId, $eventId, $userId, $type);
-                                    $this->createReminderNotification($tenantId, $userId, $event, $message);
-                                    if ($markedSent) {
-                                        $sent++;
-                                    }
-                                } else {
-                                    EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
-                                    Log::warning("[EventNotificationService] Reminder email returned false; reminder not marked sent", [
-                                        'event_id' => $eventId,
-                                        'user_id' => $userId,
-                                        'type' => $type,
-                                    ]);
-                                }
-                            } catch (\Throwable $e) {
-                                if (!$emailAccepted) {
-                                    EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
-                                }
-                                Log::warning("[EventNotificationService] Reminder email failed for user {$userId}: " . $e->getMessage());
-                            }
-                        });
-                    } catch (\Throwable $e) {
-                        if (empty($emailAccepted)) {
-                            EventReminderService::releaseReminderDeliveryClaim($tenantId, $eventId, $userId, $type);
-                        }
-                        Log::error("[EventNotificationService] Reminder failed: event={$eventId}, user={$userId}, type={$type}: " . $e->getMessage());
-                    }
-                }
-            }
-
-            return $sent;
-        } catch (\Throwable $e) {
-            Log::error("EventNotificationService::sendReminder error: " . $e->getMessage());
-            return 0;
-        }
+        return app(EventReminderService::class)->sendEventReminders($tenantId, $eventId);
     }
 
     /**
      * Notify attendees and waitlisted users of event cancellation.
      *
-     * @return int Number of notifications sent
-     */
-    /**
      * @param array<int> $recipientUserIds
+     * @return int Number of notifications sent
      */
     public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null, array $recipientUserIds = [], ?object $eventSnapshot = null): int
     {
         try {
             // Series DELETE removes the event rows before notifying, so the caller
-            // passes a pre-deletion snapshot (id/title/start_time/location) — the
+            // passes a pre-deletion snapshot (including timezone) — the
             // DB lookup below would find nothing post-delete.
             $event = $eventSnapshot ?? DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'location'])
+                ->select(['id', 'title', 'start_time', 'location', 'timezone'])
                 ->first();
 
             if (!$event) {
@@ -376,13 +274,25 @@ class EventNotificationService
     /**
      * Notify attendees that an event has been updated.
      *
-     * Only notifies for meaningful changes (start_time, end_time, location, title).
+     * Only notifies for attendee-relevant schedule, venue, access and capacity changes.
      * Creates in-app notifications for each attendee.
      */
     public function notifyEventUpdated(int $eventId, array $changes): void
     {
         try {
-            $meaningfulKeys = ['start_time', 'end_time', 'location', 'title'];
+            $meaningfulKeys = [
+                'start_time',
+                'end_time',
+                'timezone',
+                'all_day',
+                'location',
+                'title',
+                'is_online',
+                'online_link',
+                'allow_remote_attendance',
+                'max_attendees',
+                'venue_accessibility',
+            ];
             $meaningfulChanges = array_intersect_key($changes, array_flip($meaningfulKeys));
             if (empty($meaningfulChanges)) {
                 return;
@@ -393,7 +303,7 @@ class EventNotificationService
             $event = DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'location', 'user_id'])
+                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'timezone', 'user_id'])
                 ->first();
 
             if (!$event) {
@@ -433,16 +343,37 @@ class EventNotificationService
                 LocaleContext::withLocale($attendee, function () use ($attendee, $attendeeId, $tenantId, $event, $eventTitle, $safeTitle, $path, $meaningfulChanges) {
                     // Build change summary (localised per recipient)
                     $changeParts = [];
-                    if (isset($meaningfulChanges['start_time'])) {
-                        $changeParts[] = __('notifications.event_change_date_time');
+                    if (array_key_exists('start_time', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.time');
                     }
-                    if (isset($meaningfulChanges['location'])) {
-                        $changeParts[] = __('notifications.event_change_location');
+                    if (array_key_exists('end_time', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.time');
                     }
-                    if (isset($meaningfulChanges['title'])) {
-                        $changeParts[] = __('notifications.event_change_title');
+                    if (array_key_exists('timezone', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.timezone');
                     }
-                    $changeLabel = implode(__('notifications.event_change_separator'), $changeParts);
+                    if (array_key_exists('all_day', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.all_day');
+                    }
+                    if (array_key_exists('location', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.venue');
+                    }
+                    if (array_key_exists('title', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.title');
+                    }
+                    if (array_key_exists('is_online', $meaningfulChanges)
+                        || array_key_exists('online_link', $meaningfulChanges)
+                        || array_key_exists('allow_remote_attendance', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.online_access');
+                    }
+                    if (array_key_exists('max_attendees', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.capacity');
+                    }
+                    if (array_key_exists('venue_accessibility', $meaningfulChanges)) {
+                        $changeParts[] = __('event_notifications.update.fields.accessibility');
+                    }
+                    $changeParts = array_values(array_unique($changeParts));
+                    $changeLabel = implode(__('event_notifications.update.separator'), $changeParts);
                     $message = __('notifications.event_updated', ['title' => $eventTitle, 'changes' => $changeLabel]);
 
                     Notification::create([
@@ -607,10 +538,14 @@ class EventNotificationService
         try {
             TenantContext::setById($tenantId);
 
+            if (!EventNotificationPreferenceResolver::allowsBackgroundActivity($tenantId, 'event_created')) {
+                return;
+            }
+
             $event = DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
-                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'is_online', 'online_link'])
+                ->select(['id', 'title', 'start_time', 'end_time', 'location', 'timezone', 'is_online', 'online_link'])
                 ->first();
 
             if (!$event) {
@@ -621,6 +556,8 @@ class EventNotificationService
             $organizer = DB::table('users')
                 ->where('id', $organizerId)
                 ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->whereNull('deleted_at')
                 ->select(['id as user_id', 'tenant_id', 'email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
@@ -664,11 +601,17 @@ class EventNotificationService
                 }
             });
 
-            // Optionally notify any attendees who RSVPed during creation
-            // (notifyAttendees() handles per-recipient locale wrapping internally.)
+            // Render every attendee's confirmation independently. The caller's
+            // locale must never leak into stored bell copy, email subjects, or
+            // the default HTML email body.
             if ($notifyInitialAttendees) {
-                $initialMessage = __('notifications.event_attendee_confirmation', ['title' => $eventTitle]);
-                $this->notifyAttendees($tenantId, $eventId, $initialMessage);
+                $this->notifyInitialAttendeesOfCreation(
+                    $tenantId,
+                    $eventId,
+                    $organizerId,
+                    $eventTitle,
+                    $path,
+                );
             }
         } catch (\Throwable $e) {
             Log::error("EventNotificationService::notifyEventCreated error: " . $e->getMessage());
@@ -677,6 +620,85 @@ class EventNotificationService
                 TenantContext::setById($previousTenantId);
             } else {
                 TenantContext::reset();
+            }
+        }
+    }
+
+    /**
+     * Notify RSVPs that already exist when publication completes.
+     *
+     * This intentionally does not delegate to notifyAttendees(): that method
+     * accepts organizer-authored copy, while this system confirmation must be
+     * translated separately for every recipient.
+     */
+    private function notifyInitialAttendeesOfCreation(
+        int $tenantId,
+        int $eventId,
+        int $organizerId,
+        string $eventTitle,
+        string $path,
+    ): void {
+        $attendees = DB::table('event_rsvps as r')
+            ->join('users as u', function ($join) use ($tenantId): void {
+                $join->on('r.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('r.event_id', $eventId)
+            ->where('r.tenant_id', $tenantId)
+            ->whereIn('r.status', ['going', 'interested'])
+            ->where('u.status', 'active')
+            ->whereNull('u.deleted_at')
+            ->where('u.id', '<>', $organizerId)
+            ->select([
+                'r.user_id',
+                'u.tenant_id',
+                'u.email',
+                'u.name',
+                'u.first_name',
+                'u.preferred_language',
+            ])
+            ->distinct()
+            ->get();
+
+        foreach ($attendees as $attendee) {
+            $attendeeId = (int) $attendee->user_id;
+
+            try {
+                LocaleContext::withLocale($attendee, function () use (
+                    $attendee,
+                    $attendeeId,
+                    $tenantId,
+                    $eventTitle,
+                    $path,
+                ): void {
+                    $message = __('notifications.event_attendee_confirmation', [
+                        'title' => $eventTitle,
+                    ]);
+
+                    Notification::create([
+                        'user_id' => $attendeeId,
+                        'tenant_id' => $tenantId,
+                        'message' => $message,
+                        'link' => $path,
+                        'type' => 'event_created',
+                        'created_at' => now(),
+                    ]);
+
+                    $this->sendEventEmail(
+                        $attendee,
+                        $message,
+                        $message,
+                        $path,
+                        'event_created',
+                    );
+                });
+            } catch (\Throwable $e) {
+                Log::warning('[EventNotificationService] Initial attendee confirmation failed', [
+                    'tenant_id' => $tenantId,
+                    'event_id' => $eventId,
+                    'user_id' => $attendeeId,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
     }
@@ -701,10 +723,6 @@ class EventNotificationService
      */
     private function sendEventEmail(object $user, string $subject, string $content, string $link, string $type, ?string $htmlBody = null): bool
     {
-        if (empty($user->email)) {
-            return false;
-        }
-
         $userId = (int) ($user->user_id ?? 0);
         if ($userId <= 0) {
             return false;
@@ -720,8 +738,24 @@ class EventNotificationService
         }
 
         return (bool) TenantContext::runForTenant($tenantId, function () use ($user, $subject, $content, $link, $type, $htmlBody, $userId, $tenantId): bool {
-            // Respect user's notification frequency preference
-            $frequency = $this->getUserEventEmailFrequency($userId);
+            if (!EventNotificationPreferenceResolver::isRecipientEligible($userId, $tenantId)
+                || !EventNotificationPreferenceResolver::allowsBackgroundActivity($tenantId, $type)) {
+                return true;
+            }
+
+            // Web push is an independent channel. An Events email opt-out or
+            // digest cadence must never disable a user's push preference.
+            try {
+                WebPushService::sendToUserStatic($userId, $subject, $content, $link, $type);
+            } catch (\Throwable $e) {
+                Log::debug("[EventNotificationService] WebPush failed: " . $e->getMessage());
+            }
+
+            if (empty($user->email)) {
+                return true;
+            }
+
+            $frequency = EventNotificationPreferenceResolver::frequency($userId, $tenantId);
 
             if ($frequency === 'off') {
                 return true;
@@ -730,8 +764,9 @@ class EventNotificationService
             if ($frequency === 'instant') {
                 // Send immediately
                 try {
-                    $body   = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
-                    $sent   = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, null, $type, ['tenant_id' => $tenantId]);
+                    $body = $htmlBody ?? $this->buildDefaultEventEmailHtml($subject, $content, $link, $user);
+                    $unsubscribeUrl = EventNotificationPreferenceResolver::unsubscribeUrl($userId, $tenantId);
+                    $sent = EmailDispatchService::sendRaw($user->email, $subject, $body, null, null, $unsubscribeUrl, $type, ['tenant_id' => $tenantId]);
                     if (!$sent) {
                         Log::warning("[EventNotificationService] Instant email send returned false", [
                             'user_id' => $userId,
@@ -742,13 +777,6 @@ class EventNotificationService
                 } catch (\Throwable $e) {
                     Log::warning("[EventNotificationService] Instant email send failed: " . $e->getMessage());
                     $sent = false;
-                }
-
-                // Also send web push
-                try {
-                    WebPushService::sendToUserStatic($userId, $subject, $content, $link);
-                } catch (\Throwable $e) {
-                    Log::debug("[EventNotificationService] WebPush failed: " . $e->getMessage());
                 }
 
                 return (bool) $sent;
@@ -802,47 +830,6 @@ class EventNotificationService
         return $contextTenantId !== null ? (int) $contextTenantId : null;
     }
 
-    /**
-     * Get the user's email notification frequency for events.
-     *
-     * Checks notification_settings for an 'event' context, falls back to global,
-     * then to the tenant default.
-     */
-    private function getUserEventEmailFrequency(int $userId): string
-    {
-        // Check event-specific setting
-        $frequency = DB::table('notification_settings')
-            ->where('user_id', $userId)
-            ->where('context_type', 'event')
-            ->value('frequency');
-
-        if ($frequency !== null) {
-            return $frequency === 'weekly' ? 'monthly' : $frequency;
-        }
-
-        // Fall back to global setting
-        $frequency = DB::table('notification_settings')
-            ->where('user_id', $userId)
-            ->where('context_type', 'global')
-            ->where('context_id', 0)
-            ->value('frequency');
-
-        if ($frequency !== null) {
-            return $frequency === 'weekly' ? 'monthly' : $frequency;
-        }
-
-        // Fall back to tenant default. Members opt INTO the daily digest
-        // from notification settings — we don't email until they say yes.
-        try {
-            $tenant = TenantContext::get();
-            $config = json_decode($tenant['configuration'] ?? '{}', true);
-            $default = $config['notifications']['default_frequency'] ?? 'off';
-            return $default === 'weekly' ? 'monthly' : $default;
-        } catch (\Throwable $e) {
-            return 'off';
-        }
-    }
-
     // =========================================================================
     // REMINDER NOTIFICATION (in-app)
     // =========================================================================
@@ -853,7 +840,10 @@ class EventNotificationService
     private function buildReminderMessage(object $event, string $reminderType): string
     {
         $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-        $when = $this->formatEventDateTime($event->start_time);
+        $when = $this->formatEventDateTime(
+            $event->start_time,
+            eventTimezone: $event->timezone ?? null,
+        );
 
         $locationText = '';
         if (!empty($event->is_online) && !empty($event->online_link)) {
@@ -878,13 +868,42 @@ class EventNotificationService
      * PHP's date() always renders English weekday/month names; Carbon's
      * isoFormat honours the locale switched in by LocaleContext, so reminder,
      * cancellation, update, and created emails render dates in the
-     * recipient's preferred_language.
+     * recipient's preferred_language. Event timestamps are stored as UTC and
+     * converted to the event's validated IANA timezone; legacy or invalid
+     * timezone values fail safe to UTC. The explicit zone label prevents an
+     * ambiguous local time from being sent to attendees.
      */
-    private function formatEventDateTime(string $dateTime, string $isoFormat = 'dddd, MMM D, h:mm A'): string
+    private function formatEventDateTime(
+        string $dateTime,
+        string $isoFormat = 'dddd, MMM D, h:mm A',
+        ?string $eventTimezone = null,
+    ): string
     {
-        return \Carbon\Carbon::parse($dateTime)
+        $timezone = trim((string) $eventTimezone);
+        if (!$this->isIanaTimezone($timezone)) {
+            $timezone = 'UTC';
+        }
+
+        return \Carbon\Carbon::parse($dateTime, 'UTC')
+            ->setTimezone($timezone)
             ->locale((string) app()->getLocale())
-            ->isoFormat($isoFormat);
+            ->isoFormat($isoFormat)
+            . ' (' . $timezone . ')';
+    }
+
+    private function isIanaTimezone(string $timezone): bool
+    {
+        if ($timezone === 'UTC') {
+            return true;
+        }
+
+        static $identifiers = null;
+        $identifiers ??= array_fill_keys(
+            \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC),
+            true,
+        );
+
+        return isset($identifiers[$timezone]);
     }
 
     /**
@@ -1012,7 +1031,10 @@ HTML;
 
         $dateHtml = '';
         if (!empty($event->start_time)) {
-            $when = $this->formatEventDateTime($event->start_time);
+            $when = $this->formatEventDateTime(
+                $event->start_time,
+                eventTimezone: $event->timezone ?? null,
+            );
             $scheduledFor = htmlspecialchars(__('emails.events.cancelled_scheduled_for', ['when' => $when]), ENT_QUOTES, 'UTF-8');
             $dateHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">{$scheduledFor}</p>";
         }
@@ -1057,21 +1079,58 @@ HTML;
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
         $dateTimeLabel = htmlspecialchars(__('emails.events.change_label_date_time'), ENT_QUOTES, 'UTF-8');
+        $endTimeLabel = htmlspecialchars(__('emails.events.change_label_end_time'), ENT_QUOTES, 'UTF-8');
         $locationLabel = htmlspecialchars(__('emails.events.change_label_location'), ENT_QUOTES, 'UTF-8');
         $titleLabel = htmlspecialchars(__('emails.events.change_label_title'), ENT_QUOTES, 'UTF-8');
+        $timezoneLabel = htmlspecialchars(__('event_notifications.update.fields.timezone'), ENT_QUOTES, 'UTF-8');
+        $allDayLabel = htmlspecialchars(__('event_notifications.update.fields.all_day'), ENT_QUOTES, 'UTF-8');
+        $onlineAccessLabel = htmlspecialchars(__('event_notifications.update.fields.online_access'), ENT_QUOTES, 'UTF-8');
+        $capacityLabel = htmlspecialchars(__('event_notifications.update.fields.capacity'), ENT_QUOTES, 'UTF-8');
+        $accessibilityLabel = htmlspecialchars(__('event_notifications.update.fields.accessibility'), ENT_QUOTES, 'UTF-8');
 
         $changesHtml = '';
-        if (isset($changes['start_time'])) {
-            $newTime = $this->formatEventDateTime($changes['start_time']);
+        if (array_key_exists('start_time', $changes)) {
+            $newTime = $this->formatEventDateTime(
+                $changes['start_time'],
+                eventTimezone: $event->timezone ?? null,
+            );
             $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$dateTimeLabel}</strong> {$newTime}</li>";
         }
-        if (isset($changes['location'])) {
-            $newLocation = htmlspecialchars($changes['location'], ENT_QUOTES, 'UTF-8');
+        if (array_key_exists('end_time', $changes)) {
+            $newEndTime = $this->formatEventDateTime(
+                $changes['end_time'],
+                eventTimezone: $event->timezone ?? null,
+            );
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$endTimeLabel}</strong> {$newEndTime}</li>";
+        }
+        if (array_key_exists('location', $changes)) {
+            $newLocation = htmlspecialchars((string) ($changes['location'] ?? ''), ENT_QUOTES, 'UTF-8');
             $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$locationLabel}</strong> {$newLocation}</li>";
         }
-        if (isset($changes['title'])) {
+        if (array_key_exists('title', $changes)) {
             $newTitle = htmlspecialchars($changes['title'], ENT_QUOTES, 'UTF-8');
             $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$titleLabel}</strong> {$newTitle}</li>";
+        }
+        if (array_key_exists('timezone', $changes)) {
+            $newTimezone = htmlspecialchars((string) $changes['timezone'], ENT_QUOTES, 'UTF-8');
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$timezoneLabel}</strong> {$newTimezone}</li>";
+        }
+        if (array_key_exists('all_day', $changes)) {
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$allDayLabel}</strong></li>";
+        }
+        if (array_key_exists('is_online', $changes)
+            || array_key_exists('online_link', $changes)
+            || array_key_exists('allow_remote_attendance', $changes)) {
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$onlineAccessLabel}</strong></li>";
+        }
+        if (array_key_exists('max_attendees', $changes)) {
+            $newCapacity = $changes['max_attendees'] === null
+                ? ''
+                : ' ' . htmlspecialchars((string) $changes['max_attendees'], ENT_QUOTES, 'UTF-8');
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$capacityLabel}</strong>{$newCapacity}</li>";
+        }
+        if (array_key_exists('venue_accessibility', $changes)) {
+            $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$accessibilityLabel}</strong></li>";
         }
 
         $updatedHeading = htmlspecialchars(__('emails.events.updated_heading'), ENT_QUOTES, 'UTF-8');
@@ -1123,7 +1182,11 @@ HTML;
         // Date/time row
         $dateHtml = '';
         if (!empty($event->start_time)) {
-            $when = $this->formatEventDateTime($event->start_time, 'dddd, MMMM D, YYYY, h:mm A');
+            $when = $this->formatEventDateTime(
+                $event->start_time,
+                'dddd, MMMM D, YYYY, h:mm A',
+                $event->timezone ?? null,
+            );
             $safeWhen = htmlspecialchars($when, ENT_QUOTES, 'UTF-8');
             $dateHtml = "<p style=\"color: #64748b; margin: 0 0 6px; font-size: 14px;\">&#128197; {$safeWhen}</p>";
         }
@@ -1173,7 +1236,10 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
-        $when = $this->formatEventDateTime($event->start_time);
+        $when = $this->formatEventDateTime(
+            $event->start_time,
+            eventTimezone: $event->timezone ?? null,
+        );
         $heading = $reminderType === '24h'
             ? htmlspecialchars(__('emails.events.reminder_heading_24h'), ENT_QUOTES, 'UTF-8')
             : htmlspecialchars(__('emails.events.reminder_heading_1h'), ENT_QUOTES, 'UTF-8');

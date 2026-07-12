@@ -3351,6 +3351,10 @@ CREATE TABLE `event_attendance` (
   `event_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `tenant_id` int(11) NOT NULL,
+  `attendance_status` varchar(32) DEFAULT NULL COMMENT 'Canonical attendance state; nullable during rolling deployment',
+  `attendance_version` bigint(20) unsigned DEFAULT NULL COMMENT 'Monotonic attendance activity version',
+  `status_changed_at` timestamp NULL DEFAULT NULL,
+  `status_changed_by` int(11) DEFAULT NULL,
   `checked_in_at` timestamp NULL DEFAULT NULL COMMENT 'When the attendee was checked in',
   `checked_in_by` int(11) DEFAULT NULL COMMENT 'User who checked them in (organizer/admin)',
   `checked_out_at` timestamp NULL DEFAULT NULL COMMENT 'Optional: when they left',
@@ -3363,9 +3367,139 @@ CREATE TABLE `event_attendance` (
   KEY `idx_attendance_event` (`event_id`),
   KEY `idx_attendance_user` (`user_id`),
   KEY `idx_attendance_tenant` (`tenant_id`),
+  KEY `idx_event_attendance_tenant_event_status` (`tenant_id`,`event_id`,`attendance_status`,`id`),
   CONSTRAINT `fk_attendance_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_attendance_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_attendance_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_attendance_activity`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_attendance_activity` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `attendance_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `attendance_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `from_status` varchar(32) DEFAULT NULL,
+  `to_status` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_attendance_activity_key` (`tenant_id`,`idempotency_key`),
+  UNIQUE KEY `uq_event_attendance_activity_version` (`tenant_id`,`attendance_id`,`attendance_version`),
+  KEY `idx_event_attendance_activity_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `idx_event_attendance_activity_user` (`tenant_id`,`user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_attendance_activity_no_update` BEFORE UPDATE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable';
+CREATE TRIGGER `trg_event_attendance_activity_no_delete` BEFORE DELETE ON `event_attendance_activity` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_activity_immutable';
+DROP TABLE IF EXISTS `event_attendance_credit_claims`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_attendance_credit_claims` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `attendance_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `claim_type` varchar(50) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `funding_source_type` varchar(32) NOT NULL,
+  `funding_source_id` int(11) DEFAULT NULL,
+  `payer_user_id` int(11) DEFAULT NULL,
+  `payee_user_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `unit` varchar(32) NOT NULL DEFAULT 'time_credit',
+  `status` varchar(32) NOT NULL DEFAULT 'pending',
+  `transaction_id` bigint(20) unsigned DEFAULT NULL,
+  `parent_claim_id` bigint(20) unsigned DEFAULT NULL,
+  `failure_code` varchar(100) DEFAULT NULL,
+  `reversal_code` varchar(100) DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `failed_at` timestamp NULL DEFAULT NULL,
+  `reversed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_credit_claim_subject` (`tenant_id`,`event_id`,`user_id`,`claim_type`),
+  UNIQUE KEY `uq_event_credit_claim_key` (`tenant_id`,`idempotency_key`),
+  UNIQUE KEY `uq_event_credit_claim_transaction` (`transaction_id`),
+  KEY `idx_event_credit_claim_status` (`tenant_id`,`status`,`created_at`,`id`),
+  KEY `idx_event_credit_claim_attendance` (`tenant_id`,`event_id`,`attendance_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_attendance_claim_no_delete` BEFORE DELETE ON `event_attendance_credit_claims` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_attendance_credit_claim_immutable';
+DROP TABLE IF EXISTS `event_domain_outbox`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_domain_outbox` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `aggregate_stream` varchar(191) NOT NULL DEFAULT 'event',
+  `aggregate_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `action` varchar(80) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `production_mode` varchar(32) NOT NULL DEFAULT 'direct',
+  `status` varchar(32) NOT NULL DEFAULT 'direct',
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`payload`)),
+  `available_at` timestamp NULL DEFAULT NULL,
+  `claim_token` char(36) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `next_attempt_at` timestamp NULL DEFAULT NULL,
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `dead_lettered_at` timestamp NULL DEFAULT NULL,
+  `last_error` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_outbox_tenant_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_outbox_claim` (`status`,`available_at`,`next_attempt_at`,`id`),
+  KEY `idx_event_outbox_aggregate` (`tenant_id`,`event_id`,`aggregate_version`),
+  KEY `idx_event_outbox_stream` (`tenant_id`,`event_id`,`aggregate_stream`,`aggregate_version`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_notification_deliveries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_notification_deliveries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `recipient_user_id` int(11) NOT NULL,
+  `channel` varchar(32) NOT NULL,
+  `delivery_key` varchar(191) NOT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'pending',
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `next_attempt_at` timestamp NULL DEFAULT NULL,
+  `claim_token` char(36) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `suppressed_at` timestamp NULL DEFAULT NULL,
+  `dead_lettered_at` timestamp NULL DEFAULT NULL,
+  `preference_reason` varchar(100) DEFAULT NULL,
+  `suppression_reason` varchar(191) DEFAULT NULL,
+  `provider` varchar(50) DEFAULT NULL,
+  `provider_evidence_id` varchar(255) DEFAULT NULL,
+  `last_error` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_delivery_tenant_key` (`tenant_id`,`delivery_key`),
+  UNIQUE KEY `uq_event_delivery_recipient_channel` (`outbox_id`,`recipient_user_id`,`channel`),
+  KEY `idx_event_delivery_claim` (`status`,`next_attempt_at`,`id`),
+  KEY `idx_event_delivery_recipient` (`tenant_id`,`recipient_user_id`,`status`),
+  CONSTRAINT `fk_event_delivery_outbox` FOREIGN KEY (`outbox_id`) REFERENCES `event_domain_outbox` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `event_recurrence_rules`;
@@ -3455,6 +3589,186 @@ CREATE TABLE `event_reminders` (
   CONSTRAINT `fk_reminder_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_registrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registrations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `registration_state` varchar(32) NOT NULL,
+  `registration_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `state_changed_at` timestamp NOT NULL,
+  `state_changed_by` int(11) DEFAULT NULL,
+  `invited_at` timestamp NULL DEFAULT NULL,
+  `pending_at` timestamp NULL DEFAULT NULL,
+  `confirmed_at` timestamp NULL DEFAULT NULL,
+  `declined_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_registration_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
+  KEY `idx_event_registration_capacity` (`tenant_id`,`event_id`,`capacity_pool_key`,`registration_state`,`id`),
+  KEY `idx_event_registration_user` (`tenant_id`,`user_id`,`registration_state`,`event_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_registration_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_registration_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `registration_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL,
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `registration_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(64) NOT NULL,
+  `from_state` varchar(32) DEFAULT NULL,
+  `to_state` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_registration_history_version` (`tenant_id`,`registration_id`,`registration_version`),
+  UNIQUE KEY `uq_event_registration_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_registration_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
+  KEY `idx_event_registration_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_registration_history_no_update` BEFORE UPDATE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable';
+CREATE TRIGGER `trg_event_registration_history_no_delete` BEFORE DELETE ON `event_registration_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_registration_history_immutable';
+DROP TABLE IF EXISTS `event_waitlist_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_entries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL DEFAULT 'event',
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `queue_state` varchar(32) NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `queue_sequence` bigint(20) unsigned NOT NULL,
+  `state_changed_at` timestamp NOT NULL,
+  `state_changed_by` int(11) DEFAULT NULL,
+  `offered_at` timestamp NULL DEFAULT NULL,
+  `offer_expires_at` timestamp NULL DEFAULT NULL,
+  `offer_token_hash` char(64) DEFAULT NULL,
+  `offer_token_used_at` timestamp NULL DEFAULT NULL,
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `accepted_registration_id` bigint(20) unsigned DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_entry_subject` (`tenant_id`,`event_id`,`user_id`,`capacity_pool_key`),
+  UNIQUE KEY `uq_event_waitlist_entry_sequence` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_sequence`),
+  UNIQUE KEY `uq_event_waitlist_offer_token` (`offer_token_hash`),
+  KEY `idx_event_waitlist_queue` (`tenant_id`,`event_id`,`capacity_pool_key`,`queue_state`,`queue_sequence`,`id`),
+  KEY `idx_event_waitlist_expiry` (`queue_state`,`offer_expires_at`,`id`),
+  KEY `idx_event_waitlist_user` (`tenant_id`,`user_id`,`queue_state`,`event_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_waitlist_entry_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_entry_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `capacity_pool_key` varchar(100) NOT NULL,
+  `allocation_key` varchar(191) DEFAULT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `queue_sequence` bigint(20) unsigned NOT NULL,
+  `action` varchar(64) NOT NULL,
+  `from_state` varchar(32) DEFAULT NULL,
+  `to_state` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_history_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
+  UNIQUE KEY `uq_event_waitlist_history_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_waitlist_history_event` (`tenant_id`,`event_id`,`capacity_pool_key`,`created_at`,`id`),
+  KEY `idx_event_waitlist_history_user` (`tenant_id`,`user_id`,`created_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_waitlist_history_no_update` BEFORE UPDATE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable';
+CREATE TRIGGER `trg_event_waitlist_history_no_delete` BEFORE DELETE ON `event_waitlist_entry_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_entry_history_immutable';
+DROP TABLE IF EXISTS `event_waitlist_offer_envelopes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_offer_envelopes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(80) NOT NULL,
+  `cipher_version` varchar(32) NOT NULL,
+  `key_version` varchar(64) NOT NULL,
+  `key_fingerprint` char(64) NOT NULL,
+  `aad_hash` char(64) NOT NULL,
+  `token_ciphertext` longtext DEFAULT NULL,
+  `status` varchar(32) NOT NULL DEFAULT 'sealed',
+  `envelope_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `claim_token_hash` char(64) DEFAULT NULL,
+  `claimed_by` varchar(191) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `handed_off_at` timestamp NULL DEFAULT NULL,
+  `erased_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_offer_envelope_outbox` (`tenant_id`,`outbox_id`),
+  UNIQUE KEY `uq_event_waitlist_offer_envelope_version` (`tenant_id`,`waitlist_entry_id`,`queue_version`),
+  KEY `idx_event_waitlist_offer_envelope_status` (`tenant_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_waitlist_offer_envelope_entry` (`tenant_id`,`event_id`,`waitlist_entry_id`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_waitlist_offer_envelope_access`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_waitlist_offer_envelope_access` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `envelope_id` bigint(20) unsigned NOT NULL,
+  `waitlist_entry_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `queue_version` bigint(20) unsigned NOT NULL,
+  `operation` varchar(32) NOT NULL,
+  `consumer` varchar(191) DEFAULT NULL,
+  `claim_id_hash` char(64) DEFAULT NULL,
+  `from_status` varchar(32) DEFAULT NULL,
+  `to_status` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) NOT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_waitlist_envelope_access_key` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_waitlist_envelope_access_envelope` (`tenant_id`,`envelope_id`,`created_at`,`id`),
+  KEY `idx_event_waitlist_envelope_access_event` (`tenant_id`,`event_id`,`operation`,`created_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_waitlist_envelope_access_no_update` BEFORE UPDATE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable';
+CREATE TRIGGER `trg_event_waitlist_envelope_access_no_delete` BEFORE DELETE ON `event_waitlist_offer_envelope_access` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_waitlist_offer_envelope_access_immutable';
 DROP TABLE IF EXISTS `event_rsvps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3500,6 +3814,97 @@ CREATE TABLE `event_series` (
   CONSTRAINT `fk_series_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_staff_assignments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_staff_assignments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role` varchar(40) NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'active',
+  `assignment_version` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `granted_at` timestamp NOT NULL,
+  `granted_by` int(11) NOT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revoked_by` int(11) DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_staff_assignment_subject` (`tenant_id`,`event_id`,`user_id`,`role`),
+  KEY `idx_event_staff_assignment_event` (`tenant_id`,`event_id`,`status`,`expires_at`,`id`),
+  KEY `idx_event_staff_assignment_user` (`tenant_id`,`user_id`,`status`,`expires_at`),
+  KEY `fk_event_staff_assignment_event` (`event_id`),
+  KEY `fk_event_staff_assignment_user` (`user_id`),
+  KEY `fk_event_staff_assignment_grantor` (`granted_by`),
+  KEY `fk_event_staff_assignment_revoker` (`revoked_by`),
+  CONSTRAINT `fk_event_staff_assignment_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_grantor` FOREIGN KEY (`granted_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_revoker` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_event_staff_assignment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `event_staff_assignment_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_staff_assignment_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `assignment_id` bigint(20) unsigned NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role` varchar(40) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `assignment_version` bigint(20) unsigned NOT NULL,
+  `action` varchar(32) NOT NULL,
+  `idempotency_key` varchar(191) DEFAULT NULL,
+  `from_status` varchar(16) DEFAULT NULL,
+  `to_status` varchar(16) NOT NULL,
+  `previous_expires_at` timestamp NULL DEFAULT NULL,
+  `new_expires_at` timestamp NULL DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_staff_history_version` (`tenant_id`,`assignment_id`,`assignment_version`),
+  UNIQUE KEY `uq_event_staff_history_idempotency` (`tenant_id`,`idempotency_key`),
+  KEY `idx_event_staff_history_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `idx_event_staff_history_user` (`tenant_id`,`user_id`,`created_at`),
+  KEY `fk_event_staff_history_assignment` (`assignment_id`),
+  KEY `fk_event_staff_history_actor` (`actor_user_id`),
+  CONSTRAINT `fk_event_staff_history_actor` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_event_staff_history_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `event_staff_assignments` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_staff_history_no_update` BEFORE UPDATE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable';
+CREATE TRIGGER `trg_event_staff_history_no_delete` BEFORE DELETE ON `event_staff_assignment_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_staff_assignment_history_immutable';
+DROP TABLE IF EXISTS `event_status_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `event_status_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `actor_user_id` int(11) NOT NULL,
+  `lifecycle_version` bigint(20) unsigned NOT NULL,
+  `from_publication_status` varchar(32) NOT NULL,
+  `to_publication_status` varchar(32) NOT NULL,
+  `from_operational_status` varchar(32) NOT NULL,
+  `to_operational_status` varchar(32) NOT NULL,
+  `from_legacy_status` varchar(32) NOT NULL,
+  `to_legacy_status` varchar(32) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_event_status_history_version` (`tenant_id`,`event_id`,`lifecycle_version`),
+  KEY `idx_event_status_history_event` (`tenant_id`,`event_id`,`created_at`,`id`),
+  KEY `idx_event_status_history_actor` (`tenant_id`,`actor_user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TRIGGER `trg_event_status_history_no_update` BEFORE UPDATE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable';
+CREATE TRIGGER `trg_event_status_history_no_delete` BEFORE DELETE ON `event_status_history` FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'event_status_history_immutable';
 DROP TABLE IF EXISTS `event_waitlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -3540,6 +3945,9 @@ CREATE TABLE `events` (
   `start_time` datetime NOT NULL,
   `start_date` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
+  `timezone` varchar(64) DEFAULT NULL COMMENT 'IANA timezone retained for display and recurrence semantics',
+  `timezone_source` varchar(64) DEFAULT NULL COMMENT 'Timezone provenance/backfill status; non-tenant sources remain auditable',
+  `all_day` tinyint(1) DEFAULT NULL COMMENT 'Explicit all-day semantics; NULL is reserved for rolling-deploy compatibility',
   `max_attendees` int(11) DEFAULT NULL,
   `is_online` tinyint(1) NOT NULL DEFAULT 0,
   `online_link` varchar(512) DEFAULT NULL,
@@ -3554,19 +3962,46 @@ CREATE TABLE `events` (
   `auto_log_hours` tinyint(1) DEFAULT 0 COMMENT 'Auto-log hours upon attendance',
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
+  `accessibility_step_free` tinyint(1) DEFAULT NULL,
+  `accessibility_toilet` tinyint(1) DEFAULT NULL,
+  `accessibility_hearing_loop` tinyint(1) DEFAULT NULL,
+  `accessibility_quiet_space` tinyint(1) DEFAULT NULL,
+  `accessibility_seating` tinyint(1) DEFAULT NULL,
+  `accessibility_parking` tinyint(1) DEFAULT NULL,
+  `accessibility_parking_details` varchar(1000) DEFAULT NULL,
+  `accessibility_transit_details` varchar(1000) DEFAULT NULL,
+  `accessibility_assistance_contact` varchar(500) DEFAULT NULL,
+  `accessibility_notes` text DEFAULT NULL,
   `award` varchar(255) DEFAULT NULL,
   `event` varchar(255) DEFAULT NULL,
   `federated_visibility` enum('none','listed','joinable') NOT NULL DEFAULT 'none',
   `allow_remote_attendance` tinyint(1) NOT NULL DEFAULT 0,
   `status` enum('active','cancelled','completed','draft') DEFAULT 'active',
+  `publication_status` varchar(32) DEFAULT NULL COMMENT 'Canonical editorial/publication lifecycle state',
+  `operational_status` varchar(32) DEFAULT NULL COMMENT 'Canonical scheduling/delivery lifecycle state',
+  `lifecycle_version` bigint(20) unsigned DEFAULT NULL COMMENT 'Monotonic version for lifecycle history and outbox ordering',
+  `publication_status_changed_at` timestamp NULL DEFAULT NULL,
+  `publication_status_changed_by` int(11) DEFAULT NULL,
+  `operational_status_changed_at` timestamp NULL DEFAULT NULL,
+  `operational_status_changed_by` int(11) DEFAULT NULL,
+  `lifecycle_reason` text DEFAULT NULL,
+  `moderation_submitted_at` timestamp NULL DEFAULT NULL,
+  `moderation_submitted_by` int(11) DEFAULT NULL,
+  `moderated_at` timestamp NULL DEFAULT NULL,
+  `moderated_by` int(11) DEFAULT NULL,
+  `moderation_reason` text DEFAULT NULL,
   `parent_event_id` int(11) DEFAULT NULL COMMENT 'Links to parent recurring event template',
   `occurrence_date` date DEFAULT NULL COMMENT 'Specific date for this occurrence',
+  `occurrence_key` varchar(191) DEFAULT NULL COMMENT 'Stable identity for a concrete registrable occurrence; NULL for templates',
+  `recurrence_engine` varchar(32) DEFAULT NULL COMMENT 'Engine that materialised this recurrence tree or occurrence',
+  `recurrence_engine_version` varchar(32) DEFAULT NULL COMMENT 'Engine contract version used to materialise this row',
   `is_recurring_template` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True if this event is a recurrence template',
   `cancellation_reason` text DEFAULT NULL,
   `cancelled_at` timestamp NULL DEFAULT NULL,
   `cancelled_by` int(11) DEFAULT NULL,
   `series_id` int(11) DEFAULT NULL COMMENT 'Links event to a series',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_events_tenant_occurrence` (`tenant_id`,`occurrence_key`),
   KEY `idx_event_tenant` (`tenant_id`),
   KEY `idx_event_start` (`start_time`),
   KEY `fk_event_group` (`group_id`),
@@ -3580,6 +4015,8 @@ CREATE TABLE `events` (
   KEY `idx_events_group` (`group_id`),
   KEY `idx_events_tenant_status_start` (`tenant_id`,`status`,`start_time`),
   KEY `idx_events_tenant_start_id` (`tenant_id`,`start_time`,`id`),
+  KEY `idx_events_tenant_step_free_start` (`tenant_id`,`accessibility_step_free`,`start_time`),
+  KEY `idx_events_tenant_lifecycle_start` (`tenant_id`,`publication_status`,`operational_status`,`start_time`,`id`),
   CONSTRAINT `fk_event_group` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_event_opportunity` FOREIGN KEY (`volunteer_opportunity_id`) REFERENCES `vol_opportunities` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_events_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
@@ -5957,13 +6394,27 @@ CREATE TABLE `group_scheduled_posts` (
   `recurrence_pattern` enum('daily','weekly','monthly') DEFAULT NULL,
   `scheduled_at` datetime NOT NULL,
   `published_at` datetime DEFAULT NULL,
-  `status` enum('scheduled','published','cancelled') NOT NULL DEFAULT 'scheduled',
+  `status` enum('scheduled','processing','published','cancelled','failed') NOT NULL DEFAULT 'scheduled',
+  `claim_token` char(36) DEFAULT NULL,
+  `claimed_at` timestamp NULL DEFAULT NULL,
+  `lease_expires_at` timestamp NULL DEFAULT NULL,
+  `attempt_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `next_attempt_at` timestamp NULL DEFAULT NULL,
+  `last_error_code` varchar(64) DEFAULT NULL,
+  `last_error_message` varchar(500) DEFAULT NULL,
+  `published_resource_type` varchar(32) DEFAULT NULL,
+  `published_resource_id` bigint(20) unsigned DEFAULT NULL,
+  `recurrence_parent_id` int(10) unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_group_scheduled_claim_token` (`claim_token`),
+  UNIQUE KEY `uq_group_scheduled_recurrence_parent` (`recurrence_parent_id`),
   KEY `idx_gsp_group` (`group_id`,`status`),
   KEY `idx_gsp_scheduled` (`status`,`scheduled_at`),
-  KEY `idx_gsp_tenant` (`tenant_id`)
+  KEY `idx_gsp_tenant` (`tenant_id`),
+  KEY `idx_group_scheduled_due_claim` (`status`,`next_attempt_at`,`scheduled_at`),
+  KEY `idx_group_scheduled_lease` (`status`,`lease_expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_sso_mappings`;
@@ -6115,11 +6566,42 @@ CREATE TABLE `group_webhooks` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `last_fired_at` datetime DEFAULT NULL,
   `failure_count` int(11) NOT NULL DEFAULT 0,
+  `disabled_at` timestamp NULL DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_group_webhooks_group` (`group_id`,`is_active`),
   KEY `idx_group_webhooks_tenant` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `group_webhook_deliveries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `group_webhook_deliveries` (
+  `id` char(36) NOT NULL,
+  `tenant_id` int(10) unsigned NOT NULL,
+  `group_id` int(10) unsigned NOT NULL,
+  `webhook_id` int(10) unsigned NOT NULL,
+  `event` varchar(64) NOT NULL,
+  `payload` longtext NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'queued',
+  `attempt_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `available_at` timestamp NOT NULL,
+  `dispatched_at` timestamp NULL DEFAULT NULL,
+  `claim_token` char(36) DEFAULT NULL,
+  `lease_expires_at` timestamp NULL DEFAULT NULL,
+  `http_status` smallint(5) unsigned DEFAULT NULL,
+  `response_excerpt` text DEFAULT NULL,
+  `last_error_code` varchar(64) DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_group_webhook_delivery_claim` (`claim_token`),
+  KEY `idx_group_webhook_delivery_due` (`status`,`available_at`,`dispatched_at`),
+  KEY `idx_group_webhook_delivery_lease` (`status`,`lease_expires_at`),
+  KEY `idx_group_webhook_delivery_tenant_group` (`tenant_id`,`group_id`,`created_at`),
+  KEY `idx_group_webhook_delivery_webhook` (`webhook_id`,`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_wiki_pages`;
@@ -7134,7 +7616,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=333 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=342 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -8616,6 +9098,71 @@ CREATE TABLE `member_verification_badges` (
   KEY `idx_verified_by` (`verified_by`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `member_vetting_attestation_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `member_vetting_attestation_events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `attestation_id` bigint(20) unsigned NOT NULL,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `scheme_code` varchar(64) NOT NULL,
+  `attestation_code` varchar(64) NOT NULL,
+  `purpose_code` varchar(64) NOT NULL,
+  `scope_type` varchar(32) NOT NULL,
+  `scope_identifier` varchar(191) NOT NULL DEFAULT '',
+  `event_type` varchar(32) NOT NULL,
+  `decision_before` varchar(20) DEFAULT NULL,
+  `decision_after` varchar(20) NOT NULL,
+  `reason_code` varchar(64) DEFAULT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `policy_version` varchar(64) NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_vetting_event_member_history` (`tenant_id`,`user_id`,`created_at`),
+  KEY `idx_vetting_event_actor_history` (`tenant_id`,`actor_user_id`,`created_at`),
+  KEY `member_vetting_attestation_events_attestation_id_foreign` (`attestation_id`),
+  KEY `member_vetting_attestation_events_user_id_foreign` (`user_id`),
+  KEY `member_vetting_attestation_events_actor_user_id_foreign` (`actor_user_id`),
+  CONSTRAINT `member_vetting_attestation_events_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `member_vetting_attestation_events_attestation_id_foreign` FOREIGN KEY (`attestation_id`) REFERENCES `member_vetting_attestations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `member_vetting_attestation_events_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `member_vetting_attestation_events_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `member_vetting_attestations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `member_vetting_attestations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `scheme_code` varchar(64) NOT NULL,
+  `attestation_code` varchar(64) NOT NULL,
+  `purpose_code` varchar(64) NOT NULL,
+  `scope_type` varchar(32) NOT NULL DEFAULT 'tenant',
+  `scope_identifier` varchar(191) NOT NULL DEFAULT '',
+  `decision` varchar(20) NOT NULL,
+  `confirmed_by` int(11) DEFAULT NULL,
+  `confirmed_at` datetime DEFAULT NULL,
+  `revoked_by` int(11) DEFAULT NULL,
+  `revoked_at` datetime DEFAULT NULL,
+  `revocation_reason_code` varchar(64) DEFAULT NULL,
+  `policy_version` varchar(64) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_member_vetting_attestation_scope` (`tenant_id`,`user_id`,`scheme_code`,`attestation_code`,`purpose_code`,`scope_type`,`scope_identifier`),
+  KEY `idx_member_vetting_policy_status` (`tenant_id`,`user_id`,`attestation_code`,`purpose_code`,`decision`),
+  KEY `member_vetting_attestations_user_id_foreign` (`user_id`),
+  KEY `member_vetting_attestations_confirmed_by_foreign` (`confirmed_by`),
+  KEY `member_vetting_attestations_revoked_by_foreign` (`revoked_by`),
+  CONSTRAINT `member_vetting_attestations_confirmed_by_foreign` FOREIGN KEY (`confirmed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `member_vetting_attestations_revoked_by_foreign` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `member_vetting_attestations_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `member_vetting_attestations_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mentions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -9488,6 +10035,8 @@ DROP TABLE IF EXISTS `notification_queue`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notification_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_delivery_id` bigint(20) unsigned DEFAULT NULL,
+  `idempotency_key` varchar(191) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `tenant_id` int(11) NOT NULL,
   `activity_type` varchar(50) NOT NULL,
@@ -9504,11 +10053,13 @@ CREATE TABLE `notification_queue` (
   `frequency` enum('instant','daily','weekly','monthly') DEFAULT 'daily',
   `email_body` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_notification_queue_tenant_key` (`tenant_id`,`idempotency_key`),
   KEY `user_id` (`user_id`),
   KEY `idx_nq_tenant_status_frequency` (`tenant_id`,`status`,`frequency`),
   KEY `idx_nq_status_frequency_created` (`status`,`frequency`,`created_at`),
   KEY `notification_queue_frequency_status_batch_idx` (`frequency`,`status`,`processing_batch_id`),
   KEY `notification_queue_retry_idx` (`frequency`,`status`,`last_attempted_at`,`attempts`),
+  KEY `idx_notification_queue_event_delivery` (`event_delivery_id`),
   CONSTRAINT `notification_queue_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -11067,6 +11618,31 @@ CREATE TABLE `safeguarding_flagged_messages` (
   KEY `idx_flagged_reviewed` (`reviewed_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `safeguarding_policy_rotation_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `safeguarding_policy_rotation_events` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `jurisdiction` varchar(40) NOT NULL,
+  `scheme_code` varchar(64) NOT NULL,
+  `attestation_code` varchar(64) NOT NULL,
+  `purpose_code` varchar(64) NOT NULL,
+  `scope_type` varchar(32) NOT NULL,
+  `scope_identifier` varchar(191) NOT NULL DEFAULT '',
+  `previous_policy_version` varchar(64) NOT NULL,
+  `new_policy_version` varchar(64) NOT NULL,
+  `reason_code` varchar(64) NOT NULL,
+  `actor_user_id` int(11) DEFAULT NULL,
+  `affected_member_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_safeguarding_policy_rotation_tenant` (`tenant_id`,`created_at`),
+  KEY `safeguarding_policy_rotation_events_actor_user_id_foreign` (`actor_user_id`),
+  CONSTRAINT `safeguarding_policy_rotation_events_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `safeguarding_policy_rotation_events_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `safeguarding_report_actions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -11110,6 +11686,42 @@ CREATE TABLE `safeguarding_reports` (
   KEY `idx_safeguard_tenant_assigned` (`tenant_id`,`assigned_to_user_id`),
   KEY `idx_safeguard_tenant_review_due` (`tenant_id`,`review_due_at`),
   KEY `idx_safeguard_tenant_reporter` (`tenant_id`,`reporter_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `safeguarding_vetting_review_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `safeguarding_vetting_review_requests` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `jurisdiction` varchar(40) NOT NULL,
+  `scheme_code` varchar(64) NOT NULL,
+  `attestation_code` varchar(64) NOT NULL,
+  `purpose_code` varchar(64) NOT NULL,
+  `scope_type` varchar(32) NOT NULL DEFAULT 'tenant',
+  `scope_identifier` varchar(191) NOT NULL DEFAULT '',
+  `policy_version` varchar(64) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `request_source` varchar(32) NOT NULL DEFAULT 'member_request',
+  `requested_by` int(11) DEFAULT NULL,
+  `requested_at` datetime NOT NULL,
+  `handled_by` int(11) DEFAULT NULL,
+  `handled_at` datetime DEFAULT NULL,
+  `resolution_code` varchar(64) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_vetting_review_member_scope` (`tenant_id`,`user_id`,`purpose_code`,`scope_type`,`scope_identifier`),
+  KEY `idx_vetting_review_queue` (`tenant_id`,`status`,`requested_at`),
+  KEY `idx_vetting_review_member` (`tenant_id`,`user_id`,`purpose_code`),
+  KEY `safeguarding_vetting_review_requests_user_id_foreign` (`user_id`),
+  KEY `safeguarding_vetting_review_requests_requested_by_foreign` (`requested_by`),
+  KEY `safeguarding_vetting_review_requests_handled_by_foreign` (`handled_by`),
+  CONSTRAINT `safeguarding_vetting_review_requests_handled_by_foreign` FOREIGN KEY (`handled_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `safeguarding_vetting_review_requests_requested_by_foreign` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `safeguarding_vetting_review_requests_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `safeguarding_vetting_review_requests_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `salary_benchmarks`;
@@ -12097,6 +12709,23 @@ CREATE TABLE `tenant_safeguarding_options` (
   CONSTRAINT `fk_tso_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Admin-configured safeguarding options shown during onboarding per tenant';
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tenant_safeguarding_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tenant_safeguarding_settings` (
+  `tenant_id` int(11) NOT NULL,
+  `jurisdiction` varchar(40) NOT NULL,
+  `policy_version` varchar(64) NOT NULL DEFAULT '1',
+  `configured_by` int(11) DEFAULT NULL,
+  `configured_at` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`tenant_id`),
+  KEY `tenant_safeguarding_settings_configured_by_foreign` (`configured_by`),
+  CONSTRAINT `tenant_safeguarding_settings_configured_by_foreign` FOREIGN KEY (`configured_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `tenant_safeguarding_settings_tenant_id_foreign` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tenant_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -12953,6 +13582,8 @@ CREATE TABLE `user_safeguarding_preferences` (
   `review_reminder_sent_at` timestamp NULL DEFAULT NULL,
   `review_confirmed_at` timestamp NULL DEFAULT NULL,
   `review_escalated_at` timestamp NULL DEFAULT NULL,
+  `policy_review_required_at` datetime DEFAULT NULL,
+  `policy_review_reason_code` varchar(64) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -13242,6 +13873,7 @@ CREATE TABLE `users` (
   `resume_summary` text DEFAULT NULL,
   `stripe_customer_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `users_id_tenant_unique` (`id`,`tenant_id`),
   UNIQUE KEY `unique_email_tenant` (`email`,`tenant_id`),
   UNIQUE KEY `idx_tenant_username` (`tenant_id`,`username`),
   KEY `idx_users_email` (`email`),
@@ -14377,22 +15009,32 @@ CREATE TABLE `webauthn_credentials` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `tenant_id` int(11) NOT NULL,
-  `credential_id` varchar(255) NOT NULL COMMENT 'Base64url encoded credential ID',
+  `credential_id` varchar(1364) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'Unpadded base64url credential ID (maximum 1023 decoded bytes)',
   `public_key` text NOT NULL COMMENT 'PEM-format public key from lbuchs/WebAuthn library',
-  `sign_count` int(11) DEFAULT 0 COMMENT 'Signature counter for replay protection',
+  `sign_count` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'WebAuthn signature counter for clone detection',
   `transports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Array of transport hints (usb, nfc, ble, internal)' CHECK (json_valid(`transports`)),
   `device_name` varchar(100) DEFAULT NULL,
   `authenticator_type` varchar(30) DEFAULT NULL,
   `attestation_type` varchar(50) DEFAULT NULL COMMENT 'Attestation type (none, indirect, direct)',
+  `rp_id` varchar(253) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL COMMENT 'RP ID cryptographically bound to this credential',
+  `registration_origin` varchar(2048) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL COMMENT 'Exact browser origin used for registration',
+  `user_handle` varchar(86) CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'Unpadded base64url WebAuthn user handle (maximum 64 decoded bytes)',
+  `aaguid` char(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL COMMENT 'Canonical authenticator AAGUID',
+  `backup_eligible` tinyint(1) DEFAULT NULL COMMENT 'WebAuthn BE flag at registration',
+  `backup_state` tinyint(1) DEFAULT NULL COMMENT 'WebAuthn BS flag at registration',
+  `user_verified` tinyint(1) DEFAULT NULL COMMENT 'Whether registration required user verification',
+  `credential_discoverable` tinyint(1) DEFAULT NULL COMMENT 'Whether the credential is discoverable/resident',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_used_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_credential` (`credential_id`(191)),
+  UNIQUE KEY `unique_credential` (`credential_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_tenant` (`tenant_id`),
-  KEY `idx_credential` (`credential_id`(191)),
+  KEY `idx_webauthn_user_tenant` (`user_id`,`tenant_id`),
   CONSTRAINT `webauthn_credentials_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `webauthn_credentials_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
+  CONSTRAINT `webauthn_credentials_ibfk_2` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `webauthn_credentials_user_tenant_foreign` FOREIGN KEY (`user_id`,`tenant_id`) REFERENCES `users` (`id`,`tenant_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `weekly_rank_snapshots`;
@@ -14870,7 +15512,14 @@ INSERT INTO `laravel_migrations` VALUES
 (331,'2026_07_10_000001_add_amount_refunded_to_vol_donations',92),
 (332,'2026_07_10_000002_add_external_partner_id_to_federation_api_keys',93),
 (333,'2026_07_10_000003_add_heartbeat_at_to_prerender_jobs',94),
-(334,'2026_07_10_000004_add_fence_ready_at_to_prerender_jobs',95);
+(334,'2026_07_10_000004_add_fence_ready_at_to_prerender_jobs',95),
+(336,'2026_07_11_000001_create_safeguarding_attestations',96),
+(337,'2026_07_11_000002_add_safeguarding_policy_lifecycle',97),
+(338,'2026_07_11_000010_create_event_domain_outbox',98),
+(339,'2026_07_11_000011_create_event_notification_deliveries',99),
+(340,'2026_07_11_000012_add_event_delivery_identity_to_notification_queue',100),
+(341,'2026_07_11_000013_add_event_time_identity_foundation',101),
+(342,'2026_07_11_000045_harden_webauthn_credentials',102);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -15181,4 +15830,3 @@ INSERT INTO `migrations` VALUES
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

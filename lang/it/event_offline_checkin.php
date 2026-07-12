@@ -1,0 +1,66 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'privacy' => [
+        'title' => 'Check-in riservato e resiliente',
+        'body' => 'I codici firmati non contengono nome, indirizzo email o numero di telefono. Puoi inserire un codice qui sotto senza usare la fotocamera.',
+        'no_wallet' => 'Le azioni di presenza non modificano mai i saldi e non assegnano crediti di tempo.',
+    ],
+    'code' => [
+        'title' => 'Inserisci un codice partecipante firmato',
+        'intro' => 'Usa questa alternativa online se la fotocamera o il dispositivo offline dello staff non è disponibile. La ricerca manuale per nome resta disponibile più sotto.',
+        'label' => 'Codice del partecipante',
+        'hint' => 'Incolla il codice completo che inizia con nqx2_. Il codice non viene conservato nel registro di controllo.',
+        'action' => 'Azione di presenza',
+        'reason' => 'Motivo della correzione',
+        'reason_hint' => 'Per annullare un’azione è necessario un motivo. Non inserire informazioni sensibili.',
+        'confirm' => 'Ho verificato il partecipante e selezionato l’azione desiderata.',
+        'submit' => 'Applica l’azione con codice firmato',
+    ],
+    'actions' => [
+        'check_in' => 'Registra ingresso',
+        'check_out' => 'Registra uscita',
+        'no_show' => 'Segna come assente',
+        'undo' => 'Annulla l’ultima azione',
+    ],
+    'attendee' => [
+        'manage_link' => 'Gestisci il mio codice di check-in',
+        'title' => 'Il tuo codice di check-in per l’evento',
+        'intro' => 'Crea un codice firmato da mostrare allo staff dell’evento sullo schermo o su una copia stampata.',
+        'privacy' => 'Il codice identifica solo questa registrazione all’evento. Non contiene nome, e-mail o numero di telefono.',
+        'notice_issued' => 'Il nuovo codice di check-in è mostrato qui sotto.',
+        'notice_replaced' => 'Il codice precedente non funziona più. Il sostituto è mostrato qui sotto.',
+        'notice_revoked' => 'Il codice di check-in è stato revocato.',
+        'notice_already_active' => 'Esiste già un codice attivo. Sostituiscilo se la tua copia non è disponibile.',
+        'notice_invalid' => 'Conferma l’azione richiesta e riprova.',
+        'notice_failed' => 'Non è stato possibile modificare il codice di check-in. Aggiorna la pagina e riprova.',
+        'status_heading' => 'Stato del codice',
+        'status_active' => 'Attivo',
+        'status_rotated' => 'Sostituito',
+        'status_revoked' => 'Revocato',
+        'status_expired' => 'Scaduto',
+        'expires' => 'Scade il :date',
+        'one_shot_heading' => 'Salva subito questo codice',
+        'one_shot' => 'Per sicurezza, il codice completo viene mostrato solo quando viene creato o sostituito.',
+        'code_label' => 'Codice di check-in firmato',
+        'code_hint' => 'Seleziona e copia il codice completo che inizia con nqx2_.',
+        'print_hint' => 'Puoi stampare questa pagina o salvare una copia accessibile. Mantieni privato il codice fino al check-in.',
+        'print' => 'Stampa questo codice',
+        'issue_confirm' => 'Ho capito che il codice completo verrà mostrato una sola volta.',
+        'issue' => 'Crea codice di check-in',
+        'replace' => 'Sostituisci il codice copiato o smarrito',
+        'replace_hint' => 'La sostituzione invalida immediatamente ogni copia salvata o stampata.',
+        'replace_confirm' => 'Ho capito che il mio codice attuale smetterà di funzionare.',
+        'revoke' => 'Revoca il codice',
+        'reason' => 'Motivo della revoca',
+        'reason_hint' => 'Inserisci un breve motivo operativo senza informazioni sensibili.',
+        'revoke_confirm' => 'Ho capito che questo codice smetterà immediatamente di funzionare.',
+    ],
+    'device' => [
+        'lost' => 'Se un dispositivo dello staff viene smarrito, revocalo subito nell’area eventi standard. Continua qui per nome o codice firmato.',
+    ],
+];

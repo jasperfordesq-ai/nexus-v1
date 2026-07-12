@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "イベント分析",
+    "subtitle": "運用パフォーマンス、出席状況、コミュニケーション、プライバシーに配慮したコンバージョン指標。",
+    "generated_at": "生成された {{date}}",
+    "loading": "イベント分析の読み込み中",
+    "load_error": "イベント分析をロードできませんでした。",
+    "retry": "もう一度試してください",
+    "refresh": "リフレッシュ",
+    "export": "CSVのエクスポート",
+    "exporting": "エクスポート中…",
+    "export_started": "分析エクスポートが準備されました。",
+    "download_error": "分析エクスポートをダウンロードできませんでした。",
+    "privacy_title": "プライバシー保護されたレポート",
+    "privacy_note": "オプションの指標は、少なくとも {{count}} 人の同意者が表示されるまで非表示になります。",
+    "consent_bound": "同意が必要",
+    "suppressed": "抑制された",
+    "not_limited": "制限なし",
+    "finance_redacted": "役割による制限",
+    "columns": {
+      "metric": "メトリック",
+      "value": "値"
+    },
+    "sections": {
+      "registration": "登録",
+      "acquisition": "招待状と順番待ちリスト",
+      "attendance": "出席",
+      "communications": "コミュニケーション",
+      "funnel": "プライバシーに配慮したファネル",
+      "finance": "チケットとクレジット"
+    },
+    "metrics": {
+      "confirmed": "確認された登録",
+      "pending": "保留中の登録",
+      "cancelled": "キャンセルされた登録",
+      "capacity_remaining": "残り容量",
+      "invitations_issued": "招待状の発行",
+      "invitations_accepted": "招待を受け付けました",
+      "invitation_conversion": "招待状の変換",
+      "waitlist_joined": "待機リストへの参加",
+      "waitlist_accepted": "キャンセル待ちの受付",
+      "waitlist_conversion": "待機リストの変換",
+      "checked_in": "現在チェックイン中",
+      "attended": "出席しました",
+      "no_show": "ノーショー",
+      "attendance_rate": "出席率",
+      "delivered": "配信された通知",
+      "suppressed_deliveries": "通知が抑制されました",
+      "failed_deliveries": "通知に失敗しました",
+      "dead_lettered": "介入が必要な通知",
+      "delivery_rate": "配送率",
+      "event_views": "イベントビュー",
+      "registration_starts": "登録開始",
+      "start_conversion": "閲覧から登録への変換",
+      "finance": "財務指標",
+      "ticket_units": "確認されたチケット単位",
+      "ticket_credit_value": "確認されたチケットクレジット額",
+      "completed_credit_claims": "完了したクレジット請求",
+      "failed_credit_claims": "クレジット請求の失敗",
+      "guardian_consents": "保護者の同意"
+    }
+  }
+}

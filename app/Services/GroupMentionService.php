@@ -25,9 +25,9 @@ class GroupMentionService
      * tenant users.
      *
      * @param string $content Text that may contain @username mentions
-     * @return array<int, array{username: string, user_id: int}> Resolved mentions
+     * @return array<int, array{username: string, user_id: int, preferred_language: string|null}> Resolved mentions
      */
-    public static function parseMentions(string $content): array
+    public static function parseMentions(string $content, ?int $groupId = null): array
     {
         preg_match_all('/@(\w+)/', $content, $matches);
 
@@ -39,12 +39,22 @@ class GroupMentionService
 
         $tenantId = TenantContext::getId();
 
-        $users = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', '!=', 'banned')
-            ->whereIn('username', $usernames)
-            ->select(['id', 'username', 'preferred_language'])
-            ->get();
+        $query = DB::table('users as u')
+            ->where('u.tenant_id', $tenantId)
+            ->where('u.status', '!=', 'banned')
+            ->whereIn('u.username', $usernames)
+            ->select(['u.id', 'u.username', 'u.preferred_language']);
+
+        if ($groupId !== null) {
+            $query->join('group_members as gm', function ($join) use ($tenantId, $groupId) {
+                $join->on('gm.user_id', '=', 'u.id')
+                    ->where('gm.tenant_id', '=', $tenantId)
+                    ->where('gm.group_id', '=', $groupId)
+                    ->where('gm.status', '=', 'active');
+            });
+        }
+
+        $users = $query->get();
 
         $results = [];
         foreach ($users as $user) {
@@ -76,7 +86,15 @@ class GroupMentionService
         int $contextId
     ): void {
         $tenantId = TenantContext::getId();
-        $mentions = self::parseMentions($content);
+
+        // Mentions are a child-content write. Do not resolve recipients or
+        // emit notifications when the parent is foreign, non-writable, or the
+        // author is no longer an active member/administrator.
+        if (!GroupAccessService::canWriteContent($groupId, $authorId)) {
+            return;
+        }
+
+        $mentions = self::parseMentions($content, $groupId);
 
         if (empty($mentions)) {
             return;
@@ -88,7 +106,11 @@ class GroupMentionService
             [$groupId, $tenantId]
         );
 
-        $groupName = $group->name ?? 'a group';
+        if (!$group) {
+            return;
+        }
+
+        $groupName = (string) $group->name;
         $link = '/groups/' . $groupId;
 
         foreach ($mentions as $mention) {
@@ -121,30 +143,45 @@ class GroupMentionService
      * limited to a specific group.
      *
      * @param int    $groupId Group to search within
+     * @param int    $viewerId Authorized viewer requesting suggestions
      * @param string $query   Search term to match against name/username
      * @param int    $limit   Maximum results to return
      * @return array<int, array{id: int, name: string, username: string|null, avatar_url: string|null}>
      */
-    public static function getMemberSuggestions(int $groupId, string $query, int $limit = 10): array
+    public static function getMemberSuggestions(int $groupId, int $viewerId, string $query, int $limit = 10): array
     {
+        if (!GroupAccessService::canViewMemberContent($groupId, $viewerId)) {
+            return [];
+        }
+
         $tenantId = TenantContext::getId();
         $searchTerm = '%' . $query . '%';
 
-        $results = DB::select(
-            "SELECT u.id,
-                    COALESCE(u.name, CONCAT(u.first_name, ' ', COALESCE(u.last_name, ''))) as name,
-                    u.username,
-                    u.avatar_url
-             FROM group_members gm
-             JOIN users u ON gm.user_id = u.id
-             WHERE gm.group_id = ?
-               AND u.tenant_id = ?
-               AND u.status != 'banned'
-               AND (u.name LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ?)
-             ORDER BY u.first_name ASC
-             LIMIT ?",
-            [$groupId, $tenantId, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $limit]
-        );
+        $results = DB::table('group_members as gm')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('gm.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('gm.tenant_id', $tenantId)
+            ->where('gm.group_id', $groupId)
+            ->where('gm.status', 'active')
+            ->where('u.status', '!=', 'banned')
+            ->where(function ($builder) use ($searchTerm) {
+                $builder->where('u.name', 'LIKE', $searchTerm)
+                    ->orWhere('u.first_name', 'LIKE', $searchTerm)
+                    ->orWhere('u.last_name', 'LIKE', $searchTerm)
+                    ->orWhere('u.username', 'LIKE', $searchTerm);
+            })
+            ->select([
+                'u.id',
+                'u.username',
+                'u.avatar_url',
+            ])
+            ->selectRaw("COALESCE(u.name, CONCAT(u.first_name, ' ', COALESCE(u.last_name, ''))) as name")
+            ->orderBy('u.first_name')
+            ->limit(max(1, min($limit, 50)))
+            ->get()
+            ->all();
 
         return array_map(function ($user) {
             return [

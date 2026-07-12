@@ -6,6 +6,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
+import userEvent from '@testing-library/user-event';
+
+const mockMembersTabRender = vi.hoisted(() => vi.fn());
+const mockEventsTabRender = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts', () => createMockContexts());
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
@@ -13,8 +17,18 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 // Mock every heavyweight tab so GroupTabContent can render in isolation
 vi.mock('../tabs/GroupFeedTab', () => ({ GroupFeedTab: () => <div data-testid="feed-tab" /> }));
 vi.mock('../tabs/GroupDiscussionTab', () => ({ GroupDiscussionTab: () => <div data-testid="discussion-tab" /> }));
-vi.mock('../tabs/GroupMembersTab', () => ({ GroupMembersTab: () => <div data-testid="members-tab" /> }));
-vi.mock('../tabs/GroupEventsTab', () => ({ GroupEventsTab: () => <div data-testid="events-tab" /> }));
+vi.mock('../tabs/GroupMembersTab', () => ({
+  GroupMembersTab: (props: Record<string, unknown>) => {
+    mockMembersTabRender(props);
+    return <div data-testid="members-tab" />;
+  },
+}));
+vi.mock('../tabs/GroupEventsTab', () => ({
+  GroupEventsTab: (props: Record<string, unknown>) => {
+    mockEventsTabRender(props);
+    return <div data-testid="events-tab" />;
+  },
+}));
 vi.mock('../tabs/GroupFilesTab', () => ({ GroupFilesTab: () => <div data-testid="files-tab" /> }));
 vi.mock('../tabs/GroupAnnouncementsTab', () => ({ GroupAnnouncementsTab: () => <div data-testid="announcements-tab" /> }));
 vi.mock('../tabs/GroupChatroomsTab', () => ({ GroupChatroomsTab: () => <div data-testid="chatrooms-tab" /> }));
@@ -53,20 +67,29 @@ const BASE_PROPS = {
   expandedDiscussionId: null,
   expandedDiscussion: null,
   expandedLoading: false,
+  loadingEarlierReplies: false,
   replyContent: '',
   sendingReply: false,
   onShowNewDiscussion: vi.fn(),
   onExpandDiscussion: vi.fn(),
   onLoadMoreDiscussions: vi.fn(),
+  onLoadEarlierReplies: vi.fn(),
   onReplyContentChange: vi.fn(),
   onSendReply: vi.fn(),
   members: [],
   membersLoading: false,
+  membersLoadingMore: false,
+  membersHasMore: false,
   updatingMember: null,
   onUpdateMemberRole: vi.fn(),
   onRemoveMember: vi.fn(),
+  onSearchMembers: vi.fn(),
+  onLoadMoreMembers: vi.fn(),
   events: [],
   eventsLoading: false,
+  eventsLoadingMore: false,
+  eventsHasMore: false,
+  onLoadMoreEvents: vi.fn(),
   onJoinLeave: vi.fn(),
 };
 
@@ -91,6 +114,81 @@ describe('GroupTabContent', () => {
   it('renders events tab when activeTab=events', () => {
     render(<GroupTabContent {...BASE_PROPS} activeTab="events" />);
     expect(screen.getByTestId('events-tab')).toBeInTheDocument();
+  });
+
+  it('forwards server search and cursor paging controls to the members tab', () => {
+    const onSearchMembers = vi.fn();
+    const onLoadMoreMembers = vi.fn();
+    render(
+      <GroupTabContent
+        {...BASE_PROPS}
+        activeTab="members"
+        membersHasMore
+        membersLoadingMore
+        onSearchMembers={onSearchMembers}
+        onLoadMoreMembers={onLoadMoreMembers}
+      />,
+    );
+
+    expect(mockMembersTabRender).toHaveBeenLastCalledWith(expect.objectContaining({
+      membersHasMore: true,
+      membersLoadingMore: true,
+      onSearchMembers,
+      onLoadMoreMembers,
+    }));
+  });
+
+  it('forwards cursor paging controls to the events tab', () => {
+    const onLoadMoreEvents = vi.fn();
+    render(
+      <GroupTabContent
+        {...BASE_PROPS}
+        activeTab="events"
+        eventsHasMore
+        eventsLoadingMore
+        onLoadMoreEvents={onLoadMoreEvents}
+      />,
+    );
+
+    expect(mockEventsTabRender).toHaveBeenLastCalledWith(expect.objectContaining({
+      eventsHasMore: true,
+      eventsLoadingMore: true,
+      onLoadMoreEvents,
+    }));
+  });
+
+  it('renders a translated retryable error instead of a false empty feed', async () => {
+    const retry = vi.fn();
+    render(
+      <GroupTabContent
+        {...BASE_PROPS}
+        activeTab="feed"
+        feedError
+        onRefreshFeed={retry}
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed to load feed');
+    expect(screen.queryByTestId('feed-tab')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Try Again' }));
+    expect(retry).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ['discussion', 'discussionsError', 'discussion-tab'],
+    ['members', 'membersError', 'members-tab'],
+    ['events', 'eventsError', 'events-tab'],
+  ] as const)('does not render the %s empty state when its read failed', (activeTab, errorProp, testId) => {
+    render(
+      <GroupTabContent
+        {...BASE_PROPS}
+        activeTab={activeTab}
+        {...{ [errorProp]: true }}
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByTestId(testId)).not.toBeInTheDocument();
   });
 
   it('renders files tab for members when activeTab=files', () => {

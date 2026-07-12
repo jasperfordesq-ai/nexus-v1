@@ -24,37 +24,41 @@ import Pin from 'lucide-react/icons/pin';
 import PinOff from 'lucide-react/icons/pin-off';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
+import Edit from 'lucide-react/icons/square-pen';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
+import {
+  createGroupAnnouncement,
+  deleteGroupAnnouncement,
+  listGroupAnnouncements,
+  notifyGroupAnnouncementsChanged,
+  updateGroupAnnouncement,
+  type GroupAnnouncement as Announcement,
+} from '../api/announcements';
+import { GroupApiError } from '../api/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface Announcement {
-  id: number;
-  title: string;
-  content: string;
-  is_pinned: boolean;
-  author: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at?: string;
-}
-
 interface GroupAnnouncementsTabProps {
   groupId: number;
   isAdmin: boolean;
   isMember?: boolean;
+}
+
+function sortAnnouncements(items: Announcement[]): Announcement[] {
+  return [...items].sort((a, b) => {
+    if (a.is_pinned && !b.is_pinned) return -1;
+    if (!a.is_pinned && b.is_pinned) return 1;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,78 +76,96 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isPinned, setIsPinned] = useState(false);
+  const [editingTarget, setEditingTarget] = useState<Announcement | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   // ─── Load announcements ───
-  const loadAnnouncements = useCallback(async () => {
+  const loadAnnouncements = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     try {
-      const res = await api.get(`/v2/groups/${groupId}/announcements`);
-      if (res.success) {
-        const payload = res.data;
-        const items = Array.isArray(payload)
-          ? payload
-          : (payload as { items?: Announcement[]; announcements?: Announcement[] })?.items
-            ?? (payload as { announcements?: Announcement[] })?.announcements
-            ?? [];
-        // Sort: pinned first, then by date
-        items.sort((a: Announcement, b: Announcement) => {
-          if (a.is_pinned && !b.is_pinned) return -1;
-          if (!a.is_pinned && b.is_pinned) return 1;
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        });
-        setAnnouncements(items);
-      }
+      const items = [...await listGroupAnnouncements(groupId, { signal })];
+      if (!signal?.aborted) setAnnouncements(sortAnnouncements(items));
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupAnnouncementsTab.load', err);
       toast.error(t('announcements.load_failed'));
+    } finally {
+      if (!signal?.aborted) setLoading(false);
     }
-    setLoading(false);
   }, [groupId, toast, t]);
 
-  useEffect(() => { loadAnnouncements(); }, [loadAnnouncements]);
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadAnnouncements(controller.signal);
+    return () => controller.abort();
+  }, [loadAnnouncements]);
 
   // ─── Create announcement ───
-  const handleCreate = useCallback(async () => {
+  const closeComposer = useCallback(() => {
+    setEditingTarget(null);
+    setTitle('');
+    setContent('');
+    setIsPinned(false);
+    onClose();
+  }, [onClose]);
+
+  const openCreate = useCallback(() => {
+    setEditingTarget(null);
+    setTitle('');
+    setContent('');
+    setIsPinned(false);
+    onOpen();
+  }, [onOpen]);
+
+  const openEdit = useCallback((announcement: Announcement) => {
+    setEditingTarget(announcement);
+    setTitle(announcement.title);
+    setContent(announcement.content);
+    setIsPinned(Boolean(announcement.is_pinned));
+    onOpen();
+  }, [onOpen]);
+
+  const handleSubmit = useCallback(async () => {
     if (!title.trim() || !content.trim()) return;
     setCreating(true);
     try {
-      const res = await api.post(`/v2/groups/${groupId}/announcements`, {
-        title: title.trim(),
-        content: content.trim(),
-        is_pinned: isPinned,
-      });
-      if (res.success) {
+      const input = { title: title.trim(), content: content.trim(), is_pinned: isPinned };
+      if (editingTarget) {
+        const updated = await updateGroupAnnouncement(groupId, editingTarget.id, input);
+        setAnnouncements((prev) => sortAnnouncements(prev.map((announcement) => (
+          announcement.id === editingTarget.id
+            ? { ...announcement, ...input, ...(updated ?? {}) }
+            : announcement
+        ))));
+        toast.success(t('announcements.updated'));
+      } else {
+        await createGroupAnnouncement(groupId, input);
         toast.success(t('announcements.created'));
-        setTitle('');
-        setContent('');
-        setIsPinned(false);
-        onClose();
-        loadAnnouncements();
+        void loadAnnouncements();
       }
+      notifyGroupAnnouncementsChanged(groupId);
+      closeComposer();
     } catch (err) {
-      logError('GroupAnnouncementsTab.create', err);
-      toast.error(t('announcements.create_failed'));
+      logError(editingTarget ? 'GroupAnnouncementsTab.edit' : 'GroupAnnouncementsTab.create', err);
+      toast.error(t(editingTarget ? 'announcements.update_failed' : 'announcements.create_failed'));
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
-  }, [groupId, title, content, isPinned, toast, onClose, loadAnnouncements, t]);
+  }, [groupId, title, content, isPinned, editingTarget, toast, loadAnnouncements, closeComposer, t]);
 
   // ─── Toggle pin ───
   const handleTogglePin = useCallback(async (announcement: Announcement) => {
     try {
-      await api.put(`/v2/groups/${groupId}/announcements/${announcement.id}`, {
+      const updated = await updateGroupAnnouncement(groupId, announcement.id, {
         is_pinned: !announcement.is_pinned,
       });
-      setAnnouncements((prev) =>
+      setAnnouncements((prev) => sortAnnouncements(
         prev.map((a) =>
-          a.id === announcement.id ? { ...a, is_pinned: !a.is_pinned } : a
-        ).sort((a, b) => {
-          if (a.is_pinned && !b.is_pinned) return -1;
-          if (!a.is_pinned && b.is_pinned) return 1;
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        })
-      );
+          a.id === announcement.id ? { ...a, is_pinned: !a.is_pinned, ...(updated ?? {}) } : a
+        )
+      ));
+      notifyGroupAnnouncementsChanged(groupId);
       toast.success(announcement.is_pinned ? t('announcements.unpinned') : t('announcements.pinned_success'));
     } catch (err) {
       logError('GroupAnnouncementsTab.togglePin', err);
@@ -156,22 +178,24 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.delete(`/v2/groups/${groupId}/announcements/${deleteTarget.id}`);
+      await deleteGroupAnnouncement(groupId, deleteTarget.id);
       toast.success(t('announcements.deleted'));
       setAnnouncements((prev) => prev.filter((a) => a.id !== deleteTarget.id));
+      notifyGroupAnnouncementsChanged(groupId);
       setDeleteTarget(null);
     } catch (err) {
       logError('GroupAnnouncementsTab.delete', err);
       toast.error(t('announcements.delete_failed'));
+    } finally {
+      setDeleting(false);
     }
-    setDeleting(false);
   }, [groupId, deleteTarget, toast, t]);
 
   // ─── Render ───
   return (
     <div className="space-y-4">
       {/* Header */}
-      <GlassCard className="p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Megaphone className="w-5 h-5" aria-hidden="true" />
@@ -183,7 +207,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
               className="w-full sm:w-auto"
               size="sm"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-              onPress={onOpen}
+              onPress={openCreate}
             >
               {t('announcements.new')}
             </Button>
@@ -226,19 +250,19 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                         </Chip>
                       )}
                     </div>
-                    <SafeHtml content={announcement.content} className="text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
-                    <div className="flex items-center gap-2 mt-2 text-xs text-theme-subtle">
-                      <span>{announcement.author.name}</span>
+                    <SafeHtml content={announcement.content} className="break-words text-sm text-theme-secondary whitespace-pre-wrap" as="div" />
+                    <div className="mt-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-theme-subtle">
+                      <span className="min-w-0 break-words">{announcement.author.name}</span>
                       <span className="text-theme-muted" aria-hidden="true">&middot;</span>
-                      <span>{formatRelativeTime(announcement.created_at)}</span>
+                      <time dateTime={announcement.created_at}>{formatRelativeTime(announcement.created_at)}</time>
                     </div>
                   </div>
 
                   {isAdmin && (
                     <Dropdown>
                       <DropdownTrigger>
-                        <Button isIconOnly variant="light" size="sm" aria-label={t('announcements.actions_aria')}>
-                          <MoreVertical className="w-4 h-4" />
+                        <Button isIconOnly variant="light" size="sm" className="min-h-11 min-w-11" aria-label={t('announcements.actions_aria')}>
+                          <MoreVertical className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </DropdownTrigger>
                       <DropdownMenu aria-label={t('announcements.dropdown_aria')}>
@@ -248,6 +272,13 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                           onPress={() => handleTogglePin(announcement)}
                         >
                           {announcement.is_pinned ? t('announcements.unpin') : t('announcements.pin')}
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit" id="edit"
+                          startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
+                          onPress={() => openEdit(announcement)}
+                        >
+                          {t('announcements.edit')}
                         </DropdownItem>
                         <DropdownItem
                           key="delete" id="delete"
@@ -268,10 +299,10 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         )}
       </GlassCard>
 
-      {/* Create announcement modal */}
+      {/* Create/edit announcement modal */}
       <Modal
         isOpen={isOpen}
-        onOpenChange={(open) => !open && onClose()}
+        onOpenChange={(open) => !open && closeComposer()}
         classNames={{
           base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
@@ -279,11 +310,11 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         }}
       >
         <ModalContent>
-          {(onModalClose) => (
+          {() => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-accent" aria-hidden="true" />
-                {t('announcements.new')}
+                {t(editingTarget ? 'announcements.edit_title' : 'announcements.new')}
               </ModalHeader>
               <ModalBody className="gap-4">
                 <Input
@@ -316,20 +347,21 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                     color={isPinned ? 'primary' : 'default'}
                     startContent={<Pin className="w-4 h-4" />}
                     onPress={() => setIsPinned(!isPinned)}
+                    aria-pressed={isPinned}
                   >
                     {isPinned ? t('announcements.pinned') : t('announcements.pin_this')}
                   </Button>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onModalClose}>{t('announcements.cancel')}</Button>
+                <Button variant="flat" onPress={closeComposer}>{t('announcements.cancel')}</Button>
                 <Button
                   color="primary"
                   isLoading={creating}
                   isDisabled={!title.trim() || !content.trim()}
-                  onPress={handleCreate}
+                  onPress={handleSubmit}
                 >
-                  {t('announcements.post')}
+                  {t(editingTarget ? 'announcements.save' : 'announcements.post')}
                 </Button>
               </ModalFooter>
             </>

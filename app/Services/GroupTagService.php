@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Core\TenantContext;
@@ -217,10 +218,14 @@ class GroupTagService
 
         return DB::table('groups as g')
             ->join('group_tag_assignments as gta', 'g.id', '=', 'gta.group_id')
+            ->join('group_tags as gt', 'gt.id', '=', 'gta.tag_id')
             ->where('gta.tag_id', $tagId)
             ->where('g.tenant_id', $tenantId)
+            ->where('gt.tenant_id', $tenantId)
+            ->where('g.status', GroupStatus::Active->value)
+            ->where('g.visibility', 'public')
             ->select('g.id', 'g.name', 'g.description', 'g.image_url', 'g.cached_member_count', 'g.visibility')
-            ->limit($limit)
+            ->limit(max(1, min($limit, 100)))
             ->get()
             ->map(fn ($row) => (array) $row)
             ->toArray();

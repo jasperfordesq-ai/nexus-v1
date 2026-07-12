@@ -1,0 +1,73 @@
+{
+  "subject": "Nuashonr\u00fa imeachta: :title",
+  "view_event": "F\u00e9ach ar an imeacht",
+  "accept_offer": "Glac le d\u2019\u00e1it",
+  "reason": "C\u00fais: :reason",
+  "states": {
+    "invited": "cuireadh tugtha",
+    "pending": "ar feitheamh",
+    "confirmed": "deimhnithe",
+    "declined": "di\u00faltaithe",
+    "cancelled": "curtha ar ceal",
+    "waiting": "ar an liosta feithimh",
+    "offered": "\u00e1it tairgthe",
+    "accepted": "glactha",
+    "expired": "imithe in \u00e9ag"
+  },
+  "lifecycle": {
+    "published": "Foils\u00edodh an t-imeacht \u201c:title\u201d.",
+    "postponed": "Cuireadh an t-imeacht \u201c:title\u201d siar.",
+    "cancelled": "Cuireadh an t-imeacht \u201c:title\u201d ar ceal.",
+    "archived": "Cuireadh an t-imeacht \u201c:title\u201d sa chartlann.",
+    "restored": "Athch\u00f3ir\u00edodh an t-imeacht \u201c:title\u201d.",
+    "completed": "Cr\u00edochna\u00edodh an t-imeacht \u201c:title\u201d."
+  },
+  "registration": {
+    "invited": "Tugadh cuireadh duit chuig \u201c:title\u201d.",
+    "pending": "T\u00e1 do chl\u00e1r\u00fa do \u201c:title\u201d ar feitheamh.",
+    "confirmed": "Deimhn\u00edodh do chl\u00e1r\u00fa do \u201c:title\u201d.",
+    "declined": "Di\u00falta\u00edodh do chl\u00e1r\u00fa do \u201c:title\u201d.",
+    "cancelled": "Cuireadh do chl\u00e1r\u00fa do \u201c:title\u201d ar ceal.",
+    "organizer": "T\u00e1 cl\u00e1r\u00fa :name do \u201c:title\u201d :state anois."
+  },
+  "waitlist": {
+    "waiting": "T\u00e1 t\u00fa ar an liosta feithimh do \u201c:title\u201d.",
+    "offered": "T\u00e1 \u00e1it ar f\u00e1il duit ag \u201c:title\u201d. Glac l\u00e9i sula dt\u00e9ann an tairiscint in \u00e9ag.",
+    "accepted": "Ghlac t\u00fa le d\u2019\u00e1it ag \u201c:title\u201d.",
+    "expired": "T\u00e1 an tairiscint \u00e1ite do \u201c:title\u201d imithe in \u00e9ag.",
+    "cancelled": "N\u00edl t\u00fa ar an liosta feithimh do \u201c:title\u201d a thuilleadh.",
+    "organizer": "T\u00e1 st\u00e1das liosta feithimh :name do \u201c:title\u201d :state anois."
+  },
+  "staff_role": {
+    "granted": "Sannadh r\u00f3l :role duit do \u201c:title\u201d.",
+    "revoked": "Baineadh do r\u00f3l :role do \u201c:title\u201d."
+  },
+  "reminder": {
+    "subject": "Meabhr\u00fach\u00e1n imeachta: :title",
+    "message": "Tos\u00f3idh \u201c:title\u201d i gceann :offset ar :when."
+  },
+  "update": {
+    "message": "Athra\u00edodh \u201c:title\u201d: :changes.",
+    "separator": ", ",
+    "series_scope": "Baineann an t-athr\u00fa seo le gach tarl\u00fa amach anseo.",
+    "fields": {
+      "title": "teideal",
+      "time": "d\u00e1ta n\u00f3 am",
+      "timezone": "crios ama",
+      "all_day": "socr\u00fa uile-lae",
+      "venue": "ionad",
+      "online_access": "rochtain ar l\u00edne",
+      "capacity": "acmhainn",
+      "accessibility": "inrochtaineacht an ionaid",
+      "cancellation_policy": "polasa\u00ed cealaithe"
+    }
+  },
+  "roles": {
+    "co_organizer": "comheagra\u00ed",
+    "registration_manager": "bainisteoir cl\u00e1r\u00fach\u00e1in",
+    "communications_manager": "bainisteoir cumars\u00e1ide",
+    "check_in_staff": "foireann seice\u00e1la isteach",
+    "finance_manager": "bainisteoir airgeadais",
+    "staff": "foireann imeachta"
+  }
+}

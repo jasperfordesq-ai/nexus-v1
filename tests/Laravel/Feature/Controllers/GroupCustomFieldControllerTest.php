@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -40,10 +41,29 @@ class GroupCustomFieldControllerTest extends TestCase
         $this->apiPut('/v2/groups/1/custom-fields', [])->assertStatus(401);
     }
 
-    public function test_get_values_returns_non_5xx_when_authenticated(): void
+    public function test_get_values_fails_closed_while_capability_is_unfinished(): void
     {
         $this->authenticatedUser();
-        $response = $this->apiGet('/v2/groups/1/custom-fields');
-        $this->assertNotEquals(401, $response->status(), 'Auth should have passed');
+
+        $this->apiGet('/v2/groups/1/custom-fields')
+            ->assertStatus(410)
+            ->assertJsonPath('errors.0.code', 'CAPABILITY_UNAVAILABLE');
+    }
+
+    public function test_set_values_fails_closed_without_mutating_storage(): void
+    {
+        $this->authenticatedUser();
+        $before = DB::table('group_custom_field_values')->count();
+
+        $this->apiPut('/v2/groups/1/custom-fields', [
+            'fields' => ['unavailable_field' => 'must not persist'],
+        ])
+            ->assertStatus(410)
+            ->assertJsonPath('errors.0.code', 'CAPABILITY_UNAVAILABLE');
+
+        self::assertSame(
+            $before,
+            DB::table('group_custom_field_values')->count(),
+        );
     }
 }

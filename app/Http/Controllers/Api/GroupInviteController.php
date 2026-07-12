@@ -4,16 +4,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SafeguardingPolicyException;
-use Illuminate\Http\JsonResponse;
 use App\Services\GroupInviteService;
+use Illuminate\Http\JsonResponse;
 
-/**
- * GroupInviteController — Invite links, email invites, acceptance, and revocation for groups.
- */
-class GroupInviteController extends BaseApiController
+/** Invite links, email invitations, previews, acceptance, and revocation. */
+final class GroupInviteController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
@@ -21,143 +21,134 @@ class GroupInviteController extends BaseApiController
         private readonly GroupInviteService $inviteService,
     ) {}
 
-    /**
-     * GET /api/v2/groups/{id}/invites
-     */
     public function index(int $id): JsonResponse
     {
-        $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
+        $result = $this->inviteService->getPendingInvites($id, $this->requireUserId());
 
-        $result = $this->inviteService->getPendingInvites($id, $userId);
-
-        if ($result === null) {
-            $errors = $this->inviteService->getErrors();
-            $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.listing_failed'), $code);
-        }
-
-        return $this->successResponse($result);
+        return $result === null
+            ? $this->inviteErrorResponse(__('errors.group_invites.listing_failed'))
+            : $this->respondWithData($result);
     }
 
-    /**
-     * POST /api/v2/groups/{id}/invites/link
-     */
     public function createLink(int $id): JsonResponse
     {
-        $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
+        $rawExpiryDays = request()->input('expiry_days');
+        $expiryDays = null;
+        if ($rawExpiryDays !== null) {
+            $validated = filter_var($rawExpiryDays, FILTER_VALIDATE_INT);
+            if ($validated === false) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    __('api.value_out_of_range', ['min' => 1, 'max' => 90]),
+                    'expiry_days',
+                    422,
+                );
+            }
+            $expiryDays = (int) $validated;
         }
 
-        $expiryDays = request()->input('expiry_days');
-        $result = $this->inviteService->createLink($id, $userId, $expiryDays);
+        $result = $this->inviteService->createLink($id, $this->requireUserId(), $expiryDays);
 
-        if ($result === null) {
-            $errors = $this->inviteService->getErrors();
-            $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.create_failed'), $code);
-        }
-
-        return $this->successResponse($result, 201);
+        return $result === null
+            ? $this->inviteErrorResponse(__('errors.group_invites.create_failed'))
+            : $this->respondWithData($result, null, 201);
     }
 
-    /**
-     * POST /api/v2/groups/{id}/invites/email
-     */
     public function sendEmails(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
-
-        // Email fan-out is a reflection/DoS target — an attacker can use us as
-        // a relay to spam external addresses. Cap per-user per-hour. The
-        // per-invite batch is additionally capped inside sendEmailInvites.
         $this->rateLimit('group_invite_email', 10, 3600);
 
         $emails = request()->input('emails');
-
-        if (!is_array($emails) || empty($emails)) {
-            return $this->errorResponse(__('api.group_invites_emails_required'), 422);
+        if (! is_array($emails) || $emails === []) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.group_invites_emails_required'),
+                'emails',
+                422,
+            );
         }
-        // Hard ceiling on batch size so one call can't mail 10k addresses.
-        if (count($emails) > 50) {
-            return $this->errorResponse(__('api.group_invites_max_per_request'), 422);
+        if (count($emails) > GroupInviteService::MAX_PENDING_INVITES) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.group_invites_max_per_request'),
+                'emails',
+                422,
+            );
         }
 
         $message = request()->input('message', '');
+        if (! is_string($message)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'message', 422);
+        }
+
         try {
             $result = $this->inviteService->sendEmailInvites($id, $userId, $emails, $message);
         } catch (SafeguardingPolicyException $e) {
             return $this->safeguardingPolicyError($e);
         }
 
-        if ($result === null) {
-            $errors = $this->inviteService->getErrors();
-            $code = ($errors[0]['code'] ?? '') === 'FORBIDDEN' ? 403 : 400;
-            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.send_failed'), $code);
-        }
-
-        return $this->successResponse($result);
+        return $result === null
+            ? $this->inviteErrorResponse(__('errors.group_invites.send_failed'))
+            : $this->respondWithData($result);
     }
 
-    /**
-     * DELETE /api/v2/groups/{id}/invites/{inviteId}
-     */
     public function revoke(int $id, int $inviteId): JsonResponse
     {
-        $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
+        if (! $this->inviteService->revokeInvite($id, $inviteId, $this->requireUserId())) {
+            return $this->inviteErrorResponse(__('errors.group_invites.revoke_failed'));
         }
 
-        $success = $this->inviteService->revokeInvite($id, $inviteId, $userId);
-
-        if (!$success) {
-            $errors = $this->inviteService->getErrors();
-            $code = match ($errors[0]['code'] ?? '') {
-                'NOT_FOUND' => 404,
-                'FORBIDDEN' => 403,
-                default => 400,
-            };
-            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.revoke_failed'), $code);
-        }
-
-        return $this->successResponse(['message' => __('api_controllers_1.group_invite.invite_revoked')]);
+        return $this->respondWithData([
+            'id' => $inviteId,
+            'status' => GroupInviteService::STATUS_REVOKED,
+        ]);
     }
 
-    /**
-     * POST /api/v2/invites/{token}/accept
-     */
+    /** GET /api/v2/groups/invite/{token} */
+    public function show(string $token): JsonResponse
+    {
+        $result = $this->inviteService->previewInvite($token, $this->requireUserId());
+
+        return $result === null
+            ? $this->inviteErrorResponse(__('errors.group_invites.listing_failed'))
+            : $this->respondWithData($result);
+    }
+
+    /** POST /api/v2/groups/invite/{token}/accept */
     public function accept(string $token): JsonResponse
     {
-        $userId = $this->requireUserId();
-        if ($userId instanceof JsonResponse) {
-            return $userId;
-        }
-
         try {
-            $result = $this->inviteService->acceptInvite($token, $userId);
+            $result = $this->inviteService->acceptInvite($token, $this->requireUserId());
         } catch (SafeguardingPolicyException $e) {
             return $this->safeguardingPolicyError($e);
         }
 
-        if ($result === null) {
-            $errors = $this->inviteService->getErrors();
-            $code = match ($errors[0]['code'] ?? '') {
-                'NOT_FOUND' => 404,
-                'EXPIRED' => 410,
-                'ALREADY_MEMBER' => 409,
-                'FORBIDDEN' => 403,
-                default => 400,
-            };
-            return $this->errorResponse($errors[0]['message'] ?? __('errors.group_invites.accept_failed'), $code);
-        }
+        return $result === null
+            ? $this->inviteErrorResponse(__('errors.group_invites.accept_failed'))
+            : $this->respondWithData($result);
+    }
 
-        return $this->successResponse($result);
+    private function inviteErrorResponse(string $fallback): JsonResponse
+    {
+        $error = $this->inviteService->getErrors()[0] ?? [
+            'code' => 'INVITE_FAILED',
+            'message' => $fallback,
+        ];
+        $code = (string) ($error['code'] ?? 'INVITE_FAILED');
+
+        return $this->respondWithError(
+            $code,
+            (string) ($error['message'] ?? $fallback),
+            isset($error['field']) ? (string) $error['field'] : null,
+            match ($code) {
+                'NOT_FOUND' => 404,
+                'FORBIDDEN', 'BANNED', 'EMAIL_MISMATCH' => 403,
+                'EXPIRED', 'REVOKED' => 410,
+                'CAPACITY_FULL', 'MEMBERSHIP_LIMIT_REACHED', 'GROUP_UNAVAILABLE', 'INVITE_LIMIT_REACHED' => 409,
+                'VALIDATION_ERROR' => 422,
+                default => 400,
+            },
+        );
     }
 }

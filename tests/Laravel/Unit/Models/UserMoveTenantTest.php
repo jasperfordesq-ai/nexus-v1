@@ -8,21 +8,24 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Models;
 
-use Tests\Laravel\TestCase;
 use App\Models\User;
+use App\Services\TokenService;
+use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use ReflectionMethod;
+use Tests\Laravel\TestCase;
 
 /**
  * User::moveTenant() Contract Tests
  *
- * Unit tests that verify the moveTenant() method signature and return type
- * without requiring a database connection.
- *
- * The current implementation is a lightweight helper that updates users.tenant_id
- * and returns bool. It takes two required parameters: userId and newTenantId.
+ * Contract and lifecycle tests for tenant moves.
  */
-class UserMoveTenantTest extends \Tests\Laravel\TestCase
+class UserMoveTenantTest extends TestCase
 {
+    use DatabaseTransactions;
+
     // ==========================================
     // Method Existence & Signature Tests
     // ==========================================
@@ -103,5 +106,117 @@ class UserMoveTenantTest extends \Tests\Laravel\TestCase
             'moveTenant should update tenant_id');
         $this->assertStringContainsString('newTenantId', $source,
             'moveTenant should use the newTenantId parameter');
+    }
+
+    public function testMoveTenantRevokesPasskeysBeforeChangingTenant(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $credentialId = $this->insertPasskey((int) $user->id, $this->testTenantId);
+
+        $result = User::moveTenant((int) $user->id, 999);
+
+        $this->assertSame(['success' => true, 'moved' => 1, 'failed' => []], $result);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'tenant_id' => 999]);
+        $this->assertDatabaseMissing('webauthn_credentials', [
+            'user_id' => $user->id,
+            'credential_id' => $credentialId,
+        ]);
+    }
+
+    public function testFailedTenantMoveRollsBackPasskeyRevocation(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $credentialId = $this->insertPasskey((int) $user->id, $this->testTenantId);
+
+        try {
+            User::moveTenant((int) $user->id, 2_000_000_000);
+            $this->fail('Moving to a tenant that does not exist should fail.');
+        } catch (QueryException) {
+            // The users.tenant_id foreign key rejects the move. The credential
+            // deletion must be rolled back by the same transaction.
+        }
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+        $this->assertDatabaseHas('webauthn_credentials', [
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => $credentialId,
+        ]);
+    }
+
+    public function testPasskeyOnlyUserMoveFailsWithRecoveryRequirement(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        DB::table('users')->where('id', $user->id)->update([
+            'password' => null,
+            'password_hash' => null,
+        ]);
+        $credentialId = $this->insertPasskey((int) $user->id, $this->testTenantId);
+
+        $result = User::moveTenant((int) $user->id, 999);
+
+        $this->assertSame([
+            'success' => false,
+            'moved' => 0,
+            'failed' => ['passkey_recovery_required'],
+        ], $result);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+        $this->assertDatabaseHas('webauthn_credentials', [
+            'user_id' => $user->id,
+            'credential_id' => $credentialId,
+        ]);
+    }
+
+    public function testTenantMoveRevokesJwtAndSanctumSessions(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $tokenService = app(TokenService::class);
+        $accessToken = $tokenService->generateToken(
+            (int) $user->id,
+            $this->testTenantId
+        );
+        $user->createToken('tenant-move-regression');
+
+        $result = User::moveTenant((int) $user->id, 999);
+
+        $this->assertSame(['success' => true, 'moved' => 1, 'failed' => []], $result);
+        $this->assertNull($tokenService->validateToken($accessToken));
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'tokenable_type' => User::class,
+            'tokenable_id' => $user->id,
+        ]);
+    }
+
+    private function insertPasskey(int $userId, int $tenantId): string
+    {
+        $credentialId = 'tenant-move-' . bin2hex(random_bytes(16));
+        $data = [
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'credential_id' => $credentialId,
+            'public_key' => 'test-public-key',
+            'sign_count' => 0,
+            'created_at' => now(),
+        ];
+
+        // Keep this lifecycle regression executable before and after the
+        // hardening migration is applied to a developer's existing test DB.
+        if (Schema::hasColumn('webauthn_credentials', 'user_handle')) {
+            $data['user_handle'] = rtrim(strtr(base64_encode(hash(
+                'sha256',
+                $userId . ':' . $tenantId,
+                true
+            )), '+/', '-_'), '=');
+        }
+
+        DB::table('webauthn_credentials')->insert($data);
+
+        return $credentialId;
     }
 }

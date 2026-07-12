@@ -1,0 +1,45 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'form' => [
+        'title' => 'Acessibilidade do local',
+        'hint' => 'Registe o que está disponível no local. Escolha «Desconhecido» quando a organização não tiver confirmado uma característica; não é o mesmo que «Não».',
+        'parking_details' => 'Estacionamento e chegada',
+        'parking_details_hint' => 'Descreva lugares acessíveis, pontos de largada e o percurso até à entrada.',
+        'transit_details' => 'Transportes públicos',
+        'transit_details_hint' => 'Descreva paragens ou estações próximas e quaisquer barreiras no percurso.',
+        'assistance_contact' => 'Contacto para assistência de acessibilidade',
+        'assistance_contact_hint' => 'Indique um contacto público para questões de acesso. Não introduza dados privados de participantes.',
+        'notes' => 'Informações adicionais de acesso',
+        'notes_hint' => 'Inclua informações úteis sobre entrada, elevador, piso, iluminação ou ambiente sensorial.',
+        'privacy_note' => 'Estas informações são mostradas aos membros do evento. Pedidos privados de adaptação devem ser feitos no formulário de inscrição.',
+    ],
+    'features' => [
+        'step_free_access' => 'Acesso sem degraus',
+        'accessible_toilet' => 'Casa de banho acessível',
+        'hearing_loop' => 'Anel de indução',
+        'quiet_space' => 'Espaço tranquilo',
+        'seating_available' => 'Lugares sentados disponíveis',
+        'accessible_parking' => 'Estacionamento acessível',
+    ],
+    'status' => ['yes' => 'Sim', 'no' => 'Não', 'unknown' => 'Desconhecido'],
+    'filters' => [
+        'step_free_label' => 'Acesso sem degraus no local',
+        'step_free_hint' => 'Filtre pelas informações de acesso confirmadas pela organização.',
+        'step_free_options' => ['any' => 'Qualquer local', 'yes' => 'Acesso sem degraus confirmado', 'no' => 'Com degraus', 'unknown' => 'Acesso sem degraus desconhecido'],
+        'step_free_active' => 'Acesso sem degraus: :value',
+    ],
+    'detail' => [
+        'title' => 'Acessibilidade do local',
+        'intro' => 'Informações de acesso fornecidas pela organização. Contacte-a se precisar de confirmar uma adaptação.',
+        'features_label' => 'Características de acessibilidade do local',
+        'parking_details' => 'Estacionamento e chegada',
+        'transit_details' => 'Transportes públicos',
+        'assistance_contact' => 'Assistência de acessibilidade',
+        'notes' => 'Informações adicionais de acesso',
+    ],
+];

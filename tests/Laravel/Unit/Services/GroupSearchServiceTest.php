@@ -274,11 +274,14 @@ class GroupSearchServiceTest extends TestCase
         $groupActive    = $this->insertGroup($userId, self::TENANT_ID);
         $groupInactive  = $this->insertGroup($userId, self::TENANT_ID);
 
-        // Mark one group inactive
-        DB::table('groups')->where('id', $groupInactive)->update(['is_active' => 0]);
+        // Mark one group canonically archived and keep the compatibility mirror aligned.
+        DB::table('groups')->where('id', $groupInactive)->update([
+            'status' => 'archived',
+            'is_active' => 0,
+        ]);
 
         $activeGroups = DB::select(
-            "SELECT id FROM `groups` WHERE tenant_id = ? AND is_active = 1 ORDER BY id",
+            "SELECT id FROM `groups` WHERE tenant_id = ? AND status = 'active' ORDER BY id",
             [self::TENANT_ID]
         );
 
@@ -307,7 +310,7 @@ class GroupSearchServiceTest extends TestCase
         $otherGroup = $this->insertGroup($userId, $otherTenantId);
 
         $groups = DB::select(
-            "SELECT id FROM `groups` WHERE tenant_id = ? AND is_active = 1 ORDER BY id",
+            "SELECT id FROM `groups` WHERE tenant_id = ? AND status = 'active' ORDER BY id",
             [self::TENANT_ID]
         );
 

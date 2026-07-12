@@ -1,0 +1,73 @@
+{
+  "subject": "Atualização do evento: :title",
+  "view_event": "Ver evento",
+  "accept_offer": "Aceitar o seu lugar",
+  "reason": "Motivo: :reason",
+  "states": {
+    "invited": "convidada",
+    "pending": "pendente",
+    "confirmed": "confirmada",
+    "declined": "recusada",
+    "cancelled": "cancelada",
+    "waiting": "em lista de espera",
+    "offered": "oferecida",
+    "accepted": "aceite",
+    "expired": "expirada"
+  },
+  "lifecycle": {
+    "published": "O evento “:title” foi publicado.",
+    "postponed": "O evento “:title” foi adiado.",
+    "cancelled": "O evento “:title” foi cancelado.",
+    "archived": "O evento “:title” foi arquivado.",
+    "restored": "O evento “:title” foi restaurado.",
+    "completed": "O evento “:title” foi concluído."
+  },
+  "registration": {
+    "invited": "Recebeu um convite para “:title”.",
+    "pending": "A sua inscrição em “:title” está pendente.",
+    "confirmed": "A sua inscrição em “:title” está confirmada.",
+    "declined": "A sua inscrição em “:title” foi recusada.",
+    "cancelled": "A sua inscrição em “:title” foi cancelada.",
+    "organizer": "A inscrição de :name em “:title” está agora :state."
+  },
+  "waitlist": {
+    "waiting": "Está na lista de espera de “:title”.",
+    "offered": "Há um lugar disponível para si em “:title”. Aceite-o antes de a oferta expirar.",
+    "accepted": "Aceitou o seu lugar em “:title”.",
+    "expired": "A sua oferta de lugar em “:title” expirou.",
+    "cancelled": "Já não está na lista de espera de “:title”.",
+    "organizer": "O estado de :name na lista de espera de “:title” é agora :state."
+  },
+  "staff_role": {
+    "granted": "Foi-lhe atribuído o papel :role em “:title”.",
+    "revoked": "O seu papel :role em “:title” foi removido."
+  },
+  "reminder": {
+    "subject": "Lembrete do evento: :title",
+    "message": "“:title” começa dentro de :offset, em :when."
+  },
+  "update": {
+    "message": "“:title” foi alterado: :changes.",
+    "separator": ", ",
+    "series_scope": "Esta alteração aplica-se a todas as ocorrências futuras.",
+    "fields": {
+      "title": "título",
+      "time": "data ou hora",
+      "timezone": "fuso horário",
+      "all_day": "definição de dia inteiro",
+      "venue": "local",
+      "online_access": "acesso online",
+      "capacity": "capacidade",
+      "accessibility": "acessibilidade do local",
+      "cancellation_policy": "política de cancelamento"
+    }
+  },
+  "roles": {
+    "co_organizer": "coorganizador",
+    "registration_manager": "gestor de inscrições",
+    "communications_manager": "gestor de comunicações",
+    "check_in_staff": "equipa de receção",
+    "finance_manager": "gestor financeiro",
+    "staff": "equipa do evento"
+  }
+}

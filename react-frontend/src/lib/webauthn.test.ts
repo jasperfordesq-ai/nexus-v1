@@ -47,13 +47,13 @@ import {
   isPlatformAuthenticatorAvailable,
   isBiometricAvailable,
   detectPlatform,
-  getDefaultDeviceName,
   registerBiometric,
   authenticateWithBiometric,
   isConditionalMediationAvailable,
   startConditionalAuthentication,
   getWebAuthnStatus,
   getWebAuthnCredentials,
+  confirmWebAuthnSecurity,
   removeWebAuthnCredential,
   renameWebAuthnCredential,
   removeAllWebAuthnCredentials,
@@ -165,10 +165,11 @@ describe("isBiometricAvailable", () => {
     expect(await isBiometricAvailable()).toBe(false);
   });
 
-  it("returns true when platform authenticator is enrolled", async () => {
+  it("returns true for ordinary WebAuthn even without a platform authenticator", async () => {
     mockBrowserSupports.mockReturnValue(true);
-    mockPlatformAvailable.mockResolvedValue(true);
+    mockPlatformAvailable.mockResolvedValue(false);
     expect(await isBiometricAvailable()).toBe(true);
+    expect(mockPlatformAvailable).not.toHaveBeenCalled();
   });
 });
 
@@ -196,28 +197,6 @@ describe("detectPlatform", () => {
   it("returns unknown for unrecognised UA", () => { setUA("SomeWeirdBot/1.0"); expect(detectPlatform()).toBe("unknown"); });
 });
 
-describe("getDefaultDeviceName", () => {
-  const originalUserAgent = navigator.userAgent;
-  afterEach(() => {
-    Object.defineProperty(navigator, "userAgent", { value: originalUserAgent, configurable: true });
-  });
-
-  const cases: [string, string][] = [
-    ["Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Windows PC"],
-    ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15", "Mac"],
-    ["Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)", "iPhone"],
-    ["Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)", "iPad"],
-    ["Mozilla/5.0 (Linux; Android 14; Pixel 8)", "Android device"],
-    ["Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36", "Linux PC"],
-    ["SomeWeirdBot/1.0", "Device"],
-  ];
-
-  it.each(cases)("UA %s -> %s", (ua, expected) => {
-    Object.defineProperty(navigator, "userAgent", { value: ua, configurable: true });
-    expect(getDefaultDeviceName()).toBe(expected);
-  });
-});
-
 // -------- Registration
 
 describe("registerBiometric", () => {
@@ -240,11 +219,21 @@ describe("registerBiometric", () => {
     expect(mockApiPost.mock.calls[1][1]).toMatchObject({ device_name: "Custom Name" });
   });
 
-  it("uses default device name when none supplied", async () => {
+  it("passes the security confirmation token to both registration steps", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA }).mockResolvedValueOnce({ success: true });
+    mockStartRegistration.mockResolvedValue(MOCK_CREDENTIAL);
+
+    await registerBiometric("Custom Name", "platform", "security-token");
+
+    expect(mockApiPost.mock.calls[0][1]).toEqual({ security_confirmation_token: "security-token" });
+    expect(mockApiPost.mock.calls[1][1]).toMatchObject({ security_confirmation_token: "security-token" });
+  });
+
+  it("does not persist an untranslated device name when none is supplied", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA }).mockResolvedValueOnce({ success: true });
     mockStartRegistration.mockResolvedValue(MOCK_CREDENTIAL);
     await registerBiometric(undefined, "platform");
-    expect(mockApiPost.mock.calls[1][1].device_name).toBe("Windows PC");
+    expect(mockApiPost.mock.calls[1][1]).not.toHaveProperty("device_name");
   });
 
   it("sets hints=[client-device] for platform attachment", async () => {
@@ -374,11 +363,11 @@ describe("authenticateWithBiometric", () => {
     expect(result).toEqual({ success: true, data: MOCK_AUTH_RESULT });
   });
 
-  it("sends email in challenge request", async () => {
+  it("does not disclose the email in the public challenge request", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE }).mockResolvedValueOnce({ success: true, data: MOCK_AUTH_RESULT });
     mockStartAuthentication.mockResolvedValue(MOCK_ASSERTION);
     await authenticateWithBiometric("user@test.com");
-    expect(mockApiPost.mock.calls[0][1]).toEqual({ email: "user@test.com" });
+    expect(mockApiPost.mock.calls[0][1]).toEqual({});
   });
 
   it("maps allowCredentials to SimpleWebAuthn format", async () => {
@@ -390,9 +379,9 @@ describe("authenticateWithBiometric", () => {
   });
 
   it("returns error when challenge request fails", async () => {
-    mockApiPost.mockResolvedValueOnce({ success: false, error: "Unauthorised" });
+    mockApiPost.mockResolvedValueOnce({ success: false, error: "Unauthorised", code: "FEATURE_DISABLED" });
     const result = await authenticateWithBiometric();
-    expect(result).toEqual({ success: false, error: "Unauthorised" });
+    expect(result).toEqual({ success: false, error: "Unauthorised", errorCode: "FEATURE_DISABLED" });
   });
 
   it("returns error when verify step fails", async () => {
@@ -432,6 +421,38 @@ describe("authenticateWithBiometric", () => {
     mockStartAuthentication.mockRejectedValueOnce(new Error("Hardware failure"));
     const result = await authenticateWithBiometric();
     expect(result).toEqual({ success: false, error: "Hardware failure", errorCode: "unknown" });
+  });
+
+  it("cancels an explicit browser ceremony through the caller signal", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    let rejectGet!: (error: Error) => void;
+    mockStartAuthentication.mockImplementationOnce(
+      () => new Promise((_resolve, reject) => { rejectGet = reject; }),
+    );
+    const controller = new AbortController();
+    const pending = authenticateWithBiometric(undefined, controller.signal);
+    await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalled());
+
+    controller.abort();
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
+    rejectGet(new DOMException("Aborted", "AbortError"));
+    await expect(pending).resolves.toMatchObject({ success: false, errorCode: "cancelled" });
+  });
+
+  it("does not return tokens when aborted during verification", async () => {
+    const controller = new AbortController();
+    mockApiPost
+      .mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE })
+      .mockImplementationOnce(async () => {
+        controller.abort();
+        return { success: true, data: MOCK_AUTH_RESULT };
+      });
+    mockStartAuthentication.mockResolvedValue(MOCK_ASSERTION);
+
+    expect(await authenticateWithBiometric(undefined, controller.signal)).toEqual({
+      success: false,
+      errorCode: "cancelled",
+    });
   });
 });
 
@@ -564,7 +585,23 @@ describe("startConditionalAuthentication", () => {
     expect(mockStartAuthentication).not.toHaveBeenCalled();
   });
 
-  it("does not cancel a ceremony it no longer owns after modal login takes over", async () => {
+  it("cancels pending conditional auth even when the explicit challenge fetch fails", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    mockStartAuthentication.mockImplementationOnce(() => new Promise(() => {}));
+    const controller = new AbortController();
+    void startConditionalAuthentication(controller.signal);
+    await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalledTimes(1));
+
+    mockApiPost.mockResolvedValueOnce({ success: false, code: "AUTH_WEBAUTHN_UNAVAILABLE" });
+    const result = await authenticateWithBiometric("user@example.com");
+
+    expect(result.errorCode).toBe("AUTH_WEBAUTHN_UNAVAILABLE");
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
+    controller.abort();
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
+  });
+
+  it("cancels conditional auth immediately and ignores its stale unmount after modal takeover", async () => {
     // Conditional request pending…
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
     mockStartAuthentication.mockImplementationOnce(() => new Promise(() => {}));
@@ -577,10 +614,11 @@ describe("startConditionalAuthentication", () => {
     mockStartAuthentication.mockImplementationOnce(() => new Promise(() => {}));
     void authenticateWithBiometric("user@example.com");
     await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalledTimes(2));
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
 
     // The login page unmounting now must NOT cancel the user's modal ceremony
     controller.abort();
-    expect(mockCancelCeremony).not.toHaveBeenCalled();
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -588,14 +626,14 @@ describe("startConditionalAuthentication", () => {
 
 describe("getWebAuthnStatus", () => {
   it("returns status from API", async () => {
-    mockApiGet.mockResolvedValue({ data: { registered: true, count: 2 } });
+    mockApiGet.mockResolvedValue({ success: true, data: { registered: true, count: 2 } });
     const result = await getWebAuthnStatus();
     expect(result).toEqual({ registered: true, count: 2 });
     expect(mockApiGet).toHaveBeenCalledWith("/webauthn/status");
   });
 
   it("returns default when API returns no data", async () => {
-    mockApiGet.mockResolvedValue({ data: null });
+    mockApiGet.mockResolvedValue({ success: true, data: null });
     const result = await getWebAuthnStatus();
     expect(result).toEqual({ registered: false, count: 0 });
   });
@@ -603,21 +641,56 @@ describe("getWebAuthnStatus", () => {
 
 describe("getWebAuthnCredentials", () => {
   it("returns credentials array from API", async () => {
-    const creds = [{ credential_id: "cred-1", device_name: "Windows PC", authenticator_type: "platform", created_at: "2026-01-01T00:00:00Z", last_used_at: "2026-03-01T00:00:00Z" }];
-    mockApiGet.mockResolvedValue({ data: { credentials: creds, count: 1 } });
+    const creds = [{
+      credential_id: "cred-1",
+      device_name: "Windows PC",
+      authenticator_type: "platform",
+      created_at: "2026-01-01T00:00:00Z",
+      last_used_at: "2026-03-01T00:00:00Z",
+      rp_id: "hour-timebank.ie",
+      backup_eligible: true,
+      backup_state: true,
+      user_verified: true,
+    }];
+    mockApiGet.mockResolvedValue({ success: true, data: { credentials: creds, count: 1 } });
     const result = await getWebAuthnCredentials();
     expect(result).toEqual(creds);
     expect(mockApiGet).toHaveBeenCalledWith("/webauthn/credentials");
   });
 
   it("returns empty array when API returns no data", async () => {
-    mockApiGet.mockResolvedValue({ data: null });
+    mockApiGet.mockResolvedValue({ success: true, data: null });
     expect(await getWebAuthnCredentials()).toEqual([]);
   });
 
   it("returns empty array when credentials key missing", async () => {
-    mockApiGet.mockResolvedValue({ data: { count: 0 } });
+    mockApiGet.mockResolvedValue({ success: true, data: { count: 0 } });
     expect(await getWebAuthnCredentials()).toEqual([]);
+  });
+
+  it("throws on a resolved API failure so settings can show a retry state", async () => {
+    mockApiGet.mockResolvedValue({ success: false, code: "FEATURE_DISABLED" });
+    await expect(getWebAuthnCredentials()).rejects.toThrow("FEATURE_DISABLED");
+  });
+});
+
+describe("confirmWebAuthnSecurity", () => {
+  it("returns a short-lived security confirmation token", async () => {
+    mockApiPost.mockResolvedValue({
+      success: true,
+      data: { security_confirmation_token: "security-token", expires_in: 300 },
+    });
+
+    expect(await confirmWebAuthnSecurity({ current_password: "secret" })).toEqual({
+      success: true,
+      securityConfirmationToken: "security-token",
+      expiresIn: 300,
+      errorCode: undefined,
+      error: undefined,
+    });
+    expect(mockApiPost).toHaveBeenCalledWith("/webauthn/security-confirm", {
+      current_password: "secret",
+    });
   });
 });
 
@@ -640,18 +713,48 @@ describe("removeWebAuthnCredential", () => {
       error: "Blocked",
     });
   });
+
+  it("passes confirmation and exposes session revocation", async () => {
+    mockApiPost.mockResolvedValue({ success: true, data: { sessions_revoked: true } });
+    expect(await removeWebAuthnCredential("cred-1", "security-token")).toMatchObject({
+      success: true,
+      sessionsRevoked: true,
+    });
+    expect(mockApiPost).toHaveBeenCalledWith("/webauthn/remove", {
+      credential_id: "cred-1",
+      security_confirmation_token: "security-token",
+    });
+  });
 });
 
 describe("renameWebAuthnCredential", () => {
-  it("returns true on success", async () => {
+  it("returns a structured success", async () => {
     mockApiPost.mockResolvedValue({ success: true });
-    expect(await renameWebAuthnCredential("cred-1", "My YubiKey")).toBe(true);
+    expect(await renameWebAuthnCredential("cred-1", "My YubiKey")).toEqual({
+      success: true,
+      errorCode: undefined,
+      error: undefined,
+    });
     expect(mockApiPost).toHaveBeenCalledWith("/webauthn/rename", { credential_id: "cred-1", device_name: "My YubiKey" });
   });
 
-  it("returns false on failure", async () => {
-    mockApiPost.mockResolvedValue({ success: false });
-    expect(await renameWebAuthnCredential("cred-1", "My YubiKey")).toBe(false);
+  it("preserves the API error on failure", async () => {
+    mockApiPost.mockResolvedValue({ success: false, code: "SECURITY_CONFIRMATION_REQUIRED", error: "Denied" });
+    expect(await renameWebAuthnCredential("cred-1", "My YubiKey")).toEqual({
+      success: false,
+      errorCode: "SECURITY_CONFIRMATION_REQUIRED",
+      error: "Denied",
+    });
+  });
+
+  it("passes the security confirmation token", async () => {
+    mockApiPost.mockResolvedValue({ success: true });
+    await renameWebAuthnCredential("cred-1", "My YubiKey", "security-token");
+    expect(mockApiPost).toHaveBeenCalledWith("/webauthn/rename", {
+      credential_id: "cred-1",
+      device_name: "My YubiKey",
+      security_confirmation_token: "security-token",
+    });
   });
 });
 
@@ -675,6 +778,21 @@ describe("removeAllWebAuthnCredentials", () => {
       removedCount: 0,
       errorCode: "LAST_SIGN_IN_METHOD",
       error: undefined,
+    });
+  });
+
+  it("passes confirmation and exposes session revocation", async () => {
+    mockApiPost.mockResolvedValue({
+      success: true,
+      data: { removed_count: 2, sessions_revoked: true },
+    });
+    expect(await removeAllWebAuthnCredentials("security-token")).toMatchObject({
+      success: true,
+      removedCount: 2,
+      sessionsRevoked: true,
+    });
+    expect(mockApiPost).toHaveBeenCalledWith("/webauthn/remove-all", {
+      security_confirmation_token: "security-token",
     });
   });
 });

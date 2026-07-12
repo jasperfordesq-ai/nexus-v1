@@ -6,13 +6,15 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\Models\Event;
 use App\Models\Group;
 use App\Models\Listing;
 use App\Models\MarketplaceListing;
 use App\Models\User;
+use App\Support\Events\EventSearchVisibility;
 use Illuminate\Database\Eloquent\Builder;
-use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Meilisearch\Client as MeilisearchClient;
@@ -100,7 +102,15 @@ class SearchService
     private const FILTERABLE_ATTRIBUTES = [
         'listings'             => ['tenant_id', 'status', 'moderation_status', 'category_id', 'type', 'user_id', 'skill_tags'],
         'users'                => ['tenant_id', 'status', 'profile_type'],
-        'events'               => ['tenant_id', 'status', 'start_time', 'is_online'],
+        'events'               => [
+            'tenant_id',
+            'status',
+            'publication_status',
+            'operational_status',
+            'is_recurring_template',
+            'start_time',
+            'is_online',
+        ],
         'groups'               => ['tenant_id', 'status', 'privacy'],
         'marketplace_listings' => ['tenant_id', 'category_id', 'status', 'moderation_status', 'price_type', 'condition', 'seller_type', 'delivery_method'],
         'group_content'        => ['tenant_id', 'group_id', 'content_type'],
@@ -227,7 +237,15 @@ class SearchService
             'events' => [
                 'pk'         => 'id',
                 'searchable' => ['title', 'description', 'location', 'organizer_name'],
-                'filterable' => ['tenant_id', 'status', 'start_time', 'is_online'],
+                'filterable' => [
+                    'tenant_id',
+                    'status',
+                    'publication_status',
+                    'operational_status',
+                    'is_recurring_template',
+                    'start_time',
+                    'is_online',
+                ],
                 'sortable'   => ['start_time', 'created_at'],
                 'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
             ],
@@ -464,26 +482,52 @@ class SearchService
      */
     public static function indexEvent(array|Event $event): void
     {
+        $eventId = (int) ($event instanceof Event ? $event->getKey() : ($event['id'] ?? 0));
+        $doc = static::eventDocument($event);
+        if ($eventId <= 0 || $doc === null) {
+            if ($eventId > 0) {
+                static::removeEvent($eventId);
+            }
+            return;
+        }
+
         if (!static::isAvailable()) {
             return;
         }
 
-        $doc = $event instanceof Event ? [
+        static::client()->index('events')->addDocuments([$doc]);
+    }
+
+    /** @return array<string,mixed>|null */
+    private static function eventDocument(array|Event $event): ?array
+    {
+        $lifecycle = EventSearchVisibility::discoverableLifecycle($event);
+        if ($lifecycle === null) {
+            return null;
+        }
+
+        return $event instanceof Event ? [
             'id'             => $event->id,
             'tenant_id'      => $event->tenant_id,
             'title'          => $event->title ?? '',
             'description'    => $event->description ?? '',
             'location'       => $event->location ?? '',
             'status'         => $event->status ?? 'active',
+            'publication_status' => $lifecycle['publication']->value,
+            'operational_status' => $lifecycle['operational']->value,
+            'is_recurring_template' => false,
             'is_online'      => (bool) ($event->allow_remote_attendance ?? false),
             'organizer_name' => $event->user
                 ? trim($event->user->first_name . ' ' . $event->user->last_name)
                 : '',
             'start_time'     => $event->start_time?->timestamp ?? $event->start_date?->timestamp ?? 0,
             'created_at'     => $event->created_at?->timestamp ?? 0,
-        ] : $event;
-
-        static::client()->index('events')->addDocuments([$doc]);
+        ] : [
+            ...$event,
+            'publication_status' => $lifecycle['publication']->value,
+            'operational_status' => $lifecycle['operational']->value,
+            'is_recurring_template' => false,
+        ];
     }
 
     /**
@@ -493,6 +537,18 @@ class SearchService
      */
     public static function indexGroup(array|Group $group): void
     {
+        $status = $group instanceof Group
+            ? $group->status->value
+            : (string) ($group['status'] ?? (! empty($group['is_active']) ? GroupStatus::Active->value : GroupStatus::Archived->value));
+
+        if ($status !== GroupStatus::Active->value) {
+            $groupId = (int) ($group instanceof Group ? $group->id : ($group['id'] ?? 0));
+            if ($groupId > 0) {
+                self::removeGroup($groupId);
+            }
+            return;
+        }
+
         if (!static::isAvailable()) {
             return;
         }
@@ -502,7 +558,7 @@ class SearchService
             'tenant_id'     => $group->tenant_id,
             'name'          => $group->name ?? '',
             'description'   => $group->description ?? '',
-            'status'        => $group->is_active ? 'active' : 'inactive',
+            'status'        => $status,
             'privacy'       => $group->visibility ?? 'public',
             'members_count' => $group->cached_member_count ?? $group->active_members_count ?? 0,
             'created_at'    => $group->created_at?->timestamp ?? 0,
@@ -718,15 +774,23 @@ class SearchService
         try {
             $now = now()->timestamp;
             $result = static::client()->index('events')->search($term, [
-                'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'filter'               => EventSearchVisibility::meilisearchFilter($tenantId, $now),
                 'limit'                => max(0, $limit),
                 'offset'               => $offset,
                 'sort'                 => ['start_time:asc'],
                 'attributesToRetrieve' => ['id'],
             ]);
+            $hitIds = array_values(array_unique(array_map(
+                'intval',
+                array_column($result->getHits(), 'id'),
+            )));
+            $visibleIds = self::visibleEventIds($hitIds, $tenantId);
+
             return [
-                'ids'   => array_column($result->getHits(), 'id'),
-                'total' => $result->getEstimatedTotalHits() ?? count($result->getHits()),
+                'ids'   => $visibleIds,
+                // A stale external document must not inflate a count that a
+                // caller could expose as proof that hidden content exists.
+                'total' => count($visibleIds),
             ];
         } catch (\Throwable) {
             return null;
@@ -782,7 +846,13 @@ class SearchService
         $limit = min($limit, 50);
 
         if (static::isAvailable()) {
-            return $this->searchViaMeilisearch($term, $type, $limit);
+            try {
+                return $this->searchViaMeilisearch($term, $type, $limit);
+            } catch (\Throwable $exception) {
+                Log::warning('SearchService: Meilisearch search failed, falling back to SQL', [
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         }
 
         return $this->searchViaSQL($term, $type, $limit);
@@ -821,17 +891,21 @@ class SearchService
         if ($type === null || $type === 'events') {
             $now = now()->timestamp;
             $hits = $client->index('events')->search($term, [
-                'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'filter'               => EventSearchVisibility::meilisearchFilter($tenantId, $now),
                 'limit'                => $limit,
                 'sort'                 => ['start_time:asc'],
             ])->getHits();
 
             if (!empty($hits)) {
-                // Hydrate from DB to get relations
-                $eventIds = array_column($hits, 'id');
-                $events = $this->event->newQuery()
+                // Hydrate from DB under the same canonical visibility policy.
+                // This is required even with Meili filters: the external index
+                // can be stale after an outage or delayed asynchronous delete.
+                $eventIds = array_values(array_unique(array_map('intval', array_column($hits, 'id'))));
+                $eventQuery = $this->event->newQueryWithoutScopes()
                     ->with(['user:id,first_name,last_name,avatar_url'])
-                    ->whereIn('id', $eventIds)
+                    ->whereIn('events.id', $eventIds)
+                    ->where('events.start_time', '>=', now());
+                $events = EventSearchVisibility::applyToEloquent($eventQuery, (int) $tenantId)
                     ->get()
                     ->keyBy('id');
 
@@ -855,6 +929,7 @@ class SearchService
             if (!empty($hits)) {
                 $groupIds = array_column($hits, 'id');
                 $groups = $this->group->newQuery()
+                    ->active()
                     ->withCount('activeMembers')
                     ->whereIn('id', $groupIds)
                     ->get()
@@ -932,17 +1007,18 @@ class SearchService
         }
 
         if ($type === null || $type === 'events') {
-            $results['events'] = $this->event->newQuery()
+            $eventQuery = $this->event->newQueryWithoutScopes()
                 ->with(['user:id,first_name,last_name,avatar_url'])
                 ->where(function (Builder $q) use ($like) {
                     $q->where('title', 'LIKE', $like)
                       ->orWhere('description', 'LIKE', $like)
                       ->orWhere('location', 'LIKE', $like);
                 })
-                ->where(function (Builder $q) {
-                    $q->whereNull('status')->orWhere('status', 'active');
-                })
-                ->where('start_time', '>=', now())
+                ->where('events.start_time', '>=', now());
+            $results['events'] = EventSearchVisibility::applyToEloquent(
+                $eventQuery,
+                (int) TenantContext::getId(),
+            )
                 ->orderBy('start_time')
                 ->limit($limit)
                 ->get()
@@ -952,6 +1028,7 @@ class SearchService
 
         if ($type === null || $type === 'groups') {
             $results['groups'] = $this->group->newQuery()
+                ->active()
                 ->withCount('activeMembers')
                 ->where(function (Builder $q) use ($like) {
                     $q->where('name', 'LIKE', $like)
@@ -1061,16 +1138,18 @@ class SearchService
             $now = now()->timestamp;
             $eventSort = $sort === 'newest' ? ['start_time:desc'] : ['start_time:asc'];
             $hits = $client->index('events')->search($term, [
-                'filter' => "tenant_id = {$tenantId} AND start_time >= {$now}",
+                'filter' => EventSearchVisibility::meilisearchFilter($tenantId, $now),
                 'limit'  => $limit,
                 'sort'   => $eventSort,
             ])->getHits();
 
             if (!empty($hits)) {
-                $eventIds = array_column($hits, 'id');
-                $events = $this->event->newQuery()
+                $eventIds = array_values(array_unique(array_map('intval', array_column($hits, 'id'))));
+                $eventQuery = $this->event->newQueryWithoutScopes()
                     ->with(['user:id,first_name,last_name,avatar_url'])
-                    ->whereIn('id', $eventIds)
+                    ->whereIn('events.id', $eventIds)
+                    ->where('events.start_time', '>=', now());
+                $events = EventSearchVisibility::applyToEloquent($eventQuery, (int) $tenantId)
                     ->get()
                     ->keyBy('id');
                 foreach ($eventIds as $eid) {
@@ -1092,6 +1171,7 @@ class SearchService
             if (!empty($hits)) {
                 $groupIds = array_column($hits, 'id');
                 $groups = $this->group->newQuery()
+                    ->active()
                     ->withCount('activeMembers')
                     ->whereIn('id', $groupIds)
                     ->get()
@@ -1184,17 +1264,15 @@ class SearchService
         }
 
         if ($type === 'all' || $type === 'events') {
-            $eq = $this->event->newQuery()
+            $eq = $this->event->newQueryWithoutScopes()
                 ->with(['user:id,first_name,last_name,avatar_url'])
                 ->where(function (Builder $q) use ($like) {
                     $q->where('title', 'LIKE', $like)
                       ->orWhere('description', 'LIKE', $like)
                       ->orWhere('location', 'LIKE', $like);
                 })
-                ->where(function (Builder $q) {
-                    $q->whereNull('status')->orWhere('status', 'active');
-                })
-                ->where('start_time', '>=', now());
+                ->where('events.start_time', '>=', now());
+            EventSearchVisibility::applyToEloquent($eq, (int) TenantContext::getId());
 
             $this->applySortOrder($eq, $sort, 'start_time');
             foreach ($eq->limit($limit)->get() as $e) {
@@ -1204,6 +1282,7 @@ class SearchService
 
         if ($type === 'all' || $type === 'groups') {
             $gq = $this->group->newQuery()
+                ->active()
                 ->withCount('activeMembers')
                 ->where(function (Builder $q) use ($like) {
                     $q->where('name', 'LIKE', $like)
@@ -1284,12 +1363,26 @@ class SearchService
         }, $userHits);
 
         $now = now()->timestamp;
-        $events = $client->index('events')->search($term, [
-            'filter'               => "tenant_id = {$tenantId} AND start_time >= {$now}",
+        $eventHits = $client->index('events')->search($term, [
+            'filter'               => EventSearchVisibility::meilisearchFilter($tenantId, $now),
             'limit'                => $limit,
             'sort'                 => ['start_time:asc'],
-            'attributesToRetrieve' => ['id', 'title', 'start_time'],
+            'attributesToRetrieve' => ['id'],
         ])->getHits();
+        $eventIds = array_values(array_unique(array_map('intval', array_column($eventHits, 'id'))));
+        $eventQuery = $this->event->newQueryWithoutScopes()
+            ->whereIn('events.id', $eventIds)
+            ->where('events.start_time', '>=', now())
+            ->select(['events.id', 'events.title', 'events.start_time']);
+        $eventRows = EventSearchVisibility::applyToEloquent($eventQuery, (int) $tenantId)
+            ->get()
+            ->keyBy('id');
+        $events = [];
+        foreach ($eventIds as $eventId) {
+            if ($eventRows->has($eventId)) {
+                $events[] = $eventRows[$eventId]->toArray();
+            }
+        }
 
         // Autocomplete must also hide private groups from non-members.
         $groups = $client->index('groups')->search($term, [
@@ -1334,12 +1427,13 @@ class SearchService
             })
             ->all();
 
-        $events = $this->event->newQuery()
+        $eventQuery = $this->event->newQueryWithoutScopes()
             ->where('title', 'LIKE', $like)
-            ->where(function (Builder $q) {
-                $q->whereNull('status')->orWhere('status', 'active');
-            })
-            ->where('start_time', '>=', now())
+            ->where('events.start_time', '>=', now());
+        $events = EventSearchVisibility::applyToEloquent(
+            $eventQuery,
+            (int) TenantContext::getId(),
+        )
             ->select('id', 'title', 'start_time')
             ->orderBy('start_time')
             ->limit($limit)
@@ -1347,6 +1441,7 @@ class SearchService
             ->toArray();
 
         $groups = $this->group->newQuery()
+            ->active()
             ->where('name', 'LIKE', $like)
             ->select('id', 'name')
             ->orderByDesc('id')
@@ -1425,6 +1520,37 @@ class SearchService
             ->limit($limit)
             ->pluck('id')
             ->all();
+    }
+
+    /**
+     * Revalidate external Event hit IDs against current tenant-owned database
+     * state. Preserves Meilisearch relevance order while dropping stale rows.
+     *
+     * @param array<int,mixed> $eventIds
+     * @return list<int>
+     */
+    private static function visibleEventIds(array $eventIds, int $tenantId): array
+    {
+        $eventIds = array_values(array_unique(array_filter(
+            array_map('intval', $eventIds),
+            static fn (int $id): bool => $id > 0,
+        )));
+        if ($eventIds === [] || $tenantId <= 0) {
+            return [];
+        }
+
+        $query = Event::withoutGlobalScopes()
+            ->whereIn('events.id', $eventIds)
+            ->where('events.start_time', '>=', now());
+        $visible = EventSearchVisibility::applyToEloquent($query, $tenantId)
+            ->pluck('events.id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->flip();
+
+        return array_values(array_filter(
+            $eventIds,
+            static fn (int $id): bool => $visible->has($id),
+        ));
     }
 
     // =========================================================================

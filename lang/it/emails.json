@@ -317,6 +317,7 @@
     "intro": "Ecco un riepilogo di quello che si è perso su Project NEXUS:",
     "opted_in_notice": "Ha ricevuto questa e-mail perché ha optato per un riepilogo {{frequency}}.",
     "manage_notifications": "Gestisci notifiche",
+    "unsubscribe_events": "Annulla solo le email sugli eventi",
     "view_item": "Vedi",
     "frequency_instant": "Istantaneo",
     "frequency_daily": "Giornaliero",
@@ -394,6 +395,13 @@
     "updated_subject": "Aggiornato: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} il suo evento \"{{title}}\"",
     "view_event": "Visualizza evento",
+    "broadcast_subject": "Un messaggio su {{title}}",
+    "follow_up_subject": "Seguito dopo {{title}}",
+    "review_request_subject": "Com’è stato {{title}}?",
+    "broadcast_heading": "Un messaggio su {{title}}",
+    "follow_up_heading": "Seguito dopo {{title}}",
+    "review_request_heading": "Condividi la tua esperienza di {{title}}",
+    "leave_event_review": "Lascia una recensione",
     "view_updated_event": "Visualizza evento aggiornato",
     "browse_events": "Sfoglia eventi",
     "new_rsvp_heading": "Nuova RSVP!",
@@ -409,6 +417,7 @@
     "updated_heading": "Evento aggiornato",
     "updated_body": "L'evento <strong>\"{{title}}\"</strong> è stato aggiornato:",
     "change_label_date_time": "Data/Ora:",
+    "change_label_end_time": "Ora di fine:",
     "change_label_location": "Luogo:",
     "change_label_title": "Titolo:",
     "reminder_heading_24h": "Evento domani",
@@ -617,6 +626,16 @@
     "impact_minor": "Minore",
     "impact_cosmetic": "Cosmetico"
   },
+  "event_guardian_consent": {
+    "subject": "È necessario il consenso di una persona tutrice per :event",
+    "title": "Esamina il consenso",
+    "greeting": "Ciao :name,",
+    "introduction": ":minor ha chiesto di partecipare a :event. Esamina i requisiti di sicurezza dell’evento prima di decidere se dare il consenso.",
+    "security_notice": "Questo link è univoco per la richiesta di consenso. Non inoltrarlo né condividerlo.",
+    "review_button": "Esamina e dai il consenso",
+    "expiry_notice": "Il link scade dopo l’evento oppure quando la richiesta viene ritirata o sostituita.",
+    "consent_text": "Confermo di essere autorizzato/a a consentire la partecipazione della persona minorenne a :event e di aver esaminato i requisiti di sicurezza dell’evento."
+  },
   "donation_admin": {
     "created_subject": "Nuova donazione: :amount a :community",
     "created_title": "Nuova donazione ricevuta",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Anonimo",
     "anonymous_note": "(contrassegnato come anonimo pubblicamente)",
     "review_cta": "Visualizza donazioni"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Registrazione ospite annullata: :event",
+    "cancelled_message": "La tua registrazione come ospite per :event è stata annullata.",
+    "view_event": "Visualizza evento"
+  },
+  "event_invitation": {
+    "subject": "Sei stato invitato a :event",
+    "message": "Sei stato invitato a partecipare a :event. Controlla i dettagli e rispondi prima della scadenza dell'invito.",
+    "expiry": "Questo invito scade il :expiry.",
+    "accept_button": "Controlla l'invito"
   }
 }

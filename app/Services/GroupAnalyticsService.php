@@ -17,18 +17,37 @@ use App\Core\TenantContext;
  */
 class GroupAnalyticsService
 {
+    public const MIN_DAYS = 1;
+    public const MAX_DAYS = 365;
+    public const MIN_MONTHS = 1;
+    public const MAX_MONTHS = 24;
+    public const MIN_LIMIT = 1;
+    public const MAX_LIMIT = 100;
+
     /**
      * Get comprehensive analytics dashboard for a group.
      */
     public static function getDashboard(int $groupId, int $days = 30): array
     {
+        $days = self::boundedDays($days);
+        $engagement = self::getEngagementMetrics($groupId, $days);
+        $overview = self::getOverview($groupId);
+
         return [
-            'overview' => self::getOverview($groupId),
+            'overview' => $overview,
+            'kpi' => [
+                'total_members' => (int) ($overview['total_members'] ?? 0),
+                'active_members' => (int) ($engagement['summary']['active_members'] ?? 0),
+                'participation_rate' => (float) ($engagement['summary']['participation_rate'] ?? 0),
+                'avg_posts_per_day' => (float) ($engagement['summary']['avg_posts_per_day'] ?? 0),
+            ],
             'member_growth' => self::getMemberGrowth($groupId, $days),
-            'engagement' => self::getEngagementMetrics($groupId, $days),
+            'engagement' => $engagement,
             'top_contributors' => self::getTopContributors($groupId, $days),
             'content_performance' => self::getContentPerformance($groupId, $days),
             'activity_breakdown' => self::getActivityBreakdown($groupId, $days),
+            'retention' => self::getRetentionMetrics($groupId, min(6, self::MAX_MONTHS)),
+            'comparative' => self::getComparativeAnalytics($groupId),
         ];
     }
 
@@ -98,8 +117,9 @@ class GroupAnalyticsService
      */
     public static function getMemberGrowth(int $groupId, int $days = 30): array
     {
+        $days = self::boundedDays($days);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days)->startOfDay();
+        $since = self::periodStart($days);
 
         $joins = DB::table('group_members')
             ->where('group_id', $groupId)
@@ -144,8 +164,9 @@ class GroupAnalyticsService
      */
     public static function getEngagementMetrics(int $groupId, int $days = 30): array
     {
+        $days = self::boundedDays($days);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days)->startOfDay();
+        $since = self::periodStart($days);
 
         // Discussion posts per day
         $postsPerDay = DB::table('group_posts as gp')
@@ -214,7 +235,7 @@ class GroupAnalyticsService
                 'total_members' => $totalMembers,
                 'active_members' => $uniqueActive,
                 'participation_rate' => $totalMembers > 0 ? round(($uniqueActive / $totalMembers) * 100, 1) : 0,
-                'avg_posts_per_day' => $days > 0 ? round(array_sum(array_column($result, 'posts')) / $days, 1) : 0,
+                'avg_posts_per_day' => round(array_sum(array_column($result, 'posts')) / max(1, count($result)), 1),
             ],
         ];
     }
@@ -224,8 +245,10 @@ class GroupAnalyticsService
      */
     public static function getTopContributors(int $groupId, int $days = 30, int $limit = 10): array
     {
+        $days = self::boundedDays($days);
+        $limit = self::boundedLimit($limit);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days)->startOfDay();
+        $since = self::periodStart($days);
 
         return DB::table('group_posts as gp')
             ->join('group_discussions as gd', 'gp.discussion_id', '=', 'gd.id')
@@ -247,8 +270,10 @@ class GroupAnalyticsService
      */
     public static function getContentPerformance(int $groupId, int $days = 30, int $limit = 10): array
     {
+        $days = self::boundedDays($days);
+        $limit = self::boundedLimit($limit);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days)->startOfDay();
+        $since = self::periodStart($days);
 
         return DB::table('group_discussions as gd')
             ->leftJoin('group_posts as gp', 'gd.id', '=', 'gp.discussion_id')
@@ -270,8 +295,9 @@ class GroupAnalyticsService
      */
     public static function getActivityBreakdown(int $groupId, int $days = 30): array
     {
+        $days = self::boundedDays($days);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days)->startOfDay();
+        $since = self::periodStart($days);
 
         $discussions = DB::table('group_discussions')
             ->where('group_id', $groupId)
@@ -306,12 +332,11 @@ class GroupAnalyticsService
             ->count();
 
         return [
-            'discussions' => $discussions,
-            'posts' => $posts,
-            'events' => $events,
-            'files' => $files,
-            'member_joins' => $memberJoins,
-            'total' => $discussions + $posts + $events + $files + $memberJoins,
+            ['type' => 'discussions', 'count' => $discussions],
+            ['type' => 'posts', 'count' => $posts],
+            ['type' => 'events', 'count' => $events],
+            ['type' => 'files', 'count' => $files],
+            ['type' => 'member_joins', 'count' => $memberJoins],
         ];
     }
 
@@ -320,43 +345,54 @@ class GroupAnalyticsService
      */
     public static function getRetentionMetrics(int $groupId, int $months = 6): array
     {
+        $months = max(self::MIN_MONTHS, min($months, self::MAX_MONTHS));
         $tenantId = TenantContext::getId();
+        $firstMonth = now()->subMonths($months - 1)->startOfMonth();
+
+        // Two fixed queries regardless of the number of requested cohorts:
+        // one for current active memberships and one for recently active users.
+        $memberships = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('created_at', '>=', $firstMonth)
+            ->select('user_id', 'created_at')
+            ->get();
+
+        $recentlyActive = DB::table('group_posts as gp')
+            ->join('group_discussions as gd', 'gp.discussion_id', '=', 'gd.id')
+            ->where('gd.group_id', $groupId)
+            ->where('gd.tenant_id', $tenantId)
+            ->where('gp.tenant_id', $tenantId)
+            ->where('gp.created_at', '>=', now()->subDays(30))
+            ->distinct()
+            ->pluck('gp.user_id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->flip();
+
+        $cohortCounts = [];
+        foreach ($memberships as $membership) {
+            $month = \Illuminate\Support\Carbon::parse($membership->created_at)->format('Y-m');
+            $cohortCounts[$month] ??= ['joined' => 0, 'still_active' => 0];
+            $cohortCounts[$month]['joined']++;
+            if ($recentlyActive->has((int) $membership->user_id)) {
+                $cohortCounts[$month]['still_active']++;
+            }
+        }
 
         $cohorts = [];
         for ($i = $months - 1; $i >= 0; $i--) {
-            $monthStart = now()->subMonths($i)->startOfMonth();
-            $monthEnd = now()->subMonths($i)->endOfMonth();
-            $monthLabel = $monthStart->format('Y-m');
-
-            // Members who joined this month
-            $joinedIds = DB::table('group_members')
-                ->where('group_id', $groupId)
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
-                ->whereBetween('created_at', [$monthStart, $monthEnd])
-                ->pluck('user_id')
-                ->toArray();
-
-            $joined = count($joinedIds);
-
-            // Of those who joined, how many are still active (posted in last 30 days)?
-            $stillActive = 0;
-            if ($joined > 0 && $i > 0) {
-                $stillActive = DB::table('group_posts as gp')
-                    ->join('group_discussions as gd', 'gp.discussion_id', '=', 'gd.id')
-                    ->where('gd.group_id', $groupId)
-                    ->where('gp.tenant_id', $tenantId)
-                    ->where('gp.created_at', '>=', now()->subDays(30))
-                    ->whereIn('gp.user_id', $joinedIds)
-                    ->distinct('gp.user_id')
-                    ->count('gp.user_id');
-            }
+            $month = now()->subMonths($i)->format('Y-m');
+            $joined = (int) ($cohortCounts[$month]['joined'] ?? 0);
+            $stillActive = (int) ($cohortCounts[$month]['still_active'] ?? 0);
+            $rate = $joined > 0 ? round(($stillActive / $joined) * 100, 1) : 0.0;
 
             $cohorts[] = [
-                'month' => $monthLabel,
+                'month' => $month,
                 'joined' => $joined,
                 'still_active' => $stillActive,
-                'retention_rate' => $joined > 0 ? round(($stillActive / $joined) * 100, 1) : 0,
+                'retention_rate' => $rate,
+                'retention_pct' => $rate,
             ];
         }
 
@@ -381,12 +417,13 @@ class GroupAnalyticsService
 
         $allGroups = DB::table('groups')
             ->where('tenant_id', $tenantId)
-            ->where('is_active', true)
+            ->where('status', \App\Enums\GroupStatus::Active->value)
             ->select('id', 'cached_member_count')
             ->get();
 
         $totalGroups = $allGroups->count();
         $memberCounts = $allGroups->pluck('cached_member_count')->sort()->values()->toArray();
+        $groupIds = $allGroups->pluck('id')->map(static fn (mixed $id): int => (int) $id)->all();
 
         // Calculate percentile
         $groupMembers = (int) $group->cached_member_count;
@@ -396,12 +433,45 @@ class GroupAnalyticsService
         // Average stats
         $avgMembers = $totalGroups > 0 ? round(array_sum($memberCounts) / $totalGroups) : 0;
 
+        $activityCounts = array_fill_keys($groupIds, 0);
+        if ($groupIds !== []) {
+            $since = self::periodStart(30);
+            $discussionCounts = DB::table('group_discussions')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('group_id', $groupIds)
+                ->where('created_at', '>=', $since)
+                ->selectRaw('group_id, COUNT(*) as aggregate')
+                ->groupBy('group_id')
+                ->pluck('aggregate', 'group_id');
+            $postCounts = DB::table('group_posts as gp')
+                ->join('group_discussions as gd', 'gp.discussion_id', '=', 'gd.id')
+                ->where('gp.tenant_id', $tenantId)
+                ->where('gd.tenant_id', $tenantId)
+                ->whereIn('gd.group_id', $groupIds)
+                ->where('gp.created_at', '>=', $since)
+                ->selectRaw('gd.group_id, COUNT(*) as aggregate')
+                ->groupBy('gd.group_id')
+                ->pluck('aggregate', 'gd.group_id');
+
+            foreach ($groupIds as $candidateGroupId) {
+                $activityCounts[$candidateGroupId] = (int) ($discussionCounts[$candidateGroupId] ?? 0)
+                    + (int) ($postCounts[$candidateGroupId] ?? 0);
+            }
+        }
+
+        $groupActivity = (int) ($activityCounts[$groupId] ?? 0);
+        $avgActivity = $totalGroups > 0 ? round(array_sum($activityCounts) / $totalGroups, 1) : 0.0;
+
         return [
             'group_members' => $groupMembers,
+            'your_members' => $groupMembers,
             'avg_members' => $avgMembers,
             'percentile' => $percentile,
+            'percentile_rank' => $percentile,
             'total_groups' => $totalGroups,
             'rank' => $totalGroups - $belowCount,
+            'your_activity' => $groupActivity,
+            'avg_activity' => $avgActivity,
         ];
     }
 
@@ -429,8 +499,9 @@ class GroupAnalyticsService
      */
     public static function exportActivity(int $groupId, int $days = 30): array
     {
+        $days = self::boundedDays($days);
         $tenantId = TenantContext::getId();
-        $since = now()->subDays($days);
+        $since = self::periodStart($days);
 
         return DB::table('group_posts as gp')
             ->join('group_discussions as gd', 'gp.discussion_id', '=', 'gd.id')
@@ -443,5 +514,20 @@ class GroupAnalyticsService
             ->get()
             ->map(fn ($row) => (array) $row)
             ->toArray();
+    }
+
+    private static function boundedDays(int $days): int
+    {
+        return max(self::MIN_DAYS, min($days, self::MAX_DAYS));
+    }
+
+    private static function boundedLimit(int $limit): int
+    {
+        return max(self::MIN_LIMIT, min($limit, self::MAX_LIMIT));
+    }
+
+    private static function periodStart(int $days): \Illuminate\Support\Carbon
+    {
+        return now()->subDays(max(0, $days - 1))->startOfDay();
     }
 }

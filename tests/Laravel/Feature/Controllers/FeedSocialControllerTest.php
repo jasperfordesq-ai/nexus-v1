@@ -191,4 +191,74 @@ class FeedSocialControllerTest extends TestCase
         $this->assertNotContains((int) $hiddenPostId, $ids);
         $this->assertSame(1, (int) $response->json('meta.total_items'));
     }
+
+    public function test_group_feed_post_requires_active_membership_and_active_parent(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $groupId = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $owner->id,
+            'name' => 'Member-only feed parent',
+            'description' => 'Public overview does not make child feed content public.',
+            'visibility' => 'public',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'group_id' => $groupId,
+            'content' => 'Member-only group feed canary',
+            'type' => 'post',
+            'visibility' => 'public',
+            'is_hidden' => 0,
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $hashtagId = DB::table('hashtags')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'tag' => 'memberonlycanary',
+            'post_count' => 1,
+            'last_used_at' => now(),
+            'created_at' => now(),
+        ]);
+        DB::table('post_hashtags')->insert([
+            'tenant_id' => $this->testTenantId,
+            'post_id' => $postId,
+            'hashtag_id' => $hashtagId,
+            'created_at' => now(),
+        ]);
+
+        $this->apiGet('/v2/feed/hashtags/memberonlycanary')
+            ->assertOk()
+            ->assertJsonMissing(['id' => $postId]);
+
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => $viewer->id,
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->apiGet('/v2/feed/hashtags/memberonlycanary')
+            ->assertOk()
+            ->assertJsonFragment(['id' => $postId]);
+
+        DB::table('groups')->where('id', $groupId)->update([
+            'status' => 'archived',
+            'is_active' => 0,
+        ]);
+        $this->apiGet('/v2/feed/hashtags/memberonlycanary')
+            ->assertOk()
+            ->assertJsonMissing(['id' => $postId]);
+    }
 }

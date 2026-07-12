@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "Sicherheit",
+    "overview": "Sicherheitsanforderungen und Bewertungen"
+  },
+  "safety": {
+    "actions": {
+      "retry": "Versuchen Sie es erneut",
+      "save_draft": "Entwurf speichern",
+      "publish": "Anforderungen veröffentlichen",
+      "archive": "Archivanforderungen",
+      "cancel": "Abbrechen",
+      "confirm_archive": "Jetzt archivieren",
+      "acknowledge": "Bestätigen Sie den Code",
+      "withdraw_acknowledgement": "Bestätigung zurückziehen",
+      "request_guardian_consent": "Fordern Sie die Zustimmung des Erziehungsberechtigten an",
+      "withdraw_guardian_consent": "Einwilligungsanfrage zurückziehen",
+      "change_member": "Mitglied wechseln",
+      "save_review": "Bewertungsentscheidung speichern",
+      "cancel_edit": "Bearbeitung abbrechen",
+      "edit_review": "Entscheidung aktualisieren",
+      "withdraw_review": "Entscheidung zurückziehen"
+    },
+    "organizer": {
+      "title": "Veranstaltungssicherheit",
+      "description": "Legen Sie versionierte Teilnahmeanforderungen fest und führen Sie eine kontrollierte, überprüfbare Aufzeichnung von Sicherheitsentscheidungen.",
+      "loading": "Sicherheit beim Laden von Ereignissen",
+      "load_error_title": "Veranstaltungssicherheit ist nicht verfügbar",
+      "load_error_description": "Die Sicherheitsrichtlinie und das Überprüfungsbuch konnten nicht geladen werden. Es wurde keine Sicherheitsentscheidung geändert.",
+      "configuration_invalid": "Die Sicherheitsdurchsetzung ist nicht verfügbar, da die Konfiguration ungültig ist.",
+      "shadow_title": "Beobachtungsmodus",
+      "shadow_description": "Anforderungen werden bewertet und erfasst, blockieren aber noch nicht die Teilnahme.",
+      "read_only": "Sie können diese Richtlinie anzeigen, ihre Anforderungen jedoch nicht ändern.",
+      "action_error": "Die Sicherheitsänderung konnte nicht gespeichert werden. Aktualisieren Sie den Arbeitsbereich und versuchen Sie es erneut.",
+      "success": {
+        "saved": "Sicherheitsanforderungen als Entwurf gespeichert.",
+        "published": "Sicherheitsanforderungen veröffentlicht.",
+        "archived": "Sicherheitsanforderungen archiviert."
+      }
+    },
+    "attendee": {
+      "title": "Teilnahmevoraussetzungen",
+      "description": "Führen Sie die entsprechenden Sicherheitsmaßnahmen durch, bevor Sie sich registrieren oder sich auf die Warteliste setzen.",
+      "loading": "Teilnahmevoraussetzungen werden geladen",
+      "load_error_title": "Teilnahmevoraussetzungen liegen nicht vor",
+      "load_error_description": "Wir konnten die Sicherheitsanforderungen der Veranstaltung nicht überprüfen. Versuchen Sie es erneut, bevor Sie sich registrieren.",
+      "action_error": "Dieser Sicherheitsschritt konnte nicht abgeschlossen werden. Versuchen Sie es erneut.",
+      "denial_title": "Eine Teilnahme ist derzeit nicht gestattet",
+      "attention_title": "Es besteht Handlungsbedarf",
+      "success": {
+        "acknowledge": "Verhaltenskodex anerkannt.",
+        "withdraw_code": "Codebestätigung zurückgezogen.",
+        "request_guardian": "Anfrage zur Einwilligung des Erziehungsberechtigten gesendet.",
+        "withdraw_guardian": "Antrag auf Einwilligung des Erziehungsberechtigten zurückgezogen."
+      }
+    },
+    "rollout": {
+      "off": "Durchsetzung aus",
+      "shadow": "Beobachtungsmodus",
+      "enforce": "Durchsetzung aktiv"
+    },
+    "requirements": {
+      "title": "Teilnahmepolitik",
+      "description": "Entwurfsänderungen sind bis zur Veröffentlichung privat. Durch die Veröffentlichung wird eine unveränderliche Version für den Beweisabgleich erstellt.",
+      "minimum_age": "Mindestalter",
+      "minimum_age_hint": "Lassen Sie das Feld leer, wenn für die Veranstaltung kein Mindestalter gilt.",
+      "guardian_required": "Für Minderjährige ist die Zustimmung des Erziehungsberechtigten erforderlich",
+      "guardian_required_hint": "Die Zustimmung ist an die genaue veröffentlichte Anforderungsversion und das Veranstaltungsdatum gebunden.",
+      "minor_threshold": "Untere Altersgrenze",
+      "minor_threshold_hint": "Mitglieder unter diesem Alter benötigen bei der Veranstaltung eine Einwilligung.",
+      "code_required": "Erfordern eine Anerkennung des Verhaltenskodex",
+      "code_required_hint": "Teilnehmer müssen vor der Teilnahme den genauen veröffentlichten Text zur Kenntnis nehmen.",
+      "code_version": "Codetextversion",
+      "code_version_hint": "Verwenden Sie eine aussagekräftige Kennung, z. B. „event-conduct-2026-01“.",
+      "code_text": "Verhaltenskodex",
+      "code_text_hint": "Geben Sie die vollständigen Bedingungen an, die die Teilnehmer lesen und anerkennen müssen.",
+      "archive_title": "Diese Sicherheitsanforderungen archivieren?",
+      "archive_description": "Archivierte Anforderungen gelten nicht mehr als aktive Teilnahmerichtlinie. Die Nachweise und die Prüfhistorie bleiben erhalten.",
+      "status": {
+        "draft": "Entwurf",
+        "published": "Veröffentlicht",
+        "archived": "Archiviert"
+      }
+    },
+    "eligibility": {
+      "allow": "Anforderungen abgeschlossen",
+      "deny": "Teilnahme gesperrt",
+      "unavailable": "Verifizierung nicht verfügbar",
+      "not_evaluated": "Noch nicht ausgewertet"
+    },
+    "reasons": {
+      "unknown": "Eine Teilnahmepflicht bedarf noch der Beachtung.",
+      "safeguarding_policy": "Sichere politische Entscheidung",
+      "minimum_age": "Mindestalter",
+      "guardian_consent": "Erfordernis der Einwilligung des Erziehungsberechtigten",
+      "code_of_conduct": "Verhaltenskodex-Anforderung",
+      "conduct_violation": "Verhaltensverstoß",
+      "safety_review": "Entscheidung zur Sicherheitsüberprüfung",
+      "user_block": "Eine Mitgliedersperre verhindert die Teilnahme",
+      "event_safety_unbound_guest_denied": "Melden Sie sich an, um die Teilnahmevoraussetzungen zu überprüfen.",
+      "event_safety_user_not_active": "Ihr Mitgliedskonto ist derzeit nicht aktiv.",
+      "event_safety_bilateral_user_block": "Eine Mitgliedersperre verhindert die Teilnahme an dieser Veranstaltung.",
+      "event_safety_requirements_not_published": "Der Veranstalter hat die Sicherheitsbestimmungen noch nicht veröffentlicht.",
+      "event_safety_requirements_integrity_invalid": "Die veröffentlichten Sicherheitsanforderungen konnten nicht überprüft werden.",
+      "event_safety_requirements_version_unavailable": "Die veröffentlichte Anforderungsversion ist nicht verfügbar.",
+      "event_safety_date_of_birth_required": "Fügen Sie Ihr Geburtsdatum hinzu, damit die Altersanforderungen überprüft werden können.",
+      "event_safety_date_of_birth_invalid": "Ihr eingetragenes Geburtsdatum konnte nicht verifiziert werden.",
+      "event_safety_minimum_age_not_met": "Sie erfüllen nicht das Mindestalter für diese Veranstaltung.",
+      "event_safety_minor_policy_unavailable": "Die Richtlinie für die Teilnahme von Minderjährigen ist nicht verfügbar.",
+      "event_safety_guardian_consent_required": "Eine gültige Einwilligung des Erziehungsberechtigten ist erforderlich.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Bestätigen Sie den aktuellen Verhaltenskodex.",
+      "event_safety_active_participation_denial": "Eine aktive Sicherheitsentscheidung verhindert die Teilnahme.",
+      "event_safety_safeguarding_policy_denied": "Die Schutzbestimmungen erlauben derzeit keine Teilnahme.",
+      "event_safety_safeguarding_policy_invalid": "Die Sicherungsentscheidung konnte nicht überprüft werden.",
+      "event_safety_safeguarding_policy_unavailable": "Die sichere Verifizierung ist vorübergehend nicht verfügbar.",
+      "event_safety_schema_unavailable": "Die Sicherheitsüberprüfung ist vorübergehend nicht verfügbar.",
+      "event_safety_evaluation_unavailable": "Die Sicherheitsüberprüfung ist vorübergehend nicht verfügbar.",
+      "event_safety_organizer_not_active": "Der Veranstalter ist derzeit nicht aktiv.",
+      "event_safety_denial_safeguarding_policy": "Eine schützende politische Entscheidung verhindert eine Teilnahme."
+    },
+    "code": {
+      "title": "Verhaltenskodex",
+      "confirm_read": "Ich habe den vollständigen Verhaltenskodex gelesen und stimme ihm zu.",
+      "status": {
+        "not_required": "Nicht erforderlich",
+        "required": "Bestätigung erforderlich",
+        "acknowledged": "Bestätigt"
+      }
+    },
+    "guardian": {
+      "title": "Zustimmung des Erziehungsberechtigten",
+      "description": "Der Erziehungsberechtigte erhält einen privaten, zeitlich begrenzten Link. Ihre Identität und ihr Einwilligungs-Token werden niemals in der Veranstaltungsliste angezeigt.",
+      "name_label": "Name des Wächters",
+      "email_label": "E-Mail des Erziehungsberechtigten",
+      "relationship_label": "Beziehung zum Teilnehmer",
+      "privacy_notice": "Die Adresse wird für den Versand verschlüsselt und nach der Verarbeitung aus dem Versandumschlag entfernt.",
+      "relationships": {
+        "parent": "Elternteil",
+        "guardian": "Erziehungsberechtigter",
+        "legal_guardian": "Erziehungsberechtigter",
+        "carer": "Betreuungsperson"
+      },
+      "status": {
+        "not_required": "Nicht erforderlich",
+        "required": "Einwilligung erforderlich",
+        "pending": "Warte auf den Vormund",
+        "active": "Einwilligung erteilt",
+        "withdrawn": "Zurückgezogen",
+        "expired": "Abgelaufen"
+      }
+    },
+    "decisions": {
+      "deny": "Teilnahme verweigern",
+      "remove": "Aus der Veranstaltung entfernen"
+    },
+    "review_status": {
+      "active": "Aktiv",
+      "withdrawn": "Zurückgezogen",
+      "expired": "Abgelaufen"
+    },
+    "review_actions": {
+      "recorded": "Entscheidung protokolliert",
+      "withdrawn": "Entscheidung zurückgezogen",
+      "expired": "Entscheidung abgelaufen"
+    },
+    "reviews": {
+      "title": "Teilnahmeberichte",
+      "description": "Erfassen Sie kontrollierte Entscheidungen ohne Freitextnotizen, Kontaktdaten oder Vorfallaufzeichnungen.",
+      "new_title": "Zeichnen Sie eine Entscheidung auf",
+      "edit_title": "Aktualisieren Sie diese Entscheidung",
+      "member_label": "Finden Sie ein Mitglied",
+      "member_hint": "Suchen Sie nach Namen und wählen Sie dann das richtige Mitglied aus.",
+      "member_search_error": "Mitglieder konnten nicht durchsucht werden. Versuchen Sie es erneut.",
+      "decision_label": "Entscheidung",
+      "reason_label": "Kontrollierter Grund",
+      "effective_from": "Gültig ab",
+      "effective_until": "Gültig bis",
+      "effective_until_hint": "Lassen Sie das Feld leer, wenn die Entscheidung kein geplantes Ende hat.",
+      "no_notes_notice": "Aus Datenschutzgründen akzeptiert dieses Ledger nur kontrollierte Ursachencodes. Erfassen Sie Vorfälle und sensible Beweise im genehmigten Sicherungssystem.",
+      "saved": "Teilnahmebewertung gespeichert.",
+      "withdrawn": "Teilnahmebesprechung zurückgezogen.",
+      "action_error": "Die Teilnahmebeurteilung konnte nicht geändert werden. Aktualisieren Sie und versuchen Sie es erneut.",
+      "history_title": "Überprüfen Sie das Hauptbuch",
+      "total": "{{count}} erfasste Entscheidungen",
+      "empty": "Für diese Veranstaltung wurden keine Teilnahmebewertungen erfasst.",
+      "reviewed_by": "Bewertet von",
+      "version": "Entscheidungsversion",
+      "audit_history": "Audit-Verlauf ({{count}}-Einträge)",
+      "pagination": "Seiten zur Teilnahmeüberprüfung"
+    },
+    "guardian_grant": {
+      "page_title": "Zustimmung des Erziehungsberechtigten",
+      "title": "Überprüfen Sie die Einwilligung des Erziehungsberechtigten",
+      "description": "Bestätigen Sie die E-Mail-Adresse, die diesen privaten Link erhalten hat, und geben Sie dann Ihr Einverständnis, dass der Teilnehmer gemäß den veröffentlichten Sicherheitsanforderungen der Veranstaltung teilnimmt.",
+      "email_label": "E-Mail-Adresse des Erziehungsberechtigten",
+      "email_hint": "Geben Sie dieselbe Adresse ein, die die Einwilligungsanfrage erhalten hat.",
+      "confirm_label": "Ich bin der genannte Elternteil, Erziehungsberechtigte oder Betreuer und stimme der Teilnahme dieses Teilnehmers zu.",
+      "privacy_notice": "Der Link ist zeitlich begrenzt und kann nur für diese Veranstaltungs- und Anforderungsversion verwendet werden. Aus der Antwort geht nicht hervor, ob eine E-Mail-Adresse registriert ist.",
+      "submit": "Geben Sie Ihre Zustimmung",
+      "success_title": "Einwilligung erfasst",
+      "success_description": "Der Teilnehmer kann nun fortfahren, sobald alle anderen Veranstaltungsanforderungen erfüllt sind.",
+      "invalid_title": "Dieser Einwilligungslink kann nicht verwendet werden",
+      "invalid_description": "Der Link oder die E-Mail-Adresse ist möglicherweise falsch, abgelaufen oder bereits ausgefüllt. Bitten Sie den Teilnehmer, eine neue Anfrage zu senden.",
+      "browse_events": "Durchsuchen Sie Veranstaltungen"
+    }
+  },
+  "govuk": {
+    "link": "Sicherheitsanforderungen und Bewertungen",
+    "back": "Zurück zur Veranstaltung",
+    "title": "Veranstaltungssicherheit",
+    "intro": "Überprüfen Sie die Teilnahmevoraussetzungen, führen Sie alle für Sie relevanten Schritte aus oder verwalten Sie die kontrollierte Sicherheitsrichtlinie der Veranstaltung.",
+    "updated": "Das Sicherheitsprotokoll der Veranstaltung wurde aktualisiert.",
+    "failed": "Die Sicherheitsänderung konnte nicht abgeschlossen werden. Überprüfen Sie die aktuellen Informationen und versuchen Sie es erneut.",
+    "unavailable_title": "Veranstaltungssicherheit ist nicht verfügbar",
+    "unavailable_body": "Die Teilnahmevoraussetzungen konnten nicht überprüft werden. Es wurde keine Sicherheitsentscheidung geändert.",
+    "rollout": {
+      "off": "Durchsetzung aus",
+      "shadow": "Beobachtungsmodus",
+      "enforce": "Durchsetzung aktiv"
+    },
+    "requirement_status": {
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert"
+    },
+    "policy_title": "Teilnahmepolitik",
+    "policy_intro": "Entwurfsänderungen bleiben bis zur Veröffentlichung privat. Jede veröffentlichte Version wird zum Zwecke des Beweisabgleichs aufbewahrt.",
+    "minimum_age": "Mindestalter",
+    "minimum_age_hint": "Lassen Sie das Feld leer, wenn für die Veranstaltung kein Mindestalter gilt.",
+    "guardian_policy": "Zustimmung des Erziehungsberechtigten",
+    "guardian_required": "Für Minderjährige ist die Zustimmung des Erziehungsberechtigten erforderlich",
+    "minor_threshold": "Untere Altersgrenze",
+    "minor_threshold_hint": "Mitglieder unter diesem Alter benötigen bei der Veranstaltung die Zustimmung eines Erziehungsberechtigten.",
+    "code_policy": "Verhaltenskodex",
+    "code_required": "Fordern Sie die Teilnehmer auf, den Verhaltenskodex anzuerkennen",
+    "code_version": "Codetextversion",
+    "code_version_hint": "Verwenden Sie eine aussagekräftige Kennung, z. B. „event-conduct-2026-01“.",
+    "code_text": "Vollständiger Text des Verhaltenskodex",
+    "save_draft": "Entwurf speichern",
+    "publish": "Anforderungen veröffentlichen",
+    "archive": "Archivanforderungen",
+    "archive_warning": "Archivierte Anforderungen sind nicht mehr die aktive Richtlinie. Beweismittel und Prüfungshistorie bleiben erhalten.",
+    "confirm_archive": "Jetzt archivieren",
+    "attendee_title": "Teilnahmevoraussetzungen",
+    "eligibility": {
+      "allow": "Ihre geltenden Anforderungen sind vollständig.",
+      "deny": "Die Teilnahme ist derzeit gesperrt, bis die aufgeführten Voraussetzungen geklärt sind.",
+      "unavailable": "Die Anforderungen können derzeit nicht überprüft werden. Versuchen Sie es erneut, bevor Sie sich registrieren.",
+      "not_evaluated": "Die Teilnahmevoraussetzungen wurden noch nicht evaluiert."
+    },
+    "action_required": "Vor der Teilnahme besteht Handlungsbedarf",
+    "code_title": "Verhaltenskodex",
+    "confirm_code": "Ich habe den vollständigen Verhaltenskodex gelesen und stimme ihm zu.",
+    "acknowledge": "Bestätigen Sie den Code",
+    "withdraw_acknowledgement": "Bestätigung zurückziehen",
+    "guardian_title": "Zustimmung des Erziehungsberechtigten",
+    "guardian_status": {
+      "not_required": "Eine Einwilligung des Erziehungsberechtigten ist nicht erforderlich.",
+      "required": "Es ist eine Anfrage zur Einwilligung des Erziehungsberechtigten erforderlich.",
+      "pending": "Die Anfrage wartet auf die Antwort des Vormunds.",
+      "active": "Die Einwilligung des Erziehungsberechtigten wurde erteilt.",
+      "withdrawn": "Der Antrag auf Einwilligung des Erziehungsberechtigten wurde zurückgezogen.",
+      "expired": "Die Anfrage zur Einwilligung des Erziehungsberechtigten ist abgelaufen."
+    },
+    "guardian_name": "Name des Wächters",
+    "guardian_email": "E-Mail-Adresse des Erziehungsberechtigten",
+    "guardian_relationship": "Beziehung zum Teilnehmer",
+    "relationships": {
+      "parent": "Elternteil",
+      "guardian": "Erziehungsberechtigter",
+      "legal_guardian": "Erziehungsberechtigter",
+      "carer": "Betreuungsperson"
+    },
+    "guardian_privacy": "Die Adresse wird für den Versand verschlüsselt und nach der Verarbeitung aus dem Versandumschlag entfernt.",
+    "request_guardian": "Einwilligungsanfrage senden",
+    "withdraw_guardian": "Einwilligungsanfrage zurückziehen",
+    "reviews_title": "Teilnahmeberichte",
+    "reviews_intro": "Erfassen Sie kontrollierte Entscheidungen ohne Freitextnotizen, Kontaktdaten oder Vorfallaufzeichnungen.",
+    "review_member": "Veranstaltungsteilnehmer",
+    "review_member_choose": "Wählen Sie einen Teilnehmer",
+    "member_fallback": "Mitgliedsnummer:id",
+    "review_decision": "Entscheidung",
+    "decisions": {
+      "deny": "Teilnahme verweigern",
+      "remove": "Aus der Veranstaltung entfernen"
+    },
+    "review_reason": "Kontrollierter Grund",
+    "reasons": {
+      "unknown": "Eine Teilnahmepflicht bedarf noch der Beachtung.",
+      "safeguarding_policy": "Sichere politische Entscheidung",
+      "minimum_age": "Mindestalter",
+      "guardian_consent": "Erfordernis der Einwilligung des Erziehungsberechtigten",
+      "code_of_conduct": "Verhaltenskodex-Anforderung",
+      "conduct_violation": "Verhaltensverstoß",
+      "safety_review": "Entscheidung zur Sicherheitsüberprüfung",
+      "user_block": "Eine Mitgliedersperre verhindert die Teilnahme"
+    },
+    "effective_from": "Gültig ab",
+    "effective_until": "Gültig bis",
+    "effective_until_hint": "Lassen Sie das Feld leer, wenn die Entscheidung kein geplantes Ende hat.",
+    "no_notes": "Verwenden Sie aus Datenschutzgründen nur kontrollierte Gründe. Bewahren Sie Vorfälle und sensible Beweise im genehmigten Sicherungssystem auf.",
+    "save_review": "Bewertungsentscheidung speichern",
+    "no_people": "Es sind keine Veranstaltungsteilnehmer für eine neue Bewertung verfügbar.",
+    "open_people": "Öffnen Sie den Arbeitsbereich „Event-Personen“.",
+    "ledger_title": "Überprüfen Sie das Hauptbuch",
+    "review_status": "Status",
+    "review_states": {
+      "active": "Aktiv",
+      "withdrawn": "Zurückgezogen",
+      "expired": "Abgelaufen"
+    },
+    "reviewed_by": "Bewertet von",
+    "withdraw_review": "Entscheidung zurückziehen",
+    "ledger_empty": "Für diese Veranstaltung wurden keine Teilnahmebewertungen erfasst."
+  }
+}

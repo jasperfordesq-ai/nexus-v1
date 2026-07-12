@@ -1,0 +1,51 @@
+{
+  "contract_version": 1,
+  "credential": {
+    "format": "nqx2",
+    "algorithm": "Ed25519",
+    "contains_pii": false,
+    "one_shot_delivery": true,
+    "claims": ["alg", "aud", "evt", "exp", "iat", "jti", "kid", "occ", "ten", "v", "ver"]
+  },
+  "device": {
+    "format": "nxd1",
+    "one_shot_delivery": true,
+    "event_scoped": true,
+    "actor_bound": true,
+    "revocable": true,
+    "expiring": true
+  },
+  "manifest": {
+    "schema_version": 2,
+    "encrypted_at_rest_required": true,
+    "contains_manual_fallback_names": true,
+    "forbidden_fields": [
+      "email",
+      "phone",
+      "registration_answers",
+      "meeting_link",
+      "notes",
+      "credential_token",
+      "device_secret"
+    ]
+  },
+  "queue": {
+    "states": ["pending", "synced", "conflict", "rejected"],
+    "operations": ["check_in", "check_out", "no_show", "undo"],
+    "same_idempotency_key_for_attendance_and_decision": true,
+    "bounded_replay": true,
+    "purge_on": ["logout", "device_revocation", "device_expiry", "manifest_expiry"]
+  },
+  "conflict_resolution": {
+    "append_only": true,
+    "dispositions": ["apply", "reject"],
+    "reason_required": true,
+    "canonical_attendance_only": true
+  },
+  "privacy": {
+    "credential_contains_pii": false,
+    "device_secrets_redacted": true,
+    "credential_secrets_redacted": true,
+    "wallet_effects_supported": false
+  }
+}

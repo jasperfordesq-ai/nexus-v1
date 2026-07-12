@@ -15,6 +15,8 @@ import enHome from './locales/en/home.json';
 import enMembers from './locales/en/members.json';
 import enExchanges from './locales/en/exchanges.json';
 import enEvents from './locales/en/events.json';
+import enEventTemplates from './locales/en/event_templates.json';
+import enEventTickets from './locales/en/event_tickets.json';
 import enNotifications from './locales/en/notifications.json';
 import enSettings from './locales/en/settings.json';
 import enWallet from './locales/en/wallet.json';
@@ -29,6 +31,24 @@ import enVolunteering from './locales/en/volunteering.json';
 import enOrganisations from './locales/en/organisations.json';
 import enEndorsements from './locales/en/endorsements.json';
 import enFederation from './locales/en/federation.json';
+import { Uniwind } from 'uniwind';
+
+// Jest does not run Metro, so global.css is not compiled into Uniwind's native
+// variable store. Seed the HeroUI Native tokens exercised by shared controls so
+// useThemeColor returns real colours instead of the library's `invalid` sentinel.
+const heroUiTestTheme = {
+  '--color-accent': '#6366f1',
+  '--color-accent-hover': '#4f46e5',
+  '--color-default-hover': '#e5e7eb',
+  '--color-danger': '#dc2626',
+  '--color-danger-hover': '#b91c1c',
+  '--color-danger-soft-hover': '#fee2e2',
+  '--color-success': '#16a34a',
+  '--color-warning': '#d97706',
+};
+
+Uniwind.updateCSSVariables('light', heroUiTestTheme);
+Uniwind.updateCSSVariables('dark', heroUiTestTheme);
 
 i18n.use(initReactI18next).init({
   // Suppress the i18next "made possible by Locize" promo log in tests
@@ -42,6 +62,8 @@ i18n.use(initReactI18next).init({
       members: enMembers,
       exchanges: enExchanges,
       events: enEvents,
+      event_templates: enEventTemplates,
+      event_tickets: enEventTickets,
       notifications: enNotifications,
       settings: enSettings,
       wallet: enWallet,
@@ -69,6 +91,8 @@ i18n.use(initReactI18next).init({
     'members',
     'exchanges',
     'events',
+    'event_templates',
+    'event_tickets',
     'notifications',
     'settings',
     'wallet',

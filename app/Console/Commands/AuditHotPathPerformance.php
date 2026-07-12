@@ -212,7 +212,7 @@ final class AuditHotPathPerformance extends Command
             ],
             [
                 'name' => 'events upcoming public',
-                'sql' => "SELECT id FROM events WHERE tenant_id = ? AND (status IS NULL OR status = 'active') AND start_time >= NOW() ORDER BY start_time DESC, id DESC LIMIT 21",
+                'sql' => "SELECT id FROM events WHERE tenant_id = ? AND (status IS NULL OR status = 'active') AND start_time >= NOW() ORDER BY start_time ASC, id ASC LIMIT 21",
                 'bindings' => [$tenantId],
                 'strict' => true,
                 'requires' => ['events' => ['tenant_id', 'status', 'start_time', 'id']],

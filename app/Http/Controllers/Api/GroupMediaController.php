@@ -4,229 +4,536 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
-use App\Exceptions\SafeguardingPolicyException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Core\TenantContext;
+use App\Exceptions\GroupStorageQuarantineException;
+use App\Exceptions\SafeguardingPolicyException;
+use App\Services\GroupAccessService;
+use App\Services\GroupAuditService;
+use App\Services\GroupFileService;
 use App\Services\GroupService;
+use App\Services\GroupStorageQuarantine;
+use Carbon\CarbonImmutable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
-/**
- * GroupMediaController — Media gallery for groups: list, upload, and delete images/videos.
- *
- * Uses direct DB queries (no dedicated service — keep it simple).
- */
-class GroupMediaController extends BaseApiController
+/** Private group gallery API for validated images and videos. */
+final class GroupMediaController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /**
-     * GET /api/v2/groups/{id}/media
-     *
-     * List media for a group with cursor pagination and optional type filter.
-     */
-    public function index(int $id): JsonResponse
+    private const MAX_FILE_SIZE = 50 * 1024 * 1024;
+    private const MAX_CAPTION_LENGTH = 2_000;
+    private const MAX_IMAGE_PIXELS = 25_000_000;
+
+    /** @var array<string, list<string>> */
+    private const MIME_EXTENSIONS = [
+        'image/jpeg' => ['jpg', 'jpeg'],
+        'image/png' => ['png'],
+        'image/gif' => ['gif'],
+        'image/webp' => ['webp'],
+        'video/mp4' => ['mp4', 'm4v'],
+        'video/webm' => ['webm'],
+        'video/quicktime' => ['mov'],
+    ];
+
+    public function index(int $id): JsonResponse|StreamedResponse
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
         }
+        $this->rateLimit('groups_media_read', 120, 60);
 
-        if (!GroupService::canView($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.group_media_forbidden'), null, 403);
+        if (($authorizationError = $this->authorizeParent($id, $userId, false)) !== null) {
+            return $authorizationError;
         }
 
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
+        $contentId = $this->query('content');
+        if ($contentId !== null) {
+            if (! ctype_digit((string) $contentId) || (int) $contentId < 1) {
+                return $this->respondWithError('NOT_FOUND', __('api.group_media_not_found'), null, 404);
+            }
+            return $this->streamMedia($id, (int) $contentId, $tenantId);
+        }
+
         $limit = $this->queryInt('per_page', 20, 1, 100);
         $cursor = $this->query('cursor');
-        $type = $this->query('type'); // image, video
-
-        $params = [$tenantId, $id, $tenantId];
-        $where = "WHERE m.group_id = ? AND m.tenant_id = ?";
-
-        if ($type && in_array($type, ['image', 'video'], true)) {
-            $where .= " AND m.media_type = ?";
-            $params = [$tenantId, $id, $tenantId, $type];
+        $type = $this->query('type');
+        if ($type !== null && ! in_array($type, ['image', 'video'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_filter_invalid'), 'type', 422);
         }
 
-        if ($cursor) {
-            $decodedCursor = $this->decodeCursor($cursor);
-            if ($decodedCursor !== null) {
-                $where .= " AND m.id < ?";
-                $params[] = (int) $decodedCursor;
+        $query = DB::table('group_media as m')
+            ->leftJoin('users as u', function ($join) use ($tenantId): void {
+                $join->on('u.id', '=', 'm.uploaded_by')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('m.group_id', $id)
+            ->where('m.tenant_id', $tenantId)
+            ->whereNotNull('m.file_path')
+            ->where('m.file_path', '!=', '')
+            ->select([
+                'm.id', 'm.group_id', 'm.file_path', 'm.url', 'm.media_type as type',
+                'm.original_name', 'm.mime_type', 'm.thumbnail_path', 'm.caption',
+                'm.file_size', 'm.width', 'm.height', 'm.uploaded_by', 'm.created_at',
+                'm.updated_at', 'u.name as uploader_name', 'u.avatar_url as uploader_avatar',
+            ]);
+
+        if ($type !== null) {
+            $query->where('m.media_type', $type);
+        }
+        if ($cursor !== null && $cursor !== '') {
+            $decodedCursor = $this->decodeMediaCursor($cursor);
+            if ($decodedCursor === null) {
+                return $this->respondWithError('INVALID_CURSOR', __('api.invalid_cursor'), 'cursor', 422);
             }
+            $query->where('m.id', '<', $decodedCursor);
         }
 
-        $sql = "SELECT m.id, m.file_path, m.url, m.media_type AS type,
-                       m.thumbnail_path AS thumbnail_url,
-                       m.caption, m.file_size, m.uploaded_by, u.name AS uploader_name,
-                       m.created_at
-                FROM group_media m
-                LEFT JOIN users u ON u.id = m.uploaded_by AND u.tenant_id = ?
-                {$where}
-                ORDER BY m.id DESC
-                LIMIT ?";
-        $params[] = $limit + 1;
-
-        $rows = DB::select($sql, $params);
-
-        $hasMore = count($rows) > $limit;
+        $rows = $query->orderByDesc('m.id')->limit($limit + 1)->get();
+        $hasMore = $rows->count() > $limit;
         if ($hasMore) {
-            array_pop($rows);
+            $rows->pop();
         }
-
-        $nextCursor = null;
-        if ($hasMore && !empty($rows)) {
-            $lastItem = end($rows);
-            $nextCursor = $this->encodeCursor($lastItem->id);
-        }
+        $last = $rows->last();
+        $viewerCanManage = GroupAccessService::canManage($id, $userId);
 
         return $this->successResponse([
-            'items' => $rows,
-            'cursor' => $nextCursor,
+            'items' => $rows
+                ->map(fn (object $row): array => $this->serializeMedia($row, $id, $userId, $viewerCanManage))
+                ->all(),
+            'cursor' => $hasMore && $last !== null ? $this->encodeMediaCursor((int) $last->id) : null,
             'has_more' => $hasMore,
         ]);
     }
 
-    /**
-     * POST /api/v2/groups/{id}/media
-     *
-     * Upload a media file (image or video) for a group.
-     */
     public function upload(int $id): JsonResponse
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
         }
+        $this->rateLimit('groups_media_upload', 10, 60);
 
-        if (!GroupService::isActiveMember($id, $userId) && !GroupService::canModify($id, $userId)) {
-            return $this->respondWithError('FORBIDDEN', __('api.group_media_upload_forbidden'), null, 403);
+        if (($authorizationError = $this->authorizeParent($id, $userId, true)) !== null) {
+            return $authorizationError;
         }
-
-        $tenantId = TenantContext::getId();
 
         $file = request()->file('file');
-        if (!$file || !$file->isValid()) {
-            return $this->errorResponse(__('api.group_media_file_required'), 400);
+        $caption = trim((string) request()->input('caption', ''));
+        $validated = $this->validateMediaUpload($file, $caption);
+        if ($validated instanceof JsonResponse) {
+            return $validated;
         }
 
-        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'];
-        if (!in_array($file->getMimeType(), $allowedMimes, true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_type_not_allowed'), null, 422);
-        }
-        if ($file->getSize() > 50 * 1024 * 1024) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_size_exceeded'), null, 422);
-        }
-
-        // Determine type from mime
-        $mime = $file->getMimeType();
-        if (str_starts_with($mime, 'image/')) {
-            $type = 'image';
-        } elseif (str_starts_with($mime, 'video/')) {
-            $type = 'video';
-        } else {
-            return $this->errorResponse(__('api.group_media_images_videos_only'), 422);
-        }
-
+        $tenantId = (int) TenantContext::getId();
         try {
             GroupService::assertSafeguardingBroadcastAllowed(
                 $id,
                 $userId,
-                (int) $tenantId,
+                $tenantId,
                 'group_media_upload',
-                $file->getClientOriginalName(),
+                trim($validated['name'] . ' ' . $caption),
             );
         } catch (SafeguardingPolicyException $e) {
             return $this->safeguardingPolicyError($e);
         }
 
-        $storagePath = "groups/{$tenantId}/{$id}/media";
-        $path = $file->store($storagePath, 'public');
-
-        if (!$path) {
-            return $this->errorResponse(__('api.group_media_store_failed'), 500);
+        /** @var UploadedFile $file */
+        $file = $validated['file'];
+        $path = $file->storeAs(
+            "groups/{$tenantId}/{$id}/media",
+            Str::random(40) . '.' . $validated['extension'],
+            'local',
+        );
+        if (! is_string($path) || $path === '') {
+            return $this->respondWithError('UPLOAD_FAILED', __('api.group_media_store_failed'), 'file', 500);
         }
 
         try {
-            // Re-evaluate after the potentially slow file write. If policy or
-            // membership changed during upload, remove the bytes before exit.
-            GroupService::assertSafeguardingBroadcastAllowed(
-                $id,
-                $userId,
-                (int) $tenantId,
-                'group_media_upload',
-                $file->getClientOriginalName(),
-            );
-        } catch (SafeguardingPolicyException $e) {
-            Storage::disk('public')->delete($path);
-            return $this->safeguardingPolicyError($e);
-        } catch (\Throwable $e) {
-            Storage::disk('public')->delete($path);
-            throw $e;
+            $mediaId = DB::transaction(function () use ($id, $userId, $tenantId, $path, $validated, $caption): ?int {
+                DB::table('tenants')->where('id', $tenantId)->lockForUpdate()->first();
+                $group = DB::table('groups')
+                    ->where('id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+                if ($group === null || $this->authorizeParent($id, $userId, true) !== null) {
+                    return null;
+                }
+                if (! $this->quotaAvailable($id, $tenantId, $validated['size'])) {
+                    return null;
+                }
+
+                $now = now();
+                $mediaId = (int) DB::table('group_media')->insertGetId([
+                    'group_id' => $id,
+                    'tenant_id' => $tenantId,
+                    'file_path' => $path,
+                    'url' => null,
+                    'media_type' => $validated['type'],
+                    'original_name' => $validated['name'],
+                    'mime_type' => $validated['mime'],
+                    'thumbnail_path' => null,
+                    'caption' => $caption !== '' ? $caption : null,
+                    'file_size' => $validated['size'],
+                    'width' => $validated['width'],
+                    'height' => $validated['height'],
+                    'uploaded_by' => $userId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+
+                GroupAuditService::log(
+                    GroupAuditService::ACTION_MEDIA_UPLOADED,
+                    $id,
+                    $userId,
+                    [
+                        'media_id' => $mediaId,
+                        'media_type' => $validated['type'],
+                        'original_name' => $validated['name'],
+                        'file_size' => $validated['size'],
+                        'target_user_id' => $userId,
+                    ],
+                );
+
+                return $mediaId;
+            }, 3);
+        } catch (Throwable $exception) {
+            Storage::disk('local')->delete($path);
+            Log::error('Group media database write failed after storage', [
+                'group_id' => $id,
+                'error' => $exception->getMessage(),
+            ]);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.group_media_store_failed'), 'file', 500);
         }
 
-        $fileUrl = Storage::disk('public')->url($path);
-        $now = now()->toDateTimeString();
+        if ($mediaId === null) {
+            Storage::disk('local')->delete($path);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.group_media_store_failed'), 'file', 409);
+        }
 
-        DB::insert(
-            "INSERT INTO group_media (group_id, tenant_id, file_path, url, media_type, file_size, uploaded_by, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [$id, $tenantId, $path, $fileUrl, $type, $file->getSize(), $userId, $now]
+        $row = DB::table('group_media as m')
+            ->leftJoin('users as u', function ($join) use ($tenantId): void {
+                $join->on('u.id', '=', 'm.uploaded_by')->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('m.id', $mediaId)
+            ->where('m.tenant_id', $tenantId)
+            ->select([
+                'm.id', 'm.group_id', 'm.file_path', 'm.url', 'm.media_type as type',
+                'm.original_name', 'm.mime_type', 'm.thumbnail_path', 'm.caption',
+                'm.file_size', 'm.width', 'm.height', 'm.uploaded_by', 'm.created_at',
+                'm.updated_at', 'u.name as uploader_name', 'u.avatar_url as uploader_avatar',
+            ])
+            ->first();
+
+        return $this->successResponse(
+            $this->serializeMedia($row, $id, $userId, GroupAccessService::canManage($id, $userId)),
+            201,
         );
-
-        $mediaId = (int) DB::getPdo()->lastInsertId();
-
-        $media = DB::selectOne(
-            "SELECT * FROM group_media WHERE id = ? AND tenant_id = ?",
-            [$mediaId, $tenantId]
-        );
-
-        return $this->successResponse($media, 201);
     }
 
-    /**
-     * DELETE /api/v2/groups/{id}/media/{mediaId}
-     *
-     * Delete a media item from storage and database.
-     */
     public function destroy(int $id, int $mediaId): JsonResponse
     {
         $userId = $this->requireUserId();
         if ($userId instanceof JsonResponse) {
             return $userId;
         }
+        $this->rateLimit('groups_media_delete', 20, 60);
 
-        $tenantId = TenantContext::getId();
+        if (($authorizationError = $this->authorizeParent($id, $userId, true)) !== null) {
+            return $authorizationError;
+        }
+        $tenantId = (int) TenantContext::getId();
 
-        $media = DB::selectOne(
-            "SELECT * FROM group_media WHERE id = ? AND group_id = ? AND tenant_id = ?",
-            [$mediaId, $id, $tenantId]
-        );
+        try {
+            $result = (new GroupStorageQuarantine())->run(function (\Closure $quarantine) use ($id, $mediaId, $userId, $tenantId): string {
+                DB::table('groups')
+                    ->where('id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+                $media = DB::table('group_media')
+                    ->where('id', $mediaId)
+                    ->where('group_id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+                if ($media === null) {
+                    return 'not_found';
+                }
+                if ((int) $media->uploaded_by !== $userId && ! GroupAccessService::canManage($id, $userId)) {
+                    return 'forbidden';
+                }
 
-        if (!$media) {
-            return $this->errorResponse(__('api.group_media_not_found'), 404);
+                $assets = [];
+                foreach ([$media->file_path ?? null, $media->thumbnail_path ?? null] as $storedPath) {
+                    if (! is_string($storedPath) || ! $this->isSafeStoragePath($storedPath, $tenantId, $id)) {
+                        continue;
+                    }
+                    foreach (['local', 'public'] as $diskName) {
+                        $assets[] = ['disk' => $diskName, 'path' => $storedPath];
+                    }
+                }
+                $quarantine($assets);
+
+                $deleted = DB::table('group_media')
+                    ->where('id', $mediaId)
+                    ->where('group_id', $id)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
+                if ($deleted !== 1) {
+                    throw new \RuntimeException('Group media metadata delete lost its locked row.');
+                }
+
+                GroupAuditService::log(
+                    GroupAuditService::ACTION_MEDIA_DELETED,
+                    $id,
+                    $userId,
+                    [
+                        'media_id' => $mediaId,
+                        'media_type' => (string) $media->media_type,
+                        'original_name' => (string) ($media->original_name ?? ''),
+                        'file_size' => (int) ($media->file_size ?? 0),
+                        'target_user_id' => (int) $media->uploaded_by,
+                    ],
+                );
+
+                return 'deleted';
+            });
+        } catch (GroupStorageQuarantineException $exception) {
+            Log::error('Group media storage quarantine failed', [
+                'group_id' => $id,
+                'media_id' => $mediaId,
+                'error' => $exception->getMessage(),
+            ]);
+            return $this->respondWithError('STORAGE_DELETE_FAILED', __('api.group_media_delete_storage_failed'), null, 500);
+        } catch (Throwable $exception) {
+            Log::error('Group media delete failed', [
+                'group_id' => $id,
+                'media_id' => $mediaId,
+                'error' => $exception->getMessage(),
+            ]);
+            return $this->respondWithError('DELETE_FAILED', __('api.group_media_delete_failed'), null, 500);
         }
 
-        // Authorization: only uploader or group admin can delete
-        $isUploader = (int) $media->uploaded_by === $userId && GroupService::isActiveMember($id, $userId);
-        $isAdmin = GroupService::canModify($id, $userId);
-        if (!$isUploader && !$isAdmin) {
-            return $this->errorResponse(__('api.group_media_delete_forbidden'), 403);
+        return match ($result) {
+            'deleted' => $this->successResponse(['message' => __('api_controllers_3.group_media.media_deleted')]),
+            'forbidden' => $this->respondWithError('FORBIDDEN', __('api.group_media_delete_forbidden'), null, 403),
+            'storage_failed' => $this->respondWithError('STORAGE_DELETE_FAILED', __('api.group_media_delete_storage_failed'), null, 500),
+            default => $this->respondWithError('NOT_FOUND', __('api.group_media_not_found'), null, 404),
+        };
+    }
+
+    private function validateMediaUpload(mixed $file, string $caption): array|JsonResponse
+    {
+        if (! $file instanceof UploadedFile || ! $file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_file_required'), 'file', 400);
+        }
+        if (mb_strlen($caption) > self::MAX_CAPTION_LENGTH) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_caption_too_long', ['max' => self::MAX_CAPTION_LENGTH]), 'caption', 422);
         }
 
-        // Delete file from storage
-        if ($media->file_path && Storage::disk('public')->exists($media->file_path)) {
-            Storage::disk('public')->delete($media->file_path);
+        $size = (int) $file->getSize();
+        if ($size < 1) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_empty'), 'file', 422);
+        }
+        if ($size > self::MAX_FILE_SIZE) {
+            return $this->respondWithError('FILE_TOO_LARGE', __('api.group_media_size_exceeded'), 'file', 413);
         }
 
-        DB::delete(
-            "DELETE FROM group_media WHERE id = ? AND tenant_id = ?",
-            [$mediaId, $tenantId]
-        );
+        $name = trim($file->getClientOriginalName());
+        if ($name === '' || mb_strlen($name) > 255 || preg_match('/[\x00-\x1F\x7F]/u', $name) === 1
+            || str_contains($name, '/') || str_contains($name, '\\')) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_name_invalid'), 'file', 422);
+        }
 
-        return $this->successResponse(['message' => __('api_controllers_3.group_media.media_deleted')]);
+        $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+        $mime = strtolower(trim(explode(';', (string) $file->getMimeType(), 2)[0]));
+        if (! isset(self::MIME_EXTENSIONS[$mime]) || ! in_array($extension, self::MIME_EXTENSIONS[$mime], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_type_not_allowed'), 'file', 422);
+        }
+
+        $type = str_starts_with($mime, 'image/') ? 'image' : 'video';
+        $width = null;
+        $height = null;
+        if ($type === 'image') {
+            $realPath = $file->getRealPath();
+            $dimensions = is_string($realPath) ? @getimagesize($realPath) : false;
+            $width = (int) ($dimensions[0] ?? 0);
+            $height = (int) ($dimensions[1] ?? 0);
+            if ($dimensions === false || $width < 1 || $height < 1 || ($width * $height) > self::MAX_IMAGE_PIXELS) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.group_media_dimensions_invalid'), 'file', 422);
+            }
+        }
+
+        return [
+            'file' => $file,
+            'name' => $name,
+            'extension' => $extension,
+            'mime' => $mime,
+            'type' => $type,
+            'size' => $size,
+            'width' => $width,
+            'height' => $height,
+        ];
+    }
+
+    private function quotaAvailable(int $groupId, int $tenantId, int $incomingBytes): bool
+    {
+        $groupBytes = (int) DB::table('group_files')
+            ->where('tenant_id', $tenantId)
+            ->where('group_id', $groupId)
+            ->sum('file_size')
+            + (int) DB::table('group_media')
+                ->where('tenant_id', $tenantId)
+                ->where('group_id', $groupId)
+                ->sum('file_size');
+        if ($groupBytes + $incomingBytes > GroupFileService::MAX_GROUP_STORAGE) {
+            return false;
+        }
+
+        $tenantBytes = (int) DB::table('group_files')->where('tenant_id', $tenantId)->sum('file_size')
+            + (int) DB::table('group_media')->where('tenant_id', $tenantId)->sum('file_size');
+        return $tenantBytes + $incomingBytes <= GroupFileService::MAX_TENANT_STORAGE;
+    }
+
+    private function authorizeParent(int $groupId, int $userId, bool $write): ?JsonResponse
+    {
+        $tenantId = (int) TenantContext::getId();
+        if (! DB::table('groups')->where('id', $groupId)->where('tenant_id', $tenantId)->exists()) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+
+        $allowed = $write
+            ? GroupAccessService::canWriteContent($groupId, $userId)
+            : GroupAccessService::canViewMemberContent($groupId, $userId);
+        if (! $allowed) {
+            return $this->respondWithError(
+                'FORBIDDEN',
+                $write ? __('api.group_media_upload_forbidden') : __('api.group_media_forbidden'),
+                null,
+                403,
+            );
+        }
+
+        return null;
+    }
+
+    private function streamMedia(int $groupId, int $mediaId, int $tenantId): JsonResponse|StreamedResponse
+    {
+        $media = DB::table('group_media')
+            ->where('id', $mediaId)
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if ($media === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_media_not_found'), null, 404);
+        }
+
+        $thumbnail = $this->query('variant') === 'thumbnail';
+        $path = (string) ($thumbnail ? ($media->thumbnail_path ?? '') : ($media->file_path ?? ''));
+        $disk = Storage::disk('local');
+        if (! $this->isSafeStoragePath($path, $tenantId, $groupId) || ! $disk->exists($path)) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_media_not_found'), null, 404);
+        }
+
+        try {
+            $mime = $disk->mimeType($path) ?: 'application/octet-stream';
+        } catch (Throwable) {
+            $mime = 'application/octet-stream';
+        }
+        $filename = (string) ($media->original_name ?: basename($path));
+
+        return $disk->response($path, $filename, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . addslashes($filename) . '"',
+            'Cache-Control' => 'private, no-store',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cross-Origin-Resource-Policy' => 'same-origin',
+        ]);
+    }
+
+    private function serializeMedia(
+        object $media,
+        int $groupId,
+        int $viewerUserId,
+        bool $viewerCanManage,
+    ): array {
+        $hasPrivateFile = is_string($media->file_path ?? null) && $media->file_path !== '';
+        return [
+            'id' => (int) $media->id,
+            'group_id' => $groupId,
+            'type' => (string) $media->type,
+            'original_name' => $media->original_name !== null ? (string) $media->original_name : null,
+            'mime_type' => $media->mime_type !== null ? (string) $media->mime_type : null,
+            'url' => $hasPrivateFile ? $this->protectedMediaUrl($groupId, (int) $media->id) : null,
+            'thumbnail_url' => ! empty($media->thumbnail_path)
+                ? $this->protectedMediaUrl($groupId, (int) $media->id, true)
+                : null,
+            'caption' => $media->caption !== null ? (string) $media->caption : null,
+            'file_size' => (int) $media->file_size,
+            'width' => $media->width !== null ? (int) $media->width : null,
+            'height' => $media->height !== null ? (int) $media->height : null,
+            'uploaded_by' => (int) $media->uploaded_by,
+            'uploader_name' => (string) ($media->uploader_name ?? ''),
+            'uploader_avatar' => $media->uploader_avatar !== null ? (string) $media->uploader_avatar : null,
+            'uploader' => [
+                'id' => (int) $media->uploaded_by,
+                'name' => (string) ($media->uploader_name ?? ''),
+                'avatar_url' => $media->uploader_avatar !== null ? (string) $media->uploader_avatar : null,
+            ],
+            'created_at' => CarbonImmutable::parse($media->created_at)->toIso8601String(),
+            'updated_at' => CarbonImmutable::parse($media->updated_at ?? $media->created_at)->toIso8601String(),
+            'capabilities' => [
+                'can_view' => true,
+                'can_delete' => $viewerCanManage || (int) $media->uploaded_by === $viewerUserId,
+            ],
+        ];
+    }
+
+    private function protectedMediaUrl(int $groupId, int $mediaId, bool $thumbnail = false): string
+    {
+        return "/api/v2/groups/{$groupId}/media?content={$mediaId}" . ($thumbnail ? '&variant=thumbnail' : '');
+    }
+
+    private function encodeMediaCursor(int $id): string
+    {
+        return base64_encode((string) $id);
+    }
+
+    private function decodeMediaCursor(string $cursor): ?int
+    {
+        $decoded = base64_decode($cursor, true);
+        return $decoded !== false && ctype_digit($decoded) && (int) $decoded > 0 ? (int) $decoded : null;
+    }
+
+    private function isSafeStoragePath(string $path, int $tenantId, int $groupId): bool
+    {
+        if ($path === '' || str_contains($path, "\0")) {
+            return false;
+        }
+        $normalized = str_replace('\\', '/', $path);
+        if (str_starts_with($normalized, '/') || preg_match('/^[A-Za-z]:\//', $normalized) === 1) {
+            return false;
+        }
+        foreach (explode('/', $normalized) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                return false;
+            }
+        }
+
+        return str_starts_with($normalized, "groups/{$tenantId}/{$groupId}/media/");
     }
 }

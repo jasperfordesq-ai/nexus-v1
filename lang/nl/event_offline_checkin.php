@@ -1,0 +1,66 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'privacy' => [
+        'title' => 'Privé en betrouwbaar inchecken',
+        'body' => 'Ondertekende deelnemerscodes bevatten geen naam, e-mailadres of telefoonnummer. U kunt hieronder een code invoeren zonder camera.',
+        'no_wallet' => 'Aanwezigheidsacties wijzigen nooit saldi en kennen geen tijdtegoeden toe.',
+    ],
+    'code' => [
+        'title' => 'Ondertekende deelnemerscode invoeren',
+        'intro' => 'Gebruik dit online alternatief als de camera of het offline personeelsapparaat niet beschikbaar is. Handmatig zoeken op naam blijft verderop beschikbaar.',
+        'label' => 'Deelnemerscode',
+        'hint' => 'Plak de volledige code die begint met nqx2_. De code wordt niet in het auditlog opgeslagen.',
+        'action' => 'Aanwezigheidsactie',
+        'reason' => 'Reden voor correctie',
+        'reason_hint' => 'Bij ongedaan maken is een reden verplicht. Vermeld geen gevoelige informatie.',
+        'confirm' => 'Ik heb de deelnemer gecontroleerd en de bedoelde actie gekozen.',
+        'submit' => 'Actie met ondertekende code toepassen',
+    ],
+    'actions' => [
+        'check_in' => 'Inchecken',
+        'check_out' => 'Uitchecken',
+        'no_show' => 'Als afwezig markeren',
+        'undo' => 'Laatste actie ongedaan maken',
+    ],
+    'attendee' => [
+        'manage_link' => 'Mijn incheckcode beheren',
+        'title' => 'Uw incheckcode voor het evenement',
+        'intro' => 'Maak een ondertekende code om op het scherm of als afdruk aan het evenemententeam te tonen.',
+        'privacy' => 'De code identificeert alleen deze evenementregistratie. De code bevat geen naam, e-mailadres of telefoonnummer.',
+        'notice_issued' => 'Uw nieuwe incheckcode wordt hieronder weergegeven.',
+        'notice_replaced' => 'Uw vorige code werkt niet meer. De vervangende code staat hieronder.',
+        'notice_revoked' => 'Uw incheckcode is ingetrokken.',
+        'notice_already_active' => 'Er bestaat al een actieve code. Vervang deze als uw kopie niet beschikbaar is.',
+        'notice_invalid' => 'Bevestig de gevraagde actie en probeer het opnieuw.',
+        'notice_failed' => 'De incheckcode kon niet worden gewijzigd. Vernieuw de pagina en probeer het opnieuw.',
+        'status_heading' => 'Codestatus',
+        'status_active' => 'Actief',
+        'status_rotated' => 'Vervangen',
+        'status_revoked' => 'Ingetrokken',
+        'status_expired' => 'Verlopen',
+        'expires' => 'Verloopt op :date',
+        'one_shot_heading' => 'Bewaar deze code nu',
+        'one_shot' => 'Om veiligheidsredenen wordt de volledige code alleen weergegeven wanneer deze wordt aangemaakt of vervangen.',
+        'code_label' => 'Ondertekende incheckcode',
+        'code_hint' => 'Selecteer en kopieer de volledige code die begint met nqx2_.',
+        'print_hint' => 'U kunt deze pagina afdrukken of een toegankelijke kopie bewaren. Houd de code privé tot het inchecken.',
+        'print' => 'Deze code afdrukken',
+        'issue_confirm' => 'Ik begrijp dat de volledige code slechts één keer wordt weergegeven.',
+        'issue' => 'Incheckcode aanmaken',
+        'replace' => 'Gekopieerde of verloren code vervangen',
+        'replace_hint' => 'Door de code te vervangen worden alle bewaarde of afgedrukte kopieën onmiddellijk ongeldig.',
+        'replace_confirm' => 'Ik begrijp dat mijn huidige code niet meer zal werken.',
+        'revoke' => 'Code intrekken',
+        'reason' => 'Reden voor intrekking',
+        'reason_hint' => 'Noteer een korte operationele reden zonder gevoelige informatie.',
+        'revoke_confirm' => 'Ik begrijp dat deze code onmiddellijk niet meer zal werken.',
+    ],
+    'device' => [
+        'lost' => 'Trek bij verlies van een personeelsapparaat de toegang direct in via de gewone evenementenomgeving. Ga hier verder op naam of met een ondertekende code.',
+    ],
+];

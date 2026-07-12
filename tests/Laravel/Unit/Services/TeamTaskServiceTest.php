@@ -4,165 +4,118 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Models\User;
+use App\Services\GroupAuditService;
 use App\Services\TeamTaskService;
-use App\Core\TenantContext;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use Tests\Laravel\TestCase;
 
-class TeamTaskServiceTest extends TestCase
+final class TeamTaskServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private TeamTaskService $service;
+    private User $owner;
+    private User $nonMember;
+    private int $groupId;
 
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->service = new TeamTaskService();
+        $this->owner = User::factory()->forTenant($this->testTenantId)->create();
+        $this->nonMember = User::factory()->forTenant($this->testTenantId)->create();
+        $this->groupId = (int) DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $this->owner->id,
+            'name' => 'Team task unit fixture ' . uniqid('', true),
+            'slug' => 'team-task-unit-' . uniqid(),
+            'description' => 'Real parent-policy fixture.',
+            'visibility' => 'private',
+            'status' => 'active',
+            'is_active' => true,
+            'cached_member_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        \App\Core\TenantContext::setById($this->testTenantId);
     }
 
-    public function test_getTasks_returns_paginated_structure(): void
+    public function test_reads_fail_closed_without_an_actor(): void
     {
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('orderByDesc')->with('id')->andReturnSelf();
-        DB::shouldReceive('limit')->andReturnSelf();
-        DB::shouldReceive('get')->andReturn(collect([]));
+        $this->assertSame($this->testTenantId, (int) \App\Core\TenantContext::getId());
+        $this->assertDatabaseHas('groups', [
+            'id' => $this->groupId,
+            'tenant_id' => $this->testTenantId,
+        ]);
 
-        $result = $this->service->getTasks(1);
-
-        $this->assertArrayHasKey('items', $result);
-        $this->assertArrayHasKey('cursor', $result);
-        $this->assertArrayHasKey('has_more', $result);
-    }
-
-    public function test_getTasks_requires_active_group_membership_when_user_is_supplied(): void
-    {
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-
-        $result = $this->service->getTasks(10, [], 99);
+        $result = $this->service->getTasks($this->groupId);
 
         $this->assertSame(['items' => [], 'cursor' => null, 'has_more' => false], $result);
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+        $this->assertSame('FORBIDDEN', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_getById_returns_null_when_not_found(): void
+    public function test_parent_policy_runs_before_payload_validation(): void
     {
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 999)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', TenantContext::getId())->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(null);
+        $this->assertNull($this->service->create(
+            $this->groupId,
+            (int) $this->nonMember->id,
+            ['title' => ''],
+        ));
+        $this->assertSame('FORBIDDEN', $this->service->getErrors()[0]['code']);
 
-        $this->assertNull($this->service->getById(999));
+        $this->assertNull($this->service->create(
+            $this->groupId,
+            (int) $this->owner->id,
+            ['title' => ''],
+        ));
+        $this->assertSame('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_create_returns_null_when_title_is_empty(): void
+    public function test_missing_task_is_tenant_scoped(): void
     {
-        $result = $this->service->create(1, 1, ['title' => '']);
+        $this->assertNull($this->service->getById(PHP_INT_MAX, (int) $this->owner->id));
+        $this->assertSame([], $this->service->getErrors());
 
-        $this->assertNull($result);
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
+        $this->assertFalse($this->service->delete(PHP_INT_MAX, (int) $this->owner->id));
+        $this->assertSame('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_create_returns_null_for_invalid_status(): void
+    public function test_owner_can_read_empty_stats_without_a_membership_row(): void
     {
-        $result = $this->service->create(1, 1, ['title' => 'Test', 'status' => 'invalid']);
-
-        $this->assertNull($result);
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
+        $this->assertSame([
+            'total' => 0,
+            'todo' => 0,
+            'in_progress' => 0,
+            'done' => 0,
+            'overdue' => 0,
+        ], $this->service->getStats($this->groupId, (int) $this->owner->id));
+        $this->assertSame([], $this->service->getErrors());
     }
 
-    public function test_create_returns_null_for_invalid_priority(): void
+    public function test_task_delete_writes_actor_and_creator_audit(): void
     {
-        $result = $this->service->create(1, 1, ['title' => 'Test', 'priority' => 'invalid']);
+        $taskId = $this->service->create($this->groupId, (int) $this->owner->id, [
+            'title' => 'Audited task deletion',
+        ]);
+        self::assertNotNull($taskId);
 
-        $this->assertNull($result);
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
-    }
+        self::assertTrue($this->service->delete((int) $taskId, (int) $this->owner->id));
 
-    public function test_update_returns_false_when_task_not_found(): void
-    {
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 999)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', Mockery::any())->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(null);
-
-        $result = $this->service->update(999, 1, ['title' => 'Updated']);
-
-        $this->assertFalse($result);
-        $this->assertEquals('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_update_requires_group_membership(): void
-    {
-        $task = (object) ['id' => 1, 'group_id' => 10, 'status' => 'todo'];
-
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 1)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', Mockery::any())->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($task);
-
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-
-        $result = $this->service->update(1, 99, ['title' => 'Updated']);
-
-        $this->assertFalse($result);
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_update_returns_false_when_title_set_to_empty(): void
-    {
-        $task = (object) ['id' => 1, 'group_id' => 10, 'status' => 'todo'];
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($task);
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 1)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(true);
-
-        $result = $this->service->update(1, 1, ['title' => '   ']);
-
-        $this->assertFalse($result);
-        $this->assertEquals('VALIDATION_ERROR', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_delete_returns_false_when_not_found(): void
-    {
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn(null);
-
-        $result = $this->service->delete(999, 1);
-
-        $this->assertFalse($result);
-    }
-
-    public function test_getStats_returns_expected_keys(): void
-    {
-        $stats = (object) ['total' => 5, 'todo' => 2, 'in_progress' => 1, 'done' => 2, 'overdue' => 0];
-
-        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('selectRaw')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($stats);
-
-        $result = $this->service->getStats(1);
-
-        $this->assertEquals(5, $result['total']);
-        $this->assertEquals(2, $result['todo']);
-        $this->assertEquals(1, $result['in_progress']);
-        $this->assertEquals(2, $result['done']);
-        $this->assertEquals(0, $result['overdue']);
+        $audit = DB::table('group_audit_log')
+            ->where('group_id', $this->groupId)
+            ->where('action', GroupAuditService::ACTION_TEAM_TASK_DELETED)
+            ->sole();
+        self::assertSame((int) $this->owner->id, (int) $audit->user_id);
+        $details = json_decode((string) $audit->details, true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame((int) $taskId, (int) $details['task_id']);
+        self::assertSame((int) $this->owner->id, (int) $details['target_user_id']);
+        self::assertSame('Audited task deletion', $details['title']);
     }
 }

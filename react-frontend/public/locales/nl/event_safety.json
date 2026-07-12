@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "Veiligheid",
+    "overview": "Veiligheidseisen en beoordelingen"
+  },
+  "safety": {
+    "actions": {
+      "retry": "Probeer het opnieuw",
+      "save_draft": "Concept opslaan",
+      "publish": "Publicatievereisten",
+      "archive": "Archiefvereisten",
+      "cancel": "Annuleren",
+      "confirm_archive": "Nu archiveren",
+      "acknowledge": "Bevestig de code",
+      "withdraw_acknowledgement": "Bevestiging intrekken",
+      "request_guardian_consent": "Vraag toestemming van de voogd",
+      "withdraw_guardian_consent": "Toestemmingsverzoek intrekken",
+      "change_member": "Wijzig lid",
+      "save_review": "Bewaar het beoordelingsbesluit",
+      "cancel_edit": "Bewerking annuleren",
+      "edit_review": "Besluit bijwerken",
+      "withdraw_review": "Beslissing intrekken"
+    },
+    "organizer": {
+      "title": "Veiligheid van evenementen",
+      "description": "Stel op versie gebaseerde deelnamevereisten in en houd een gecontroleerde, controleerbare registratie bij van veiligheidsbeslissingen.",
+      "loading": "Veiligheid van evenementen laden",
+      "load_error_title": "De veiligheid van evenementen is niet beschikbaar",
+      "load_error_description": "Het veiligheidsbeleid en het overzichtsboek konden niet worden geladen. Er is geen veiligheidsbesluit gewijzigd.",
+      "configuration_invalid": "Veiligheidshandhaving is niet beschikbaar omdat de configuratie ervan ongeldig is.",
+      "shadow_title": "Observatiemodus",
+      "shadow_description": "De eisen worden geëvalueerd en vastgelegd, maar deelname staat nog niet in de weg.",
+      "read_only": "U kunt dit beleid bekijken, maar de vereisten ervan niet wijzigen.",
+      "action_error": "De veiligheidswijziging kon niet worden opgeslagen. Vernieuw de werkruimte en probeer het opnieuw.",
+      "success": {
+        "saved": "Veiligheidseisen opgeslagen als concept.",
+        "published": "Veiligheidseisen gepubliceerd.",
+        "archived": "Veiligheidseisen gearchiveerd."
+      }
+    },
+    "attendee": {
+      "title": "Deelnamevereisten",
+      "description": "Voltooi de toepasselijke veiligheidsstappen voordat u zich registreert of op de wachtlijst komt te staan.",
+      "loading": "Deelnamevereisten laden",
+      "load_error_title": "Er zijn geen deelnamevereisten",
+      "load_error_description": "We konden de veiligheidseisen van het evenement niet verifiëren. Probeer het opnieuw voordat u zich registreert.",
+      "action_error": "Die veiligheidsstap kon niet worden voltooid. Probeer het opnieuw.",
+      "denial_title": "Deelname is momenteel niet toegestaan",
+      "attention_title": "Actie is vereist",
+      "success": {
+        "acknowledge": "Gedragscode erkend.",
+        "withdraw_code": "Codebevestiging ingetrokken.",
+        "request_guardian": "Toestemmingsverzoek voogd verzonden.",
+        "withdraw_guardian": "Toestemmingsverzoek voogd ingetrokken."
+      }
+    },
+    "rollout": {
+      "off": "Handhaving uitgeschakeld",
+      "shadow": "Observatiemodus",
+      "enforce": "Handhaving actief"
+    },
+    "requirements": {
+      "title": "Participatiebeleid",
+      "description": "Conceptwijzigingen zijn privé totdat ze worden gepubliceerd. Door te publiceren ontstaat een onveranderlijke versie voor het matchen van bewijsmateriaal.",
+      "minimum_age": "Minimum leeftijd",
+      "minimum_age_hint": "Laat dit veld leeg als het evenement geen minimumleeftijd kent.",
+      "guardian_required": "Toestemming van de voogd vereisen voor minderjarigen",
+      "guardian_required_hint": "Toestemming is gebonden aan de exacte gepubliceerde vereisteversie en gebeurtenisdatum.",
+      "minor_threshold": "Kleine leeftijdsgrens",
+      "minor_threshold_hint": "Leden die jonger zijn dan deze leeftijd op het evenement hebben toestemming nodig.",
+      "code_required": "Vereist erkenning van de gedragscode",
+      "code_required_hint": "Deelnemers moeten de exacte gepubliceerde tekst erkennen voordat ze deelnemen.",
+      "code_version": "Codetekstversie",
+      "code_version_hint": "Gebruik een betekenisvolle ID, zoals event-conduct-2026-01.",
+      "code_text": "Gedragscode",
+      "code_text_hint": "Vermeld de volledige voorwaarden die deelnemers moeten lezen en erkennen.",
+      "archive_title": "Deze veiligheidseisen archiveren?",
+      "archive_description": "Gearchiveerde vereisten zijn niet langer het actieve participatiebeleid. Het bewijsmateriaal en de auditgeschiedenis blijven behouden.",
+      "status": {
+        "draft": "Voorlopige versie",
+        "published": "Gepubliceerd",
+        "archived": "Gearchiveerd"
+      }
+    },
+    "eligibility": {
+      "allow": "Vereisten voltooid",
+      "deny": "Deelname geblokkeerd",
+      "unavailable": "Verificatie niet beschikbaar",
+      "not_evaluated": "Nog niet geëvalueerd"
+    },
+    "reasons": {
+      "unknown": "Een participatievereiste verdient nog aandacht.",
+      "safeguarding_policy": "Beveiliging van beleidsbeslissingen",
+      "minimum_age": "Minimale leeftijdseis",
+      "guardian_consent": "Toestemmingsvereiste van de voogd",
+      "code_of_conduct": "Gedragscodevereiste",
+      "conduct_violation": "Een overtreding begaan",
+      "safety_review": "Beslissing over veiligheidsbeoordeling",
+      "user_block": "Een ledenblokkering verhindert deelname",
+      "event_safety_unbound_guest_denied": "Meld u aan om de deelnamevereisten te verifiëren.",
+      "event_safety_user_not_active": "Uw ledenaccount is momenteel niet actief.",
+      "event_safety_bilateral_user_block": "Een ledenblokkering verhindert deelname aan dit evenement.",
+      "event_safety_requirements_not_published": "De organisator heeft de veiligheidseisen nog niet gepubliceerd.",
+      "event_safety_requirements_integrity_invalid": "De gepubliceerde veiligheidseisen konden niet worden geverifieerd.",
+      "event_safety_requirements_version_unavailable": "De gepubliceerde vereisteversie is niet beschikbaar.",
+      "event_safety_date_of_birth_required": "Voeg uw geboortedatum toe, zodat de leeftijdsvereisten kunnen worden gecontroleerd.",
+      "event_safety_date_of_birth_invalid": "Uw geregistreerde geboortedatum kan niet worden geverifieerd.",
+      "event_safety_minimum_age_not_met": "Je voldoet niet aan de minimumleeftijd voor dit evenement.",
+      "event_safety_minor_policy_unavailable": "Het beleid voor kleine deelname is niet beschikbaar.",
+      "event_safety_guardian_consent_required": "Geldige toestemming van de voogd is vereist.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Erken de huidige gedragscode.",
+      "event_safety_active_participation_denial": "Een actieve veiligheidsbeslissing verhindert deelname.",
+      "event_safety_safeguarding_policy_denied": "Het borgingsbeleid staat momenteel geen deelname toe.",
+      "event_safety_safeguarding_policy_invalid": "Het vrijwaringsbesluit kon niet worden geverifieerd.",
+      "event_safety_safeguarding_policy_unavailable": "Het beveiligen van verificatie is tijdelijk niet beschikbaar.",
+      "event_safety_schema_unavailable": "Veiligheidsverificatie is tijdelijk niet beschikbaar.",
+      "event_safety_evaluation_unavailable": "Veiligheidsverificatie is tijdelijk niet beschikbaar.",
+      "event_safety_organizer_not_active": "De organisator van het evenement is momenteel niet actief.",
+      "event_safety_denial_safeguarding_policy": "Een borgende beleidsbeslissing verhindert participatie."
+    },
+    "code": {
+      "title": "Gedragscode",
+      "confirm_read": "Ik heb de volledige gedragscode gelezen en ga ermee akkoord.",
+      "status": {
+        "not_required": "Niet vereist",
+        "required": "Bevestiging vereist",
+        "acknowledged": "Bevestigd"
+      }
+    },
+    "guardian": {
+      "title": "Toestemming van de voogd",
+      "description": "De voogd ontvangt een persoonlijke, in de tijd beperkte link. Hun identiteit en toestemmingstoken worden nooit getoond in het evenementenrooster.",
+      "name_label": "Naam van de voogd",
+      "email_label": "E-mailadres van de Guardian",
+      "relationship_label": "Relatie met de deelnemer",
+      "privacy_notice": "Het adres wordt gecodeerd voor bezorging en na verwerking uit de bezorgenvelop verwijderd.",
+      "relationships": {
+        "parent": "Ouder",
+        "guardian": "Voogd",
+        "legal_guardian": "Wettelijke voogd",
+        "carer": "Verzorger"
+      },
+      "status": {
+        "not_required": "Niet vereist",
+        "required": "Toestemming vereist",
+        "pending": "Wachten op voogd",
+        "active": "Toestemming verleend",
+        "withdrawn": "Ingetrokken",
+        "expired": "Verlopen"
+      }
+    },
+    "decisions": {
+      "deny": "Deelname weigeren",
+      "remove": "Verwijderen uit evenement"
+    },
+    "review_status": {
+      "active": "Actief",
+      "withdrawn": "Ingetrokken",
+      "expired": "Verlopen"
+    },
+    "review_actions": {
+      "recorded": "Beslissing vastgelegd",
+      "withdrawn": "Besluit ingetrokken",
+      "expired": "Beslissing verlopen"
+    },
+    "reviews": {
+      "title": "Deelname beoordelingen",
+      "description": "Leg gecontroleerde beslissingen vast zonder vrije tekstnotities, contactgegevens of incidentregistraties.",
+      "new_title": "Leg een besluit vast",
+      "edit_title": "Update dit besluit",
+      "member_label": "Zoek een lid",
+      "member_hint": "Zoek op naam en selecteer vervolgens het juiste lid.",
+      "member_search_error": "Er kon niet naar leden worden gezocht. Probeer het opnieuw.",
+      "decision_label": "Besluit",
+      "reason_label": "Gecontroleerde rede",
+      "effective_from": "Effectief vanaf",
+      "effective_until": "Effectief tot",
+      "effective_until_hint": "Laat dit veld leeg als de beslissing geen gepland einde kent.",
+      "no_notes_notice": "Uit privacyoverwegingen accepteert dit grootboek alleen gecontroleerde redencodes. Registreer incidenten en gevoelig bewijsmateriaal in het goedgekeurde beveiligingssysteem.",
+      "saved": "Deelnamebeoordeling opgeslagen.",
+      "withdrawn": "Deelnamebeoordeling ingetrokken.",
+      "action_error": "De deelnamebeoordeling kon niet worden gewijzigd. Vernieuw en probeer het opnieuw.",
+      "history_title": "Grootboek controleren",
+      "total": "{{count}} vastgelegde beslissingen",
+      "empty": "Voor dit evenement zijn geen deelnamebeoordelingen geregistreerd.",
+      "reviewed_by": "Beoordeeld door",
+      "version": "Beslissingsversie",
+      "audit_history": "Auditgeschiedenis ({{count}} vermeldingen)",
+      "pagination": "Beoordelingspagina's van deelname"
+    },
+    "guardian_grant": {
+      "page_title": "Toestemming van de voogd",
+      "title": "Controleer de toestemming van de voogd",
+      "description": "Bevestig het e-mailadres dat deze privélink heeft ontvangen en geef vervolgens toestemming aan de bezoeker om deel te nemen onder de gepubliceerde veiligheidseisen van het evenement.",
+      "email_label": "E-mailadres van Guardian",
+      "email_hint": "Voer hetzelfde adres in waarop het toestemmingsverzoek is ontvangen.",
+      "confirm_label": "Ik ben de genoemde ouder, voogd of verzorger en ik ga ermee akkoord dat deze deelnemer deelneemt.",
+      "privacy_notice": "De link is beperkt in de tijd en kan alleen worden gebruikt voor deze evenement- en vereisteversie. Uit de reactie blijkt niet of er een e-mailadres geregistreerd is.",
+      "submit": "Geef toestemming",
+      "success_title": "Toestemming vastgelegd",
+      "success_description": "De bezoeker kan nu doorgaan zodra aan alle andere evenementvereisten is voldaan.",
+      "invalid_title": "Deze toestemmingslink kan niet worden gebruikt",
+      "invalid_description": "Mogelijk is de link of het e-mailadres onjuist, verlopen of al ingevuld. Vraag de bezoeker om een ​​nieuw verzoek te sturen.",
+      "browse_events": "Blader door evenementen"
+    }
+  },
+  "govuk": {
+    "link": "Veiligheidseisen en beoordelingen",
+    "back": "Terug naar evenement",
+    "title": "Veiligheid van evenementen",
+    "intro": "Bekijk de deelnamevereisten, voltooi alle stappen die op u van toepassing zijn of beheer het gecontroleerde veiligheidsbeleid van het evenement.",
+    "updated": "Het veiligheidsrecord voor evenementen is bijgewerkt.",
+    "failed": "De veiligheidswijziging kon niet worden voltooid. Controleer de huidige informatie en probeer het opnieuw.",
+    "unavailable_title": "De veiligheid van evenementen is niet beschikbaar",
+    "unavailable_body": "De deelnamevereisten konden niet worden geverifieerd. Er is geen veiligheidsbesluit gewijzigd.",
+    "rollout": {
+      "off": "Handhaving uitgeschakeld",
+      "shadow": "Observatiemodus",
+      "enforce": "Handhaving actief"
+    },
+    "requirement_status": {
+      "draft": "Voorlopige versie",
+      "published": "Gepubliceerd",
+      "archived": "Gearchiveerd"
+    },
+    "policy_title": "Participatiebeleid",
+    "policy_intro": "Conceptwijzigingen blijven privé totdat ze worden gepubliceerd. Elke gepubliceerde versie wordt bewaard voor het matchen van bewijsmateriaal.",
+    "minimum_age": "Minimum leeftijd",
+    "minimum_age_hint": "Laat dit veld leeg als het evenement geen minimumleeftijd kent.",
+    "guardian_policy": "Toestemming van de voogd",
+    "guardian_required": "Toestemming van de voogd vereisen voor minderjarigen",
+    "minor_threshold": "Kleine leeftijdsgrens",
+    "minor_threshold_hint": "Leden die jonger zijn dan deze leeftijd op het evenement hebben toestemming van hun voogd nodig.",
+    "code_policy": "Gedragscode",
+    "code_required": "Vraag deelnemers om de gedragscode te erkennen",
+    "code_version": "Codetekstversie",
+    "code_version_hint": "Gebruik een betekenisvolle ID, zoals event-conduct-2026-01.",
+    "code_text": "Volledige tekst van de gedragscode",
+    "save_draft": "Concept opslaan",
+    "publish": "Publicatievereisten",
+    "archive": "Archiefvereisten",
+    "archive_warning": "Gearchiveerde vereisten zijn niet langer het actieve beleid. Bewijsmateriaal en auditgeschiedenis blijven behouden.",
+    "confirm_archive": "Nu archiveren",
+    "attendee_title": "Deelnamevereisten",
+    "eligibility": {
+      "allow": "Uw toepasselijke vereisten zijn voltooid.",
+      "deny": "Deelname is momenteel geblokkeerd totdat aan de genoemde vereisten is voldaan.",
+      "unavailable": "De vereisten kunnen momenteel niet worden geverifieerd. Probeer het opnieuw voordat u zich registreert.",
+      "not_evaluated": "De deelnamevereisten zijn nog niet geëvalueerd."
+    },
+    "action_required": "Voor deelname is actie nodig",
+    "code_title": "Gedragscode",
+    "confirm_code": "Ik heb de volledige gedragscode gelezen en ga ermee akkoord.",
+    "acknowledge": "Bevestig de code",
+    "withdraw_acknowledgement": "Bevestiging intrekken",
+    "guardian_title": "Toestemming van de voogd",
+    "guardian_status": {
+      "not_required": "Toestemming van de voogd is niet vereist.",
+      "required": "Er is een verzoek om toestemming van de voogd vereist.",
+      "pending": "Het verzoek wacht op de reactie van de voogd.",
+      "active": "Er is toestemming van de voogd verleend.",
+      "withdrawn": "Het verzoek om toestemming van de voogd werd ingetrokken.",
+      "expired": "Het toestemmingsverzoek voor de voogd is verlopen."
+    },
+    "guardian_name": "Naam van de voogd",
+    "guardian_email": "E-mailadres van Guardian",
+    "guardian_relationship": "Relatie met de deelnemer",
+    "relationships": {
+      "parent": "Ouder",
+      "guardian": "Voogd",
+      "legal_guardian": "Wettelijke voogd",
+      "carer": "Verzorger"
+    },
+    "guardian_privacy": "Het adres wordt gecodeerd voor bezorging en na verwerking uit de bezorgenvelop verwijderd.",
+    "request_guardian": "Toestemmingsverzoek verzenden",
+    "withdraw_guardian": "Toestemmingsverzoek intrekken",
+    "reviews_title": "Deelname beoordelingen",
+    "reviews_intro": "Registreer gecontroleerde beslissingen zonder vrije tekstnotities, contactgegevens of incidentregistraties.",
+    "review_member": "Deelnemer aan evenement",
+    "review_member_choose": "Kies een deelnemer",
+    "member_fallback": "Lid #:id",
+    "review_decision": "Besluit",
+    "decisions": {
+      "deny": "Deelname weigeren",
+      "remove": "Verwijderen uit evenement"
+    },
+    "review_reason": "Gecontroleerde rede",
+    "reasons": {
+      "unknown": "Een participatievereiste verdient nog aandacht.",
+      "safeguarding_policy": "Beveiliging van beleidsbeslissingen",
+      "minimum_age": "Minimale leeftijdseis",
+      "guardian_consent": "Toestemmingsvereiste van de voogd",
+      "code_of_conduct": "Gedragscodevereiste",
+      "conduct_violation": "Een overtreding begaan",
+      "safety_review": "Beslissing over veiligheidsbeoordeling",
+      "user_block": "Een ledenblokkering verhindert deelname"
+    },
+    "effective_from": "Effectief vanaf",
+    "effective_until": "Effectief tot",
+    "effective_until_hint": "Laat dit veld leeg als de beslissing geen gepland einde kent.",
+    "no_notes": "Gebruik vanwege privacy alleen gecontroleerde redenen. Bewaar incidenten en gevoelig bewijsmateriaal in het goedgekeurde beveiligingssysteem.",
+    "save_review": "Bewaar het beoordelingsbesluit",
+    "no_people": "Er zijn geen deelnemers aan het evenement beschikbaar voor een nieuwe beoordeling.",
+    "open_people": "Open de werkruimte voor gebeurtenismensen",
+    "ledger_title": "Grootboek controleren",
+    "review_status": "Status",
+    "review_states": {
+      "active": "Actief",
+      "withdrawn": "Ingetrokken",
+      "expired": "Verlopen"
+    },
+    "reviewed_by": "Beoordeeld door",
+    "withdraw_review": "Beslissing intrekken",
+    "ledger_empty": "Voor dit evenement zijn geen deelnamebeoordelingen geregistreerd."
+  }
+}

@@ -53,6 +53,7 @@ const authDefaults = {
 
 let authOverrides: Partial<typeof authDefaults> = {};
 let conditionalAutofillEnabled = true;
+let passkeyAuthenticationEnabled = true;
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ ...authDefaults, ...authOverrides }),
@@ -63,7 +64,7 @@ vi.mock('@/contexts', () => ({
     tenantPath: mockTenantPath,
     authenticationConfig: { 'passkeys.conditional_autofill': conditionalAutofillEnabled },
     isLoading: false,
-    hasFeature: vi.fn(() => true),
+    hasFeature: vi.fn((feature: string) => feature !== 'biometric_login' || passkeyAuthenticationEnabled),
     hasModule: vi.fn(() => true),
   }),
   useToast: () => mockToast,
@@ -91,7 +92,7 @@ vi.mock('@/contexts/TenantContext', () => ({
     tenantPath: mockTenantPath,
     authenticationConfig: { 'passkeys.conditional_autofill': conditionalAutofillEnabled },
     isLoading: false,
-    hasFeature: vi.fn(() => true),
+    hasFeature: vi.fn((feature: string) => feature !== 'biometric_login' || passkeyAuthenticationEnabled),
     hasModule: vi.fn(() => true),
   }),
 }));
@@ -171,15 +172,16 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     vi.clearAllMocks();
     authOverrides = {};
     conditionalAutofillEnabled = true;
+    passkeyAuthenticationEnabled = true;
     Object.defineProperty(window, 'PublicKeyCredential', {
-      value: { isConditionalMediationAvailable: vi.fn() },
+      value: class MockPublicKeyCredential {},
       configurable: true,
     });
     // Defaults: biometric available, conditional mediation not supported
     mockIsBiometricAvailable.mockResolvedValue(true);
     mockIsConditionalMediationAvailable.mockResolvedValue(false);
     mockStartConditionalAuthentication.mockResolvedValue(null);
-    mockLoginWithBiometric.mockResolvedValue({ success: false, error: 'cancelled' });
+    mockLoginWithBiometric.mockResolvedValue({ success: false, errorCode: 'cancelled' });
   });
 
   afterEach(() => {
@@ -205,9 +207,46 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     expect(screen.queryByText('Sign in with a passkey')).toBeNull();
   });
 
+  it('does not report support when PublicKeyCredential exists but is not callable', () => {
+    Object.defineProperty(window, 'PublicKeyCredential', {
+      value: undefined,
+      configurable: true,
+    });
+
+    render(<LoginPage />);
+
+    expect(screen.queryByText('Sign in with a passkey')).toBeNull();
+  });
+
+  it('hides explicit and conditional passkey authentication when the tenant master switch is off', async () => {
+    passkeyAuthenticationEnabled = false;
+    mockIsConditionalMediationAvailable.mockResolvedValue(true);
+
+    render(<LoginPage />);
+    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+    fireEvent.focus(emailInput);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    expect(screen.queryByText('Sign in with a passkey')).toBeNull();
+    expect(mockIsConditionalMediationAvailable).not.toHaveBeenCalled();
+    expect(mockStartConditionalAuthentication).not.toHaveBeenCalled();
+  });
+
+  it('uses the required username WebAuthn autocomplete contract and stable field names', () => {
+    render(<LoginPage />);
+
+    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+    const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
+    expect(emailInput.id).toBe('login-email');
+    expect(emailInput.name).toBe('username');
+    expect(emailInput.autocomplete).toBe('username webauthn');
+    expect(passwordInput.id).toBe('login-password');
+    expect(passwordInput.name).toBe('password');
+  });
+
   // ─── 3. handleBiometricLogin calls loginWithBiometric (no email) ───────────
   it('calls loginWithBiometric with undefined when no email entered', async () => {
-    mockLoginWithBiometric.mockResolvedValue({ success: false, error: 'cancelled' });
+    mockLoginWithBiometric.mockResolvedValue({ success: false, errorCode: 'cancelled' });
     const user = userEvent.setup();
 
     render(<LoginPage />);
@@ -218,12 +257,12 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
     await user.click(screen.getByText('Sign in with a passkey'));
 
-    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined);
+    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined, expect.any(AbortSignal));
   });
 
   // ─── 4. handleBiometricLogin passes email when filled ──────────────────────
-  it('calls loginWithBiometric with email when email field is filled', async () => {
-    mockLoginWithBiometric.mockResolvedValue({ success: false, error: 'cancelled' });
+  it('keeps the passkey ceremony account-agnostic when email is filled', async () => {
+    mockLoginWithBiometric.mockResolvedValue({ success: false, errorCode: 'cancelled' });
     const user = userEvent.setup();
 
     render(<LoginPage />);
@@ -242,7 +281,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
     await user.click(screen.getByText('Sign in with a passkey'));
 
-    expect(mockLoginWithBiometric).toHaveBeenCalledWith('alice@example.com');
+    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined, expect.any(AbortSignal));
   });
 
   // ─── 5. Conditional mediation starts when tenant selected ──────────────────
@@ -277,7 +316,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     expect(mockStartConditionalAuthentication).not.toHaveBeenCalled();
 
     await user.click(screen.getByText('Sign in with a passkey'));
-    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined);
+    expect(mockLoginWithBiometric).toHaveBeenCalledWith(undefined, expect.any(AbortSignal));
   });
 
   // ─── 6. Conditional mediation aborted on unmount ───────────────────────────
@@ -299,6 +338,22 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
     expect(abortSpy).toHaveBeenCalled();
     abortSpy.mockRestore();
+  });
+
+  it('aborts an explicit passkey attempt when the login page unmounts', async () => {
+    let receivedSignal: AbortSignal | undefined;
+    mockLoginWithBiometric.mockImplementation((_email, signal: AbortSignal) => {
+      receivedSignal = signal;
+      return new Promise(() => {});
+    });
+    const user = userEvent.setup();
+    const { unmount } = render(<LoginPage />);
+
+    await user.click(screen.getByText('Sign in with a passkey'));
+    await waitFor(() => expect(receivedSignal).toBeDefined());
+    unmount();
+
+    expect(receivedSignal?.aborted).toBe(true);
   });
 
   // ─── 6b. StrictMode double-mount must net out to ONE credential request ────
@@ -356,10 +411,11 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
   });
 
   // ─── 7. Error toast when no passkey found ──────────────────────────────────
-  it('shows error toast when loginWithBiometric returns "Credential not found"', async () => {
+  it('maps the stable credential-not-found code without parsing English text', async () => {
     mockLoginWithBiometric.mockResolvedValue({
       success: false,
-      error: 'Credential not found',
+      error: 'Localized backend text',
+      errorCode: 'AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND',
     });
     const user = userEvent.setup();
 

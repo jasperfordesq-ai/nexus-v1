@@ -28,6 +28,7 @@
  *   --missing-only     Only translate absent keys, not existing English fallback values
  *   --force            Re-translate strings even if they already differ from EN
  *   --include-simple   Translate short/simple strings too (useful for missing UI labels)
+ *   --translate-skipped-missing  Translate otherwise protected values only when the key is absent
  *   --google           Use Google's public translate endpoint when no API key is available
  *   --summary          Print a summary of gaps before translating
  */
@@ -152,6 +153,7 @@ const DRY_RUN = args.includes('--dry-run');
 const MISSING_ONLY = args.includes('--missing-only');
 const FORCE = args.includes('--force');
 const INCLUDE_SIMPLE = args.includes('--include-simple');
+const TRANSLATE_SKIPPED_MISSING = args.includes('--translate-skipped-missing');
 const USE_GOOGLE = args.includes('--google');
 const nsFilter = args.includes('--namespace') ? args[args.indexOf('--namespace') + 1] : null;
 const langFilter = args.includes('--lang') ? args[args.indexOf('--lang') + 1] : null;
@@ -474,9 +476,14 @@ async function main() {
       const keysToTranslate = [];
       for (const [key, enVal] of Object.entries(enFlat)) {
         if (typeof enVal !== 'string') continue;
-        if (shouldSkipValue(enVal)) continue;
-
         const langVal = langFlat[key];
+        // New namespaces still need exact key parity. Some legitimate UI strings
+        // (for example "Version {{version}}" or "Online") resemble protected
+        // tokens and used to be silently omitted while --summary reported zero
+        // gaps. This opt-in translates only those ABSENT values; it never
+        // rewrites an existing protected token.
+        if (shouldSkipValue(enVal)
+          && !(TRANSLATE_SKIPPED_MISSING && langVal === undefined)) continue;
         const needsTranslation =
           langVal === undefined ||   // missing
           (!MISSING_ONLY && langVal === enVal) ||       // English fallback (identical to source)

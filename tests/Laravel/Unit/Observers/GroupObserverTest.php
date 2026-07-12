@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Unit\Observers;
 
+use App\Enums\GroupStatus;
 use App\Models\Group;
 use App\Observers\GroupObserver;
 use App\Services\SearchService;
@@ -36,6 +37,7 @@ class GroupObserverTest extends TestCase
     {
         $group = new Group();
         $group->id = 5;
+        $group->status = GroupStatus::Active;
 
         $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
 
@@ -48,6 +50,7 @@ class GroupObserverTest extends TestCase
     {
         $group = Mockery::mock(Group::class)->makePartial();
         $group->id = 5;
+        $group->status = GroupStatus::Active;
         $group->shouldReceive('getDirty')->andReturn(['member_count' => 25]);
 
         $this->searchMock->shouldNotReceive('indexGroup');
@@ -61,6 +64,7 @@ class GroupObserverTest extends TestCase
     {
         $group = Mockery::mock(Group::class)->makePartial();
         $group->id = 5;
+        $group->status = GroupStatus::Active;
         $group->shouldReceive('getDirty')->andReturn(['name' => 'New Name']);
 
         $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
@@ -74,9 +78,39 @@ class GroupObserverTest extends TestCase
     {
         $group = Mockery::mock(Group::class)->makePartial();
         $group->id = 5;
+        $group->status = GroupStatus::Active;
         $group->shouldReceive('getDirty')->andReturn(['visibility' => 'private']);
 
         $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
+
+        (new GroupObserver())->updated($group);
+
+        $this->assertTrue(true);
+    }
+
+    public function test_created_non_active_group_is_removed_from_discovery(): void
+    {
+        $group = new Group();
+        $group->id = 51;
+        $group->status = GroupStatus::PendingReview;
+
+        $this->searchMock->shouldNotReceive('indexGroup');
+        $this->searchMock->shouldReceive('removeGroup')->once()->with(51);
+
+        (new GroupObserver())->created($group);
+
+        $this->assertTrue(true);
+    }
+
+    public function test_lifecycle_update_removes_non_active_group_from_discovery(): void
+    {
+        $group = Mockery::mock(Group::class)->makePartial();
+        $group->id = 52;
+        $group->status = GroupStatus::Archived;
+        $group->shouldReceive('getDirty')->andReturn(['status' => GroupStatus::Archived->value]);
+
+        $this->searchMock->shouldNotReceive('indexGroup');
+        $this->searchMock->shouldReceive('removeGroup')->once()->with(52);
 
         (new GroupObserver())->updated($group);
 

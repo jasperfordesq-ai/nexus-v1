@@ -6,6 +6,8 @@
 
 namespace App\Models;
 
+use App\Enums\EventOperationalState;
+use App\Enums\EventPublicationState;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,14 +26,27 @@ class Event extends Model
         'user_id', 'title', 'description', 'location',
         'latitude', 'longitude', 'start_time', 'end_time', 'group_id',
         'category_id', 'max_attendees', 'is_online', 'online_link',
-        'image_url', 'federated_visibility', 'video_url',
-        'allow_remote_attendance',
+        'image_url', 'cover_image', 'federated_visibility', 'video_url',
+        'allow_remote_attendance', 'series_id',
+        'accessibility_step_free', 'accessibility_toilet',
+        'accessibility_hearing_loop', 'accessibility_quiet_space',
+        'accessibility_seating', 'accessibility_parking',
+        'accessibility_parking_details', 'accessibility_transit_details',
+        'accessibility_assistance_contact', 'accessibility_notes',
     ];
 
     /**
      * Attributes hidden from JSON serialization to prevent data leakage.
      */
-    protected $hidden = ['tenant_id'];
+    protected $hidden = [
+        'tenant_id',
+        'publication_status_changed_by',
+        'operational_status_changed_by',
+        'moderation_submitted_by',
+        'moderated_by',
+        'moderation_reason',
+        'lifecycle_reason',
+    ];
 
     protected $casts = [
         'latitude' => 'float',
@@ -41,6 +56,23 @@ class Event extends Model
         'max_attendees' => 'integer',
         'is_online' => 'boolean',
         'allow_remote_attendance' => 'boolean',
+        'all_day' => 'boolean',
+        'accessibility_step_free' => 'boolean',
+        'accessibility_toilet' => 'boolean',
+        'accessibility_hearing_loop' => 'boolean',
+        'accessibility_quiet_space' => 'boolean',
+        'accessibility_seating' => 'boolean',
+        'accessibility_parking' => 'boolean',
+        'publication_status' => EventPublicationState::class,
+        'operational_status' => EventOperationalState::class,
+        'lifecycle_version' => 'integer',
+        'calendar_sequence' => 'integer',
+        'federation_version' => 'integer',
+        'agenda_version' => 'integer',
+        'publication_status_changed_at' => 'datetime',
+        'operational_status_changed_at' => 'datetime',
+        'moderation_submitted_at' => 'datetime',
+        'moderated_at' => 'datetime',
     ];
 
     /**
@@ -75,6 +107,11 @@ class Event extends Model
         return $this->belongsTo(Group::class);
     }
 
+    public function series(): BelongsTo
+    {
+        return $this->belongsTo(EventSeries::class, 'series_id');
+    }
+
     public function rsvps(): HasMany
     {
         return $this->hasMany(EventRsvp::class);
@@ -83,6 +120,19 @@ class Event extends Model
     public function polls(): HasMany
     {
         return $this->hasMany(Poll::class);
+    }
+
+    public function statusHistory(): HasMany
+    {
+        return $this->hasMany(EventStatusHistory::class);
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(EventSession::class)
+            ->orderBy('starts_at_utc')
+            ->orderBy('position')
+            ->orderBy('id');
     }
 
     public function scopeUpcoming(Builder $query): Builder

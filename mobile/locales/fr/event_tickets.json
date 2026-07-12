@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Billets d'événement",
+      "gatewayDisabledTitle": "Le paiement payant et avec crédit de temps est désactivé",
+      "gatewayDisabledDescription": "Ce flux mobile prend uniquement en charge l'attribution de billets gratuits. Il ne facture jamais d'argent ni de crédits de temps et ne change pas votre portefeuille.",
+      "loading": "Chargement des billets d'événement",
+      "loadFailedTitle": "Impossible de charger les billets",
+      "loadFailedDescription": "Le catalogue de billets d'événement n'a pas pu être chargé. Essayer à nouveau.",
+      "myTicketsTitle": "Mes billets",
+      "noTickets": "Vous n'avez pas de billet pour cet événement.",
+      "ticketFallback": "Billet d'événement",
+      "entitlementSummary": "{{count}} billet · {{status}}",
+      "entitlementSummary_other": "{{count}} billets · {{status}}",
+      "cancelTicket": "Annuler le billet",
+      "timeCreditCancelDisabled": "L’annulation de billet avec crédit de temps n’est pas disponible dans ce flux uniquement gratuit. Aucune action sur le portefeuille n'a été entreprise.",
+      "cancelTitle": "Annuler ce billet gratuit ?",
+      "cancelDescription": "Donnez une brève raison. La quantité reviendra à l'allocation gratuite.",
+      "reasonLabel": "Motif d'annulation",
+      "confirmCancellation": "Confirmer l'annulation",
+      "reasonInvalidTitle": "Vérifiez le motif de l'annulation",
+      "reasonInvalidDescription": "Entrez un motif ne dépassant pas 500 caractères.",
+      "cancelledTitle": "Billet gratuit annulé",
+      "cancelledDescription": "La quantité a été remise dans l'allocation gratuite.",
+      "cancelFailedTitle": "Impossible d'annuler le billet",
+      "cancelFailedDescription": "Actualisez le catalogue et réessayez.",
+      "catalogueTitle": "Billets disponibles",
+      "catalogueEmpty": "Aucun type de billet n'est disponible pour cet événement.",
+      "free": "Gratuit",
+      "timeCreditPrice": "{{credits}} crédits de temps",
+      "remaining": "{{count}} restants",
+      "remaining_other": "{{count}} restants",
+      "timeCreditDisabledTitle": "Paiement en crédit-temps indisponible",
+      "timeCreditDisabledDescription": "La passerelle de portefeuille approuvée n'est pas connectée. Aucun crédit ne peut être débité depuis cet écran.",
+      "unitsLabel": "Quantité (jusqu'à {{count}})",
+      "registrationRequired": "Une inscription confirmée à l’événement est requise avant de réclamer un billet gratuit.",
+      "notEligible": "Vous ne répondez pas actuellement aux règles d’éligibilité de ce type de billet.",
+      "salesClosed": "Ce type de billet n'est actuellement pas ouvert à l'attribution.",
+      "soldOut": "Il ne vous reste aucun billet gratuit dans cette allocation.",
+      "claimFreeTicket": "Réclamez un billet gratuit",
+      "unitsInvalidTitle": "Vérifiez la quantité",
+      "unitsInvalidDescription": "Saisissez un nombre entier compris entre 1 et {{count}}.",
+      "allocatedTitle": "Billet gratuit attribué",
+      "allocatedDescription": "Votre billet est maintenant confirmé.",
+      "allocateFailedTitle": "Impossible d'attribuer un ticket",
+      "allocateFailedDescription": "Vérifiez votre inscription, votre éligibilité et votre allocation restante, puis réessayez."
+    },
+    "status": {
+      "confirmed": "Confirmé",
+      "cancelled": "Annulé"
+    }
+  }
+}

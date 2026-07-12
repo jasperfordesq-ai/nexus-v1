@@ -172,7 +172,7 @@ class SmartGroupRankingService
             $groups = DB::select(
                 "SELECT g.id, g.cached_member_count
                  FROM `groups` g
-                 WHERE g.tenant_id = ? AND (g.is_active = 1 OR g.is_active IS NULL)
+                 WHERE g.tenant_id = ? AND g.status = 'active'
                  {$typeCondition}
                  ORDER BY g.cached_member_count DESC",
                 [$tenantId]

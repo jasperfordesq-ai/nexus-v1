@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
 {
+    /** @var list<string> */
+    private const PRIVACY_PRESERVING_REFERRER_POLICIES = [
+        'no-referrer',
+        'same-origin',
+        'strict-origin',
+        'strict-origin-when-cross-origin',
+    ];
+
     /**
      * Cached build commit, resolved once per worker boot. Reading the file on
      * every request would be wasteful; OPCache + this static keep it free.
@@ -128,7 +136,18 @@ class SecurityHeaders
             . "base-uri 'self'; "
             . "object-src 'none';";
         $response->headers->set('Content-Security-Policy', $csp);
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        // Keep an endpoint's equally strict or stricter policy (for example,
+        // one-time calendar feed secrets), while replacing unknown or weaker
+        // policies with the platform default.
+        $endpointPolicies = array_values(array_filter(array_map(
+            static fn (string $policy): string => strtolower(trim($policy)),
+            explode(',', (string) $response->headers->get('Referrer-Policy', '')),
+        )));
+        $hasSafeEndpointPolicy = $endpointPolicies !== []
+            && array_diff($endpointPolicies, self::PRIVACY_PRESERVING_REFERRER_POLICIES) === [];
+        if (! $hasSafeEndpointPolicy) {
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        }
 
         // Self-only grants: camera (story creator), microphone (voice
         // messages), geolocation (maps); everything else denied to

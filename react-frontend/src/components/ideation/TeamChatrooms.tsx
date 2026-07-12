@@ -379,10 +379,10 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   const activeChatroom = chatrooms.find(c => c.id === activeChatroomId);
 
   return (
-    <div className="flex gap-4 min-h-[400px]">
+    <div className="flex min-h-[400px] min-w-0 flex-col gap-3 md:flex-row md:gap-4">
       {/* Channel Sidebar */}
-      <div className="w-48 shrink-0">
-        <div className="flex items-center justify-between mb-3">
+      <nav className="w-full min-w-0 md:w-48 md:shrink-0" aria-label={t('chatrooms.title')}>
+        <div className="mb-2 flex items-center justify-between md:mb-3">
           <h3 className="text-sm font-semibold text-[var(--color-text)]">
             {t('chatrooms.title')}
           </h3>
@@ -393,19 +393,21 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
               size="sm"
               onPress={onCreateOpen}
               aria-label={t('chatrooms.create')}
+              className="h-11 w-11 min-w-11 md:h-8 md:w-8 md:min-w-8"
             >
               <Plus className="w-4 h-4" />
             </Button>
           )}
         </div>
 
-        <div className="space-y-1">
+        <div className="flex max-w-full gap-2 overflow-x-auto pb-1 md:block md:space-y-1 md:overflow-visible md:pb-0">
           {chatrooms.map((room) => (
             <Button
               key={room.id}
               onPress={() => setActiveChatroomId(room.id)}
               variant="light"
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start min-h-9 ${
+              aria-current={activeChatroomId === room.id ? 'page' : undefined}
+              className={`min-h-11 min-w-[9rem] flex-none justify-start gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors md:min-h-9 md:w-full md:min-w-0 ${
                 activeChatroomId === room.id
                   ? 'bg-accent/10 text-accent font-medium'
                   : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
@@ -431,10 +433,10 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
             {t('chatrooms.empty_title')}
           </p>
         )}
-      </div>
+      </nav>
 
       {/* Message Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         {!activeChatroomId ? (
           <EmptyState
             icon={<MessageSquare className="w-10 h-10 text-theme-subtle" />}
@@ -444,14 +446,14 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
         ) : (
           <>
             {/* Channel Header */}
-            <div className="flex items-center justify-between mb-3 pb-3 border-b border-[var(--color-border)]">
-              <div className="flex items-center gap-2">
+            <div className="mb-3 flex flex-wrap items-start justify-between gap-2 border-b border-[var(--color-border)] pb-3">
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                 {activeChatroom?.is_private ? (
                   <Lock className="w-4 h-4 text-[var(--color-text-tertiary)]" />
                 ) : (
                   <Hash className="w-4 h-4 text-[var(--color-text-tertiary)]" />
                 )}
-                <span className="font-semibold text-[var(--color-text)]">
+                <span className="min-w-0 truncate font-semibold text-[var(--color-text)]">
                   {activeChatroom?.name}
                 </span>
                 {activeChatroom?.category && (
@@ -465,16 +467,18 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                   </Chip>
                 )}
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 {pinnedMessages.length > 0 && (
                   <Tooltip content={tGroups('chatrooms.show_pinned')}>
                     <Button
                       isIconOnly
                       variant="light"
                       size="sm"
-                      onPress={() => setShowPinned(!showPinned)}
+                      onPress={() => setShowPinned((visible) => !visible)}
                       aria-label={tGroups('chatrooms.show_pinned')}
-                      className={showPinned ? 'text-warning' : ''}
+                      aria-expanded={showPinned}
+                      aria-controls="group-chatroom-pinned-messages"
+                      className={`relative h-11 w-11 min-w-11 md:h-8 md:w-8 md:min-w-8 ${showPinned ? 'text-warning' : ''}`}
                     >
                       <Pin className="w-3.5 h-3.5" />
                       <span className="text-[10px] absolute -top-0.5 -right-0.5 bg-warning text-warning-foreground rounded-full w-3.5 h-3.5 flex items-center justify-center">
@@ -491,6 +495,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                     color="danger"
                     onPress={onDeleteOpen}
                     aria-label={t('chatrooms.delete_channel')}
+                    className="h-11 w-11 min-w-11 md:h-8 md:w-8 md:min-w-8"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -500,7 +505,10 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
             {/* Pinned Messages Section */}
             {showPinned && pinnedMessages.length > 0 && (
-              <div className="mb-3 p-3 rounded-lg bg-warning/10 border border-warning/20">
+              <div
+                id="group-chatroom-pinned-messages"
+                className="mb-3 rounded-lg border border-warning/20 bg-warning/10 p-3"
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Pin className="w-3.5 h-3.5 text-warning" />
                   <span className="text-sm font-semibold text-[var(--color-text)]">
@@ -517,7 +525,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                         name={msg.author.name}
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                           <span className="text-xs font-medium text-[var(--color-text)]">
                             {msg.author.name}
                           </span>
@@ -535,7 +543,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                             </OverlayActionButton>
                           )}
                         </div>
-                        <p className="text-xs text-[var(--color-text-secondary)] whitespace-pre-wrap line-clamp-2">
+                        <p className="line-clamp-2 break-words whitespace-pre-wrap text-xs text-[var(--color-text-secondary)]">
                           {msg.body}
                         </p>
                       </div>
@@ -546,7 +554,12 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
             )}
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto space-y-3 mb-3 max-h-96">
+            <div
+              className="mb-3 max-h-96 flex-1 space-y-3 overflow-y-auto"
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions text"
+            >
               {isLoadingMessages && (
                 <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
                   <Spinner size="sm" />
@@ -570,7 +583,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                     name={msg.author.name}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                       <span className="text-sm font-medium text-[var(--color-text)]">
                         {msg.author.name}
                       </span>
@@ -611,7 +624,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                         </OverlayActionButton>
                       )}
                     </div>
-                    <p className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap">
+                    <p className="break-words whitespace-pre-wrap text-sm text-[var(--color-text-secondary)]">
                       {msg.body}
                     </p>
                   </div>
@@ -622,7 +635,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
             {/* Message Input */}
             {isAuthenticated && (
-              <div className="flex gap-2">
+              <div className="flex min-w-0 gap-2">
                 <Input
                   placeholder={t('chatrooms.message_placeholder')}
                   aria-label={t('chatrooms.message_placeholder')}
@@ -641,6 +654,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                   isDisabled={!newMessage.trim()}
                   onPress={handleSendMessage}
                   aria-label={t('chatrooms.send')}
+                  className="h-11 w-11 min-w-11 md:h-8 md:w-8 md:min-w-8"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

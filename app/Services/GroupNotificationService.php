@@ -47,17 +47,23 @@ class GroupNotificationService
 
         $safeUserName  = htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $link = "/groups/{$groupId}/members?tab=requests";
+        ['relative' => $link, 'absolute' => $actionUrl] = $this->notificationLinks("/groups/{$groupId}?tab=members");
+        $safeActionUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
+        $policies = GroupNotificationPreferenceService::getForUsers(
+            array_map(static fn (object $admin): int => (int) $admin->user_id, $admins),
+            $groupId,
+        );
 
         foreach ($admins as $admin) {
             if ((int) $admin->user_id === $userId) {
                 continue; // Don't notify the requester if they're somehow an admin
             }
             // Render the bell + email in each admin's preferred language.
-            LocaleContext::withLocale($admin->preferred_language ?? null, function () use ($admin, $groupId, $userName, $group, $safeUserName, $safeGroupName, $link) {
+            $deliveryPolicy = $policies[(int) $admin->user_id] ?? GroupNotificationPreferenceService::get((int) $admin->user_id, $groupId);
+            LocaleContext::withLocale($admin->preferred_language ?? null, function () use ($admin, $groupId, $userId, $userName, $group, $safeUserName, $safeGroupName, $link, $safeActionUrl, $deliveryPolicy) {
                 $message = __('notifications.group_join_request', ['name' => $userName, 'group' => $group->name]);
                 $htmlContent = "<p>" . __('notifications.group_join_request', ['name' => "<strong>{$safeUserName}</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-                    . "<p><a href=\"{$link}\">" . __('notifications.group_join_request_review') . "</a></p>";
+                    . "<p><a href=\"{$safeActionUrl}\">" . __('notifications.group_join_request_review') . "</a></p>";
 
                 try {
                     NotificationDispatcher::dispatch(
@@ -67,7 +73,10 @@ class GroupNotificationService
                         'group_join_request',
                         $message,
                         $link,
-                        $htmlContent
+                        $htmlContent,
+                        false,
+                        $userId,
+                        $deliveryPolicy,
                     );
                 } catch (\Throwable $e) {
                     Log::error('GroupNotification: failed to dispatch join request notification', [
@@ -94,12 +103,14 @@ class GroupNotificationService
 
         $recipientLocale = $this->getUserLocale($userId, $tenantId);
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $link = "/groups/{$groupId}";
+        ['relative' => $link, 'absolute' => $actionUrl] = $this->notificationLinks("/groups/{$groupId}");
+        $safeActionUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
+        $deliveryPolicy = GroupNotificationPreferenceService::get($userId, $groupId);
 
-        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link) {
+        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link, $safeActionUrl, $deliveryPolicy) {
             $message = __('notifications.group_joined', ['group' => $group->name]);
             $htmlContent = "<p>" . __('notifications.group_joined', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-                . "<p><a href=\"{$link}\">" . __('notifications.group_joined_visit') . "</a></p>";
+                . "<p><a href=\"{$safeActionUrl}\">" . __('notifications.group_joined_visit') . "</a></p>";
 
             try {
                 NotificationDispatcher::dispatch(
@@ -109,7 +120,10 @@ class GroupNotificationService
                     'group_join',
                     $message,
                     $link,
-                    $htmlContent
+                    $htmlContent,
+                    false,
+                    null,
+                    $deliveryPolicy,
                 );
             } catch (\Throwable $e) {
                 Log::error('GroupNotification: failed to dispatch joined notification', [
@@ -135,12 +149,14 @@ class GroupNotificationService
 
         $recipientLocale = $this->getUserLocale($userId, $tenantId);
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $link = "/groups";
+        ['relative' => $link, 'absolute' => $actionUrl] = $this->notificationLinks('/groups');
+        $safeActionUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
+        $deliveryPolicy = GroupNotificationPreferenceService::get($userId, $groupId);
 
-        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link) {
+        LocaleContext::withLocale($recipientLocale, function () use ($userId, $groupId, $group, $safeGroupName, $link, $safeActionUrl, $deliveryPolicy) {
             $message = __('notifications.group_join_rejected', ['group' => $group->name]);
             $htmlContent = "<p>" . __('notifications.group_join_rejected', ['group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-                . "<p><a href=\"{$link}\">" . __('notifications.group_browse_others') . "</a></p>";
+                . "<p><a href=\"{$safeActionUrl}\">" . __('notifications.group_browse_others') . "</a></p>";
 
             try {
                 NotificationDispatcher::dispatch(
@@ -150,7 +166,10 @@ class GroupNotificationService
                     'group_join_rejected',
                     $message,
                     $link,
-                    $htmlContent
+                    $htmlContent,
+                    false,
+                    null,
+                    $deliveryPolicy,
                 );
             } catch (\Throwable $e) {
                 Log::error('GroupNotification: failed to dispatch join rejected notification', [
@@ -179,19 +198,25 @@ class GroupNotificationService
         $safeTitle     = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $safeAuthor    = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $link = "/groups/{$groupId}/discussions/{$discussionId}";
+        ['relative' => $link, 'absolute' => $actionUrl] = $this->notificationLinks("/groups/{$groupId}?tab=discussion");
+        $safeActionUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
 
         $members = $this->getActiveMembers($groupId, $tenantId);
+        $policies = GroupNotificationPreferenceService::getForUsers(
+            array_map(static fn (object $member): int => (int) $member->user_id, $members),
+            $groupId,
+        );
 
         foreach ($members as $member) {
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
             // Render message + html content in each member's preferred language.
-            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $discussionId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link) {
+            $deliveryPolicy = $policies[(int) $member->user_id] ?? GroupNotificationPreferenceService::get((int) $member->user_id, $groupId);
+            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $discussionId, $authorId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link, $safeActionUrl, $deliveryPolicy) {
                 $message = __('notifications.group_new_discussion', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
                 $htmlContent = "<p>" . __('notifications.group_new_discussion', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-                    . "<p><a href=\"{$link}\">" . __('notifications.group_view_discussion') . "</a></p>";
+                    . "<p><a href=\"{$safeActionUrl}\">" . __('notifications.group_view_discussion') . "</a></p>";
 
                 try {
                     NotificationDispatcher::dispatch(
@@ -201,7 +226,10 @@ class GroupNotificationService
                         'new_topic',
                         $message,
                         $link,
-                        $htmlContent
+                        $htmlContent,
+                        false,
+                        $authorId,
+                        $deliveryPolicy,
                     );
                 } catch (\Throwable $e) {
                     Log::error('GroupNotification: failed to dispatch new discussion notification', [
@@ -232,19 +260,25 @@ class GroupNotificationService
         $safeTitle     = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $safeAuthor    = htmlspecialchars($authorName, ENT_QUOTES, 'UTF-8');
         $safeGroupName = htmlspecialchars($group->name, ENT_QUOTES, 'UTF-8');
-        $link = "/groups/{$groupId}/announcements";
+        ['relative' => $link, 'absolute' => $actionUrl] = $this->notificationLinks("/groups/{$groupId}?tab=announcements");
+        $safeActionUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
 
         $members = $this->getActiveMembers($groupId, $tenantId);
+        $policies = GroupNotificationPreferenceService::getForUsers(
+            array_map(static fn (object $member): int => (int) $member->user_id, $members),
+            $groupId,
+        );
 
         foreach ($members as $member) {
             if ((int) $member->user_id === $authorId) {
                 continue; // Don't notify the author
             }
             // Render announcement in each member's preferred language.
-            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link) {
+            $deliveryPolicy = $policies[(int) $member->user_id] ?? GroupNotificationPreferenceService::get((int) $member->user_id, $groupId);
+            LocaleContext::withLocale($member->preferred_language ?? null, function () use ($member, $groupId, $authorId, $authorName, $title, $group, $safeAuthor, $safeTitle, $safeGroupName, $link, $safeActionUrl, $deliveryPolicy) {
                 $message = __('notifications.group_new_announcement', ['author' => $authorName, 'title' => $title, 'group' => $group->name]);
                 $htmlContent = "<p>" . __('notifications.group_new_announcement', ['author' => "<strong>{$safeAuthor}</strong>", 'title' => "<strong>\"{$safeTitle}\"</strong>", 'group' => "<strong>{$safeGroupName}</strong>"]) . "</p>"
-                    . "<p><a href=\"{$link}\">" . __('notifications.group_view_announcement') . "</a></p>";
+                    . "<p><a href=\"{$safeActionUrl}\">" . __('notifications.group_view_announcement') . "</a></p>";
 
                 try {
                     NotificationDispatcher::dispatch(
@@ -255,7 +289,9 @@ class GroupNotificationService
                         $message,
                         $link,
                         $htmlContent,
-                        true // isOrganizer: announcements are admin-only, treat as organizer priority
+                        true, // isOrganizer: announcements are admin-only, treat as organizer priority
+                        $authorId,
+                        $deliveryPolicy,
                     );
                 } catch (\Throwable $e) {
                     Log::error('GroupNotification: failed to dispatch announcement notification', [
@@ -340,5 +376,17 @@ class GroupNotificationService
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
             ->value('preferred_language');
+    }
+
+    /** @return array{relative: string, absolute: string} */
+    private function notificationLinks(string $path): array
+    {
+        $relative = '/' . ltrim($path, '/');
+        $tenantPrefix = rtrim(TenantContext::getSlugPrefix(), '/');
+
+        return [
+            'relative' => $relative,
+            'absolute' => rtrim(TenantContext::getFrontendUrl(), '/') . $tenantPrefix . $relative,
+        ];
     }
 }

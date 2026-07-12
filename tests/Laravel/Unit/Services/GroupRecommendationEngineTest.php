@@ -4,12 +4,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
 use App\Services\GroupRecommendationEngine;
+use Tests\Laravel\TestCase;
 
-class GroupRecommendationEngineTest extends TestCase
+final class GroupRecommendationEngineTest extends TestCase
 {
     private GroupRecommendationEngine $engine;
 
@@ -19,10 +21,18 @@ class GroupRecommendationEngineTest extends TestCase
         $this->engine = new GroupRecommendationEngine();
     }
 
-    // ML-based recommendation engine with 4 algorithm pipelines + fusion
-    // Requires DB state for collaborative filtering, content matching, etc.
-    public function test_getRecommendations_requires_integration_test(): void
+    public function test_unknown_tenant_user_does_not_receive_cold_start_results(): void
     {
-        $this->markTestIncomplete('GroupRecommendationEngine 4-algorithm pipeline requires integration test with DB');
+        $this->assertSame([], $this->engine->getRecommendations(PHP_INT_MAX));
+    }
+
+    public function test_invalid_interaction_is_rejected(): void
+    {
+        $this->assertFalse($this->engine->trackInteraction(PHP_INT_MAX, PHP_INT_MAX, 'invalid'));
+    }
+
+    public function test_unknown_group_reference_is_rejected(): void
+    {
+        $this->assertFalse($this->engine->canReferenceGroup(PHP_INT_MAX, PHP_INT_MAX));
     }
 }

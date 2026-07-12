@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Analityka zdarzeń",
+    "subtitle": "Wydajność operacyjna, frekwencja, komunikacja i wskaźniki konwersji zapewniające ochronę prywatności.",
+    "generated_at": "Wygenerowano {{date}}",
+    "loading": "Ładowanie analityki zdarzeń",
+    "load_error": "Nie udało się załadować analityki zdarzeń.",
+    "retry": "Spróbuj ponownie",
+    "refresh": "Odśwież",
+    "export": "Eksportuj plik CSV",
+    "exporting": "Eksportuję…",
+    "export_started": "Przygotowano eksport Analytics.",
+    "download_error": "Nie można pobrać eksportu statystyk.",
+    "privacy_title": "Raportowanie chronione prywatnością",
+    "privacy_note": "Opcjonalne dane są ukryte do czasu, aż zostanie reprezentowanych co najmniej {{count}} osób, które wyraziły zgodę.",
+    "consent_bound": "Zgoda związana",
+    "suppressed": "Stłumiony",
+    "not_limited": "Bez limitu",
+    "finance_redacted": "Ograniczone przez twoją rolę",
+    "columns": {
+      "metric": "Metryczne",
+      "value": "Wartość"
+    },
+    "sections": {
+      "registration": "Rejestracja",
+      "acquisition": "Zaproszenia i lista oczekujących",
+      "attendance": "Obecność",
+      "communications": "Komunikacja",
+      "funnel": "Lejek zapewniający prywatność",
+      "finance": "Bilety i kredyty"
+    },
+    "metrics": {
+      "confirmed": "Potwierdzone rejestracje",
+      "pending": "Oczekujące rejestracje",
+      "cancelled": "Anulowane rejestracje",
+      "capacity_remaining": "Pozostała pojemność",
+      "invitations_issued": "Zaproszenia wydane",
+      "invitations_accepted": "Zaproszenia przyjęte",
+      "invitation_conversion": "Konwersja zaproszeń",
+      "waitlist_joined": "Dołącza lista oczekujących",
+      "waitlist_accepted": "Akceptacja listy oczekujących",
+      "waitlist_conversion": "Konwersja listy oczekujących",
+      "checked_in": "Aktualnie się melduję",
+      "attended": "Uczestniczyłem",
+      "no_show": "Brak pokazów",
+      "attendance_rate": "Wskaźnik frekwencji",
+      "delivered": "Powiadomienia dostarczone",
+      "suppressed_deliveries": "Powiadomienia wyłączone",
+      "failed_deliveries": "Powiadomienia nie powiodły się",
+      "dead_lettered": "Powiadomienia wymagające interwencji",
+      "delivery_rate": "Szybkość dostawy",
+      "event_views": "Widoki wydarzeń",
+      "registration_starts": "Rozpoczyna się rejestracja",
+      "start_conversion": "Konwersja obejrzenia na rejestrację",
+      "finance": "Wskaźniki finansowe",
+      "ticket_units": "Potwierdzone jednostki biletowe",
+      "ticket_credit_value": "Potwierdzona wartość kredytu na bilet",
+      "completed_credit_claims": "Gotowe wierzytelności kredytowe",
+      "failed_credit_claims": "Nieudane roszczenia kredytowe",
+      "guardian_consents": "Opiekun wyraża zgodę"
+    }
+  }
+}

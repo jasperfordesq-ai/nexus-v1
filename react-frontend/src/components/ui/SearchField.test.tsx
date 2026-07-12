@@ -135,4 +135,17 @@ describe('SearchField', () => {
 
     expect(screen.getByRole('button', { name: 'Clear member search' })).toBeInTheDocument();
   });
+
+  it('omits the optional clear action when isClearable is false', () => {
+    render(
+      <SearchField
+        value=""
+        aria-label="Search groups"
+        clearButtonLabel="Clear group search"
+        isClearable={false}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Clear group search' })).not.toBeInTheDocument();
+  });
 });

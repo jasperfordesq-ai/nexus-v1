@@ -58,8 +58,12 @@ class NotificationsController extends BaseApiController
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
-        if ($this->query('type')) {
-            $filters['type'] = $this->query('type');
+        $type = $this->query('type');
+        if (is_string($type) && $type !== '') {
+            if (! $this->notificationService->supportsCategory($type)) {
+                return $this->invalidCategoryResponse('type');
+            }
+            $filters['type'] = $type;
         }
         if ($this->queryBool('unread_only')) {
             $filters['unread_only'] = true;
@@ -128,118 +132,16 @@ class NotificationsController extends BaseApiController
         $limit = $this->queryInt('per_page', 20, 1, 100);
         $cursor = $this->query('cursor');
 
-        $query = \App\Models\Notification::query()
-            ->where('user_id', $userId);
-
-        if ($cursor !== null) {
-            $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
-                $query->where('id', '<', (int) $cursorId);
-            }
-        }
-
-        // Fetch more than needed to allow grouping
-        $rawNotifications = $query->orderByDesc('id')
-            ->limit(200)
-            ->get();
-
-        // Group by type + link (link represents the target, e.g. "/posts/123")
-        $groups = [];
-        foreach ($rawNotifications as $notification) {
-            $groupKey = $notification->type . ':' . ($notification->link ?? 'none');
-            if (!isset($groups[$groupKey])) {
-                $groups[$groupKey] = [];
-            }
-            $groups[$groupKey][] = $notification;
-        }
-
-        // Build grouped response
-        $result = [];
-        foreach ($groups as $groupKey => $notifications) {
-            $latest = $notifications[0]; // Already ordered by id DESC
-
-            if (count($notifications) === 1) {
-                // Single notification, no grouping
-                $item = $latest->toArray();
-                $item['is_grouped'] = false;
-                $result[] = $item;
-            } else {
-                // Grouped notification
-                $actorIds = [];
-                $actors = [];
-                $allRead = true;
-
-                foreach ($notifications as $n) {
-                    if (!$n->is_read) {
-                        $allRead = false;
-                    }
-                    // Extract actor info if actor_id exists
-                    if ($n->actor_id && !in_array($n->actor_id, $actorIds, true)) {
-                        $actorIds[] = $n->actor_id;
-                    }
-                }
-
-                // Fetch actor details (first 3)
-                if (!empty($actorIds)) {
-                    $actorUsers = DB::table('users')
-                        ->whereIn('id', array_slice($actorIds, 0, 3))
-                        ->get(['id', 'name', 'first_name', 'last_name', 'avatar_url']);
-
-                    foreach ($actorUsers as $actorUser) {
-                        $actors[] = [
-                            'id' => $actorUser->id,
-                            'name' => $actorUser->name ?: trim(($actorUser->first_name ?? '') . ' ' . ($actorUser->last_name ?? '')),
-                            'avatar_url' => $actorUser->avatar_url,
-                        ];
-                    }
-                }
-
-                $count = count($notifications);
-                $remainingCount = max(0, $count - 3);
-
-                // Build grouped message
-                $actorNames = array_map(fn ($a) => $a['name'], $actors);
-                $action = $this->getActionVerb($latest->type);
-                $target = $this->getTargetLabel($latest->type);
-
-                if (count($actorNames) >= 2 && $remainingCount > 0) {
-                    $message = "{$actorNames[0]}, {$actorNames[1]}, and {$remainingCount} others {$action} your {$target}";
-                } elseif (count($actorNames) >= 2) {
-                    $message = implode(' and ', $actorNames) . " {$action} your {$target}";
-                } elseif (count($actorNames) === 1 && $count > 1) {
-                    $message = "{$actorNames[0]} and " . ($count - 1) . " others {$action} your {$target}";
-                } else {
-                    $message = $latest->message ?? "{$count} notifications";
-                }
-
-                $item = $latest->toArray();
-                $item['is_grouped'] = true;
-                $item['group_key'] = $groupKey;
-                $item['group_count'] = $count;
-                $item['actors'] = $actors;
-                $item['remaining_count'] = $remainingCount;
-                $item['message'] = $message;
-                $item['body'] = $message;
-                $item['latest_at'] = $latest->created_at?->toIso8601String();
-                $item['read_at'] = $allRead ? ($latest->created_at?->toIso8601String() ?? now()->toIso8601String()) : null;
-                $item['notification_ids'] = array_map(fn ($n) => $n->id, $notifications);
-                $result[] = $item;
-            }
-        }
-
-        // Sort by latest_at (most recent first) and paginate
-        usort($result, function ($a, $b) {
-            return ($b['id'] ?? 0) <=> ($a['id'] ?? 0);
-        });
-
-        $paginated = array_slice($result, 0, $limit);
-        $hasMore = count($result) > $limit;
+        $result = $this->notificationService->getGroupedNotifications($userId, [
+            'limit' => $limit,
+            'cursor' => is_string($cursor) ? $cursor : null,
+        ]);
 
         return $this->respondWithCollection(
-            $paginated,
-            $hasMore && !empty($paginated) ? base64_encode((string) end($paginated)['id']) : null,
+            $result['items'],
+            $result['cursor'],
             $limit,
-            $hasMore
+            $result['has_more']
         );
     }
 
@@ -259,65 +161,14 @@ class NotificationsController extends BaseApiController
         $groupKey = $groupKey ?? $request->input('group_key');
 
         if (!is_string($groupKey) || trim($groupKey) === '') {
-            return $this->respondWithError('INVALID_GROUP_KEY', 'Notification group key is required.', 'group_key', 422);
+            return $this->respondWithError('INVALID_GROUP_KEY', __('api.field_required'), 'group_key', 422);
         }
 
-        $groupKey = urldecode(trim($groupKey));
-
-        // Parse group key: "type:link"
-        $parts = explode(':', $groupKey, 2);
-        $type = $parts[0] ?? '';
-        $link = ($parts[1] ?? '') === 'none' ? null : ($parts[1] ?? null);
-
-        $query = \App\Models\Notification::query()
-            ->where('user_id', $userId)
-            ->where('type', $type)
-            ->where('is_read', false);
-
-        if ($link !== null) {
-            $query->where('link', $link);
-        } else {
-            $query->whereNull('link');
-        }
-
-        $count = $query->update(['is_read' => true]);
+        $count = $this->notificationService->markGroupRead($userId, $groupKey);
 
         return $this->respondWithData([
             'marked_read' => $count,
         ]);
-    }
-
-    /**
-     * Get a human-readable action verb for a notification type.
-     */
-    private function getActionVerb(string $type): string
-    {
-        return match ($type) {
-            'like', 'post_like' => 'liked',
-            'comment', 'post_comment' => 'commented on',
-            'mention' => 'mentioned you in',
-            'connection_request', 'friend_request' => 'sent you a connection request',
-            'connection_accepted', 'friend_accepted' => 'accepted your connection',
-            'review', 'new_review', 'review_received' => 'reviewed',
-            'event_rsvp' => 'RSVP\'d to',
-            'group_join' => 'joined',
-            default => 'interacted with',
-        };
-    }
-
-    /**
-     * Get a human-readable target label for a notification type.
-     */
-    private function getTargetLabel(string $type): string
-    {
-        return match ($type) {
-            'like', 'post_like', 'comment', 'post_comment', 'mention' => 'post',
-            'review', 'new_review', 'review_received' => 'listing',
-            'event_rsvp', 'event_reminder', 'event_update' => 'event',
-            'group_join', 'group_invite', 'group_post' => 'group',
-            'listing_interest', 'listing_match' => 'listing',
-            default => 'content',
-        };
     }
 
     /**
@@ -398,29 +249,29 @@ class NotificationsController extends BaseApiController
         $userId = $this->requireAuth();
 
         $category = $this->query('category');
-        $query = \App\Models\Notification::where('user_id', $userId);
 
-        if ($category) {
-            // Use the same type categories as the service
-            $typeCategories = [
-                'messages'     => ['message', 'new_message', 'message_received', 'federation_message'],
-                'connections'  => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted'],
-                'reviews'      => ['review', 'new_review', 'review_received'],
-                'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received'],
-                'social'       => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
-                'events'       => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
-                'groups'       => ['group_invite', 'group_join', 'group_post'],
-                'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
-            ];
-            if (isset($typeCategories[$category])) {
-                $query->whereIn('type', $typeCategories[$category]);
-            }
+        if (is_string($category) && $category !== '' && ! $this->notificationService->supportsCategory($category)) {
+            return $this->invalidCategoryResponse();
         }
 
-        $count = $query->count();
-        $query->delete(); // soft-delete via SoftDeletes trait
+        $count = $this->notificationService->deleteAll(
+            $userId,
+            is_string($category) && $category !== '' ? $category : null
+        );
 
         return $this->respondWithData(['deleted' => $count]);
+    }
+
+    private function invalidCategoryResponse(string $field = 'category'): JsonResponse
+    {
+        return $this->respondWithError(
+            'INVALID_CATEGORY',
+            __('api.invalid_category_type', [
+                'types' => implode(', ', $this->notificationService->categoryNames()),
+            ]),
+            $field,
+            422
+        );
     }
 
     // ========================================================================

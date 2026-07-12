@@ -18,13 +18,8 @@ use Tests\Laravel\TestCase;
  * Tests attach/detach idempotency, error guarding (non-existent group),
  * groupIdsForCourse, and the coursesForGroup query.
  *
- * coursesForGroup calls GroupService::isActiveMember / canModify internally
- * to decide whether to expose 'group'-visibility courses; we test the
- * simpler public/members visibility cases that don't require those side-effects.
- *
- * Skipped: GroupService member/moderator checks (require group_members rows
- * and a live GroupService — the business path is exercised indirectly by
- * testing public-visibility courses).
+ * coursesForGroup inherits the parent Group's member-content boundary before
+ * applying course visibility, publication, and role rules.
  */
 class CourseGroupServiceTest extends TestCase
 {
@@ -91,6 +86,20 @@ class CourseGroupServiceTest extends TestCase
             'published_at'      => now(),
             'created_at'        => now(),
             'updated_at'        => now(),
+        ]);
+    }
+
+    private function insertGroupMember(int $groupId, int $userId): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id' => self::TENANT_ID,
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'status' => 'active',
+            'role' => 'member',
+            'joined_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 
@@ -240,7 +249,7 @@ class CourseGroupServiceTest extends TestCase
 
         CourseGroupService::attach($courseId, $groupId);
 
-        $result = CourseGroupService::coursesForGroup($groupId, null);
+        $result = CourseGroupService::coursesForGroup($groupId, $ownerId);
 
         $this->assertCount(1, $result);
         $this->assertSame($courseId, (int) $result[0]['id']);
@@ -255,7 +264,7 @@ class CourseGroupServiceTest extends TestCase
 
         CourseGroupService::attach($courseId, $groupId);
 
-        $result = CourseGroupService::coursesForGroup($groupId, null);
+        $result = CourseGroupService::coursesForGroup($groupId, $ownerId);
 
         $this->assertEmpty($result);
     }
@@ -269,7 +278,7 @@ class CourseGroupServiceTest extends TestCase
 
         CourseGroupService::attach($courseId, $groupId);
 
-        $result = CourseGroupService::coursesForGroup($groupId, null);
+        $result = CourseGroupService::coursesForGroup($groupId, $ownerId);
 
         $this->assertEmpty($result);
     }
@@ -283,7 +292,7 @@ class CourseGroupServiceTest extends TestCase
 
         CourseGroupService::attach($courseId, $groupId);
 
-        // viewerUserId = null → anonymous → can only see 'public'
+        // Anonymous viewers cannot cross the parent Group member-content boundary.
         $result = CourseGroupService::coursesForGroup($groupId, null);
 
         $this->assertEmpty($result);
@@ -298,11 +307,24 @@ class CourseGroupServiceTest extends TestCase
         $courseId = $this->insertCourse($authorId, 'published', 'members');
 
         CourseGroupService::attach($courseId, $groupId);
+        $this->insertGroupMember($groupId, $viewerId);
 
-        // Any non-null userId triggers the orWhere('visibility','members') branch
         $result = CourseGroupService::coursesForGroup($groupId, $viewerId);
 
         $this->assertCount(1, $result);
         $this->assertSame($courseId, (int) $result[0]['id']);
+    }
+
+    public function test_coursesForGroup_conceals_courses_from_authenticated_non_member(): void
+    {
+        $ownerId = $this->insertUser();
+        $authorId = $this->insertUser();
+        $viewerId = $this->insertUser();
+        $groupId = $this->insertGroup($ownerId);
+        $courseId = $this->insertCourse($authorId, 'published', 'public');
+
+        CourseGroupService::attach($courseId, $groupId);
+
+        $this->assertSame([], CourseGroupService::coursesForGroup($groupId, $viewerId));
     }
 }

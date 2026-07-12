@@ -80,7 +80,7 @@ class ShiftGroupReservationService
             return null;
         }
 
-        if (! self::canManageGroup($groupId, $reservedBy, $tenantId)) {
+        if (! GroupAccessService::canIntegrate($groupId, $reservedBy)) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_reservation_leader_only_reserve')];
             return null;
         }
@@ -532,28 +532,8 @@ class ShiftGroupReservationService
 
     private static function canManageGroup(int $groupId, int $userId, int $tenantId): bool
     {
-        if (self::isTenantAdmin($userId, $tenantId)) {
-            return true;
-        }
-
-        // Check if group owner
-        $isOwner = DB::table('groups')
-            ->where('id', $groupId)
-            ->where('tenant_id', $tenantId)
-            ->where('owner_id', $userId)
-            ->exists();
-
-        if ($isOwner) {
-            return true;
-        }
-
-        // Check if group admin/owner role
-        return DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->whereIn('role', ['owner', 'admin'])
-            ->exists();
+        return (int) TenantContext::getId() === $tenantId
+            && GroupAccessService::canManage($groupId, $userId);
     }
 
     private static function isTenantAdmin(int $userId, int $tenantId): bool

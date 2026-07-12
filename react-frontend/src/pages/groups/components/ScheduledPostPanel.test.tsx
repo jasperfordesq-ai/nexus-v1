@@ -76,6 +76,7 @@ describe('ScheduledPostPanel', () => {
     // The component returns null when not admin — the panel heading and Add button are absent
     expect(screen.queryByText(TITLE_TEXT)).toBeNull();
     expect(screen.queryByText(ADD_TEXT)).toBeNull();
+    expect(mockApi.get).not.toHaveBeenCalled();
   });
 
   it('shows loading state initially when isAdmin is true', () => {
@@ -111,8 +112,19 @@ describe('ScheduledPostPanel', () => {
     render(<ScheduledPostPanel groupId={5} isAdmin={true} />);
 
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/5/scheduled-posts');
+      expect(mockApi.get).toHaveBeenCalledWith(
+        '/v2/groups/5/scheduled-posts',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
     });
+  });
+
+  it('shows an error instead of an empty success state when load resolves success=false', async () => {
+    mockApi.get.mockResolvedValue({ success: false, code: 'HTTP_500' });
+    render(<ScheduledPostPanel groupId={1} isAdmin={true} />);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    expect(screen.queryByText(EMPTY_TEXT)).not.toBeInTheDocument();
   });
 
   it('shows error toast when load fails', async () => {

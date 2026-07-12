@@ -7,10 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use App\Core\TenantContext;
+use App\Services\GroupAccessService;
 use App\Services\GroupAnalyticsService;
-use App\Services\GroupService;
 use App\Support\CsvExportSanitizer;
 
 /**
@@ -27,7 +25,7 @@ class GroupAnalyticsController extends BaseApiController
      */
     private function requireGroupAdmin(int $groupId, int $userId): ?JsonResponse
     {
-        if (!GroupService::canModify($groupId, $userId)) {
+        if (!GroupAccessService::canManage($groupId, $userId)) {
             return $this->errorResponse(__('api.group_analytics_admin_required'), 403);
         }
         return null;
@@ -43,7 +41,7 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        $days = $this->queryInt('days', 30);
+        $days = (int) $this->queryInt('days', 30, GroupAnalyticsService::MIN_DAYS, GroupAnalyticsService::MAX_DAYS);
         $result = GroupAnalyticsService::getDashboard($id, $days);
 
         return $this->successResponse($result);
@@ -59,7 +57,7 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        return $this->successResponse(GroupAnalyticsService::getMemberGrowth($id, $this->queryInt('days', 30)));
+        return $this->successResponse(GroupAnalyticsService::getMemberGrowth($id, (int) $this->queryInt('days', 30, GroupAnalyticsService::MIN_DAYS, GroupAnalyticsService::MAX_DAYS)));
     }
 
     public function engagement(int $id): JsonResponse
@@ -69,7 +67,7 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        return $this->successResponse(GroupAnalyticsService::getEngagementMetrics($id, $this->queryInt('days', 30)));
+        return $this->successResponse(GroupAnalyticsService::getEngagementMetrics($id, (int) $this->queryInt('days', 30, GroupAnalyticsService::MIN_DAYS, GroupAnalyticsService::MAX_DAYS)));
     }
 
     public function contributors(int $id): JsonResponse
@@ -79,7 +77,11 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        return $this->successResponse(GroupAnalyticsService::getTopContributors($id, $this->queryInt('days', 30), $this->queryInt('limit', 10)));
+        return $this->successResponse(GroupAnalyticsService::getTopContributors(
+            $id,
+            (int) $this->queryInt('days', 30, GroupAnalyticsService::MIN_DAYS, GroupAnalyticsService::MAX_DAYS),
+            (int) $this->queryInt('limit', 10, GroupAnalyticsService::MIN_LIMIT, GroupAnalyticsService::MAX_LIMIT),
+        ));
     }
 
     public function retention(int $id): JsonResponse
@@ -89,7 +91,10 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        return $this->successResponse(GroupAnalyticsService::getRetentionMetrics($id, $this->queryInt('months', 6)));
+        return $this->successResponse(GroupAnalyticsService::getRetentionMetrics(
+            $id,
+            (int) $this->queryInt('months', 6, GroupAnalyticsService::MIN_MONTHS, GroupAnalyticsService::MAX_MONTHS),
+        ));
     }
 
     public function comparative(int $id): JsonResponse
@@ -143,7 +148,7 @@ class GroupAnalyticsController extends BaseApiController
         $authCheck = $this->requireGroupAdmin($id, $userId);
         if ($authCheck) return $authCheck;
 
-        $days = $this->queryInt('days', 30);
+        $days = (int) $this->queryInt('days', 30, GroupAnalyticsService::MIN_DAYS, GroupAnalyticsService::MAX_DAYS);
         $activity = GroupAnalyticsService::exportActivity($id, $days);
 
         return response()->streamDownload(function () use ($activity) {

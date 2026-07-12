@@ -1,0 +1,71 @@
+{
+  "contract_version": 1,
+  "event_id": 101,
+  "rollout": {
+    "mode": "shadow",
+    "source": "tenant_override",
+    "configuration_valid": true,
+    "enforcement_active": false
+  },
+  "requirements": {
+    "status": "published",
+    "revision": 3,
+    "current_version": 2,
+    "published_version": 2,
+    "version": {
+      "number": 2,
+      "minimum_age": 14,
+      "guardian_consent_required": true,
+      "minor_age_threshold": 18,
+      "code_of_conduct": {
+        "required": true,
+        "text": "Treat everyone with respect and follow the event safety guidance.",
+        "text_version": "conduct-2026-07",
+        "text_hash": "426bb49f31b7c15dfd91b62db039e1247633019cc53a970926f4bff91f549296"
+      },
+      "published_at": "2030-04-01T09:00:00+00:00"
+    }
+  },
+  "eligibility": {
+    "status": "deny",
+    "reason_codes": [
+      "event_safety_code_of_conduct_acknowledgement_required"
+    ],
+    "required_actions": [
+      "event_safety_acknowledge_code_of_conduct"
+    ],
+    "requirements_version": 2,
+    "age_at_event": 20,
+    "minor_at_event": false
+  },
+  "evidence": {
+    "code_of_conduct": {
+      "status": "required",
+      "acknowledgement_id": null,
+      "text_version": "conduct-2026-07",
+      "acknowledged_at": null
+    },
+    "guardian_consent": {
+      "status": "not_required",
+      "consent_id": null,
+      "consent_version": null,
+      "expires_at": null,
+      "granted_at": null
+    },
+    "active_denial": null
+  },
+  "permissions": {
+    "manage_requirements": false,
+    "review_participation": false,
+    "acknowledge_code_of_conduct": true,
+    "withdraw_code_of_conduct": false,
+    "request_guardian_consent": false,
+    "withdraw_guardian_consent": false
+  },
+  "privacy": {
+    "guardian_identity_redacted": true,
+    "guardian_token_redacted": true,
+    "safeguarding_policy_evidence_redacted": true,
+    "free_text_review_notes_supported": false
+  }
+}

@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,18 +29,24 @@ class GroupRecommendationEngine
     private const WEIGHT_LOCATION = 0.20;
     private const WEIGHT_ACTIVITY = 0.15;
 
+    /** @var list<string> */
+    private const TRACKABLE_ACTIONS = ['viewed', 'clicked', 'joined', 'dismissed'];
+
     /**
      * Get personalized group recommendations for a user.
      */
     public function getRecommendations($userId, $limit = 10, $options = []): array
     {
         $tenantId = TenantContext::getId();
+        if (!$this->tenantUserExists((int) $userId, (int) $tenantId)) {
+            return [];
+        }
 
         $userGroups = $this->getUserGroups($userId);
 
         // Cold-start
         if (empty($userGroups)) {
-            $connectionGroups = $this->getConnectionGroups($userId, $tenantId);
+            $connectionGroups = $this->getConnectionGroups($userId, $tenantId, $limit);
             if (!empty($connectionGroups)) {
                 return $connectionGroups;
             }
@@ -86,11 +93,19 @@ class GroupRecommendationEngine
     /**
      * Track user interaction with recommendations.
      */
-    public function trackInteraction($userId, $groupId, $action): void
+    public function trackInteraction($userId, $groupId, $action): bool
     {
+        $tenantId = (int) TenantContext::getId();
+        if (
+            !in_array($action, self::TRACKABLE_ACTIONS, true)
+            || !$this->canReferenceGroup((int) $userId, (int) $groupId)
+        ) {
+            return false;
+        }
+
         try {
-            DB::table('group_recommendation_interactions')->insert([
-                'tenant_id' => TenantContext::getId(),
+            return DB::table('group_recommendation_interactions')->insert([
+                'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'group_id' => $groupId,
                 'action' => $action,
@@ -98,7 +113,24 @@ class GroupRecommendationEngine
             ]);
         } catch (\Exception $e) {
             Log::warning('[GroupRecommendationEngine] trackInteraction failed', ['error' => $e->getMessage()]);
+            return false;
         }
+    }
+
+    /** Confirm both sides of a recommendation reference belong to this tenant. */
+    public function canReferenceGroup(int $userId, int $groupId): bool
+    {
+        $tenantId = (int) TenantContext::getId();
+
+        return $this->tenantUserExists($userId, $tenantId)
+            && DB::table('groups')
+                ->where('id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', GroupStatus::Active->value)
+                ->where(function ($query) {
+                    $query->whereNull('visibility')->orWhere('visibility', 'public');
+                })
+                ->exists();
     }
 
     /**
@@ -106,15 +138,19 @@ class GroupRecommendationEngine
      */
     public function getPerformanceMetrics($days = 30): array
     {
+        $tenantId = (int) TenantContext::getId();
+        $days = min(max((int) $days, 1), 365);
+
         try {
             return array_map(
                 fn ($row) => (array) $row,
                 DB::select(
                     "SELECT action, COUNT(*) as count, COUNT(DISTINCT user_id) as unique_users
                      FROM group_recommendation_interactions
-                     WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                     WHERE tenant_id = ?
+                       AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
                      GROUP BY action",
-                    [$days]
+                    [$tenantId, $days]
                 )
             );
         } catch (\Exception $e) {
@@ -158,18 +194,26 @@ class GroupRecommendationEngine
             JOIN (
                 SELECT user_id, COUNT(DISTINCT group_id) as total_groups
                 FROM group_members
-                WHERE status = 'active'
+                WHERE tenant_id = ?
+                  AND status = 'active'
+                  AND group_id IN (
+                      SELECT id FROM `groups` WHERE tenant_id = ? AND status = ?
+                  )
                 GROUP BY user_id
             ) user_totals ON user_totals.user_id = gm.user_id
             WHERE gm.group_id IN ($placeholders)
             AND gm.user_id != ?
             AND gm.status = 'active'
-            AND gm.group_id IN (SELECT g.id FROM `groups` g WHERE g.tenant_id = ?)
+            AND gm.tenant_id = ?
             GROUP BY gm.user_id, user_totals.total_groups
             HAVING overlap_count >= 2
             ORDER BY jaccard_similarity DESC, overlap_count DESC
             LIMIT 100
-        ", array_merge([$userGroupCount], $userGroupIds, [$userId, $tenantId]));
+        ", array_merge(
+            [$userGroupCount, $tenantId, $tenantId, GroupStatus::Active->value],
+            $userGroupIds,
+            [$userId, $tenantId]
+        ));
 
         if (empty($similarUsers)) {
             return [];
@@ -277,11 +321,12 @@ class GroupRecommendationEngine
                 )) AS distance_km
             FROM `groups`
             WHERE tenant_id = ?
+            AND status = ?
             AND latitude IS NOT NULL AND longitude IS NOT NULL
             AND (visibility IS NULL OR visibility = 'public')
             HAVING distance_km <= 50
             ORDER BY distance_km ASC LIMIT 50
-        ", [$user->latitude, $user->longitude, $user->latitude, $tenantId]);
+        ", [$user->latitude, $user->longitude, $user->latitude, $tenantId, GroupStatus::Active->value]);
 
         $scores = [];
         foreach ($groups as $group) {
@@ -368,6 +413,7 @@ class GroupRecommendationEngine
         if (!empty($options['type_id'])) {
             $validGroupIds = DB::table('groups')
                 ->where('tenant_id', $tenantId)
+                ->where('status', GroupStatus::Active->value)
                 ->where('type_id', $options['type_id'])
                 ->pluck('id')
                 ->all();
@@ -376,6 +422,7 @@ class GroupRecommendationEngine
 
         $visibleGroupIds = DB::table('groups')
             ->where('tenant_id', $tenantId)
+            ->where('status', GroupStatus::Active->value)
             ->where(function ($q) {
                 $q->whereNull('visibility')->orWhere('visibility', 'public');
             })
@@ -455,11 +502,12 @@ class GroupRecommendationEngine
                    COUNT(DISTINCT gm.id) as member_count
             FROM `groups` g
             LEFT JOIN group_types gt ON g.type_id = gt.id
-            LEFT JOIN group_members gm ON g.id = gm.group_id AND gm.status = 'active'
+            LEFT JOIN group_members gm
+              ON g.id = gm.group_id AND gm.status = 'active' AND gm.tenant_id = ?
             WHERE g.tenant_id = ? AND g.status = 'active' AND g.id IN ($placeholders)
             AND (g.visibility IS NULL OR g.visibility = 'public')
             GROUP BY g.id
-        ", array_merge([$tenantId], $groupIds));
+        ", array_merge([$tenantId, $tenantId], $groupIds));
 
         $result = [];
         foreach ($groups as $group) {
@@ -486,8 +534,9 @@ class GroupRecommendationEngine
             DB::select(
                 "SELECT gm.group_id FROM group_members gm
                  JOIN `groups` g ON gm.group_id = g.id
-                 WHERE gm.user_id = ? AND gm.status = 'active' AND g.tenant_id = ?",
-                [$userId, $tenantId]
+                 WHERE gm.user_id = ? AND gm.tenant_id = ? AND gm.status = 'active'
+                   AND g.tenant_id = ? AND g.status = ?",
+                [$userId, $tenantId, $tenantId, GroupStatus::Active->value]
             )
         );
     }
@@ -502,20 +551,32 @@ class GroupRecommendationEngine
                  FROM connections c
                  JOIN group_members gm ON gm.user_id = CASE
                      WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END
+                    AND gm.tenant_id = ? AND gm.status = 'active'
                  JOIN `groups` g ON g.id = gm.group_id
                  LEFT JOIN group_types gt ON g.type_id = gt.id
-                 LEFT JOIN group_members gm2 ON gm2.group_id = g.id AND gm2.status = 'active'
+                 LEFT JOIN group_members gm2
+                   ON gm2.group_id = g.id AND gm2.status = 'active' AND gm2.tenant_id = ?
                  WHERE (c.requester_id = ? OR c.receiver_id = ?)
                    AND c.status = 'accepted' AND c.tenant_id = ?
                    AND g.tenant_id = ? AND g.status = 'active'
                    AND (g.visibility IS NULL OR g.visibility = 'public')
-                   AND gm.status = 'active'
                    AND g.id NOT IN (
                        SELECT group_id FROM group_members WHERE user_id = ? AND tenant_id = ?
                    )
                  GROUP BY g.id
                  ORDER BY connection_count DESC, member_count DESC LIMIT ?",
-                [$userId, $userId, $userId, $tenantId, $tenantId, $userId, $tenantId, $limit]
+                [
+                    $userId,
+                    $tenantId,
+                    $tenantId,
+                    $userId,
+                    $userId,
+                    $tenantId,
+                    $tenantId,
+                    $userId,
+                    $tenantId,
+                    $limit,
+                ]
             );
 
             $result = [];
@@ -538,13 +599,14 @@ class GroupRecommendationEngine
 
     private function getPopularGroups($tenantId, $limit, $options): array
     {
-        $params = [$tenantId];
+        $params = [$tenantId, $tenantId, GroupStatus::Active->value];
         $sql = "SELECT g.*, gt.name as type_name,
                        COUNT(DISTINCT gm.id) as member_count
                 FROM `groups` g
                 LEFT JOIN group_types gt ON g.type_id = gt.id
-                LEFT JOIN group_members gm ON g.id = gm.group_id AND gm.status = 'active'
-                WHERE g.tenant_id = ?
+                LEFT JOIN group_members gm
+                  ON g.id = gm.group_id AND gm.status = 'active' AND gm.tenant_id = ?
+                WHERE g.tenant_id = ? AND g.status = ?
                 AND (g.visibility IS NULL OR g.visibility = 'public')";
 
         if (!empty($options['type_id'])) {
@@ -574,11 +636,12 @@ class GroupRecommendationEngine
                 JOIN `groups` g ON gm.group_id = g.id
                 WHERE g.tenant_id = ? AND g.status = 'active'
                 AND (g.visibility IS NULL OR g.visibility = 'public')
+                AND gm.tenant_id = ?
                 AND gm.status = 'active'
                 AND gm.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
                 GROUP BY gm.group_id HAVING recent_joins >= 2
                 ORDER BY recent_joins DESC LIMIT 50
-            ", [$tenantId]);
+            ", [$tenantId, $tenantId]);
         } catch (\Exception $e) {
             Log::debug('[GroupRecommendation] getTrendingBoosts failed: ' . $e->getMessage());
             return [];
@@ -614,5 +677,13 @@ class GroupRecommendationEngine
         if ($score >= 0.6) return __('api.group_recommendation_similar_members');
         if ($score >= 0.4) return __('api.group_recommendation_area');
         return __('api.group_recommendation_interest');
+    }
+
+    private function tenantUserExists(int $userId, int $tenantId): bool
+    {
+        return $userId > 0 && DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
     }
 }

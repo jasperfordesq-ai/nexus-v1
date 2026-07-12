@@ -41,6 +41,7 @@ class EventNotificationStateTest extends TestCase
             'title' => 'Original title',
             'location' => 'Community hall',
             'start_time' => now()->addDays(5)->setSecond(0)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(5)->addHour()->setSecond(0)->format('Y-m-d H:i:s'),
         ]);
 
         $this->assertTrue(EventService::update($eventId, (int) $organizer->id, [

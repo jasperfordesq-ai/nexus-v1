@@ -33,10 +33,10 @@ class FederationApiMiddleware
      *
      * @return bool|JsonResponse Returns true on success, or a JsonResponse on auth failure.
      */
-    public static function authenticate(): bool|JsonResponse
+    public static function authenticate(?string $rawBody = null): bool|JsonResponse
     {
         if (self::hasHmacSignature()) {
-            return self::authenticateWithHmac();
+            return self::authenticateWithHmac($rawBody);
         }
 
         if (self::hasJwtToken()) {
@@ -135,7 +135,7 @@ class FederationApiMiddleware
      *
      * @return bool|JsonResponse
      */
-    private static function authenticateWithHmac(): bool|JsonResponse
+    private static function authenticateWithHmac(?string $rawBody = null): bool|JsonResponse
     {
         $platformId = $_SERVER['HTTP_X_FEDERATION_PLATFORM_ID'] ?? '';
         $timestamp = $_SERVER['HTTP_X_FEDERATION_TIMESTAMP'] ?? '';
@@ -159,7 +159,13 @@ class FederationApiMiddleware
             return self::sendError(401, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
         }
 
-        if (!self::verifyHmacSignature((int) $partner['id'], $signature, $partner['signing_secret'], $timestamp)) {
+        if (!self::verifyHmacSignature(
+            (int) $partner['id'],
+            $signature,
+            $partner['signing_secret'],
+            $timestamp,
+            $rawBody,
+        )) {
             return self::sendError(401, 'Invalid request signature', 'SIGNATURE_INVALID');
         }
 
@@ -238,11 +244,17 @@ class FederationApiMiddleware
     /**
      * Verify HMAC-SHA256 signature.
      */
-    private static function verifyHmacSignature(int $partnerId, string $signature, string $secret, string $timestamp): bool
+    private static function verifyHmacSignature(
+        int $partnerId,
+        string $signature,
+        string $secret,
+        string $timestamp,
+        ?string $rawBody = null,
+    ): bool
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD']);
         $path = $_SERVER['REQUEST_URI'];
-        $body = file_get_contents('php://input') ?: '';
+        $body = $rawBody ?? (file_get_contents('php://input') ?: '');
 
         // Replay attack prevention via nonce header.
         // Nonce is REQUIRED for HMAC-signed requests — without it, the only

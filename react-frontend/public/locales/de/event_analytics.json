@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Ereignisanalyse",
+    "subtitle": "Betriebsleistung, Anwesenheit, Kommunikation und datenschutzsichere Konvertierungsmetriken.",
+    "generated_at": "Generiert {{date}}",
+    "loading": "Ereignisanalyse wird geladen",
+    "load_error": "Die Ereignisanalyse konnte nicht geladen werden.",
+    "retry": "Versuchen Sie es erneut",
+    "refresh": "Aktualisieren",
+    "export": "CSV exportieren",
+    "exporting": "Exportieren…",
+    "export_started": "Analytics-Export vorbereitet.",
+    "download_error": "Der Analyseexport konnte nicht heruntergeladen werden.",
+    "privacy_title": "Datenschutzgeschützte Berichterstattung",
+    "privacy_note": "Optionale Metriken werden ausgeblendet, bis mindestens {{count}} eingewilligte Personen vertreten sind.",
+    "consent_bound": "Einwilligungspflichtig",
+    "suppressed": "Unterdrückt",
+    "not_limited": "Keine Begrenzung",
+    "finance_redacted": "Eingeschränkt durch Ihre Rolle",
+    "columns": {
+      "metric": "Metrisch",
+      "value": "Wert"
+    },
+    "sections": {
+      "registration": "Registrierung",
+      "acquisition": "Einladungen und Warteliste",
+      "attendance": "Anwesenheit",
+      "communications": "Kommunikation",
+      "funnel": "Datenschutzsicherer Trichter",
+      "finance": "Tickets und Guthaben"
+    },
+    "metrics": {
+      "confirmed": "Bestätigte Anmeldungen",
+      "pending": "Ausstehende Anmeldungen",
+      "cancelled": "Abgesagte Anmeldungen",
+      "capacity_remaining": "Verbleibende Kapazität",
+      "invitations_issued": "Einladungen herausgegeben",
+      "invitations_accepted": "Einladungen angenommen",
+      "invitation_conversion": "Einladungsumwandlung",
+      "waitlist_joined": "Warteliste wird hinzugefügt",
+      "waitlist_accepted": "Annahmen auf der Warteliste",
+      "waitlist_conversion": "Konvertierung der Warteliste",
+      "checked_in": "Derzeit eingecheckt",
+      "attended": "Besucht",
+      "no_show": "Nichterscheinen",
+      "attendance_rate": "Anwesenheitsquote",
+      "delivered": "Benachrichtigungen zugestellt",
+      "suppressed_deliveries": "Benachrichtigungen unterdrückt",
+      "failed_deliveries": "Benachrichtigungen sind fehlgeschlagen",
+      "dead_lettered": "Benachrichtigungen, die ein Eingreifen erfordern",
+      "delivery_rate": "Lieferrate",
+      "event_views": "Ereignisansichten",
+      "registration_starts": "Die Registrierung beginnt",
+      "start_conversion": "Konvertierung von Ansichten in Registrierung",
+      "finance": "Finanzkennzahlen",
+      "ticket_units": "Bestätigte Ticketeinheiten",
+      "ticket_credit_value": "Bestätigter Ticket-Guthabenwert",
+      "completed_credit_claims": "Abgeschlossene Kreditforderungen",
+      "failed_credit_claims": "Fehlgeschlagene Kreditforderungen",
+      "guardian_consents": "Der Erziehungsberechtigte stimmt zu"
+    }
+  }
+}

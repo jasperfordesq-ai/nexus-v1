@@ -1,0 +1,66 @@
+{
+  "manage": {
+    "federation": {
+      "title": "Gefedereerd delen van evenement",
+      "tab": "Federatie",
+      "overview": "Federatiebezorging bekijken",
+      "description": "Controleer hoe dit evenement met partnergemeenschappen wordt gedeeld zonder privégegevens van deelnemers te tonen.",
+      "refresh": "Vernieuwen",
+      "loading": "Federatiestatus laden...",
+      "load_error_title": "Federatiestatus kan niet worden geladen",
+      "load_error_description": "De bezorgdiagnose kon niet worden geladen. Probeer het opnieuw.",
+      "try_again": "Opnieuw proberen",
+      "not_configured_title": "Geen partnergemeenschappen geconfigureerd",
+      "not_configured_description": "Dit evenement wordt momenteel niet bij een federatiepartner bezorgd.",
+      "degraded_title": "Sommige bezorgingen vereisen aandacht",
+      "degraded_description": "Een of meer bezorgingen hebben de limiet voor nieuwe pogingen bereikt. Gebruik de diagnosecode wanneer u contact opneemt met een beheerder.",
+      "metrics": {
+        "configured_partners": "Geconfigureerde partners",
+        "recipient_partners": "Bezorggeschiedenis",
+        "federation_version": "Federatieversie",
+        "visibility": "Gedeelde zichtbaarheid"
+      },
+      "visibility": {
+        "none": "Niet gedeeld",
+        "listed": "Vermeld",
+        "joinable": "Vermeld en toegankelijk"
+      },
+      "delivery_summary": "Bezorgoverzicht",
+      "delivery_status": {
+        "pending": "In afwachting",
+        "retry": "Nieuwe poging gepland",
+        "processing": "Bezig",
+        "delivered": "Bezorgd",
+        "dead_letter": "Aandacht vereist"
+      },
+      "partners_table_aria": "Gefedereerde evenementbezorging per partner",
+      "columns": {
+        "partner": "Partner",
+        "action": "Actie",
+        "delivery": "Bezorging",
+        "attempts": "Pogingen",
+        "activity": "Laatste activiteit"
+      },
+      "no_deliveries": "Er zijn geen federatiebezorgingen voor dit evenement geregistreerd.",
+      "removed_partner": "Verwijderde partner",
+      "partner_status": {
+        "active": "Actief",
+        "pending": "In afwachting",
+        "suspended": "Opgeschort",
+        "failed": "Mislukt",
+        "removed": "Verwijderd",
+        "unknown": "Onbekende status"
+      },
+      "events_disabled": "Delen van evenementen uitgeschakeld",
+      "action": {
+        "upsert": "Publiceren of bijwerken",
+        "tombstone": "Verwijderen"
+      },
+      "not_available": "Niet beschikbaar",
+      "error_code": "Diagnosecode: {{code}}",
+      "error_code_unknown": "Diagnosecode niet beschikbaar",
+      "attempt_count": "{{count}} van {{max}}",
+      "generated_at": "Bijgewerkt: {{time}}"
+    }
+  }
+}

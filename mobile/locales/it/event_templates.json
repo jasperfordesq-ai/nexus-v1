@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Modelli di eventi",
+      "safetyTitle": "I modelli copiano solo la configurazione",
+      "safetyDescription": "Le persone, le registrazioni, le risposte private, le presenze, i ticket, lo storico delle consegne, gli identificatori della federazione e lo stato di pubblicazione non vengono mai copiati.",
+      "loading": "Caricamento dei modelli di eventi",
+      "loadFailedTitle": "Impossibile caricare i modelli",
+      "loadFailedDescription": "Impossibile caricare la libreria dei modelli. Riprova.",
+      "emptyTitle": "Nessun modello trovato",
+      "emptyDescription": "Salva un evento come modello sul Web per creare una libreria di configurazione riutilizzabile.",
+      "source": "Fonte: {{title}}",
+      "versionAndUses": "Versione {{version}} · Utilizza: {{count}}",
+      "useTemplate": "Usa il modello",
+      "scheduleTitle": "Pianifica il nuovo evento",
+      "scheduleDescription": "Controlla il titolo, il fuso orario e il programma futuro. Verrà creata una nuova bozza.",
+      "eventTitle": "Titolo dell'evento",
+      "start": "Inizia",
+      "end": "Fine (facoltativo)",
+      "timezone": "Fuso orario",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "Opzionale YYYY-MM-DDTHH:mm",
+      "validationTitle": "Controlla i dettagli della bozza",
+      "validationDescription": "Inserisci un titolo, un fuso orario e una pianificazione futura valida.",
+      "previewFailedTitle": "Impossibile rivedere la bozza",
+      "previewFailedDescription": "Il server non è riuscito a preparare l'anteprima della bozza sicura.",
+      "review": "Rivedi la bozza",
+      "reviewTitle": "Esamina la nuova bozza dell'evento",
+      "reviewDescription": "Conferma i controlli del server prima di creare la bozza.",
+      "readyTitle": "Pronto per creare una bozza",
+      "readyDescription": "Sono stati verificati la versione corrente, i campi sicuri, la pianificazione e il flusso di lavoro di creazione.",
+      "draftState": "Stato di pubblicazione: Bozza",
+      "changeDetails": "Modificare i dettagli",
+      "createDraft": "Crea bozza",
+      "createdTitle": "Bozza dell'evento creata",
+      "createdDescription": "Rivedilo e pubblicalo separatamente quando sarà pronto.",
+      "createFailedTitle": "Impossibile creare la bozza",
+      "createFailedDescription": "Impossibile creare la bozza dell'evento. Riprova."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Hai ancora l'autorizzazione per gestire l'evento di origine",
+      "event_template_check_allowlist_exact": "Sono inclusi solo i campi di configurazione approvati",
+      "event_template_check_private_records_skipped": "Sono esclusi i documenti privati e operativi",
+      "event_template_check_versioned_snapshot": "La configurazione è uno snapshot con versione immutabile",
+      "event_template_check_version_current": "La versione del modello selezionato è quella attuale",
+      "event_template_check_schedule_valid": "Il nuovo programma è valido e in futuro",
+      "event_template_check_federation_none": "La Federazione è disabilitata per la nuova bozza",
+      "event_template_check_canonical_writer": "Verrà utilizzato il flusso di lavoro canonico per la creazione di eventi"
+    }
+  }
+}

@@ -102,7 +102,7 @@ class GroupConversationController extends BaseApiController
         $targetUserId = $this->inputInt('user_id');
 
         if (!$targetUserId) {
-            return $this->respondWithError('VALIDATION_ERROR', 'user_id is required', 'user_id', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_user'), 'user_id', 422);
         }
 
         $result = GroupConversationService::addMember($id, $targetUserId, $userId);

@@ -222,19 +222,6 @@ class Authenticate
 
             auth()->guard('sanctum')->setUser($eloquentUser);
 
-            // TODO(post-migration): Remove this legacy session bridge once all delegation
-            // controllers are replaced with pure Laravel controllers. The $_SESSION writes
-            // Risk: session state can leak between requests in long-lived workers (e.g. Octane).
-            if (session_status() === PHP_SESSION_NONE) {
-                @session_start();
-            }
-            $_SESSION['user_id'] = $userId;
-            // Use the *request* tenant (not the user's home tenant) so that super-admins
-            // browsing cross-tenant are tracked against the correct community. Falling back
-            // to $eloquentUser->tenant_id only when TenantContext has not resolved a tenant
-            // (e.g. super-admin panel routes that are not tenant-scoped).
-            $_SESSION['tenant_id'] = $tenantId ?? (int) $eloquentUser->tenant_id;
-
             return true;
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('[Auth] Legacy token exception: ' . $e->getMessage());
@@ -259,7 +246,7 @@ class Authenticate
     {
         $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
         $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Vary', 'Authorization, Cookie');
+        $response->setVary(['Authorization', 'Cookie'], false);
 
         return $response;
     }

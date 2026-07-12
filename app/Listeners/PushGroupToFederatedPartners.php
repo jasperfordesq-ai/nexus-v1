@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\Events\GroupCreated;
 use App\Events\GroupUpdated;
 use App\Services\FederationExternalApiClient;
@@ -52,8 +53,16 @@ class PushGroupToFederatedPartners implements ShouldQueue
                 return;
             }
 
+            $storedStatus = $group->status;
+            $status = $storedStatus instanceof GroupStatus ? $storedStatus : GroupStatus::tryFrom((string) $storedStatus);
+            $isRetraction = $event instanceof GroupUpdated && $status !== GroupStatus::Active;
+
+            if ($event instanceof GroupCreated && $status !== GroupStatus::Active) {
+                return;
+            }
+
             $visibility = $group->federated_visibility ?? 'none';
-            if (!in_array($visibility, ['listed', 'public'], true)) {
+            if (! $isRetraction && ! in_array($visibility, ['listed', 'public'], true)) {
                 return;
             }
 
@@ -62,7 +71,9 @@ class PushGroupToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            $action = $event instanceof GroupUpdated ? 'updated' : 'created';
+            $action = $isRetraction
+                ? 'deleted'
+                : ($event instanceof GroupUpdated ? 'updated' : 'created');
 
             $payload = [
                 'action'      => $action,

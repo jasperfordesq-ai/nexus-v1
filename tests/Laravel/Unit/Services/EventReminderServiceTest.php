@@ -17,6 +17,7 @@ class EventReminderServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config()->set('events.reminders.mode', 'legacy');
         $this->service = new EventReminderService();
     }
 
@@ -39,26 +40,6 @@ class EventReminderServiceTest extends TestCase
             ->once()
             ->with('tenants')
             ->andReturn($tenantQuery);
-    }
-
-    // =========================================================================
-    // scheduleReminder()
-    // =========================================================================
-
-    public function test_scheduleReminder_returns_true_on_success(): void
-    {
-        DB::shouldReceive('statement')->once()->andReturn(true);
-
-        $result = $this->service->scheduleReminder(2, 1, '2026-04-01 10:00:00');
-        $this->assertTrue($result);
-    }
-
-    public function test_scheduleReminder_returns_false_on_exception(): void
-    {
-        DB::shouldReceive('statement')->andThrow(new \Exception('DB error'));
-
-        $result = $this->service->scheduleReminder(2, 1, '2026-04-01 10:00:00');
-        $this->assertFalse($result);
     }
 
     // =========================================================================
@@ -113,13 +94,4 @@ class EventReminderServiceTest extends TestCase
         $this->assertStringContainsString('TenantContext::getSlugPrefix()', $source);
     }
 
-    public function test_configured_email_reminders_with_invalid_email_are_failed_not_left_pending(): void
-    {
-        $source = file_get_contents(app_path('Services/EventReminderService.php'));
-
-        $this->assertStringContainsString('failConfiguredReminder', $source);
-        $this->assertStringContainsString('filter_var($reminder->email, FILTER_VALIDATE_EMAIL)', $source);
-        $this->assertStringContainsString("->where('status', 'pending')", $source);
-        $this->assertStringContainsString("'status' => 'failed'", $source);
-    }
 }

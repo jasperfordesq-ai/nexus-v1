@@ -73,8 +73,8 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
         </div>
 
         {/* Footer: option count + configure button */}
-        <div className="flex items-center justify-between mt-auto pt-2">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2 mt-auto pt-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5">
             {optionCount > 0 ? (
               <Chip size="sm" variant="soft" color={liveCount > 0 ? 'primary' : 'default'}>
                 {liveCount > 0
@@ -94,6 +94,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
               variant="tertiary"
               startContent={<Settings2 size={14} aria-hidden="true" />}
               onPress={() => onConfigure(module)}
+              className="ml-auto shrink-0"
             >
               {t('config.configure')}
             </Button>

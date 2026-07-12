@@ -18,7 +18,7 @@ import { useDisclosure } from '@/components/ui/useDisclosure';
  * and breadcrumb navigation.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import BookOpen from 'lucide-react/icons/book-open';
 import FileText from 'lucide-react/icons/file-text';
@@ -30,41 +30,24 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
+import {
+  createGroupWikiPage,
+  deleteGroupWikiPage,
+  getGroupWikiPage,
+  listGroupWikiPages,
+  listGroupWikiRevisions,
+  updateGroupWikiPage,
+  type GroupWikiPageDetail as WikiPageDetail,
+  type GroupWikiPageSummary as WikiPageSummary,
+  type GroupWikiRevision as WikiRevision,
+} from '../api/wiki';
+import { normalizeGroupApiError, type GroupApiError } from '../api/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-interface WikiPageSummary {
-  id: number;
-  title: string;
-  slug: string;
-  parent_id: number | null;
-  sort_order: number;
-  is_published: boolean;
-  author: {
-    id: number;
-    name: string;
-  };
-  updated_at: string;
-}
-
-interface WikiPageDetail extends WikiPageSummary {
-  content: string;
-}
-
-interface WikiRevision {
-  id: number;
-  change_summary: string | null;
-  editor: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-}
 
 interface GroupWikiTabProps {
   groupId: number;
@@ -116,6 +99,7 @@ function buildBreadcrumbs(
 
 export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTabProps) {
   const { t } = useTranslation('groups');
+  const { t: tCommon } = useTranslation('common');
   const toast = useToast();
   const createModal = useDisclosure();
   const deleteModal = useDisclosure();
@@ -123,10 +107,14 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
   // ─── Page list state ───
   const [pages, setPages] = useState<WikiPageSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pagesError, setPagesError] = useState<GroupApiError | null>(null);
+  const pagesRequestRef = useRef<AbortController | null>(null);
 
   // ─── Selected page state ───
   const [selectedPage, setSelectedPage] = useState<WikiPageDetail | null>(null);
   const [pageLoading, setPageLoading] = useState(false);
+  const [pageError, setPageError] = useState<{ error: GroupApiError; slug: string } | null>(null);
+  const pageRequestRef = useRef<AbortController | null>(null);
 
   // ─── Edit mode state ───
   const [editing, setEditing] = useState(false);
@@ -148,45 +136,77 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
   const [revisions, setRevisions] = useState<WikiRevision[]>([]);
   const [revisionsOpen, setRevisionsOpen] = useState(false);
   const [revisionsLoading, setRevisionsLoading] = useState(false);
+  const [revisionsError, setRevisionsError] = useState<{ error: GroupApiError; pageId: number } | null>(null);
+  const revisionsRequestRef = useRef<AbortController | null>(null);
 
   // ─── Load page list ───
   const loadPages = useCallback(async () => {
+    pagesRequestRef.current?.abort();
+    const controller = new AbortController();
+    pagesRequestRef.current = controller;
     setLoading(true);
+    setPagesError(null);
     try {
-      const res = await api.get(`/v2/groups/${groupId}/wiki`);
-      const raw = res.data as WikiPageSummary[] | { pages?: WikiPageSummary[] } | undefined;
-      const items = Array.isArray(raw) ? raw : (raw as { pages?: WikiPageSummary[] })?.pages ?? [];
+      const items = await listGroupWikiPages(groupId, { signal: controller.signal });
+      if (controller.signal.aborted || pagesRequestRef.current !== controller) return;
       setPages(items);
     } catch (err) {
+      const apiError = normalizeGroupApiError(err);
+      if (apiError.isCancellation) return;
+      if (pagesRequestRef.current !== controller) return;
       logError('GroupWikiTab.loadPages', err);
-      toast.error(t('wiki.load_failed'));
+      setPagesError(apiError);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted && pagesRequestRef.current === controller) {
+        setLoading(false);
+      }
     }
-  }, [groupId, toast, t]);
+  }, [groupId]);
 
   useEffect(() => {
-    loadPages();
+    setPages([]);
+    setSelectedPage(null);
+    void loadPages();
+    return () => pagesRequestRef.current?.abort();
   }, [loadPages]);
+
+  useEffect(() => () => {
+    pageRequestRef.current?.abort();
+    revisionsRequestRef.current?.abort();
+  }, []);
 
   // ─── Load single page ───
   const loadPage = useCallback(
     async (slug: string) => {
+      pageRequestRef.current?.abort();
+      revisionsRequestRef.current?.abort();
+      const controller = new AbortController();
+      pageRequestRef.current = controller;
       setPageLoading(true);
+      setPageError(null);
+      setSelectedPage(null);
       setEditing(false);
       setRevisionsOpen(false);
+      setRevisionsLoading(false);
       setRevisions([]);
+      setRevisionsError(null);
       try {
-        const res = await api.get(`/v2/groups/${groupId}/wiki/${slug}`);
-        setSelectedPage(res.data as WikiPageDetail);
+        const page = await getGroupWikiPage(groupId, slug, { signal: controller.signal });
+        if (controller.signal.aborted || pageRequestRef.current !== controller) return;
+        setSelectedPage(page);
       } catch (err) {
+        const apiError = normalizeGroupApiError(err);
+        if (apiError.isCancellation) return;
+        if (pageRequestRef.current !== controller) return;
         logError('GroupWikiTab.loadPage', err);
-        toast.error(t('wiki.page_load_failed'));
+        setPageError({ error: apiError, slug });
       } finally {
-        setPageLoading(false);
+        if (!controller.signal.aborted && pageRequestRef.current === controller) {
+          setPageLoading(false);
+        }
       }
     },
-    [groupId, toast, t],
+    [groupId],
   );
 
   // ─── Create page ───
@@ -194,25 +214,19 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     if (!newTitle.trim() || !newContent.trim()) return;
     setCreating(true);
     try {
-      const body: Record<string, unknown> = {
+      const body = {
         title: newTitle.trim(),
         content: newContent.trim(),
+        ...(newParentId ? { parent_id: newParentId } : {}),
       };
-      if (newParentId) body.parent_id = newParentId;
-
-      const res = await api.post<{ slug?: string }>(`/v2/groups/${groupId}/wiki`, body);
-      if (res.success) {
-        toast.success(t('wiki.created'));
-        setNewTitle('');
-        setNewContent('');
-        setNewParentId(null);
-        createModal.onClose();
-        await loadPages();
-        // Open the newly created page
-        if (res.data?.slug) {
-          loadPage(res.data.slug);
-        }
-      }
+      const createdPage = await createGroupWikiPage(groupId, body);
+      toast.success(t('wiki.created'));
+      setNewTitle('');
+      setNewContent('');
+      setNewParentId(null);
+      createModal.onClose();
+      await loadPages();
+      void loadPage(createdPage.slug);
     } catch (err) {
       logError('GroupWikiTab.create', err);
       toast.error(t('wiki.create_failed'));
@@ -226,39 +240,37 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     if (!selectedPage || !editContent.trim()) return;
     setSaving(true);
     try {
-      const body: Record<string, unknown> = { content: editContent.trim() };
-      if (changeSummary.trim()) body.change_summary = changeSummary.trim();
-
-      const res = await api.put(`/v2/groups/${groupId}/wiki/${selectedPage.id}`, body);
-      if (res.success) {
-        toast.success(t('wiki.saved'));
-        setEditing(false);
-        setChangeSummary('');
-        // Reload the page to reflect the saved content
-        loadPage(selectedPage.slug);
-        loadPages();
-      }
+      const updatedPage = await updateGroupWikiPage(groupId, selectedPage.id, {
+        content: editContent.trim(),
+        ...(changeSummary.trim() ? { change_summary: changeSummary.trim() } : {}),
+      });
+      toast.success(t('wiki.saved'));
+      setSelectedPage(updatedPage);
+      setEditing(false);
+      setChangeSummary('');
+      void loadPages();
     } catch (err) {
       logError('GroupWikiTab.save', err);
       toast.error(t('wiki.save_failed'));
     } finally {
       setSaving(false);
     }
-  }, [groupId, selectedPage, editContent, changeSummary, toast, t, loadPage, loadPages]);
+  }, [groupId, selectedPage, editContent, changeSummary, toast, t, loadPages]);
 
   // ─── Delete page ───
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.delete(`/v2/groups/${groupId}/wiki/${deleteTarget.id}`);
+      await deleteGroupWikiPage(groupId, deleteTarget.id);
       toast.success(t('wiki.deleted'));
+      setPages((currentPages) => currentPages.filter((page) => page.id !== deleteTarget.id));
       setDeleteTarget(null);
       deleteModal.onClose();
       if (selectedPage?.id === deleteTarget.id) {
         setSelectedPage(null);
       }
-      loadPages();
+      void loadPages();
     } catch (err) {
       logError('GroupWikiTab.delete', err);
       toast.error(t('wiki.delete_failed'));
@@ -270,22 +282,40 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
   // ─── Load revisions ───
   const loadRevisions = useCallback(
     async (pageId: number) => {
+      revisionsRequestRef.current?.abort();
+      const controller = new AbortController();
+      revisionsRequestRef.current = controller;
       setRevisionsLoading(true);
+      setRevisionsOpen(true);
+      setRevisions([]);
+      setRevisionsError(null);
       try {
-        const res = await api.get(`/v2/groups/${groupId}/wiki/${pageId}/revisions`);
-        const rawRevisions = res.data as WikiRevision[] | { revisions?: WikiRevision[] } | undefined;
-        const items = Array.isArray(rawRevisions) ? rawRevisions : (rawRevisions as { revisions?: WikiRevision[] })?.revisions ?? [];
+        const items = await listGroupWikiRevisions(groupId, pageId, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted || revisionsRequestRef.current !== controller) return;
         setRevisions(items);
-        setRevisionsOpen(true);
       } catch (err) {
+        const apiError = normalizeGroupApiError(err);
+        if (apiError.isCancellation) return;
+        if (revisionsRequestRef.current !== controller) return;
         logError('GroupWikiTab.loadRevisions', err);
-        toast.error(t('wiki.revisions_failed'));
+        setRevisionsError({ error: apiError, pageId });
       } finally {
-        setRevisionsLoading(false);
+        if (!controller.signal.aborted && revisionsRequestRef.current === controller) {
+          setRevisionsLoading(false);
+        }
       }
     },
-    [groupId, toast, t],
+    [groupId],
   );
+
+  const closeRevisions = useCallback(() => {
+    revisionsRequestRef.current?.abort();
+    setRevisionsLoading(false);
+    setRevisionsError(null);
+    setRevisionsOpen(false);
+  }, []);
 
   // ─── Enter edit mode ───
   const startEditing = useCallback(() => {
@@ -334,7 +364,21 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         )}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-4">
+      {pagesError && (
+        <GlassCard className="p-4" role="alert">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-danger">{t('wiki.load_failed')}</p>
+            {pagesError.retryable && (
+              <Button variant="flat" size="sm" onPress={() => void loadPages()}>
+                {tCommon('actions.retry')}
+              </Button>
+            )}
+          </div>
+        </GlassCard>
+      )}
+
+      {(!pagesError || pages.length > 0) && (
+        <div className="flex flex-col lg:flex-row gap-4">
         {/* Sidebar: page list */}
         <GlassCard className="p-4 lg:w-72 lg:flex-shrink-0">
           <h3 className="text-sm font-semibold text-theme-secondary mb-3">
@@ -351,19 +395,19 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   <li key={page.id}>
                     <Button
                       variant="light"
-                      className={`w-full min-h-[40px] text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start ${
+                      className={`w-full min-h-[40px] text-start px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start ${
                         selectedPage?.id === page.id
                           ? 'bg-accent/10 text-accent font-medium'
                           : 'text-theme-secondary hover:bg-theme-hover'
                       }`}
-                      style={{ paddingLeft: `${page.depth * 16 + 12}px` }}
+                      style={{ paddingInlineStart: `${page.depth * 16 + 12}px` }}
                       onPress={() => loadPage(page.slug)}
                       aria-current={selectedPage?.id === page.id ? 'page' : undefined}
                     >
                       <FileText className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                       <span className="truncate">{page.title}</span>
                       {!page.is_published && (
-                        <Chip size="sm" variant="flat" color="warning" className="ml-auto text-xs">
+                        <Chip size="sm" variant="flat" color="warning" className="ms-auto text-xs">
                           {t('wiki.draft')}
                         </Chip>
                       )}
@@ -383,6 +427,21 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                 <Spinner size="lg" />
               </div>
             </GlassCard>
+          ) : pageError ? (
+            <GlassCard className="p-6" role="alert">
+              <div className="flex flex-col items-start gap-3">
+                <p className="text-sm text-danger">{t('wiki.page_load_failed')}</p>
+                {pageError.error.retryable && (
+                  <Button
+                    variant="flat"
+                    size="sm"
+                    onPress={() => void loadPage(pageError.slug)}
+                  >
+                    {tCommon('actions.retry')}
+                  </Button>
+                )}
+              </div>
+            </GlassCard>
           ) : selectedPage ? (
             <GlassCard className="p-6">
               {/* Breadcrumbs */}
@@ -394,7 +453,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   {breadcrumbs.map((crumb, idx) => (
                     <span key={crumb.id} className="flex items-center gap-1">
                       {idx > 0 && (
-                        <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                        <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 rtl:rotate-180" aria-hidden="true" />
                       )}
                       {idx < breadcrumbs.length - 1 ? (
                         <Button
@@ -419,7 +478,9 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   <div className="flex items-center gap-2 mt-1 text-xs text-theme-subtle">
                     <span>{selectedPage.author.name}</span>
                     <span aria-hidden="true">&#183;</span>
-                    <span>{formatRelativeTime(selectedPage.updated_at)}</span>
+                    <time dateTime={selectedPage.updated_at}>
+                      {formatRelativeTime(selectedPage.updated_at)}
+                    </time>
                     {!selectedPage.is_published && (
                       <Chip size="sm" variant="flat" color="warning" className="text-xs">
                         {t('wiki.draft')}
@@ -445,9 +506,14 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     variant="light"
                     size="sm"
                     startContent={<History className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => loadRevisions(selectedPage.id)}
+                    onPress={() => {
+                      if (revisionsOpen) closeRevisions();
+                      else void loadRevisions(selectedPage.id);
+                    }}
                     isLoading={revisionsLoading}
-                    aria-label={t('wiki.history_aria')}
+                    aria-label={revisionsOpen ? t('wiki.history_close_aria') : t('wiki.history_aria')}
+                    aria-expanded={revisionsOpen}
+                    aria-controls={`wiki-revisions-${selectedPage.id}`}
                   >
                     {t('wiki.history')}
                   </Button>
@@ -524,12 +590,42 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
 
               {/* Revision history (expandable) */}
               {revisionsOpen && (
-                <div className="mt-6 border-t border-theme-default pt-4">
-                  <h4 className="text-sm font-semibold text-theme-primary flex items-center gap-2 mb-3">
+                <div
+                  id={`wiki-revisions-${selectedPage.id}`}
+                  className="mt-6 border-t border-theme-default pt-4"
+                  role="region"
+                  aria-labelledby={`wiki-revisions-${selectedPage.id}-heading`}
+                >
+                  <h4
+                    id={`wiki-revisions-${selectedPage.id}-heading`}
+                    className="text-sm font-semibold text-theme-primary flex items-center gap-2 mb-3"
+                  >
                     <History className="w-4 h-4" aria-hidden="true" />
                     {t('wiki.revision_history')}
                   </h4>
-                  {revisions.length === 0 ? (
+                  {revisionsLoading ? (
+                    <div
+                      role="status"
+                      aria-busy="true"
+                      aria-label={t('wiki.revision_history')}
+                      className="flex justify-center py-4"
+                    >
+                      <Spinner size="sm" />
+                    </div>
+                  ) : revisionsError ? (
+                    <div className="flex flex-col items-start gap-3" role="alert">
+                      <p className="text-sm text-danger">{t('wiki.revisions_failed')}</p>
+                      {revisionsError.error.retryable && (
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          onPress={() => void loadRevisions(revisionsError.pageId)}
+                        >
+                          {tCommon('actions.retry')}
+                        </Button>
+                      )}
+                    </div>
+                  ) : revisions.length === 0 ? (
                     <p className="text-sm text-theme-subtle">
                       {t('wiki.no_revisions')}
                     </p>
@@ -544,16 +640,16 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                             <Edit className="w-4 h-4 text-accent" aria-hidden="true" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-theme-primary">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                              <span className="min-w-0 break-words font-medium text-theme-primary">
                                 {rev.editor.name}
                               </span>
-                              <span className="text-theme-subtle">
+                              <time className="text-theme-subtle" dateTime={rev.created_at}>
                                 {formatRelativeTime(rev.created_at)}
-                              </span>
+                              </time>
                             </div>
                             {rev.change_summary && (
-                              <p className="text-xs text-theme-muted mt-0.5">
+                              <p className="mt-0.5 break-words text-xs text-theme-muted">
                                 {rev.change_summary}
                               </p>
                             )}
@@ -566,7 +662,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     <Button
                       variant="flat"
                       size="sm"
-                      onPress={() => setRevisionsOpen(false)}
+                      onPress={closeRevisions}
                     >
                       {t('wiki.close_history')}
                     </Button>
@@ -600,7 +696,8 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
             </GlassCard>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       {/* ─── Create Page Modal ─── */}
       <Modal

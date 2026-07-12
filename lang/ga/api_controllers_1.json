@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Críochnaíodh athsheiceáil suaitheantas do :count úsáideoirí"
     },
     "admin_groups": {
+        "rule_not_found": "Níor aimsíodh an riail",
         "group_archived": "Grúpa cartlannaithe",
         "group_unarchived": "Grúpa díchartlannaithe",
         "ownership_transferred": "Úinéireacht aistrithe",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Cuireadh d'iarratas scriosadh cuntais isteach. Gheobhaidh tú deimhniú trí ríomhphost."
     },
     "group_challenge": {
-        "challenge_deleted": "Dúshlán scriosta"
+        "challenge_deleted": "Dúshlán scriosta",
+        "challenge_cancelled": "Dúshlán curtha ar ceal",
+        "challenge_immutable": "Ní féidir dúshláin chríochnaithe nó dúshláin ar bronnadh luach saothair orthu a chur ar ceal"
+    },
+    "group_chatroom": {
+        "default_name": "Ginearálta",
+        "default_description": "Seomra comhrá réamhshocraithe an ghrúpa"
     },
     "group_exchange": {
         "exchange_cancelled": "Malartú curtha ar ceal",

@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Badge-hercontrole voltooid voor :count gebruikers"
     },
     "admin_groups": {
+        "rule_not_found": "Regel niet gevonden",
         "group_archived": "Groep gearchiveerd",
         "group_unarchived": "Groep gedearchiveerd",
         "ownership_transferred": "Eigendom overgedragen",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Uw accountverwijderingsverzoek is ingediend. U ontvangt een bevestiging via e-mail."
     },
     "group_challenge": {
-        "challenge_deleted": "Uitdaging verwijderd"
+        "challenge_deleted": "Uitdaging verwijderd",
+        "challenge_cancelled": "Uitdaging geannuleerd",
+        "challenge_immutable": "Voltooide of beloonde uitdagingen kunnen niet worden geannuleerd"
+    },
+    "group_chatroom": {
+        "default_name": "Algemeen",
+        "default_description": "Standaard groepschat"
     },
     "group_exchange": {
         "exchange_cancelled": "Uitwisseling geannuleerd",

@@ -12,7 +12,6 @@ const { mockAdminGroups, mockToastSuccess, mockToastError, mockNavigate } = vi.h
   mockAdminGroups: {
     getGroup: vi.fn(),
     getMembers: vi.fn(),
-    updateGroup: vi.fn(),
     geocodeGroup: vi.fn(),
     promoteMember: vi.fn(),
     demoteMember: vi.fn(),
@@ -58,6 +57,12 @@ vi.mock('react-router-dom', async (importOriginal) => {
   };
 });
 
+vi.mock('./GroupAuditLog', () => ({
+  GroupAuditLog: ({ groupId }: { groupId: number }) => (
+    <div data-testid="group-audit-log">Audit group {groupId}</div>
+  ),
+}));
+
 const GROUP = {
   id: 42,
   name: 'Test Group',
@@ -94,6 +99,13 @@ const MEMBERS = [
     role: 'member',
     joined_at: '2025-02-01T00:00:00Z',
   },
+  {
+    user_id: 12,
+    user_name: 'Carol',
+    user_avatar: null,
+    role: 'admin',
+    joined_at: '2025-03-01T00:00:00Z',
+  },
 ];
 
 import GroupDetail from './GroupDetail';
@@ -101,9 +113,9 @@ import GroupDetail from './GroupDetail';
 describe('GroupDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/admin/groups/42/detail');
     mockAdminGroups.getGroup.mockResolvedValue({ success: true, data: GROUP });
     mockAdminGroups.getMembers.mockResolvedValue({ success: true, data: MEMBERS });
-    mockAdminGroups.updateGroup.mockResolvedValue({ success: true });
     mockAdminGroups.geocodeGroup.mockResolvedValue({ success: true });
     mockAdminGroups.promoteMember.mockResolvedValue({ success: true });
     mockAdminGroups.demoteMember.mockResolvedValue({ success: true });
@@ -139,37 +151,15 @@ describe('GroupDetail', () => {
     });
   });
 
-  it('shows edit form when Edit button is clicked', async () => {
+  it('routes Edit to the canonical tenant group form and keeps the overview read-only', async () => {
     render(<GroupDetail />);
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
     });
 
     await userEvent.click(screen.getByRole('button', { name: /edit/i }));
-
-    await waitFor(() => {
-      const inputs = screen.getAllByRole('textbox');
-      expect(inputs.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('calls updateGroup and shows success toast on save', async () => {
-    render(<GroupDetail />);
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
-    });
-
-    await userEvent.click(screen.getByRole('button', { name: /edit/i }));
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
-    });
-
-    await userEvent.click(screen.getByRole('button', { name: /save/i }));
-
-    await waitFor(() => {
-      expect(mockAdminGroups.updateGroup).toHaveBeenCalledWith(42, expect.any(Object));
-      expect(mockToastSuccess).toHaveBeenCalled();
-    });
+    expect(mockNavigate).toHaveBeenCalledWith('/test/groups/edit/42');
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('renders members in Members tab', async () => {
@@ -178,7 +168,7 @@ describe('GroupDetail', () => {
       expect(screen.getByText('Test Group')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('tab', { name: /members/i }));
+    await userEvent.click(await screen.findByRole('tab', { name: /members/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -215,8 +205,19 @@ describe('GroupDetail', () => {
     // Owner row (Alice) should not have promote button (only kick for non-owners)
     // Alice is owner so she has no kick button — count should match Bob's row only
     const kickBtns = screen.getAllByRole('button', { name: /kick/i });
-    // Should be exactly 1 (for Bob only)
-    expect(kickBtns).toHaveLength(1);
+    // Bob and Carol can be removed; the owner cannot.
+    expect(kickBtns).toHaveLength(2);
+  });
+
+  it('never offers the unfinished Make Owner action and retains admin demotion', async () => {
+    render(<GroupDetail />);
+    await screen.findByText('Test Group');
+    await userEvent.click(screen.getByRole('tab', { name: /members/i }));
+    await screen.findByText('Carol');
+
+    expect(screen.queryByRole('button', { name: /make owner/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /demote/i })).toBeInTheDocument();
+    expect(screen.getByText('Administrator')).toBeInTheDocument();
   });
 
   it('opens confirm modal when kick is clicked', async () => {
@@ -248,7 +249,7 @@ describe('GroupDetail', () => {
       expect(screen.getByText('Test Group')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('tab', { name: /location/i }));
+    await userEvent.click(await screen.findByRole('tab', { name: /location/i }));
 
     await waitFor(() => {
       const geocodeBtn = screen.getByRole('button', { name: /geocode/i });
@@ -262,10 +263,39 @@ describe('GroupDetail', () => {
       expect(screen.getByText('Test Group')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByRole('tab', { name: /location/i }));
+    await userEvent.click(await screen.findByRole('tab', { name: /location/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Dublin')).toBeInTheDocument();
     });
+  });
+
+  it('uses a translated fallback instead of rendering an unknown visibility code', async () => {
+    mockAdminGroups.getGroup.mockResolvedValue({
+      success: true,
+      data: { ...GROUP, visibility: 'future_visibility' },
+    });
+    render(<GroupDetail />);
+
+    expect(await screen.findByText('Unknown visibility')).toBeInTheDocument();
+    expect(screen.queryByText('future_visibility')).not.toBeInTheDocument();
+  });
+
+  it('mounts the addressable audit tab for ?tab=audit', async () => {
+    window.history.replaceState({}, '', '/admin/groups/42/detail?tab=audit');
+    render(<GroupDetail />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('group-audit-log')).toHaveTextContent('Audit group 42');
+    });
+    expect(screen.getByRole('tab', { name: /audit log/i })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('replaces an invalid detail tab with the canonical overview URL', async () => {
+    window.history.replaceState({}, '', '/admin/groups/42/detail?tab=unknown');
+    render(<GroupDetail />);
+
+    await waitFor(() => expect(window.location.search).toBe(''));
+    expect(screen.getByRole('tab', { name: /overview/i })).toHaveAttribute('aria-selected', 'true');
   });
 });

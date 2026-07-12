@@ -1,0 +1,66 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'privacy' => [
+        'title' => 'Enregistrement confidentiel et résilient',
+        'body' => 'Les codes signés ne contiennent ni nom, ni adresse électronique, ni numéro de téléphone. Vous pouvez saisir un code ci-dessous sans caméra.',
+        'no_wallet' => 'Les actions de présence ne modifient jamais les soldes et n’attribuent aucun crédit-temps.',
+    ],
+    'code' => [
+        'title' => 'Saisir un code de participant signé',
+        'intro' => 'Utilisez cette solution en ligne si la caméra ou l’appareil hors ligne du personnel est indisponible. La recherche manuelle par nom reste disponible plus bas.',
+        'label' => 'Code du participant',
+        'hint' => 'Collez le code complet commençant par nqx2_. Le code n’est pas conservé dans le journal d’audit.',
+        'action' => 'Action de présence',
+        'reason' => 'Motif de correction',
+        'reason_hint' => 'Un motif est obligatoire pour annuler une action. N’indiquez aucune information sensible.',
+        'confirm' => 'J’ai vérifié le participant et sélectionné l’action voulue.',
+        'submit' => 'Appliquer l’action avec le code signé',
+    ],
+    'actions' => [
+        'check_in' => 'Enregistrer l’arrivée',
+        'check_out' => 'Enregistrer le départ',
+        'no_show' => 'Marquer absent',
+        'undo' => 'Annuler la dernière action',
+    ],
+    'attendee' => [
+        'manage_link' => 'Gérer mon code d’enregistrement',
+        'title' => 'Votre code d’enregistrement à l’événement',
+        'intro' => 'Créez un code signé à présenter au personnel de l’événement sur votre écran ou sur une copie imprimée.',
+        'privacy' => 'Le code identifie uniquement cette inscription à l’événement. Il ne contient aucun nom, e-mail ou numéro de téléphone.',
+        'notice_issued' => 'Votre nouveau code d’enregistrement est affiché ci-dessous.',
+        'notice_replaced' => 'Votre ancien code ne fonctionne plus. Le code de remplacement est affiché ci-dessous.',
+        'notice_revoked' => 'Votre code d’enregistrement a été révoqué.',
+        'notice_already_active' => 'Un code actif existe déjà. Remplacez-le si votre copie n’est plus disponible.',
+        'notice_invalid' => 'Confirmez l’action demandée et réessayez.',
+        'notice_failed' => 'Le code d’enregistrement n’a pas pu être modifié. Actualisez la page et réessayez.',
+        'status_heading' => 'État du code',
+        'status_active' => 'Actif',
+        'status_rotated' => 'Remplacé',
+        'status_revoked' => 'Révoqué',
+        'status_expired' => 'Expiré',
+        'expires' => 'Expire le :date',
+        'one_shot_heading' => 'Enregistrez ce code maintenant',
+        'one_shot' => 'Pour des raisons de sécurité, le code complet n’est affiché qu’au moment de sa création ou de son remplacement.',
+        'code_label' => 'Code d’enregistrement signé',
+        'code_hint' => 'Sélectionnez et copiez le code complet commençant par nqx2_.',
+        'print_hint' => 'Vous pouvez imprimer cette page ou enregistrer une copie accessible. Gardez le code privé jusqu’à l’enregistrement.',
+        'print' => 'Imprimer ce code',
+        'issue_confirm' => 'Je comprends que le code complet ne sera affiché qu’une seule fois.',
+        'issue' => 'Créer un code d’enregistrement',
+        'replace' => 'Remplacer un code copié ou perdu',
+        'replace_hint' => 'Le remplacement du code invalide immédiatement toute copie enregistrée ou imprimée.',
+        'replace_confirm' => 'Je comprends que mon code actuel cessera de fonctionner.',
+        'revoke' => 'Révoquer le code',
+        'reason' => 'Motif de la révocation',
+        'reason_hint' => 'Indiquez un court motif opérationnel sans information sensible.',
+        'revoke_confirm' => 'Je comprends que ce code cessera immédiatement de fonctionner.',
+    ],
+    'device' => [
+        'lost' => 'Si un appareil du personnel est perdu, révoquez-le immédiatement dans l’espace événements standard. Continuez ici avec le nom ou le code signé.',
+    ],
+];

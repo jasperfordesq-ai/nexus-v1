@@ -8,16 +8,28 @@ namespace App\Http\Controllers\GovukAlpha;
 
 use App\Core\TenantContext;
 use App\Core\Validator;
+use App\Enums\EventNotificationDeliveryMode;
+use App\Exceptions\EventAttendanceException;
+use App\Exceptions\EventParticipationException;
+use App\Exceptions\EventRegistrationException;
+use App\Exceptions\EventWaitlistException;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Http\Controllers\Api\CoreController;
 use App\Http\Controllers\GovukAlpha\Support\AccessibleIdentityResolver;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\ListingImage;
 use App\Models\User;
+use App\Policies\EventPolicy;
 use App\Services\BrokerControlConfigService;
 use App\Services\Auth\AuthenticationMethodGuard;
 use App\Services\CommentService;
 use App\Services\ConnectionService;
+use App\Services\EventAttendanceService;
+use App\Services\EventNotificationDeliveryModeResolver;
+use App\Services\EventRegistrationService;
 use App\Services\EventService;
+use App\Services\EventWaitlistService;
 use App\Services\ExchangeService;
 use App\Services\ExchangeWorkflowService;
 use App\Services\FeedService;
@@ -53,6 +65,15 @@ class AlphaController extends Controller
     use Concerns\ListingsParity;
     use Concerns\MessagesParity;
     use Concerns\EventsParity;
+    use Concerns\EventAgendaParity;
+    use Concerns\EventRemindersParity;
+    use Concerns\EventSafetyParity;
+    use Concerns\EventTemplatesParity;
+    use Concerns\EventTicketsParity;
+    use Concerns\EventAnalyticsParity;
+    use Concerns\EventCommunicationsParity;
+    use Concerns\EventOfflineCheckinParity;
+    use Concerns\EventRegistrationParity;
     use Concerns\GroupsParity;
     use Concerns\MembersParity;
     use Concerns\ConnectionsMatchesParity;
@@ -95,7 +116,47 @@ class AlphaController extends Controller
         private readonly FeedService $feedService,
         private readonly ListingService $listingService,
         private readonly RegistrationService $registrationService,
+        private readonly EventRegistrationService $eventRegistrationService,
+        private readonly EventWaitlistService $eventWaitlistService,
+        private readonly EventAttendanceService $eventAttendanceService,
     ) {}
+
+    private function accessibleEventActor(int $userId): User
+    {
+        $actor = User::withoutGlobalScopes()
+            ->where('tenant_id', (int) TenantContext::getId())
+            ->whereKey($userId)
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->first();
+        if ($actor === null) {
+            throw new EventRegistrationException('event_registration_actor_invalid');
+        }
+
+        return $actor;
+    }
+
+    private function accessibleEventMutationKey(Request $request): ?string
+    {
+        $header = $request->header('Idempotency-Key');
+        $body = $request->input('idempotency_key');
+        $header = is_string($header) ? trim($header) : null;
+        $body = is_string($body) ? trim($body) : null;
+        if ($header !== null && $body !== null && $header !== $body) {
+            throw new EventRegistrationException('event_registration_idempotency_key_invalid');
+        }
+        $key = $header ?? $body;
+        if ($key === null || $key === '') {
+            // Canonical compatibility methods derive a stable identity from the
+            // locked monotonic version/state when an older form sends no key.
+            return null;
+        }
+        if (mb_strlen($key) > 191) {
+            throw new EventRegistrationException('event_registration_idempotency_key_invalid');
+        }
+
+        return $key;
+    }
 
     /**
      * Safely coerce a request value to a string, returning the default when
@@ -1452,12 +1513,16 @@ class AlphaController extends Controller
         }
 
         $filters = $this->eventFilters($request);
+        $viewerId = $this->currentUserId();
         $query = [
             'limit' => 12,
             'when' => $filters['when'],
         ];
+        if ($viewerId !== null) {
+            $query['viewer_id'] = $viewerId;
+        }
 
-        foreach (['category_id', 'search', 'cursor', 'near_lat', 'near_lng', 'radius_km'] as $key) {
+        foreach (['category_id', 'search', 'step_free', 'cursor', 'near_lat', 'near_lng', 'radius_km'] as $key) {
             if (($filters[$key] ?? null) !== null && $filters[$key] !== '') {
                 $query[$key] = $filters[$key];
             }
@@ -1469,7 +1534,8 @@ class AlphaController extends Controller
 
         try {
             $result = EventService::getAll($query);
-            $items = $this->withResolvedImageKey($result['items'] ?? [], 'cover_image');
+            $legacyItems = $this->withResolvedImageKey($result['items'] ?? [], 'cover_image');
+            $items = $this->eventsCanonicalViewModels($legacyItems, $viewerId);
             $meta = [
                 'has_more' => (bool) ($result['has_more'] ?? false),
                 'cursor' => $result['cursor'] ?? null,
@@ -1499,33 +1565,27 @@ class AlphaController extends Controller
         abort_unless(TenantContext::hasFeature('events'), 403);
 
         $viewerId = $this->currentUserId();
-        $event = EventService::getById($id, $viewerId);
-        abort_if($event === null, 404);
+        $legacyEvent = EventService::getById($id, $viewerId);
+        abort_if($legacyEvent === null, 404);
 
-        $event['cover_image'] = $this->resolveAsset($event['cover_image'] ?? null);
+        $legacyEvent['cover_image'] = $this->resolveAsset(
+            $legacyEvent['cover_image'] ?? $legacyEvent['image_url'] ?? null
+        );
+        $event = $this->eventsCanonicalViewModel($legacyEvent, $viewerId);
 
         // Attendee roster (going + interested). EventService::getAttendees
         // self-enforces roster privacy, returning an empty list when the viewer
         // may not see it.
         $attendees = [];
         try {
-            $attendees = EventService::getAttendees($id, ['status' => 'all', 'limit' => 50], $viewerId)['items'] ?? [];
+            $legacyAttendees = EventService::getAttendees(
+                $id,
+                ['status' => 'all', 'limit' => 50],
+                $viewerId
+            )['items'] ?? [];
+            $attendees = $this->eventsCanonicalRoster($legacyAttendees);
         } catch (\Throwable $e) {
             report($e);
-        }
-
-        // The signed-in member's current waitlist position, if any. When the
-        // event is full, EventService::rsvp('going') auto-waitlists the user and
-        // returns false — so the detail page exposes join/leave-waitlist controls
-        // and the member's queue position (parity with React's EventDetailPage
-        // waitlist_position display).
-        $waitlistPosition = null;
-        if ($viewerId !== null) {
-            try {
-                $waitlistPosition = EventService::getUserWaitlistPosition($id, $viewerId);
-            } catch (\Throwable $e) {
-                report($e);
-            }
         }
 
         // Polls attached to this event (event_id scope). PollService::getById
@@ -1552,9 +1612,33 @@ class AlphaController extends Controller
         $seriesId = isset($event['series_id']) ? (int) $event['series_id'] : 0;
         if ($seriesId > 0) {
             try {
-                $seriesEvents = EventService::getSeriesEvents($seriesId);
+                $seriesEvents = EventService::getSeriesEvents($seriesId, $viewerId);
             } catch (\Throwable $e) {
                 report($e);
+            }
+        }
+
+        $eventOperations = ['people' => false, 'attendance' => false, 'broadcast' => false];
+        if ($viewerId !== null) {
+            try {
+                $actor = $this->accessibleEventActor($viewerId);
+                $policyEvent = Event::withoutGlobalScopes()
+                    ->where('tenant_id', TenantContext::currentId())
+                    ->whereKey($id)
+                    ->first();
+                if ($policyEvent instanceof Event) {
+                    $policy = app(EventPolicy::class);
+                    $eventOperations = [
+                        'people' => $policy->manageRegistration($actor, $policyEvent)
+                            && $policy->viewRoster($actor, $policyEvent)
+                            && $policy->viewWaitlist($actor, $policyEvent),
+                        'attendance' => $policy->manageAttendance($actor, $policyEvent)
+                            && $policy->viewRoster($actor, $policyEvent),
+                        'broadcast' => $policy->broadcast($actor, $policyEvent),
+                    ];
+                }
+            } catch (\Throwable $exception) {
+                report($exception);
             }
         }
 
@@ -1564,11 +1648,11 @@ class AlphaController extends Controller
             'activeNav' => 'events',
             'event' => $event,
             'requiresAuth' => $viewerId === null,
-            'isOwner' => $viewerId !== null && (int) ($event['user_id'] ?? 0) === $viewerId,
+            'isOwner' => $viewerId !== null && (int) ($event['organizer']['id'] ?? 0) === $viewerId,
             'attendees' => $attendees,
-            'waitlistPosition' => $waitlistPosition,
             'polls' => $polls,
             'seriesEvents' => $seriesEvents,
+            'eventOperations' => $eventOperations,
             'status' => self::asStr(request()->query('status')) ?: null,
             'ogImage' => $this->absoluteAssetUrl($event['cover_image'] ?? null),
             'ogImageAlt' => $event['cover_image'] ? ($event['title'] ?? null) : null,
@@ -1628,7 +1712,13 @@ class AlphaController extends Controller
             $this->attachEventCoverImage($request, $eventId, $userId);
 
             try {
-                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_event'], 'create_event', __('govuk_alpha.events.gamification_reason'));
+                \App\Services\GamificationService::awardXP(
+                    $userId,
+                    \App\Services\GamificationService::XP_VALUES['create_event'],
+                    'create_event',
+                    __('govuk_alpha.events.gamification_reason'),
+                    'event:' . $eventId
+                );
             } catch (\Throwable $e) {
                 Log::warning('Accessible event XP award failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
             }
@@ -1739,7 +1829,10 @@ class AlphaController extends Controller
             // EventsController::update). EventService tracks the changes internally.
             try {
                 $meaningfulChanges = EventService::getLastMeaningfulUpdateChanges();
-                if (!empty($meaningfulChanges)) {
+                if (!empty($meaningfulChanges)
+                    && EventNotificationDeliveryModeResolver::resolve(
+                        (int) TenantContext::getId(),
+                    ) !== EventNotificationDeliveryMode::OutboxAuthoritative) {
                     app(\App\Services\EventNotificationService::class)->notifyEventUpdated($id, $meaningfulChanges);
                 }
             } catch (\Throwable $e) {
@@ -1759,9 +1852,16 @@ class AlphaController extends Controller
         [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
 
         $reason = trim(self::asStr($request->input('reason')));
+        $idempotencyKey = trim((string) ($request->header('Idempotency-Key')
+            ?? $request->input('idempotency_key', '')));
         $ok = false;
         try {
-            $ok = EventService::cancelEvent($id, $userId, $reason);
+            $ok = EventService::cancelEvent(
+                $id,
+                $userId,
+                $reason,
+                $idempotencyKey !== '' ? $idempotencyKey : null,
+            );
         } catch (\Throwable $e) {
             report($e);
         }
@@ -1777,17 +1877,26 @@ class AlphaController extends Controller
     {
         [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
 
+        $reason = trim(self::asStr($request->input('reason')));
+        $idempotencyKey = trim((string) ($request->header('Idempotency-Key')
+            ?? $request->input('idempotency_key', '')));
         $ok = false;
         try {
-            $ok = EventService::delete($id, $userId);
+            $ok = EventService::delete(
+                $id,
+                $userId,
+                $reason !== '' ? $reason : null,
+                $idempotencyKey !== '' ? $idempotencyKey : null,
+            );
         } catch (\Throwable $e) {
             report($e);
         }
 
-        // The event no longer exists on success, so return to the events list.
+        // Archive-first lifecycle keeps the event and its audit evidence while
+        // removing it from normal discovery, so return to the visible list.
         return redirect()->route('govuk-alpha.events.index', [
             'tenantSlug' => $tenantSlug,
-            'status' => $ok ? 'event-deleted' : 'event-delete-failed',
+            'status' => $ok ? 'event-archived' : 'event-archive-failed',
         ]);
     }
 
@@ -1801,23 +1910,83 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $status = $this->allowed($request->input('status', 'going'), ['going', 'interested', 'not_going'], 'going');
-
+        $status = $this->allowed(
+            $request->input('status', 'going'),
+            ['going', 'interested', 'not_going'],
+            'going',
+        );
+        $changed = false;
         try {
-            if (!EventService::rsvp($id, $userId, $status)) {
-                // A 'going' RSVP on a full event is not a failure: EventService::rsvp
-                // auto-adds the member to the waitlist and reports it via an
-                // EVENT_FULL error. Surface that as the waitlist-joined banner so
-                // the member knows they are queued, matching the React behaviour.
-                foreach (EventService::getErrors() as $err) {
-                    if (($err['code'] ?? null) === 'EVENT_FULL' || !empty($err['waitlisted'])) {
-                        return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'waitlist-joined']);
-                    }
-                }
+            $actor = $this->accessibleEventActor($userId);
+            $requestKey = $this->accessibleEventMutationKey($request);
+            if ($status === 'going') {
+                try {
+                    $registration = DB::transaction(function () use (
+                        $id,
+                        $userId,
+                        $actor,
+                        $requestKey,
+                    ) {
+                        $result = $this->eventRegistrationService->confirmCompatibility(
+                            $id,
+                            $userId,
+                            $actor,
+                            $requestKey,
+                        );
+                        $this->eventWaitlistService->withdrawCompatibility(
+                            $id,
+                            $userId,
+                            $actor,
+                            $requestKey,
+                        );
 
-                return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
+                        return $result;
+                    }, 5);
+                    $changed = $registration->changed;
+                } catch (EventRegistrationException $exception) {
+                    if ($exception->reasonCode !== 'event_registration_capacity_full') {
+                        throw $exception;
+                    }
+                    $this->eventWaitlistService->joinCompatibility(
+                        $id,
+                        $userId,
+                        $actor,
+                        $requestKey,
+                    );
+
+                    return redirect()->route('govuk-alpha.events.show', [
+                        'tenantSlug' => $tenantSlug,
+                        'id' => $id,
+                        'status' => 'waitlist-joined',
+                    ]);
+                }
+            } else {
+                DB::transaction(function () use (
+                    $id,
+                    $userId,
+                    $status,
+                    $actor,
+                    $requestKey,
+                ): void {
+                    $this->eventRegistrationService->withdrawCompatibility(
+                        $id,
+                        $userId,
+                        $actor,
+                        $requestKey,
+                    );
+                    $this->eventWaitlistService->withdrawCompatibility(
+                        $id,
+                        $userId,
+                        $actor,
+                        $requestKey,
+                    );
+                    if (! EventService::rsvp($id, $userId, $status)) {
+                        throw new \RuntimeException('accessible_event_rsvp_failed');
+                    }
+                }, 5);
+                $changed = EventService::wasLastRsvpChanged();
             }
-        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+        } catch (SafeguardingPolicyException $e) {
             return redirect()->route('govuk-alpha.events.show', [
                 'tenantSlug' => $tenantSlug,
                 'id' => $id,
@@ -1825,16 +1994,24 @@ class AlphaController extends Controller
                     ? 'rsvp-policy-unavailable'
                     : 'rsvp-vetting-required',
             ]);
+        } catch (EventParticipationException|EventRegistrationException|EventWaitlistException $e) {
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'rsvp-failed',
+            ]);
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
         }
 
-        // Notify the organiser of the RSVP + award XP for attending — parity with
-        // EventsController::rsvp. wasLastRsvpChanged() must be read before any other
-        // EventService call; notification/XP failure must not change the outcome.
+        // Notify the organiser only for a state change. The XP call below uses a
+        // stable database-backed event reference, so retries can safely recover
+        // without status cycling or RSVP recreation awarding twice.
         try {
-            if (EventService::wasLastRsvpChanged()) {
+            if ($changed && EventNotificationDeliveryModeResolver::resolve(
+                (int) TenantContext::getId(),
+            ) === EventNotificationDeliveryMode::Direct) {
                 app(\App\Services\EventNotificationService::class)->notifyRsvp($id, $userId, $status);
             }
         } catch (\Throwable $e) {
@@ -1842,7 +2019,13 @@ class AlphaController extends Controller
         }
         if ($status === 'going') {
             try {
-                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['attend_event'], 'attend_event', 'RSVPed to an event');
+                \App\Services\GamificationService::awardXP(
+                    $userId,
+                    \App\Services\GamificationService::XP_VALUES['attend_event'],
+                    'attend_event',
+                    __('govuk_alpha.profile.activity_types.event_rsvp'),
+                    'event:' . $id
+                );
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Alpha RSVP XP award failed', ['error' => $e->getMessage()]);
             }
@@ -1871,10 +2054,14 @@ class AlphaController extends Controller
         $event = EventService::getById($id, $userId);
         abort_if($event === null, 404);
 
-        $ok = false;
         try {
-            $ok = EventService::addToWaitlist($id, $userId);
-        } catch (\App\Exceptions\SafeguardingPolicyException $e) {
+            $this->eventWaitlistService->joinCompatibility(
+                $id,
+                $userId,
+                $this->accessibleEventActor($userId),
+                $this->accessibleEventMutationKey($request),
+            );
+        } catch (SafeguardingPolicyException $e) {
             return redirect()->route('govuk-alpha.events.show', [
                 'tenantSlug' => $tenantSlug,
                 'id' => $id,
@@ -1882,14 +2069,25 @@ class AlphaController extends Controller
                     ? 'waitlist-policy-unavailable'
                     : 'waitlist-vetting-required',
             ]);
+        } catch (EventParticipationException|EventRegistrationException|EventWaitlistException $e) {
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'waitlist-failed',
+            ]);
         } catch (\Throwable $e) {
             report($e);
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'waitlist-failed',
+            ]);
         }
 
         return redirect()->route('govuk-alpha.events.show', [
             'tenantSlug' => $tenantSlug,
             'id' => $id,
-            'status' => $ok ? 'waitlist-joined' : 'waitlist-failed',
+            'status' => 'waitlist-joined',
         ]);
     }
 
@@ -1913,7 +2111,15 @@ class AlphaController extends Controller
         abort_if($event === null, 404);
 
         try {
-            EventService::removeFromWaitlist($id, $userId);
+            $this->eventWaitlistService->withdrawCompatibility(
+                $id,
+                $userId,
+                $this->accessibleEventActor($userId),
+                $this->accessibleEventMutationKey($request),
+            );
+        } catch (EventRegistrationException|EventWaitlistException $e) {
+            // Leaving is historically idempotent. Missing/inactive queue facts
+            // still redirect to the same confirmation and never cross tenants.
         } catch (\Throwable $e) {
             report($e);
         }
@@ -10386,7 +10592,13 @@ class AlphaController extends Controller
             'passkeys' => $this->alphaPasskeys($userId),
             'twoFactorEnabled' => \App\Services\TotpService::isEnabled($userId),
             'twoFactorEnrollmentAllowed' => TenantContext::hasFeature('two_factor_authentication'),
-            'passkeyEnrollmentAllowed' => TenantContext::hasFeature('biometric_login'),
+            'passkeyEnrollmentAllowed' => (bool) config('webauthn.authentication_enabled', true)
+                && TenantContext::hasFeature('biometric_login')
+                && \App\Services\AuthenticationConfigurationService::get(
+                    \App\Services\AuthenticationConfigurationService::CONFIG_PASSKEYS_ENROLLMENT_ENABLED,
+                    true,
+                    TenantContext::getId()
+                ) === true,
             'prefersChronological' => (bool) ($account->prefers_chronological_feed ?? false),
             'autoTranslate' => (bool) ($account->auto_translate_ugc ?? false),
             'autoTranslateLocale' => (string) ($account->auto_translate_target_locale ?? $account->preferred_language ?? 'en'),
@@ -10545,7 +10757,7 @@ class AlphaController extends Controller
     }
 
     /**
-     * The 16 notification toggles with their defaults, mirroring
+     * The notification toggles with their defaults, mirroring
      * UsersController::notificationPreferences so the alpha settings page
      * shows the same controls as the React NotificationsTab.
      *
@@ -10562,6 +10774,7 @@ class AlphaController extends Controller
             'caring_smart_nudges'           => (bool) ($prefs['caring_smart_nudges'] ?? true),
             'federation_notifications_enabled' => $fedEnabled,
             'email_listings'                => (bool) ($prefs['email_listings'] ?? true),
+            'email_events'                  => (bool) ($prefs['email_events'] ?? true),
             'email_transactions'            => (bool) ($prefs['email_transactions'] ?? true),
             'email_reviews'                 => (bool) ($prefs['email_reviews'] ?? true),
             'email_gamification_digest'     => (bool) ($prefs['email_gamification_digest'] ?? true),
@@ -10612,7 +10825,7 @@ class AlphaController extends Controller
 
         $jsonKeys = [
             'email_messages', 'email_connections', 'caring_smart_nudges',
-            'email_listings', 'email_transactions', 'email_reviews',
+            'email_listings', 'email_events', 'email_transactions', 'email_reviews',
             'email_gamification_digest', 'email_gamification_milestones', 'email_digest',
             'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
             'push_enabled', 'push_campaigns_opted_in',
@@ -10691,12 +10904,21 @@ class AlphaController extends Controller
         $credentialId = trim(self::asStr($request->input('credential_id')));
         $name = mb_substr(trim(self::asStr($request->input('device_name'))), 0, 100);
 
-        if ($credentialId === '' || $name === '') {
+        if (
+            $credentialId === ''
+            || preg_match('/^[A-Za-z0-9_-]{1,1364}$/D', $credentialId) !== 1
+            || $name === ''
+            || preg_match('/[\x00-\x1F\x7F]/u', $name) === 1
+        ) {
             return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-name-required'])->withFragment('passkeys');
         }
 
+        if ($response = $this->confirmAccessiblePasskeyPassword($request, $tenantSlug, $userId)) {
+            return $response;
+        }
+
         $affected = DB::update(
-            'UPDATE webauthn_credentials SET device_name = ? WHERE credential_id = ? AND user_id = ? AND tenant_id = ?',
+            'UPDATE webauthn_credentials SET device_name = ?, updated_at = CURRENT_TIMESTAMP() WHERE credential_id = ? AND user_id = ? AND tenant_id = ?',
             [$name, $credentialId, $userId, TenantContext::getId()]
         );
 
@@ -10716,8 +10938,12 @@ class AlphaController extends Controller
         }
 
         $credentialId = trim(self::asStr($request->input('credential_id')));
-        if ($credentialId === '') {
+        if ($credentialId === '' || preg_match('/^[A-Za-z0-9_-]{1,1364}$/D', $credentialId) !== 1) {
             return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-not-found'])->withFragment('passkeys');
+        }
+
+        if ($response = $this->confirmAccessiblePasskeyPassword($request, $tenantSlug, $userId)) {
+            return $response;
         }
 
         $tenantId = TenantContext::getId();
@@ -10740,19 +10966,83 @@ class AlphaController extends Controller
                 return 'passkey-last-sign-in-method';
             }
 
-            DB::table('webauthn_credentials')
+            $deleted = DB::table('webauthn_credentials')
                 ->where('credential_id', $credentialId)
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->delete();
+            if ($deleted > 0) {
+                $revoked = app(\App\Services\TokenService::class)->revokeAllTokensForUser($userId);
+                if ($revoked < 1) {
+                    throw new \RuntimeException('Unable to revoke sessions after accessible passkey removal.');
+                }
+                $user = User::withoutGlobalScopes()
+                    ->whereKey($userId)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+                if ($user === null) {
+                    throw new \RuntimeException('Unable to resolve user for accessible session revocation.');
+                }
+                $user->tokens()->delete();
+            }
 
             return 'passkey-removed';
         });
 
-        return redirect()->route('govuk-alpha.profile.settings', [
-            'tenantSlug' => $tenantSlug,
-            'status' => $status,
-        ])->withFragment('passkeys');
+        if ($status !== 'passkey-removed') {
+            return redirect()->route('govuk-alpha.profile.settings', [
+                'tenantSlug' => $tenantSlug,
+                'status' => $status,
+            ])->withFragment('passkeys');
+        }
+
+        // Authenticator removal is a high-risk account change. End every active
+        // legacy JWT and Sanctum session so a stolen session cannot silently
+        // persist after the member changes their sign-in factors.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = [];
+            session_regenerate_id(true);
+        }
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-removed'])
+            ->withCookie(cookie()->forget('auth_token', '/'));
+    }
+
+    /**
+     * The HTML-first frontend cannot run a WebAuthn ceremony, so require the
+     * member's current password before changing a passkey. Members without a
+     * password can use the main app, which supports passkey/TOTP step-up.
+     */
+    private function confirmAccessiblePasskeyPassword(
+        Request $request,
+        string $tenantSlug,
+        int $userId
+    ): ?RedirectResponse {
+        $password = self::asStr($request->input('current_password'));
+        if ($password === '') {
+            return redirect()->route('govuk-alpha.profile.settings', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'passkey-password-required',
+            ])->withFragment('passkeys');
+        }
+
+        $passwordHash = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->value('password_hash');
+        if (!is_string($passwordHash) || $passwordHash === '' || !password_verify($password, $passwordHash)) {
+            return redirect()->route('govuk-alpha.profile.settings', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'passkey-password-incorrect',
+            ])->withFragment('passkeys');
+        }
+
+        return null;
     }
 
     /** Personalisation: chronological feed + UGC auto-translation (user columns). */
@@ -10904,7 +11194,6 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
-
         if ($request->allFiles() !== [] || $request->except('_token') !== []) {
             $status = 'vetting-review-evidence-prohibited';
         } else {
@@ -12148,6 +12437,7 @@ class AlphaController extends Controller
             'search' => trim(self::asStr($request->query('q'))) ?: null,
             'type' => $type,
             'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
+            'step_free' => $this->allowed($request->query('step_free', 'any'), ['any', 'yes', 'no', 'unknown'], 'any'),
             'cursor' => self::asStr($request->query('cursor')) ?: null,
             'hours' => $hours,
             'service' => $service,
@@ -12220,6 +12510,11 @@ class AlphaController extends Controller
             'search' => trim(self::asStr($request->query('q'))) ?: null,
             'when' => $this->allowed($request->query('when', 'upcoming'), ['upcoming', 'past', 'all'], 'upcoming'),
             'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
+            'step_free' => $this->allowed(
+                $request->query('step_free', 'any'),
+                ['any', 'yes', 'no', 'unknown'],
+                'any',
+            ),
             'cursor' => self::asStr($request->query('cursor')) ?: null,
             'near' => $near,
         ], $this->nearMeFilters($near));
@@ -12233,6 +12528,16 @@ class AlphaController extends Controller
         $videoUrl = trim(self::asStr($request->input('video_url')));
         $endTime = trim(self::asStr($request->input('end_time')));
         $categoryId = self::asStr($request->input('category_id'));
+        $triState = static fn (mixed $value): ?bool => match (trim((string) $value)) {
+            'yes' => true,
+            'no' => false,
+            default => null,
+        };
+        $accessibilityText = static function (Request $request, string $field): ?string {
+            $value = trim(self::asStr($request->input($field)));
+
+            return $value !== '' ? $value : null;
+        };
 
         return [
             'title' => trim(self::asStr($request->input('title'))),
@@ -12246,6 +12551,18 @@ class AlphaController extends Controller
             'online_link' => $onlineLink !== '' ? $onlineLink : null,
             'allow_remote_attendance' => $request->boolean('allow_remote_attendance'),
             'video_url' => $videoUrl !== '' ? $videoUrl : null,
+            'venue_accessibility' => [
+                'step_free_access' => $triState($request->input('accessibility_step_free')),
+                'accessible_toilet' => $triState($request->input('accessibility_toilet')),
+                'hearing_loop' => $triState($request->input('accessibility_hearing_loop')),
+                'quiet_space' => $triState($request->input('accessibility_quiet_space')),
+                'seating_available' => $triState($request->input('accessibility_seating')),
+                'accessible_parking' => $triState($request->input('accessibility_parking')),
+                'parking_details' => $accessibilityText($request, 'accessibility_parking_details'),
+                'transit_details' => $accessibilityText($request, 'accessibility_transit_details'),
+                'assistance_contact' => $accessibilityText($request, 'accessibility_assistance_contact'),
+                'notes' => $accessibilityText($request, 'accessibility_notes'),
+            ],
         ];
     }
 
@@ -15658,7 +15975,17 @@ class AlphaController extends Controller
 
         $ok = false;
         try {
-            $ok = \App\Services\EventService::markAttended($id, $attendeeId, $userId);
+            $result = $this->eventAttendanceService->record(
+                $id,
+                $attendeeId,
+                $this->accessibleEventActor($userId),
+                null,
+                null,
+                $this->accessibleEventMutationKey($request),
+            );
+            $ok = in_array($result->outcome, ['checked_in', 'already_checked_in'], true);
+        } catch (EventAttendanceException|EventRegistrationException $e) {
+            $ok = false;
         } catch (\Throwable $e) {
             report($e);
         }

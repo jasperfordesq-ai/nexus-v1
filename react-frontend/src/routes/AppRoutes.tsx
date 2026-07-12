@@ -12,7 +12,7 @@
  */
 
 import { type ReactNode } from 'react';
-import { Route, Navigate } from 'react-router-dom';
+import { Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts/TenantContext';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
@@ -24,6 +24,13 @@ import { lazyWithRetry } from './lazyWithRetry';
 import { renderSharedPublicFeatureRoutes } from './sharedPublicFeatureRoutes';
 
 const VerifyIdentityOptionalPage = lazyWithRetry(() => import('@/pages/settings/VerifyIdentityOptionalPage'));
+
+function LegacyEventEditRedirect() {
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const { tenantPath } = useTenant();
+  return <Navigate to={`${tenantPath(`/events/${id}/edit`)}${location.search}${location.hash}`} replace />;
+}
 
 // Full app shell (navbar, drawers, footer, podcast, session/update UI) is not
 // needed for login/register startup. Keep it in its own route chunk.
@@ -66,10 +73,12 @@ const NotificationsPage = lazyWithRetry(() => import('@/pages/notifications/Noti
 const MembersPage = lazyWithRetry(() => import('@/pages/members/MembersPage'));
 const EventsPage = lazyWithRetry(() => import('@/pages/events/EventsPage'));
 const EventDetailPage = lazyWithRetry(() => import('@/pages/events/EventDetailPage'));
+const EventManagePage = lazyWithRetry(() => import('@/pages/events/EventManagePage'));
 const CreateEventPage = lazyWithRetry(() => import('@/pages/events/CreateEventPage'));
 const GroupsPage = lazyWithRetry(() => import('@/pages/groups/GroupsPage'));
 const GroupDetailPage = lazyWithRetry(() => import('@/pages/groups/GroupDetailPage'));
 const CreateGroupPage = lazyWithRetry(() => import('@/pages/groups/CreateGroupPage'));
+const GroupInviteAcceptPage = lazyWithRetry(() => import('@/pages/groups/GroupInviteAcceptPage'));
 const NotFoundPage = lazyWithRetry(() => import('@/pages/errors/NotFoundPage'));
 const ComingSoonPage = lazyWithRetry(() => import('@/pages/errors/ComingSoonPage'));
 const ExchangesPage = lazyWithRetry(() => import('@/pages/exchanges/ExchangesPage'));
@@ -168,6 +177,7 @@ const MatchesPage = lazyWithRetry(() => import('@/pages/matches/MatchesPage'));
 const MatchPreferencesPage = lazyWithRetry(() => import('@/pages/matches/MatchPreferencesPage'));
 const ReviewsPage = lazyWithRetry(() => import('@/pages/reviews/ReviewsPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
+const EventGuardianConsentPage = lazyWithRetry(() => import('@/pages/events/EventGuardianConsentPage'));
 const AiChatPage = lazyWithRetry(() => import('@/pages/chat/AiChatPage'));
 const ConnectionsPage = lazyWithRetry(() => import('@/pages/connections/ConnectionsPage'));
 const SkillsBrowsePage = lazyWithRetry(() => import('@/pages/skills/SkillsBrowsePage'));
@@ -332,6 +342,7 @@ export function AppRoutes() {
 
         {/* Newsletter unsubscribe â€” public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
+        <Route path="events/:id/guardian-consent" element={<ErrorBoundary><EventGuardianConsentPage /></ErrorBoundary>} />
 
         {/* Shared public routes use one path/auth/feature policy in both registries. */}
         {renderSharedPublicFeatureRoutes()}
@@ -638,6 +649,13 @@ export function AppRoutes() {
             <FeatureGate feature="groups" fallback={<ComingSoonPage feature={t('coming_soon.features.groups')} />}>
               <FeatureErrorBoundary featureName="Groups">
                 <GroupsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="groups/invite/:token" element={
+            <FeatureGate feature="groups" redirect="/">
+              <FeatureErrorBoundary featureName="Groups">
+                <GroupInviteAcceptPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -1156,7 +1174,7 @@ export function AppRoutes() {
             </FeatureGate>
           } />
 
-          {/* Feature-gated: Events (create/edit only â€” view routes are public) */}
+          {/* Feature-gated: authenticated Event management routes */}
           <Route path="events/create" element={
             <FeatureGate feature="events" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Events">
@@ -1164,13 +1182,21 @@ export function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
-          <Route path="events/edit/:id" element={
+          <Route path="events/:id/edit" element={
             <FeatureGate feature="events" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Events">
                 <CreateEventPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="events/:id/manage/:section?" element={
+            <FeatureGate feature="events" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Events">
+                <EventManagePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="events/edit/:id" element={<LegacyEventEditRedirect />} />
 
           {/* Feature-gated: Groups (create/edit only â€” view routes are public) */}
           <Route path="groups/create" element={

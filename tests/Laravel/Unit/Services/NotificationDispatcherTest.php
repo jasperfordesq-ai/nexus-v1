@@ -153,4 +153,63 @@ class NotificationDispatcherTest extends TestCase
         $this->assertTrue($result);
         $this->assertSame($before + 1, $this->queueCountForUser(), 'organizer new_topic must enqueue exactly one instant email');
     }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function test_explicit_muted_policy_suppresses_every_channel(): void
+    {
+        $notification = Mockery::mock('alias:App\Models\Notification');
+        $notification->shouldNotReceive('createNotification');
+        $before = $this->queueCountForUser();
+
+        $result = NotificationDispatcher::dispatch(
+            $this->userId,
+            'group',
+            10,
+            'new_topic',
+            'Muted message',
+            '/group',
+            '<p>Muted</p>',
+            false,
+            null,
+            ['frequency' => 'muted', 'email_enabled' => true, 'push_enabled' => true],
+        );
+
+        $this->assertTrue($result);
+        $this->assertSame($before, $this->queueCountForUser());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function test_digest_policy_queues_daily_email_while_push_is_disabled(): void
+    {
+        $notification = Mockery::mock('alias:App\Models\Notification');
+        $notification->shouldReceive('createNotification')->once()->andReturn(123);
+        $before = $this->queueCountForUser();
+
+        $result = NotificationDispatcher::dispatch(
+            $this->userId,
+            'group',
+            10,
+            'new_topic',
+            'Digest message',
+            '/group',
+            '<p>Digest</p>',
+            false,
+            null,
+            ['frequency' => 'digest', 'email_enabled' => true, 'push_enabled' => false],
+        );
+
+        $this->assertTrue($result);
+        $this->assertSame($before + 1, $this->queueCountForUser());
+        $this->assertDatabaseHas('notification_queue', [
+            'user_id' => $this->userId,
+            'frequency' => 'daily',
+            'activity_type' => 'new_topic',
+        ]);
+    }
 }

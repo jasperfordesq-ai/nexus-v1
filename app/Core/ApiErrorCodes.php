@@ -153,6 +153,9 @@ class ApiErrorCodes
     /** Resource state conflict (e.g., already completed) */
     public const RESOURCE_CONFLICT = 'RESOURCE_CONFLICT';
 
+    /** Tenant move would remove a user's only usable passkey-based sign-in method */
+    public const USER_MOVE_PASSKEY_RECOVERY_REQUIRED = 'USER_MOVE_PASSKEY_RECOVERY_REQUIRED';
+
     /** Resource has been deleted */
     public const RESOURCE_DELETED = 'RESOURCE_DELETED';
 
@@ -264,7 +267,8 @@ class ApiErrorCodes
             // 409 Conflict
             self::VALIDATION_DUPLICATE,
             self::RESOURCE_ALREADY_EXISTS,
-            self::RESOURCE_CONFLICT => 409,
+            self::RESOURCE_CONFLICT,
+            self::USER_MOVE_PASSKEY_RECOVERY_REQUIRED => 409,
 
             // 410 Gone
             self::RESOURCE_DELETED => 410,

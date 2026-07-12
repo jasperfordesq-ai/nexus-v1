@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Event analytics",
+    "subtitle": "Operational performance, attendance, communications and privacy-safe conversion metrics.",
+    "generated_at": "Generated {{date}}",
+    "loading": "Loading event analytics",
+    "load_error": "Event analytics could not be loaded.",
+    "retry": "Try again",
+    "refresh": "Refresh",
+    "export": "Export CSV",
+    "exporting": "Exporting…",
+    "export_started": "Analytics export prepared.",
+    "download_error": "The analytics export could not be downloaded.",
+    "privacy_title": "Privacy-protected reporting",
+    "privacy_note": "Optional metrics are hidden until at least {{count}} consented people are represented.",
+    "consent_bound": "Consent-bound",
+    "suppressed": "Suppressed",
+    "not_limited": "No limit",
+    "finance_redacted": "Restricted by your role",
+    "columns": {
+      "metric": "Metric",
+      "value": "Value"
+    },
+    "sections": {
+      "registration": "Registration",
+      "acquisition": "Invitations and waitlist",
+      "attendance": "Attendance",
+      "communications": "Communications",
+      "funnel": "Privacy-safe funnel",
+      "finance": "Tickets and credits"
+    },
+    "metrics": {
+      "confirmed": "Confirmed registrations",
+      "pending": "Pending registrations",
+      "cancelled": "Cancelled registrations",
+      "capacity_remaining": "Capacity remaining",
+      "invitations_issued": "Invitations issued",
+      "invitations_accepted": "Invitations accepted",
+      "invitation_conversion": "Invitation conversion",
+      "waitlist_joined": "Waitlist joins",
+      "waitlist_accepted": "Waitlist acceptances",
+      "waitlist_conversion": "Waitlist conversion",
+      "checked_in": "Currently checked in",
+      "attended": "Attended",
+      "no_show": "No-shows",
+      "attendance_rate": "Attendance rate",
+      "delivered": "Notifications delivered",
+      "suppressed_deliveries": "Notifications suppressed",
+      "failed_deliveries": "Notifications failed",
+      "dead_lettered": "Notifications requiring intervention",
+      "delivery_rate": "Delivery rate",
+      "event_views": "Event views",
+      "registration_starts": "Registration starts",
+      "start_conversion": "View-to-registration conversion",
+      "finance": "Financial metrics",
+      "ticket_units": "Confirmed ticket units",
+      "ticket_credit_value": "Confirmed ticket credit value",
+      "completed_credit_claims": "Completed credit claims",
+      "failed_credit_claims": "Failed credit claims",
+      "guardian_consents": "Guardian consents"
+    }
+  }
+}

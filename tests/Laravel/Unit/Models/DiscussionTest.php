@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Models;
 use App\Models\Discussion;
 use App\Models\Concerns\HasTenantScope;
 use App\Models\Group;
+use App\Models\GroupDiscussion;
 use App\Models\GroupPost;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,6 +17,16 @@ use Tests\Laravel\TestCase;
 
 class DiscussionTest extends TestCase
 {
+    public function test_legacy_name_inherits_the_canonical_group_discussion_mapping(): void
+    {
+        $legacy = new Discussion();
+        $canonical = new GroupDiscussion();
+
+        $this->assertInstanceOf(GroupDiscussion::class, $legacy);
+        $this->assertSame($canonical->getFillable(), $legacy->getFillable());
+        $this->assertSame($canonical->getCasts(), $legacy->getCasts());
+    }
+
     public function test_table_name(): void
     {
         $model = new Discussion();
@@ -27,7 +38,7 @@ class DiscussionTest extends TestCase
         $model = new Discussion();
         $expected = [
             'tenant_id', 'group_id', 'user_id', 'title',
-            'is_pinned', 'is_locked', 'status',
+            'is_pinned', 'is_locked',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }

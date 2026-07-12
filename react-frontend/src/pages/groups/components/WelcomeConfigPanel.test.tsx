@@ -48,6 +48,7 @@ describe('WelcomeConfigPanel — access control', () => {
     expect(screen.queryByText('Welcome Message')).not.toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+    expect(api.get).not.toHaveBeenCalled();
   });
 
   it('renders the panel when isAdmin=true', async () => {
@@ -79,7 +80,10 @@ describe('WelcomeConfigPanel — form rendering after load', () => {
   it('calls GET /v2/groups/:id/welcome on mount', async () => {
     render(<WelcomeConfigPanel groupId={7} isAdmin={true} />);
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith('/v2/groups/7/welcome');
+      expect(api.get).toHaveBeenCalledWith(
+        '/v2/groups/7/welcome',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
     });
   });
 
@@ -137,7 +141,7 @@ describe('WelcomeConfigPanel — save action', () => {
   });
 
   it('calls PUT /v2/groups/:id/welcome with current config on save', async () => {
-    vi.mocked(api.put).mockResolvedValue({ success: true });
+    vi.mocked(api.put).mockResolvedValue({ success: true, data: ENABLED_CONFIG });
     render(<WelcomeConfigPanel groupId={5} isAdmin={true} />);
     await waitFor(() => expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument());
 
@@ -152,7 +156,7 @@ describe('WelcomeConfigPanel — save action', () => {
   });
 
   it('shows success toast on successful save', async () => {
-    vi.mocked(api.put).mockResolvedValue({ success: true });
+    vi.mocked(api.put).mockResolvedValue({ success: true, data: ENABLED_CONFIG });
     render(<WelcomeConfigPanel groupId={5} isAdmin={true} />);
     await waitFor(() => expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument());
 
@@ -217,5 +221,19 @@ describe('WelcomeConfigPanel — graceful degradation', () => {
     });
     // Textarea starts empty and disabled (enabled defaults to false)
     expect(screen.getByRole('textbox')).toBeDisabled();
+  });
+
+  it('uses defaults when API GET resolves with success:false', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: false,
+      code: 'HTTP_500',
+      error: 'Raw server copy',
+    });
+    render(<WelcomeConfigPanel groupId={1} isAdmin={true} />);
+
+    await waitFor(() => expect(screen.getByText('Welcome Message')).toBeInTheDocument());
+    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.queryByText('Raw server copy')).not.toBeInTheDocument();
   });
 });

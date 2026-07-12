@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Concerns\InteractsWithCourses;
 use App\Models\Group;
 use App\Services\CourseGroupService;
-use App\Services\GroupService;
+use App\Services\GroupAccessService;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -63,7 +63,7 @@ class CourseGroupController extends BaseApiController
         $this->ensureCoursesFeature();
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
-        if (!GroupService::canView($groupId, $userId)) {
+        if (!GroupAccessService::canViewMemberContent($groupId, $userId)) {
             return $this->respondWithData([]);
         }
 
@@ -87,7 +87,7 @@ class CourseGroupController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        if (!GroupService::canModify($groupId, $userId)) {
+        if (!GroupAccessService::canIntegrate($groupId, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_modify_forbidden'), null, 403);
         }
 

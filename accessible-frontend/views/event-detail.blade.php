@@ -5,16 +5,90 @@
 @extends('accessible-frontend::layout')
 
 @section('content')
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.events.calendar.actions', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+            {{ __('govuk_alpha.events.calendar_actions_title') }}
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a class="govuk-link" href="{{ route('govuk-alpha.events.agenda', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+            {{ __('govuk_alpha.events.agenda_link') }}
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a class="govuk-link" href="{{ route('govuk-alpha.events.safety', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+            {{ __('event_safety.govuk.link') }}
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a class="govuk-link" href="{{ route('govuk-alpha.events.tickets.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+            {{ __('event_tickets.title') }}
+        </a>
+    </p>
     @php
-        $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
-        $start = $formatDateTime($event['start_time'] ?? $event['start_date'] ?? null);
-        $end = $formatDateTime($event['end_time'] ?? $event['end_date'] ?? null);
-        $categoryName = $event['category']['name'] ?? $event['category_name'] ?? null;
-        $organiserName = $event['user']['name'] ?? trim(($event['user']['first_name'] ?? '') . ' ' . ($event['user']['last_name'] ?? ''));
-        $currentRsvp = $event['my_rsvp'] ?? null;
+        $schedule = is_array($event['schedule'] ?? null) ? $event['schedule'] : [];
+        $timezone = (string) ($schedule['timezone'] ?? 'UTC');
+        $formatDateTime = static fn ($value): ?string => $value
+            ? \Illuminate\Support\Carbon::parse($value)->setTimezone($timezone)->translatedFormat('j F Y, g:ia T')
+            : null;
+        $isAllDay = (bool) ($schedule['all_day'] ?? false);
+        if ($isAllDay) {
+            $startDate = isset($schedule['start_at'])
+                ? \Illuminate\Support\Carbon::parse($schedule['start_at'])->setTimezone($timezone)
+                : null;
+            $exclusiveEnd = isset($schedule['end_at'])
+                ? \Illuminate\Support\Carbon::parse($schedule['end_at'])->setTimezone($timezone)
+                : null;
+            $inclusiveEnd = $exclusiveEnd !== null
+                && $startDate !== null
+                && $exclusiveEnd->gt($startDate)
+                ? $exclusiveEnd->copy()->subDay()
+                : null;
+            $start = $startDate?->translatedFormat('j F Y');
+            $end = $inclusiveEnd !== null
+                && $startDate !== null
+                && !$inclusiveEnd->isSameDay($startDate)
+                ? $inclusiveEnd->translatedFormat('j F Y')
+                : null;
+        } else {
+            $start = $formatDateTime($schedule['start_at'] ?? null);
+            $end = $formatDateTime($schedule['end_at'] ?? null);
+        }
+        $categoryName = $event['category']['name'] ?? null;
+        $organiserName = (string) ($event['organizer']['display_name'] ?? '');
+        $locationFacts = is_array($event['location'] ?? null) ? $event['location'] : [];
+        $venueAccessibility = is_array($locationFacts['accessibility'] ?? null)
+            ? $locationFacts['accessibility']
+            : [];
+        $relationship = is_array($event['relationship'] ?? null) ? $event['relationship'] : [];
+        $engagementState = (string) ($relationship['engagement']['state'] ?? 'none');
+        $registrationState = (string) ($relationship['registration']['state'] ?? 'none');
+        $attendanceState = (string) ($relationship['attendance']['state'] ?? 'not_checked_in');
+        $onlineAccess = is_array($event['online_access'] ?? null) ? $event['online_access'] : [];
+        $metrics = is_array($event['metrics'] ?? null) ? $event['metrics'] : [];
+        $currentRsvp = match (true) {
+            $registrationState === 'confirmed' => 'going',
+            in_array($registrationState, ['declined', 'cancelled'], true) => 'not_going',
+            $engagementState === 'interested' => 'interested',
+            default => null,
+        };
+        $primaryImage = $event['primary_image']['url'] ?? null;
+        $publicationState = (string) ($schedule['publication_state'] ?? 'published');
+        $operationalState = (string) ($schedule['operational_state'] ?? $schedule['state'] ?? 'scheduled');
+        $isCancelled = $operationalState === 'cancelled';
+        $isArchived = $publicationState === 'archived';
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_events') }}</a>
+
+    @if ($registrationState === 'confirmed')
+        <p class="govuk-body">
+            <a class="govuk-link" href="{{ route('govuk-alpha.events.reminders', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                {{ __('govuk_alpha_events.reminders.manage_link') }}
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a class="govuk-link" href="{{ route('govuk-alpha.events.check-in.credential', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                {{ __('event_offline_checkin.attendee.manage_link') }}
+            </a>
+        </p>
+    @endif
 
     @if ($status === 'event-created')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-created-title">
@@ -61,11 +135,12 @@
                 </div>
             </div>
         </div>
-    @elseif (in_array($status, ['waitlist-joined', 'waitlist-left', 'poll-voted'], true))
+    @elseif (in_array($status, ['waitlist-joined', 'waitlist-left', 'waitlist-offer-accepted', 'poll-voted'], true))
         @php
             $depthMessage = match ($status) {
                 'waitlist-joined' => __('govuk_alpha.events.states.waitlist-joined'),
                 'waitlist-left' => __('govuk_alpha.events.states.waitlist-left'),
+                'waitlist-offer-accepted' => __('govuk_alpha.events.waitlist_offer_accepted'),
                 default => __('govuk_alpha.events.states.poll-voted'),
             };
         @endphp
@@ -77,7 +152,7 @@
                 <p class="govuk-notification-banner__heading">{{ $depthMessage }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['rsvp-failed', 'rsvp-vetting-required', 'rsvp-policy-unavailable', 'event-update-failed', 'event-cancel-failed', 'waitlist-failed', 'waitlist-vetting-required', 'waitlist-policy-unavailable', 'poll-vote-failed'], true))
+    @elseif (in_array($status, ['rsvp-failed', 'rsvp-vetting-required', 'rsvp-policy-unavailable', 'event-update-failed', 'event-cancel-failed', 'waitlist-failed', 'waitlist-offer-accept-failed', 'waitlist-vetting-required', 'waitlist-policy-unavailable', 'poll-vote-failed'], true))
         @php
             $depthError = match ($status) {
                 'rsvp-failed' => __('govuk_alpha.events.rsvp_failed'),
@@ -85,6 +160,7 @@
                 'rsvp-policy-unavailable', 'waitlist-policy-unavailable' => __('safeguarding.errors.policy_unavailable_detail'),
                 'event-update-failed' => __('govuk_alpha.events.update_failed'),
                 'event-cancel-failed' => __('govuk_alpha.events.cancel_failed'),
+                'waitlist-offer-accept-failed' => __('govuk_alpha.events.waitlist_offer_accept_failed'),
                 'waitlist-failed' => __('govuk_alpha.events.states.waitlist-failed'),
                 default => __('govuk_alpha.events.states.poll-vote-failed'),
             };
@@ -99,8 +175,6 @@
         </div>
     @endif
 
-    @php $isCancelled = ($event['status'] ?? '') === 'cancelled'; @endphp
-
     {{-- Cancelled event warning — rendered ABOVE the grid so it spans full width --}}
     @if ($isCancelled)
         <div class="govuk-warning-text govuk-!-margin-bottom-6">
@@ -108,18 +182,57 @@
             <strong class="govuk-warning-text__text">
                 <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
                 {{ __('govuk_alpha.events.polish_events.cancelled_banner_heading') }}
-                @if (!empty($event['cancellation_reason']))
+                @if (!empty($schedule['cancellation_reason']))
                     <br>
-                    <span class="govuk-body govuk-!-margin-top-1">{{ __('govuk_alpha.events.polish_events.cancelled_reason_prefix') }} {{ $event['cancellation_reason'] }}</span>
+                    <span class="govuk-body govuk-!-margin-top-1">{{ __('govuk_alpha.events.polish_events.cancelled_reason_prefix') }} {{ $schedule['cancellation_reason'] }}</span>
                 @endif
             </strong>
         </div>
     @endif
 
-    <div class="govuk-grid-row">
+    @if ($isArchived)
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="event-archived-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="event-archived-title">{{ __('govuk_alpha.events.archive_event') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.archived_notice') }}</p>
+            </div>
+        </div>
+    @endif
+
+    <div
+        class="govuk-grid-row"
+        data-events-contract-version="{{ $event['contract_version'] ?? '' }}"
+        data-event-timezone="{{ $timezone }}"
+        data-event-engagement-state="{{ $engagementState }}"
+        data-event-registration-state="{{ $registrationState }}"
+        data-event-attendance-state="{{ $attendanceState }}"
+        data-event-online-access-state="{{ $onlineAccess['reveal_state'] ?? '' }}">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">{{ __('govuk_alpha.events.detail_title') }}</span>
             <h1 class="govuk-heading-xl">{{ $event['title'] }}</h1>
+
+            @if (!empty($eventOperations['people']) || !empty($eventOperations['attendance']) || !empty($eventOperations['broadcast']) || $registrationState !== 'none' || ($isOwner ?? false))
+                <nav class="govuk-button-group" aria-label="{{ __('govuk_alpha.events.operations_navigation') }}">
+                    @if (!empty($eventOperations['people']) || $registrationState !== 'none' || ($isOwner ?? false))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.registration.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('event_registration.title') }}</a>
+                    @endif
+                    @if (!empty($eventOperations['people']))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.people', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.people_title') }}</a>
+                    @endif
+                    @if (!empty($eventOperations['attendance']))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.check-in', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.check_in_title') }}</a>
+                    @endif
+                    @if (!empty($eventOperations['broadcast']))
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.communications.index', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.communications.title') }}</a>
+                    @endif
+                    @if ($isOwner ?? false)
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.analytics.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.events.analytics.link') }}</a>
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.events.templates.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('event_templates.title') }}</a>
+                    @endif
+                </nav>
+            @endif
 
             {{-- Capacity tag — moved into two-thirds column, immediately after h1, before image --}}
             @if (!empty($event['is_full']))
@@ -136,13 +249,14 @@
                     || !empty($event['parent_event_id'])
                     || (!empty($seriesEvents) && count($seriesEvents) > 1);
             @endphp
-            @if ($isOwner ?? false)
+            @if (($isOwner ?? false) && !$isArchived)
                 <div class="govuk-button-group govuk-!-margin-bottom-4">
                     <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.events.edit_event') }}</a>
                     @if ($eventIsSeries)
                         <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.recurring.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_events.nav.edit_series') }}</a>
                     @endif
                     <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.polls', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_events.nav.manage_polls') }}</a>
+                    <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.templates.capture.preview', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('event_templates.capture_preview_title') }}</a>
                 </div>
                 @unless($isCancelled)
                     <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
@@ -151,9 +265,10 @@
                             <p class="govuk-body">{{ __('govuk_alpha.events.cancel_confirm') }}</p>
                             <form method="post" action="{{ route('govuk-alpha.events.cancel', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
                                 @csrf
+                                <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label" for="cancel-reason">{{ __('govuk_alpha.events.cancel_reason_label') }}</label>
-                                    <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3"></textarea>
+                                    <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3" required></textarea>
                                 </div>
                                 <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.cancel_event_button') }}</button>
                             </form>
@@ -161,20 +276,25 @@
                     </details>
                 @endunless
                 <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
-                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.delete_event') }}</span></summary>
+                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.archive_event') }}</span></summary>
                     <div class="govuk-details__text">
-                        <p class="govuk-body">{{ __('govuk_alpha.events.delete_confirm') }}</p>
+                        <p class="govuk-body">{{ __('govuk_alpha.events.archive_confirm') }}</p>
                         <form method="post" action="{{ route('govuk-alpha.events.delete', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
                             @csrf
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.delete_event_button') }}</button>
+                            <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="archive-reason">{{ __('govuk_alpha.events.archive_reason_label') }}</label>
+                                <textarea class="govuk-textarea" id="archive-reason" name="reason" rows="2"></textarea>
+                            </div>
+                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.archive_event_button') }}</button>
                         </form>
                     </div>
                 </details>
             @endif
 
-            @if (!empty($event['cover_image']))
+            @if ($primaryImage)
                 <figure class="nexus-alpha-detail-hero">
-                    <img src="{{ $event['cover_image'] }}" alt="{{ __('govuk_alpha.events.image_alt', ['title' => $event['title']]) }}" width="640" height="360" decoding="async">
+                    <img src="{{ $primaryImage }}" alt="{{ __('govuk_alpha.events.image_alt', ['title' => $event['title']]) }}" width="640" height="360" decoding="async">
                 </figure>
             @endif
 
@@ -188,7 +308,7 @@
         @if ($start)
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.starts') }}</dt>
-                <dd class="govuk-summary-list__value">{{ $start }}</dd>
+                <dd class="govuk-summary-list__value">{{ $start }}@if($isAllDay) · {{ __('govuk_alpha.events.all_day') }}@endif</dd>
             </div>
         @endif
         @if ($end)
@@ -200,27 +320,27 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.location') }}</dt>
             <dd class="govuk-summary-list__value">
-                {{ $event['location'] ?? __('govuk_alpha.events.online') }}
+                {{ $locationFacts['label'] ?? __('govuk_alpha.events.online') }}
                 @php
-                    $eventHasCoords = isset($event['latitude'], $event['longitude'])
-                        && $event['latitude'] !== null && $event['longitude'] !== null
-                        && empty($event['is_online']);
+                    $eventHasCoords = isset($locationFacts['latitude'], $locationFacts['longitude'])
+                        && $locationFacts['latitude'] !== null && $locationFacts['longitude'] !== null
+                        && ($locationFacts['mode'] ?? 'in_person') !== 'online';
                 @endphp
                 @if ($eventHasCoords && \App\Core\TenantContext::hasFeature('maps'))
                     <br><a class="govuk-link" href="{{ route('govuk-alpha.events.map', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha_events.nav.view_location') }}</a>
                 @endif
             </dd>
         </div>
-        @if (!empty($event['online_link']) && \Illuminate\Support\Str::startsWith((string) $event['online_link'], ['http://', 'https://']))
+        @if (($onlineAccess['reveal_state'] ?? '') === 'available' && !empty($onlineAccess['join_url']) && \Illuminate\Support\Str::startsWith((string) $onlineAccess['join_url'], ['http://', 'https://']))
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.online_link_label') }}</dt>
                 <dd class="govuk-summary-list__value">
-                    <a class="govuk-link" href="{{ $event['online_link'] }}" rel="noopener noreferrer">{{ __('govuk_alpha.events.online_link_text') }}</a>
+                    <a class="govuk-link" href="{{ $onlineAccess['join_url'] }}" rel="noopener noreferrer">{{ __('govuk_alpha.events.online_link_text') }}</a>
                 </dd>
             </div>
         @endif
-        @php $videoUrl = $event['video_url'] ?? null; @endphp
-        @if (!empty($videoUrl) && \Illuminate\Support\Str::startsWith((string) $videoUrl, ['http://', 'https://']))
+        @php $videoUrl = ($onlineAccess['reveal_state'] ?? '') === 'available' ? ($onlineAccess['video_url'] ?? null) : null; @endphp
+        @if ($videoUrl && \Illuminate\Support\Str::startsWith((string) $videoUrl, ['http://', 'https://']))
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.polish_events.video_url_summary_label') }}</dt>
                 <dd class="govuk-summary-list__value">
@@ -242,13 +362,56 @@
         @endif
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.attendees_label') }}</dt>
-            <dd class="govuk-summary-list__value">{{ trans_choice('govuk_alpha.events.attendees', (int) ($event['attendee_count'] ?? 0), ['count' => (int) ($event['attendee_count'] ?? 0)]) }}</dd>
+            <dd class="govuk-summary-list__value">{{ trans_choice('govuk_alpha.events.attendees', (int) ($metrics['confirmed_count'] ?? 0), ['count' => (int) ($metrics['confirmed_count'] ?? 0)]) }}</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.interested_label') }}</dt>
-            <dd class="govuk-summary-list__value">{{ trans_choice('govuk_alpha.events.interested', (int) ($event['interested_count'] ?? 0), ['count' => (int) ($event['interested_count'] ?? 0)]) }}</dd>
+            <dd class="govuk-summary-list__value">{{ trans_choice('govuk_alpha.events.interested', (int) ($metrics['interested_count'] ?? 0), ['count' => (int) ($metrics['interested_count'] ?? 0)]) }}</dd>
         </div>
     </dl>
+
+    @if (($venueAccessibility['provided'] ?? false) === true && ($locationFacts['mode'] ?? 'in_person') !== 'online')
+        @php
+            $venueAccessFeatures = [
+                'step_free_access',
+                'accessible_toilet',
+                'hearing_loop',
+                'quiet_space',
+                'seating_available',
+                'accessible_parking',
+            ];
+            $venueAccessDetails = [
+                'parking_details',
+                'transit_details',
+                'assistance_contact',
+                'notes',
+            ];
+        @endphp
+        <section class="govuk-!-margin-top-7" aria-labelledby="venue-accessibility-heading">
+            <h2 class="govuk-heading-l" id="venue-accessibility-heading">{{ __('event_accessibility.detail.title') }}</h2>
+            <p class="govuk-body">{{ __('event_accessibility.detail.intro') }}</p>
+            <dl class="govuk-summary-list">
+                @foreach ($venueAccessFeatures as $key)
+                    @php
+                        $value = $venueAccessibility[$key] ?? null;
+                        $accessStatus = $value === true ? 'yes' : ($value === false ? 'no' : 'unknown');
+                    @endphp
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">{{ __('event_accessibility.features.' . $key) }}</dt>
+                        <dd class="govuk-summary-list__value">{{ __('event_accessibility.status.' . $accessStatus) }}</dd>
+                    </div>
+                @endforeach
+                @foreach ($venueAccessDetails as $key)
+                    @if (!empty($venueAccessibility[$key]))
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">{{ __('event_accessibility.detail.' . $key) }}</dt>
+                            <dd class="govuk-summary-list__value">{{ $venueAccessibility[$key] }}</dd>
+                        </div>
+                    @endif
+                @endforeach
+            </dl>
+        </section>
+    @endif
 
     {{-- Share link — zero-JS mailto: fallback. Shown for all authenticated visitors on non-cancelled events. --}}
     @if (!$requiresAuth)
@@ -280,20 +443,38 @@
         </div>
     @else
         @php
-            $onWaitlist = isset($waitlistPosition) && $waitlistPosition !== null;
-            // Show the waitlist join control when the event is full and the member
-            // is not already attending. Once on the waitlist, show position + leave.
-            $eventIsFull = !empty($event['is_full']);
-            $isGoing = ($currentRsvp ?? null) === 'going';
+            $hasActiveWaitlistOffer = $registrationState === 'offered';
+            $onWaitlist = in_array($registrationState, ['waitlisted', 'offered'], true);
+            // The canonical relationship owns registration and capacity state;
+            // the HTML form is only a progressive-enhancement adapter.
+            $eventIsFull = (bool) ($relationship['capacity']['is_full'] ?? false);
+            $isGoing = $registrationState === 'confirmed';
         @endphp
 
         @if ($onWaitlist || ($eventIsFull && !$isGoing))
             <section class="govuk-!-margin-top-7" aria-labelledby="waitlist-heading">
-                <h2 class="govuk-heading-m" id="waitlist-heading">{{ __('govuk_alpha.events.waitlist_heading') }}</h2>
-                @if ($onWaitlist)
+                <h2 class="govuk-heading-m" id="waitlist-heading">{{ $hasActiveWaitlistOffer ? __('govuk_alpha.events.waitlist_offer_title') : __('govuk_alpha.events.waitlist_heading') }}</h2>
+                @if ($hasActiveWaitlistOffer)
+                    <div class="govuk-inset-text">
+                        <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.events.waitlist_offer_description') }}</p>
+                    </div>
+                    <div class="govuk-button-group">
+                        <form method="post" action="{{ route('govuk-alpha.events.waitlist.accept', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                            @csrf
+                            <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
+                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_offer_accept') }}</button>
+                        </form>
+                        <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                            @csrf
+                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.waitlist_offer_decline') }}</button>
+                        </form>
+                    </div>
+                @elseif ($onWaitlist)
                     <div class="govuk-inset-text">
                         <p class="govuk-body govuk-!-margin-bottom-1">{{ __('govuk_alpha.events.waitlist_on_list_note') }}</p>
-                        <p class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ __('govuk_alpha.events.waitlist_position', ['position' => $waitlistPosition]) }}</p>
+                        @if (($relationship['registration']['waitlist_position'] ?? null) !== null)
+                            <p class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ __('govuk_alpha.events.waitlist_position', ['position' => $relationship['registration']['waitlist_position']]) }}</p>
+                        @endif
                     </div>
                     <form method="post" action="{{ route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
                         @csrf
@@ -309,6 +490,7 @@
             </section>
         @endif
 
+        @unless($hasActiveWaitlistOffer)
         <form method="post" action="{{ route('govuk-alpha.events.rsvp.store', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" class="govuk-!-margin-top-7">
             @csrf
             <fieldset class="govuk-fieldset" aria-describedby="rsvp-hint">
@@ -327,6 +509,7 @@
             </fieldset>
             <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button">{{ __('govuk_alpha.actions.rsvp') }}</button>
         </form>
+        @endunless
 
         {{-- ===== Event polls ===== --}}
         @if (!empty($polls))
@@ -467,9 +650,10 @@
                 <dl class="govuk-summary-list">
                     @foreach ($attendees as $attendee)
                         @php
-                            $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                            $attendeeId = (int) ($attendee['id'] ?? $attendee['user_id'] ?? 0);
-                            $isAttended = ($attendee['rsvp_status'] ?? '') === 'attended';
+                            $attendeeName = trim((string) ($attendee['member']['display_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                            $attendeeId = (int) ($attendee['member']['id'] ?? 0);
+                            $attendeeAttendance = (string) ($attendee['attendance']['state'] ?? 'not_checked_in');
+                            $isAttended = in_array($attendeeAttendance, ['attended', 'checked_in', 'checked_out'], true);
                         @endphp
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">{{ $attendeeName }}</dt>
@@ -497,12 +681,14 @@
         <ul class="govuk-list">
             @foreach ($attendees as $attendee)
                 @php
-                    $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                    $rsvpDisplay = in_array(($attendee['rsvp_status'] ?? ''), ['going', 'attended'], true) ? 'going' : 'interested';
+                    $attendeeName = trim((string) ($attendee['member']['display_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                    $attendeeRegistration = (string) ($attendee['registration']['state'] ?? 'none');
+                    $attendeeEngagement = (string) ($attendee['engagement']['state'] ?? 'none');
+                    $rsvpDisplay = $attendeeRegistration === 'confirmed' ? 'going' : ($attendeeEngagement === 'interested' ? 'interested' : 'not_going');
                 @endphp
                 <li>
-                    @if (!empty($attendee['avatar_url']))
-                        <img class="nexus-alpha-avatar" src="{{ $attendee['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                    @if (!empty($attendee['member']['avatar_url']))
+                        <img class="nexus-alpha-avatar" src="{{ $attendee['member']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
                     @else
                         <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($attendeeName, 0, 1)) }}</span>
                     @endif

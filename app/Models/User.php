@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use App\Services\TokenService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -339,6 +340,7 @@ class User extends Authenticatable
             'email_connections' => 1,
             'email_transactions' => 1,
             'email_reviews' => 1,
+            'email_events' => 1,
             'push_enabled' => 1,
             'push_campaigns_opted_in' => 0,
             'email_org_payments' => 1,
@@ -378,7 +380,7 @@ class User extends Authenticatable
         $allowed = [
             'email_messages', 'email_listings', 'email_digest',
             'email_connections', 'email_transactions',
-            'email_reviews', 'push_enabled', 'push_campaigns_opted_in',
+            'email_reviews', 'email_events', 'push_enabled', 'push_campaigns_opted_in',
             'email_org_payments', 'email_org_transfers', 'email_org_membership',
             'email_org_admin', 'email_gamification_digest',
             'email_gamification_milestones',
@@ -388,18 +390,37 @@ class User extends Authenticatable
         $sanitized = [];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $prefs)) {
-                // Coerce to 0/1 — all current keys are boolean toggles.
-                $sanitized[$key] = filter_var($prefs[$key], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                $value = filter_var($prefs[$key], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                if ($value === null) {
+                    return false;
+                }
+                $sanitized[$key] = $value ? 1 : 0;
             }
+        }
+
+        if ($sanitized === []) {
+            return false;
         }
 
         try {
             $tenantId = TenantContext::getId();
-            DB::table('users')
+            $query = DB::table('users')
                 ->where('id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->update(['notification_preferences' => json_encode($sanitized)]);
-            return true;
+                ->where('tenant_id', $tenantId);
+
+            // Atomic JSON_SET avoids lost updates when independent settings
+            // requests or an unsubscribe arrive at the same time.
+            $assignments = [];
+            foreach ($sanitized as $key => $value) {
+                $assignments[] = "'$.{$key}', {$value}";
+            }
+            $document = "CASE WHEN JSON_VALID(notification_preferences) THEN notification_preferences ELSE JSON_OBJECT() END";
+            $updated = $query->update([
+                'notification_preferences' => DB::raw('JSON_SET(' . $document . ', ' . implode(', ', $assignments) . ')'),
+                'updated_at' => now(),
+            ]);
+
+            return $updated === 1 || $query->exists();
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('[User::updateNotificationPreferences] Error: ' . $e->getMessage());
             return false;
@@ -505,14 +526,63 @@ class User extends Authenticatable
      */
     public static function moveTenant(int $userId, int $newTenantId): array
     {
-        $affected = DB::table('users')
-            ->where('id', $userId)
-            ->update(['tenant_id' => $newTenantId]);
+        $outcome = DB::transaction(static function () use ($userId, $newTenantId): array {
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->select(['tenant_id', 'password_hash'])
+                ->lockForUpdate()
+                ->first();
+
+            if ($user === null || (int) $user->tenant_id === $newTenantId) {
+                return ['affected' => 0, 'failed' => []];
+            }
+
+            // A passkey is cryptographically scoped to the tenant's RP ID and
+            // must never follow an account into a different tenant. Delete all
+            // credentials for this user before changing the referenced tenant;
+            // the transaction restores them if the move itself fails.
+            $oldTenantId = (int) $user->tenant_id;
+            $passkeyCount = DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $oldTenantId)
+                ->lockForUpdate()
+                ->count();
+            if (
+                $passkeyCount > 0
+                && (!is_string($user->password_hash) || $user->password_hash === '')
+            ) {
+                return ['affected' => 0, 'failed' => ['passkey_recovery_required']];
+            }
+
+            // A tenant move is a security-boundary change. Revoke every bearer
+            // session in the same transaction so an old token cannot inherit
+            // destination-tenant access or newly granted privileges.
+            if (app(TokenService::class)->revokeAllTokensForUser($userId) < 1) {
+                throw new \RuntimeException('Unable to revoke sessions before tenant move.');
+            }
+            $userModel = self::withoutGlobalScopes()->find($userId);
+            if ($userModel === null) {
+                throw new \RuntimeException('Unable to resolve user before tenant move.');
+            }
+            $userModel->tokens()->delete();
+
+            DB::table('webauthn_credentials')
+                ->where('user_id', $userId)
+                ->delete();
+
+            $affected = DB::table('users')
+                ->where('id', $userId)
+                ->update(['tenant_id' => $newTenantId]);
+
+            return ['affected' => $affected, 'failed' => []];
+        });
+
+        $affected = (int) $outcome['affected'];
 
         return [
             'success' => $affected > 0,
             'moved'   => (int) $affected,
-            'failed'  => [],
+            'failed'  => $outcome['failed'],
         ];
     }
 }

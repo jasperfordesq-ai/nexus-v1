@@ -144,6 +144,7 @@ return [
     'event_rsvp_status_going'    => 'Going',
     'event_rsvp_status_interested' => 'Interested',
     'event_change_date_time'     => 'date/time',
+    'event_change_end_time'      => 'end time',
     'event_change_location'      => 'location',
     'event_change_title'         => 'title',
     'event_change_separator'     => ' and ',

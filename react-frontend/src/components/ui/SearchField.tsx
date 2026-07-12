@@ -56,7 +56,7 @@ export function SearchField({
   classNames,
   clearButtonLabel,
   endContent,
-  isClearable: _isClearable,
+  isClearable = true,
   onChange,
   onValueChange,
   placeholder,
@@ -81,9 +81,11 @@ export function SearchField({
         <HeroUISearchField.SearchIcon>{startContent}</HeroUISearchField.SearchIcon>
         <HeroUISearchField.Input className={classNames?.input} placeholder={placeholder} />
         {endContent}
-        <HeroUISearchField.ClearButton
-          aria-label={clearButtonLabel ?? t('search.clear')}
-        />
+        {isClearable && (
+          <HeroUISearchField.ClearButton
+            aria-label={clearButtonLabel ?? t('search.clear')}
+          />
+        )}
       </HeroUISearchField.Group>
     </HeroUISearchField>
   );

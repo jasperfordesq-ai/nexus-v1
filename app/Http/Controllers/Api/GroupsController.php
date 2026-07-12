@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Services\GroupNotificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use App\Services\GroupService;
 use App\Services\GroupAnnouncementService;
 
@@ -68,6 +69,10 @@ class GroupsController extends BaseApiController
         }
 
         $result = $this->groupService->getAll($filters);
+        if ($result === null) {
+            $errors = $this->groupService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
 
         // Batch-load viewer memberships (single query instead of N+1)
         if ($userId && !empty($result['items'])) {
@@ -102,6 +107,14 @@ class GroupsController extends BaseApiController
         return $this->respondWithData($group);
     }
 
+    /** GET /api/v2/groups/form-capabilities */
+    public function formCapabilities(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        return $this->respondWithData($this->groupService->getFormCapabilities($userId));
+    }
+
     // ================================================================
     // CREATE / UPDATE / DELETE
     // ================================================================
@@ -115,10 +128,30 @@ class GroupsController extends BaseApiController
         $this->rateLimit('groups_create', 10, 60);
 
         $data = $this->getAllInput();
+        $stagedImages = [];
+        foreach (['avatar' => 'image_url', 'cover' => 'cover_image_url'] as $input => $field) {
+            $file = request()->file($input);
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+            $stored = $this->storeGroupImageFile($file, $input === 'cover' ? 'cover' : 'avatar');
+            if ($stored instanceof JsonResponse) {
+                $this->cleanupStagedGroupImages($stagedImages);
+                return $stored;
+            }
+            $stagedImages[] = $stored;
+            $data[$field] = $stored;
+        }
 
-        $createdGroup = $this->groupService->create($userId, $data);
+        try {
+            $createdGroup = $this->groupService->create($userId, $data);
+        } catch (\Throwable $exception) {
+            $this->cleanupStagedGroupImages($stagedImages);
+            throw $exception;
+        }
 
         if ($createdGroup === null) {
+            $this->cleanupStagedGroupImages($stagedImages);
             $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
@@ -134,14 +167,106 @@ class GroupsController extends BaseApiController
         $groupId = $createdGroup instanceof \App\Models\Group ? $createdGroup->id : (int) $createdGroup;
         $group = $this->groupService->getById($groupId, $userId);
 
-        // Award XP for creating a group
-        try {
-            \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_group'], 'create_group', 'Created a group');
-        } catch (\Throwable $e) {
-            \Log::warning('Gamification XP award failed', ['action' => 'create_group', 'user' => $userId, 'error' => $e->getMessage()]);
+        // Pending-review groups have not completed creation for economy purposes.
+        if ($createdGroup->status === \App\Enums\GroupStatus::Active) {
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_group'], 'create_group', __('api.group_created'));
+            } catch (\Throwable $e) {
+                \Log::warning('Gamification XP award failed', ['action' => 'create_group', 'user' => $userId, 'error' => $e->getMessage()]);
+            }
         }
 
         return $this->respondWithData($group, null, 201);
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/settings
+     *
+     * Multipart form commit for fields plus staged keep/replace/remove image
+     * operations. New bytes are compensated if the database transaction fails;
+     * replaced bytes are removed only after the new record commits.
+     */
+    public function updateForm($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_settings_update', 20, 60);
+
+        $existing = $this->groupService->getById($id, $userId);
+        if ($existing === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+        if (! $this->groupService->canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_edit_forbidden'), null, 403);
+        }
+
+        $data = $this->getAllInput();
+        $operations = [
+            'avatar' => (string) ($data['avatar_action'] ?? 'keep'),
+            'cover' => (string) ($data['cover_action'] ?? 'keep'),
+        ];
+        foreach ($operations as $operation) {
+            if (! in_array($operation, ['keep', 'replace', 'remove'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_action_invalid'), 'image', 422);
+            }
+        }
+
+        $stagedImages = [];
+        foreach ($operations as $type => $operation) {
+            $field = $type === 'avatar' ? 'image_url' : 'cover_image_url';
+            if ($operation === 'remove') {
+                $data[$field] = null;
+                continue;
+            }
+            if ($operation !== 'replace') {
+                continue;
+            }
+
+            $file = request()->file($type);
+            if (! $file instanceof UploadedFile) {
+                $this->cleanupStagedGroupImages($stagedImages);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_image_uploaded'), $type, 422);
+            }
+            $stored = $this->storeGroupImageFile($file, $type);
+            if ($stored instanceof JsonResponse) {
+                $this->cleanupStagedGroupImages($stagedImages);
+                return $stored;
+            }
+            $stagedImages[] = $stored;
+            $data[$field] = $stored;
+        }
+        unset($data['avatar_action'], $data['cover_action']);
+
+        try {
+            $success = $this->groupService->update($id, $userId, $data, true);
+        } catch (\Throwable $exception) {
+            $this->cleanupStagedGroupImages($stagedImages);
+            throw $exception;
+        }
+        if (! $success) {
+            $this->cleanupStagedGroupImages($stagedImages);
+            $errors = $this->groupService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
+        foreach ($operations as $type => $operation) {
+            if ($operation === 'keep') {
+                continue;
+            }
+            $oldUrl = $type === 'avatar'
+                ? ($existing['image_url'] ?? null)
+                : ($existing['cover_image_url'] ?? null);
+            if (is_string($oldUrl) && $oldUrl !== '' && ! in_array($oldUrl, $stagedImages, true)
+                && ! \App\Core\ImageUploader::deleteTenantUpload($oldUrl, 'groups')) {
+                \Log::warning('Group settings committed but previous image cleanup was not possible', [
+                    'group_id' => $id,
+                    'type' => $type,
+                    'previous_url' => $oldUrl,
+                ]);
+            }
+        }
+
+        return $this->respondWithData($this->groupService->getById($id, $userId));
     }
 
     /**
@@ -228,23 +353,25 @@ class GroupsController extends BaseApiController
 
         if (!($result['success'] ?? false)) {
             $error = $result['error'] ?? __('api.group_join_failed');
-            $errorCode = $result['code'] ?? null;
+            $errorCode = (string) ($result['code'] ?? 'JOIN_FAILED');
             $httpStatus = match ($errorCode) {
                 'NOT_FOUND' => 404,
-                'BANNED' => 403,
+                'BANNED', 'FORBIDDEN' => 403,
                 'ALREADY_MEMBER' => 409,
+                'CAPACITY_FULL', 'MEMBERSHIP_LIMIT_REACHED', 'GROUP_UNAVAILABLE' => 409,
                 default => 422,
             };
-            return $this->respondWithError('JOIN_FAILED', $error, null, $httpStatus);
+            return $this->respondWithError($errorCode, $error, null, $httpStatus);
         }
 
         $joinStatus = $result['status'] ?? 'active';
+        $joinAction = $result['action'] ?? ($joinStatus === 'active' ? 'joined' : 'requested');
 
         // Notify based on join result
         try {
-            if ($joinStatus === 'active') {
+            if ($joinAction === 'joined') {
                 $this->groupNotificationService->notifyJoined($id, $userId);
-            } elseif ($joinStatus === 'pending') {
+            } elseif ($joinAction === 'requested') {
                 $this->groupNotificationService->notifyJoinRequest($id, $userId);
             }
         } catch (\Throwable $e) {
@@ -252,16 +379,21 @@ class GroupsController extends BaseApiController
         }
 
         // Award XP when user actually joins (not just pending request)
-        if ($joinStatus === 'active') {
+        if ($joinAction === 'joined') {
             try {
-                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', 'Joined a group');
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', __('api.group_joined'));
             } catch (\Throwable $e) {
                 \Log::warning('Gamification XP award failed', ['action' => 'join_group', 'user' => $userId, 'error' => $e->getMessage()]);
             }
         }
 
         return $this->respondWithData([
-            'status'  => $joinStatus,
+            'status' => $joinStatus,
+            'action' => $joinAction,
+            'membership' => [
+                'status' => $joinStatus,
+                'role' => 'member',
+            ],
             'message' => $joinStatus === 'active' ? __('api.group_joined') : __('api.group_join_requested'),
         ]);
     }
@@ -274,9 +406,9 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_leave', 30, 60);
 
-        $success = $this->groupService->leave($id, $userId);
+        $result = $this->groupService->leave($id, $userId);
 
-        if (!$success) {
+        if (!($result['success'] ?? false)) {
             $errors = $this->groupService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
@@ -288,15 +420,22 @@ class GroupsController extends BaseApiController
                     $httpStatus = 409;
                     break;
                 }
-                if ($error['code'] === 'SOLE_ADMIN') {
-                    $httpStatus = 422;
+                if (in_array($error['code'], ['SOLE_ADMIN', 'OWNER_CANNOT_LEAVE'], true)) {
+                    $httpStatus = 409;
+                    break;
+                }
+                if ($error['code'] === 'BANNED') {
+                    $httpStatus = 403;
                     break;
                 }
             }
             return $this->respondWithErrors($errors, $httpStatus);
         }
 
-        return $this->noContent();
+        return $this->respondWithData([
+            'status' => 'none',
+            'action' => $result['action'],
+        ]);
     }
 
     // ================================================================
@@ -327,6 +466,7 @@ class GroupsController extends BaseApiController
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'viewer_user_id' => $userId,
         ];
 
         if ($this->query('role')) {
@@ -335,8 +475,14 @@ class GroupsController extends BaseApiController
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
+        if ($this->query('q') !== null) {
+            $filters['q'] = $this->query('q');
+        }
 
         $result = $this->groupService->getMembers($id, $filters);
+        if ($result === null) {
+            return $this->respondWithErrors($this->groupService->getErrors(), 422);
+        }
 
         return $this->respondWithCollection(
             $result['items'],
@@ -404,6 +550,14 @@ class GroupsController extends BaseApiController
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
                     $status = 403;
+                    break;
+                }
+                if ($error['code'] === 'NOT_MEMBER') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'VALIDATION_ERROR') {
+                    $status = 409;
                     break;
                 }
             }
@@ -476,6 +630,10 @@ class GroupsController extends BaseApiController
                     $status = 403;
                     break;
                 }
+                if (in_array($error['code'], ['CAPACITY_FULL', 'MEMBERSHIP_LIMIT_REACHED', 'GROUP_UNAVAILABLE'], true)) {
+                    $status = 409;
+                    break;
+                }
             }
             return $this->respondWithErrors($errors, $status);
         }
@@ -494,7 +652,7 @@ class GroupsController extends BaseApiController
         // Award XP to the requester when their join request is accepted
         if ($action === 'accept') {
             try {
-                \App\Services\GamificationService::awardXP($requesterId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', 'Joined a group (request accepted)');
+                \App\Services\GamificationService::awardXP($requesterId, \App\Services\GamificationService::XP_VALUES['join_group'], 'join_group', __('api.group_joined'));
             } catch (\Throwable $e) {
                 \Log::warning('Gamification XP award failed', ['action' => 'join_group', 'user' => $requesterId, 'error' => $e->getMessage()]);
             }
@@ -529,15 +687,7 @@ class GroupsController extends BaseApiController
         $result = $this->groupService->getDiscussions($id, $userId, $filters);
 
         if ($result === null) {
-            $errors = $this->groupService->getErrors();
-            $status = 400;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->discussionErrorResponse(400);
         }
 
         return $this->respondWithCollection(
@@ -566,15 +716,7 @@ class GroupsController extends BaseApiController
         }
 
         if ($discussion === null) {
-            $errors = $this->groupService->getErrors();
-            $status = 422;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->discussionErrorResponse(422);
         }
 
         // Notify group members of new discussion
@@ -608,19 +750,7 @@ class GroupsController extends BaseApiController
         $result = $this->groupService->getDiscussionMessages($id, $discussionId, $userId, $filters);
 
         if ($result === null) {
-            $errors = $this->groupService->getErrors();
-            $status = 400;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'NOT_FOUND') {
-                    $status = 404;
-                    break;
-                }
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->discussionErrorResponse(400);
         }
 
         return $this->respondWithData([
@@ -652,22 +782,24 @@ class GroupsController extends BaseApiController
         }
 
         if ($message === null) {
-            $errors = $this->groupService->getErrors();
-            $status = 422;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'NOT_FOUND') {
-                    $status = 404;
-                    break;
-                }
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->discussionErrorResponse(422);
         }
 
         return $this->respondWithData($message, null, 201);
+    }
+
+    private function discussionErrorResponse(int $fallbackStatus): JsonResponse
+    {
+        $errors = $this->groupService->getErrors();
+        $status = match ($errors[0]['code'] ?? '') {
+            'NOT_FOUND' => 404,
+            'FORBIDDEN' => 403,
+            'DISCUSSION_LOCKED' => 409,
+            'INVALID_CURSOR', 'VALIDATION_ERROR' => 422,
+            default => $fallbackStatus,
+        };
+
+        return $this->respondWithErrors($errors, $status);
     }
 
     // ================================================================
@@ -793,16 +925,45 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_image_upload', 10, 60);
 
+        if (! $this->groupService->getById($id, $userId)) {
+            return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+        if (! $this->groupService->canModify($id, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_modify_forbidden'), null, 403);
+        }
+
         $file = request()->file('image');
         if (!$file || !$file->isValid()) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_image_uploaded'), 'image', 400);
         }
 
         $imageType = $this->query('type', 'avatar');
-        if (!in_array($imageType, ['avatar', 'cover'])) {
-            $imageType = 'avatar';
+        if (!in_array($imageType, ['avatar', 'cover'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_type_invalid'), 'type', 422);
         }
 
+        $extension = strtolower($file->getClientOriginalExtension());
+        $mime = (string) $file->getMimeType();
+        $allowed = [
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png' => ['png'],
+            'image/gif' => ['gif'],
+            'image/webp' => ['webp'],
+        ];
+        $realPath = $file->getRealPath();
+        $dimensions = is_string($realPath) ? @getimagesize($realPath) : false;
+        $pixelCount = $dimensions === false ? 0 : (int) $dimensions[0] * (int) $dimensions[1];
+        if (! isset($allowed[$mime]) || ! in_array($extension, $allowed[$mime], true) || $dimensions === false) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_invalid'), 'image', 422);
+        }
+        if ((int) $file->getSize() < 1 || (int) $file->getSize() > 8 * 1024 * 1024) {
+            return $this->respondWithError('FILE_TOO_LARGE', __('api.group_image_size_exceeded'), 'image', 413);
+        }
+        if ($pixelCount < 1 || $pixelCount > 25_000_000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_dimensions_invalid'), 'image', 422);
+        }
+
+        $imageUrl = null;
         try {
             // Build a $_FILES-compatible array for ImageUploader::upload()
             $fileArray = [
@@ -813,11 +974,15 @@ class GroupsController extends BaseApiController
                 'size'     => $file->getSize(),
             ];
 
-            $imageUrl = \App\Core\ImageUploader::upload($fileArray);
+            $imageUrl = \App\Core\ImageUploader::upload($fileArray, 'groups');
+            if ($imageUrl === null) {
+                return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 500);
+            }
 
-            $success = $this->groupService->updateImage($id, $userId, $imageUrl, $imageType);
+            $replacement = $this->groupService->replaceImage($id, $userId, $imageUrl, $imageType);
 
-            if (!$success) {
+            if ($replacement === null) {
+                \App\Core\ImageUploader::deleteTenantUpload($imageUrl, 'groups');
                 $errors = $this->groupService->getErrors();
                 $status = 400;
                 foreach ($errors as $error) {
@@ -833,25 +998,129 @@ class GroupsController extends BaseApiController
                 return $this->respondWithErrors($errors, $status);
             }
 
-            return $this->respondWithData(['image_url' => $imageUrl]);
+            $previousUrl = $replacement['previous_url'];
+            if ($previousUrl !== null && $previousUrl !== $imageUrl
+                && ! \App\Core\ImageUploader::deleteTenantUpload($previousUrl, 'groups')) {
+                \Log::warning('Group image replacement committed but legacy file cleanup was not possible', [
+                    'group_id' => $id,
+                    'type' => $imageType,
+                    'previous_url' => $previousUrl,
+                ]);
+            }
+
+            return $this->respondWithData(['image_url' => $imageUrl, 'type' => $imageType]);
         } catch (\Exception $e) {
+            if (is_string($imageUrl)) {
+                \App\Core\ImageUploader::deleteTenantUpload($imageUrl, 'groups');
+            }
             \Log::error('Group image upload failed', ['error' => $e->getMessage()]);
             return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 500);
         }
+    }
+
+    /** DELETE /api/v2/groups/{id}/image?type=avatar|cover */
+    public function removeImage($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_image_remove', 10, 60);
+        $imageType = $this->query('type', 'avatar');
+        if (! in_array($imageType, ['avatar', 'cover'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_type_invalid'), 'type', 422);
+        }
+
+        $replacement = $this->groupService->replaceImage($id, $userId, null, $imageType);
+        if ($replacement === null) {
+            $errors = $this->groupService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
+        $previousUrl = $replacement['previous_url'];
+        if ($previousUrl !== null && ! \App\Core\ImageUploader::deleteTenantUpload($previousUrl, 'groups')) {
+            \Log::warning('Group image removal committed but legacy file cleanup was not possible', [
+                'group_id' => $id,
+                'type' => $imageType,
+                'previous_url' => $previousUrl,
+            ]);
+        }
+
+        return $this->respondWithData(['image_url' => null, 'type' => $imageType]);
     }
 
     // ================================================================
     // HELPERS
     // ================================================================
 
+    private function storeGroupImageFile(UploadedFile $file, string $type): string|JsonResponse
+    {
+        if (! $file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.no_image_uploaded'), $type, 422);
+        }
+
+        $extension = strtolower($file->getClientOriginalExtension());
+        $mime = (string) $file->getMimeType();
+        $allowed = [
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png' => ['png'],
+            'image/gif' => ['gif'],
+            'image/webp' => ['webp'],
+        ];
+        if ((int) $file->getSize() < 1 || (int) $file->getSize() > 8 * 1024 * 1024) {
+            return $this->respondWithError('FILE_TOO_LARGE', __('api.group_image_size_exceeded'), $type, 413);
+        }
+        $realPath = $file->getRealPath();
+        $dimensions = is_string($realPath) ? @getimagesize($realPath) : false;
+        $pixelCount = $dimensions === false ? 0 : (int) $dimensions[0] * (int) $dimensions[1];
+        if (! isset($allowed[$mime]) || ! in_array($extension, $allowed[$mime], true) || $dimensions === false) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_invalid'), $type, 422);
+        }
+        if ($pixelCount < 1 || $pixelCount > 25_000_000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_image_dimensions_invalid'), $type, 422);
+        }
+
+        try {
+            $fileArray = [
+                'name' => $file->getClientOriginalName(),
+                'type' => $mime,
+                'tmp_name' => $realPath,
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ];
+            $url = \App\Core\ImageUploader::upload($fileArray, 'groups');
+            return is_string($url) && $url !== ''
+                ? $url
+                : $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), $type, 500);
+        } catch (\Throwable $exception) {
+            \Log::error('Staged group image upload failed', [
+                'type' => $type,
+                'error' => $exception->getMessage(),
+            ]);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), $type, 500);
+        }
+    }
+
+    /** @param list<string> $urls */
+    private function cleanupStagedGroupImages(array $urls): void
+    {
+        foreach ($urls as $url) {
+            if (! \App\Core\ImageUploader::deleteTenantUpload($url, 'groups')) {
+                \Log::warning('Failed to compensate staged group image', ['url' => $url]);
+            }
+        }
+    }
+
     private function resolveErrorStatus(array $errors): int
     {
         foreach ($errors as $error) {
-            if ($error['code'] === 'NOT_FOUND') {
-                return 404;
-            }
-            if ($error['code'] === 'FORBIDDEN') {
-                return 403;
+            $status = match ($error['code'] ?? '') {
+                'NOT_FOUND' => 404,
+                'FORBIDDEN' => 403,
+                'INVALID_CURSOR', 'VALIDATION', 'VALIDATION_ERROR' => 422,
+                default => null,
+            };
+
+            if ($status !== null) {
+                return $status;
             }
         }
         return 400;

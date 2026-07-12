@@ -1,0 +1,42 @@
+{
+  "contract_version": 2,
+  "event_id": 101,
+  "relationship": {
+    "engagement": {
+      "state": "none",
+      "can_change": true
+    },
+    "registration": {
+      "state": "confirmed",
+      "waitlist_position": null,
+      "can_register": false,
+      "can_withdraw": true,
+      "can_join_waitlist": false,
+      "can_leave_waitlist": false
+    },
+    "attendance": {
+      "state": "not_checked_in",
+      "checked_in_at": null,
+      "checked_out_at": null
+    },
+    "capacity": {
+      "limit": 20,
+      "confirmed": 19,
+      "remaining": 1,
+      "is_full": false,
+      "waitlist_count": 4
+    }
+  },
+  "metrics": {
+    "confirmed_count": 19,
+    "interested_count": 8,
+    "waitlist_count": 4
+  },
+  "status": "going",
+  "rsvp_counts": {
+    "going": 19,
+    "interested": 8
+  },
+  "waitlist_position": null,
+  "message": null
+}

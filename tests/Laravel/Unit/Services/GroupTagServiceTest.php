@@ -132,4 +132,21 @@ class GroupTagServiceTest extends TestCase
         $result = GroupTagService::suggest('art');
         $this->assertSame([], $result);
     }
+
+    public function test_findGroupsByTag_only_returns_active_public_same_tenant_groups_and_caps_limit(): void
+    {
+        DB::shouldReceive('table')->with('groups as g')->andReturnSelf();
+        DB::shouldReceive('join')->with('group_tag_assignments as gta', 'g.id', '=', 'gta.group_id')->andReturnSelf();
+        DB::shouldReceive('join')->with('group_tags as gt', 'gt.id', '=', 'gta.tag_id')->andReturnSelf();
+        DB::shouldReceive('where')->with('gta.tag_id', 12)->andReturnSelf();
+        DB::shouldReceive('where')->with('g.tenant_id', $this->testTenantId)->andReturnSelf();
+        DB::shouldReceive('where')->with('gt.tenant_id', $this->testTenantId)->andReturnSelf();
+        DB::shouldReceive('where')->with('g.status', 'active')->andReturnSelf();
+        DB::shouldReceive('where')->with('g.visibility', 'public')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('limit')->with(100)->andReturnSelf();
+        DB::shouldReceive('get')->andReturn(collect([]));
+
+        $this->assertSame([], GroupTagService::findGroupsByTag(12, 999));
+    }
 }

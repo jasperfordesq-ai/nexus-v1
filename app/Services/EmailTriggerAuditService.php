@@ -1207,6 +1207,20 @@ class EmailTriggerAuditService
                 ->where('er.status', 'sent')
                 ->whereIn('er.reminder_type', ['email', 'both'])
                 ->where('er.sent_at', '>=', $since)
+                ->when(
+                    Schema::hasTable('event_notification_deliveries') && Schema::hasTable('event_domain_outbox'),
+                    fn ($query) => $query->whereNotExists(function ($sub): void {
+                        $sub->select(DB::raw(1))
+                            ->from('event_notification_deliveries as event_delivery')
+                            ->join('event_domain_outbox as edo', 'edo.id', '=', 'event_delivery.outbox_id')
+                            ->whereColumn('event_delivery.tenant_id', 'er.tenant_id')
+                            ->whereColumn('event_delivery.recipient_user_id', 'er.user_id')
+                            ->whereColumn('edo.event_id', 'er.event_id')
+                            ->where('event_delivery.channel', 'email')
+                            ->where('event_delivery.status', 'suppressed')
+                            ->whereColumn('event_delivery.created_at', '>=', 'er.created_at');
+                    }),
+                )
                 ->whereNotExists(function ($sub) {
                     $sub->select(DB::raw(1))
                         ->from('email_log')

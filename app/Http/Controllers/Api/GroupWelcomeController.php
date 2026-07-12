@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\GroupService;
+use App\Services\GroupAccessService;
 use App\Services\GroupWelcomeService;
 
 /**
@@ -29,7 +29,7 @@ class GroupWelcomeController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canView($id, $userId)) {
+        if (!GroupAccessService::canConfigure($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_welcome_forbidden'), null, 403);
         }
 
@@ -51,7 +51,7 @@ class GroupWelcomeController extends BaseApiController
             return $userId;
         }
 
-        if (!GroupService::canModify($id, $userId)) {
+        if (!GroupAccessService::canConfigure($id, $userId)) {
             return $this->respondWithError('FORBIDDEN', __('api.group_admin_required'), null, 403);
         }
 

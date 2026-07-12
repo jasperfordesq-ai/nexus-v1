@@ -1,0 +1,202 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
+
+const mockGet = jest.fn();
+const mockPreview = jest.fn();
+const mockCreate = jest.fn();
+const mockSchedule = jest.fn();
+const mockCancel = jest.fn();
+const mockRetry = jest.fn();
+const mockShowToast = jest.fn();
+
+jest.mock('expo-router', () => ({
+  useLocalSearchParams: () => ({ id: '42' }),
+  router: { canGoBack: () => true, back: jest.fn(), replace: jest.fn() },
+}));
+jest.mock('@/components/ui/AppTopBar', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  return ({ title }: { title: string }) => <Text>{title}</Text>;
+});
+jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/AppToast', () => ({
+  useAppToast: () => ({ show: mockShowToast }),
+}));
+jest.mock('@/lib/api/eventCommunications', () => ({
+  getEventCommunications: (...args: unknown[]) => mockGet(...args),
+  previewEventCommunication: (...args: unknown[]) => mockPreview(...args),
+  createEventCommunication: (...args: unknown[]) => mockCreate(...args),
+  scheduleEventCommunication: (...args: unknown[]) => mockSchedule(...args),
+  cancelEventCommunication: (...args: unknown[]) => mockCancel(...args),
+  retryEventCommunication: (...args: unknown[]) => mockRetry(...args),
+}));
+jest.mock('react-i18next', () => {
+  const labels: Record<string, string> = {
+    title: 'Organizer communications',
+    privacy_title: 'Audience privacy is protected',
+    privacy_description: 'Only aggregate delivery totals are shown.',
+    new_message: 'New message',
+    compose_title: 'Compose message',
+    compose_description: 'Write a message for an exact audience.',
+    variant_label: 'Message type',
+    segments_label: 'Audience segments',
+    segments_description: 'Canonical event audiences.',
+    channels_label: 'Delivery channels',
+    body_label: 'Message',
+    preview_button: 'Preview audience',
+    save_draft_button: 'Save draft',
+    preview_title: 'Exact audience preview',
+    preview_summary: '{{recipients}} recipients, {{deliveries}} deliveries',
+    schedule_title: 'Schedule message',
+    schedule_description: 'Leave blank to send now.',
+    schedule_label: 'Date and time',
+    schedule_placeholder: '2030-08-01T10:00',
+    confirm_schedule: 'Confirm schedule',
+    cancel_title: 'Cancel message',
+    cancel_description: 'Cancellation is available only before delivery starts.',
+    cancel_reason_label: 'Cancellation reason',
+    confirm_cancel: 'Confirm cancellation',
+    status_title: 'Message status',
+    loading: 'Loading communications',
+    empty_title: 'No messages',
+    empty_description: 'Create a message draft.',
+    schedule_button: 'Schedule',
+    cancel_button: 'Cancel',
+    retry_button: 'Retry',
+    not_recorded: 'Not recorded',
+    version: 'Version {{version}}',
+    audience_summary: '{{count}} recipients across {{segments}}',
+    channels_summary: 'Channels: {{channels}}',
+    delivery_summary: '{{delivered}} of {{total}} delivered; {{suppressed}} suppressed; {{dead}} dead-lettered',
+    scheduled_for: 'Scheduled: {{date}}',
+    'variants.announcement': 'Announcement',
+    'variants.follow_up': 'Post-event follow-up',
+    'variants.review_request': 'Review request',
+    'statuses.draft': 'Draft',
+    'statuses.scheduled': 'Scheduled',
+    'segments.registration_confirmed': 'Confirmed registrations',
+    'segments.waitlist_active': 'Active waitlist',
+    'segments.attendance_attended': 'Attended',
+    'segments.attendance_no_show': 'Did not attend',
+    'channels.email': 'Email',
+    'channels.in_app': 'In-app notification',
+    'channels.push': 'Push notification',
+  };
+  return {
+    useTranslation: () => ({
+      t: (key: string, values?: Record<string, unknown>) => {
+        let value = labels[key] ?? key;
+        Object.entries(values ?? {}).forEach(([name, replacement]) => {
+          value = value.replace(`{{${name}}}`, String(replacement));
+        });
+        return value;
+      },
+      i18n: { language: 'en' },
+    }),
+  };
+});
+
+import EventCommunicationsScreen from './event-communications';
+
+function broadcast(overrides: Record<string, unknown> = {}) {
+  return {
+    contract_version: 1,
+    id: 8,
+    event_id: 42,
+    variant: 'announcement',
+    status: 'draft',
+    version: 1,
+    audience: { segments: ['registration_confirmed'], recipient_count: 12 },
+    channels: ['email', 'in_app'],
+    body: null,
+    delivery: { total: 0, delivered: 0, suppressed: 0, dead_lettered: 0, failure_code: null },
+    capabilities: { edit: true, schedule: true, cancel: true, retry: false },
+    scheduled_at: null,
+    cancelled_at: null,
+    sent_at: null,
+    failed_at: null,
+    created_at: '2026-07-11T10:00:00+00:00',
+    updated_at: '2026-07-11T10:00:00+00:00',
+    ...overrides,
+  };
+}
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockGet.mockResolvedValue({
+    data: [broadcast()],
+    meta: { base_url: '', current_page: 1, per_page: 50, total: 1, total_pages: 1, has_more: false },
+  });
+  mockPreview.mockResolvedValue({
+    contract_version: 1,
+    event_id: 42,
+    variant: 'announcement',
+    segments: ['registration_confirmed'],
+    channels: ['email', 'in_app'],
+    recipient_count: 12,
+    delivery_count: 24,
+    segment_counts: { registration_confirmed: 12 },
+    generated_at: '2026-07-11T10:00:00+00:00',
+  });
+  mockCreate.mockResolvedValue(broadcast({ body: '  Exact organizer prose.\n  ' }));
+  mockSchedule.mockResolvedValue(broadcast({
+    status: 'scheduled',
+    version: 2,
+    capabilities: { edit: false, schedule: false, cancel: true, retry: false },
+    scheduled_at: '2026-07-11T10:05:00+00:00',
+  }));
+  mockCancel.mockResolvedValue(broadcast({
+    status: 'cancelled',
+    version: 3,
+    capabilities: { edit: false, schedule: false, cancel: false, retry: false },
+  }));
+});
+
+describe('EventCommunicationsScreen', () => {
+  it('shows aggregate status without participant identities', async () => {
+    const screen = render(<EventCommunicationsScreen />);
+
+    expect(await screen.findByText('Announcement')).toBeTruthy();
+    expect(screen.getByText('Audience privacy is protected')).toBeTruthy();
+    expect(screen.getByText('12 recipients across Confirmed registrations')).toBeTruthy();
+    expect(screen.queryByText(/@/)).toBeNull();
+  });
+
+  it('requires an exact preview and preserves organizer wording when saving', async () => {
+    const screen = render(<EventCommunicationsScreen />);
+    await screen.findByText('Announcement');
+
+    fireEvent.press(screen.getByText('New message'));
+    fireEvent.changeText(screen.getByTestId('event-communication-body'), '  Exact organizer prose.\n  ');
+    fireEvent.press(screen.getByText('Preview audience'));
+
+    expect(await screen.findByText('12 recipients, 24 deliveries')).toBeTruthy();
+    fireEvent.press(screen.getByText('Save draft'));
+
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledWith(
+      42,
+      expect.objectContaining({ body: '  Exact organizer prose.\n  ' }),
+      expect.any(String),
+    ));
+  });
+
+  it('schedules immediately and cancels with optimistic versions', async () => {
+    const screen = render(<EventCommunicationsScreen />);
+    await screen.findByText('Announcement');
+
+    fireEvent.press(screen.getByText('Schedule'));
+    fireEvent.press(screen.getByText('Confirm schedule'));
+    await waitFor(() => expect(mockSchedule).toHaveBeenCalledWith(8, 1, null, expect.any(String)));
+
+    fireEvent.press(screen.getByText('Cancel'));
+    fireEvent.changeText(screen.getByTestId('event-communication-cancel-reason'), 'Plan changed');
+    fireEvent.press(screen.getByText('Confirm cancellation'));
+
+    await waitFor(() => expect(mockCancel).toHaveBeenCalledWith(8, 2, 'Plan changed', expect.any(String)));
+  });
+});

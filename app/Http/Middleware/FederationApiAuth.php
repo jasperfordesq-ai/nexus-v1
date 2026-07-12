@@ -28,17 +28,21 @@ class FederationApiAuth
 {
     public function handle(Request $request, Closure $next, string ...$permissions): Response
     {
-        $result = FederationApiMiddleware::authenticate();
+        $result = FederationApiMiddleware::authenticate($request->getContent());
 
         // authenticate() returns true on success, JsonResponse on failure
         if ($result !== true) {
-            return $result;
+            return $this->normalizeIngestError($request, $result);
         }
 
         $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = (int) ($partner['tenant_id'] ?? 0);
         if ($partnerTenantId <= 0) {
-            return FederationApiMiddleware::sendError(401, __('api.federation.webhook_auth_failed'), 'INVALID_PARTNER_TENANT');
+            return $this->normalizeIngestError($request, FederationApiMiddleware::sendError(
+                401,
+                __('api.federation.webhook_auth_failed'),
+                'INVALID_PARTNER_TENANT',
+            ));
         }
 
         $resolvedTenantId = (int) TenantContext::getId();
@@ -53,11 +57,19 @@ class FederationApiAuth
                 'path' => $request->path(),
             ]);
 
-            return FederationApiMiddleware::sendError(403, __('api.federation.tenant_mismatch'), 'TENANT_MISMATCH');
+            return $this->normalizeIngestError($request, FederationApiMiddleware::sendError(
+                403,
+                __('api.federation.tenant_mismatch'),
+                'TENANT_MISMATCH',
+            ));
         }
 
         if (!TenantContext::setById($partnerTenantId)) {
-            return FederationApiMiddleware::sendError(500, __('api.federation.webhook_tenant_error'), 'TENANT_ERROR');
+            return $this->normalizeIngestError($request, FederationApiMiddleware::sendError(
+                500,
+                __('api.federation.webhook_tenant_error'),
+                'TENANT_ERROR',
+            ));
         }
 
         $requiredPermissions = !empty($permissions)
@@ -65,10 +77,48 @@ class FederationApiAuth
             : $this->requiredPermissionsForRequest($request);
 
         if (!FederationApiMiddleware::hasAnyPermission($requiredPermissions)) {
-            return FederationApiMiddleware::sendError(403, __('api.federation.permission_denied'), 'PERMISSION_DENIED');
+            return $this->normalizeIngestError($request, FederationApiMiddleware::sendError(
+                403,
+                __('api.federation.permission_denied'),
+                'PERMISSION_DENIED',
+            ));
         }
 
         return $next($request);
+    }
+
+    /** Keep Nexus V2 ingest failures on the canonical errors[] contract. */
+    private function normalizeIngestError(Request $request, Response $response): Response
+    {
+        $path = '/' . ltrim($request->path(), '/');
+        if (! str_contains($path, '/v2/federation/ingest/')) {
+            return $response;
+        }
+
+        $legacy = json_decode((string) $response->getContent(), true);
+        $code = is_array($legacy) && is_string($legacy['code'] ?? null)
+            ? $legacy['code']
+            : 'FEDERATION_AUTH_FAILED';
+        $message = is_array($legacy) && is_string($legacy['message'] ?? null)
+            ? $legacy['message']
+            : __('api.federation.webhook_auth_failed');
+        $normalized = response()->json([
+            'errors' => [[
+                'code' => $code,
+                'message' => $message,
+            ]],
+        ], $response->getStatusCode(), [
+            'API-Version' => '2.0',
+            'Cache-Control' => 'private, no-store',
+            'Pragma' => 'no-cache',
+        ]);
+        foreach (['Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'] as $header) {
+            if ($response->headers->has($header)) {
+                $normalized->headers->set($header, (string) $response->headers->get($header));
+            }
+        }
+
+        return $normalized;
     }
 
     /**

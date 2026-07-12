@@ -7,6 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\AuthenticationConfigurationService;
+use App\Services\Auth\AuthenticationMethodGuard;
+use App\Services\AuditLogService;
 use App\Services\FederationFeatureService;
 use App\Services\FeedRankingService;
 use App\Services\GroupConfigurationService;
@@ -227,6 +229,9 @@ class AdminConfigController extends BaseApiController
             'tenant_id' => $tenantId,
             'features' => $features,
             'modules' => $modules,
+            'security_impact' => [
+                'biometric_login' => $this->passkeyDisableImpact($tenantId),
+            ],
         ]);
     }
 
@@ -253,12 +258,30 @@ class AdminConfigController extends BaseApiController
             $this->requireSuperAdmin();
         }
 
-        $tenant = DB::selectOne("SELECT features FROM tenants WHERE id = ?", [$tenantId]);
-        $features = ($tenant && !empty($tenant->features)) ? (json_decode($tenant->features, true) ?: []) : [];
-        $features[$featureName] = (bool) $enabled;
+        if (
+            $featureName === 'biometric_login'
+            && $enabled === false
+            && $this->input('confirm_disable') !== true
+        ) {
+            return $this->respondWithError(
+                'PASSKEY_DISABLE_CONFIRMATION_REQUIRED',
+                __('api.validation_failed'),
+                'confirm_disable',
+                409
+            );
+        }
 
         try {
-            DB::transaction(function () use ($features, $tenantId, $featureName, $enabled): void {
+            DB::transaction(function () use ($tenantId, $featureName, $enabled): void {
+                $tenant = DB::table('tenants')
+                    ->where('id', $tenantId)
+                    ->select('features')
+                    ->lockForUpdate()
+                    ->first();
+                $features = ($tenant && !empty($tenant->features))
+                    ? (json_decode((string) $tenant->features, true) ?: [])
+                    : [];
+                $features[$featureName] = (bool) $enabled;
                 DB::update("UPDATE tenants SET features = ? WHERE id = ?", [json_encode($features), $tenantId]);
 
                 if ($featureName === 'federation') {
@@ -277,8 +300,77 @@ class AdminConfigController extends BaseApiController
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenants_list_public');
+        $this->redisCache->delete('tenants_list_public_all');
+
+        if ($featureName === 'biometric_login') {
+            app(AuditLogService::class)->logAdminAction(
+                $enabled ? 'passkey_authentication_enabled' : 'passkey_authentication_disabled',
+                (int) auth()->id(),
+                null,
+                [
+                    'tenant_id' => $tenantId,
+                    'enabled' => $enabled,
+                    'impact' => $this->passkeyDisableImpact($tenantId),
+                ]
+            );
+        }
 
         return $this->respondWithData(['feature' => $featureName, 'enabled' => (bool) $enabled]);
+    }
+
+    /**
+     * @return array{credential_count: int, registered_users: int, passkey_only_users: int}
+     */
+    private function passkeyDisableImpact(int $tenantId): array
+    {
+        if (!Schema::hasTable('webauthn_credentials') || !Schema::hasTable('users')) {
+            return ['credential_count' => 0, 'registered_users' => 0, 'passkey_only_users' => 0];
+        }
+
+        $credentialCount = DB::table('webauthn_credentials as wc')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'wc.user_id')
+                    ->on('u.tenant_id', '=', 'wc.tenant_id');
+            })
+            ->where('wc.tenant_id', $tenantId)
+            ->count();
+
+        $registeredUsers = DB::table('webauthn_credentials as wc')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'wc.user_id')
+                    ->on('u.tenant_id', '=', 'wc.tenant_id');
+            })
+            ->where('wc.tenant_id', $tenantId)
+            ->distinct()
+            ->count('wc.user_id');
+
+        $passkeyOnly = DB::table('webauthn_credentials as wc')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'wc.user_id')
+                    ->on('u.tenant_id', '=', 'wc.tenant_id');
+            })
+            ->where('wc.tenant_id', $tenantId)
+            ->where(function ($query): void {
+                $query->whereNull('u.password_hash')->orWhere('u.password_hash', '');
+            });
+
+        $enabledProviders = AuthenticationMethodGuard::enabledIdentityProviders($tenantId);
+        if (Schema::hasTable('oauth_identities') && $enabledProviders !== []) {
+            $passkeyOnly->whereNotExists(function ($query) use ($tenantId, $enabledProviders): void {
+                $query->selectRaw('1')
+                    ->from('oauth_identities as oi')
+                    ->whereColumn('oi.user_id', 'u.id')
+                    ->where('oi.tenant_id', $tenantId)
+                    ->whereIn('oi.provider', $enabledProviders);
+            });
+        }
+
+        return [
+            'credential_count' => (int) $credentialCount,
+            'registered_users' => (int) $registeredUsers,
+            'passkey_only_users' => (int) $passkeyOnly->distinct()->count('wc.user_id'),
+        ];
     }
 
     /** PUT /api/v2/admin/config/modules */
@@ -1228,14 +1320,23 @@ class AdminConfigController extends BaseApiController
             }
             $validation = TenantHierarchyService::validateRoutingUpdate($tenantId, $routingFields);
             if (!$validation['success']) {
-                return $this->respondWithError(
-                    'VALIDATION_ERROR',
+                $code = (string) ($validation['code'] ?? 'VALIDATION_ERROR');
+                $response = $this->respondWithError(
+                    $code,
                     (string) ($validation['error'] ?? __('api.no_valid_fields_to_update')),
                     null,
-                    422
+                    $code === 'PASSKEY_RP_CHANGE_BLOCKED' ? 409 : 422
                 );
+                if (isset($validation['security_impact']) && is_array($validation['security_impact'])) {
+                    $payload = $response->getData(true);
+                    $payload['meta']['security_impact'] = $validation['security_impact'];
+                    $response->setData($payload);
+                }
+
+                return $response;
             }
             $directUpdates = array_replace($directUpdates, $validation['data'] ?? []);
+            $routingFields = array_replace($routingFields, $validation['data'] ?? []);
         }
 
         if (isset($kvUpdates['welcome_credits'])) {
@@ -1350,10 +1451,15 @@ class AdminConfigController extends BaseApiController
         $routingIdentityChanged = $routingFields !== [];
         $requiresAuthoritativeRefresh = $routingIdentityChanged
             || array_key_exists('maintenance_mode', $kvUpdates);
+        $nonRoutingDirectUpdates = array_diff_key(
+            $directUpdates,
+            array_flip(['slug', 'domain'])
+        );
         $prerenderJobId = 0;
         try {
-            DB::transaction(function () use (
-                $directUpdates,
+            $transactionFailure = DB::transaction(function () use (
+                $nonRoutingDirectUpdates,
+                $routingFields,
                 $kvUpdates,
                 $tenantId,
                 $adminId,
@@ -1361,25 +1467,35 @@ class AdminConfigController extends BaseApiController
                 $routingIdentityChanged,
                 &$childIdsToBust,
                 &$prerenderJobId
-            ): void {
-                if ($directUpdates !== []) {
+            ): ?array {
+                if ($routingFields !== []) {
+                    $routingResult = TenantHierarchyService::applyRoutingUpdateAtomically(
+                        $tenantId,
+                        $routingFields
+                    );
+                    if (!$routingResult['success']) {
+                        return $routingResult;
+                    }
+                }
+
+                if ($nonRoutingDirectUpdates !== []) {
                     $setClauses = [];
                     $params = [];
-                    foreach ($directUpdates as $col => $val) {
+                    foreach ($nonRoutingDirectUpdates as $col => $val) {
                         $setClauses[] = "`{$col}` = ?";
                         $params[] = $val;
                     }
                     $params[] = $tenantId;
                     DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
 
-                    if (array_key_exists('domain', $directUpdates)) {
-                        $childIdsToBust = DB::table('tenants')
-                            ->where('parent_id', $tenantId)
-                            ->where('is_active', 1)
-                            ->pluck('id')
-                            ->map(fn ($id) => (int) $id)
-                            ->toArray();
-                    }
+                }
+                if (array_key_exists('domain', $routingFields)) {
+                    $childIdsToBust = DB::table('tenants')
+                        ->where('parent_id', $tenantId)
+                        ->where('is_active', 1)
+                        ->pluck('id')
+                        ->map(fn ($id) => (int) $id)
+                        ->toArray();
                 }
 
                 foreach ($kvUpdates as $key => $value) {
@@ -1390,6 +1506,8 @@ class AdminConfigController extends BaseApiController
                 $prerenderJobId = $requiresAuthoritativeRefresh
                     ? $invalidator->refreshAllOrFail($routingIdentityChanged)
                     : $invalidator->refreshTenantOrFail($tenantId, true);
+
+                return null;
             });
         } catch (\Throwable $e) {
             report($e);
@@ -1399,6 +1517,22 @@ class AdminConfigController extends BaseApiController
                 null,
                 503
             );
+        }
+        if (is_array($transactionFailure)) {
+            $code = (string) ($transactionFailure['code'] ?? 'VALIDATION_ERROR');
+            $response = $this->respondWithError(
+                $code,
+                (string) ($transactionFailure['error'] ?? __('api.no_valid_fields_to_update')),
+                null,
+                $code === 'PASSKEY_RP_CHANGE_BLOCKED' ? 409 : 422
+            );
+            if (isset($transactionFailure['security_impact']) && is_array($transactionFailure['security_impact'])) {
+                $payload = $response->getData(true);
+                $payload['meta']['security_impact'] = $transactionFailure['security_impact'];
+                $response->setData($payload);
+            }
+
+            return $response;
         }
 
         foreach ($childIdsToBust as $childId) {
@@ -2530,15 +2664,20 @@ class AdminConfigController extends BaseApiController
         $value = $this->input('value');
 
         if (!$key || !is_string($key)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Configuration key is required', 'key', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_key_required'), 'key', 422);
         }
 
         if (!array_key_exists($key, GroupConfigurationService::DEFAULTS)) {
-            return $this->respondWithError('VALIDATION_ERROR', "Unknown configuration key: {$key}", 'key', 422);
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.group_config_key_invalid', ['key' => $key]),
+                'key',
+                422,
+            );
         }
 
         if ($value === null) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Value is required', 'value', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_value_required'), 'value', 422);
         }
 
         // Type coercion based on default type
@@ -2568,7 +2707,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_settings_required'), 'settings', 422);
         }
 
         $updated = [];

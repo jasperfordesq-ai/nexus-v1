@@ -49,6 +49,7 @@
         "openspout/openspout": "^4.28",
         "pelago/emogrifier": "^8.2",
         "pusher/pusher-php-server": "^7.2",
+        "sabre/vobject": "^5.0",
         "sendgrid/sendgrid": "^8.1",
         "sentry/sentry": "^4.0",
         "sentry/sentry-laravel": "^4.23",

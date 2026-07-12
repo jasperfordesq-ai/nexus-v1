@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Entradas para eventos",
+      "gatewayDisabledTitle": "El pago pagado y con crédito por tiempo está deshabilitado",
+      "gatewayDisabledDescription": "Este flujo móvil solo admite la asignación gratuita de boletos. Nunca cobra dinero ni créditos de tiempo y no cambia su billetera.",
+      "loading": "Cargando entradas para eventos",
+      "loadFailedTitle": "No se pueden cargar boletos",
+      "loadFailedDescription": "No se pudo cargar el catálogo de entradas del evento. Intentar otra vez.",
+      "myTicketsTitle": "Mis entradas",
+      "noTickets": "No tienes entrada para este evento.",
+      "ticketFallback": "Entrada para el evento",
+      "entitlementSummary": "{{count}} billete · {{status}}",
+      "entitlementSummary_other": "{{count}} entradas · {{status}}",
+      "cancelTicket": "Cancelar billete",
+      "timeCreditCancelDisabled": "La cancelación de boletos con crédito de tiempo no está disponible en este flujo gratuito. No se ha tomado ninguna medida en la billetera.",
+      "cancelTitle": "¿Cancelar este boleto gratis?",
+      "cancelDescription": "Da una breve razón. La cantidad volverá a la asignación gratuita.",
+      "reasonLabel": "Motivo de cancelación",
+      "confirmCancellation": "Confirmar cancelación",
+      "reasonInvalidTitle": "Consulta el motivo de la cancelación",
+      "reasonInvalidDescription": "Ingrese un motivo de no más de 500 caracteres.",
+      "cancelledTitle": "Boleto gratuito cancelado",
+      "cancelledDescription": "La cantidad ha sido devuelta a la asignación gratuita.",
+      "cancelFailedTitle": "No se puede cancelar el billete",
+      "cancelFailedDescription": "Actualiza el catálogo y vuelve a intentarlo.",
+      "catalogueTitle": "Entradas disponibles",
+      "catalogueEmpty": "No hay tipos de entradas disponibles para este evento.",
+      "free": "Gratis",
+      "timeCreditPrice": "{{credits}} créditos de tiempo",
+      "remaining": "{{count}} restantes",
+      "remaining_other": "{{count}} restantes",
+      "timeCreditDisabledTitle": "Pago con crédito de tiempo no disponible",
+      "timeCreditDisabledDescription": "La puerta de enlace de billetera aprobada no está conectada. No se pueden debitar créditos desde esta pantalla.",
+      "unitsLabel": "Cantidad (hasta {{count}})",
+      "registrationRequired": "Se requiere un registro confirmado del evento antes de reclamar una entrada gratuita.",
+      "notEligible": "Actualmente no cumples con las reglas de elegibilidad de este tipo de boleto.",
+      "salesClosed": "Este tipo de entrada no está actualmente abierta para asignación.",
+      "soldOut": "No quedan entradas gratuitas para usted en esta asignación.",
+      "claimFreeTicket": "Reclamar billete gratis",
+      "unitsInvalidTitle": "comprobar la cantidad",
+      "unitsInvalidDescription": "Ingrese un número entero entre 1 y {{count}}.",
+      "allocatedTitle": "Entrada gratuita asignada",
+      "allocatedDescription": "Tu billete ya está confirmado.",
+      "allocateFailedTitle": "No se puede asignar el billete",
+      "allocateFailedDescription": "Verifique su registro, elegibilidad y asignación restante, luego inténtelo nuevamente."
+    },
+    "status": {
+      "confirmed": "Confirmado",
+      "cancelled": "Cancelado"
+    }
+  }
+}

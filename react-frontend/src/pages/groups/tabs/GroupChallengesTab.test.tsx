@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, userEvent, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
@@ -20,9 +20,13 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/lib/helpers', () => ({
-  formatRelativeTime: (d: string) => d,
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    formatRelativeTime: (d: string) => d,
+  };
+});
 
 // ─── Contexts ─────────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
@@ -132,17 +136,21 @@ vi.mock('@/components/ui', async (importOriginal) => {
 const { makeChallenge } = vi.hoisted(() => ({
   makeChallenge: (overrides: Record<string, unknown> = {}) => ({
     id: 1,
+    group_id: 5,
     title: 'Post 10 times',
     description: 'Create 10 posts this month',
     metric: 'posts' as const,
     target_value: 10,
     current_value: 6,
     reward_xp: 100,
-    start_date: '2025-01-01T00:00:00Z',
-    end_date: '2099-12-31T00:00:00Z',
-    is_completed: false,
-    created_by: { id: 1, name: 'Admin User' },
+    status: 'active',
+    progress_percentage: 60,
+    starts_at: '2025-01-01T00:00:00Z',
+    ends_at: '2099-12-31T00:00:00Z',
+    completed_at: null,
+    creator: { id: 1, name: 'Admin User', avatar_url: null },
     created_at: '2025-01-01T00:00:00Z',
+    updated_at: '2025-01-01T00:00:00Z',
     ...overrides,
   }),
 }));
@@ -263,37 +271,140 @@ describe('GroupChallengesTab', () => {
     expect(createBtn).toBeUndefined();
   });
 
+  it('shows active-challenge cancellation only to group admins and requires explicit confirmation', async () => {
+    mockApi.get.mockResolvedValue(makeSuccessResponse([makeChallenge()]));
+    mockApi.delete.mockResolvedValue({
+      success: true,
+      data: {
+        challenge: makeChallenge({ status: 'cancelled' }),
+        changed: true,
+        message: 'cancelled',
+      },
+    });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    const { rerender } = render(<GroupChallengesTab {...defaultProps} isAdmin={false} />);
+
+    await screen.findByText('Post 10 times');
+    expect(screen.queryByRole('button', { name: 'Cancel challenge “Post 10 times”' })).not.toBeInTheDocument();
+
+    rerender(<GroupChallengesTab {...defaultProps} isAdmin />);
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel challenge “Post 10 times”' }));
+
+    const dialog = await screen.findByRole('alertdialog');
+    expect(within(dialog).getByText('Cancel challenge?')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Stop progress for “Post 10 times”/)).toBeInTheDocument();
+    expect(mockApi.delete).not.toHaveBeenCalled();
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel challenge' }));
+    await waitFor(() => expect(mockApi.delete).toHaveBeenCalledWith('/v2/groups/5/challenges/1'));
+    await waitFor(() => expect(screen.getByText('Cancelled')).toBeInTheDocument());
+    expect(screen.getByText('Post 10 times')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel challenge “Post 10 times”' })).not.toBeInTheDocument();
+    expect(mockToast.success).toHaveBeenCalledWith('Challenge cancelled');
+  });
+
+  it('keeps the active challenge and confirmation open when cancellation fails', async () => {
+    mockApi.get.mockResolvedValue(makeSuccessResponse([makeChallenge()]));
+    mockApi.delete.mockResolvedValue({ success: false, code: 'HTTP_500' });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab {...defaultProps} isAdmin />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel challenge “Post 10 times”' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel challenge' }));
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Failed to cancel challenge'));
+    expect(screen.getByText('Post 10 times')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  });
+
+  it('disables destructive dialog actions while cancellation is in flight', async () => {
+    let resolveCancel: ((value: {
+      success: boolean;
+      data: { challenge: ReturnType<typeof makeChallenge>; changed: boolean; message: string };
+    }) => void) | undefined;
+    mockApi.get.mockResolvedValue(makeSuccessResponse([makeChallenge()]));
+    mockApi.delete.mockImplementation(() => new Promise((resolve) => { resolveCancel = resolve; }));
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab {...defaultProps} isAdmin />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel challenge “Post 10 times”' }));
+    const dialog = await screen.findByRole('alertdialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel challenge' }));
+
+    await waitFor(() => {
+      expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(within(dialog).getByRole('button', { name: 'Cancel challenge' })).toBeDisabled();
+    });
+
+    resolveCancel?.({
+      success: true,
+      data: {
+        challenge: makeChallenge({ status: 'cancelled' }),
+        changed: true,
+        message: 'cancelled',
+      },
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+
+  it('surfaces an immutable completion race and refreshes away the stale cancel action', async () => {
+    mockApi.get
+      .mockResolvedValueOnce(makeSuccessResponse([makeChallenge()]))
+      .mockResolvedValueOnce(makeSuccessResponse([
+        makeChallenge({ status: 'completed', completed_at: '2026-07-11T09:00:00Z', current_value: 10, progress_percentage: 100 }),
+      ]));
+    mockApi.delete.mockResolvedValue({
+      success: false,
+      status: 409,
+      code: 'CHALLENGE_IMMUTABLE',
+    });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab {...defaultProps} isAdmin />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel challenge “Post 10 times”' }));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Cancel challenge' }));
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Completed or rewarded challenges cannot be cancelled.'));
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Cancel challenge “Post 10 times”' })).not.toBeInTheDocument());
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
   it('shows completed challenge with completed chip', async () => {
     mockApi.get.mockResolvedValue(makeSuccessResponse([
-      makeChallenge({ is_completed: true, completed_at: '2025-06-01T00:00:00Z', current_value: 10 }),
+      makeChallenge({ status: 'completed', completed_at: '2025-06-01T00:00:00Z', current_value: 10, progress_percentage: 100 }),
     ]));
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
     render(<GroupChallengesTab {...defaultProps} />);
+    await userEvent.click(await screen.findByRole('button', { name: /Challenge history/ }));
     await waitFor(() => {
       // challenges.completed_chip translation key
-      expect(screen.getByText(/completed_chip|completed/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/completed_chip|completed/i).length).toBeGreaterThan(0);
     });
   });
 
   it('shows completed section toggle when completed challenges exist', async () => {
     mockApi.get.mockResolvedValue(makeSuccessResponse([
-      makeChallenge({ id: 1, is_completed: false }),
-      makeChallenge({ id: 2, title: 'Done challenge', is_completed: true, current_value: 10 }),
+      makeChallenge({ id: 1, status: 'active' }),
+      makeChallenge({ id: 2, title: 'Done challenge', status: 'completed', current_value: 10, progress_percentage: 100 }),
     ]));
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
     render(<GroupChallengesTab {...defaultProps} />);
-    await waitFor(() => {
-      const buttons = screen.getAllByRole('button');
-      const toggleBtn = buttons.find(b => b.textContent?.includes('challenges.completed_section') || b.getAttribute('aria-expanded') !== null);
-      expect(toggleBtn).toBeDefined();
-    });
+    const toggleButton = await screen.findByRole('button', { name: /Challenge history/ });
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Done challenge')).toBeInTheDocument();
   });
 
   it('calls api.get for the correct group challenges endpoint', async () => {
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
     render(<GroupChallengesTab {...defaultProps} />);
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/5/challenges');
+      expect(mockApi.get).toHaveBeenCalledWith(
+        '/v2/groups/5/challenges?all=1',
+        { signal: expect.any(AbortSignal) },
+      );
     });
   });
 
@@ -306,6 +417,39 @@ describe('GroupChallengesTab', () => {
     });
   });
 
+  it('shows a truthful retryable error instead of the empty state', async () => {
+    mockApi.get
+      .mockResolvedValueOnce({ success: false, code: 'HTTP_500' })
+      .mockResolvedValueOnce(makeSuccessResponse([makeChallenge({ title: 'Recovered challenge' })]));
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab {...defaultProps} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Failed to load challenges');
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try Again' }));
+    expect(await screen.findByText('Recovered challenge')).toBeInTheDocument();
+  });
+
+  it('ignores a stale response after the group changes', async () => {
+    let resolveFirst: ((value: ReturnType<typeof makeSuccessResponse>) => void) | undefined;
+    const firstRequest = new Promise<ReturnType<typeof makeSuccessResponse>>((resolve) => {
+      resolveFirst = resolve;
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/groups/5/')) return firstRequest;
+      return Promise.resolve(makeSuccessResponse([makeChallenge({ title: 'Current group challenge' })]));
+    });
+
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    const { rerender } = render(<GroupChallengesTab groupId={5} isAdmin={false} />);
+    rerender(<GroupChallengesTab groupId={6} isAdmin={false} />);
+
+    expect(await screen.findByText('Current group challenge')).toBeInTheDocument();
+    resolveFirst?.(makeSuccessResponse([makeChallenge({ title: 'Stale group challenge' })]));
+    await waitFor(() => expect(screen.queryByText('Stale group challenge')).not.toBeInTheDocument());
+  });
+
   it('handles array-wrapped response shape', async () => {
     mockApi.get.mockResolvedValue(makeSuccessResponse([makeChallenge({ title: 'Array shape' })]));
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
@@ -315,13 +459,12 @@ describe('GroupChallengesTab', () => {
     });
   });
 
-  it('handles object-wrapped response shape (challenges key)', async () => {
+  it('rejects the legacy challenges envelope instead of showing stale data', async () => {
     mockApi.get.mockResolvedValue(makeSuccessResponse({ challenges: [makeChallenge({ title: 'Object shape' })] }));
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
     render(<GroupChallengesTab {...defaultProps} />);
-    await waitFor(() => {
-      expect(screen.getByText('Object shape')).toBeInTheDocument();
-    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Failed to load challenges');
+    expect(screen.queryByText('Object shape')).not.toBeInTheDocument();
   });
 });
 
@@ -330,46 +473,103 @@ describe('GroupChallengesTab', () => {
 // is not rendered on initial load. We test the create flow via the empty-state
 // admin button which calls onOpen().
 
-describe('GroupChallengesTab — create flow (mocked useDisclosure open)', () => {
+describe('GroupChallengesTab — create flow', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   it('calls api.post when create form submitted with all required fields', async () => {
-    // Override useDisclosure so modal is open
-    const onClose = vi.fn();
-    const uiMod = await import('@/components/ui');
-    vi.spyOn(uiMod, 'useDisclosure').mockReturnValue({ isOpen: true, onOpen: vi.fn(), onClose, onOpenChange: vi.fn(), isControlled: false });
-
     mockApi.get.mockResolvedValue({ success: true, data: [] });
-    mockApi.post.mockResolvedValue({ success: true, data: { id: 99 } });
+    mockApi.post.mockResolvedValue({ success: true, data: makeChallenge({ id: 99, current_value: 0, progress_percentage: 0 }) });
 
     const { GroupChallengesTab } = await import('./GroupChallengesTab');
     render(<GroupChallengesTab groupId={5} isAdmin={true} />);
 
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Create Challenge' }))[0]);
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('spinbutton', { name: 'Reward XP' })).not.toBeInTheDocument();
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'New Challenge');
+    await userEvent.type(screen.getByRole('textbox', { name: 'Description' }), 'Do something great');
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Target Value' }), { target: { value: '10' } });
+    fireEvent.change(document.querySelector('input[type="date"]') as HTMLInputElement, { target: { value: '2099-12-31' } });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Create Challenge' }));
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/groups/5/challenges', expect.objectContaining({
+        title: 'New Challenge',
+        description: 'Do something great',
+        target_value: 10,
+        reward_xp: 0,
+        ends_at: '2099-12-31',
+      }));
     });
+  });
 
-    // Fill in required fields — Input stub uses onChange(e) → setFormTitle(e.target.value)
-    const inputs = screen.getAllByRole('textbox');
-    if (inputs[0]) fireEvent.change(inputs[0], { target: { value: 'New Challenge' } });
-    if (inputs[1]) fireEvent.change(inputs[1], { target: { value: 'Do something great' } });
+  it('offers only implemented metrics and server-defined reward bands', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab groupId={5} isAdmin={true} />);
 
-    const numberInputs = document.querySelectorAll('input[type="number"]');
-    if (numberInputs[0]) fireEvent.change(numberInputs[0], { target: { value: '10' } });
-    if (numberInputs[1]) fireEvent.change(numberInputs[1], { target: { value: '50' } });
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Create Challenge' }))[0]);
 
-    const dateInputs = document.querySelectorAll('input[type="date"]');
-    if (dateInputs[0]) fireEvent.change(dateInputs[0], { target: { value: '2099-12-31' } });
+    const metricTrigger = screen.getByRole('button', { name: /Metric/i });
+    await userEvent.click(metricTrigger);
+    expect(await screen.findByRole('option', { name: 'Posts' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Discussions' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Members' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Files' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Events' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('option', { name: 'Posts' }));
 
-    // The button text is the translated value "Create Challenge"
-    const buttons = screen.getAllByRole('button');
-    const submitBtn = buttons.find(b =>
-      b.textContent?.toLowerCase().includes('create challenge') ||
-      b.textContent?.includes('challenges.create_submit')
-    );
-    // Submit button exists in the modal footer
-    expect(submitBtn).toBeDefined();
+    const rewardTrigger = screen.getByRole('button', { name: /Reward XP/i });
+    await userEvent.click(rewardTrigger);
+    for (const reward of ['0 XP', '25 XP', '50 XP', '100 XP']) {
+      expect(await screen.findByRole('option', { name: reward })).toBeInTheDocument();
+    }
+  });
+
+  it('shows translated validation errors instead of silently ignoring an invalid form', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab groupId={5} isAdmin={true} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Create Challenge' }))[0]);
+    const createButtons = await screen.findAllByRole('button', { name: 'Create Challenge' });
+    await userEvent.click(createButtons[createButtons.length - 1]);
+
+    expect((await screen.findAllByText('Required')).length).toBeGreaterThanOrEqual(3);
+    expect(mockApi.post).not.toHaveBeenCalled();
+  });
+
+  it('does not show a success toast for a resolved create failure', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    mockApi.post.mockResolvedValue({ success: false, code: 'HTTP_422' });
+
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab groupId={5} isAdmin={true} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Create Challenge' }))[0]);
+    await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'New Challenge');
+    await userEvent.type(screen.getByRole('textbox', { name: 'Description' }), 'Do something great');
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Target Value' }), { target: { value: '10' } });
+    fireEvent.change(document.querySelector('input[type="date"]') as HTMLInputElement, { target: { value: '2099-12-31' } });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Create Challenge' }));
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('closes the create modal without submitting when cancel is pressed', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    const { GroupChallengesTab } = await import('./GroupChallengesTab');
+    render(<GroupChallengesTab groupId={5} isAdmin={true} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Create Challenge' }))[0]);
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(mockApi.post).not.toHaveBeenCalled();
   });
 });

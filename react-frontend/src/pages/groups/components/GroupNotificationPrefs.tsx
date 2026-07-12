@@ -16,10 +16,14 @@ import { Switch } from '@/components/ui/Switch';
 import { useState, useEffect } from 'react';
 
 import Bell from 'lucide-react/icons/bell';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
+import {
+  getGroupNotificationPreferences,
+  updateGroupNotificationPreferences,
+  type GroupNotificationPreferences,
+} from '../api';
 
 interface GroupNotificationPrefsProps {
   groupId: number;
@@ -27,59 +31,55 @@ interface GroupNotificationPrefsProps {
   onClose: () => void;
 }
 
-interface NotificationPrefs {
-  frequency: 'instant' | 'digest' | 'muted';
-  email_enabled: boolean;
-  push_enabled: boolean;
-}
+const DEFAULT_NOTIFICATION_PREFERENCES: GroupNotificationPreferences = {
+  frequency: 'instant',
+  email_enabled: true,
+  push_enabled: true,
+  updated_at: null,
+};
 
 export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotificationPrefsProps) {
   const { t } = useTranslation('groups');
   const toast = useToast();
 
-  const [prefs, setPrefs] = useState<NotificationPrefs>({
-    frequency: 'instant',
-    email_enabled: true,
-    push_enabled: true,
-  });
+  const [prefs, setPrefs] = useState<GroupNotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
+    const controller = new AbortController();
 
     async function loadPrefs() {
       setLoading(true);
+      setLoadError(false);
+      setPrefs(DEFAULT_NOTIFICATION_PREFERENCES);
       try {
-        const res = await api.get(`/v2/groups/${groupId}/notification-prefs`);
-        if (res.success && res.data) {
-          const data = res.data as NotificationPrefs;
-          setPrefs({
-            frequency: data.frequency ?? 'instant',
-            email_enabled: data.email_enabled ?? true,
-            push_enabled: data.push_enabled ?? true,
-          });
-        }
+        const data = await getGroupNotificationPreferences(groupId, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        setPrefs(data);
       } catch (err) {
+        if (controller.signal.aborted) return;
         logError('GroupNotificationPrefs.loadPrefs', err);
+        setLoadError(true);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     loadPrefs();
-  }, [groupId, isOpen]);
+    return () => controller.abort();
+  }, [groupId, isOpen, loadAttempt]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await api.put(`/v2/groups/${groupId}/notification-prefs`, prefs);
-      if (res.success) {
-        toast.success(t('notifications.prefs_saved'));
-        onClose();
-      } else {
-        toast.error(t('notifications.prefs_save_failed'));
-      }
+      const saved = await updateGroupNotificationPreferences(groupId, prefs);
+      setPrefs(saved.preferences);
+      toast.success(t('notifications.prefs_saved'));
+      onClose();
     } catch (err) {
       logError('GroupNotificationPrefs.handleSave', err);
       toast.error(t('notifications.prefs_save_failed'));
@@ -101,13 +101,20 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
             <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
               <Spinner size="md" />
             </div>
+          ) : loadError ? (
+            <div role="alert" className="space-y-3 py-6 text-center">
+              <p className="text-sm text-theme-muted">{t('form.error_load_failed')}</p>
+              <Button variant="flat" onPress={() => setLoadAttempt((attempt) => attempt + 1)}>
+                {t('form.try_again')}
+              </Button>
+            </div>
           ) : (
             <div className="space-y-6">
               <RadioGroup
                 label={t('notifications.frequency_label')}
                 value={prefs.frequency}
                 onValueChange={(value) =>
-                  setPrefs((prev) => ({ ...prev, frequency: value as NotificationPrefs['frequency'] }))
+                  setPrefs((prev) => ({ ...prev, frequency: value as GroupNotificationPreferences['frequency'] }))
                 }
               >
                 <Radio value="instant">
@@ -124,6 +131,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
               <div className="space-y-3">
                 <Switch
                   isSelected={prefs.email_enabled}
+                  isDisabled={prefs.frequency === 'muted'}
                   onValueChange={(checked) =>
                     setPrefs((prev) => ({ ...prev, email_enabled: checked }))
                   }
@@ -133,6 +141,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
 
                 <Switch
                   isSelected={prefs.push_enabled}
+                  isDisabled={prefs.frequency === 'muted'}
                   onValueChange={(checked) =>
                     setPrefs((prev) => ({ ...prev, push_enabled: checked }))
                   }
@@ -152,7 +161,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
             color="primary"
             onPress={handleSave}
             isLoading={saving}
-            isDisabled={loading}
+            isDisabled={loading || loadError}
           >
             {t('common:save')}
           </Button>

@@ -23,6 +23,7 @@
     "cta": "グループを探す"
   },
   "group_promoted": {
+    "role_admin": "管理者",
     "subject": "{{group_name}} の{{role}}になりました — {{community}}",
     "title": "役割の更新",
     "preview": "おめでとうございます — {{group_name}} の{{role}}に就任されました",

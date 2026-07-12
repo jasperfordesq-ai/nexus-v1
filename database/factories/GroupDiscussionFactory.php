@@ -23,6 +23,7 @@ class GroupDiscussionFactory extends Factory
             'user_id'   => User::factory(),
             'title'     => $this->faker->sentence(5),
             'is_pinned' => $this->faker->boolean(10),
+            'is_locked' => false,
         ];
     }
 

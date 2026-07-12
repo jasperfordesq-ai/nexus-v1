@@ -76,6 +76,7 @@
         "badge_recheck_completed": "اكتملت إعادة فحص الشارة لـ :count مستخدم/مستخدمين"
     },
     "admin_groups": {
+        "rule_not_found": "القاعدة غير موجودة",
         "group_archived": "تم أرشفة المجموعة",
         "group_unarchived": "تم إلغاء أرشفة المجموعة",
         "ownership_transferred": "تم نقل الملكية",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "تم تقديم طلب حذف حسابك. ستصلك رسالة تأكيد عبر البريد الإلكتروني."
     },
     "group_challenge": {
-        "challenge_deleted": "تم حذف التحدي"
+        "challenge_deleted": "تم حذف التحدي",
+        "challenge_cancelled": "تم إلغاء التحدي",
+        "challenge_immutable": "لا يمكن إلغاء التحديات المكتملة أو التي تم منح مكافآتها"
+    },
+    "group_chatroom": {
+        "default_name": "عام",
+        "default_description": "غرفة الدردشة الافتراضية للمجموعة"
     },
     "group_exchange": {
         "exchange_cancelled": "تم إلغاء التبادل",

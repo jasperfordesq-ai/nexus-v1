@@ -58,7 +58,6 @@ const inlineStyleExceptionGroups = [
     files: {
       'src/admin/modules/categories/CategoriesAdmin.tsx': 3,
       'src/admin/modules/crm/OnboardingFunnel.tsx': 1,
-      'src/admin/modules/groups/GroupEdit.tsx': 1,
       'src/admin/modules/groups/GroupOrganization.tsx': 1,
       'src/admin/modules/groups/GroupTypes.tsx': 1,
       'src/admin/modules/system/AdminSettings.tsx': 1,
@@ -69,6 +68,7 @@ const inlineStyleExceptionGroups = [
       'src/components/ui/ConfettiCelebration.tsx': 1,
       'src/components/wallet/CategorySelect.tsx': 1,
       'src/pages/groups/components/GroupBrandingPicker.tsx': 3,
+      'src/pages/groups/components/GroupHeader.tsx': 1,
       'src/pages/profile/CollectionDetailPage.tsx': 1,
       'src/pages/profile/MyCollectionsPage.tsx': 1,
       'src/pages/profile/UserCollectionsView.tsx': 1,

@@ -45,12 +45,14 @@ import { useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { eventsApi, type EventCategory } from '@/lib/events-api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
-import type { Event } from '@/types/api';
-
-/** Event category IDs matching EventsPage — names resolved via t() inside the component */
-const EVENT_CATEGORY_IDS = ['workshop', 'social', 'outdoor', 'online', 'meeting', 'training', 'other'] as const;
+import {
+  EMPTY_VENUE_ACCESSIBILITY,
+  EventVenueAccessibilityFields,
+  type VenueAccessibilityDraft,
+} from './components/EventVenueAccessibilityFields';
 
 const MAX_IMAGE_SIZE_MB = 5;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -68,6 +70,7 @@ interface FormData {
   location: string;
   latitude?: number;
   longitude?: number;
+  venueAccessibility: VenueAccessibilityDraft;
   max_attendees: string;
   category: string;
   // Video conferencing
@@ -93,6 +96,7 @@ const initialFormData: FormData = {
   endDate: null,
   endTime: null,
   location: '',
+  venueAccessibility: { ...EMPTY_VENUE_ACCESSIBILITY },
   max_attendees: '',
   category: '',
   allowRemoteAttendance: false,
@@ -157,6 +161,10 @@ function handleDragOver(e: React.DragEvent) {
   e.preventDefault();
 }
 
+function normalizeAddress(value: string): string {
+  return value.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+}
+
 export function CreateEventPage() {
   const { t } = useTranslation('events');
   const { id } = useParams<{ id: string }>();
@@ -174,11 +182,13 @@ export function CreateEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<EventCategory[]>([]);
 
   // Image upload state
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [existingImage, setExistingImage] = useState<string | null>(null);
+  const [coverRemovalRequested, setCoverRemovalRequested] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -187,6 +197,7 @@ export function CreateEventPage() {
   // double-click can fire handleSubmit twice before React re-renders and create two
   // events. This ref blocks the second call immediately.
   const submittingRef = useRef(false);
+  const geocodedAddressRef = useRef<string | null>(null);
 
   // Poll attachment state
   const [availablePolls, setAvailablePolls] = useState<{ id: number; question: string }[]>([]);
@@ -204,13 +215,15 @@ export function CreateEventPage() {
     try {
       setIsLoading(true);
       setLoadError(null);
-      const response = await api.get<Event>(`/v2/events/${id}`);
+      const response = await eventsApi.get(id);
       if (response.success && response.data) {
         const event = response.data;
-        const seriesFields = event as Event & { is_recurring_template?: number | boolean; parent_event_id?: number | null };
-        setSeriesLinked(!!seriesFields.is_recurring_template || !!seriesFields.parent_event_id);
-        const startDate = new Date(event.start_date);
-        const endDate = event.end_date ? new Date(event.end_date) : null;
+        setSeriesLinked(event.series.recurrence !== null);
+        const startDate = new Date(event.schedule.start_at ?? '');
+        const endDate = event.schedule.end_at ? new Date(event.schedule.end_at) : null;
+        geocodedAddressRef.current = event.location.latitude !== null && event.location.longitude !== null
+          ? event.location.label
+          : null;
 
         setFormData({
           title: event.title,
@@ -219,13 +232,21 @@ export function CreateEventPage() {
           startTime: parseTime(startDate.toTimeString().slice(0, 5)),
           endDate: endDate ? parseDate(endDate.toISOString().split('T')[0] ?? '') : null,
           endTime: endDate ? parseTime(endDate.toTimeString().slice(0, 5)) : null,
-          location: event.location || '',
-          latitude: event.coordinates?.lat,
-          longitude: event.coordinates?.lng,
-          max_attendees: event.max_attendees?.toString() || '',
-          category: event.category_name || '',
-          allowRemoteAttendance: !!event.allow_remote_attendance,
-          videoUrl: event.video_url || '',
+          location: event.location.label || '',
+          latitude: event.location.latitude ?? undefined,
+          longitude: event.location.longitude ?? undefined,
+          venueAccessibility: {
+            ...EMPTY_VENUE_ACCESSIBILITY,
+            ...(event.location.accessibility ?? {}),
+            parking_details: event.location.accessibility?.parking_details ?? '',
+            transit_details: event.location.accessibility?.transit_details ?? '',
+            assistance_contact: event.location.accessibility?.assistance_contact ?? '',
+            notes: event.location.accessibility?.notes ?? '',
+          },
+          max_attendees: event.relationship.capacity.limit?.toString() || '',
+          category: event.category?.id ? String(event.category.id) : '',
+          allowRemoteAttendance: event.location.mode !== 'in_person',
+          videoUrl: event.online_access.video_url || event.online_access.join_url || '',
           // Recurrence fields default (editing a recurring event is not supported yet)
           isRecurring: false,
           recurrenceFrequency: 'weekly',
@@ -235,8 +256,8 @@ export function CreateEventPage() {
           recurrenceEndDate: null,
         });
 
-        if (event.cover_image) {
-          setExistingImage(resolveAssetUrl(event.cover_image));
+        if (event.primary_image?.url) {
+          setExistingImage(resolveAssetUrl(event.primary_image.url));
         }
       } else {
         setLoadError(t('form.error_not_found'));
@@ -254,6 +275,18 @@ export function CreateEventPage() {
       loadEvent();
     }
   }, [isEditing, loadEvent]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    eventsApi.categories({ signal: controller.signal }).then((response) => {
+      if (!controller.signal.aborted && response.success && response.data) {
+        setCategories(response.data);
+      }
+    }).catch((error) => {
+      if (!controller.signal.aborted) logError('Failed to load event categories', error);
+    });
+    return () => controller.abort();
+  }, []);
 
   // Load available polls for attachment
   useEffect(() => {
@@ -301,6 +334,7 @@ export function CreateEventPage() {
     }
 
     setImageFile(file);
+    setCoverRemovalRequested(false);
 
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -308,13 +342,16 @@ export function CreateEventPage() {
       setImagePreview(ev.target.result as string);
     };
     reader.readAsDataURL(file);
-    setExistingImage(null);
   }
 
   function removeImage() {
-    setImageFile(null);
-    setImagePreview(null);
-    setExistingImage(null);
+    if (imageFile || imagePreview) {
+      setImageFile(null);
+      setImagePreview(null);
+    } else if (existingImage) {
+      setExistingImage(null);
+      setCoverRemovalRequested(true);
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -336,13 +373,13 @@ export function CreateEventPage() {
     }
 
     setImageFile(file);
+    setCoverRemovalRequested(false);
     const reader = new FileReader();
     reader.onload = (ev) => {
       if (!ev.target?.result) return;
       setImagePreview(ev.target.result as string);
     };
     reader.readAsDataURL(file);
-    setExistingImage(null);
   }
 
   function validateForm(): boolean {
@@ -411,7 +448,7 @@ export function CreateEventPage() {
 
     try {
       setIsUploadingImage(true);
-      const response = await api.upload(`/v2/events/${eventId}/image`, imageFile, 'image');
+      const response = await eventsApi.uploadCover(eventId, imageFile);
       if (!response.success) {
         toast.error(t('form.toast.image_failed'));
       }
@@ -461,10 +498,27 @@ export function CreateEventPage() {
         location: formData.location || null,
         latitude: formData.latitude,
         longitude: formData.longitude,
+        venue_accessibility: {
+          step_free_access: formData.venueAccessibility.step_free_access,
+          accessible_toilet: formData.venueAccessibility.accessible_toilet,
+          hearing_loop: formData.venueAccessibility.hearing_loop,
+          quiet_space: formData.venueAccessibility.quiet_space,
+          seating_available: formData.venueAccessibility.seating_available,
+          accessible_parking: formData.venueAccessibility.accessible_parking,
+          parking_details: formData.venueAccessibility.parking_details.trim() || null,
+          transit_details: formData.venueAccessibility.transit_details.trim() || null,
+          assistance_contact: formData.venueAccessibility.assistance_contact.trim() || null,
+          notes: formData.venueAccessibility.notes.trim() || null,
+        },
         max_attendees: formData.max_attendees ? parseInt(formData.max_attendees) : null,
         allow_remote_attendance: formData.allowRemoteAttendance,
         video_url: formData.allowRemoteAttendance && formData.videoUrl.trim() ? formData.videoUrl.trim() : null,
       };
+
+      if (coverRemovalRequested) {
+        payload.cover_image = null;
+        payload.image_url = null;
+      }
 
       // Associate event with group when created from group Events tab
       if (groupId && !isEditing) {
@@ -472,12 +526,9 @@ export function CreateEventPage() {
       }
 
       if (formData.category) {
-        const categoryInt = parseInt(formData.category);
+        const categoryInt = Number(formData.category);
         if (!isNaN(categoryInt)) {
           payload.category_id = categoryInt;
-        } else {
-          // Category is a slug string (e.g. 'workshop') — send as category_name
-          payload.category_name = formData.category;
         }
       }
 
@@ -521,13 +572,13 @@ export function CreateEventPage() {
           setShowScopeModal(true);
           return; // finally{} clears isSubmitting
         }
-        response = await api.put(`/v2/events/${id}`, payload);
+        response = await eventsApi.update(id!, payload);
       } else if (recurrenceRule) {
         // Recurrence-aware endpoint — creates the template event AND its
         // occurrences. Plain POST /v2/events ignores recurrence fields.
-        response = await api.post('/v2/events/recurring', payload);
+        response = await eventsApi.createRecurring(payload);
       } else {
-        response = await api.post('/v2/events', payload);
+        response = await eventsApi.create(payload);
       }
 
       if (response.success) {
@@ -569,11 +620,11 @@ export function CreateEventPage() {
         const seriesPayload: Record<string, unknown> = { ...payload, scope: 'all' };
         delete seriesPayload.start_time;
         delete seriesPayload.end_time;
-        response = await api.put(`/v2/events/${id}/recurring`, seriesPayload);
+        response = await eventsApi.updateRecurring(id, seriesPayload);
       } else {
         // scope 'single' via the recurring endpoint DETACHES the occurrence
         // from the series, so later series-wide edits won't overwrite it.
-        response = await api.put(`/v2/events/${id}/recurring`, { ...payload, scope: 'single' });
+        response = await eventsApi.updateRecurring(id, { ...payload, scope: 'single' });
       }
 
       if (response.success) {
@@ -632,7 +683,9 @@ export function CreateEventPage() {
         sizes: '(min-width: 1024px) 896px, 92vw',
       })
     : null;
-  const selectedCategoryLabel = formData.category ? t(`category.${formData.category}`) : t('form.summary_not_set');
+  const selectedCategoryLabel = formData.category
+    ? categories.find((category) => String(category.id) === formData.category)?.name ?? t('form.summary_not_set')
+    : t('form.summary_not_set');
 
   return (
     <motion.div
@@ -801,8 +854,8 @@ export function CreateEventPage() {
                 label: 'text-theme-muted',
               }}
             >
-              {EVENT_CATEGORY_IDS.map((catId) => (
-                <SelectItem key={catId} id={catId}>{t(`category.${catId}`)}</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} id={String(category.id)}>{category.name}</SelectItem>
               ))}
             </Select>
           </div>
@@ -1066,8 +1119,23 @@ export function CreateEventPage() {
                 label={t('form.location_label')}
                 placeholder={t('form.location_placeholder')}
                 value={formData.location}
-                onChange={(val) => setFormData((prev) => ({ ...prev, location: val }))}
+                onChange={(val) => {
+                  const selectedAddress = geocodedAddressRef.current;
+                  const diverged = selectedAddress !== null
+                    && normalizeAddress(val) !== normalizeAddress(selectedAddress);
+                  if (diverged) geocodedAddressRef.current = null;
+                  setFormData((prev) => ({
+                    ...prev,
+                    location: val,
+                    latitude: diverged ? undefined : prev.latitude,
+                    longitude: diverged ? undefined : prev.longitude,
+                    venueAccessibility: val.trim()
+                      ? prev.venueAccessibility
+                      : { ...EMPTY_VENUE_ACCESSIBILITY },
+                  }));
+                }}
                 onPlaceSelect={(place) => {
+                  geocodedAddressRef.current = place.formattedAddress;
                   setFormData((prev) => ({
                     ...prev,
                     location: place.formattedAddress,
@@ -1076,11 +1144,13 @@ export function CreateEventPage() {
                   }));
                 }}
                 onClear={() => {
+                  geocodedAddressRef.current = null;
                   setFormData((prev) => ({
                     ...prev,
                     location: '',
                     latitude: undefined,
                     longitude: undefined,
+                    venueAccessibility: { ...EMPTY_VENUE_ACCESSIBILITY },
                   }));
                 }}
                 classNames={{
@@ -1114,6 +1184,17 @@ export function CreateEventPage() {
               />
             </div>
           </div>
+
+          {formData.location.trim() && (
+            <EventVenueAccessibilityFields
+              value={formData.venueAccessibility}
+              onChange={(venueAccessibility) => setFormData((previous) => ({
+                ...previous,
+                venueAccessibility,
+              }))}
+              isDisabled={isSubmitting}
+            />
+          )}
 
           {/* Remote Attendance / Video Conferencing */}
           <div className="space-y-4">

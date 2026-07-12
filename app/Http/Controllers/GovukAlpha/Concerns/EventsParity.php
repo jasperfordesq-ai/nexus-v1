@@ -7,14 +7,35 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Enums\EventAttendanceAction;
+use App\Enums\EventPeopleBulkAction;
+use App\Exceptions\EventAttendanceException;
+use App\Exceptions\EventParticipationException;
+use App\Exceptions\EventRegistrationException;
+use App\Exceptions\EventWaitlistException;
+use App\Exceptions\SafeguardingPolicyException;
 use App\Models\Poll;
+use App\Models\Event;
+use App\Models\User;
+use App\Policies\EventPolicy;
+use App\Services\EventCalendarService;
+use App\Services\EventAttendanceService;
+use App\Services\EventPeopleBulkService;
+use App\Services\EventPeopleService;
+use App\Services\EventNotificationDeliveryModeResolver;
 use App\Services\EventService;
+use App\Services\EventWaitlistService;
 use App\Services\PollService;
 use App\Services\UgcTranslationService;
+use App\Support\Events\EventContractMapper;
+use App\Support\Events\EventPeopleBulkOperation;
+use App\Support\Events\EventPeopleQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use App\Enums\EventNotificationDeliveryMode;
 
 /**
  * Events — accessible (GOV.UK) frontend parity methods.
@@ -42,9 +63,376 @@ use Symfony\Component\HttpFoundation\Response;
  *                               (CreateEventPage poll Select + POST/PUT poll_ids[])
  *   - eventsTranslate /
  *     eventsRunTranslate      — on-demand description translation (TranslateButton)
+ *   - eventsCalendar*         — privacy-safe calendar exports, add-to-calendar actions,
+ *                               and owner-scoped personal feed subscriptions
  */
 trait EventsParity
 {
+    public function eventsAcceptWaitlistOffer(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): RedirectResponse {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'auth-required',
+            ]);
+        }
+
+        abort_if(EventService::getById($id, $userId) === null, 404);
+
+        try {
+            app(EventWaitlistService::class)->acceptActiveOffer(
+                $id,
+                $userId,
+                $this->accessibleEventActor($userId),
+                (string) $this->accessibleEventMutationKey($request),
+            );
+        } catch (SafeguardingPolicyException|EventParticipationException|EventRegistrationException|EventWaitlistException $exception) {
+            Log::notice('Accessible event waitlist offer acceptance rejected', [
+                'tenant_id' => TenantContext::getId(),
+                'event_id' => $id,
+                'reason_code' => $exception->reasonCode,
+            ]);
+
+            return redirect()->route('govuk-alpha.events.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'waitlist-offer-accept-failed',
+            ]);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => 'waitlist-offer-accepted',
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  Canonical accessible view models
+    // -----------------------------------------------------------------
+
+    // -----------------------------------------------------------------
+    //  Event People and manual attendance operations
+    // -----------------------------------------------------------------
+
+    public function eventsPeople(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $context = $this->eventsOperationalContext($tenantSlug, $id, 'people');
+        if ($context instanceof RedirectResponse) {
+            return $context;
+        }
+        [$event, $actor] = $context;
+        try {
+            $query = EventPeopleQuery::fromArray([
+                'page' => self::asStr($request->query('page'), '1'),
+                'per_page' => '25',
+                'search' => self::asStr($request->query('search')),
+                'registration_state' => self::asStr($request->query('registration_state')),
+                'waitlist_state' => self::asStr($request->query('waitlist_state')),
+                'attendance_state' => self::asStr($request->query('attendance_state')),
+                'engagement_state' => self::asStr($request->query('engagement_state')),
+                'sort' => self::asStr($request->query('sort'), 'name'),
+                'direction' => self::asStr($request->query('direction'), 'asc'),
+            ]);
+        } catch (EventRegistrationException) {
+            return redirect()->route('govuk-alpha.events.people', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+            ]);
+        }
+        $result = app(EventPeopleService::class)->paginateForActor($event, $actor, $query);
+
+        return $this->view('accessible-frontend::event-people', [
+            'title' => __('govuk_alpha.events.people_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'event' => $event,
+            'canManageAttendance' => app(EventPolicy::class)->manageAttendance($actor, $event),
+            'people' => $result['items'],
+            'metrics' => $result['metrics'],
+            'query' => $query,
+            'total' => $result['total'],
+            'totalPages' => $result['total'] > 0
+                ? (int) ceil($result['total'] / $result['per_page'])
+                : 0,
+            'status' => self::asStr($request->query('status')) ?: null,
+            'updated' => max(0, (int) $request->query('updated', 0)),
+            'failed' => max(0, (int) $request->query('failed', 0)),
+        ]);
+    }
+
+    public function eventsUpdatePeople(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): RedirectResponse {
+        $context = $this->eventsOperationalContext($tenantSlug, $id, 'people');
+        if ($context instanceof RedirectResponse) {
+            return $context;
+        }
+        [$event, $actor] = $context;
+        $action = EventPeopleBulkAction::tryFrom(self::asStr($request->input('action')));
+        $allowed = [
+            EventPeopleBulkAction::Approve,
+            EventPeopleBulkAction::Reject,
+            EventPeopleBulkAction::Cancel,
+        ];
+        $rawIds = $request->input('user_ids', []);
+        $userIds = [];
+        if (is_array($rawIds)) {
+            foreach ($rawIds as $rawId) {
+                if ((is_int($rawId) || (is_string($rawId) && ctype_digit($rawId)))
+                    && (int) $rawId > 0) {
+                    $userIds[(int) $rawId] = true;
+                }
+            }
+        }
+        $userIds = array_keys($userIds);
+        $reason = trim(self::asStr($request->input('reason')));
+        $confirmed = self::asStr($request->input('confirmation')) === '1';
+        if ($action === null
+            || ! in_array($action, $allowed, true)
+            || $userIds === []
+            || count($userIds) > EventPeopleBulkService::MAX_OPERATIONS
+            || ! $confirmed
+            || (in_array($action, [EventPeopleBulkAction::Reject, EventPeopleBulkAction::Cancel], true)
+                && $reason === '')) {
+            return redirect()->route('govuk-alpha.events.people', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'people-invalid',
+            ]);
+        }
+
+        $tenantId = (int) TenantContext::getId();
+        $versions = DB::table('event_registrations')
+            ->where('tenant_id', $tenantId)
+            ->where('event_id', $id)
+            ->whereIn('user_id', $userIds)
+            ->pluck('registration_version', 'user_id');
+        $requestKey = self::asStr($request->input('idempotency_key'));
+        if ($requestKey === '') {
+            $requestKey = (string) \Illuminate\Support\Str::uuid();
+        }
+        $operations = [];
+        foreach ($userIds as $userId) {
+            $operations[] = new EventPeopleBulkOperation(
+                $userId,
+                $action,
+                max(0, (int) ($versions[$userId] ?? 0)),
+                'accessible-people:' . hash('sha256', "{$requestKey}|{$action->value}|{$userId}"),
+                $reason !== '' ? $reason : null,
+            );
+        }
+
+        try {
+            $result = app(EventPeopleBulkService::class)->execute($event, $actor, $operations);
+
+            return redirect()->route('govuk-alpha.events.people', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $result['failed'] > 0 ? 'people-partial' : 'people-updated',
+                'updated' => $result['succeeded'],
+                'failed' => $result['failed'],
+            ]);
+        } catch (\Throwable $exception) {
+            Log::notice('Accessible Event People operation rejected', [
+                'tenant_id' => $tenantId,
+                'event_id' => $id,
+                'exception' => $exception::class,
+            ]);
+
+            return redirect()->route('govuk-alpha.events.people', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'people-failed',
+            ]);
+        }
+    }
+
+    public function eventsCheckIn(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $context = $this->eventsOperationalContext($tenantSlug, $id, 'attendance');
+        if ($context instanceof RedirectResponse) {
+            return $context;
+        }
+        [$event, $actor] = $context;
+        try {
+            $query = EventPeopleQuery::fromArray([
+                'page' => self::asStr($request->query('page'), '1'),
+                'per_page' => '25',
+                'search' => self::asStr($request->query('search')),
+                'attendance_state' => self::asStr($request->query('attendance_state')),
+                'sort' => self::asStr($request->query('sort'), 'name'),
+                'direction' => self::asStr($request->query('direction'), 'asc'),
+            ]);
+        } catch (EventRegistrationException) {
+            return redirect()->route('govuk-alpha.events.check-in', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+            ]);
+        }
+        $result = app(EventPeopleService::class)->paginateForActor($event, $actor, $query);
+
+        return $this->view('accessible-frontend::event-check-in', [
+            'title' => __('govuk_alpha.events.check_in_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'event' => $event,
+            'people' => $result['items'],
+            'metrics' => $result['metrics'],
+            'query' => $query,
+            'total' => $result['total'],
+            'totalPages' => $result['total'] > 0
+                ? (int) ceil($result['total'] / $result['per_page'])
+                : 0,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function eventsUpdateAttendance(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+        int $userId,
+    ): RedirectResponse {
+        $context = $this->eventsOperationalContext($tenantSlug, $id, 'attendance');
+        if ($context instanceof RedirectResponse) {
+            return $context;
+        }
+        [$event, $actor] = $context;
+        $action = EventAttendanceAction::tryFrom(self::asStr($request->input('action')));
+        $versionValue = $request->input('expected_version');
+        $expectedVersion = is_int($versionValue)
+            ? $versionValue
+            : (is_string($versionValue) && ctype_digit($versionValue) ? (int) $versionValue : -1);
+        $reason = trim(self::asStr($request->input('reason')));
+        if ($action === null
+            || $expectedVersion < 0
+            || self::asStr($request->input('confirmation')) !== '1'
+            || ($action === EventAttendanceAction::Undo && $reason === '')
+            || ! app(EventPeopleService::class)->attendanceSubjectVisible($event, $userId)) {
+            return redirect()->route('govuk-alpha.events.check-in', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'attendance-invalid',
+            ]);
+        }
+
+        try {
+            app(EventAttendanceService::class)->transition(
+                $id,
+                $userId,
+                $action,
+                $actor,
+                $expectedVersion,
+                $reason !== '' ? $reason : null,
+                self::asStr($request->input('idempotency_key'))
+                    ?: (string) \Illuminate\Support\Str::uuid(),
+            );
+            $status = 'attendance-updated';
+        } catch (EventAttendanceException $exception) {
+            $status = $exception->reasonCode === 'event_attendance_version_conflict'
+                ? 'attendance-conflict'
+                : 'attendance-failed';
+            Log::notice('Accessible Event attendance operation rejected', [
+                'tenant_id' => TenantContext::getId(),
+                'event_id' => $id,
+                'reason_code' => $exception->reasonCode,
+            ]);
+        }
+
+        return redirect()->route('govuk-alpha.events.check-in', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $status,
+        ]);
+    }
+
+    /** @return array{Event,User}|RedirectResponse */
+    private function eventsOperationalContext(
+        string $tenantSlug,
+        int $id,
+        string $projection,
+    ): array|RedirectResponse {
+        $userId = $this->eventsParityGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+        $actor = $this->accessibleEventActor($userId);
+        $event = Event::withoutGlobalScopes()
+            ->where('tenant_id', TenantContext::currentId())
+            ->whereKey($id)
+            ->first();
+        abort_unless($event instanceof Event, 404);
+        $policy = app(EventPolicy::class);
+        $allowed = $projection === 'people'
+            ? $policy->manageRegistration($actor, $event)
+                && $policy->viewRoster($actor, $event)
+                && $policy->viewWaitlist($actor, $event)
+            : $policy->manageAttendance($actor, $event)
+                && $policy->viewRoster($actor, $event);
+        abort_unless($allowed, 403);
+
+        return [$event, $actor];
+    }
+
+    /**
+     * Project tenant-scoped EventService rows through the same v2 contract
+     * mapper used by the React API. The accessible frontend remains HTML-first,
+     * but relationship, schedule, location and online-access decisions must not
+     * drift into a second implementation in Blade templates.
+     *
+     * @param  array<int, array<string, mixed>>  $events
+     * @return array<int, array<string, mixed>>
+     */
+    private function eventsCanonicalViewModels(array $events, ?int $viewerId, bool $detail = false): array
+    {
+        if ($events === []) {
+            return [];
+        }
+
+        $factsById = EventService::getContractFacts($events, $viewerId);
+
+        return array_values(array_map(
+            static function (array $event) use ($factsById, $detail): array {
+                $eventId = (int) ($event['id'] ?? 0);
+
+                return EventContractMapper::event(
+                    $event,
+                    $factsById[$eventId] ?? [],
+                    $detail
+                );
+            },
+            $events
+        ));
+    }
+
+    /** @param array<string, mixed> $event */
+    private function eventsCanonicalViewModel(array $event, ?int $viewerId, bool $detail = true): array
+    {
+        return $this->eventsCanonicalViewModels([$event], $viewerId, $detail)[0];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $attendees
+     * @return array<int, array<string, mixed>>
+     */
+    private function eventsCanonicalRoster(array $attendees): array
+    {
+        return array_values(array_map(
+            static fn (array $attendee): array => EventContractMapper::roster($attendee),
+            $attendees
+        ));
+    }
+
     // -----------------------------------------------------------------
     //  Shared guards
     // -----------------------------------------------------------------
@@ -120,13 +508,20 @@ trait EventsParity
         abort_unless(TenantContext::hasFeature('maps'), 403);
 
         $viewerId = $this->currentUserId();
-        $event = EventService::getById($id, $viewerId);
-        abort_if($event === null, 404);
+        $legacyEvent = EventService::getById($id, $viewerId);
+        abort_if($legacyEvent === null, 404);
+        $event = $this->eventsCanonicalViewModel($legacyEvent, $viewerId);
 
-        $lat = isset($event['latitude']) && $event['latitude'] !== null ? (float) $event['latitude'] : null;
-        $lng = isset($event['longitude']) && $event['longitude'] !== null ? (float) $event['longitude'] : null;
-        $location = trim(self::asStr($event['location'] ?? ''));
-        $isOnline = (bool) ($event['is_online'] ?? false);
+        $locationFacts = is_array($event['location'] ?? null) ? $event['location'] : [];
+        $lat = isset($locationFacts['latitude']) && $locationFacts['latitude'] !== null
+            ? (float) $locationFacts['latitude']
+            : null;
+        $lng = isset($locationFacts['longitude']) && $locationFacts['longitude'] !== null
+            ? (float) $locationFacts['longitude']
+            : null;
+        $location = trim(self::asStr($locationFacts['label'] ?? ''));
+        $locationMode = self::asStr($locationFacts['mode'] ?? 'in_person');
+        $isOnline = $locationMode === 'online';
 
         return $this->view('accessible-frontend::events-map', [
             'title' => __('govuk_alpha_events.map.title'),
@@ -137,7 +532,7 @@ trait EventsParity
             'lng' => $lng,
             'location' => $location !== '' ? $location : null,
             'isOnline' => $isOnline,
-            'hasCoordinates' => $lat !== null && $lng !== null && !$isOnline,
+            'hasCoordinates' => $lat !== null && $lng !== null && $locationMode !== 'online',
         ]);
     }
 
@@ -212,7 +607,10 @@ trait EventsParity
             // Notify RSVPs of meaningful changes — parity with the API update path.
             try {
                 $changes = EventService::getLastMeaningfulUpdateChanges();
-                if (!empty($changes)) {
+                if (!empty($changes)
+                    && EventNotificationDeliveryModeResolver::resolve(
+                        (int) TenantContext::getId(),
+                    ) !== EventNotificationDeliveryMode::OutboxAuthoritative) {
                     app(\App\Services\EventNotificationService::class)->notifyEventUpdated($id, $changes);
                 }
             } catch (\Throwable $e) {
@@ -464,5 +862,333 @@ trait EventsParity
         }
 
         return $out;
+    }
+
+    // -----------------------------------------------------------------
+    //  Privacy-safe calendar parity
+    // -----------------------------------------------------------------
+
+    public function eventsCalendarActions(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $service = app(EventCalendarService::class);
+        $projection = $service->projectionForEvent($user, $id);
+        abort_if($projection === null, 404);
+
+        return $this->view('accessible-frontend::events-calendar', [
+            'title' => __('govuk_alpha.events.calendar_actions_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'event' => $service->apiProjection($projection),
+            'calendarActions' => $service->calendarActions($projection),
+        ]);
+    }
+
+    public function eventsCalendarDownload(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $service = app(EventCalendarService::class);
+        $projection = $service->projectionForEvent($user, $id);
+        abort_if($projection === null, 404);
+
+        return $this->eventsCalendarResponse(
+            $service->renderEvent($projection),
+            'event-' . $id . '.ics',
+        );
+    }
+
+    public function eventsCalendarFeed(
+        Request $request,
+        string $tenantSlug,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $service = app(EventCalendarService::class);
+        [$from, $until] = $service->tenantFeedRange();
+        $items = $service->projectionsForRange(
+            $user,
+            $from,
+            $until,
+        );
+
+        return $this->eventsCalendarResponse(
+            $service->renderFeed($items, __('govuk_alpha.events.calendar_tenant_name', [
+                'tenant' => TenantContext::getName(),
+            ])),
+            'events.ics',
+        );
+    }
+
+    public function eventsCalendarSubscriptions(
+        Request $request,
+        string $tenantSlug,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $statusInput = $request->query('status');
+        $status = is_string($statusInput) && in_array($statusInput, ['revoked'], true)
+            ? $statusInput
+            : null;
+
+        return $this->eventsCalendarSubscriptionsPage($user, $tenantSlug, null, [], $status);
+    }
+
+    public function eventsCreateCalendarSubscription(
+        Request $request,
+        string $tenantSlug,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $labelInput = $request->input('label');
+        $label = is_string($labelInput) ? trim($labelInput) : '';
+        $hasControlCharacters = $label !== ''
+            && preg_match('/[\x00-\x1F\x7F]/u', $label) === 1;
+        $safeLabel = preg_replace('/[\x00-\x1F\x7F]/u', '', $label) ?? '';
+        if (($labelInput !== null && ! is_string($labelInput))
+            || mb_strlen($label) > 100
+            || $hasControlCharacters) {
+            return $this->eventsCalendarSubscriptionsPage(
+                $user,
+                $tenantSlug,
+                null,
+                [__('govuk_alpha.events.calendar_subscription_label_invalid')],
+                null,
+                422,
+                mb_substr($safeLabel, 0, 100),
+            );
+        }
+
+        $service = app(EventCalendarService::class);
+        try {
+            $created = $service->createFeedToken($user, $label !== '' ? $label : null);
+        } catch (\DomainException $exception) {
+            $message = $exception->getMessage() === 'event_calendar_token_limit'
+                ? __('govuk_alpha.events.calendar_subscription_limit')
+                : __('govuk_alpha.events.calendar_subscription_create_failed');
+
+            return $this->eventsCalendarSubscriptionsPage(
+                $user,
+                $tenantSlug,
+                null,
+                [$message],
+                null,
+                409,
+                $label,
+            );
+        } catch (\Throwable $exception) {
+            // Never log the request label, token result, URL, or exception
+            // message: any of them could become a capability disclosure.
+            Log::warning('Accessible calendar subscription creation failed', [
+                'tenant_id' => TenantContext::currentId(),
+                'user_id' => (int) $user->getKey(),
+                'exception_class' => $exception::class,
+            ]);
+
+            return $this->eventsCalendarSubscriptionsPage(
+                $user,
+                $tenantSlug,
+                null,
+                [__('govuk_alpha.events.calendar_subscription_create_failed')],
+                null,
+                500,
+                $label,
+            );
+        }
+
+        $feedUrl = $created['feed_url'] ?? null;
+        unset($created['secret'], $created['feed_url']);
+        if (! is_string($feedUrl) || $feedUrl === '') {
+            return $this->eventsCalendarSubscriptionsPage(
+                $user,
+                $tenantSlug,
+                null,
+                [__('govuk_alpha.events.calendar_subscription_create_failed')],
+                null,
+                500,
+            );
+        }
+
+        // Render the capability once, directly in this no-store POST response.
+        // It is never flashed into session state or persisted in plaintext.
+        return $this->eventsCalendarSubscriptionsPage(
+            $user,
+            $tenantSlug,
+            $feedUrl,
+            [],
+            'created',
+        );
+    }
+
+    public function eventsConfirmCalendarSubscriptionRevoke(
+        Request $request,
+        string $tenantSlug,
+        int $tokenId,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $token = app(EventCalendarService::class)->feedTokenForOwner($user, $tokenId);
+        abort_if($token === null || ! (bool) ($token['active'] ?? false), 404);
+
+        return $this->eventsCalendarSubscriptionRevokePage($tenantSlug, $token);
+    }
+
+    public function eventsRevokeCalendarSubscription(
+        Request $request,
+        string $tenantSlug,
+        int $tokenId,
+    ): Response|RedirectResponse {
+        $user = $this->eventsCalendarUser($tenantSlug);
+        if ($user instanceof RedirectResponse) {
+            return $user;
+        }
+
+        $service = app(EventCalendarService::class);
+        $token = $service->feedTokenForOwner($user, $tokenId);
+        abort_if($token === null || ! (bool) ($token['active'] ?? false), 404);
+
+        if ($request->input('confirm_revoke') !== 'yes') {
+            return $this->eventsCalendarSubscriptionRevokePage(
+                $tenantSlug,
+                $token,
+                [__('govuk_alpha.events.calendar_subscription_confirmation_required')],
+                422,
+            );
+        }
+
+        if (! $service->revokeFeedToken($user, $tokenId)) {
+            return $this->eventsCalendarSubscriptionsPage(
+                $user,
+                $tenantSlug,
+                null,
+                [__('govuk_alpha.events.calendar_subscription_revoke_failed')],
+                null,
+                409,
+            );
+        }
+
+        return redirect()
+            ->route('govuk-alpha.events.calendar.subscriptions', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'revoked',
+            ])
+            ->withHeaders([
+                'Cache-Control' => 'private, no-store, max-age=0',
+                'Pragma' => 'no-cache',
+                'Referrer-Policy' => 'no-referrer',
+            ]);
+    }
+
+    /**
+     * @param list<string> $errors
+     */
+    private function eventsCalendarSubscriptionsPage(
+        User $user,
+        string $tenantSlug,
+        ?string $createdFeedUrl = null,
+        array $errors = [],
+        ?string $status = null,
+        int $httpStatus = 200,
+        string $label = '',
+    ): Response {
+        $service = app(EventCalendarService::class);
+        $response = $this->view('accessible-frontend::events-calendar-subscriptions', [
+            'title' => __('govuk_alpha.events.calendar_subscriptions_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'tokens' => $service->listFeedTokens($user),
+            'calendarTimezone' => $service->tenantTimezone(),
+            'createdFeedUrl' => $createdFeedUrl,
+            'errors' => $errors,
+            'status' => $status,
+            'label' => $label,
+        ], $httpStatus);
+
+        return $this->eventsCalendarSensitiveHtmlResponse($response);
+    }
+
+    /**
+     * @param array<string, int|string|bool|null> $token
+     * @param list<string> $errors
+     */
+    private function eventsCalendarSubscriptionRevokePage(
+        string $tenantSlug,
+        array $token,
+        array $errors = [],
+        int $httpStatus = 200,
+    ): Response {
+        $response = $this->view('accessible-frontend::events-calendar-subscription-revoke', [
+            'title' => __('govuk_alpha.events.calendar_subscription_revoke_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'token' => $token,
+            'errors' => $errors,
+        ], $httpStatus);
+
+        return $this->eventsCalendarSensitiveHtmlResponse($response);
+    }
+
+    private function eventsCalendarSensitiveHtmlResponse(Response $response): Response
+    {
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Referrer-Policy', 'no-referrer');
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+        return $response;
+    }
+
+    private function eventsCalendarUser(string $tenantSlug): User|RedirectResponse
+    {
+        $userId = $this->eventsParityGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $user = User::withoutGlobalScopes()
+            ->where('tenant_id', TenantContext::currentId())
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
+            ->find($userId);
+        abort_unless($user instanceof User, 403);
+
+        return $user;
+    }
+
+    private function eventsCalendarResponse(string $body, string $filename): Response
+    {
+        return response($body, 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'Pragma' => 'no-cache',
+            'Referrer-Policy' => 'no-referrer',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 }

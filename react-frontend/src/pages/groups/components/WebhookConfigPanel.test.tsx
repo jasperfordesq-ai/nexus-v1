@@ -32,13 +32,9 @@ vi.mock('@/lib/api', () => ({
 }));
 
 // ── useConfirm mock ───────────────────────────────────────────────────────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...actual,
-    useConfirm: () => mockConfirm,
-  };
-});
+vi.mock('@/components/ui/ConfirmDialog', () => ({
+  useConfirm: () => mockConfirm,
+}));
 
 vi.mock('@/contexts', () =>
   createMockContexts({
@@ -74,10 +70,12 @@ const WEBHOOKS = [
 
 describe('WebhookConfigPanel — non-admin', () => {
   it('renders nothing when isAdmin=false', () => {
+    vi.clearAllMocks();
     mockApi.get.mockResolvedValue({ success: true, data: [] });
     render(<WebhookConfigPanel groupId={GROUP_ID} isAdmin={false} />);
     // Component returns null; no webhooks title or add button should appear
     expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument();
+    expect(mockApi.get).not.toHaveBeenCalled();
   });
 });
 
@@ -109,6 +107,15 @@ describe('WebhookConfigPanel — admin', () => {
       expect(busyEls.length).toBe(0);
     });
     // No webhook rows
+    expect(screen.queryByText('https://example.com/hook')).not.toBeInTheDocument();
+  });
+
+  it('shows an error instead of an empty success state when load resolves success=false', async () => {
+    mockApi.get.mockResolvedValueOnce({ success: false, code: 'HTTP_500' });
+
+    render(<WebhookConfigPanel groupId={GROUP_ID} isAdmin={true} />);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
     expect(screen.queryByText('https://example.com/hook')).not.toBeInTheDocument();
   });
 
@@ -161,6 +168,27 @@ describe('WebhookConfigPanel — admin', () => {
       const urlInputs = screen.getAllByRole('textbox');
       expect(urlInputs.length).toBeGreaterThan(0);
     });
+  });
+
+  it('advertises only webhook events that have real producers', async () => {
+    const user = userEvent.setup();
+    mockApi.get.mockResolvedValueOnce({ success: true, data: [] });
+
+    render(<WebhookConfigPanel groupId={GROUP_ID} isAdmin={true} />);
+    await waitFor(() => expect(screen.queryByRole('status', { busy: true })).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: /add/i }));
+
+    for (const event of [
+      'member.joined',
+      'member.left',
+      'discussion.created',
+      'post.created',
+      'file.uploaded',
+    ]) {
+      expect(screen.getByText(event)).toBeInTheDocument();
+    }
+    expect(screen.queryByText('group.updated')).not.toBeInTheDocument();
+    expect(screen.queryByText('milestone.reached')).not.toBeInTheDocument();
   });
 
   it('shows toast error if URL is empty on create', async () => {

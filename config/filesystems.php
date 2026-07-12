@@ -51,6 +51,15 @@ return [
             'throw' => false,
         ],
 
+        // Read-only migration source for files written by historical services
+        // directly beneath the Apache document root. Runtime Groups endpoints
+        // must never write to or generate URLs from this disk.
+        'legacy_httpdocs' => [
+            'driver' => 'local',
+            'root' => base_path('httpdocs'),
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

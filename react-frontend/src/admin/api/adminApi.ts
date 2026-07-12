@@ -57,11 +57,11 @@ import type {
   MonitoredUser,
   BrokerConfig,
   AdminGroup,
+  GroupStatus,
   GroupApproval,
   GroupAnalyticsData,
   GroupModerationItem,
   GroupType,
-  GroupPolicy,
   GroupTag,
   GroupCollection,
   GroupAutoAssignRule,
@@ -289,8 +289,12 @@ export const adminConfig = {
   get: () =>
     api.get<TenantConfig>('/v2/admin/config'),
 
-  updateFeature: (feature: string, enabled: boolean) =>
-    api.put<{ success: boolean }>('/v2/admin/config/features', { feature, enabled }),
+  updateFeature: (feature: string, enabled: boolean, options?: { confirmDisable?: boolean }) =>
+    api.put<{ success: boolean }>('/v2/admin/config/features', {
+      feature,
+      enabled,
+      ...(options?.confirmDisable ? { confirm_disable: true } : {}),
+    }),
 
   updateModule: (module: string, enabled: boolean) =>
     api.put<{ success: boolean }>('/v2/admin/config/modules', { module, enabled }),
@@ -802,7 +806,7 @@ export const adminBroker = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminGroups = {
-  list: (params: { page?: number; per_page?: number; status?: string; search?: string } = {}) =>
+  list: (params: { page?: number; per_page?: number; status?: GroupStatus; search?: string } = {}) =>
     api.get<PaginatedResponse<AdminGroup>>(
       `/v2/admin/groups${buildQuery(params)}`
     ),
@@ -822,7 +826,7 @@ export const adminGroups = {
   getModeration: () =>
     api.get<GroupModerationItem[]>('/v2/admin/groups/moderation'),
 
-  updateStatus: (id: number, status: 'active' | 'inactive') =>
+  updateStatus: (id: number, status: GroupStatus) =>
     api.put<{ success: boolean }>(`/v2/admin/groups/${id}/status`, { status }),
 
   delete: (id: number) =>
@@ -840,13 +844,6 @@ export const adminGroups = {
 
   deleteGroupType: (id: number) =>
     api.delete<{ success: boolean }>(`/v2/admin/groups/types/${id}`),
-
-  // Policies
-  getPolicies: (typeId: number) =>
-    api.get<GroupPolicy[]>(`/v2/admin/groups/types/${typeId}/policies`),
-
-  setPolicy: (typeId: number, key: string, value: string | number | boolean) =>
-    api.put<{ success: boolean }>(`/v2/admin/groups/types/${typeId}/policies`, { key, value }),
 
   // Group detail
   getGroup: (id: number) =>
@@ -920,6 +917,9 @@ export const adminGroups = {
 
   createAutoAssignRule: (data: { group_id: number; rule_type: GroupAutoAssignRuleType; rule_value: string }) =>
     api.post<{ id: number }>('/v2/admin/group-auto-assign-rules', data),
+
+  updateAutoAssignRule: (id: number, data: Partial<Pick<GroupAutoAssignRule, 'group_id' | 'rule_type' | 'rule_value' | 'is_active'>>) =>
+    api.put<{ id: number }>(`/v2/admin/group-auto-assign-rules/${id}`, data),
 
   deleteAutoAssignRule: (id: number) =>
     api.delete<{ message: string }>(`/v2/admin/group-auto-assign-rules/${id}`),

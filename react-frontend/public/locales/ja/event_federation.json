@@ -1,0 +1,66 @@
+{
+  "manage": {
+    "federation": {
+      "title": "イベントの連携共有",
+      "tab": "連携共有",
+      "overview": "連携配信を確認",
+      "description": "参加者の非公開データを開示せずに、このイベントが提携コミュニティへ共有される状況を確認します。",
+      "refresh": "更新",
+      "loading": "連携状況を読み込んでいます...",
+      "load_error_title": "連携状況を読み込めません",
+      "load_error_description": "配信診断を読み込めませんでした。もう一度お試しください。",
+      "try_again": "もう一度試す",
+      "not_configured_title": "提携コミュニティが設定されていません",
+      "not_configured_description": "現在、このイベントは連携先へ配信されていません。",
+      "degraded_title": "確認が必要な配信があります",
+      "degraded_description": "1件以上の配信が再試行上限に達しました。管理者へ問い合わせる際は診断コードをお伝えください。",
+      "metrics": {
+        "configured_partners": "設定済み連携先",
+        "recipient_partners": "配信履歴",
+        "federation_version": "連携バージョン",
+        "visibility": "共有範囲"
+      },
+      "visibility": {
+        "none": "共有なし",
+        "listed": "一覧に掲載",
+        "joinable": "掲載して参加可能"
+      },
+      "delivery_summary": "配信概要",
+      "delivery_status": {
+        "pending": "保留中",
+        "retry": "再試行予定",
+        "processing": "処理中",
+        "delivered": "配信済み",
+        "dead_letter": "確認が必要"
+      },
+      "partners_table_aria": "連携先別のイベント配信状況",
+      "columns": {
+        "partner": "連携先",
+        "action": "操作",
+        "delivery": "配信",
+        "attempts": "試行回数",
+        "activity": "最新の処理"
+      },
+      "no_deliveries": "このイベントの連携配信履歴はありません。",
+      "removed_partner": "削除された連携先",
+      "partner_status": {
+        "active": "有効",
+        "pending": "保留中",
+        "suspended": "停止中",
+        "failed": "失敗",
+        "removed": "削除済み",
+        "unknown": "不明な状態"
+      },
+      "events_disabled": "イベント共有は無効です",
+      "action": {
+        "upsert": "公開または更新",
+        "tombstone": "削除"
+      },
+      "not_available": "利用できません",
+      "error_code": "診断コード: {{code}}",
+      "error_code_unknown": "診断コードを利用できません",
+      "attempt_count": "{{max}}回中{{count}}回",
+      "generated_at": "更新日時: {{time}}"
+    }
+  }
+}

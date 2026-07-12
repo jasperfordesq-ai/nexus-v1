@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\GroupStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -47,7 +48,10 @@ class FeedSidebarController extends BaseApiController
 
                 $groups = 0;
                 try {
-                    $groups = (int) DB::table('groups')->where('tenant_id', $tenantId)->count();
+                    $groups = (int) DB::table('groups')
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', GroupStatus::Active->value)
+                        ->count();
                 } catch (\Exception $e) { /* table may not exist */ }
 
                 return [
@@ -149,7 +153,12 @@ class FeedSidebarController extends BaseApiController
                     'listings' => (int) DB::table('listings')->where('tenant_id', $tenantId)->where('status', 'active')->count(),
                 ];
                 try { $stats['events'] = (int) DB::table('events')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['events'] = 0; }
-                try { $stats['groups'] = (int) DB::table('groups')->where('tenant_id', $tenantId)->count(); } catch (\Exception $e) { $stats['groups'] = 0; }
+                try {
+                    $stats['groups'] = (int) DB::table('groups')
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', GroupStatus::Active->value)
+                        ->count();
+                } catch (\Exception $e) { $stats['groups'] = 0; }
                 return $stats;
             });
         } catch (\Throwable $e) {
@@ -202,11 +211,7 @@ class FeedSidebarController extends BaseApiController
                         ->where('gm.status', 'active');
                 })
                 ->where('g.tenant_id', $tenantId)
-                ->where('g.is_active', 1)
-                ->where(function ($q) {
-                    $q->whereNull('g.status')
-                        ->orWhere('g.status', 'active');
-                })
+                ->where('g.status', GroupStatus::Active->value)
                 ->where(function ($q) use ($tenantId, $userId) {
                     $q->where('g.visibility', 'public');
 

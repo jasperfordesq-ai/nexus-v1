@@ -40,76 +40,87 @@ vi.mock('@/lib/helpers', async (importOriginal) => {
 });
 
 // ─── Stub HeroUI components that misbehave in jsdom ──────────────────────────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...orig,
-    GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-      <div data-testid="glass-card" className={className}>{children}</div>
-    ),
-    Dropdown: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="member-dropdown">{children}</div>
-    ),
-    DropdownTrigger: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="dropdown-trigger">{children}</div>
-    ),
-    DropdownMenu: ({
-      children,
-    }: {
-      children: React.ReactNode;
-      'aria-label'?: string;
-    }) => (
-      <div data-testid="member-dropdown-menu">{children}</div>
-    ),
-    DropdownItem: ({
-      children,
-      onPress,
-      id,
-    }: {
-      children: React.ReactNode;
-      onPress?: () => void;
-      id?: string;
-      key?: string;
-      className?: string;
-      color?: string;
-      startContent?: React.ReactNode;
-    }) => (
-      <button data-testid={`member-action-${id}`} onClick={onPress}>
-        {children}
-      </button>
-    ),
-    Button: ({
-      children,
-      isIconOnly,
-      isLoading,
-      'aria-label': ariaLabel,
-      ...rest
-    }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-      isIconOnly?: boolean;
-      isLoading?: boolean;
-      variant?: string;
-      size?: string;
-    }) => (
-      <button
-        {...rest}
-        aria-label={ariaLabel}
-        data-loading={isLoading ? 'true' : undefined}
-        data-testid={ariaLabel ? `btn-${ariaLabel}` : 'btn'}
-      >
-        {isLoading ? <span>Loading...</span> : children}
-      </button>
-    ),
-    Chip: ({ children, className }: { children: React.ReactNode; className?: string; size?: string; variant?: string; startContent?: React.ReactNode }) => (
-      <span data-testid="chip" className={className}>{children}</span>
-    ),
-    Spinner: ({ size }: { size?: string }) => (
-      <div role="status" aria-busy="true" data-testid="spinner" data-size={size} />
-    ),
-    Avatar: ({ name, src }: { name?: string; src?: string; size?: string; className?: string }) => (
-      <img data-testid="member-avatar" alt={name ?? ''} src={src ?? ''} />
-    ),
-  };
-});
+vi.mock('@/components/ui/GlassCard', () => ({
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="glass-card" className={className}>{children}</div>
+  ),
+}));
+
+vi.mock('@/components/ui/Dropdown', () => ({
+  Dropdown: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="member-dropdown">{children}</div>
+  ),
+  DropdownTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown-trigger">{children}</div>
+  ),
+  DropdownMenu: ({ children }: { children: React.ReactNode; 'aria-label'?: string }) => (
+    <div data-testid="member-dropdown-menu">{children}</div>
+  ),
+  DropdownItem: ({
+    children,
+    onPress,
+    id,
+  }: {
+    children: React.ReactNode;
+    onPress?: () => void;
+    id?: string;
+    key?: string;
+    className?: string;
+    color?: string;
+    startContent?: React.ReactNode;
+  }) => (
+    <button data-testid={`member-action-${id}`} onClick={onPress}>
+      {children}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({
+    children,
+    isIconOnly: _isIconOnly,
+    isLoading,
+    isDisabled,
+    onPress,
+    'aria-label': ariaLabel,
+    ...rest
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    isIconOnly?: boolean;
+    isLoading?: boolean;
+    isDisabled?: boolean;
+    onPress?: () => void;
+    variant?: string;
+    size?: string;
+  }) => (
+    <button
+      {...rest}
+      aria-label={ariaLabel}
+      disabled={isDisabled || isLoading}
+      data-loading={isLoading ? 'true' : undefined}
+      onClick={onPress}
+    >
+      {isLoading ? <span>Loading...</span> : children}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/ui/Chip', () => ({
+  Chip: ({ children, className }: { children: React.ReactNode; className?: string; size?: string; variant?: string; startContent?: React.ReactNode }) => (
+    <span data-testid="chip" className={className}>{children}</span>
+  ),
+}));
+
+vi.mock('@/components/ui/Spinner', () => ({
+  Spinner: ({ size }: { size?: string }) => (
+    <div role="status" aria-busy="true" data-testid="spinner" data-size={size} />
+  ),
+}));
+
+vi.mock('@/components/ui/Avatar', () => ({
+  Avatar: ({ name, src }: { name?: string; src?: string; size?: string; className?: string }) => (
+    <img data-testid="member-avatar" alt={name ?? ''} src={src || undefined} />
+  ),
+}));
 
 // ─── Stub EmptyState ──────────────────────────────────────────────────────────
 vi.mock('@/components/feedback', () => ({
@@ -141,8 +152,12 @@ const defaultProps = {
   groupOwnerId: 1,
   groupAdminIds: [],
   updatingMember: null,
+  membersHasMore: false,
+  membersLoadingMore: false,
   onUpdateMemberRole: vi.fn(),
   onRemoveMember: vi.fn(),
+  onSearchMembers: vi.fn(),
+  onLoadMoreMembers: vi.fn(),
 };
 
 describe('GroupMembersTab', () => {
@@ -213,6 +228,30 @@ describe('GroupMembersTab', () => {
     const { GroupMembersTab } = await import('./GroupMembersTab');
     render(<GroupMembersTab {...defaultProps} userIsAdmin={true} />);
     expect(screen.getByTestId('member-dropdown')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Manage Alice Green' })).toHaveClass('min-h-11', 'min-w-11');
+  });
+
+  it('uses server capabilities to hide forbidden role actions', async () => {
+    const member = makeMember({
+      capabilities: { can_change_role: false, can_remove: true },
+    });
+    const { GroupMembersTab } = await import('./GroupMembersTab');
+    render(<GroupMembersTab {...defaultProps} members={[member]} userIsAdmin />);
+
+    expect(screen.queryByTestId('member-action-promote')).not.toBeInTheDocument();
+    expect(screen.getByTestId('member-action-remove')).toBeInTheDocument();
+  });
+
+  it('hides the action menu when the server grants no member-management capability', async () => {
+    const admin = makeMember({
+      id: 5,
+      role: 'admin' as const,
+      capabilities: { can_change_role: false, can_remove: false },
+    });
+    const { GroupMembersTab } = await import('./GroupMembersTab');
+    render(<GroupMembersTab {...defaultProps} members={[admin]} userIsAdmin />);
+
+    expect(screen.queryByTestId('member-dropdown')).not.toBeInTheDocument();
   });
 
   it('does not show dropdown for the current user themselves', async () => {
@@ -331,5 +370,62 @@ describe('GroupMembersTab', () => {
     expect(screen.getByText('Bob Smith')).toBeInTheDocument();
     expect(screen.getByText('Carol Day')).toBeInTheDocument();
     expect(screen.getAllByTestId('member-avatar').length).toBe(3);
+  });
+
+  it('debounces server-backed search and never filters the current page as if it were complete', async () => {
+    const members = [
+      makeMember({ id: 10, name: 'Alice Green', tagline: 'Gardener' }),
+      makeMember({ id: 11, name: 'Bob Smith', tagline: 'Software developer' }),
+    ];
+    const onSearchMembers = vi.fn();
+    const { GroupMembersTab } = await import('./GroupMembersTab');
+    const { rerender } = render(
+      <GroupMembersTab {...defaultProps} members={members} onSearchMembers={onSearchMembers} />,
+    );
+
+    const search = screen.getByRole('searchbox', { name: 'Search group members' });
+    await userEvent.type(search, 'developer');
+
+    expect(screen.getByText('Alice Green')).toBeInTheDocument();
+    expect(screen.getByText('Bob Smith')).toBeInTheDocument();
+    await waitFor(() => expect(onSearchMembers).toHaveBeenCalledWith('developer'));
+
+    rerender(
+      <GroupMembersTab {...defaultProps} members={[]} onSearchMembers={onSearchMembers} />,
+    );
+    expect(screen.getByText('No matching members')).toBeInTheDocument();
+    expect(screen.getByText('No members match “developer”.')).toBeInTheDocument();
+  });
+
+  it('exposes cursor-backed load more and renders member 21 after an append', async () => {
+    const members = Array.from({ length: 20 }, (_, index) => makeMember({
+      id: index + 1,
+      name: `Member ${index + 1}`,
+      tagline: '',
+    }));
+    const onLoadMoreMembers = vi.fn();
+    const { GroupMembersTab } = await import('./GroupMembersTab');
+    const { rerender } = render(
+      <GroupMembersTab
+        {...defaultProps}
+        members={members}
+        membersHasMore
+        onLoadMoreMembers={onLoadMoreMembers}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Load more members' }));
+    expect(onLoadMoreMembers).toHaveBeenCalledOnce();
+
+    rerender(
+      <GroupMembersTab
+        {...defaultProps}
+        members={[...members, makeMember({ id: 21, name: 'Member 21', tagline: '' })]}
+        membersHasMore={false}
+        onLoadMoreMembers={onLoadMoreMembers}
+      />,
+    );
+    expect(screen.getByText('Member 21')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Load more members' })).not.toBeInTheDocument();
   });
 });

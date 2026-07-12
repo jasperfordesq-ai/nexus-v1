@@ -21,6 +21,7 @@ const { mockAdminGroups } = vi.hoisted(() => ({
     setCollectionGroups: vi.fn(),
     getAutoAssignRules: vi.fn(),
     createAutoAssignRule: vi.fn(),
+    updateAutoAssignRule: vi.fn(),
     deleteAutoAssignRule: vi.fn(),
     list: vi.fn(),
   },
@@ -143,6 +144,7 @@ describe('GroupOrganization', () => {
     mockAdminGroups.deleteCollection.mockResolvedValue({ success: true });
     mockAdminGroups.setCollectionGroups.mockResolvedValue({ success: true });
     mockAdminGroups.createAutoAssignRule.mockResolvedValue({ success: true });
+    mockAdminGroups.updateAutoAssignRule.mockResolvedValue({ success: true });
     mockAdminGroups.deleteAutoAssignRule.mockResolvedValue({ success: true });
   });
 
@@ -308,6 +310,26 @@ describe('GroupOrganization', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Cyclists')).toBeInTheDocument();
+    });
+  });
+
+  it('toggles a rule through the tenant-scoped update API', async () => {
+    mockAdminGroups.getAutoAssignRules.mockResolvedValue({
+      success: true,
+      data: [makeRule({ id: 42, is_active: 1 })],
+    });
+
+    const { default: GroupOrganization } = await import('./GroupOrganization');
+    render(<GroupOrganization />);
+    await waitFor(() => screen.queryAllByRole('tab').length > 0);
+    fireEvent.click(screen.getAllByRole('tab').find((tab) => tab.textContent?.toLowerCase().includes('rule'))!);
+
+    const toggle = await screen.findByRole('switch', { name: /Cyclists/i });
+    fireEvent.click(toggle);
+
+    await waitFor(() => {
+      expect(mockAdminGroups.updateAutoAssignRule).toHaveBeenCalledWith(42, { is_active: false });
+      expect(mockToastFns.success).toHaveBeenCalled();
     });
   });
 

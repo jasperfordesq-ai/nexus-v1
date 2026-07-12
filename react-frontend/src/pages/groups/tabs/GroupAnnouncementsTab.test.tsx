@@ -4,18 +4,37 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, userEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
 // ─── Mock api ────────────────────────────────────────────────────────────────
-const { mockApi } = vi.hoisted(() => ({
-  mockApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn(), download: vi.fn(), upload: vi.fn() },
+const {
+  mockCreateAnnouncement,
+  mockDeleteAnnouncement,
+  mockListAnnouncements,
+  mockNotifyAnnouncementsChanged,
+  mockUpdateAnnouncement,
+} = vi.hoisted(() => ({
+  mockCreateAnnouncement: vi.fn(),
+  mockDeleteAnnouncement: vi.fn(),
+  mockListAnnouncements: vi.fn(),
+  mockNotifyAnnouncementsChanged: vi.fn(),
+  mockUpdateAnnouncement: vi.fn(),
 }));
 
-vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
+vi.mock('../api/announcements', () => ({
+  createGroupAnnouncement: mockCreateAnnouncement,
+  deleteGroupAnnouncement: mockDeleteAnnouncement,
+  listGroupAnnouncements: mockListAnnouncements,
+  notifyGroupAnnouncementsChanged: mockNotifyAnnouncementsChanged,
+  updateGroupAnnouncement: mockUpdateAnnouncement,
+}));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ formatRelativeTime: (d: string) => d }));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return { ...actual, formatRelativeTime: (d: string) => d };
+});
 
 // ─── Toast / Auth / Tenant ───────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn(), showToast: vi.fn() };
@@ -55,11 +74,6 @@ vi.mock('@/components/feedback', () => ({
   ),
 }));
 
-// ─── Stub SafeHtml ────────────────────────────────────────────────────────────
-vi.mock('@/components/ui/SafeHtml', () => ({
-  SafeHtml: ({ content }: { content: string; className?: string; as?: string }) => <div>{content}</div>,
-}));
-
 // ─── Stub HeroUI Modal (render-prop pattern) and other UI components ──────────
 vi.mock('@/components/ui', async (importOriginal) => {
   const orig = await importOriginal<Record<string, unknown>>();
@@ -72,7 +86,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
     ModalHeader: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-header">{children}</div>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-body">{children}</div>,
     ModalFooter: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-footer">{children}</div>,
-    Button: ({ children, onPress, isLoading, isDisabled, startContent, isIconOnly, variant, color, size, ...rest }: {
+    Button: ({ children, onPress, isLoading, isDisabled, startContent }: {
       children?: React.ReactNode; onPress?: () => void; isLoading?: boolean; isDisabled?: boolean;
       startContent?: React.ReactNode; isIconOnly?: boolean; variant?: string; color?: string; size?: string; [key: string]: unknown
     }) => (
@@ -128,17 +142,16 @@ const makeAnnouncement = (overrides = {}) => ({
   ...overrides,
 });
 
-const makeResponse = (data: unknown[] = []) => ({ success: true, data });
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('GroupAnnouncementsTab', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockApi.get.mockResolvedValue(makeResponse());
+    mockListAnnouncements.mockResolvedValue([]);
   });
 
   it('shows loading spinner while fetching announcements', async () => {
-    mockApi.get.mockImplementationOnce(() => new Promise(() => {}));
+    mockListAnnouncements.mockImplementationOnce(() => new Promise(() => {}));
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     const spinners = screen.queryAllByRole('status');
@@ -155,7 +168,7 @@ describe('GroupAnnouncementsTab', () => {
   });
 
   it('renders announcement titles after data loads', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([makeAnnouncement()]));
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement()]);
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     await waitFor(() => {
@@ -164,19 +177,37 @@ describe('GroupAnnouncementsTab', () => {
   });
 
   it('renders announcement author name', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([makeAnnouncement()]));
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement()]);
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     await waitFor(() => {
       expect(screen.getByText('Alice Admin')).toBeInTheDocument();
     });
+    expect(screen.getByText('2025-06-01T10:00:00Z')).toHaveAttribute('dateTime', '2025-06-01T10:00:00Z');
+  });
+
+  it('sanitizes scripts, event handlers, and javascript URLs in announcement content', async () => {
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement({
+      content: '<script>window.__announcementXss=1</script><img src=x onerror="window.__announcementXss=2"><a href="javascript:alert(1)" onclick="alert(2)">Safe announcement</a>',
+    })]);
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    const { container } = render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
+
+    expect(await screen.findByText('Safe announcement', { exact: true })).toBeInTheDocument();
+    expect(container.querySelector('script')).toBeNull();
+    expect(container.querySelector('[onerror], [onclick]')).toBeNull();
+    expect(container.innerHTML).not.toContain('javascript:');
+    expect((window as typeof window & { __announcementXss?: number }).__announcementXss).toBeUndefined();
   });
 
   it('fetches announcements from the correct API endpoint', async () => {
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={7} isAdmin={false} />);
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/7/announcements');
+      expect(mockListAnnouncements).toHaveBeenCalledWith(
+        7,
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
     });
   });
 
@@ -188,6 +219,73 @@ describe('GroupAnnouncementsTab', () => {
       const newBtn = buttons.find((b) => b.textContent?.toLowerCase().includes('new') || b.textContent?.toLowerCase().includes('announ'));
       expect(newBtn).toBeDefined();
     });
+  });
+
+  it('posts a new announcement from the admin form', async () => {
+    mockCreateAnnouncement.mockResolvedValue(makeAnnouncement({ id: 12 }));
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    render(<GroupAnnouncementsTab groupId={3} isAdmin={true} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'New Announcement' }))[0]);
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'Schedule update');
+    await userEvent.type(screen.getByRole('textbox', { name: 'Content' }), 'The meeting starts at seven.');
+    await userEvent.click(screen.getByRole('button', { name: 'Post Announcement' }));
+
+    await waitFor(() => {
+      expect(mockCreateAnnouncement).toHaveBeenCalledWith(3, {
+        title: 'Schedule update',
+        content: 'The meeting starts at seven.',
+        is_pinned: false,
+      });
+    });
+    expect(mockNotifyAnnouncementsChanged).toHaveBeenCalledWith(3);
+  });
+
+  it('exposes the composer pin toggle with aria-pressed state', async () => {
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    render(<GroupAnnouncementsTab groupId={3} isAdmin={true} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'New Announcement' }))[0]);
+    const pin = screen.getByRole('button', { name: 'Pin this announcement' });
+    expect(pin).toHaveAttribute('aria-pressed', 'false');
+
+    await userEvent.click(pin);
+    expect(screen.getByRole('button', { name: 'Pinned' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('edits an existing announcement through the admin action menu', async () => {
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement({ id: 22 })]);
+    mockUpdateAnnouncement.mockResolvedValue(makeAnnouncement({
+      id: 22,
+      title: 'Updated meeting',
+      content: 'The room changed.',
+      is_pinned: true,
+    }));
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    render(<GroupAnnouncementsTab groupId={3} isAdmin={true} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Actions' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+
+    expect(await screen.findByText('Edit announcement')).toBeInTheDocument();
+    const titleInput = screen.getByRole('textbox', { name: 'Title' });
+    const contentInput = screen.getByRole('textbox', { name: 'Content' });
+    expect(titleInput).toHaveValue('Team Meeting');
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, 'Updated meeting');
+    await userEvent.clear(contentInput);
+    await userEvent.type(contentInput, 'The room changed.');
+    await userEvent.click(screen.getByRole('button', { name: 'Pin this announcement' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(mockUpdateAnnouncement).toHaveBeenCalledWith(3, 22, {
+      title: 'Updated meeting',
+      content: 'The room changed.',
+      is_pinned: true,
+    }));
+    expect(mockNotifyAnnouncementsChanged).toHaveBeenCalledWith(3);
+    expect(mockToast.success).toHaveBeenCalledWith('Announcement updated');
   });
 
   it('does NOT show New Announcement button for non-admins', async () => {
@@ -204,7 +302,7 @@ describe('GroupAnnouncementsTab', () => {
   });
 
   it('shows pinned badge for pinned announcements', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([makeAnnouncement({ is_pinned: true, title: 'Pinned Post' })]));
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement({ is_pinned: true, title: 'Pinned Post' })]);
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     await waitFor(() => {
@@ -213,34 +311,30 @@ describe('GroupAnnouncementsTab', () => {
   });
 
   it('shows admin action menu for admins on announcement cards', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([makeAnnouncement()]));
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement()]);
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={true} />);
-    await waitFor(() => {
-      expect(screen.getByTestId('dropdown')).toBeInTheDocument();
-    });
+    expect(await screen.findByRole('button', { name: 'Actions' })).toHaveClass('min-h-11', 'min-w-11');
   });
 
   it('calls PUT endpoint when pin is toggled', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([makeAnnouncement({ id: 99 })]));
-    mockApi.put.mockResolvedValue({ success: true });
+    mockListAnnouncements.mockResolvedValue([makeAnnouncement({ id: 99 })]);
+    mockUpdateAnnouncement.mockResolvedValue(makeAnnouncement({ id: 99, is_pinned: true }));
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={true} />);
 
     await waitFor(() => screen.getByText('Team Meeting'));
 
-    const pinItem = screen.queryAllByRole('menuitem').find((el) =>
-      el.textContent?.toLowerCase().includes('pin')
-    );
-    if (pinItem) fireEvent.click(pinItem);
+    await userEvent.click(screen.getByRole('button', { name: 'Actions' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /^Pin$/i }));
 
     await waitFor(() => {
-      expect(mockApi.put).toHaveBeenCalledWith('/v2/groups/3/announcements/99', expect.objectContaining({ is_pinned: true }));
+      expect(mockUpdateAnnouncement).toHaveBeenCalledWith(3, 99, { is_pinned: true });
     });
   });
 
   it('shows error toast when loading fails', async () => {
-    mockApi.get.mockRejectedValue(new Error('network'));
+    mockListAnnouncements.mockRejectedValue(new Error('network'));
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     await waitFor(() => {
@@ -249,15 +343,41 @@ describe('GroupAnnouncementsTab', () => {
   });
 
   it('renders multiple announcements', async () => {
-    mockApi.get.mockResolvedValue(makeResponse([
+    mockListAnnouncements.mockResolvedValue([
       makeAnnouncement({ id: 1, title: 'First Announcement' }),
       makeAnnouncement({ id: 2, title: 'Second Announcement' }),
-    ]));
+    ]);
     const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
     render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
     await waitFor(() => {
       expect(screen.getByText('First Announcement')).toBeInTheDocument();
       expect(screen.getByText('Second Announcement')).toBeInTheDocument();
     });
+  });
+
+  it('aborts the announcement read when the tab unmounts', async () => {
+    mockListAnnouncements.mockImplementationOnce(() => new Promise(() => {}));
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    const { unmount } = render(<GroupAnnouncementsTab groupId={6} isAdmin={false} />);
+
+    await waitFor(() => expect(mockListAnnouncements).toHaveBeenCalled());
+    const options = mockListAnnouncements.mock.calls[0]?.[1] as { signal: AbortSignal };
+    expect(options.signal.aborted).toBe(false);
+
+    unmount();
+    expect(options.signal.aborted).toBe(true);
+  });
+
+  it('surfaces adapter rejection from a resolved API failure', async () => {
+    const { normalizeGroupApiError } = await import('../api/core');
+    mockListAnnouncements.mockRejectedValue(normalizeGroupApiError({
+      success: false,
+      code: 'HTTP_403',
+      status: 403,
+    }));
+    const { GroupAnnouncementsTab } = await import('./GroupAnnouncementsTab');
+    render(<GroupAnnouncementsTab groupId={3} isAdmin={false} />);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Failed to load announcements'));
   });
 });

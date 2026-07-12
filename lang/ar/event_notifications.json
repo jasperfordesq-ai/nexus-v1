@@ -1,0 +1,73 @@
+{
+  "subject": "تحديث الفعالية: :title",
+  "view_event": "عرض الفعالية",
+  "accept_offer": "قبول مكانك",
+  "reason": "السبب: :reason",
+  "states": {
+    "invited": "مدعو",
+    "pending": "قيد المراجعة",
+    "confirmed": "مؤكد",
+    "declined": "مرفوض",
+    "cancelled": "ملغى",
+    "waiting": "على قائمة الانتظار",
+    "offered": "معروض",
+    "accepted": "مقبول",
+    "expired": "منتهي"
+  },
+  "lifecycle": {
+    "published": "تم نشر الفعالية «:title».",
+    "postponed": "تم تأجيل الفعالية «:title».",
+    "cancelled": "تم إلغاء الفعالية «:title».",
+    "archived": "تمت أرشفة الفعالية «:title».",
+    "restored": "تمت استعادة الفعالية «:title».",
+    "completed": "اكتملت الفعالية «:title»."
+  },
+  "registration": {
+    "invited": "تمت دعوتك إلى «:title».",
+    "pending": "تسجيلك في «:title» قيد المراجعة.",
+    "confirmed": "تم تأكيد تسجيلك في «:title».",
+    "declined": "تم رفض تسجيلك في «:title».",
+    "cancelled": "تم إلغاء تسجيلك في «:title».",
+    "organizer": "حالة تسجيل :name في «:title» الآن :state."
+  },
+  "waitlist": {
+    "waiting": "أنت على قائمة انتظار «:title».",
+    "offered": "توفر لك مكان في «:title». اقبله قبل انتهاء العرض.",
+    "accepted": "قبلت مكانك في «:title».",
+    "expired": "انتهى عرض مكانك في «:title».",
+    "cancelled": "لم تعد على قائمة انتظار «:title».",
+    "organizer": "حالة :name على قائمة انتظار «:title» الآن :state."
+  },
+  "staff_role": {
+    "granted": "تم تعيينك بدور :role لفعالية «:title».",
+    "revoked": "تمت إزالة دورك :role لفعالية «:title»."
+  },
+  "reminder": {
+    "subject": "تذكير بالفعالية: :title",
+    "message": "تبدأ فعالية «:title» بعد :offset في :when."
+  },
+  "update": {
+    "message": "تم تغيير «:title»: :changes.",
+    "separator": "، ",
+    "series_scope": "ينطبق هذا التغيير على جميع المواعيد المستقبلية.",
+    "fields": {
+      "title": "العنوان",
+      "time": "التاريخ أو الوقت",
+      "timezone": "المنطقة الزمنية",
+      "all_day": "إعداد اليوم الكامل",
+      "venue": "المكان",
+      "online_access": "الوصول عبر الإنترنت",
+      "capacity": "السعة",
+      "accessibility": "إمكانية الوصول إلى المكان",
+      "cancellation_policy": "سياسة الإلغاء"
+    }
+  },
+  "roles": {
+    "co_organizer": "منظم مشارك",
+    "registration_manager": "مدير التسجيل",
+    "communications_manager": "مدير الاتصالات",
+    "check_in_staff": "فريق تسجيل الحضور",
+    "finance_manager": "مدير مالي",
+    "staff": "فريق الفعالية"
+  }
+}

@@ -33,11 +33,18 @@ import {
   Cell,
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import {
+  downloadGroupAnalyticsExport,
+  getGroupAnalyticsDashboard,
+  type GroupAnalyticsDashboard as AnalyticsDashboard,
+  type GroupAnalyticsDaysRange as DaysRange,
+  type GroupAnalyticsExport,
+} from '../api/analytics';
+import { GroupApiError } from '../api/core';
 /**
  * Group Analytics Tab
  * Dashboard for group admins/owners showing KPIs, growth, engagement, * top contributors, activity breakdown, retention cohorts, and comparative stats.
@@ -47,65 +54,6 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-interface KpiData {
-  total_members: number;
-  active_members: number;
-  participation_rate: number;
-  avg_posts_per_day: number;
-}
-
-interface GrowthPoint {
-  date: string;
-  members: number;
-  new_members: number;
-}
-
-interface EngagementPoint {
-  date: string;
-  posts: number;
-  discussions: number;
-  active_members: number;
-}
-
-interface Contributor {
-  user_id: number;
-  name: string;
-  avatar_url: string | null;
-  post_count: number;
-}
-
-interface ActivityBreakdown {
-  type: string;
-  count: number;
-}
-
-interface RetentionCohort {
-  month: string;
-  joined: number;
-  still_active: number;
-  retention_pct: number;
-}
-
-interface ComparativeStats {
-  your_members: number;
-  avg_members: number;
-  your_activity: number;
-  avg_activity: number;
-  percentile_rank: number;
-}
-
-interface AnalyticsDashboard {
-  kpi: KpiData;
-  growth: GrowthPoint[];
-  engagement: EngagementPoint[];
-  top_contributors: Contributor[];
-  activity_breakdown: ActivityBreakdown[];
-  retention: RetentionCohort[];
-  comparative: ComparativeStats;
-}
-
-type DaysRange = 7 | 30 | 90;
 
 interface GroupAnalyticsTabProps {
   groupId: number;
@@ -134,38 +82,35 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
   const [days, setDays] = useState<DaysRange>(30);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<AnalyticsDashboard | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [exporting, setExporting] = useState<GroupAnalyticsExport | null>(null);
 
-  const loadAnalytics = useCallback(async () => {
+  const loadAnalytics = useCallback(async (signal: AbortSignal) => {
     setLoading(true);
+    setLoadFailed(false);
     try {
-      const res = await api.get(`/v2/groups/${groupId}/analytics?days=${days}`);
-      if (res.success && res.data) {
-        // Map backend field names to frontend interface
-        const raw = res.data as Record<string, unknown>;
-        const mapped: AnalyticsDashboard = {
-          kpi: (raw.overview ?? raw.kpi ?? {}) as KpiData,
-          growth: (raw.member_growth ?? raw.growth ?? []) as GrowthPoint[],
-          engagement: ((raw.engagement as Record<string, unknown>)?.timeline ?? raw.engagement ?? []) as EngagementPoint[],
-          top_contributors: (raw.top_contributors ?? []) as Contributor[],
-          activity_breakdown: (Array.isArray(raw.activity_breakdown ?? raw.activity) ? (raw.activity_breakdown ?? raw.activity) : []) as ActivityBreakdown[],
-          retention: (raw.retention ?? []) as RetentionCohort[],
-          comparative: (raw.comparative ?? {}) as ComparativeStats,
-        };
-        setData(mapped);
-      }
+      const dashboard = await getGroupAnalyticsDashboard(groupId, days, { signal });
+      if (!signal.aborted) setData(dashboard);
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupAnalyticsTab.loadAnalytics', err);
-      toast.error(t('analytics.load_error'));
+      if (!signal.aborted) {
+        setLoadFailed(true);
+        toast.error(t('analytics.load_error'));
+      }
     } finally {
-      setLoading(false);
+      if (!signal.aborted) setLoading(false);
     }
   }, [groupId, days, t, toast]);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadAnalytics();
-    }
-  }, [isAdmin, loadAnalytics]);
+    if (!isAdmin) return;
+
+    const controller = new AbortController();
+    void loadAnalytics(controller.signal);
+    return () => controller.abort();
+  }, [isAdmin, loadAnalytics, loadAttempt]);
 
   // ─────────────────────────────────────────────────────────────────────
   // Admin-only gate
@@ -198,18 +143,48 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
     );
   }
 
+  if (loadFailed) {
+    return (
+      <GlassCard className="p-6">
+        <div role="alert" className="flex flex-col items-center gap-3 text-center">
+          <p className="text-sm text-danger">{t('analytics.load_error')}</p>
+          <Button variant="flat" onPress={() => setLoadAttempt((attempt) => attempt + 1)}>
+            {t('try_again')}
+          </Button>
+        </div>
+      </GlassCard>
+    );
+  }
+
   const kpi = data?.kpi;
+  const activityChartData = (data?.activity_breakdown ?? []).map((entry) => ({
+    ...entry,
+    label: (() => {
+      switch (entry.type) {
+        case 'posts': return t('analytics.chart_posts');
+        case 'discussions': return t('analytics.chart_discussions');
+        case 'events': return t('events');
+        case 'files': return t('detail.tab_files');
+        case 'member_joins': return t('analytics.col_joined');
+        default: return entry.type;
+      }
+    })(),
+  }));
 
   // ─────────────────────────────────────────────────────────────────────
   // Export handlers
   // ─────────────────────────────────────────────────────────────────────
 
-  const handleExportMembers = () => {
-    window.open(`/api/v2/groups/${groupId}/analytics/export/members`, '_blank');
-  };
-
-  const handleExportActivity = () => {
-    window.open(`/api/v2/groups/${groupId}/analytics/export/activity`, '_blank');
+  const handleExport = async (type: GroupAnalyticsExport) => {
+    setExporting(type);
+    try {
+      await downloadGroupAnalyticsExport(groupId, type);
+    } catch (err) {
+      logError('GroupAnalyticsTab.handleExport', err);
+      toast.error(t('files.download_failed'));
+    } finally {
+      setExporting(null);
+    }
   };
 
   // ─────────────────────────────────────────────────────────────────────
@@ -245,12 +220,14 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         </ToggleButtonGroup>
 
         {/* Export buttons */}
-        <div className="flex items-center gap-2">
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:items-center">
           <Button
             size="sm"
             variant="flat"
             startContent={<Download className="w-4 h-4" aria-hidden="true" />}
-            onPress={handleExportMembers}
+            onPress={() => void handleExport('members')}
+            isLoading={exporting === 'members'}
+            isDisabled={exporting !== null}
             aria-label={t('analytics.export_members_aria')}
           >
             {t('analytics.export_members')}
@@ -259,7 +236,9 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             size="sm"
             variant="flat"
             startContent={<Download className="w-4 h-4" aria-hidden="true" />}
-            onPress={handleExportActivity}
+            onPress={() => void handleExport('activity')}
+            isLoading={exporting === 'activity'}
+            isDisabled={exporting !== null}
             aria-label={t('analytics.export_activity_aria')}
           >
             {t('analytics.export_activity')}
@@ -339,11 +318,20 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Spinner />
             </div>
           ) : data && data.growth.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={data.growth}
-                margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-              >
+            <>
+              <ul className="sr-only">
+                {data.growth.map((point) => (
+                  <li key={point.date}>
+                    {point.date}: {t('analytics.chart_total_members')} {point.total_members};{' '}
+                    {t('analytics.chart_new_members')} {point.new_members}
+                  </li>
+                ))}
+              </ul>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={data.growth}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                >
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="currentColor"
@@ -378,8 +366,9 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
                 />
-              </LineChart>
-            </ResponsiveContainer>
+                </LineChart>
+              </ResponsiveContainer>
+            </>
           ) : (
             <p className="flex h-[300px] items-center justify-center text-sm text-muted">
               {t('analytics.no_growth_data')}
@@ -401,11 +390,21 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Spinner />
             </div>
           ) : data && data.engagement.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={data.engagement}
-                margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-              >
+            <>
+              <ul className="sr-only">
+                {data.engagement.map((point) => (
+                  <li key={point.date}>
+                    {point.date}: {t('analytics.chart_posts')} {point.posts};{' '}
+                    {t('analytics.chart_discussions')} {point.discussions};{' '}
+                    {t('analytics.chart_active_members')} {point.active_members}
+                  </li>
+                ))}
+              </ul>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={data.engagement}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+                >
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="currentColor"
@@ -444,8 +443,9 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
-              </BarChart>
-            </ResponsiveContainer>
+                </BarChart>
+              </ResponsiveContainer>
+            </>
           ) : (
             <p className="flex h-[300px] items-center justify-center text-sm text-muted">
               {t('analytics.no_engagement_data')}
@@ -512,13 +512,19 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
                 <Spinner />
               </div>
-            ) : data && data.activity_breakdown.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
+            ) : activityChartData.length > 0 ? (
+              <>
+                <ul className="sr-only">
+                  {activityChartData.map((entry) => (
+                    <li key={entry.type}>{entry.label}: {entry.count}</li>
+                  ))}
+                </ul>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
                   <Pie
-                    data={data.activity_breakdown}
+                    data={activityChartData}
                     dataKey="count"
-                    nameKey="type"
+                    nameKey="label"
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
@@ -529,7 +535,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                     }
                     labelLine={{ strokeWidth: 1 }}
                   >
-                    {data.activity_breakdown.map((entry, index) => (
+                    {activityChartData.map((entry, index) => (
                       <Cell
                         key={`cell-${entry.type}`}
                         fill={CHART_COLORS[index % CHART_COLORS.length]}
@@ -544,8 +550,9 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                       name,
                     ]}
                   />
-                </PieChart>
-              </ResponsiveContainer>
+                  </PieChart>
+                </ResponsiveContainer>
+              </>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {t('analytics.no_activity_data')}
@@ -568,7 +575,8 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               <Spinner />
             </div>
           ) : data && data.retention.length > 0 ? (
-            <Table aria-label={t('analytics.retention_table_aria')} removeWrapper>
+            <div className="overflow-x-auto">
+              <Table aria-label={t('analytics.retention_table_aria')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('analytics.col_month')}</TableColumn>
                 <TableColumn align="end">{t('analytics.col_joined')}</TableColumn>
@@ -603,7 +611,8 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
+              </Table>
+            </div>
           ) : (
             <p className="flex h-[200px] items-center justify-center text-sm text-muted">
               {t('analytics.no_retention_data')}

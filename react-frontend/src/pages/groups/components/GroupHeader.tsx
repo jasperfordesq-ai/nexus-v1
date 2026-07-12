@@ -65,6 +65,7 @@ interface GroupHeaderProps {
   joinRequests: JoinRequest[];
   requestsLoading: boolean;
   requestsLoaded: boolean;
+  requestsError?: boolean;
   processingRequest: number | null;
   getMemberCount: (group: GroupDetails) => number;
   onJoinLeave: () => void;
@@ -74,6 +75,10 @@ interface GroupHeaderProps {
   onOpenNotifPrefs: () => void;
   onLoadJoinRequests: () => void;
   onJoinRequest: (userId: number, action: 'accept' | 'reject') => void;
+}
+
+function safeBrandColor(value: string | null | undefined): string | null {
+  return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value.toUpperCase() : null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -91,6 +96,7 @@ export function GroupHeader({
   joinRequests,
   requestsLoading,
   requestsLoaded,
+  requestsError = false,
   processingRequest,
   getMemberCount,
   onJoinLeave,
@@ -112,16 +118,45 @@ export function GroupHeader({
       })
     : null;
   const avatarImage = resolveAvatarUrl(group.image_url);
+  const primaryColor = safeBrandColor(group.primary_color);
+  const accentColor = safeBrandColor(group.accent_color);
+  const brandedFallbackStyle = !coverImage && (primaryColor || accentColor)
+    ? {
+        backgroundImage: `linear-gradient(135deg, ${primaryColor ? `${primaryColor}38` : 'color-mix(in srgb, var(--color-primary) 18%, transparent)'}, var(--surface-elevated), ${accentColor ? `${accentColor}30` : 'color-mix(in srgb, var(--color-secondary) 16%, transparent)'})`,
+        ...(primaryColor ? { '--group-primary-color': primaryColor } : {}),
+        ...(accentColor ? { '--group-accent-color': accentColor } : {}),
+      } as React.CSSProperties
+    : undefined;
   const visibilityLabel = group.visibility === 'private' || group.visibility === 'secret'
     ? t('detail.private_chip')
     : t('detail.public_chip');
   const visibilityAria = group.visibility === 'private' || group.visibility === 'secret'
     ? t('detail.visibility_private_aria')
     : t('detail.visibility_public_aria');
+  const membershipStatus = group.viewer_membership?.status ?? (userIsMember ? 'active' : 'none');
+  const membershipCapabilities = group.viewer_membership?.capabilities;
+  const isOwner = group.viewer_membership?.role === 'owner';
+  const canLeave = membershipCapabilities?.can_leave ?? (membershipStatus === 'active' && !isOwner);
+  const canCancelRequest = membershipCapabilities?.can_cancel_request ?? membershipStatus === 'pending';
+  const canJoin = membershipCapabilities?.can_join
+    ?? (membershipStatus === 'none' || membershipStatus === 'invited');
+  const canDelete = membershipCapabilities?.can_delete ?? isOwner;
+  const canInvite = membershipCapabilities?.can_invite ?? userIsAdmin;
+  const showMembershipAction = canCancelRequest || canLeave || canJoin;
+  const membershipActionIsExit = canCancelRequest || canLeave;
+  const membershipActionLabel = canCancelRequest
+    ? t('detail.cancel_join_request')
+    : canLeave
+      ? t('detail.leave_group')
+      : t('detail.join_group');
 
   return (
     <GlassCard className="overflow-hidden">
-      <div className="relative min-h-32 bg-gradient-to-br from-[var(--color-primary)]/18 via-[var(--surface-elevated)] to-[var(--color-secondary)]/16">
+      <div
+        className="relative min-h-32 bg-gradient-to-br from-[var(--color-primary)]/18 via-[var(--surface-elevated)] to-[var(--color-secondary)]/16"
+        style={brandedFallbackStyle}
+        data-group-branding={brandedFallbackStyle ? 'custom' : 'theme'}
+      >
         {coverImageProps && (
           <img
             {...coverImageProps}
@@ -195,29 +230,36 @@ export function GroupHeader({
               >
                 {t('detail.settings')}
               </Button>
-              <Button
-                variant="flat"
-                className="min-w-0 flex-1 bg-red-500/10 text-[var(--color-error)] hover:bg-red-500/20 sm:flex-none"
-                startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                onPress={onOpenDelete}
-              >
-                {t('detail.delete')}
-              </Button>
+              {canDelete && (
+                <Button
+                  variant="flat"
+                  className="min-w-0 flex-1 bg-red-500/10 text-[var(--color-error)] hover:bg-red-500/20 sm:flex-none"
+                  startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                  onPress={onOpenDelete}
+                >
+                  {t('detail.delete')}
+                </Button>
+              )}
             </>
           )}
           {isAuthenticated && (
             <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
-              <Button
-                className={userIsMember
-                  ? 'min-w-0 flex-1 bg-theme-hover text-theme-primary sm:flex-none'
-                  : 'min-w-0 flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:flex-none'
-                }
-                startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
-                onPress={onJoinLeave}
-                isLoading={isJoining}
-              >
-                {userIsMember ? t('detail.leave_group') : t('detail.join_group')}
-              </Button>
+              {showMembershipAction && (
+                <Button
+                  className={membershipActionIsExit
+                    ? 'min-w-0 flex-1 bg-theme-hover text-theme-primary sm:flex-none'
+                    : 'min-w-0 flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:flex-none'
+                  }
+                  startContent={membershipActionIsExit
+                    ? <UserMinus className="w-4 h-4" aria-hidden="true" />
+                    : <UserPlus className="w-4 h-4" aria-hidden="true" />
+                  }
+                  onPress={onJoinLeave}
+                  isLoading={isJoining}
+                >
+                  {membershipActionLabel}
+                </Button>
+              )}
               {userIsMember && (
                 <Button
                   isIconOnly
@@ -229,7 +271,7 @@ export function GroupHeader({
                   <Megaphone className="w-4 h-4" />
                 </Button>
               )}
-              {userIsAdmin && (
+              {canInvite && (
                 <Button
                   variant="bordered"
                   className="min-w-0 flex-1 sm:flex-none"
@@ -330,6 +372,13 @@ export function GroupHeader({
           {requestsLoading ? (
             <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-4">
               <Spinner size="sm" />
+            </div>
+          ) : requestsError ? (
+            <div role="alert" className="flex flex-wrap items-center gap-3">
+              <p className="text-sm text-danger">{t('toast.something_wrong')}</p>
+              <Button size="sm" variant="flat" onPress={onLoadJoinRequests}>
+                {t('try_again')}
+              </Button>
             </div>
           ) : joinRequests.length === 0 ? (
             <p className="text-sm text-theme-subtle">{t('detail.no_pending_requests')}</p>

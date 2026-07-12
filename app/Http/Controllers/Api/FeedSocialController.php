@@ -393,18 +393,7 @@ class FeedSocialController extends BaseApiController
     private function applyPostVisibility($query, int $tenantId, ?int $viewerId): void
     {
         $query->where(function ($q) use ($tenantId, $viewerId) {
-            $q->whereNull('fp.group_id')
-                ->orWhereExists(function ($sub) use ($tenantId) {
-                    $sub->select(DB::raw(1))
-                        ->from('groups as g')
-                        ->whereColumn('g.id', 'fp.group_id')
-                        ->where('g.tenant_id', $tenantId)
-                        ->where(function ($status) {
-                            $status->whereNull('g.status')
-                                ->orWhere('g.status', 'active');
-                        })
-                        ->where('g.visibility', 'public');
-                });
+            $q->whereNull('fp.group_id');
 
             if ($viewerId) {
                 $q->orWhereExists(function ($sub) use ($tenantId, $viewerId) {
@@ -412,10 +401,7 @@ class FeedSocialController extends BaseApiController
                         ->from('groups as g')
                         ->whereColumn('g.id', 'fp.group_id')
                         ->where('g.tenant_id', $tenantId)
-                        ->where(function ($status) {
-                            $status->whereNull('g.status')
-                                ->orWhere('g.status', 'active');
-                        })
+                        ->where('g.status', 'active')
                         ->where(function ($groupAccess) use ($tenantId, $viewerId) {
                             $groupAccess->where('g.owner_id', $viewerId)
                                 ->orWhereExists(function ($member) use ($tenantId, $viewerId) {

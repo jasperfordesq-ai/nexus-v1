@@ -317,6 +317,7 @@
     "intro": "Oto podsumowanie tego, co przegapiłeś/aś w Project NEXUS:",
     "opted_in_notice": "Otrzymałeś/aś ten e-mail, ponieważ wybrałeś/aś podsumowanie {{frequency}}.",
     "manage_notifications": "Zarządzaj powiadomieniami",
+    "unsubscribe_events": "Wyłącz tylko e-maile o wydarzeniach",
     "view_item": "Zobacz",
     "frequency_instant": "Natychmiastowe",
     "frequency_daily": "Codzienne",
@@ -394,6 +395,13 @@
     "updated_subject": "Zaktualizowane: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} Twoje wydarzenie \"{{title}}\"",
     "view_event": "Zobacz wydarzenie",
+    "broadcast_subject": "Wiadomość o {{title}}",
+    "follow_up_subject": "Wiadomość po {{title}}",
+    "review_request_subject": "Jak oceniasz {{title}}?",
+    "broadcast_heading": "Wiadomość o {{title}}",
+    "follow_up_heading": "Wiadomość po {{title}}",
+    "review_request_heading": "Podziel się wrażeniami z {{title}}",
+    "leave_event_review": "Dodaj opinię",
     "view_updated_event": "Zobacz zaktualizowane wydarzenie",
     "browse_events": "Przeglądaj wydarzenia",
     "new_rsvp_heading": "Nowe RSVP!",
@@ -409,6 +417,7 @@
     "updated_heading": "Wydarzenie zaktualizowane",
     "updated_body": "Wydarzenie <strong>\"{{title}}\"</strong> zostało zaktualizowane:",
     "change_label_date_time": "Data/Godzina:",
+    "change_label_end_time": "Godzina zakończenia:",
     "change_label_location": "Lokalizacja:",
     "change_label_title": "Tytuł:",
     "reminder_heading_24h": "Wydarzenie jutro",
@@ -617,6 +626,16 @@
     "impact_minor": "Drobny",
     "impact_cosmetic": "Kosmetyczny"
   },
+  "event_guardian_consent": {
+    "subject": "Wymagana zgoda opiekuna na udział w :event",
+    "title": "Sprawdź zgodę opiekuna",
+    "greeting": "Dzień dobry, :name,",
+    "introduction": ":minor chce wziąć udział w :event. Przed udzieleniem zgody zapoznaj się z wymogami bezpieczeństwa wydarzenia.",
+    "security_notice": "Ten link jest przypisany wyłącznie do tego wniosku o zgodę. Nie przekazuj go ani nie udostępniaj.",
+    "review_button": "Sprawdź i udziel zgody",
+    "expiry_notice": "Link wygasa po wydarzeniu albo po wycofaniu lub zastąpieniu wniosku.",
+    "consent_text": "Potwierdzam, że mam prawo wyrazić zgodę na udział osoby małoletniej w :event oraz że zapoznałem(-am) się z wymogami bezpieczeństwa wydarzenia."
+  },
   "donation_admin": {
     "created_subject": "Nowa darowizna: :amount dla :community",
     "created_title": "Otrzymano nową darowiznę",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Anonimowy",
     "anonymous_note": "(oznaczone jako anonimowe publicznie)",
     "review_cta": "Zobacz darowizny"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Rejestracja gościa anulowana: :event",
+    "cancelled_message": "Twoja rejestracja jako gość na :event została anulowana.",
+    "view_event": "Zobacz wydarzenie"
+  },
+  "event_invitation": {
+    "subject": "Masz zaproszenie na :event",
+    "message": "Otrzymujesz zaproszenie na :event. Sprawdź szczegóły i odpowiedz przed wygaśnięciem zaproszenia.",
+    "expiry": "To zaproszenie wygasa :expiry.",
+    "accept_button": "Sprawdź zaproszenie"
   }
 }

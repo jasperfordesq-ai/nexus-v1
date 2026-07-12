@@ -132,6 +132,25 @@ describe('api.get', () => {
     expect(url).toContain('page=2');
   });
 
+  it('merges caller-provided negotiation headers without replacing auth or tenant headers', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({ data: [] }));
+
+    await api.get('/api/v2/events', { when: 'upcoming' }, {
+      headers: {
+        'X-Events-Contract': '2',
+        Authorization: 'Bearer untrusted',
+        'X-Tenant-Slug': 'other-tenant',
+      },
+    });
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers).toMatchObject({
+      'X-Events-Contract': '2',
+      Authorization: 'Bearer test-token',
+      'X-Tenant-Slug': 'hour-timebank',
+    });
+  });
+
   it('omits Authorization header when no token is stored', async () => {
     mockStorage.get.mockImplementation(async (key: string) => {
       if (key === 'nexus_tenant_slug') return 'hour-timebank';

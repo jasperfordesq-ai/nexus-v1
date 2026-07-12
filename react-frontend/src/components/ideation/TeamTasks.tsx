@@ -35,7 +35,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
@@ -50,8 +50,12 @@ interface Task {
   status: 'todo' | 'in_progress' | 'done';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assigned_to: number | null;
+  created_by: number;
   due_date: string | null;
   created_at: string;
+  can_update_status: boolean;
+  can_edit: boolean;
+  can_delete: boolean;
   assignee?: {
     id: number;
     name: string;
@@ -105,10 +109,9 @@ const formatDate = (dateStr: string | null) => {
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
-export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProps) {
+export function TeamTasks({ groupId, members = [] }: TeamTasksProps) {
   const { t } = useTranslation(['ideation', 'common']);
   const confirm = useConfirm();
-  const { user } = useAuth();
   const toast = useToast();
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -136,8 +139,6 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
-
-  const isAdmin = isGroupAdmin || (user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role));
 
   const fetchTasks = useCallback(async () => {
     abortRef.current?.abort();
@@ -248,7 +249,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
     <div className="space-y-4">
       {/* Stats Bar */}
       {stats && (
-        <div className="flex flex-wrap gap-3 mb-4">
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
           <GlassCard className="px-3 py-2 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-[var(--color-text-tertiary)]" />
             <span className="text-sm text-[var(--color-text)]">
@@ -275,8 +276,12 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
       )}
 
       {/* Filter + Create */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap"
+          role="group"
+          aria-label={t('tasks.status_label')}
+        >
           {['all', 'todo', 'in_progress', 'done'].map((status) => (
             <Button
               key={status}
@@ -284,8 +289,9 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
               variant={statusFilter === status ? 'solid' : 'flat'}
               color={statusFilter === status ? 'primary' : 'default'}
               onPress={() => setStatusFilter(status)}
+              className="w-full min-w-0 sm:w-auto"
             >
-              {status === 'all' ? 'All' : t(`tasks.status_${status}`)}
+              {status === 'all' ? t('tabs.all') : t(`tasks.status_${status}`)}
             </Button>
           ))}
         </div>
@@ -294,6 +300,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
           size="sm"
           startContent={<Plus className="w-4 h-4" />}
           onPress={onCreateOpen}
+          className="w-full sm:w-auto"
         >
           {t('tasks.create')}
         </Button>
@@ -320,32 +327,56 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
         <div className="space-y-2">
           {tasks.map((task) => (
             <GlassCard key={task.id} className="p-3">
-              <div className="flex items-start gap-3">
+              <div
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 sm:gap-3"
+                data-testid="task-row"
+              >
                 {/* Status Toggle */}
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="flat"
-                  onPress={() => {
-                    const nextStatus = task.status === 'todo' ? 'in_progress' : task.status === 'in_progress' ? 'done' : 'todo';
-                    handleUpdateStatus(task.id, nextStatus);
-                  }}
-                  className={`mt-0.5 w-5 h-5 min-w-0 rounded border-2 flex items-center justify-center shrink-0 transition-colors p-0 ${
+                {(() => {
+                  const nextStatus = task.status === 'todo'
+                    ? 'in_progress'
+                    : task.status === 'in_progress'
+                      ? 'done'
+                      : 'todo';
+                  const statusClasses = `mt-0.5 flex h-11 w-11 min-w-11 shrink-0 items-center justify-center rounded border-2 p-0 transition-colors sm:h-8 sm:w-8 sm:min-w-8 ${
                     task.status === 'done'
-                      ? 'bg-green-500 border-green-500 text-white'
+                      ? 'border-green-500 bg-green-500 text-white'
                       : task.status === 'in_progress'
                         ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/20'
                         : 'border-[var(--color-border)]'
-                  }`}
-                  aria-label={t(`tasks.status_${task.status}`)}
-                >
-                  {task.status === 'done' && (
-                    <CheckSquare className="w-3 h-3" />
-                  )}
-                  {task.status === 'in_progress' && (
-                    <Clock className="w-3 h-3 text-[var(--color-warning)]" />
-                  )}
-                </Button>
+                  }`;
+
+                  const statusIcon = task.status === 'done'
+                    ? <CheckSquare className="h-4 w-4" />
+                    : task.status === 'in_progress'
+                      ? <Clock className="h-4 w-4 text-[var(--color-warning)]" />
+                      : <span className="h-2 w-2 rounded-full bg-[var(--color-text-tertiary)]" />;
+
+                  if (!task.can_update_status) {
+                    return (
+                      <span
+                        className={statusClasses}
+                        role="img"
+                        aria-label={`${t('tasks.status_label')}: ${t(`tasks.status_${task.status}`)}`}
+                      >
+                        {statusIcon}
+                      </span>
+                    );
+                  }
+
+                  return (
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="flat"
+                      onPress={() => handleUpdateStatus(task.id, nextStatus)}
+                      className={statusClasses}
+                      aria-label={`${t('tasks.status_label')}: ${t(`tasks.status_${nextStatus}`)}`}
+                    >
+                      {statusIcon}
+                    </Button>
+                  );
+                })()}
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
@@ -368,7 +399,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--color-text-tertiary)]">
                     {task.assignee && (
                       <span className="flex items-center gap-1">
                         <Avatar
@@ -397,13 +428,14 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                 </div>
 
                 {/* Delete */}
-                {isAdmin && (
+                {task.can_delete && (
                   <Button
                     isIconOnly
                     variant="light"
                     size="sm"
                     onPress={() => handleDeleteTask(task.id)}
-                    aria-label={t('toast.task_deleted')}
+                    className="h-11 w-11 min-w-11 sm:h-8 sm:w-8 sm:min-w-8"
+                    aria-label={`${t('common:delete')}: ${task.title}`}
                   >
                     <Trash2 className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                   </Button>
@@ -435,7 +467,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
               variant="bordered"
               minRows={2}
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Select
                 label={t('tasks.status_label')}
                 selectedKeys={[taskForm.status]}
@@ -464,7 +496,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                 <SelectItem key="urgent" id="urgent">{t('tasks.priority_urgent')}</SelectItem>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {members.length > 0 && (
                 <Select
                   label={t('tasks.assigned_to')}

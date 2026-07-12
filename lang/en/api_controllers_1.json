@@ -76,6 +76,7 @@
         "badge_recheck_completed": "Badge recheck completed for :count users"
     },
     "admin_groups": {
+        "rule_not_found": "Rule not found",
         "group_archived": "Group archived",
         "group_unarchived": "Group unarchived",
         "ownership_transferred": "Ownership transferred",
@@ -216,7 +217,13 @@
         "account_deletion_submitted": "Your account deletion request has been submitted. You will receive confirmation via email."
     },
     "group_challenge": {
-        "challenge_deleted": "Challenge deleted"
+        "challenge_deleted": "Challenge deleted",
+        "challenge_cancelled": "Challenge cancelled",
+        "challenge_immutable": "Completed or rewarded challenges cannot be cancelled"
+    },
+    "group_chatroom": {
+        "default_name": "General",
+        "default_description": "Default group chatroom"
     },
     "group_exchange": {
         "exchange_cancelled": "Exchange cancelled",

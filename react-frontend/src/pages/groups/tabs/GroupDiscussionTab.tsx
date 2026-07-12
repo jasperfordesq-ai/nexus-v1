@@ -62,6 +62,8 @@ export interface DiscussionMessage {
 
 export interface DiscussionDetail extends Discussion {
   messages: DiscussionMessage[];
+  messagesNextCursor?: string;
+  messagesHasMore: boolean;
 }
 
 interface GroupDiscussionTabProps {
@@ -73,12 +75,14 @@ interface GroupDiscussionTabProps {
   expandedDiscussionId: number | null;
   expandedDiscussion: DiscussionDetail | null;
   expandedLoading: boolean;
+  loadingEarlierReplies: boolean;
   replyContent: string;
   sendingReply: boolean;
   onJoinLeave: () => void;
   onShowNewDiscussion: () => void;
   onExpandDiscussion: (id: number) => void;
   onLoadMoreDiscussions: () => void;
+  onLoadEarlierReplies: () => void;
   onReplyContentChange: (value: string) => void;
   onSendReply: () => void;
 }
@@ -92,12 +96,14 @@ export function GroupDiscussionTab({
   expandedDiscussionId,
   expandedDiscussion,
   expandedLoading,
+  loadingEarlierReplies,
   replyContent,
   sendingReply,
   onJoinLeave,
   onShowNewDiscussion,
   onExpandDiscussion,
   onLoadMoreDiscussions,
+  onLoadEarlierReplies,
   onReplyContentChange,
   onSendReply,
 }: GroupDiscussionTabProps) {
@@ -220,7 +226,7 @@ export function GroupDiscussionTab({
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="ml-3 sm:ml-6 pl-3 sm:pl-6 border-l-2 border-theme-default space-y-4 pb-2">
+                      <div className="ms-3 space-y-4 border-s-2 border-theme-default pb-2 ps-3 sm:ms-6 sm:ps-6">
                         {expandedLoading ? (
                           <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('detail.loading_replies')}>
                             <Spinner size="sm" />
@@ -241,8 +247,22 @@ export function GroupDiscussionTab({
                               title={discussion.title}
                               description={expandedDiscussion.content}
                               targetOwnerId={discussion.author.id}
+                              allowComments={false}
                               compact
                             />
+
+                            {expandedDiscussion.messagesHasMore && (
+                              <div className="text-center">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  isLoading={loadingEarlierReplies}
+                                  onPress={onLoadEarlierReplies}
+                                >
+                                  {t('detail.load_earlier_replies')}
+                                </Button>
+                              </div>
+                            )}
 
                             {/* Messages */}
                             {expandedDiscussion.messages && expandedDiscussion.messages.length > 0 && (
@@ -288,7 +308,7 @@ export function GroupDiscussionTab({
                               />
                               <Button
                                 isIconOnly
-                                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white flex-shrink-0"
+                                className="min-h-11 min-w-11 flex-shrink-0 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                                 aria-label={t('detail.send_reply_aria')}
                                 isLoading={sendingReply}
                                 isDisabled={!replyContent.trim()}

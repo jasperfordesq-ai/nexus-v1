@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "Bezpieczeństwo",
+    "overview": "Wymagania bezpieczeństwa i recenzje"
+  },
+  "safety": {
+    "actions": {
+      "retry": "Spróbuj ponownie",
+      "save_draft": "Zapisz wersję roboczą",
+      "publish": "Opublikuj wymagania",
+      "archive": "Wymagania archiwalne",
+      "cancel": "Anuluj",
+      "confirm_archive": "Archiwizuj teraz",
+      "acknowledge": "Zatwierdź kod",
+      "withdraw_acknowledgement": "Wycofaj potwierdzenie",
+      "request_guardian_consent": "Poproś o zgodę opiekuna",
+      "withdraw_guardian_consent": "Wycofaj prośbę o zgodę",
+      "change_member": "Zmień członka",
+      "save_review": "Zapisz decyzję dotyczącą przeglądu",
+      "cancel_edit": "Anuluj edycję",
+      "edit_review": "Aktualizacja decyzji",
+      "withdraw_review": "Cofnij decyzję"
+    },
+    "organizer": {
+      "title": "Bezpieczeństwo wydarzeń",
+      "description": "Ustawiaj wersjonowane wymagania dotyczące uczestnictwa i prowadź kontrolowany, podlegający audytowi zapis decyzji dotyczących bezpieczeństwa.",
+      "loading": "Ładowanie bezpieczeństwa zdarzeń",
+      "load_error_title": "Bezpieczeństwo wydarzeń jest niedostępne",
+      "load_error_description": "The safety policy and review ledger could not be loaded. Żadna decyzja dotycząca bezpieczeństwa nie została zmieniona.",
+      "configuration_invalid": "Egzekwowanie zasad bezpieczeństwa jest niedostępne, ponieważ jego konfiguracja jest nieprawidłowa.",
+      "shadow_title": "Tryb obserwacji",
+      "shadow_description": "Wymagania są oceniane i rejestrowane, ale nie blokują jeszcze uczestnictwa.",
+      "read_only": "Możesz przeglądać tę politykę, ale nie możesz zmieniać jej wymagań.",
+      "action_error": "Nie można zapisać zmiany dotyczącej bezpieczeństwa. Odśwież obszar roboczy i spróbuj ponownie.",
+      "success": {
+        "saved": "Wymagania bezpieczeństwa zapisane jako wersja robocza.",
+        "published": "Opublikowano wymagania bezpieczeństwa.",
+        "archived": "Zarchiwizowano wymagania bezpieczeństwa."
+      }
+    },
+    "attendee": {
+      "title": "Wymagania dotyczące udziału",
+      "description": "Przed zarejestrowaniem się lub dołączeniem do listy oczekujących wykonaj odpowiednie kroki bezpieczeństwa.",
+      "loading": "Wczytuję wymagania dotyczące uczestnictwa",
+      "load_error_title": "Wymagania dotyczące uczestnictwa są niedostępne",
+      "load_error_description": "Nie mogliśmy zweryfikować wymogów bezpieczeństwa wydarzenia. Spróbuj ponownie przed rejestracją.",
+      "action_error": "Nie można ukończyć tego etapu bezpieczeństwa. Spróbuj ponownie.",
+      "denial_title": "Udział w wydarzeniu jest obecnie zabroniony",
+      "attention_title": "Wymagane jest działanie",
+      "success": {
+        "acknowledge": "Zatwierdzono kodeks postępowania.",
+        "withdraw_code": "Potwierdzenie kodu zostało wycofane.",
+        "request_guardian": "Wysłano prośbę o zgodę opiekuna.",
+        "withdraw_guardian": "Wycofano prośbę o zgodę opiekuna."
+      }
+    },
+    "rollout": {
+      "off": "Egzekucja wyłączona",
+      "shadow": "Tryb obserwacji",
+      "enforce": "Egzekwowanie aktywne"
+    },
+    "requirements": {
+      "title": "Polityka uczestnictwa",
+      "description": "Zmiany w wersji roboczej są prywatne do czasu ich opublikowania. Publikowanie tworzy niezmienną wersję na potrzeby dopasowywania dowodów.",
+      "minimum_age": "Minimalny wiek",
+      "minimum_age_hint": "Pozostaw puste, jeśli wydarzenie nie ma minimalnego wieku.",
+      "guardian_required": "Wymagaj zgody opiekuna w przypadku osób niepełnoletnich",
+      "guardian_required_hint": "Zgoda jest powiązana z dokładną opublikowaną wersją wymagań i datą wydarzenia.",
+      "minor_threshold": "Niewielki próg wiekowy",
+      "minor_threshold_hint": "Członkowie poniżej tego wieku biorący udział w wydarzeniu muszą uzyskać zgodę.",
+      "code_required": "Wymagaj potwierdzenia kodeksu postępowania",
+      "code_required_hint": "Przed wzięciem udziału uczestnicy muszą zapoznać się z dokładnym opublikowanym tekstem.",
+      "code_version": "Wersja tekstowa kodu",
+      "code_version_hint": "Użyj znaczącego identyfikatora, takiego jak event-conduct-2026-01.",
+      "code_text": "Kodeks postępowania",
+      "code_text_hint": "Podaj pełny regulamin, który uczestnicy muszą przeczytać i zaakceptować.",
+      "archive_title": "Zarchiwizować te wymagania bezpieczeństwa?",
+      "archive_description": "Zarchiwizowane wymagania przestają być polityką aktywnego uczestnictwa. Dowody i historia audytów pozostają zachowane.",
+      "status": {
+        "draft": "Projekt",
+        "published": "Opublikowany",
+        "archived": "Zarchiwizowane"
+      }
+    },
+    "eligibility": {
+      "allow": "Wymagania spełnione",
+      "deny": "Udział zablokowany",
+      "unavailable": "Weryfikacja niedostępna",
+      "not_evaluated": "Jeszcze nie ocenione"
+    },
+    "reasons": {
+      "unknown": "Wymóg uczestnictwa nadal wymaga uwagi.",
+      "safeguarding_policy": "Decyzja dotycząca polityki zabezpieczającej",
+      "minimum_age": "Minimalny wiek wymagany",
+      "guardian_consent": "Wymóg zgody opiekuna",
+      "code_of_conduct": "Wymóg kodeksu postępowania",
+      "conduct_violation": "Naruszenie postępowania",
+      "safety_review": "Decyzja dotycząca przeglądu bezpieczeństwa",
+      "user_block": "Blokada członkowska uniemożliwia uczestnictwo",
+      "event_safety_unbound_guest_denied": "Zaloguj się, aby sprawdzić wymagania uczestnictwa.",
+      "event_safety_user_not_active": "Twoje konto członkowskie nie jest obecnie aktywne.",
+      "event_safety_bilateral_user_block": "Blokada członkowska uniemożliwia udział w tym wydarzeniu.",
+      "event_safety_requirements_not_published": "Organizator nie opublikował jeszcze wymogów bezpieczeństwa.",
+      "event_safety_requirements_integrity_invalid": "Nie udało się zweryfikować opublikowanych wymagań bezpieczeństwa.",
+      "event_safety_requirements_version_unavailable": "Opublikowana wersja wymagań jest niedostępna.",
+      "event_safety_date_of_birth_required": "Dodaj swoją datę urodzenia, aby można było sprawdzić wymagania wiekowe.",
+      "event_safety_date_of_birth_invalid": "Nie udało się zweryfikować Twojej zarejestrowanej daty urodzenia.",
+      "event_safety_minimum_age_not_met": "Nie spełniasz minimalnego wieku tego wydarzenia.",
+      "event_safety_minor_policy_unavailable": "Polityka dotycząca drobnego udziału jest niedostępna.",
+      "event_safety_guardian_consent_required": "Wymagana jest ważna zgoda opiekuna.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Zapoznaj się z obowiązującym kodeksem postępowania.",
+      "event_safety_active_participation_denial": "Aktywna decyzja dotycząca bezpieczeństwa uniemożliwia uczestnictwo.",
+      "event_safety_safeguarding_policy_denied": "Polityka zabezpieczeń nie pozwala obecnie na uczestnictwo.",
+      "event_safety_safeguarding_policy_invalid": "Decyzji zabezpieczającej nie udało się zweryfikować.",
+      "event_safety_safeguarding_policy_unavailable": "Weryfikacja zabezpieczająca jest chwilowo niedostępna.",
+      "event_safety_schema_unavailable": "Weryfikacja bezpieczeństwa jest tymczasowo niedostępna.",
+      "event_safety_evaluation_unavailable": "Weryfikacja bezpieczeństwa jest tymczasowo niedostępna.",
+      "event_safety_organizer_not_active": "Organizator wydarzenia nie jest obecnie aktywny.",
+      "event_safety_denial_safeguarding_policy": "Decyzja dotycząca polityki zabezpieczającej uniemożliwia uczestnictwo."
+    },
+    "code": {
+      "title": "Kodeks postępowania",
+      "confirm_read": "Przeczytałem i zgadzam się z pełnym kodeksem postępowania.",
+      "status": {
+        "not_required": "Nie jest wymagane",
+        "required": "Wymagane potwierdzenie",
+        "acknowledged": "Potwierdzony"
+      }
+    },
+    "guardian": {
+      "title": "Zgoda opiekuna",
+      "description": "Opiekun otrzymuje prywatny, ograniczony czasowo link. Ich tożsamość i token zgody nigdy nie są widoczne na liście uczestników wydarzenia.",
+      "name_label": "Imię opiekuna",
+      "email_label": "E-mail opiekuna",
+      "relationship_label": "Stosunek do uczestnika",
+      "privacy_notice": "Adres jest szyfrowany na potrzeby dostawy i po przetworzeniu usuwany z koperty wysyłkowej.",
+      "relationships": {
+        "parent": "Rodzic",
+        "guardian": "Opiekun",
+        "legal_guardian": "Opiekun prawny",
+        "carer": "Opiekun faktyczny"
+      },
+      "status": {
+        "not_required": "Nie jest wymagane",
+        "required": "Wymagana zgoda",
+        "pending": "Oczekujący opiekun",
+        "active": "Zgoda udzielona",
+        "withdrawn": "Wycofany",
+        "expired": "Wygasły"
+      }
+    },
+    "decisions": {
+      "deny": "Odmów udziału",
+      "remove": "Usuń z wydarzenia"
+    },
+    "review_status": {
+      "active": "Aktywny",
+      "withdrawn": "Wycofany",
+      "expired": "Wygasły"
+    },
+    "review_actions": {
+      "recorded": "Decyzja zapisana",
+      "withdrawn": "Decyzja cofnięta",
+      "expired": "Decyzja wygasła"
+    },
+    "reviews": {
+      "title": "Recenzje udziału",
+      "description": "Rejestruj kontrolowane decyzje bez notatek tekstowych, danych kontaktowych i zapisów incydentów.",
+      "new_title": "Zapisz decyzję",
+      "edit_title": "Zaktualizuj tę decyzję",
+      "member_label": "Znajdź członka",
+      "member_hint": "Wyszukaj według nazwy, a następnie wybierz odpowiedniego członka.",
+      "member_search_error": "Nie można przeszukać członków. Spróbuj ponownie.",
+      "decision_label": "Decyzja",
+      "reason_label": "Kontrolowany powód",
+      "effective_from": "Obowiązuje od",
+      "effective_until": "Obowiązuje do",
+      "effective_until_hint": "Pozostaw puste, jeżeli decyzja nie ma zaplanowanego zakończenia.",
+      "no_notes_notice": "Ze względu na prywatność ta księga akceptuje wyłącznie kontrolowane kody przyczyn. Rejestruj zdarzenia i wrażliwe dowody w zatwierdzonym systemie zabezpieczeń.",
+      "saved": "Recenzja udziału została zapisana.",
+      "withdrawn": "Wycofano ocenę udziału.",
+      "action_error": "Nie można było zmienić oceny uczestnictwa. Odśwież i spróbuj ponownie.",
+      "history_title": "Przejrzyj księgę",
+      "total": "{{count}} zarejestrowanych decyzji",
+      "empty": "Nie zarejestrowano żadnych recenzji uczestnictwa w tym wydarzeniu.",
+      "reviewed_by": "Oceniony przez",
+      "version": "Wersja decyzyjna",
+      "audit_history": "Historia audytu (wpisy {{count}})",
+      "pagination": "Strony z recenzjami uczestnictwa"
+    },
+    "guardian_grant": {
+      "page_title": "Zgoda opiekuna",
+      "title": "Sprawdź zgodę opiekuna",
+      "description": "Potwierdź adres e-mail, na który otrzymano ten prywatny link, a następnie wyraż zgodę na wzięcie przez uczestnika udziału zgodnie z opublikowanymi wymogami bezpieczeństwa dotyczącymi wydarzenia.",
+      "email_label": "Adres e-mail opiekuna",
+      "email_hint": "Wpisz ten sam adres, na który otrzymano prośbę o zgodę.",
+      "confirm_label": "Jestem wskazanym rodzicem, opiekunem lub opiekunem i wyrażam zgodę na udział tego uczestnika.",
+      "privacy_notice": "Link jest ograniczony czasowo i można go używać tylko w przypadku tej wersji wydarzenia i wymagań. Odpowiedź nie ujawnia, czy adres e-mail jest zarejestrowany.",
+      "submit": "Wyraź zgodę",
+      "success_title": "Zgoda zapisana",
+      "success_description": "Uczestnik może teraz kontynuować, gdy zostaną spełnione inne wymagania dotyczące wydarzenia.",
+      "invalid_title": "Nie można użyć tego linku do zgody",
+      "invalid_description": "Link lub adres e-mail może być nieprawidłowy, wygasł lub został już uzupełniony. Poproś uczestnika o przesłanie nowej prośby.",
+      "browse_events": "Przeglądaj wydarzenia"
+    }
+  },
+  "govuk": {
+    "link": "Wymagania bezpieczeństwa i recenzje",
+    "back": "Powrót do wydarzenia",
+    "title": "Bezpieczeństwo wydarzeń",
+    "intro": "Przejrzyj wymagania dotyczące udziału, wykonaj wszystkie kroki, które Cię dotyczą lub zarządzaj polityką kontrolowanego bezpieczeństwa wydarzenia.",
+    "updated": "Zaktualizowano zapis bezpieczeństwa wydarzenia.",
+    "failed": "Nie można ukończyć zmiany związanej z bezpieczeństwem. Przejrzyj aktualne informacje i spróbuj ponownie.",
+    "unavailable_title": "Bezpieczeństwo wydarzeń jest niedostępne",
+    "unavailable_body": "Nie udało się zweryfikować wymogów uczestnictwa. Żadna decyzja dotycząca bezpieczeństwa nie została zmieniona.",
+    "rollout": {
+      "off": "Egzekucja wyłączona",
+      "shadow": "Tryb obserwacji",
+      "enforce": "Egzekwowanie aktywne"
+    },
+    "requirement_status": {
+      "draft": "Projekt",
+      "published": "Opublikowany",
+      "archived": "Zarchiwizowane"
+    },
+    "policy_title": "Polityka uczestnictwa",
+    "policy_intro": "Wersje robocze zmian pozostają prywatne do czasu ich opublikowania. Każda opublikowana wersja jest zachowywana w celu dopasowania dowodów.",
+    "minimum_age": "Minimalny wiek",
+    "minimum_age_hint": "Pozostaw puste, jeśli wydarzenie nie ma minimalnego wieku.",
+    "guardian_policy": "Zgoda opiekuna",
+    "guardian_required": "Wymagaj zgody opiekuna w przypadku osób niepełnoletnich",
+    "minor_threshold": "Niewielki próg wiekowy",
+    "minor_threshold_hint": "Członkowie poniżej tego wieku biorący udział w wydarzeniu muszą uzyskać zgodę opiekuna.",
+    "code_policy": "Kodeks postępowania",
+    "code_required": "Wymagaj od uczestników zapoznania się z kodeksem postępowania",
+    "code_version": "Wersja tekstowa kodu",
+    "code_version_hint": "Użyj znaczącego identyfikatora, takiego jak event-conduct-2026-01.",
+    "code_text": "Pełny tekst kodeksu postępowania",
+    "save_draft": "Zapisz wersję roboczą",
+    "publish": "Opublikuj wymagania",
+    "archive": "Wymagania archiwalne",
+    "archive_warning": "Zarchiwizowane wymagania przestają być aktywną polityką. Dowody i historia audytów pozostają zachowane.",
+    "confirm_archive": "Archiwizuj teraz",
+    "attendee_title": "Wymagania dotyczące udziału",
+    "eligibility": {
+      "allow": "Twoje obowiązujące wymagania zostały spełnione.",
+      "deny": "Udział jest obecnie zablokowany do czasu spełnienia wymienionych wymagań.",
+      "unavailable": "Obecnie nie można zweryfikować wymagań. Spróbuj ponownie przed rejestracją.",
+      "not_evaluated": "Wymagania dotyczące udziału nie zostały jeszcze ocenione."
+    },
+    "action_required": "Przed uczestnictwem wymagane jest podjęcie działań",
+    "code_title": "Kodeks postępowania",
+    "confirm_code": "Przeczytałem i zgadzam się z pełnym kodeksem postępowania.",
+    "acknowledge": "Zatwierdź kod",
+    "withdraw_acknowledgement": "Wycofaj potwierdzenie",
+    "guardian_title": "Zgoda opiekuna",
+    "guardian_status": {
+      "not_required": "Zgoda opiekuna nie jest wymagana.",
+      "required": "Wymagana jest prośba o zgodę opiekuna.",
+      "pending": "Zgłoszenie oczekuje na odpowiedź opiekuna.",
+      "active": "Zgoda opiekuna została udzielona.",
+      "withdrawn": "Prośba o zgodę opiekuna została wycofana.",
+      "expired": "Prośba o zgodę opiekuna wygasła."
+    },
+    "guardian_name": "Imię opiekuna",
+    "guardian_email": "Adres e-mail opiekuna",
+    "guardian_relationship": "Stosunek do uczestnika",
+    "relationships": {
+      "parent": "Rodzic",
+      "guardian": "Opiekun",
+      "legal_guardian": "Opiekun prawny",
+      "carer": "Opiekun faktyczny"
+    },
+    "guardian_privacy": "Adres jest szyfrowany na potrzeby dostawy i po przetworzeniu usuwany z koperty wysyłkowej.",
+    "request_guardian": "Wyślij prośbę o zgodę",
+    "withdraw_guardian": "Wycofaj prośbę o zgodę",
+    "reviews_title": "Recenzje udziału",
+    "reviews_intro": "Rejestruj kontrolowane decyzje bez notatek, danych kontaktowych i zapisów incydentów.",
+    "review_member": "Uczestnik wydarzenia",
+    "review_member_choose": "Wybierz uczestnika",
+    "member_fallback": "Numer członka: identyfikator",
+    "review_decision": "Decyzja",
+    "decisions": {
+      "deny": "Odmów udziału",
+      "remove": "Usuń z wydarzenia"
+    },
+    "review_reason": "Kontrolowany powód",
+    "reasons": {
+      "unknown": "Wymóg uczestnictwa nadal wymaga uwagi.",
+      "safeguarding_policy": "Decyzja dotycząca polityki zabezpieczającej",
+      "minimum_age": "Minimalny wiek wymagany",
+      "guardian_consent": "Wymóg zgody opiekuna",
+      "code_of_conduct": "Wymóg kodeksu postępowania",
+      "conduct_violation": "Naruszenie postępowania",
+      "safety_review": "Decyzja dotycząca przeglądu bezpieczeństwa",
+      "user_block": "Blokada członkowska uniemożliwia uczestnictwo"
+    },
+    "effective_from": "Obowiązuje od",
+    "effective_until": "Obowiązuje do",
+    "effective_until_hint": "Pozostaw puste, jeżeli decyzja nie ma zaplanowanego zakończenia.",
+    "no_notes": "Ze względu na prywatność używaj wyłącznie kontrolowanych powodów. Przechowuj zdarzenia i wrażliwe dowody w zatwierdzonym systemie zabezpieczeń.",
+    "save_review": "Zapisz decyzję dotyczącą przeglądu",
+    "no_people": "Żaden uczestnik wydarzenia nie jest dostępny do nowej recenzji.",
+    "open_people": "Otwórz obszar roboczy osób biorących udział w wydarzeniu",
+    "ledger_title": "Przejrzyj księgę",
+    "review_status": "Status",
+    "review_states": {
+      "active": "Aktywny",
+      "withdrawn": "Wycofany",
+      "expired": "Wygasły"
+    },
+    "reviewed_by": "Oceniony przez",
+    "withdraw_review": "Cofnij decyzję",
+    "ledger_empty": "Nie zarejestrowano żadnych recenzji uczestnictwa w tym wydarzeniu."
+  }
+}

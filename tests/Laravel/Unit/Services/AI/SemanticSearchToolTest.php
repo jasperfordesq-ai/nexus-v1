@@ -118,4 +118,86 @@ class SemanticSearchToolTest extends TestCase
             }
         }
     }
+
+    public function test_semantic_search_revalidates_event_lifecycle_and_template_visibility(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $eventIds = [];
+
+        try {
+            $insert = function (string $title, array $overrides = []) use ($owner, &$eventIds): int {
+                $id = (int) DB::table('events')->insertGetId(array_merge([
+                    'tenant_id' => $this->testTenantId,
+                    'user_id' => (int) $owner->id,
+                    'title' => $title,
+                    'description' => $title,
+                    'status' => 'active',
+                    'publication_status' => 'published',
+                    'operational_status' => 'scheduled',
+                    'lifecycle_version' => 1,
+                    'is_recurring_template' => 0,
+                    'start_time' => now()->addWeek(),
+                    'end_time' => now()->addWeek()->addHour(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ], $overrides));
+                $eventIds[] = $id;
+
+                return $id;
+            };
+
+            $scheduled = $insert('Semantic visible scheduled');
+            $postponed = $insert('Semantic visible postponed', [
+                'status' => 'cancelled',
+                'operational_status' => 'postponed',
+            ]);
+            $draft = $insert('Semantic hidden draft', [
+                'status' => 'draft',
+                'publication_status' => 'draft',
+            ]);
+            $cancelled = $insert('Semantic hidden cancelled', [
+                'status' => 'cancelled',
+                'operational_status' => 'cancelled',
+            ]);
+            $template = $insert('Semantic hidden template', ['is_recurring_template' => 1]);
+
+            $service = new class($draft, $scheduled, $cancelled, $postponed, $template) extends EmbeddingService {
+                /** @var list<int> */
+                private readonly array $ids;
+
+                public function __construct(int ...$ids)
+                {
+                    $this->ids = $ids;
+                }
+
+                public function semanticSearch(string $query, int $tenantId, array $contentTypes = [], int $limit = 10, int $candidateCap = 2000): array
+                {
+                    return array_map(
+                        static fn (int $id, int $rank): array => [
+                            'content_type' => 'event',
+                            'content_id' => $id,
+                            'score' => 1 - ($rank / 10),
+                        ],
+                        $this->ids,
+                        array_keys($this->ids),
+                    );
+                }
+            };
+
+            $result = (new SemanticSearchTool($service))->execute([
+                'query' => 'community events',
+                'types' => ['event'],
+                'limit' => 8,
+            ], (int) $owner->id);
+
+            $this->assertTrue($result['ok']);
+            $this->assertSame([$scheduled, $postponed], array_column($result['results'], 'id'));
+        } finally {
+            if ($eventIds !== []) {
+                DB::table('events')->whereIn('id', $eventIds)->delete();
+            }
+            DB::table('users')->where('id', $owner->id)->delete();
+        }
+    }
 }

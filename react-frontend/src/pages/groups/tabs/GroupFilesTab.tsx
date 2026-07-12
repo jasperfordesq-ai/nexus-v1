@@ -38,34 +38,22 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
+import {
+  deleteGroupFile,
+  downloadGroupFile,
+  listGroupFileFolders,
+  listGroupFiles,
+  uploadGroupFile,
+  type GroupFile,
+  type GroupFileFolder,
+} from '../api/files';
+import { GroupApiError } from '../api/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-interface GroupFile {
-  id: number;
-  group_id: number;
-  file_name: string;
-  file_path: string;
-  file_type: string;
-  file_size: number;
-  uploaded_by: number;
-  uploader_name: string;
-  uploader_avatar: string | null;
-  folder: string | null;
-  description: string | null;
-  download_count?: number;
-  created_at: string;
-}
-
-interface Folder {
-  folder: string;
-  file_count: number;
-}
 
 interface GroupFilesTabProps {
   groupId: number;
@@ -103,7 +91,7 @@ function getFileIcon(mimeType: string) {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId }: GroupFilesTabProps) {
+export function GroupFilesTab({ groupId, isMember = true }: GroupFilesTabProps) {
   const { t } = useTranslation(['groups', 'common']);
   const confirm = useConfirm();
   const toast = useToast();
@@ -111,8 +99,10 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<GroupFile[]>([]);
-  const [folders, setFolders] = useState<Folder[]>([]);
+  const [folders, setFolders] = useState<GroupFileFolder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filesLoadFailed, setFilesLoadFailed] = useState(false);
+  const [foldersLoadFailed, setFoldersLoadFailed] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -122,81 +112,119 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
   const [uploadFolder, setUploadFolder] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
   const [deleting, setDeleting] = useState<number | null>(null);
+  const filesControllerRef = useRef<AbortController | null>(null);
+  const foldersControllerRef = useRef<AbortController | null>(null);
+  const filesSequenceRef = useRef(0);
+  const foldersSequenceRef = useRef(0);
 
   const formatFileSize = useCallback((bytes: number) => {
     const { value, unitKey } = getFileSizeParts(bytes);
     return t('files.size_value', { value, unit: t(unitKey) });
   }, [t]);
 
-  const loadFiles = useCallback(
-    async (reset = false) => {
-      try {
-        if (reset) setLoading(true);
+  const loadFiles = useCallback(async ({
+    reset,
+    requestedCursor = null,
+    folder = null,
+    query = '',
+  }: {
+    reset: boolean;
+    requestedCursor?: string | null;
+    folder?: string | null;
+    query?: string;
+  }) => {
+    filesControllerRef.current?.abort();
+    const controller = new AbortController();
+    const requestId = ++filesSequenceRef.current;
+    filesControllerRef.current = controller;
+    setLoading(true);
+    setFilesLoadFailed(false);
 
-        const params = new URLSearchParams({ per_page: '20' });
-        if (!reset && cursor) params.set('cursor', cursor);
-        if (activeFolder) params.set('folder', activeFolder);
-        if (search.trim()) params.set('q', search.trim());
+    try {
+      const page = await listGroupFiles(groupId, {
+        cursor: reset ? null : requestedCursor,
+        folder,
+        query,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || requestId !== filesSequenceRef.current) return;
 
-        const resp = await api.get(`/v2/groups/${groupId}/files?${params}`);
-        const data = (resp.data ?? {}) as { items?: GroupFile[]; cursor?: string | null; has_more?: boolean };
-
-        if (reset) {
-          setFiles(data.items ?? []);
-        } else {
-          setFiles((prev) => [...prev, ...(data.items ?? [])]);
-        }
-        setCursor(data.cursor ?? null);
-        setHasMore(data.has_more ?? false);
-      } catch (err) {
-        logError('GroupFilesTab.loadFiles', err);
-      } finally {
+      setFiles((previous) => reset ? page.items : [...previous, ...page.items]);
+      setCursor(page.cursor);
+      setHasMore(page.hasMore);
+    } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
+      logError('GroupFilesTab.loadFiles', err);
+      if (!controller.signal.aborted && requestId === filesSequenceRef.current) {
+        setFilesLoadFailed(true);
+      }
+    } finally {
+      if (!controller.signal.aborted && requestId === filesSequenceRef.current) {
         setLoading(false);
       }
-    },
-    [groupId, cursor, activeFolder, search],
-  );
+    }
+  }, [groupId]);
 
   const loadFolders = useCallback(async () => {
+    foldersControllerRef.current?.abort();
+    const controller = new AbortController();
+    const requestId = ++foldersSequenceRef.current;
+    foldersControllerRef.current = controller;
+    setFoldersLoadFailed(false);
+
     try {
-      const resp = await api.get(`/v2/groups/${groupId}/files/folders`);
-      setFolders((resp.data || []) as Folder[]);
+      const nextFolders = await listGroupFileFolders(groupId, { signal: controller.signal });
+      if (controller.signal.aborted || requestId !== foldersSequenceRef.current) return;
+      setFolders(nextFolders);
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupFilesTab.loadFolders', err);
+      if (!controller.signal.aborted && requestId === foldersSequenceRef.current) {
+        setFoldersLoadFailed(true);
+      }
     }
   }, [groupId]);
 
   useEffect(() => {
-    loadFiles(true);
-    loadFolders();
-  }, [groupId, activeFolder]); // eslint-disable-line react-hooks/exhaustive-deps
+    const timeout = window.setTimeout(() => {
+      void loadFiles({ reset: true, folder: activeFolder, query: search });
+    }, search.trim() ? 300 : 0);
 
-  // Debounced search
+    return () => {
+      window.clearTimeout(timeout);
+      filesControllerRef.current?.abort();
+    };
+  }, [activeFolder, groupId, loadFiles, search]);
+
   useEffect(() => {
-    const timeout = setTimeout(() => loadFiles(true), 300);
-    return () => clearTimeout(timeout);
-  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+    void loadFolders();
+    return () => foldersControllerRef.current?.abort();
+  }, [groupId, loadFolders]);
+
+  const closeUploadModal = () => {
+    setSelectedFile(null);
+    setUploadFolder('');
+    setUploadDescription('');
+    uploadModal.onClose();
+  };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      if (uploadFolder.trim()) formData.append('folder', uploadFolder.trim());
-      if (uploadDescription.trim()) formData.append('description', uploadDescription.trim());
-
-      await api.upload(`/v2/groups/${groupId}/files`, formData);
+      await uploadGroupFile(groupId, {
+        file: selectedFile,
+        folder: uploadFolder,
+        description: uploadDescription,
+      });
 
       toast.success(t('files.upload_success'));
-      setSelectedFile(null);
-      setUploadFolder('');
-      setUploadDescription('');
-      uploadModal.onClose();
-      loadFiles(true);
-      loadFolders();
+      closeUploadModal();
+      void loadFiles({ reset: true, folder: activeFolder, query: search });
+      void loadFolders();
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupFilesTab.upload', err);
       toast.error(t('files.upload_error'));
     } finally {
@@ -206,29 +234,29 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
 
   const handleDownload = async (file: GroupFile) => {
     try {
-      await api.download(`/v2/groups/${groupId}/files/${file.id}/download`, {
-        filename: file.file_name,
-      });
+      await downloadGroupFile(groupId, file.id, file.file_name);
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupFilesTab.download', err);
       toast.error(t('files.download_error'));
     }
   };
 
-  const handleDelete = async (fileId: number) => {
+  const handleDelete = async (file: GroupFile) => {
     const ok = await confirm({
-      title: t('files.delete_confirm'),
+      title: t('files.delete_confirm', { name: file.file_name }),
       status: 'danger',
       confirmLabel: t('common:delete'),
     });
     if (!ok) return;
-    setDeleting(fileId);
+    setDeleting(file.id);
     try {
-      await api.delete(`/v2/groups/${groupId}/files/${fileId}`);
-      setFiles((prev) => prev.filter((f) => f.id !== fileId));
+      await deleteGroupFile(groupId, file.id);
+      setFiles((prev) => prev.filter((item) => item.id !== file.id));
       toast.success(t('files.delete_success'));
-      loadFolders();
+      void loadFolders();
     } catch (err) {
+      if (err instanceof GroupApiError && err.isCancellation) return;
       logError('GroupFilesTab.delete', err);
       toast.error(t('files.delete_error'));
     } finally {
@@ -238,6 +266,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (file) {
       if (file.size > 25 * 1024 * 1024) {
         toast.error(t('files.too_large'));
@@ -257,6 +286,22 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       <div role="status" className="flex justify-center py-12" aria-label={t('files.loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
+    );
+  }
+
+  if (filesLoadFailed) {
+    return (
+      <GlassCard className="p-6">
+        <div role="alert" className="flex flex-col items-center gap-3 text-center">
+          <p className="text-sm text-danger">{t('files.load_failed')}</p>
+          <Button
+            variant="flat"
+            onPress={() => void loadFiles({ reset: true, folder: activeFolder, query: search })}
+          >
+            {t('try_again')}
+          </Button>
+        </div>
+      </GlassCard>
     );
   }
 
@@ -286,12 +331,22 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
         <input
           ref={fileInputRef}
           type="file"
+          accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md,.markdown,.zip,.rar,.mp4,.m4v,.webm,.mp3,.wav,.ogg,.oga"
           className="hidden"
           onChange={handleFileSelect}
-          aria-hidden="true"
-          tabIndex={-1}
         />
       </div>
+
+      {foldersLoadFailed && (
+        <GlassCard className="p-4">
+          <div role="alert" className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
+            <p className="text-sm text-danger">{t('files.load_failed')}</p>
+            <Button variant="flat" size="sm" onPress={() => void loadFolders()}>
+              {t('try_again')}
+            </Button>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Folder filter — single-select ToggleButtonGroup ("__all__" sentinel = no folder filter) */}
       {folders.length > 0 && (
@@ -375,12 +430,13 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                       variant="light"
                       size="sm"
                       onPress={() => handleDownload(file)}
+                      isDisabled={!file.capabilities.can_download}
                       aria-label={t('files.download_aria', { name: file.file_name })}
                     >
                       <Download className="w-4 h-4" />
                     </Button>
 
-                    {(isAdmin || file.uploaded_by === currentUserId) && (
+                    {file.capabilities.can_delete && (
                       <Dropdown>
                         <DropdownTrigger>
                           <Button
@@ -398,7 +454,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                             className="text-danger"
                             color="danger"
                             startContent={<Trash2 className="w-4 h-4" />}
-                            onPress={() => handleDelete(file.id)}
+                            onPress={() => handleDelete(file)}
                             isDisabled={deleting === file.id}
                           >
                             {deleting === file.id
@@ -419,14 +475,24 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
       {/* Load more */}
       {hasMore && (
         <div className="flex justify-center pt-4">
-          <Button variant="flat" size="sm" onPress={() => loadFiles(false)} isLoading={loading}>
+          <Button
+            variant="flat"
+            size="sm"
+            onPress={() => void loadFiles({
+              reset: false,
+              requestedCursor: cursor,
+              folder: activeFolder,
+              query: search,
+            })}
+            isLoading={loading}
+          >
             {t('files.load_more')}
           </Button>
         </div>
       )}
 
       {/* Upload modal */}
-      <Modal isOpen={uploadModal.isOpen} onClose={uploadModal.onClose} size="md">
+      <Modal isOpen={uploadModal.isOpen} onClose={closeUploadModal} size="md">
         <ModalContent>
           <ModalHeader>{t('files.upload_title')}</ModalHeader>
           <ModalBody>
@@ -442,7 +508,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                     isIconOnly
                     variant="light"
                     size="sm"
-                    onPress={() => setSelectedFile(null)}
+                    onPress={closeUploadModal}
                     aria-label={t('files.remove_file')}
                   >
                     <X className="w-4 h-4" />
@@ -454,6 +520,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                   placeholder={t('files.folder_placeholder')}
                   value={uploadFolder}
                   onValueChange={setUploadFolder}
+                  maxLength={100}
                   startContent={<FolderPlus className="w-4 h-4 text-muted" aria-hidden="true" />}
                   size="sm"
                 />
@@ -463,6 +530,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
                   placeholder={t('files.description_placeholder')}
                   value={uploadDescription}
                   onValueChange={setUploadDescription}
+                  maxLength={2000}
                   minRows={2}
                   size="sm"
                 />
@@ -470,7 +538,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={uploadModal.onClose}>
+            <Button variant="flat" onPress={closeUploadModal}>
               {t('files.cancel')}
             </Button>
             <Button

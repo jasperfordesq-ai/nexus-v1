@@ -277,23 +277,18 @@ class ExploreService
                     FROM groups grp
                     WHERE grp.id = fp.group_id
                       AND grp.tenant_id = ?
-                      AND (grp.status IS NULL OR grp.status = 'active')
-                      AND grp.visibility = 'public'
-                )
-                OR EXISTS (
-                    SELECT 1
-                    FROM groups owned_grp
-                    WHERE owned_grp.id = fp.group_id
-                      AND owned_grp.tenant_id = ?
-                      AND owned_grp.owner_id = ?
-                )
-                OR EXISTS (
-                    SELECT 1
-                    FROM group_members gm
-                    WHERE gm.group_id = fp.group_id
-                      AND gm.tenant_id = ?
-                      AND gm.user_id = ?
-                      AND gm.status = 'active'
+                      AND grp.status = 'active'
+                      AND (
+                          grp.owner_id = ?
+                          OR EXISTS (
+                              SELECT 1
+                              FROM group_members gm
+                              WHERE gm.group_id = grp.id
+                                AND gm.tenant_id = ?
+                                AND gm.user_id = ?
+                                AND gm.status = 'active'
+                          )
+                      )
                 )
             )",
             [
@@ -301,7 +296,6 @@ class ExploreService
                 $tenantId,
                 $viewerId,
                 $viewerId,
-                $tenantId,
                 $tenantId,
                 $viewerId,
                 $tenantId,
@@ -385,9 +379,8 @@ class ExploreService
                     (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id AND gm.status = 'active') AS member_count
                 FROM `groups` g
                 WHERE g.tenant_id = ?
-                    AND g.is_active = 1
+                    AND g.status = 'active'
                     AND g.visibility = 'public'
-                    AND (g.status IS NULL OR g.status = 'active')
                 ORDER BY member_count DESC
                 LIMIT 6
             ", [$tenantId]);

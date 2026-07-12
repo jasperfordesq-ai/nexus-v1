@@ -1,0 +1,70 @@
+{
+  "contract_version": 1,
+  "event_id": 101,
+  "agenda_version": 3,
+  "timezone": "Europe/Dublin",
+  "permissions": {
+    "manage": false
+  },
+  "sessions": [
+    {
+      "id": 501,
+      "version": 2,
+      "title": "Repair skills workshop",
+      "description": "Learn safe, practical repair techniques.",
+      "type": "workshop",
+      "visibility": "registered",
+      "capacity": {
+        "limit": 24,
+        "registered": 12,
+        "remaining": 12,
+        "is_full": false
+      },
+      "registration": {
+        "state": "registered",
+        "version": 1,
+        "can_register": false,
+        "can_withdraw": true
+      },
+      "status": "scheduled",
+      "start_at": "2030-05-01T09:30:00+00:00",
+      "end_at": "2030-05-01T10:15:00+00:00",
+      "timezone": "Europe/Dublin",
+      "track": "Practical skills",
+      "room": "Workshop room",
+      "position": 1,
+      "cancellation_reason": null,
+      "speakers": [
+        {
+          "kind": "member",
+          "member_id": 7,
+          "display_name": "Alex Morgan",
+          "role": "Facilitator",
+          "position": 1
+        }
+      ],
+      "resources": [
+        {
+          "id": 701,
+          "type": "slides",
+          "title": "Workshop slides",
+          "visibility": "registered",
+          "position": 1,
+          "protected": false,
+          "available": true,
+          "url": "https://events.example.test/resources/workshop-slides"
+        },
+        {
+          "id": 702,
+          "type": "stream",
+          "title": "Live workshop stream",
+          "visibility": "registered",
+          "position": 2,
+          "protected": true,
+          "available": true,
+          "url": "https://events.example.test/live/workshop"
+        }
+      ]
+    }
+  ]
+}

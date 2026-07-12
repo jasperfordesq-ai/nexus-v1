@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Meilisearch\Client as MeilisearchClient;
@@ -100,6 +101,10 @@ class GroupSearchService
         }
 
         $tenantId = TenantContext::getId();
+        if (! self::groupIsActive($groupId, (int) $tenantId)) {
+            self::removeGroupContent($groupId);
+            return 0;
+        }
         $documents = [];
 
         // ── Discussions ──────────────────────────────────────────────────
@@ -195,6 +200,9 @@ class GroupSearchService
         }
 
         $tenantId = TenantContext::getId();
+        if (! self::groupIsActive($groupId, (int) $tenantId)) {
+            return [];
+        }
 
         try {
             $result = static::client()->index(self::INDEX_NAME)->search($query, [
@@ -275,10 +283,10 @@ class GroupSearchService
             ]);
         }
 
-        // Get all active groups for the tenant
+        // Get all canonically active groups for the tenant.
         $groups = DB::select(
-            "SELECT id FROM `groups` WHERE tenant_id = ? AND is_active = 1 ORDER BY id",
-            [$tenantId]
+            "SELECT id FROM `groups` WHERE tenant_id = ? AND status = ? ORDER BY id",
+            [$tenantId, GroupStatus::Active->value]
         );
 
         // Set tenant context so indexGroupContent queries are scoped correctly
@@ -297,5 +305,14 @@ class GroupSearchService
         }
 
         return $totalIndexed;
+    }
+
+    private static function groupIsActive(int $groupId, int $tenantId): bool
+    {
+        return DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', GroupStatus::Active->value)
+            ->exists();
     }
 }

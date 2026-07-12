@@ -40,6 +40,11 @@ jest.mock('@/lib/storage', () => ({
 const mockApiLogin = jest.fn();
 const mockApiLogout = jest.fn();
 const mockGetMe = jest.fn();
+const mockPurgeOfflineCheckin = jest.fn().mockResolvedValue(undefined);
+
+jest.mock('@/lib/eventOfflineCheckinStore', () => ({
+  purgeAllMobileOfflineCheckinData: () => mockPurgeOfflineCheckin(),
+}));
 
 jest.mock('@/lib/api/auth', () => ({
   login: (...args: unknown[]) => mockApiLogin(...args),
@@ -153,6 +158,7 @@ describe('AuthContext', () => {
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.token).toBeNull();
     expect(mockStorageRemove).toHaveBeenCalled();
+    expect(mockPurgeOfflineCheckin).toHaveBeenCalledTimes(1);
   });
 
   it('login() sets user and token', async () => {
@@ -190,6 +196,7 @@ describe('AuthContext', () => {
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.token).toBeNull();
     expect(mockStorageRemove).toHaveBeenCalled();
+    expect(mockPurgeOfflineCheckin).toHaveBeenCalledTimes(1);
   });
 
   it('refreshUser() updates in-memory user without a network call', async () => {

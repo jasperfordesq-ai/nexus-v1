@@ -6,12 +6,19 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Models\Group;
+use App\Models\User;
+use App\Services\GroupAuditService;
 use App\Services\GroupChatroomService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Tests\Laravel\TestCase;
 
 class GroupChatroomServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private GroupChatroomService $service;
 
     protected function setUp(): void
@@ -20,73 +27,100 @@ class GroupChatroomServiceTest extends TestCase
         $this->service = new GroupChatroomService();
     }
 
-    public function test_getChatrooms_returns_array(): void
+    public function test_public_contract_exposes_expected_methods(): void
     {
-        $rows = collect([
-            (object) ['id' => 1, 'group_id' => 1, 'name' => 'General', 'description' => null, 'category' => null, 'is_default' => 1, 'is_private' => 0, 'created_by' => 5, 'created_at' => '2026-01-01'],
+        $reflection = new \ReflectionClass(GroupChatroomService::class);
+        foreach (['getChatrooms', 'getById', 'create', 'ensureDefaultChatroom', 'delete', 'getMessages', 'postMessage', 'deleteMessage', 'pinMessage', 'unpinMessage', 'getPinnedMessages'] as $method) {
+            $this->assertTrue($reflection->getMethod($method)->isPublic(), $method);
+        }
+    }
+
+    public function test_default_chatroom_uses_the_active_locale_and_is_idempotent(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $owner->id,
+            'status' => 'active',
+            'is_active' => true,
         ]);
+        $previousLocale = App::getLocale();
 
-        DB::shouldReceive('table->where->where->orderByDesc->orderBy->get')->andReturn($rows);
+        try {
+            App::setLocale('de');
 
-        $result = $this->service->getChatrooms(1);
-        $this->assertCount(1, $result);
-        $this->assertEquals('General', $result[0]['name']);
-        $this->assertTrue($result[0]['is_default']);
+            $firstId = $this->service->ensureDefaultChatroom((int) $group->id, (int) $owner->id);
+            $secondId = $this->service->ensureDefaultChatroom((int) $group->id, (int) $owner->id);
+
+            self::assertNotNull($firstId);
+            self::assertSame($firstId, $secondId);
+            self::assertDatabaseHas('group_chatrooms', [
+                'id' => $firstId,
+                'tenant_id' => $this->testTenantId,
+                'group_id' => $group->id,
+                'created_by' => $owner->id,
+                'name' => 'Allgemein',
+                'description' => 'Standard-Gruppenchat',
+                'is_default' => 1,
+            ]);
+            self::assertSame(1, DB::table('group_chatrooms')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('group_id', $group->id)
+                ->where('is_default', true)
+                ->count());
+        } finally {
+            App::setLocale($previousLocale);
+        }
     }
 
-    public function test_getById_returns_null_when_not_found(): void
+    public function test_chatroom_lists_require_an_explicit_viewer(): void
     {
-        DB::shouldReceive('table->where->where->first')->andReturn(null);
-
-        $this->assertNull($this->service->getById(999));
+        $this->assertNull($this->service->getChatrooms(1));
+        $this->assertSame('FORBIDDEN', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_getById_returns_array_when_found(): void
+    public function test_message_lists_require_an_explicit_viewer(): void
     {
-        $chatroom = (object) ['id' => 1, 'group_id' => 1, 'name' => 'General', 'description' => null, 'is_default' => 1, 'created_by' => 5, 'created_at' => '2026-01-01'];
-        DB::shouldReceive('table->where->where->first')->andReturn($chatroom);
-
-        $result = $this->service->getById(1);
-        $this->assertIsArray($result);
-        $this->assertEquals(1, $result['id']);
+        $this->assertNull($this->service->getMessages(1));
+        $this->assertSame('FORBIDDEN', $this->service->getErrors()[0]['code']);
     }
 
-    public function test_getMessages_rejects_private_chatroom_for_non_member(): void
+    public function test_message_and_chatroom_delete_write_actor_target_audits(): void
     {
-        $chatroom = (object) ['id' => 5, 'group_id' => 10, 'is_private' => 1];
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $owner->id,
+            'status' => 'active',
+            'is_active' => true,
+        ]);
+        $chatroomId = $this->service->create((int) $group->id, (int) $owner->id, [
+            'name' => 'Audited room',
+        ]);
+        self::assertNotNull($chatroomId);
+        $messageId = $this->service->postMessage((int) $chatroomId, (int) $owner->id, 'Delete this message');
+        self::assertNotNull($messageId);
 
-        DB::shouldReceive('table')->with('group_chatrooms')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', \Mockery::any())->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($chatroom);
+        self::assertTrue($this->service->deleteMessage((int) $messageId, (int) $owner->id));
+        self::assertTrue($this->service->delete((int) $chatroomId, (int) $owner->id));
 
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-
-        $this->assertNull($this->service->getMessages(5, [], 99));
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
-    }
-
-    public function test_getPinnedMessages_rejects_private_chatroom_for_non_member(): void
-    {
-        $chatroom = (object) ['id' => 5, 'group_id' => 10, 'is_private' => 1];
-
-        DB::shouldReceive('table')->with('group_chatrooms')->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', \Mockery::any())->andReturnSelf();
-        DB::shouldReceive('first')->andReturn($chatroom);
-
-        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
-        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
-        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-
-        $this->assertNull($this->service->getPinnedMessages(5, 99));
-        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+        $audits = DB::table('group_audit_log')
+            ->where('group_id', $group->id)
+            ->whereIn('action', [
+                GroupAuditService::ACTION_CHATROOM_MESSAGE_DELETED,
+                GroupAuditService::ACTION_CHATROOM_DELETED,
+            ])
+            ->get()
+            ->keyBy('action');
+        self::assertCount(2, $audits);
+        self::assertSame((int) $owner->id, (int) $audits[GroupAuditService::ACTION_CHATROOM_MESSAGE_DELETED]->user_id);
+        self::assertSame((int) $owner->id, (int) $audits[GroupAuditService::ACTION_CHATROOM_DELETED]->user_id);
+        $messageDetails = json_decode(
+            (string) $audits[GroupAuditService::ACTION_CHATROOM_MESSAGE_DELETED]->details,
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        self::assertSame((int) $messageId, (int) $messageDetails['message_id']);
+        self::assertSame((int) $owner->id, (int) $messageDetails['target_user_id']);
     }
 
     public function test_getErrors_returns_array(): void

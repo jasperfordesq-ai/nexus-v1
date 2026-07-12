@@ -22,45 +22,38 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 import React from 'react';
 
-// ─── Mock @heroui/react's color-picker sub-components ────────────────────────
-// We replace the interactive sub-components with lightweight pass-throughs so
-// the wrapper tree renders without errors. parseColor is kept real.
-
-vi.mock('@heroui/react', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@heroui/react')>();
-
-  /** Minimal color object returned by the mock ColorPicker's onChange. */
+// GroupBrandingPicker uses HeroUI v3's split entrypoints, so mock those exact
+// import boundaries without replacing unrelated HeroUI components globally.
+vi.mock('@/components/ui/ColorPicker', () => {
   function makeColor(hex: string) {
-    return {
-      toString: (fmt?: string) => (fmt === 'hex' ? hex : hex),
-      toHex: () => hex,
-    };
+    return { toString: () => hex };
   }
 
-  // Compound ColorPicker mock: renders children + exposes an onChange trigger
-  // via a data-testid so tests can call it.
-  function MockColorPicker(
-    { children, value, onChange }: {
-      children?: React.ReactNode;
-      value?: unknown;
-      onChange?: (c: ReturnType<typeof makeColor>) => void;
-    }
-  ) {
+  function MockColorPicker({
+    children,
+    value,
+    onChange,
+  }: {
+    children?: React.ReactNode;
+    value?: unknown;
+    onChange?: (color: ReturnType<typeof makeColor>) => void;
+  }) {
     return (
       <div data-testid="color-picker" data-value={String(value)}>
         {children}
-        {/* Provide a hidden button tests can click to simulate a colour change */}
         <button
+          type="button"
           data-testid="color-picker-change-trigger"
-          style={{ display: 'none' }}
+          className="sr-only"
           onClick={() => onChange?.(makeColor('#ff0000'))}
         />
       </div>
     );
   }
+
   MockColorPicker.Trigger = ({ children }: { children?: React.ReactNode }) => (
     <div data-testid="color-picker-trigger">{children}</div>
   );
@@ -68,46 +61,45 @@ vi.mock('@heroui/react', async (importOriginal) => {
     <div data-testid="color-picker-popover">{children}</div>
   );
 
-  function MockColorArea({ children }: { children?: React.ReactNode }) {
+  return { ColorPicker: MockColorPicker };
+});
+
+vi.mock('@heroui/react/color-area', () => {
+  function ColorArea({ children }: { children?: React.ReactNode }) {
     return <div data-testid="color-area">{children}</div>;
   }
-  MockColorArea.Thumb = () => <div data-testid="color-area-thumb" />;
+  ColorArea.Thumb = () => <div data-testid="color-area-thumb" />;
+  return { ColorArea };
+});
 
-  function MockColorSlider({ children }: { children?: React.ReactNode }) {
+vi.mock('@heroui/react/color-slider', () => {
+  function ColorSlider({ children }: { children?: React.ReactNode }) {
     return <div data-testid="color-slider">{children}</div>;
   }
-  MockColorSlider.Track = ({ children }: { children?: React.ReactNode }) => (
-    <div>{children}</div>
-  );
-  MockColorSlider.Thumb = () => <div />;
+  ColorSlider.Track = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  ColorSlider.Thumb = () => <div />;
+  return { ColorSlider };
+});
 
-  function MockColorField({ children }: { children?: React.ReactNode }) {
+vi.mock('@heroui/react/color-field', () => {
+  function ColorField({ children }: { children?: React.ReactNode }) {
     return <div data-testid="color-field">{children}</div>;
   }
-  MockColorField.Group = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
-  MockColorField.Prefix = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
-  MockColorField.Input = () => <input data-testid="color-field-input" readOnly />;
-
-  function MockColorSwatch({ size: _size, ...rest }: { size?: string; [key: string]: unknown }) {
-    return <span data-testid="color-swatch" {...rest} />;
-  }
-
-  return {
-    ...actual,
-    ColorPicker: MockColorPicker,
-    ColorArea: MockColorArea,
-    ColorSlider: MockColorSlider,
-    ColorField: MockColorField,
-    ColorSwatch: MockColorSwatch,
-  };
+  ColorField.Group = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  ColorField.Prefix = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  ColorField.Input = () => <input data-testid="color-field-input" readOnly />;
+  return { ColorField };
 });
 
-// Also mock the @/components/ui ColorPicker re-export so it uses the mocked version.
-vi.mock('@/components/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/components/ui')>();
-  // ColorPicker is just re-exported from @heroui/react — the mock above covers it.
-  return { ...actual };
-});
+vi.mock('@heroui/react/color-swatch', () => ({
+  ColorSwatch: ({ size: _size, ...rest }: { size?: string; [key: string]: unknown }) => (
+    <span data-testid="color-swatch" {...rest} />
+  ),
+}));
+
+vi.mock('@heroui/react/label', () => ({
+  Label: ({ children, ...rest }: React.ComponentProps<'label'>) => <label {...rest}>{children}</label>,
+}));
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
@@ -267,5 +259,28 @@ describe('GroupBrandingPicker — onChange interaction', () => {
     expect(onChange).toHaveBeenNthCalledWith(1, '#ff0000', '#7928ca');
     // Second call from accent picker
     expect(onChange).toHaveBeenNthCalledWith(2, '#0070f3', '#ff0000');
+  });
+
+  it('resynchronizes after a cancelled settings draft is reopened', async () => {
+    const onChange = vi.fn();
+    const { container, rerender } = render(
+      <GroupBrandingPicker primaryColor="#111111" accentColor="#222222" onChange={onChange} />
+    );
+    screen.getAllByTestId('color-picker-change-trigger')[0].click();
+    expect(onChange).toHaveBeenCalledWith('#ff0000', '#222222');
+
+    rerender(<GroupBrandingPicker primaryColor="#333333" accentColor="#444444" onChange={onChange} />);
+    await waitFor(() => {
+      const values = Array.from(container.querySelectorAll('.font-mono')).map((element) => element.textContent);
+      expect(values).toContain('#333333');
+      expect(values).toContain('#444444');
+    });
+  });
+
+  it('can reset persisted colors back to nullable platform defaults', () => {
+    const onChange = vi.fn();
+    render(<GroupBrandingPicker primaryColor="#111111" accentColor="#222222" onChange={onChange} />);
+    screen.getByRole('button', { name: 'Use platform colors' }).click();
+    expect(onChange).toHaveBeenCalledWith(null, null);
   });
 });

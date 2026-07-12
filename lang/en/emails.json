@@ -317,6 +317,7 @@
     "intro": "Here is a summary of what you missed on Project NEXUS:",
     "opted_in_notice": "You received this email because you opted for a {{frequency}} summary.",
     "manage_notifications": "Manage Notifications",
+    "unsubscribe_events": "Stop only Event emails",
     "view_item": "View",
     "frequency_instant": "Instant",
     "frequency_daily": "Daily",
@@ -394,6 +395,13 @@
     "updated_subject": "Updated: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} your event \"{{title}}\"",
     "view_event": "View Event",
+    "broadcast_subject": "A message about {{title}}",
+    "follow_up_subject": "Following up after {{title}}",
+    "review_request_subject": "How was {{title}}?",
+    "broadcast_heading": "A message about {{title}}",
+    "follow_up_heading": "Following up after {{title}}",
+    "review_request_heading": "Share your experience of {{title}}",
+    "leave_event_review": "Leave a Review",
     "view_updated_event": "View Updated Event",
     "browse_events": "Browse Events",
     "new_rsvp_heading": "New RSVP!",
@@ -409,6 +417,7 @@
     "updated_heading": "Event Updated",
     "updated_body": "The event <strong>\"{{title}}\"</strong> has been updated:",
     "change_label_date_time": "Date/Time:",
+    "change_label_end_time": "End time:",
     "change_label_location": "Location:",
     "change_label_title": "Title:",
     "reminder_heading_24h": "Event Tomorrow",
@@ -617,6 +626,16 @@
     "private_note": "This appreciation is private — only you can see it.",
     "cta_view": "View on your profile"
   },
+  "event_guardian_consent": {
+    "subject": "Guardian consent needed for :event",
+    "title": "Review guardian consent",
+    "greeting": "Hello :name,",
+    "introduction": ":minor has asked to attend :event. Please review the event safety requirements before deciding whether to give consent.",
+    "security_notice": "This link is unique to this consent request. Do not forward or share it.",
+    "review_button": "Review and give consent",
+    "expiry_notice": "The link expires after the event or when the request is withdrawn or replaced.",
+    "consent_text": "I confirm that I am authorised to give consent for the minor to attend :event and that I have reviewed the event safety requirements."
+  },
   "donation_admin": {
     "created_subject": "New donation: :amount to :community",
     "created_title": "New Donation Received",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Anonymous",
     "anonymous_note": "(marked anonymous publicly)",
     "review_cta": "View Donations"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Guest registration cancelled: :event",
+    "cancelled_message": "Your guest registration for :event has been cancelled.",
+    "view_event": "View event"
+  },
+  "event_invitation": {
+    "subject": "You're invited to :event",
+    "message": "You have been invited to attend :event. Review the event details and respond before the invitation expires.",
+    "expiry": "This invitation expires at :expiry.",
+    "accept_button": "Review invitation"
   }
 }

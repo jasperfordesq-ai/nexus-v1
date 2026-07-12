@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Análisis de eventos",
+    "subtitle": "Métricas de rendimiento operativo, asistencia, comunicaciones y conversión segura de privacidad.",
+    "generated_at": "Generado {{date}}",
+    "loading": "Cargando análisis de eventos",
+    "load_error": "No se pudo cargar el análisis de eventos.",
+    "retry": "Inténtalo de nuevo",
+    "refresh": "Actualizar",
+    "export": "Exportar CSV",
+    "exporting": "Exportando…",
+    "export_started": "Exportación de análisis preparada.",
+    "download_error": "No se pudo descargar la exportación de análisis.",
+    "privacy_title": "Informes protegidos por la privacidad",
+    "privacy_note": "Las métricas opcionales están ocultas hasta que estén representadas al menos {{count}} personas con consentimiento.",
+    "consent_bound": "Obligado al consentimiento",
+    "suppressed": "suprimido",
+    "not_limited": "Sin límite",
+    "finance_redacted": "Restringido por su rol",
+    "columns": {
+      "metric": "Métrica",
+      "value": "Valor"
+    },
+    "sections": {
+      "registration": "Registro",
+      "acquisition": "Invitaciones y lista de espera",
+      "attendance": "Asistencia",
+      "communications": "Comunicaciones",
+      "funnel": "Embudo seguro para la privacidad",
+      "finance": "Entradas y créditos"
+    },
+    "metrics": {
+      "confirmed": "Inscripciones confirmadas",
+      "pending": "Inscripciones pendientes",
+      "cancelled": "Inscripciones canceladas",
+      "capacity_remaining": "Capacidad restante",
+      "invitations_issued": "Invitaciones emitidas",
+      "invitations_accepted": "Invitaciones aceptadas",
+      "invitation_conversion": "Conversión de invitación",
+      "waitlist_joined": "Se une a la lista de espera",
+      "waitlist_accepted": "Aceptaciones en lista de espera",
+      "waitlist_conversion": "Conversión de lista de espera",
+      "checked_in": "Actualmente registrado",
+      "attended": "Asistió",
+      "no_show": "No presentarse",
+      "attendance_rate": "Tasa de asistencia",
+      "delivered": "Notificaciones entregadas",
+      "suppressed_deliveries": "Notificaciones suprimidas",
+      "failed_deliveries": "Las notificaciones fallaron",
+      "dead_lettered": "Notificaciones que requieren intervención",
+      "delivery_rate": "Tasa de entrega",
+      "event_views": "Vistas de eventos",
+      "registration_starts": "Comienza el registro",
+      "start_conversion": "Conversión de visualización a registro",
+      "finance": "Métricas financieras",
+      "ticket_units": "Unidades de ticket confirmadas",
+      "ticket_credit_value": "Valor del crédito del billete confirmado",
+      "completed_credit_claims": "Reclamaciones de crédito completadas",
+      "failed_credit_claims": "Reclamaciones de crédito fallidas",
+      "guardian_consents": "El tutor da su consentimiento"
+    }
+  }
+}

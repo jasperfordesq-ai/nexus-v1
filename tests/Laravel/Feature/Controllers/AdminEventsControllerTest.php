@@ -6,8 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Enums\EventOperationalState;
+use App\Enums\EventPublicationState;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -21,21 +24,26 @@ class AdminEventsControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private function createEvent(int $tenantId): int
+    /** @param array<string,mixed> $overrides */
+    private function createEvent(int $tenantId, array $overrides = [], ?User $organizer = null): int
     {
-        $organizer = User::factory()->forTenant($tenantId)->create();
+        $organizer ??= User::factory()->forTenant($tenantId)->create();
+        $start = now()->addDays(7);
 
-        return DB::table('events')->insertGetId([
+        return DB::table('events')->insertGetId(array_merge([
             'tenant_id' => $tenantId,
             'user_id' => $organizer->id,
             'title' => 'Test Event',
             'description' => 'A test event description',
             'status' => 'active',
-            'start_time' => now()->addDays(7),
-            'end_time' => now()->addDays(7)->addHours(2),
+            'publication_status' => null,
+            'operational_status' => null,
+            'lifecycle_version' => null,
+            'start_time' => $start,
+            'end_time' => $start->copy()->addHours(2),
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ], $overrides));
     }
 
     private function setDailyNotificationPreference(int $userId): void
@@ -131,20 +139,194 @@ class AdminEventsControllerTest extends TestCase
     }
 
     // ================================================================
+    // APPROVE — POST /v2/admin/events/{id}/approve
+    // ================================================================
+
+    public function test_approve_uses_event_owner_and_is_idempotent(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'preferred_language' => 'en',
+        ]);
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organizer->id,
+            'title' => 'Pending event',
+            'description' => 'Awaiting moderation.',
+            'status' => 'draft',
+            'start_time' => now()->addDays(7),
+            'end_time' => now()->addDays(7)->addHour(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'active')
+            ->assertJsonPath('data.publication_state', 'published')
+            ->assertJsonPath('data.operational_state', 'scheduled')
+            ->assertJsonPath('data.lifecycle_version', 1)
+            ->assertJsonPath('data.transition.changed', true);
+
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organizer->id,
+            'status' => 'active',
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 1,
+        ]);
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.admin_publication.created')
+            ->count());
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $organizer->id)
+            ->where('link', "/events/{$eventId}")
+            ->count());
+
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'active')
+            ->assertJsonPath('data.transition.changed', false);
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $organizer->id)
+            ->where('link', "/events/{$eventId}")
+            ->count());
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.admin_publication.created')
+            ->count());
+    }
+
+    public function test_approve_does_not_cross_tenant_boundary(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $eventId = $this->createEvent(999);
+        Sanctum::actingAs($admin);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")
+            ->assertNotFound();
+    }
+
+    public function test_approve_is_tenant_admin_only(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        $eventId = $this->createEvent($this->testTenantId, ['status' => 'draft']);
+        Sanctum::actingAs($member);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")->assertForbidden();
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'status' => 'draft',
+            'publication_status' => null,
+        ]);
+    }
+
+    public function test_every_admin_lifecycle_action_is_tenant_scoped(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $eventId = $this->createEvent(999, [
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+        Sanctum::actingAs($admin);
+
+        foreach (['approve', 'reject', 'postpone', 'cancel', 'complete', 'archive', 'restore', 'reschedule'] as $action) {
+            $this->apiPost("/v2/admin/events/{$eventId}/{$action}", ['reason' => 'tenant.boundary'])
+                ->assertNotFound();
+        }
+        $this->apiDelete("/v2/admin/events/{$eventId}")->assertNotFound();
+
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'tenant_id' => 999,
+            'lifecycle_version' => 0,
+        ]);
+        $this->assertSame(0, DB::table('event_status_history')->where('event_id', $eventId)->count());
+    }
+
+    public function test_authoritative_outbox_mode_does_not_dual_dispatch_publication_side_effects(): void
+    {
+        Config::set('events.notification_delivery.mode', 'outbox_authoritative');
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'events.notification_delivery_mode')
+            ->delete();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $eventId = $this->createEvent($this->testTenantId, [
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'published');
+
+        $this->assertDatabaseHas('event_domain_outbox', [
+            'event_id' => $eventId,
+            'action' => 'event.lifecycle.transitioned',
+            'production_mode' => 'outbox_authoritative',
+            'status' => 'pending',
+        ]);
+        $this->assertSame(0, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.admin_publication.created')
+            ->count());
+        $this->assertSame(0, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('link', "/events/{$eventId}")
+            ->count());
+    }
+
+    // ================================================================
     // DELETE — DELETE /v2/admin/events/{id}
     // ================================================================
 
-    public function test_destroy_returns_200_for_admin(): void
+    public function test_destroy_archives_instead_of_deleting_and_is_idempotent(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
         $eventId = $this->createEvent($this->testTenantId);
 
-        $response = $this->apiDelete("/v2/admin/events/{$eventId}");
+        $this->apiDelete("/v2/admin/events/{$eventId}", ['reason' => 'operations.event_retired'])
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'archived')
+            ->assertJsonPath('data.operational_state', 'cancelled')
+            ->assertJsonPath('data.transition.action', 'archive')
+            ->assertJsonPath('data.transition.changed', true);
 
-        // May return 200 on success or 404 if service scopes differently
-        $this->assertContains($response->getStatusCode(), [200, 404]);
+        $this->assertDatabaseHas('events', [
+            'id' => $eventId,
+            'tenant_id' => $this->testTenantId,
+            'publication_status' => 'archived',
+            'operational_status' => 'cancelled',
+            'status' => 'cancelled',
+        ]);
+        $this->apiDelete("/v2/admin/events/{$eventId}")
+            ->assertOk()
+            ->assertJsonPath('data.transition.changed', false);
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
     }
 
     public function test_destroy_returns_403_for_regular_member(): void
@@ -225,6 +407,17 @@ class AdminEventsControllerTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('event_reminders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'remind_before_minutes' => 60,
+            'reminder_type' => 'both',
+            'scheduled_for' => now()->addDays(7)->subHour(),
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         foreach ([$organizer, $attendee, $waitlisted] as $user) {
             $this->setDailyNotificationPreference((int) $user->id);
         }
@@ -233,8 +426,361 @@ class AdminEventsControllerTest extends TestCase
             'reason' => 'Venue closed',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonPath('data.publication_state', 'published')
+            ->assertJsonPath('data.operational_state', 'cancelled')
+            ->assertJsonPath('data.transition.changed', true)
+            ->assertJsonPath('data.transition.cascade.reminders_cancelled', 1)
+            ->assertJsonPath('data.transition.cascade.waitlist_cancelled', 1)
+            ->assertJsonPath('data.transition.cascade.registrations_cancelled', 1);
+        $this->assertDatabaseHas('event_rsvps', [
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'cancelled',
+        ]);
+        $this->assertDatabaseHas('event_waitlist', [
+            'event_id' => $eventId,
+            'user_id' => $waitlisted->id,
+            'status' => 'cancelled',
+        ]);
+        $this->assertDatabaseHas('event_reminders', [
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'cancelled',
+        ]);
         $this->assertSame(3, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
         $this->assertSame(3, DB::table('notification_queue')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('activity_type', 'event_cancellation')->count());
+
+        $this->apiPost("/v2/admin/events/{$eventId}/cancel", ['reason' => 'Venue closed'])
+            ->assertOk()
+            ->assertJsonPath('data.transition.changed', false);
+        $this->assertSame(3, DB::table('notifications')->where('tenant_id', $this->testTenantId)->where('link', "/events/{$eventId}")->where('type', 'event')->count());
+        $this->assertSame(1, DB::table('event_status_history')->where('event_id', $eventId)->count());
+        $this->assertSame(1, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->count());
+    }
+
+    public function test_named_moderation_and_operational_actions_follow_the_state_machine(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create();
+        $eventId = $this->createEvent($this->testTenantId, [
+            'title' => 'Moderated lifecycle event',
+            'status' => 'draft',
+            'publication_status' => EventPublicationState::PendingReview->value,
+            'operational_status' => EventOperationalState::Scheduled->value,
+            'lifecycle_version' => 0,
+        ], $organizer);
+        Sanctum::actingAs($admin);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/reject")
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'reason');
+        $this->apiPost("/v2/admin/events/{$eventId}/reject", ['reason' => 'moderation.revision_required'])
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'draft')
+            ->assertJsonPath('data.lifecycle_version', 1);
+        $this->apiPost("/v2/admin/events/{$eventId}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'published')
+            ->assertJsonPath('data.lifecycle_version', 2);
+        $this->apiPost("/v2/admin/events/{$eventId}/postpone", ['reason' => 'operations.weather'])
+            ->assertOk()
+            ->assertJsonPath('data.operational_state', 'postponed')
+            ->assertJsonPath('data.status', 'cancelled')
+            ->assertJsonPath('data.lifecycle_version', 3);
+        $this->apiPost("/v2/admin/events/{$eventId}/reschedule", ['reason' => 'operations.new_slot'])
+            ->assertOk()
+            ->assertJsonPath('data.operational_state', 'scheduled')
+            ->assertJsonPath('data.status', 'active')
+            ->assertJsonPath('data.lifecycle_version', 4);
+        $this->apiPost("/v2/admin/events/{$eventId}/complete")
+            ->assertOk()
+            ->assertJsonPath('data.operational_state', 'completed')
+            ->assertJsonPath('data.lifecycle_version', 5);
+        $this->apiPost("/v2/admin/events/{$eventId}/archive", ['reason' => 'operations.series_complete'])
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'archived')
+            ->assertJsonPath('data.operational_state', 'completed')
+            ->assertJsonPath('data.lifecycle_version', 6);
+        $this->apiPost("/v2/admin/events/{$eventId}/restore")
+            ->assertStatus(409);
+
+        $this->assertSame(6, DB::table('event_status_history')->where('event_id', $eventId)->count());
+        $this->assertSame(6, DB::table('event_domain_outbox')
+            ->where('event_id', $eventId)
+            ->where('action', 'event.lifecycle.transitioned')
+            ->count());
+    }
+
+    public function test_archive_and_restore_reschedule_a_live_event_without_deleting_it(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $eventId = $this->createEvent($this->testTenantId, [
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 0,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPost("/v2/admin/events/{$eventId}/archive", ['reason' => 'operations.schedule_replaced'])
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'archived')
+            ->assertJsonPath('data.operational_state', 'cancelled');
+        $this->apiPost("/v2/admin/events/{$eventId}/restore")
+            ->assertOk()
+            ->assertJsonPath('data.publication_state', 'draft')
+            ->assertJsonPath('data.operational_state', 'scheduled')
+            ->assertJsonPath('data.status', 'draft');
+
+        $this->assertDatabaseHas('events', ['id' => $eventId, 'lifecycle_version' => 2]);
+    }
+
+    public function test_admin_projection_reports_real_counts_and_combined_filters(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Projection Organizer',
+        ]);
+        $attendee = User::factory()->forTenant($this->testTenantId)->create();
+        $interested = User::factory()->forTenant($this->testTenantId)->create();
+        $waitlisted = User::factory()->forTenant($this->testTenantId)->create();
+        $groupId = (int) DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $organizer->id,
+            'name' => 'Projection Group',
+            'slug' => 'projection-group-' . uniqid(),
+            'description' => null,
+            'visibility' => 'public',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $start = now()->addDays(9)->startOfHour();
+        $eventId = $this->createEvent($this->testTenantId, [
+            'title' => 'Unique projection workshop',
+            'group_id' => $groupId,
+            'status' => 'draft',
+            'publication_status' => 'pending_review',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 4,
+            'max_attendees' => 1,
+            'start_time' => $start,
+            'end_time' => $start->copy()->addHours(2),
+        ], $organizer);
+        foreach ([[$attendee->id, 'going'], [$interested->id, 'interested']] as [$userId, $status]) {
+            DB::table('event_rsvps')->insert([
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'status' => $status,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        DB::table('event_waitlist')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $waitlisted->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_attendance')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'checked_in_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Sanctum::actingAs($admin);
+
+        $query = http_build_query([
+            'publication_state' => 'pending_review',
+            'operational_state' => 'scheduled',
+            'organizer_id' => $organizer->id,
+            'group_id' => $groupId,
+            'date_from' => $start->toDateString(),
+            'date_to' => $start->toDateString(),
+            'capacity' => 'full',
+            'search' => 'Unique projection',
+        ]);
+        $this->apiGet('/v2/admin/events?' . $query)
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $eventId)
+            ->assertJsonPath('data.0.publication_state', 'pending_review')
+            ->assertJsonPath('data.0.operational_state', 'scheduled')
+            ->assertJsonPath('data.0.lifecycle_version', 4)
+            ->assertJsonPath('data.0.capacity.confirmed', 1)
+            ->assertJsonPath('data.0.capacity.is_full', true)
+            ->assertJsonPath('data.0.metrics.interested_count', 1)
+            ->assertJsonPath('data.0.metrics.waitlist_count', 1)
+            ->assertJsonPath('data.0.metrics.attendance_count', 1)
+            ->assertJsonPath('data.0.organizer.id', $organizer->id)
+            ->assertJsonPath('data.0.group.id', $groupId);
+    }
+
+    public function test_admin_projection_is_canonical_first_and_reserves_live_offers(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $organizer = User::factory()->forTenant($this->testTenantId)->create();
+        $canonicalConfirmed = User::factory()->forTenant($this->testTenantId)->create();
+        $canonicalCancelled = User::factory()->forTenant($this->testTenantId)->create();
+        $legacyConfirmed = User::factory()->forTenant($this->testTenantId)->create();
+        $offered = User::factory()->forTenant($this->testTenantId)->create();
+        $canonicalWaiting = User::factory()->forTenant($this->testTenantId)->create();
+        $canonicalWaitlistCancelled = User::factory()->forTenant($this->testTenantId)->create();
+        $legacyWaiting = User::factory()->forTenant($this->testTenantId)->create();
+        $now = now();
+        $eventId = $this->createEvent($this->testTenantId, [
+            'title' => 'Canonical admin projection fixture',
+            'max_attendees' => 3,
+        ], $organizer);
+
+        DB::table('event_registrations')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $canonicalConfirmed->id,
+                'capacity_pool_key' => 'event',
+                'registration_state' => 'confirmed',
+                'registration_version' => 1,
+                'state_changed_at' => $now,
+                'state_changed_by' => $canonicalConfirmed->id,
+                'confirmed_at' => $now,
+                'cancelled_at' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $canonicalCancelled->id,
+                'capacity_pool_key' => 'event',
+                'registration_state' => 'cancelled',
+                'registration_version' => 2,
+                'state_changed_at' => $now,
+                'state_changed_by' => $canonicalCancelled->id,
+                'confirmed_at' => null,
+                'cancelled_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ]);
+        foreach ([
+            [$canonicalConfirmed->id, 'going'],
+            [$canonicalCancelled->id, 'going'],
+            [$legacyConfirmed->id, 'attended'],
+        ] as [$userId, $status]) {
+            DB::table('event_rsvps')->insert([
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'status' => $status,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+        DB::table('event_waitlist_entries')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $offered->id,
+                'capacity_pool_key' => 'event',
+                'queue_state' => 'offered',
+                'queue_version' => 2,
+                'queue_sequence' => 1,
+                'state_changed_at' => $now,
+                'state_changed_by' => $organizer->id,
+                'offered_at' => $now,
+                'offer_expires_at' => $now->copy()->addHour(),
+                'offer_token_hash' => hash('sha256', 'admin-capacity-offer'),
+                'cancelled_at' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $canonicalWaiting->id,
+                'capacity_pool_key' => 'event',
+                'queue_state' => 'waiting',
+                'queue_version' => 1,
+                'queue_sequence' => 2,
+                'state_changed_at' => $now,
+                'state_changed_by' => $canonicalWaiting->id,
+                'offered_at' => null,
+                'offer_expires_at' => null,
+                'offer_token_hash' => null,
+                'cancelled_at' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $canonicalWaitlistCancelled->id,
+                'capacity_pool_key' => 'event',
+                'queue_state' => 'cancelled',
+                'queue_version' => 2,
+                'queue_sequence' => 3,
+                'state_changed_at' => $now,
+                'state_changed_by' => $canonicalWaitlistCancelled->id,
+                'offered_at' => null,
+                'offer_expires_at' => null,
+                'offer_token_hash' => null,
+                'cancelled_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ]);
+        foreach ([
+            [$offered->id, 1],
+            [$canonicalWaitlistCancelled->id, 2],
+            [$legacyWaiting->id, 3],
+        ] as [$userId, $position]) {
+            DB::table('event_waitlist')->insert([
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $eventId,
+                'user_id' => $userId,
+                'position' => $position,
+                'status' => 'waiting',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        Sanctum::actingAs($admin);
+        $this->apiGet("/v2/admin/events/{$eventId}")
+            ->assertOk()
+            ->assertJsonPath('data.capacity.confirmed', 2)
+            ->assertJsonPath('data.capacity.remaining', 0)
+            ->assertJsonPath('data.capacity.is_full', true)
+            ->assertJsonPath('data.metrics.confirmed_count', 2)
+            ->assertJsonPath('data.metrics.waitlist_count', 3);
+        $this->apiGet('/v2/admin/events?' . http_build_query([
+            'capacity' => 'full',
+            'search' => 'Canonical admin projection fixture',
+        ]))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $eventId);
+    }
+
+    public function test_invalid_lifecycle_and_date_filters_are_rejected(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiGet('/v2/admin/events?publication_state=unknown')->assertStatus(422);
+        $this->apiGet('/v2/admin/events?operational_state=unknown')->assertStatus(422);
+        $this->apiGet('/v2/admin/events?date_from=2030-99-99')->assertStatus(422);
+        $this->apiGet('/v2/admin/events?capacity=unknown')->assertStatus(422);
     }
 }

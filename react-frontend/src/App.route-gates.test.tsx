@@ -1,4 +1,4 @@
-﻿// Copyright © 2024–2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 const appSource = readFileSync(path.resolve(__dirname, 'routes/AppRoutes.tsx'), 'utf8');
 const authRoutesSource = readFileSync(path.resolve(__dirname, 'routes/AuthRoutes.tsx'), 'utf8');
 const publicRoutesSource = readFileSync(path.resolve(__dirname, 'routes/PublicAppRoutes.tsx'), 'utf8');
+const routeRegistryLoaderSource = readFileSync(path.resolve(__dirname, 'routes/routeRegistryLoader.ts'), 'utf8');
 const tenantShellSource = readFileSync(path.resolve(__dirname, 'components/routing/TenantShell.tsx'), 'utf8');
 const protectedRoutesStart = appSource.indexOf('{/* Protected Routes */}');
 const protectedRoutesEnd = appSource.indexOf('{/* Admin Panel', protectedRoutesStart);
@@ -51,6 +52,7 @@ const identityBearingProtectedRoutes = [
   'ideation/:challengeId/ideas/:id',
 ] as const;
 const guardDriftProtectedRoutes = [
+  'events/:id/manage/:section?',
   'settings/data-export',
   'clubs/:id/admin/import',
   'clubs/:id/admin/dues',
@@ -83,9 +85,9 @@ describe('App route feature gates', () => {
     expect(tenantShellSource).not.toMatch(/from ['"]@\/contexts\/(?:NotificationsContext|PusherContext|MenuContext|PresenceContext|PodcastPlayerContext)['"]/);
     expect(tenantShellSource).not.toContain('@/components/security/IdleLogoutGuard');
     expect(tenantShellSource).not.toContain('appRoutesModulePromise');
-    expect(tenantShellSource).toContain("import('@/routes/AuthRoutes')");
-    expect(tenantShellSource).toContain("import('@/routes/PublicAppRoutes')");
-    expect(tenantShellSource).toContain("import('@/routes/AppRoutes')");
+    expect(routeRegistryLoaderSource).toContain("import('./AuthRoutes')");
+    expect(routeRegistryLoaderSource).toContain("import('./PublicAppRoutes')");
+    expect(routeRegistryLoaderSource).toContain("import('./AppRoutes')");
     expect(tenantShellSource).toContain("lazy(() => import('./TenantAppProviders'))");
   });
 

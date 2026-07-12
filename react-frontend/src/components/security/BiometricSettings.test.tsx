@@ -4,23 +4,29 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock webauthn module
-const mockIsBiometricAvailable = vi.fn();
+const mockIsWebAuthnSupported = vi.fn();
 const mockRegisterBiometric = vi.fn();
 const mockGetWebAuthnCredentials = vi.fn();
+const mockGetWebAuthnStatus = vi.fn();
+const mockConfirmWebAuthnSecurity = vi.fn();
 const mockRemoveWebAuthnCredential = vi.fn();
 const mockRemoveAllWebAuthnCredentials = vi.fn();
 const mockRenameWebAuthnCredential = vi.fn();
 const mockDetectPlatform = vi.fn();
-let passkeyEnrollmentAllowed = true;
+const mockLogout = vi.fn();
+let passkeyAuthenticationEnabled = true;
+let passkeyEnrollmentEnabled = true;
 
 vi.mock('@/lib/webauthn', () => ({
-  isBiometricAvailable: (...args: unknown[]) => mockIsBiometricAvailable(...args),
+  isWebAuthnSupported: (...args: unknown[]) => mockIsWebAuthnSupported(...args),
   registerBiometric: (...args: unknown[]) => mockRegisterBiometric(...args),
   getWebAuthnCredentials: (...args: unknown[]) => mockGetWebAuthnCredentials(...args),
+  getWebAuthnStatus: (...args: unknown[]) => mockGetWebAuthnStatus(...args),
+  confirmWebAuthnSecurity: (...args: unknown[]) => mockConfirmWebAuthnSecurity(...args),
   removeWebAuthnCredential: (...args: unknown[]) => mockRemoveWebAuthnCredential(...args),
   removeAllWebAuthnCredentials: (...args: unknown[]) => mockRemoveAllWebAuthnCredentials(...args),
   renameWebAuthnCredential: (...args: unknown[]) => mockRenameWebAuthnCredential(...args),
@@ -41,8 +47,17 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
-  useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p: string) => '/test' + p, isLoading: false, hasFeature: vi.fn((feature: string) => feature !== 'biometric_login' || passkeyEnrollmentAllowed), hasModule: vi.fn(() => true) }),
+  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: mockLogout, register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test', slug: 'test', tagline: null },
+    branding: { name: 'Test', logo_url: null },
+    tenantSlug: 'test',
+    tenantPath: (p: string) => '/test' + p,
+    authenticationConfig: { 'passkeys.enrollment_enabled': passkeyEnrollmentEnabled },
+    isLoading: false,
+    hasFeature: vi.fn((feature: string) => feature !== 'biometric_login' || passkeyAuthenticationEnabled),
+    hasModule: vi.fn(() => true),
+  }),
 }));
 
 // Mock i18next
@@ -65,9 +80,17 @@ const settingsTranslations: Record<string, string> = {
   biometric_removed: 'Passkey removed.',
   biometric_title: 'Passkey Login',
   cancel: 'Cancel',
+  try_again: 'Try Again',
   passkey_add_another: 'Add another passkey',
   passkey_create: 'Create a passkey',
   passkey_device_tip: 'Register a passkey on each device you use. To add your phone, open this page on your phone.',
+  passkey_enrollment_disabled: 'Your community has paused new passkey setup. Existing passkeys can still be managed.',
+  passkey_default_device_name: 'This device',
+  passkey_limit_reached: 'You have reached the limit of {{count}} passkeys. Remove one before adding another.',
+  passkey_rp_label: 'Works on {{rpId}}',
+  passkey_rp_mismatch: 'This passkey was created for {{rpId}} and will not work on {{currentRpId}}. Add a new passkey on this domain.',
+  passkey_rp_unknown: 'This older passkey may not appear at signed-out login and its original domain cannot be verified. While signed in, add a new passkey, then remove this one.',
+  passkey_load_failed: 'We could not load your passkeys.',
   passkey_multi_device_note: 'You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).',
   passkey_registration_failed: 'Registration failed',
   passkey_remove_all_confirm: 'Remove All',
@@ -75,7 +98,10 @@ const settingsTranslations: Record<string, string> = {
   passkey_remove_all_title: 'Remove All Passkeys',
   passkey_remove_all_warning: 'Are you sure you want to remove all passkeys? You\'ll need to set them up again on each device.',
   passkey_remove_failed: 'Failed to remove credential',
+  passkey_remove_named: 'Remove {{name}}',
+  passkey_remove_warning: 'Remove {{name}}? You will no longer be able to use it to sign in.',
   passkey_rename: 'Rename passkey',
+  passkey_rename_named: 'Rename {{name}}',
   passkey_rename_failed: 'Failed to rename passkey',
   passkey_rename_input: 'New passkey name',
   passkey_renamed: 'Passkey renamed.',
@@ -83,14 +109,28 @@ const settingsTranslations: Record<string, string> = {
   passkey_setup_subtitle: 'Setup for this device',
   passkey_setup_tooltip: 'Show passkey setup guide',
   passkey_show_instructions: 'Show passkey setup instructions',
+  passkey_security_confirm_title: 'Confirm it is you',
+  passkey_security_confirm_description: 'Confirm your identity before changing passkeys.',
+  passkey_security_confirm_method_label: 'Confirmation method',
+  passkey_security_confirm_password: 'Current password',
+  passkey_security_confirm_totp: 'Authenticator code',
+  passkey_security_confirm_backup: 'Backup code',
+  passkey_security_confirm_action: 'Confirm',
+  passkey_security_confirm_failed: 'We could not confirm your identity.',
+  passkey_security_confirm_no_method: 'Sign out and sign in again with your passkey before making this change.',
+  passkey_sessions_revoked: 'Your passkey changed. Sign in again on every device.',
 };
 
 vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
-    t: (key: string, opts?: { fallbackValue?: string; count?: number }) => {
+    t: (key: string, opts?: { fallbackValue?: string; count?: number; name?: string; rpId?: string; currentRpId?: string }) => {
       const template = settingsTranslations[key] ?? opts?.fallbackValue ?? key;
-      return template.replace('{{count}}', String(opts?.count ?? ''));
+      return template
+        .replace('{{count}}', String(opts?.count ?? ''))
+        .replace('{{name}}', opts?.name ?? '')
+        .replace('{{rpId}}', opts?.rpId ?? '')
+        .replace('{{currentRpId}}', opts?.currentRpId ?? '');
     },
   }),
 }));
@@ -105,6 +145,7 @@ vi.mock('@/components/ui', async () => {
         disabled: isDisabled || isLoading,
         'data-testid': props['data-testid'],
         'aria-label': props['aria-label'],
+        'aria-pressed': props['aria-pressed'],
       }, isLoading ? 'Loading...' : children),
     Spinner: () => React.createElement('div', { 'data-testid': 'spinner' }, 'Loading...'),
     Tooltip: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
@@ -118,6 +159,16 @@ vi.mock('@/components/ui', async () => {
       React.createElement('div', { 'data-testid': 'modal-body' }, children),
     ModalFooter: ({ children }: { children: React.ReactNode }) =>
       React.createElement('div', { 'data-testid': 'modal-footer' }, children),
+    Input: ({ label, value, onValueChange, ...props }: Record<string, unknown>) =>
+      React.createElement('label', null,
+        label as React.ReactNode,
+        React.createElement('input', {
+          value: value as string,
+          onChange: (event: React.ChangeEvent<HTMLInputElement>) => (onValueChange as ((value: string) => void))?.(event.target.value),
+          type: props.type as string,
+          'aria-label': label as string,
+        }),
+      ),
     useDisclosure: () => {
       const [isOpen, setIsOpen] = React.useState(false);
       return {
@@ -136,18 +187,46 @@ describe('BiometricSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDetectPlatform.mockReturnValue('windows');
-    mockIsBiometricAvailable.mockResolvedValue(true);
-    passkeyEnrollmentAllowed = true;
+    mockIsWebAuthnSupported.mockReturnValue(true);
+    passkeyAuthenticationEnabled = true;
+    passkeyEnrollmentEnabled = true;
     // getWebAuthnCredentials returns Credential[] directly (not {credentials, count})
     mockGetWebAuthnCredentials.mockResolvedValue([]);
+    mockGetWebAuthnStatus.mockResolvedValue({
+      registered: false,
+      count: 0,
+      current_rp_id: 'localhost',
+      max_credentials: 10,
+      confirmation_methods: { password: true, passkey: false, totp: false },
+    });
+    mockConfirmWebAuthnSecurity.mockResolvedValue({
+      success: true,
+      securityConfirmationToken: 'security-token',
+      expiresIn: 300,
+    });
     mockRemoveWebAuthnCredential.mockResolvedValue({ success: true });
     mockRemoveAllWebAuthnCredentials.mockResolvedValue({ success: true, removedCount: 0 });
+    mockRenameWebAuthnCredential.mockResolvedValue({ success: true });
+    mockLogout.mockResolvedValue(undefined);
   });
 
   it('renders loading state initially', () => {
     mockGetWebAuthnCredentials.mockReturnValue(new Promise(() => {})); // never resolves
     render(<BiometricSettings />);
     expect(screen.getByTestId('spinner')).toBeDefined();
+  });
+
+  it('shows a retryable error instead of treating a credential-list failure as empty', async () => {
+    mockGetWebAuthnCredentials
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce([]);
+    const user = userEvent.setup();
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText('We could not load your passkeys.')).toBeDefined();
+    await user.click(screen.getByText('Try Again'));
+    expect(await screen.findByText('Create a passkey')).toBeDefined();
+    expect(mockGetWebAuthnCredentials).toHaveBeenCalledTimes(2);
   });
 
   it('renders empty state when no credentials', async () => {
@@ -177,7 +256,164 @@ describe('BiometricSettings', () => {
     });
 
     await user.click(screen.getByText('Create a passkey'));
-    expect(mockRegisterBiometric).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockRegisterBiometric).toHaveBeenCalledWith('This device', undefined, 'security-token');
+    });
+  });
+
+  it('prevents a second sensitive action while recent-session confirmation is in flight', async () => {
+    let resolveConfirmation: ((value: {
+      success: boolean;
+      securityConfirmationToken: string;
+      expiresIn: number;
+    }) => void) | undefined;
+    mockConfirmWebAuthnSecurity.mockReturnValue(new Promise((resolve) => {
+      resolveConfirmation = resolve;
+    }));
+    mockRegisterBiometric.mockResolvedValue({ success: true });
+    render(<BiometricSettings />);
+    const button = await screen.findByText('Create a passkey');
+
+    fireEvent.click(button);
+    fireEvent.click(button);
+
+    expect(mockConfirmWebAuthnSecurity).toHaveBeenCalledTimes(1);
+    resolveConfirmation?.({
+      success: true,
+      securityConfirmationToken: 'single-token',
+      expiresIn: 300,
+    });
+    await waitFor(() => expect(mockRegisterBiometric).toHaveBeenCalledTimes(1));
+  });
+
+  it('maps the credential-limit error to a specific translated explanation', async () => {
+    mockRegisterBiometric.mockResolvedValue({
+      success: false,
+      errorCode: 'WEBAUTHN_CREDENTIAL_LIMIT',
+    });
+    const user = userEvent.setup();
+    render(<BiometricSettings />);
+
+    await user.click(await screen.findByText('Create a passkey'));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith(
+        'You have reached the limit of 10 passkeys. Remove one before adding another.',
+      );
+    });
+  });
+
+  it('hides enrollment and explains when the configured credential limit is reached', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'abc123', device_name: 'Windows Hello', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null },
+    ]);
+    mockGetWebAuthnStatus.mockResolvedValue({
+      registered: true,
+      count: 1,
+      max_credentials: 1,
+      current_rp_id: 'localhost',
+      confirmation_methods: { password: true, passkey: true, totp: false },
+    });
+
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText(/reached the limit of 1 passkeys/i)).toBeDefined();
+    expect(screen.queryByText('Add another passkey')).toBeNull();
+  });
+
+  it('identifies credentials bound to a different relying-party domain', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'abc123', device_name: 'Old domain', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null, rp_id: 'old.example.org' },
+    ]);
+    mockGetWebAuthnStatus.mockResolvedValue({
+      registered: true,
+      count: 1,
+      max_credentials: 10,
+      current_rp_id: 'new.example.org',
+      confirmation_methods: { password: true, passkey: true, totp: false },
+    });
+
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText(/created for old\.example\.org/i)).toHaveTextContent('new.example.org');
+  });
+
+  it('explains when a legacy credential has no relying-party metadata', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'legacy123', device_name: 'Older passkey', authenticator_type: 'platform', created_at: '2025-01-01', last_used_at: null, rp_id: null },
+    ]);
+
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText(/may not appear at signed-out login/i)).toBeDefined();
+  });
+
+  it('prompts re-enrollment for a pre-discoverable credential even when its domain is known', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      {
+        credential_id: 'legacy-known-rp',
+        device_name: 'Older security key',
+        authenticator_type: 'cross-platform',
+        created_at: '2025-01-01',
+        last_used_at: null,
+        rp_id: 'localhost',
+        credential_discoverable: null,
+      },
+    ]);
+
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText(/may not appear at signed-out login/i)).toBeDefined();
+  });
+
+  it('requires and submits step-up confirmation when the current session is not recent', async () => {
+    mockConfirmWebAuthnSecurity
+      .mockResolvedValueOnce({ success: false, errorCode: 'SECURITY_CONFIRMATION_REQUIRED' })
+      .mockResolvedValueOnce({
+        success: true,
+        securityConfirmationToken: 'confirmed-token',
+        expiresIn: 300,
+      });
+    mockRegisterBiometric.mockResolvedValue({ success: true });
+    const user = userEvent.setup();
+
+    render(<BiometricSettings />);
+    await user.click(await screen.findByText('Create a passkey'));
+
+    expect(await screen.findByText('Confirm it is you')).toBeDefined();
+    await user.type(screen.getByLabelText('Current password'), 'correct horse');
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(mockConfirmWebAuthnSecurity).toHaveBeenLastCalledWith({ current_password: 'correct horse' });
+      expect(mockRegisterBiometric).toHaveBeenCalledWith('This device', undefined, 'confirmed-token');
+    });
+  });
+
+  it('exposes the selected step-up method through aria-pressed', async () => {
+    mockGetWebAuthnStatus.mockResolvedValue({
+      registered: false,
+      count: 0,
+      current_rp_id: 'localhost',
+      max_credentials: 10,
+      confirmation_methods: { password: true, passkey: false, totp: true },
+    });
+    mockConfirmWebAuthnSecurity.mockResolvedValue({
+      success: false,
+      errorCode: 'SECURITY_CONFIRMATION_REQUIRED',
+    });
+    const user = userEvent.setup();
+    render(<BiometricSettings />);
+
+    await user.click(await screen.findByText('Create a passkey'));
+    const password = await screen.findByRole('button', { name: 'Current password' });
+    const totp = screen.getByRole('button', { name: 'Authenticator code' });
+    expect(password).toHaveAttribute('aria-pressed', 'true');
+    expect(totp).toHaveAttribute('aria-pressed', 'false');
+
+    await user.click(totp);
+    expect(password).toHaveAttribute('aria-pressed', 'false');
+    expect(totp).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('shows success toast on registration', async () => {
@@ -206,7 +442,7 @@ describe('BiometricSettings', () => {
 
     await user.click(screen.getByText('Create a passkey'));
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalledWith('Aborted');
+      expect(mockToast.error).toHaveBeenCalledWith('Registration failed');
     });
   });
 
@@ -232,7 +468,7 @@ describe('BiometricSettings', () => {
   });
 
   it('renders not-supported message when WebAuthn unavailable', async () => {
-    mockIsBiometricAvailable.mockResolvedValue(false);
+    mockIsWebAuthnSupported.mockReturnValue(false);
 
     render(<BiometricSettings />);
     await waitFor(() => {
@@ -259,8 +495,8 @@ describe('BiometricSettings', () => {
     });
   });
 
-  it('hides passkey setup when tenant enrollment is disabled and none exist', async () => {
-    passkeyEnrollmentAllowed = false;
+  it('hides all passkey settings when the tenant master switch is disabled', async () => {
+    passkeyAuthenticationEnabled = false;
     render(<BiometricSettings />);
 
     await waitFor(() => {
@@ -269,8 +505,21 @@ describe('BiometricSettings', () => {
     });
   });
 
-  it('keeps existing passkeys manageable while hiding new enrollment', async () => {
-    passkeyEnrollmentAllowed = false;
+  it('keeps existing passkeys manageable even when this browser cannot create another', async () => {
+    mockIsWebAuthnSupported.mockReturnValue(false);
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'cross-platform', device_name: 'Security key', authenticator_type: 'cross-platform', created_at: '2026-01-01', last_used_at: null },
+    ]);
+
+    render(<BiometricSettings />);
+
+    expect(await screen.findByText(/Security key/)).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Remove Security key' })).toBeDefined();
+    expect(screen.queryByText('Add another passkey')).toBeNull();
+  });
+
+  it('keeps existing passkeys manageable and explains when new enrollment is disabled', async () => {
+    passkeyEnrollmentEnabled = false;
     mockGetWebAuthnCredentials.mockResolvedValue([
       { credential_id: 'abc123', device_name: 'Windows Hello', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null },
     ]);
@@ -282,6 +531,7 @@ describe('BiometricSettings', () => {
     });
     expect(screen.queryByText('Add another passkey')).toBeNull();
     expect(screen.queryByText(/iCloud Keychain syncs across Apple devices/)).toBeNull();
+    expect(screen.getByText(/paused new passkey setup/i)).toBeDefined();
   });
 
   it('explains when the final sign-in method cannot be removed', async () => {
@@ -295,9 +545,36 @@ describe('BiometricSettings', () => {
     const user = userEvent.setup();
 
     render(<BiometricSettings />);
-    const removeButton = await screen.findByRole('button', { name: 'Remove passkey' });
+    const removeButton = await screen.findByRole('button', { name: 'Remove Windows Hello' });
     await user.click(removeButton);
 
-    expect(mockToast.error).toHaveBeenCalledWith('common:oauth.cannot_disconnect_last');
+    expect(mockRemoveWebAuthnCredential).not.toHaveBeenCalled();
+    expect(screen.getByText(/Remove Windows Hello\?/)).toBeDefined();
+    await user.click(screen.getByRole('button', { name: 'Remove passkey' }));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('common:oauth.cannot_disconnect_last');
+    });
+  });
+
+  it('clears local authentication when passkey removal revokes all sessions', async () => {
+    mockGetWebAuthnCredentials.mockResolvedValue([
+      { credential_id: 'abc123', device_name: 'Windows Hello', authenticator_type: 'platform', created_at: '2026-01-01', last_used_at: null },
+    ]);
+    mockRemoveWebAuthnCredential.mockResolvedValue({
+      success: true,
+      sessionsRevoked: true,
+    });
+    const user = userEvent.setup();
+
+    render(<BiometricSettings />);
+    await user.click(await screen.findByRole('button', { name: 'Remove Windows Hello' }));
+    await user.click(screen.getByRole('button', { name: 'Remove passkey' }));
+
+    await waitFor(() => {
+      expect(mockRemoveWebAuthnCredential).toHaveBeenCalledWith('abc123', 'security-token');
+      expect(mockLogout).toHaveBeenCalledTimes(1);
+      expect(mockToast.success).toHaveBeenCalledWith('Your passkey changed. Sign in again on every device.');
+    });
   });
 });

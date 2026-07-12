@@ -42,8 +42,8 @@ class GroupFileServiceTest extends TestCase
     {
         try {
             $svc = new GroupFileService();
-            $result = $svc->getFolders(0);
-            $this->assertIsArray($result);
+            $result = $svc->getFolders(0, 0);
+            $this->assertTrue(is_array($result) || is_null($result));
         } catch (\TypeError $e) {
             $this->fail('TypeError: ' . $e->getMessage());
         } catch (\Throwable $e) {

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -12,31 +12,47 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import FileText from 'lucide-react/icons/file-text';
 import Calendar from 'lucide-react/icons/calendar';
-import Save from 'lucide-react/icons/save';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/types';
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Button, Chip, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
+import { GroupAuditLog } from './GroupAuditLog';
+
+const DETAIL_TABS = ['overview', 'members', 'location', 'audit'] as const;
+type DetailTab = typeof DETAIL_TABS[number];
 
 export default function GroupDetail() {
   const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { tenantPath } = useTenant();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { success, error } = useToast();
   const [group, setGroup] = useState<AdminGroupDetail | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({ name: '', description: '', location: '' });
   const [kickTarget, setKickTarget] = useState<number | null>(null);
   const [kickLoading, setKickLoading] = useState(false);
+  const requestedTab = searchParams.get('tab');
+  const selectedTab: DetailTab = DETAIL_TABS.includes(requestedTab as DetailTab)
+    ? requestedTab as DetailTab
+    : 'overview';
+
+  useEffect(() => {
+    if (requestedTab !== null && requestedTab !== selectedTab) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('tab');
+      setSearchParams(next, { replace: true });
+    }
+  }, [requestedTab, searchParams, selectedTab, setSearchParams]);
 
   const loadGroup = useCallback(async () => {
     try {
@@ -45,11 +61,6 @@ export default function GroupDetail() {
       if (response.success && response.data) {
         const groupData = response.data as AdminGroupDetail;
         setGroup(groupData);
-        setFormData({
-          name: groupData.name || '',
-          description: groupData.description || '',
-          location: groupData.location || '',
-        });
       }
     } catch {
       error(t('groups.failed_to_load_groups'));
@@ -77,21 +88,6 @@ export default function GroupDetail() {
       loadMembers();
     }
   }, [id, loadGroup, loadMembers]);
-
-  const handleSave = async () => {
-    try {
-      const res = await adminGroups.updateGroup(Number(id), formData);
-      if (res.success) {
-        success(t('groups.group_updated'));
-        setEditMode(false);
-        loadGroup();
-      } else {
-        error(res.error || t('groups.failed_to_update_group'));
-      }
-    } catch {
-      error(t('groups.failed_to_update_group'));
-    }
-  };
 
   const handleGeocode = async () => {
     try {
@@ -168,15 +164,9 @@ export default function GroupDetail() {
           <h1 className="text-2xl font-bold">{group.name}</h1>
           <p className="text-sm text-gray-500">{t('groups.group_id')}</p>
         </div>
-        {editMode ? (
-          <Button startContent={<Save className="w-4 h-4" aria-hidden="true" />} onPress={handleSave}>
-            {t('groups.save')}
-          </Button>
-        ) : (
-          <Button variant="tertiary" onPress={() => setEditMode(true)}>
-            {t('groups.edit')}
-          </Button>
-        )}
+        <Button variant="tertiary" onPress={() => navigate(tenantPath(`/groups/edit/${group.id}`))}>
+          {t('groups.edit')}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -218,31 +208,37 @@ export default function GroupDetail() {
         </Card>
       </div>
 
-      <Tabs aria-label={t('groups.detail_tabs_aria')}>
+      <Tabs
+        aria-label={t('groups.detail_tabs_aria')}
+        selectedKey={selectedTab}
+        onSelectionChange={(key) => {
+          const nextTab = DETAIL_TABS.includes(String(key) as DetailTab)
+            ? String(key) as DetailTab
+            : 'overview';
+          const next = new URLSearchParams(searchParams);
+          if (nextTab === 'overview') next.delete('tab');
+          else next.set('tab', nextTab);
+          setSearchParams(next, { replace: true });
+        }}
+      >
         <Tab key="overview" title={t('groups.overview')}>
           <Card className="p-6 mt-4 space-y-4">
-            {editMode ? (
-              <>
-                <Input label={t('groups.name')} value={formData.name} onValueChange={(v) => setFormData({ ...formData, name: v })} />
-                <Textarea label={t('groups.description')} value={formData.description} onValueChange={(v) => setFormData({ ...formData, description: v })} />
-                <Input label={t('groups.location')} value={formData.location} onValueChange={(v) => setFormData({ ...formData, location: v })} />
-              </>
-            ) : (
-              <>
-                <div>
-                  <div className="text-sm text-gray-500">{t('groups.description')}</div>
-                  <div className="mt-1">{group.description || t('groups.no_description')}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">{t('groups.visibility')}</div>
-                  <Chip className="mt-1" size="sm">{group.visibility}</Chip>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">{t('groups.created')}</div>
-                  <div className="mt-1">{new Date(group.created_at).toLocaleString(getFormattingLocale())}</div>
-                </div>
-              </>
-            )}
+            <div>
+              <div className="text-sm text-gray-500">{t('groups.description')}</div>
+              <div className="mt-1">{group.description || t('groups.no_description')}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">{t('groups.visibility')}</div>
+              <Chip className="mt-1" size="sm">
+                {(['public', 'private', 'hidden'] as string[]).includes(group.visibility)
+                  ? t(`groups.visibility_${group.visibility}`)
+                  : t('groups.visibility_unknown')}
+              </Chip>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">{t('groups.created')}</div>
+              <div className="mt-1">{new Date(group.created_at).toLocaleString(getFormattingLocale())}</div>
+            </div>
           </Card>
         </Tab>
 
@@ -264,16 +260,17 @@ export default function GroupDetail() {
                         <div>{member.user_name}</div>
                       </div>
                     </TableCell>
-                    <TableCell><Chip size="sm" color={member.role === 'owner' ? 'primary' : member.role === 'admin' ? 'secondary' : 'default'}>{member.role}</Chip></TableCell>
+                    <TableCell>
+                      <Chip size="sm" color={member.role === 'owner' ? 'primary' : member.role === 'admin' ? 'secondary' : 'default'}>
+                        {t(`groups.role_${member.role}`)}
+                      </Chip>
+                    </TableCell>
                     <TableCell>{new Date(member.joined_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         {member.role === 'member' && <Button size="sm" variant="tertiary" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}
                         {member.role === 'admin' && (
-                          <>
-                            <Button size="sm" variant="tertiary" onPress={() => handlePromote(member.user_id)}>{t('groups.make_owner')}</Button>
-                            <Button size="sm" variant="tertiary" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
-                          </>
+                          <Button size="sm" variant="tertiary" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
                         )}
                         {member.role !== 'owner' && <Button size="sm" variant="danger" onPress={() => setKickTarget(member.user_id)}>{t('groups.kick')}</Button>}
                       </div>
@@ -305,6 +302,12 @@ export default function GroupDetail() {
               {t('groups.geocode_location')}
             </Button>
           </Card>
+        </Tab>
+
+        <Tab key="audit" title={t('groups.audit_log')}>
+          <div className="mt-4">
+            <GroupAuditLog groupId={Number(id)} />
+          </div>
         </Tab>
       </Tabs>
 

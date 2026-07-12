@@ -8,217 +8,172 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
-use App\Core\Database;
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
+use App\Models\Group;
+use App\Models\User;
 use App\Services\GroupApprovalWorkflowService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use InvalidArgumentException;
+use Tests\Laravel\TestCase;
 
-/**
- * GroupApprovalWorkflowService Tests
- *
- * Tests group creation approval workflow including
- * submission, approval, and rejection processes.
- */
-class GroupApprovalWorkflowServiceTest extends \Tests\Laravel\TestCase
+final class GroupApprovalWorkflowServiceTest extends TestCase
 {
-    protected static ?int $staticTenantId = null;
-    protected static ?int $testUserId = null;
-    protected static ?int $testGroupId = null;
+    use DatabaseTransactions;
 
-    public static function setUpBeforeClass(): void
+    private User $owner;
+    private User $reviewer;
+
+    protected function setUp(): void
     {
-        parent::setUpBeforeClass();
-
-        // Boot a Laravel app so facade-backed helpers (DB, TenantContext) work
-        // inside this static hook — Laravel only boots the app in instance setUp.
-        self::bootApplicationForClass();
-
-        self::$staticTenantId = 2;
-        TenantContext::setById(self::$staticTenantId);
-
-        self::createTestData();
+        parent::setUp();
+        TenantContext::setById($this->testTenantId);
+        $this->owner = User::factory()->forTenant($this->testTenantId)->create();
+        $this->reviewer = User::factory()->forTenant($this->testTenantId)->create([
+            'role' => 'admin',
+        ]);
+        TenantContext::setById($this->testTenantId);
+        Queue::fake();
     }
 
-    protected static function createTestData(): void
+    public function test_status_constants_are_stable(): void
     {
-        $ts = time();
-
-        // Create test user
-        Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())",
-            [self::$staticTenantId, "grpappr_{$ts}@test.com", "grpappr_{$ts}", 'Approval', 'User', 'Approval User']
-        );
-        self::$testUserId = (int)Database::getInstance()->lastInsertId();
-
-        // Create test group
-        Database::query(
-            "INSERT INTO `groups` (tenant_id, name, description, owner_id, created_at)
-             VALUES (?, ?, ?, ?, NOW())",
-            [self::$staticTenantId, "Test Group {$ts}", 'Test group for approval', self::$testUserId]
-        );
-        self::$testGroupId = (int)Database::getInstance()->lastInsertId();
+        self::assertSame('pending', GroupApprovalWorkflowService::STATUS_PENDING);
+        self::assertSame('approved', GroupApprovalWorkflowService::STATUS_APPROVED);
+        self::assertSame('rejected', GroupApprovalWorkflowService::STATUS_REJECTED);
+        self::assertSame('changes_requested', GroupApprovalWorkflowService::STATUS_CHANGES_REQUESTED);
     }
 
-    public static function tearDownAfterClass(): void
+    public function test_submission_is_parent_locked_and_idempotent(): void
     {
-        if (self::$testGroupId) {
-            try {
-                Database::query("DELETE FROM group_approval_requests WHERE group_id = ?", [self::$testGroupId]);
-                Database::query("DELETE FROM `groups` WHERE id = ?", [self::$testGroupId]);
-            } catch (\Exception $e) {}
-        }
-        if (self::$testUserId) {
-            try {
-                Database::query("DELETE FROM users WHERE id = ?", [self::$testUserId]);
-            } catch (\Exception $e) {}
-        }
+        $group = $this->pendingGroup();
 
-        parent::tearDownAfterClass();
+        $first = GroupApprovalWorkflowService::submitForApproval(
+            $group->id,
+            $this->owner->id,
+            'Please review',
+        );
+        $second = GroupApprovalWorkflowService::submitForApproval($group->id, $this->owner->id);
+
+        self::assertSame($first, $second);
+        self::assertSame(1, DB::table('group_approval_requests')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $group->id)
+            ->where('status', GroupApprovalWorkflowService::STATUS_PENDING)
+            ->count());
     }
 
-    // ==========================================
-    // Status Constants Tests
-    // ==========================================
-
-    public function testStatusConstantsExist(): void
+    public function test_active_or_foreign_group_cannot_be_submitted_as_pending(): void
     {
-        $this->assertEquals('pending', GroupApprovalWorkflowService::STATUS_PENDING);
-        $this->assertEquals('approved', GroupApprovalWorkflowService::STATUS_APPROVED);
-        $this->assertEquals('rejected', GroupApprovalWorkflowService::STATUS_REJECTED);
-        $this->assertEquals('changes_requested', GroupApprovalWorkflowService::STATUS_CHANGES_REQUESTED);
+        $active = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $this->owner->id,
+            'status' => GroupStatus::Active->value,
+            'is_active' => true,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        GroupApprovalWorkflowService::submitForApproval($active->id, $this->owner->id);
     }
 
-    // ==========================================
-    // Submit For Approval Tests
-    // ==========================================
-
-    public function testSubmitForApprovalReturnsRequestId(): void
+    public function test_approval_changes_request_and_group_in_one_canonical_transition(): void
     {
-        $requestId = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId,
-            'Please approve this group'
-        );
+        $group = $this->pendingGroup();
+        $requestId = GroupApprovalWorkflowService::submitForApproval($group->id, $this->owner->id);
 
-        $this->assertNotNull($requestId);
-        $this->assertIsNumeric($requestId);
-
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-    }
-
-    public function testSubmitForApprovalCreatesRequest(): void
-    {
-        $requestId = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId,
-            'Test notes'
-        );
-
-        // Verify request was created with pending status
-        $stmt = Database::query("SELECT status FROM group_approval_requests WHERE id = ?", [$requestId]);
-        $request = $stmt->fetch();
-        $this->assertEquals('pending', $request['status']);
-
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-    }
-
-    public function testSubmitForApprovalPreventsDuplicates(): void
-    {
-        $requestId1 = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId
-        );
-
-        $requestId2 = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId
-        );
-
-        // Should return the same ID (existing pending request)
-        $this->assertEquals($requestId1, $requestId2);
-
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId1]);
-    }
-
-    // ==========================================
-    // Get Request Tests
-    // ==========================================
-
-    public function testGetRequestReturnsValidStructure(): void
-    {
-        $requestId = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId
-        );
-
-        $request = GroupApprovalWorkflowService::getRequest($requestId);
-
-        $this->assertNotEmpty($request);
-        $this->assertArrayHasKey('group_id', $request);
-        $this->assertArrayHasKey('submitted_by', $request);
-        $this->assertArrayHasKey('status', $request);
-
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
-    }
-
-    // ==========================================
-    // Approve/Reject Tests
-    // ==========================================
-
-    public function testApproveGroupChangesRequestStatus(): void
-    {
-        $requestId = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId
-        );
-
-        $result = GroupApprovalWorkflowService::approveGroup(
+        self::assertTrue(GroupApprovalWorkflowService::approveGroup(
             $requestId,
-            self::$testUserId,
-            'Approved!'
-        );
+            $this->reviewer->id,
+            'Approved',
+        ));
 
-        $this->assertTrue($result);
-
-        // Verify request status changed to approved
-        $request = GroupApprovalWorkflowService::getRequest($requestId);
-        $this->assertEquals('approved', $request['status']);
-
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
+        $this->assertRequestStatus($requestId, GroupApprovalWorkflowService::STATUS_APPROVED);
+        $this->assertGroupStatus($group->id, GroupStatus::Active, true);
+        $this->assertLifecycleAudit($group->id, GroupStatus::PendingReview, GroupStatus::Active);
+        self::assertFalse(GroupApprovalWorkflowService::approveGroup($requestId, $this->reviewer->id));
     }
 
-    public function testApproveGroupReturnsFalseForInvalidId(): void
+    public function test_rejection_changes_request_and_group_in_one_canonical_transition(): void
     {
-        $result = GroupApprovalWorkflowService::approveGroup(999999, self::$testUserId);
-        $this->assertFalse($result);
-    }
+        $group = $this->pendingGroup();
+        $requestId = GroupApprovalWorkflowService::submitForApproval($group->id, $this->owner->id);
 
-    public function testRejectGroupChangesRequestStatus(): void
-    {
-        $requestId = GroupApprovalWorkflowService::submitForApproval(
-            self::$testGroupId,
-            self::$testUserId
-        );
-
-        $result = GroupApprovalWorkflowService::rejectGroup(
+        self::assertTrue(GroupApprovalWorkflowService::rejectGroup(
             $requestId,
-            self::$testUserId,
-            'Needs changes'
-        );
+            $this->reviewer->id,
+            'Insufficient detail',
+        ));
 
-        $this->assertTrue($result);
+        $this->assertRequestStatus($requestId, GroupApprovalWorkflowService::STATUS_REJECTED);
+        $this->assertGroupStatus($group->id, GroupStatus::Rejected, false);
+        $this->assertLifecycleAudit($group->id, GroupStatus::PendingReview, GroupStatus::Rejected);
+        self::assertFalse(GroupApprovalWorkflowService::rejectGroup($requestId, $this->reviewer->id));
+    }
 
-        // Verify request status changed to rejected
-        $request = GroupApprovalWorkflowService::getRequest($requestId);
-        $this->assertEquals('rejected', $request['status']);
+    public function test_unknown_or_other_tenant_request_is_concealed(): void
+    {
+        self::assertFalse(GroupApprovalWorkflowService::approveGroup(PHP_INT_MAX, $this->reviewer->id));
 
-        // Cleanup
-        Database::query("DELETE FROM group_approval_requests WHERE id = ?", [$requestId]);
+        $foreignOwner = User::factory()->forTenant(999)->create();
+        $foreignGroup = Group::factory()->forTenant(999)->create([
+            'owner_id' => $foreignOwner->id,
+            'status' => GroupStatus::PendingReview->value,
+            'is_active' => false,
+        ]);
+        $foreignRequestId = (int) DB::table('group_approval_requests')->insertGetId([
+            'tenant_id' => 999,
+            'group_id' => $foreignGroup->id,
+            'submitted_by' => $foreignOwner->id,
+            'status' => GroupApprovalWorkflowService::STATUS_PENDING,
+            'created_at' => now(),
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        self::assertFalse(GroupApprovalWorkflowService::approveGroup($foreignRequestId, $this->reviewer->id));
+        self::assertSame(GroupApprovalWorkflowService::STATUS_PENDING, DB::table('group_approval_requests')
+            ->where('id', $foreignRequestId)
+            ->value('status'));
+    }
+
+    private function pendingGroup(): Group
+    {
+        /** @var Group $group */
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $this->owner->id,
+            'status' => GroupStatus::PendingReview->value,
+            'is_active' => false,
+        ]);
+
+        return $group;
+    }
+
+    private function assertRequestStatus(int $requestId, string $status): void
+    {
+        self::assertSame($status, DB::table('group_approval_requests')
+            ->where('id', $requestId)
+            ->value('status'));
+    }
+
+    private function assertGroupStatus(int $groupId, GroupStatus $status, bool $isActive): void
+    {
+        $group = DB::table('groups')->where('id', $groupId)->first();
+        self::assertSame($status->value, $group->status);
+        self::assertSame($isActive, (bool) $group->is_active);
+    }
+
+    private function assertLifecycleAudit(
+        int $groupId,
+        GroupStatus $oldStatus,
+        GroupStatus $newStatus,
+    ): void {
+        $audit = DB::table('group_audit_log')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $groupId)
+            ->where('action', 'group_status_changed')
+            ->sole();
+        $details = json_decode((string) $audit->details, true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame($oldStatus->value, $details['old_status']);
+        self::assertSame($newStatus->value, $details['new_status']);
     }
 }

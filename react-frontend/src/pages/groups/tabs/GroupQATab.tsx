@@ -18,7 +18,7 @@ import { useDisclosure } from '@/components/ui/useDisclosure';
  * Stack Overflow-style Q&A within a group: questions, answers, voting, accept.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import HelpCircle from 'lucide-react/icons/circle-help';
 import ArrowUp from 'lucide-react/icons/arrow-up';
@@ -31,54 +31,41 @@ import { useTranslation } from 'react-i18next';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
+import {
+  acceptGroupAnswer,
+  askGroupQuestion,
+  getGroupQuestion,
+  listGroupQuestions,
+  postGroupAnswer,
+  voteOnGroupQA,
+  type GroupQuestion as Question,
+  type GroupQuestionDetail as QuestionDetail,
+  type GroupQuestionSort as SortOption,
+} from '../api/qa';
+import { normalizeGroupApiError, type GroupApiError } from '../api/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface QuestionAuthor {
-  id: number;
-  name: string;
-  avatar: string | null;
-}
-
-interface Answer {
-  id: number;
-  question_id: number;
-  body: string;
-  vote_count: number;
-  user_vote: 1 | -1 | 0;
-  is_accepted: boolean;
-  author: QuestionAuthor;
-  created_at: string;
-}
-
-interface Question {
-  id: number;
-  group_id: number;
-  title: string;
-  body: string;
-  vote_count: number;
-  user_vote: 1 | -1 | 0;
-  answer_count: number;
-  has_accepted_answer: boolean;
-  author: QuestionAuthor;
-  created_at: string;
-}
-
-interface QuestionDetail extends Question {
-  answers: Answer[];
-}
-
-type SortOption = 'newest' | 'most_voted' | 'unanswered';
-
 interface GroupQATabProps {
   groupId: number;
   isAdmin: boolean;
   isMember?: boolean;
+}
+
+function nextVoteState(
+  voteCount: number,
+  userVote: 1 | -1 | 0,
+  requestedVote: 1 | -1,
+): { vote_count: number; user_vote: 1 | -1 | 0 } {
+  const nextVote = userVote === requestedVote ? 0 : requestedVote;
+  return {
+    vote_count: voteCount + nextVote - userVote,
+    user_vote: nextVote,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -114,7 +101,7 @@ function VoteControls({
         isIconOnly
         variant="light"
         size="sm"
-        className={userVote === 1 ? 'text-success' : 'text-muted'}
+        className={`min-h-11 min-w-11 ${userVote === 1 ? 'text-success' : 'text-muted'}`}
         onPress={() => handleVote(type, targetId, 1)}
         isDisabled={isVoting || !isMember}
         aria-label={t('qa.upvote_aria')}
@@ -138,7 +125,7 @@ function VoteControls({
         isIconOnly
         variant="light"
         size="sm"
-        className={userVote === -1 ? 'text-danger' : 'text-muted'}
+        className={`min-h-11 min-w-11 ${userVote === -1 ? 'text-danger' : 'text-muted'}`}
         onPress={() => handleVote(type, targetId, -1)}
         isDisabled={isVoting || !isMember}
         aria-label={t('qa.downvote_aria')}
@@ -155,6 +142,7 @@ function VoteControls({
 
 export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProps) {
   const { t } = useTranslation('groups');
+  const { t: tCommon } = useTranslation('common');
   const toast = useToast();
   const askModal = useDisclosure();
 
@@ -165,6 +153,9 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
   const [hasMore, setHasMore] = useState(false);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortOption>('newest');
+  const [listError, setListError] = useState<{ error: GroupApiError; reset: boolean } | null>(null);
+  const questionsRequestRef = useRef<AbortController | null>(null);
+  const searchMountedRef = useRef(false);
 
   // Ask question form
   const [askTitle, setAskTitle] = useState('');
@@ -175,6 +166,8 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [expandedDetail, setExpandedDetail] = useState<QuestionDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [detailError, setDetailError] = useState<GroupApiError | null>(null);
+  const detailRequestRef = useRef<AbortController | null>(null);
 
   // Answer form state
   const [answerBody, setAnswerBody] = useState('');
@@ -189,71 +182,120 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
 
   const loadQuestions = useCallback(
     async (reset = false) => {
+      questionsRequestRef.current?.abort();
+      const controller = new AbortController();
+      questionsRequestRef.current = controller;
+      setLoading(true);
+      setListError(null);
+
       try {
-        if (reset) setLoading(true);
-
-        const params = new URLSearchParams({ sort, per_page: '20' });
-        if (!reset && cursor) params.set('cursor', cursor);
-        if (search.trim()) params.set('q', search.trim());
-
-        const resp = await api.get(`/v2/groups/${groupId}/questions?${params}`);
-        const data = (resp.data ?? {}) as { items?: Question[]; cursor?: string | null; has_more?: boolean };
+        const data = await listGroupQuestions(groupId, {
+          sort,
+          cursor: reset ? null : cursor,
+          query: search,
+          perPage: 20,
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted || questionsRequestRef.current !== controller) return;
 
         if (reset) {
-          setQuestions(data.items ?? []);
+          setQuestions(data.items);
         } else {
-          setQuestions((prev) => [...prev, ...(data.items ?? [])]);
+          setQuestions((prev) => [...prev, ...data.items]);
         }
-        setCursor(data.cursor ?? null);
-        setHasMore(data.has_more ?? false);
+        setCursor(data.cursor);
+        setHasMore(data.has_more);
       } catch (err) {
+        const apiError = normalizeGroupApiError(err);
+        if (apiError.isCancellation) return;
+        if (questionsRequestRef.current !== controller) return;
         logError('GroupQATab.loadQuestions', err);
+        setListError({ error: apiError, reset });
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted && questionsRequestRef.current === controller) {
+          setLoading(false);
+        }
       }
     },
     [groupId, cursor, sort, search],
   );
 
   useEffect(() => {
-    loadQuestions(true);
+    void loadQuestions(true);
   }, [groupId, sort]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    detailRequestRef.current?.abort();
+    setExpandedId(null);
+    setExpandedDetail(null);
+    setDetailError(null);
+    setAnswerBody('');
+  }, [groupId]);
 
   // Debounced search
   useEffect(() => {
-    const timeout = setTimeout(() => loadQuestions(true), 300);
+    if (!searchMountedRef.current) {
+      searchMountedRef.current = true;
+      return;
+    }
+    const timeout = setTimeout(() => void loadQuestions(true), 300);
     return () => clearTimeout(timeout);
   }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => () => {
+    questionsRequestRef.current?.abort();
+    detailRequestRef.current?.abort();
+  }, []);
 
   // ─────────────────────────────────────────────────────────────────────
   // Expand / collapse a question (load detail with answers)
   // ─────────────────────────────────────────────────────────────────────
 
-  const toggleExpand = useCallback(
+  const loadQuestionDetail = useCallback(
     async (questionId: number) => {
+      detailRequestRef.current?.abort();
+      const controller = new AbortController();
+      detailRequestRef.current = controller;
+      setExpandedId(questionId);
+      setExpandedDetail(null);
+      setDetailError(null);
+      setLoadingDetail(true);
+
+      try {
+        const detail = await getGroupQuestion(groupId, questionId, {
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted || detailRequestRef.current !== controller) return;
+        setExpandedDetail(detail);
+      } catch (err) {
+        const apiError = normalizeGroupApiError(err);
+        if (apiError.isCancellation) return;
+        if (detailRequestRef.current !== controller) return;
+        logError('GroupQATab.loadDetail', err);
+        setDetailError(apiError);
+      } finally {
+        if (!controller.signal.aborted && detailRequestRef.current === controller) {
+          setLoadingDetail(false);
+        }
+      }
+    },
+    [groupId],
+  );
+
+  const toggleExpand = useCallback(
+    (questionId: number) => {
       if (expandedId === questionId) {
+        detailRequestRef.current?.abort();
         setExpandedId(null);
         setExpandedDetail(null);
+        setDetailError(null);
         setAnswerBody('');
         return;
       }
 
-      setExpandedId(questionId);
-      setExpandedDetail(null);
-      setLoadingDetail(true);
-
-      try {
-        const resp = await api.get(`/v2/groups/${groupId}/questions/${questionId}`);
-        setExpandedDetail(resp.data as QuestionDetail);
-      } catch (err) {
-        logError('GroupQATab.loadDetail', err);
-        toast.error(t('qa.load_error'));
-        setExpandedId(null);
-      } finally {
-        setLoadingDetail(false);
-      }
+      void loadQuestionDetail(questionId);
     },
-    [groupId, expandedId, t, toast],
+    [expandedId, loadQuestionDetail],
   );
 
   // ─────────────────────────────────────────────────────────────────────
@@ -265,22 +307,15 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setAsking(true);
 
     try {
-      const response = await api.post(`/v2/groups/${groupId}/questions`, {
+      await askGroupQuestion(groupId, {
         title: askTitle.trim(),
         body: askBody.trim(),
       });
-
-      if (response.success) {
-        toast.success(t('qa.ask_success'));
-        setAskTitle('');
-        setAskBody('');
-        askModal.onClose();
-        loadQuestions(true);
-      } else {
-        // A failed request resolves to { success: false } without throwing, so the
-        // unconditional success toast + modal close used to fake a posted question.
-        toast.error(response.error || t('qa.ask_error'));
-      }
+      toast.success(t('qa.ask_success'));
+      setAskTitle('');
+      setAskBody('');
+      askModal.onClose();
+      void loadQuestions(true);
     } catch (err) {
       logError('GroupQATab.ask', err);
       toast.error(t('qa.ask_error'));
@@ -298,19 +333,14 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setSubmittingAnswer(true);
 
     try {
-      const response = await api.post(`/v2/groups/${groupId}/questions/${expandedId}/answers`, {
+      await postGroupAnswer(groupId, expandedId, {
         body: answerBody.trim(),
       });
-
-      if (response.success) {
-        toast.success(t('qa.answer_success'));
-        setAnswerBody('');
-        // Refresh expanded detail and list counts
-        toggleExpand(expandedId);
-        loadQuestions(true);
-      } else {
-        toast.error(response.error || t('qa.answer_error'));
-      }
+      toast.success(t('qa.answer_success'));
+      setAnswerBody('');
+      // Refresh expanded detail without collapsing it, plus the list answer count.
+      void loadQuestionDetail(expandedId);
+      void loadQuestions(true);
     } catch (err) {
       logError('GroupQATab.answer', err);
       toast.error(t('qa.answer_error'));
@@ -334,19 +364,11 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setVotingIds((prev) => new Set(prev).add(key));
 
     try {
-      const response = await api.post(`/v2/groups/${groupId}/qa/vote`, {
+      await voteOnGroupQA(groupId, {
         type,
         target_id: targetId,
         vote,
       });
-
-      if (!response.success) {
-        // A failed vote resolves to { success: false } without throwing — don't
-        // apply the optimistic count change (it would leave a wrong, un-rolled-back
-        // vote count) and surface the error instead.
-        toast.error(response.error || t('qa.vote_error'));
-        return;
-      }
 
       // Update local state for immediate feedback
       if (type === 'question') {
@@ -355,8 +377,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
             q.id === targetId
               ? {
                   ...q,
-                  vote_count: q.vote_count + vote - q.user_vote,
-                  user_vote: q.user_vote === vote ? 0 : vote,
+                  ...nextVoteState(q.vote_count, q.user_vote, vote),
                 }
               : q,
           ),
@@ -367,8 +388,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
             prev
               ? {
                   ...prev,
-                  vote_count: prev.vote_count + vote - prev.user_vote,
-                  user_vote: prev.user_vote === vote ? (0 as const) : vote,
+                  ...nextVoteState(prev.vote_count, prev.user_vote, vote),
                 }
               : prev,
           );
@@ -382,8 +402,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                   a.id === targetId
                     ? {
                         ...a,
-                        vote_count: a.vote_count + vote - a.user_vote,
-                        user_vote: a.user_vote === vote ? (0 as const) : vote,
+                        ...nextVoteState(a.vote_count, a.user_vote, vote),
                       }
                     : a,
                 ),
@@ -411,13 +430,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     if (!expandedDetail) return;
 
     try {
-      const response = await api.post(`/v2/groups/${groupId}/answers/${answerId}/accept`);
-
-      if (!response.success) {
-        // Don't mark the answer accepted (and award the answerer) on a failed request.
-        toast.error(response.error || t('qa.accept_error'));
-        return;
-      }
+      await acceptGroupAnswer(groupId, answerId);
 
       toast.success(t('qa.accept_success'));
 
@@ -483,6 +496,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           value={search}
           onValueChange={setSearch}
           className="flex-1"
+          isClearable={Boolean(search)}
           size="sm"
           aria-label={t('qa.search_aria')}
         />
@@ -490,6 +504,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           <Button
             color="primary"
             size="sm"
+            className="w-full sm:w-auto"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={askModal.onOpen}
           >
@@ -515,8 +530,25 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         ))}
       </Tabs>
 
+      {listError && (
+        <GlassCard className="p-4" role="alert">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-danger">{t('qa.load_error')}</p>
+            {listError.error.retryable && (
+              <Button
+                variant="flat"
+                size="sm"
+                onPress={() => void loadQuestions(listError.reset)}
+              >
+                {tCommon('actions.retry')}
+              </Button>
+            )}
+          </div>
+        </GlassCard>
+      )}
+
       {/* Question list */}
-      {questions.length === 0 ? (
+      {listError?.reset ? null : questions.length === 0 ? (
         <EmptyState
           icon={<HelpCircle className="w-12 h-12" aria-hidden="true" />}
           title={t('qa.empty_title')}
@@ -531,82 +563,96 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           {questions.map((question) => (
             <GlassCard key={question.id} className="p-0 overflow-hidden">
               {/* Question row */}
-              <Button
-                variant="light"
-                className="w-full min-h-[44px] text-left p-3 hover:bg-surface-secondary/50 transition-colors justify-start rounded-none"
-                onPress={() => toggleExpand(question.id)}
-                aria-expanded={expandedId === question.id}
-                aria-label={t('qa.expand_aria', {
-                  title: question.title,
-                })}
-              >
-                <div className="flex items-start gap-3 w-full">
-                  {/* Vote controls */}
-                  <div
-                    className="flex-shrink-0"
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
-                    }}
-                    role="presentation"
-                  >
-                    <VoteControls
-                      type="question"
-                      targetId={question.id}
-                      voteCount={question.vote_count}
-                      userVote={question.user_vote}
-                      votingIds={votingIds}
-                      handleVote={handleVote}
-                      isMember={isMember}
-                      t={t}
-                    />
-                  </div>
+              <div className="flex items-start gap-3 w-full p-3">
+                {/* Vote controls remain siblings of the question-toggle button. */}
+                <div className="flex-shrink-0">
+                  <VoteControls
+                    type="question"
+                    targetId={question.id}
+                    voteCount={question.vote_count}
+                    userVote={question.user_vote}
+                    votingIds={votingIds}
+                    handleVote={handleVote}
+                    isMember={isMember}
+                    t={t}
+                  />
+                </div>
 
-                  {/* Question content */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-theme-primary line-clamp-2">
-                      {question.title}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-theme-subtle">
-                      <span>{question.author.name}</span>
-                      <span aria-hidden="true">&#183;</span>
-                      <span>{formatRelativeTime(question.created_at)}</span>
+                <Button
+                  variant="light"
+                  className="flex-1 min-w-0 min-h-[44px] text-start p-0 hover:bg-surface-secondary/50 transition-colors justify-start rounded-none"
+                  onPress={() => toggleExpand(question.id)}
+                  aria-expanded={expandedId === question.id}
+                  aria-controls={`group-question-${question.id}-detail`}
+                  aria-label={t('qa.expand_aria', {
+                    title: question.title,
+                  })}
+                >
+                  <div className="flex items-start gap-3 w-full">
+                    {/* Question content */}
+                    <div className="flex-1 min-w-0">
+                      <p id={`group-question-${question.id}-title`} className="text-sm font-medium text-theme-primary line-clamp-2">
+                        {question.title}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-theme-subtle">
+                        <span>{question.author.name}</span>
+                        <span aria-hidden="true">&#183;</span>
+                        <span>{formatRelativeTime(question.created_at)}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Stats badges */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {question.has_accepted_answer && (
+                    {/* Stats badges */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {question.has_accepted_answer && (
+                        <Chip
+                          size="sm"
+                          color="success"
+                          variant="flat"
+                          startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
+                          aria-label={t('qa.accepted_badge')}
+                        >
+                          {t('qa.accepted')}
+                        </Chip>
+                      )}
                       <Chip
                         size="sm"
-                        color="success"
                         variant="flat"
-                        startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
-                        aria-label={t('qa.accepted_badge')}
+                        startContent={<MessageSquare className="w-3 h-3" aria-hidden="true" />}
+                        aria-label={t('qa.answer_count_aria', {
+                          count: question.answer_count,
+                        })}
                       >
-                        {t('qa.accepted')}
+                        {question.answer_count}
                       </Chip>
-                    )}
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      startContent={<MessageSquare className="w-3 h-3" aria-hidden="true" />}
-                      aria-label={t('qa.answer_count_aria', {
-                        count: question.answer_count,
-                      })}
-                    >
-                      {question.answer_count}
-                    </Chip>
+                    </div>
                   </div>
-                </div>
-              </Button>
+                </Button>
+              </div>
 
               {/* Expanded detail */}
               {expandedId === question.id && (
-                <div className="border-t border-border p-4 space-y-4">
+                <div
+                  id={`group-question-${question.id}-detail`}
+                  role="region"
+                  aria-labelledby={`group-question-${question.id}-title`}
+                  className="border-t border-border p-4 space-y-4"
+                >
                   {loadingDetail ? (
                     <div className="flex justify-center py-6" role="status" aria-busy="true" aria-label={t('qa.loading_detail')}>
                       <Spinner size="sm" />
+                    </div>
+                  ) : detailError ? (
+                    <div className="flex flex-col items-start gap-3 py-4" role="alert">
+                      <p className="text-sm text-danger">{t('qa.load_error')}</p>
+                      {detailError.retryable && (
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          onPress={() => void loadQuestionDetail(question.id)}
+                        >
+                          {tCommon('actions.retry')}
+                        </Button>
+                      )}
                     </div>
                   ) : expandedDetail ? (
                     <>
@@ -674,7 +720,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                                     color="success"
                                     onPress={() => handleAccept(answer.id)}
                                     aria-label={t('qa.accept_aria')}
-                                    className="flex-shrink-0"
+                                    className="min-h-11 min-w-11 flex-shrink-0"
                                   >
                                     <Check className="w-4 h-4" aria-hidden="true" />
                                   </Button>
@@ -682,6 +728,11 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                             </div>
                           ))}
                         </div>
+                      )}
+                      {expandedDetail.answers.length === 0 && (
+                        <p className="rounded-lg bg-surface-secondary/50 px-3 py-4 text-sm text-theme-muted" role="status">
+                          {t('qa.no_answers')}
+                        </p>
                       )}
 
                       {/* Answer form */}
@@ -718,7 +769,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
       )}
 
       {/* Load more */}
-      {hasMore && (
+      {hasMore && !listError && (
         <div className="flex justify-center pt-4">
           <Button variant="flat" size="sm" onPress={() => loadQuestions(false)} isLoading={loading}>
             {t('qa.load_more')}

@@ -1,0 +1,115 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { api } from '@/lib/api';
+import type { Group } from '@/types/api';
+import { GroupApiError } from './core';
+import { listGroupDirectory } from './directory';
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn(),
+  },
+}));
+
+const group: Group = {
+  id: 42,
+  name: 'Garden Crew',
+  description: 'Grow food together.',
+  members_count: 12,
+  is_member: true,
+  visibility: 'public',
+  created_at: '2026-01-01T00:00:00Z',
+};
+
+describe('listGroupDirectory', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('maps directory filters and cursor metadata to a typed page', async () => {
+    const controller = new AbortController();
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [group],
+      meta: {
+        per_page: 20,
+        has_more: true,
+        next_cursor: 'next-page',
+        total_items: 45,
+      },
+    });
+
+    const page = await listGroupDirectory({
+      search: 'garden club',
+      visibility: 'public',
+      perPage: 20,
+      cursor: 'current-page',
+      signal: controller.signal,
+    });
+
+    expect(api.get).toHaveBeenCalledWith(
+      '/v2/groups?q=garden+club&visibility=public&per_page=20&cursor=current-page',
+      { signal: controller.signal },
+    );
+    expect(page).toEqual({
+      groups: [group],
+      nextCursor: 'next-page',
+      hasMore: true,
+      totalCount: 45,
+    });
+  });
+
+  it('maps the joined-groups filter to the membership user query', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [group],
+      meta: { per_page: 20, has_more: false },
+    });
+
+    const page = await listGroupDirectory({ memberUserId: 7, perPage: 20 });
+
+    expect(api.get).toHaveBeenCalledWith(
+      '/v2/groups?user_id=7&per_page=20',
+      { signal: undefined },
+    );
+    expect(page.groups[0]?.is_member).toBe(true);
+  });
+
+  it('rejects a resolved success:false envelope as a domain error', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: false,
+      code: 'HTTP_403',
+      error: 'Raw server copy',
+    });
+
+    const request = listGroupDirectory({ perPage: 20 });
+
+    await expect(request).rejects.toBeInstanceOf(GroupApiError);
+    await expect(request).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+      messageKey: 'api_errors.forbidden',
+    });
+  });
+
+  it('normalizes thrown transport failures and malformed success data', async () => {
+    vi.mocked(api.get).mockRejectedValueOnce(new TypeError('Private transport detail'));
+
+    await expect(listGroupDirectory({ perPage: 20 })).rejects.toMatchObject({
+      code: 'NETWORK_ERROR',
+      messageKey: 'api_errors.network',
+      retryable: true,
+    });
+
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true });
+
+    await expect(listGroupDirectory({ perPage: 20 })).rejects.toMatchObject({
+      code: 'INVALID_RESPONSE',
+      messageKey: 'api_errors.invalid_response',
+      retryable: true,
+    });
+  });
+});

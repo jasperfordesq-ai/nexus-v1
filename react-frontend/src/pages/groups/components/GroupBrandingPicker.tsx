@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { ColorPicker } from '@/components/ui/ColorPicker';
+import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * Group Branding Picker
@@ -15,7 +16,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
  * Color.toString('hex') converts back on change.
  */
 
-import { useState, useCallback, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import Paintbrush from 'lucide-react/icons/paintbrush';
 import { ColorArea } from '@heroui/react/color-area';
 import { ColorField } from '@heroui/react/color-field';
@@ -28,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 interface GroupBrandingPickerProps {
   primaryColor: string | null;
   accentColor: string | null;
-  onChange: (primary: string, accent: string) => void;
+  onChange: (primary: string | null, accent: string | null) => void;
 }
 
 const DEFAULT_PRIMARY = '#0070f3';
@@ -80,6 +81,11 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
   const [primary, setPrimary] = useState(primaryColor ?? DEFAULT_PRIMARY);
   const [accent, setAccent] = useState(accentColor ?? DEFAULT_ACCENT);
 
+  useEffect(() => {
+    setPrimary(primaryColor ?? DEFAULT_PRIMARY);
+    setAccent(accentColor ?? DEFAULT_ACCENT);
+  }, [accentColor, primaryColor]);
+
   const handlePrimaryChange = useCallback(
     (value: string) => {
       setPrimary(value);
@@ -96,6 +102,12 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
     [primary, onChange]
   );
 
+  const resetBranding = useCallback(() => {
+    setPrimary(DEFAULT_PRIMARY);
+    setAccent(DEFAULT_ACCENT);
+    onChange(null, null);
+  }, [onChange]);
+
   return (
     <GlassCard className="p-5 space-y-5">
       <div className="flex items-center gap-2 mb-1">
@@ -103,6 +115,9 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
         <h3 className="text-base font-semibold text-foreground">
           {t('branding.title')}
         </h3>
+        <Button size="sm" variant="light" className="ms-auto" onPress={resetBranding}>
+          {t('branding.reset')}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

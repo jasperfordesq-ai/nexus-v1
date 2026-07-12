@@ -21,8 +21,6 @@ import {
   walletBalanceSchema,
   transactionSchema,
   transferResponseSchema,
-  eventSchema,
-  rsvpResponseSchema,
   groupSchema,
   feedPostSchema,
   messageSchema,
@@ -322,53 +320,6 @@ describe('api-schemas', () => {
     });
   });
 
-  describe('eventSchema: GET /api/v2/events/:id', () => {
-    it('validates a full event object', () => {
-      const data = { id: 10, title: 'Community Cleanup', description: 'Join us',
-        start_date: '2026-04-15', is_online: false,
-        organizer: { id: 3, first_name: 'Bob', last_name: 'Smith' },
-        attendees_count: 12, created_at: '2026-03-01T10:00:00' };
-      expect(eventSchema.safeParse(data).success).toBe(true);
-    });
-    it('validates a minimal event (required fields only)', () => {
-      const data = { id: 1, title: 'Test', description: 'A test', start_date: '2026-04-15',
-        is_online: true, organizer: { id: 1, first_name: 'Jane', last_name: 'Doe' },
-        attendees_count: 0, created_at: '2026-03-01T00:00:00' };
-      expect(eventSchema.safeParse(data).success).toBe(true);
-    });
-    it('rejects when organizer is missing first_name', () => {
-      const data = { id: 1, title: 'T', description: 'D', start_date: '2026-04-15', is_online: false,
-        organizer: { id: 1, last_name: 'Doe' }, attendees_count: 0, created_at: '2026-03-01T00:00:00' };
-      expect(eventSchema.safeParse(data).success).toBe(false);
-    });
-    it('rejects when is_online is not a boolean (catches PHP integer-to-bool drift)', () => {
-      const data = { id: 1, title: 'T', description: 'D', start_date: '2026-04-15', is_online: 'yes',
-        organizer: { id: 1, first_name: 'J', last_name: 'D' }, attendees_count: 0, created_at: '2026-01-01' };
-      expect(eventSchema.safeParse(data).success).toBe(false);
-    });
-  });
-
-  describe('rsvpResponseSchema: POST /api/v2/events/:id/rsvp', () => {
-    it('validates attending', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'attending', rsvp_counts: { going: 5, interested: 2 } }).success).toBe(true);
-    });
-    it('validates maybe', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'maybe', rsvp_counts: { going: 3, interested: 4 } }).success).toBe(true);
-    });
-    it('validates not_attending', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'not_attending', rsvp_counts: { going: 5, interested: 0 } }).success).toBe(true);
-    });
-    it('validates waitlisted with position', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'waitlisted', rsvp_counts: { going: 5, interested: 2 }, waitlist_position: 3 }).success).toBe(true);
-    });
-    it('rejects unknown RSVP status', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'yes_please', rsvp_counts: { going: 5, interested: 2 } }).success).toBe(false);
-    });
-    it('rejects when rsvp_counts is missing', () => {
-      expect(rsvpResponseSchema.safeParse({ status: 'attending' }).success).toBe(false);
-    });
-  });
-
   describe('groupSchema: GET /api/v2/groups/:id', () => {
     const base = { id: 1, name: 'G', description: 'D', members_count: 0, created_at: '2026-01-01T00:00:00' };
     it('validates public', () => { expect(groupSchema.safeParse({ ...base, visibility: 'public' }).success).toBe(true); });
@@ -479,15 +430,6 @@ describe('api-schemas', () => {
   });
 
   describe('paginatedResponseSchema: collection contract checks', () => {
-    it('validates a paginated events list', () => {
-      const schema = paginatedResponseSchema(eventSchema);
-      const data = {
-        data: [{ id: 1, title: 'Party', description: 'Fun', start_date: '2026-05-01', is_online: false,
-          organizer: { id: 1, first_name: 'A', last_name: 'B' }, attendees_count: 5, created_at: '2026-03-01T00:00:00' }],
-        meta: { per_page: 20, has_more: false },
-      };
-      expect(schema.safeParse(data).success).toBe(true);
-    });
     it('validates a paginated groups list', () => {
       const schema = paginatedResponseSchema(groupSchema);
       const data = {

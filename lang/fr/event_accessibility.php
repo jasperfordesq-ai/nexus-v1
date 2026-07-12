@@ -1,0 +1,45 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'form' => [
+        'title' => 'Accessibilité du lieu',
+        'hint' => 'Indiquez les équipements disponibles. Choisissez « Non vérifié » lorsqu’une caractéristique n’a pas été confirmée ; cela ne signifie pas « Non ».',
+        'parking_details' => 'Stationnement et arrivée',
+        'parking_details_hint' => 'Décrivez les places accessibles, les zones de dépose et le chemin jusqu’à l’entrée.',
+        'transit_details' => 'Transports en commun',
+        'transit_details_hint' => 'Décrivez les arrêts ou gares à proximité et les éventuels obstacles sur le trajet.',
+        'assistance_contact' => 'Contact pour l’assistance à l’accessibilité',
+        'assistance_contact_hint' => 'Indiquez un contact public pour les questions d’accès. N’ajoutez aucune donnée privée sur les participants.',
+        'notes' => 'Informations d’accès supplémentaires',
+        'notes_hint' => 'Ajoutez des renseignements utiles sur l’entrée, l’ascenseur, le sol, l’éclairage ou l’environnement sensoriel.',
+        'privacy_note' => 'Ces informations sont visibles par les membres de l’événement. Les besoins d’aménagement privés doivent être indiqués dans le formulaire d’inscription.',
+    ],
+    'features' => [
+        'step_free_access' => 'Accès sans marche',
+        'accessible_toilet' => 'Toilettes accessibles',
+        'hearing_loop' => 'Boucle auditive',
+        'quiet_space' => 'Espace calme',
+        'seating_available' => 'Places assises disponibles',
+        'accessible_parking' => 'Stationnement accessible',
+    ],
+    'status' => ['yes' => 'Oui', 'no' => 'Non', 'unknown' => 'Non vérifié'],
+    'filters' => [
+        'step_free_label' => 'Accès sans marche du lieu',
+        'step_free_hint' => 'Filtrer selon les informations d’accès confirmées par l’organisateur.',
+        'step_free_options' => ['any' => 'Tous les lieux', 'yes' => 'Accès sans marche confirmé', 'no' => 'Accès avec marches', 'unknown' => 'Accès sans marche inconnu'],
+        'step_free_active' => 'Accès sans marche : :value',
+    ],
+    'detail' => [
+        'title' => 'Accessibilité du lieu',
+        'intro' => 'Informations d’accès fournies par l’organisateur. Contactez-le si vous devez confirmer un aménagement.',
+        'features_label' => 'Équipements d’accessibilité du lieu',
+        'parking_details' => 'Stationnement et arrivée',
+        'transit_details' => 'Transports en commun',
+        'assistance_contact' => 'Assistance à l’accessibilité',
+        'notes' => 'Informations d’accès supplémentaires',
+    ],
+];

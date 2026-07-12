@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use App\I18n\LocaleContext;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -80,10 +81,7 @@ class GroupReportingService
                 // Find all active groups for this tenant
                 $groups = DB::table('groups')
                     ->where('tenant_id', $tenant->id)
-                    ->where(function ($q) {
-                        $q->where('is_active', 1)
-                          ->orWhereNull('is_active');
-                    })
+                    ->where('status', GroupStatus::Active->value)
                     ->select(['id', 'tenant_id', 'name', 'owner_id', 'cached_member_count'])
                     ->get();
 

@@ -192,7 +192,17 @@ export function Layout({
         // Applied at sm+ only: on mobile the navbar collapses the logo to a
         // compact icon (see TenantLogo collapseLogoOnMobile), so the bar never
         // grows there and the extra offset would just leave a dead gap.
-        style={{ '--logo-extra': branding.logoShape === 'square' ? '1.75rem' : '0rem' } as CSSProperties}
+        style={{
+          '--logo-extra': branding.logoShape === 'square' ? '1.75rem' : '0rem',
+          '--app-header-mobile-offset': withNavbarPadding && showNavbar
+            ? 'calc(var(--safe-area-top) + 5rem)'
+            : '0px',
+          '--app-header-desktop-offset': withNavbarPadding && showNavbar
+            ? isUtilityBarVisible
+              ? 'calc(var(--safe-area-top) + 7.5rem + var(--logo-extra, 0rem))'
+              : 'calc(var(--safe-area-top) + 5.5rem + var(--logo-extra, 0rem))'
+            : '0px',
+        } as CSSProperties}
         className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible

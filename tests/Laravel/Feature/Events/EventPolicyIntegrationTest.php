@@ -1,0 +1,318 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace Tests\Laravel\Feature\Events;
+
+use App\Core\TenantContext;
+use App\Enums\EventStaffRole;
+use App\Models\User;
+use App\Services\EventRoleService;
+use App\Services\EventService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
+
+final class EventPolicyIntegrationTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
+    private function user(array $overrides = [], ?int $tenantId = null): User
+    {
+        return User::factory()->forTenant($tenantId ?? $this->testTenantId)->create(array_merge([
+            'status' => 'active',
+            'is_approved' => true,
+            'role' => 'member',
+        ], $overrides));
+    }
+
+    private function event(int $organizerId, array $overrides = []): int
+    {
+        return (int) DB::table('events')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organizerId,
+            'title' => 'Policy-integrated event',
+            'description' => 'Exercises the Events policy service boundary.',
+            'start_time' => now()->addMinutes(15),
+            'end_time' => now()->addHour(),
+            'status' => 'active',
+            'is_online' => 1,
+            'online_link' => 'https://meet.example.test/policy-integration',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    private function group(int $ownerId, string $visibility = 'private'): int
+    {
+        return (int) DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $ownerId,
+            'name' => 'Policy integration group ' . uniqid(),
+            'slug' => 'policy-integration-' . uniqid(),
+            'description' => 'Private event audience.',
+            'visibility' => $visibility,
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function joinGroup(int $groupId, User $user, string $role = 'member'): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => (int) $user->getKey(),
+            'role' => $role,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function rsvp(int $eventId, User $user, string $status): void
+    {
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => (int) $user->getKey(),
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function series(User $creator): int
+    {
+        return (int) DB::table('event_series')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'title' => 'Policy integration series',
+            'description' => null,
+            'created_by' => (int) $creator->getKey(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_canonical_permissions_are_independent_and_meeting_window_remains_mapper_owned(): void
+    {
+        Carbon::setTestNow('2030-05-01 10:00:00 UTC');
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $confirmed = $this->user(['first_name' => 'Confirmed']);
+        $unrelated = $this->user(['first_name' => 'Unrelated']);
+        $eventId = $this->event((int) $organizer->getKey());
+        $this->rsvp($eventId, $confirmed, 'going');
+
+        Sanctum::actingAs($organizer, ['*']);
+        $ownerResponse = $this->apiGet(
+            "/v2/events/{$eventId}",
+            ['X-Events-Contract' => '2']
+        );
+        $ownerResponse->assertOk()
+            ->assertJsonPath('data.permissions.edit', true)
+            ->assertJsonPath('data.permissions.manage_people', true)
+            ->assertJsonPath('data.permissions.check_in', true)
+            ->assertJsonPath('data.permissions.message', true)
+            ->assertJsonPath('data.permissions.export', true)
+            ->assertJsonPath('data.permissions.manage_agenda', true)
+            ->assertJsonPath('data.permissions.manage_staff', true)
+            ->assertJsonPath('data.permissions.manage_finance', true)
+            ->assertJsonPath('data.permissions.transfer_ownership', true)
+            ->assertJsonPath('data.online_access.reveal_state', 'available');
+
+        Sanctum::actingAs($confirmed, ['*']);
+        $confirmedResponse = $this->apiGet(
+            "/v2/events/{$eventId}",
+            ['X-Events-Contract' => '2']
+        );
+        $confirmedResponse->assertOk()
+            ->assertJsonPath('data.permissions.edit', false)
+            ->assertJsonPath('data.permissions.manage_people', false)
+            ->assertJsonPath('data.permissions.check_in', false)
+            ->assertJsonPath('data.permissions.message', false)
+            ->assertJsonPath('data.permissions.export', false)
+            ->assertJsonPath('data.permissions.manage_agenda', false)
+            ->assertJsonPath('data.permissions.manage_staff', false)
+            ->assertJsonPath('data.permissions.manage_finance', false)
+            ->assertJsonPath('data.permissions.transfer_ownership', false)
+            ->assertJsonPath('data.online_access.reveal_state', 'available');
+
+        Carbon::setTestNow('2030-05-01 08:00:00 UTC');
+        $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.online_access.reveal_state', 'scheduled')
+            ->assertJsonPath('data.online_access.join_url', null);
+
+        Sanctum::actingAs($unrelated, ['*']);
+        $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.permissions.edit', false)
+            ->assertJsonPath('data.online_access.reveal_state', 'restricted')
+            ->assertJsonPath('data.online_access.join_url', null);
+    }
+
+    public function test_delegated_roles_reach_the_canonical_contract_without_broad_privilege_leakage(): void
+    {
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $communications = $this->user(['first_name' => 'Communications']);
+        $finance = $this->user(['first_name' => 'Finance']);
+        $eventId = $this->event((int) $organizer->getKey());
+        TenantContext::setById($this->testTenantId);
+        $roles = new EventRoleService();
+        $roles->grant(
+            $eventId,
+            (int) $communications->getKey(),
+            EventStaffRole::CommunicationsManager,
+            $organizer,
+        );
+        $roles->grant(
+            $eventId,
+            (int) $finance->getKey(),
+            EventStaffRole::FinanceManager,
+            $organizer,
+        );
+
+        Sanctum::actingAs($communications, ['*']);
+        $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.permissions.edit', false)
+            ->assertJsonPath('data.permissions.message', true)
+            ->assertJsonPath('data.permissions.broadcast', true)
+            ->assertJsonPath('data.permissions.manage_agenda', false)
+            ->assertJsonPath('data.permissions.manage_staff', false)
+            ->assertJsonPath('data.permissions.manage_finance', false)
+            ->assertJsonPath('data.permissions.transfer_ownership', false);
+
+        Sanctum::actingAs($finance, ['*']);
+        $this->apiGet("/v2/events/{$eventId}", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.permissions.edit', false)
+            ->assertJsonPath('data.permissions.message', false)
+            ->assertJsonPath('data.permissions.manage_agenda', false)
+            ->assertJsonPath('data.permissions.manage_finance', true)
+            ->assertJsonPath('data.permissions.reconcile_credits', true)
+            ->assertJsonPath('data.permissions.reconcile_tickets', true)
+            ->assertJsonPath('data.permissions.transfer_ownership', false);
+    }
+
+    public function test_complete_roster_and_waitlist_are_manager_only_while_own_position_survives(): void
+    {
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $confirmed = $this->user(['first_name' => 'Confirmed']);
+        $waitlisted = $this->user(['first_name' => 'Waitlisted']);
+        $eventId = $this->event((int) $organizer->getKey());
+        $this->rsvp($eventId, $confirmed, 'going');
+        DB::table('event_waitlist')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => (int) $waitlisted->getKey(),
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Sanctum::actingAs($confirmed, ['*']);
+        $this->apiGet("/v2/events/{$eventId}/attendees", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+
+        Sanctum::actingAs($waitlisted, ['*']);
+        $waitlistResponse = $this->apiGet("/v2/events/{$eventId}/waitlist");
+        $waitlistResponse->assertOk()->assertJsonCount(0, 'data');
+        $this->assertSame(1, $waitlistResponse->json('meta.user_position'));
+
+        Sanctum::actingAs($organizer, ['*']);
+        $this->apiGet("/v2/events/{$eventId}/attendees", ['X-Events-Contract' => '2'])
+            ->assertOk()
+            ->assertJsonPath('data.0.id', (int) $confirmed->getKey());
+        $this->apiGet("/v2/events/{$eventId}/waitlist")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', (int) $waitlisted->getKey());
+    }
+
+    public function test_manage_attendance_and_series_link_share_the_policy_boundary(): void
+    {
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $attendee = $this->user(['first_name' => 'Attendee']);
+        $unrelated = $this->user(['first_name' => 'Unrelated']);
+        $eventId = $this->event((int) $organizer->getKey());
+        $seriesId = $this->series($organizer);
+        $this->rsvp($eventId, $attendee, 'going');
+
+        Sanctum::actingAs($unrelated, ['*']);
+        $this->apiPut("/v2/events/{$eventId}", ['title' => 'Forbidden edit'])
+            ->assertForbidden();
+        $this->apiGet("/v2/events/{$eventId}/attendance")
+            ->assertForbidden();
+        $this->apiPost("/v2/events/{$eventId}/attendance", ['user_id' => $attendee->id])
+            ->assertForbidden();
+        $this->apiPost("/v2/events/{$eventId}/series", ['series_id' => $seriesId])
+            ->assertForbidden();
+
+        Sanctum::actingAs($organizer, ['*']);
+        $this->apiPut("/v2/events/{$eventId}", ['title' => 'Authorised edit'])
+            ->assertOk();
+        $this->apiPost("/v2/events/{$eventId}/attendance", ['user_id' => $attendee->id])
+            ->assertOk();
+        $this->apiPost("/v2/events/{$eventId}/series", ['series_id' => $seriesId])
+            ->assertOk();
+
+        $this->assertSame(
+            'Authorised edit',
+            DB::table('events')->where('id', $eventId)->value('title')
+        );
+        $this->assertSame(
+            $seriesId,
+            (int) DB::table('events')->where('id', $eventId)->value('series_id')
+        );
+        $this->assertTrue(
+            DB::table('event_attendance')
+                ->where('event_id', $eventId)
+                ->where('user_id', $attendee->id)
+                ->exists()
+        );
+    }
+
+    public function test_private_group_and_cross_tenant_direct_ids_fail_closed(): void
+    {
+        $organizer = $this->user(['first_name' => 'Organizer']);
+        $member = $this->user(['first_name' => 'Member']);
+        $groupAdmin = $this->user(['first_name' => 'Group Admin']);
+        $outsider = $this->user(['first_name' => 'Outsider']);
+        $foreign = $this->user(['first_name' => 'Foreign'], 999);
+        $groupId = $this->group((int) $organizer->getKey());
+        $this->joinGroup($groupId, $organizer, 'owner');
+        $this->joinGroup($groupId, $member);
+        $this->joinGroup($groupId, $groupAdmin, 'admin');
+        $eventId = $this->event((int) $organizer->getKey(), ['group_id' => $groupId]);
+
+        Sanctum::actingAs($member, ['*']);
+        $this->apiGet("/v2/events/{$eventId}")->assertOk();
+
+        Sanctum::actingAs($outsider, ['*']);
+        $this->apiGet("/v2/events/{$eventId}")->assertNotFound();
+
+        Sanctum::actingAs($groupAdmin, ['*']);
+        $this->apiGet("/v2/events/{$eventId}")->assertOk();
+        $this->apiPut("/v2/events/{$eventId}", ['title' => 'Group admin cannot take ownership'])
+            ->assertForbidden();
+
+        TenantContext::setById($this->testTenantId);
+        $this->assertNull(EventService::getById($eventId, (int) $foreign->getKey()));
+    }
+}

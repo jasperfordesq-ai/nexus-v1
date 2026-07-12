@@ -17,62 +17,59 @@ import { useState, useEffect } from 'react';
 
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Save from 'lucide-react/icons/save';
-import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
+import {
+  getGroupWelcomeConfig,
+  updateGroupWelcomeConfig,
+  type GroupWelcomeConfig,
+} from '../api';
 
 interface WelcomeConfigPanelProps {
   groupId: number;
   isAdmin: boolean;
 }
 
-interface WelcomeConfig {
-  enabled: boolean;
-  message: string;
-}
+const DEFAULT_WELCOME_CONFIG: GroupWelcomeConfig = {
+  enabled: false,
+  message: '',
+};
 
 export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps) {
   const { t } = useTranslation('groups');
   const toast = useToast();
 
-  const [config, setConfig] = useState<WelcomeConfig>({
-    enabled: false,
-    message: '',
-  });
+  const [config, setConfig] = useState<GroupWelcomeConfig>(DEFAULT_WELCOME_CONFIG);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!isAdmin) return;
+    const controller = new AbortController();
+
     async function loadConfig() {
       setLoading(true);
+      setConfig(DEFAULT_WELCOME_CONFIG);
       try {
-        const res = await api.get(`/v2/groups/${groupId}/welcome`);
-        if (res.success && res.data) {
-          const data = res.data as WelcomeConfig;
-          setConfig({
-            enabled: data.enabled ?? false,
-            message: data.message ?? '',
-          });
-        }
+        const data = await getGroupWelcomeConfig(groupId, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        setConfig(data);
       } catch {
         // Defaults are fine if no config exists yet
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     loadConfig();
-  }, [groupId]);
+    return () => controller.abort();
+  }, [groupId, isAdmin]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await api.put(`/v2/groups/${groupId}/welcome`, config);
-      if (res.success) {
-        toast.success(t('welcome.saved'));
-      } else {
-        toast.error(t('welcome.save_failed'));
-      }
+      await updateGroupWelcomeConfig(groupId, config);
+      toast.success(t('welcome.saved'));
     } catch {
       toast.error(t('welcome.save_failed'));
     } finally {

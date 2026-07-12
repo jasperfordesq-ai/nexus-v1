@@ -53,13 +53,17 @@ interface Tenant {
   domain?: string;
   tagline?: string;
   logo_url?: string;
+  features?: {
+    biometric_login?: boolean;
+  };
   authentication_config?: {
     'passkeys.conditional_autofill'?: boolean;
+    'passkeys.enrollment_enabled'?: boolean;
   };
 }
 
 function browserHasPasskeyApi(): boolean {
-  return typeof window !== 'undefined' && 'PublicKeyCredential' in window;
+  return typeof window !== 'undefined' && typeof window.PublicKeyCredential === 'function';
 }
 
 export function LoginPage() {
@@ -80,7 +84,7 @@ export function LoginPage() {
     twoFactorTrustDeviceAllowed,
     twoFactorTrustedDeviceDays,
   } = useAuth();
-  const { tenant, branding, tenantSlug, tenantPath, authenticationConfig, isLoading: tenantLoading } = useTenant();
+  const { tenant, branding, tenantSlug, tenantPath, authenticationConfig, hasFeature, isLoading: tenantLoading } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();
 
@@ -110,11 +114,19 @@ export function LoginPage() {
   const [resendVerificationSent, setResendVerificationSent] = useState(false);
 
   // Passkey login state
-  const [biometricAvailable, setBiometricAvailable] = useState(browserHasPasskeyApi);
+  const biometricAvailable = browserHasPasskeyApi();
   const [biometricLoading, setBiometricLoading] = useState(false);
   const conditionalAbortRef = useRef<AbortController | null>(null);
   const conditionalStartedRef = useRef(false);
+  const biometricAbortRef = useRef<AbortController | null>(null);
+  const biometricInFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+  const selectedTenantIdRef = useRef(selectedTenantId);
+  selectedTenantIdRef.current = selectedTenantId;
   const selectedTenant = tenants.find((candidate) => String(candidate.id) === selectedTenantId);
+  const passkeyAuthenticationEnabled = selectedTenant
+    ? selectedTenant.features?.biometric_login === true
+    : hasFeature('biometric_login');
   const conditionalAutofillEnabled = selectedTenant?.authentication_config?.['passkeys.conditional_autofill']
     ?? authenticationConfig?.['passkeys.conditional_autofill']
     ?? true;
@@ -131,46 +143,74 @@ export function LoginPage() {
   // email field. Loading SimpleWebAuthn on mount was competing with login paint.
   const startConditionalAuth = useCallback(async () => {
     if (conditionalStartedRef.current) return;
+    if (biometricInFlightRef.current) return;
     if (!selectedTenantId) return;
+    if (!passkeyAuthenticationEnabled) return;
     if (!conditionalAutofillEnabled) return;
-    if (!browserHasPasskeyApi()) {
-      setBiometricAvailable(false);
-      return;
-    }
+    if (!browserHasPasskeyApi()) return;
 
     conditionalStartedRef.current = true;
-    const {
-      isConditionalMediationAvailable,
-      startConditionalAuthentication,
-    } = await import('@/lib/webauthn');
-    const supported = await isConditionalMediationAvailable();
-    if (!supported) {
-      setBiometricAvailable(false);
-      return;
-    }
-
-    // Abort any previous conditional auth
     conditionalAbortRef.current?.abort();
     const controller = new AbortController();
     conditionalAbortRef.current = controller;
+    const tenantId = selectedTenantId;
+    let conditionalUnsupported = false;
 
-    // Set tenant for API calls
-    tokenManager.setTenantId(selectedTenantId);
+    try {
+      const {
+        isConditionalMediationAvailable,
+        startConditionalAuthentication,
+      } = await import('@/lib/webauthn');
+      if (controller.signal.aborted || selectedTenantIdRef.current !== tenantId) return;
 
-    const result = await startConditionalAuthentication(controller.signal);
-    if (result?.success && result.data) {
-      // Passkey autofill succeeded — store tokens and reload to bootstrap auth
-      tokenManager.setAccessToken(result.data.access_token);
-      tokenManager.setRefreshToken(result.data.refresh_token);
-      window.location.href = from;
+      const supported = await isConditionalMediationAvailable();
+      if (controller.signal.aborted || selectedTenantIdRef.current !== tenantId) return;
+      if (!supported) {
+        conditionalUnsupported = true;
+        return;
+      }
+
+      // Bind every request and eventual token write to this immutable tenant.
+      tokenManager.setTenantId(tenantId);
+
+      const result = await startConditionalAuthentication(controller.signal);
+      if (controller.signal.aborted || selectedTenantIdRef.current !== tenantId) return;
+      if (result?.success && result.data) {
+        // Reload so AuthContext bootstraps the authenticated session normally.
+        tokenManager.setAccessToken(result.data.access_token);
+        tokenManager.setRefreshToken(result.data.refresh_token);
+        window.location.href = from;
+      }
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        logError('[LoginPage] Conditional passkey sign-in failed', err);
+      }
+    } finally {
+      if (conditionalAbortRef.current === controller) {
+        conditionalAbortRef.current = null;
+        conditionalStartedRef.current = conditionalUnsupported;
+      }
     }
-  }, [selectedTenantId, conditionalAutofillEnabled, from]);
+  }, [selectedTenantId, passkeyAuthenticationEnabled, conditionalAutofillEnabled, from]);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       conditionalAbortRef.current?.abort();
+      biometricAbortRef.current?.abort();
     };
   }, []);
+
+  useEffect(() => {
+    conditionalAbortRef.current?.abort();
+    conditionalAbortRef.current = null;
+    conditionalStartedRef.current = false;
+    biometricAbortRef.current?.abort();
+    biometricAbortRef.current = null;
+    biometricInFlightRef.current = false;
+    setBiometricLoading(false);
+  }, [selectedTenantId, passkeyAuthenticationEnabled, conditionalAutofillEnabled]);
 
   // Tenant is "resolved from URL" only when there's an explicit URL slug or
   // the hostname is a custom tenant domain (not the generic app.* domain).
@@ -233,9 +273,11 @@ export function LoginPage() {
 
   // Handle tenant selection from dropdown
   const handleTenantChange = (keys: unknown) => {
+    if (biometricInFlightRef.current || status === 'loading') return;
     if (keys === 'all' || !keys || !(keys instanceof Set)) return;
     const tenantId = Array.from(keys as Set<string>)[0] || '';
     conditionalAbortRef.current?.abort();
+    conditionalAbortRef.current = null;
     conditionalStartedRef.current = false;
     setSelectedTenantId(tenantId);
     if (tenantId) {
@@ -259,9 +301,13 @@ export function LoginPage() {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
+    if (biometricInFlightRef.current) return;
     if (!email.trim() || !password.trim()) return;
     if (!selectedTenantId) return;
 
+    conditionalAbortRef.current?.abort();
+    conditionalAbortRef.current = null;
+    conditionalStartedRef.current = false;
     setLoginErrorCode(undefined);
     setLoginRetryAfter(null);
     setResendVerificationSent(false);
@@ -296,31 +342,56 @@ export function LoginPage() {
   };
 
   const handleBiometricLogin = async () => {
-    if (!selectedTenantId) return;
-    setBiometricLoading(true);
+    if (!selectedTenantId || !passkeyAuthenticationEnabled || isLoading || biometricInFlightRef.current) return;
+    const tenantId = selectedTenantId;
+    const controller = new AbortController();
+    biometricAbortRef.current?.abort();
+    biometricAbortRef.current = controller;
+    biometricInFlightRef.current = true;
+
+    conditionalAbortRef.current?.abort();
+    conditionalAbortRef.current = null;
+    conditionalStartedRef.current = false;
+
+    if (mountedRef.current) setBiometricLoading(true);
     tokenManager.clearTokens();
-    tokenManager.setTenantId(selectedTenantId);
+    tokenManager.setTenantId(tenantId);
 
-    const result = await loginWithBiometric(email || undefined);
-    setBiometricLoading(false);
+    try {
+      const result = await loginWithBiometric(undefined, controller.signal);
+      if (controller.signal.aborted || selectedTenantIdRef.current !== tenantId) return;
 
-    if (result.success) {
-      navigate(from, { replace: true });
-    } else if (result.errorCode === 'cancelled' || result.error?.includes('cancelled')) {
-      // User cancelled — do nothing
-    } else if (result.errorCode === 'domain_not_allowed') {
-      // Server issued an RP ID that isn't valid for this domain — a platform
-      // configuration problem, not something the user can fix locally.
-      console.error('[webauthn] RP ID rejected for this origin:', result.error);
-      toast.error(t('passkey_error_domain'));
-    } else if (result.error?.includes('not found') || result.error?.includes('Credential not found')) {
-      // No passkey registered for this account
-      toast.error(t('passkey_not_found'));
-    } else {
-      // Anything else (expired challenge, network failure, server rejection)
-      // must surface — silently dropping it reads as "the button does nothing".
-      console.error('[webauthn] login failed:', result.error);
-      toast.error(t('passkey_login_failed'));
+      if (result.success) {
+        navigate(from, { replace: true });
+      } else if (result.errorCode === 'cancelled') {
+        // User cancelled; no error is necessary.
+      } else if (
+        result.errorCode === 'domain_not_allowed'
+        || result.errorCode === 'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED'
+      ) {
+        logError('[LoginPage] Passkey RP ID rejected for this origin', result.error);
+        toast.error(t('passkey_error_domain'));
+      } else if (result.errorCode === 'FEATURE_DISABLED') {
+        toast.error(t('passkey_disabled'));
+      } else if (result.errorCode === 'AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND') {
+        // Compatibility with older servers. Current public login normalises
+        // this code to avoid account/passkey enumeration.
+        toast.error(t('passkey_not_found'));
+      } else {
+        logError('[LoginPage] Passkey sign-in failed', result.error);
+        toast.error(t('passkey_login_failed'));
+      }
+    } catch (err) {
+      if (!controller.signal.aborted) {
+        logError('[LoginPage] Passkey sign-in failed before completion', err);
+        toast.error(t('passkey_login_failed'));
+      }
+    } finally {
+      if (biometricAbortRef.current === controller) {
+        biometricAbortRef.current = null;
+        biometricInFlightRef.current = false;
+        if (mountedRef.current) setBiometricLoading(false);
+      }
     }
   };
 
@@ -513,6 +584,7 @@ export function LoginPage() {
                         onChange={(key) => handleTenantChange(key && !Array.isArray(key) ? new Set([String(key)]) : new Set<string>())}
                         startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
                         isRequired
+                        isDisabled={isLoading || biometricLoading}
                         classNames={{
                           trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
                           value: 'text-theme-primary',
@@ -554,6 +626,8 @@ export function LoginPage() {
                     )}
 
                     <Input
+                      id="login-email"
+                      name="username"
                       type="email"
                       label={t('login.email_label')}
                       placeholder={t('login.email_placeholder')}
@@ -562,7 +636,7 @@ export function LoginPage() {
                       onFocus={() => { void startConditionalAuth(); }}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                       isRequired
-                      autoComplete="email webauthn"
+                      autoComplete="username webauthn"
                       classNames={{
                         inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
@@ -570,6 +644,8 @@ export function LoginPage() {
                       }} />
 
                     <Input
+                      id="login-password"
+                      name="password"
                       type={showPassword ? 'text' : 'password'}
                       label={t('login.password_label')}
                       placeholder={t('login.password_placeholder')}
@@ -622,7 +698,7 @@ export function LoginPage() {
                   </form>
 
                   {/* Passkey Login */}
-                  {biometricAvailable && selectedTenantId && (
+                  {biometricAvailable && passkeyAuthenticationEnabled && selectedTenantId && (
                     <>
                       <div className="relative flex items-center my-5">
                         <div className="flex-grow border-t border-[var(--border-default)]" />
@@ -637,7 +713,7 @@ export function LoginPage() {
                         variant="secondary"
                         onPress={handleBiometricLogin}
                         isLoading={biometricLoading}
-                        isDisabled={isLoading}
+                        isDisabled={isLoading || biometricLoading}
                         className="w-full border-accent/30 text-theme-primary hover:bg-accent/10"
                         size="lg"
                         startContent={

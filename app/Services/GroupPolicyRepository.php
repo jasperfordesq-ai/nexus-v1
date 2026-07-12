@@ -73,8 +73,7 @@ class GroupPolicyRepository
                 );
             }
 
-            // Invalidate cache
-            Cache::forget("group_policies:{$tenantId}");
+            $this->invalidateTenantCaches($tenantId);
 
             return true;
         } catch (\Throwable $e) {
@@ -224,8 +223,7 @@ class GroupPolicyRepository
                 [$tenantId, $key]
             );
 
-            // Invalidate cache
-            Cache::forget("group_policies:{$tenantId}");
+            $this->invalidateTenantCaches($tenantId);
 
             return $affected > 0;
         } catch (\Throwable $e) {
@@ -241,6 +239,19 @@ class GroupPolicyRepository
     // =========================================================================
     // Value encoding/decoding
     // =========================================================================
+
+    /**
+     * Clear both repository and runtime configuration projections.
+     *
+     * GroupConfigurationService serves policy-backed runtime decisions from
+     * group_config:{tenant}; clearing only this repository's grouped view would
+     * leave those decisions stale for up to one hour after an admin write.
+     */
+    private function invalidateTenantCaches(int $tenantId): void
+    {
+        Cache::forget("group_policies:{$tenantId}");
+        Cache::forget("group_config:{$tenantId}");
+    }
 
     /**
      * Encode a value for storage based on its type.

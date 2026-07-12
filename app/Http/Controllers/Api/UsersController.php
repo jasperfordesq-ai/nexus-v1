@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ use App\Models\User;
 use App\Services\MemberRankingService;
 use App\Services\OnboardingConfigService;
 use App\Services\GamificationService;
+use App\Services\GroupAccessService;
 use App\Models\UserBadge;
 
 /**
@@ -512,11 +514,14 @@ class UsersController extends BaseApiController
         $data = $this->getAllInput();
         $language = $data['language'] ?? null;
 
-        $validLanguages = TenantContext::getSetting('supported_languages', ['en', 'ga']);
+        $validLanguages = TenantContext::getSetting('supported_languages', SetLocale::SUPPORTED_LOCALES);
+        if (!is_array($validLanguages)) {
+            $validLanguages = SetLocale::SUPPORTED_LOCALES;
+        }
         if (!$language || !in_array($language, $validLanguages, true)) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Invalid language. Must be one of: ' . implode(', ', $validLanguages),
+                __('api.invalid_language', ['lang' => (string) $language]),
                 'language',
                 400
             );
@@ -698,6 +703,7 @@ class UsersController extends BaseApiController
     public function notificationPreferences(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
         $prefs = User::getNotificationPreferences($userId);
 
@@ -706,6 +712,7 @@ class UsersController extends BaseApiController
         // payload so the React settings UI can render a toggle for it.
         $fedEnabled = (bool) (DB::table('users')
             ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
             ->value('federation_notifications_enabled') ?? 1);
 
         return $this->respondWithData([
@@ -715,6 +722,7 @@ class UsersController extends BaseApiController
             'email_connections'             => (bool) ($prefs['email_connections'] ?? true),
             'email_transactions'            => (bool) ($prefs['email_transactions'] ?? true),
             'email_reviews'                 => (bool) ($prefs['email_reviews'] ?? true),
+            'email_events'                  => (bool) ($prefs['email_events'] ?? true),
             'email_gamification_digest'     => (bool) ($prefs['email_gamification_digest'] ?? true),
             'email_gamification_milestones' => (bool) ($prefs['email_gamification_milestones'] ?? true),
             'email_org_payments'            => (bool) ($prefs['email_org_payments'] ?? true),
@@ -739,9 +747,10 @@ class UsersController extends BaseApiController
         $data = $this->getAllInput();
 
         $prefs = [];
+        $invalidKey = null;
         $allowedKeys = [
             'email_messages', 'email_listings', 'email_digest',
-            'email_connections', 'email_transactions', 'email_reviews',
+            'email_connections', 'email_transactions', 'email_reviews', 'email_events',
             'email_gamification_digest', 'email_gamification_milestones',
             'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
             'caring_smart_nudges',
@@ -750,29 +759,57 @@ class UsersController extends BaseApiController
 
         foreach ($allowedKeys as $key) {
             if (array_key_exists($key, $data)) {
-                $prefs[$key] = (bool) $data[$key];
+                $normalized = filter_var($data[$key], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                if ($normalized === null) {
+                    $invalidKey = $key;
+                    break;
+                }
+                $prefs[$key] = $normalized;
             }
         }
 
-        if (empty($prefs)) {
+        $hasFederationPreference = array_key_exists('federation_notifications_enabled', $data);
+        $federationPreference = null;
+        if ($invalidKey === null && $hasFederationPreference) {
+            $federationPreference = filter_var(
+                $data['federation_notifications_enabled'],
+                FILTER_VALIDATE_BOOL,
+                FILTER_NULL_ON_FAILURE,
+            );
+            if ($federationPreference === null) {
+                $invalidKey = 'federation_notifications_enabled';
+            }
+        }
+
+        if ($invalidKey !== null) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.user_invalid_notification_preference', ['field' => $invalidKey]),
+                $invalidKey,
+                422,
+            );
+        }
+
+        if (empty($prefs) && !$hasFederationPreference) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.user_no_valid_prefs'), null, 400);
         }
 
-        $success = User::updateNotificationPreferences($userId, $prefs);
+        $success = $prefs === [] || User::updateNotificationPreferences($userId, $prefs);
 
         // `federation_notifications_enabled` is a column, not part of the
         // notification_preferences JSON. Update it separately when present.
-        if (array_key_exists('federation_notifications_enabled', $data)) {
+        if ($hasFederationPreference) {
             try {
                 $tenantId = TenantContext::getId();
                 DB::table('users')
                     ->where('id', $userId)
                     ->where('tenant_id', $tenantId)
                     ->update([
-                        'federation_notifications_enabled' => (bool) $data['federation_notifications_enabled'] ? 1 : 0,
+                        'federation_notifications_enabled' => $federationPreference ? 1 : 0,
                         'updated_at' => now(),
                     ]);
             } catch (\Throwable $e) {
+                $success = false;
                 Log::warning('Failed to update federation_notifications_enabled', [
                     'user_id' => $userId,
                     'error'   => $e->getMessage(),
@@ -1131,11 +1168,7 @@ class UsersController extends BaseApiController
             // Validate context_id belongs to the user's tenant
             $tenantId = TenantContext::getId();
             if ($contextType === 'group') {
-                $exists = DB::table('groups')
-                    ->where('id', $contextId)
-                    ->where('tenant_id', $tenantId)
-                    ->exists();
-                if (!$exists) {
+                if (! GroupAccessService::canViewMemberContent($contextId, $userId)) {
                     return $this->error(__('api_controllers_2.users.invalid_group_id'), 400);
                 }
             } elseif ($contextType === 'thread') {

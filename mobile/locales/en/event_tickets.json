@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Event tickets",
+      "gatewayDisabledTitle": "Paid and time-credit checkout is disabled",
+      "gatewayDisabledDescription": "This mobile flow supports free ticket allocation only. It never charges money or time credits and does not change your wallet.",
+      "loading": "Loading event tickets",
+      "loadFailedTitle": "Unable to load tickets",
+      "loadFailedDescription": "The event ticket catalogue could not be loaded. Try again.",
+      "myTicketsTitle": "My tickets",
+      "noTickets": "You do not have a ticket for this event.",
+      "ticketFallback": "Event ticket",
+      "entitlementSummary": "{{count}} ticket · {{status}}",
+      "entitlementSummary_other": "{{count}} tickets · {{status}}",
+      "cancelTicket": "Cancel ticket",
+      "timeCreditCancelDisabled": "Time-credit ticket cancellation is unavailable in this free-only flow. No wallet action has been taken.",
+      "cancelTitle": "Cancel this free ticket?",
+      "cancelDescription": "Give a short reason. The quantity will return to the free allocation.",
+      "reasonLabel": "Cancellation reason",
+      "confirmCancellation": "Confirm cancellation",
+      "reasonInvalidTitle": "Check the cancellation reason",
+      "reasonInvalidDescription": "Enter a reason of no more than 500 characters.",
+      "cancelledTitle": "Free ticket cancelled",
+      "cancelledDescription": "The quantity has been returned to the free allocation.",
+      "cancelFailedTitle": "Unable to cancel ticket",
+      "cancelFailedDescription": "Refresh the catalogue and try again.",
+      "catalogueTitle": "Available tickets",
+      "catalogueEmpty": "No ticket types are available for this event.",
+      "free": "Free",
+      "timeCreditPrice": "{{credits}} time credits",
+      "remaining": "{{count}} remaining",
+      "remaining_other": "{{count}} remaining",
+      "timeCreditDisabledTitle": "Time-credit checkout unavailable",
+      "timeCreditDisabledDescription": "The approved wallet gateway is not connected. No credits can be debited from this screen.",
+      "unitsLabel": "Quantity (up to {{count}})",
+      "registrationRequired": "A confirmed event registration is required before claiming a free ticket.",
+      "notEligible": "You do not currently meet this ticket type’s eligibility rules.",
+      "salesClosed": "This ticket type is not currently open for allocation.",
+      "soldOut": "No free tickets remain for you in this allocation.",
+      "claimFreeTicket": "Claim free ticket",
+      "unitsInvalidTitle": "Check the quantity",
+      "unitsInvalidDescription": "Enter a whole number between 1 and {{count}}.",
+      "allocatedTitle": "Free ticket allocated",
+      "allocatedDescription": "Your ticket is now confirmed.",
+      "allocateFailedTitle": "Unable to allocate ticket",
+      "allocateFailedDescription": "Check your registration, eligibility and remaining allocation, then try again."
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    }
+  }
+}

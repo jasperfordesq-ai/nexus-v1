@@ -1,0 +1,51 @@
+{
+  "templates": {
+    "mobile": {
+      "title": "Modèles d'événements",
+      "safetyTitle": "Configuration de copie de modèles uniquement",
+      "safetyDescription": "Les personnes, les inscriptions, les réponses privées, les présences, les tickets, l'historique des livraisons, les identifiants de la fédération et l'état de publication ne sont jamais copiés.",
+      "loading": "Chargement des modèles d'événements",
+      "loadFailedTitle": "Impossible de charger les modèles",
+      "loadFailedDescription": "La bibliothèque de modèles n'a pas pu être chargée. Essayer à nouveau.",
+      "emptyTitle": "Aucun modèle trouvé",
+      "emptyDescription": "Enregistrez un événement en tant que modèle sur le Web pour créer une bibliothèque de configuration réutilisable.",
+      "source": "Source : {{title}}",
+      "versionAndUses": "Version {{version}} · Utilisations : {{count}}",
+      "useTemplate": "Utiliser un modèle",
+      "scheduleTitle": "Programmer le nouvel événement",
+      "scheduleDescription": "Vérifiez le titre, le fuseau horaire et le calendrier futur. Un nouveau brouillon sera créé.",
+      "eventTitle": "Titre de l'événement",
+      "start": "Commencer",
+      "end": "Fin (facultatif)",
+      "timezone": "Fuseau horaire",
+      "datePlaceholder": "YYYY-MM-DDTHH:mm",
+      "optionalDatePlaceholder": "En option YYYY-MM-DDTHH:mm",
+      "validationTitle": "Vérifiez les détails du projet",
+      "validationDescription": "Entrez un titre, un fuseau horaire et un calendrier futur valide.",
+      "previewFailedTitle": "Impossible de réviser le brouillon",
+      "previewFailedDescription": "Le serveur n'a pas pu préparer l'aperçu du brouillon sécurisé.",
+      "review": "Ébauche de révision",
+      "reviewTitle": "Examiner le nouveau projet d'événement",
+      "reviewDescription": "Confirmez les vérifications du serveur avant de créer le brouillon.",
+      "readyTitle": "Prêt à créer un brouillon",
+      "readyDescription": "La version actuelle, les champs sécurisés, le calendrier et le workflow de création ont été vérifiés.",
+      "draftState": "État de publication : Brouillon",
+      "changeDetails": "Modifier les détails",
+      "createDraft": "Créer un brouillon",
+      "createdTitle": "Brouillon d'événement créé",
+      "createdDescription": "Révisez-le et publiez-le séparément lorsqu’il est prêt.",
+      "createFailedTitle": "Impossible de créer un brouillon",
+      "createFailedDescription": "Le brouillon de l'événement n'a pas pu être créé. Essayer à nouveau."
+    },
+    "checks": {
+      "event_template_check_source_manage": "Vous êtes toujours autorisé à gérer l'événement source",
+      "event_template_check_allowlist_exact": "Seuls les champs de configuration approuvés sont inclus",
+      "event_template_check_private_records_skipped": "Les dossiers privés et opérationnels sont exclus",
+      "event_template_check_versioned_snapshot": "La configuration est un instantané versionné immuable",
+      "event_template_check_version_current": "La version du modèle sélectionnée est actuelle",
+      "event_template_check_schedule_valid": "Le nouvel horaire est valable et dans le futur",
+      "event_template_check_federation_none": "La fédération est désactivée pour le nouveau draft",
+      "event_template_check_canonical_writer": "Le workflow de création d'événements canoniques sera utilisé"
+    }
+  }
+}

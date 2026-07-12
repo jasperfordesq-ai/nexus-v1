@@ -1,0 +1,66 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'privacy' => [
+        'title' => 'Privater und ausfallsicherer Check-in',
+        'body' => 'Signierte Teilnehmercodes enthalten weder Namen, E-Mail-Adressen noch Telefonnummern. Sie können unten einen Code ohne Kamera eingeben.',
+        'no_wallet' => 'Anwesenheitsaktionen ändern niemals Guthaben und vergeben keine Zeitgutschriften.',
+    ],
+    'code' => [
+        'title' => 'Signierten Teilnehmercode eingeben',
+        'intro' => 'Nutzen Sie diese Online-Alternative, wenn Kamera oder Offline-Mitarbeitergerät nicht verfügbar sind. Die manuelle Namenssuche folgt weiter unten.',
+        'label' => 'Teilnehmercode',
+        'hint' => 'Fügen Sie den vollständigen Code ein, der mit nqx2_ beginnt. Der Code wird nicht im Prüfprotokoll gespeichert.',
+        'action' => 'Anwesenheitsaktion',
+        'reason' => 'Grund der Korrektur',
+        'reason_hint' => 'Beim Rückgängigmachen ist ein Grund erforderlich. Geben Sie keine vertraulichen Informationen ein.',
+        'confirm' => 'Ich habe die teilnehmende Person geprüft und die beabsichtigte Aktion ausgewählt.',
+        'submit' => 'Aktion mit signiertem Code anwenden',
+    ],
+    'actions' => [
+        'check_in' => 'Einchecken',
+        'check_out' => 'Auschecken',
+        'no_show' => 'Als nicht erschienen markieren',
+        'undo' => 'Letzte Aktion rückgängig machen',
+    ],
+    'attendee' => [
+        'manage_link' => 'Meinen Check-in-Code verwalten',
+        'title' => 'Ihr Event-Check-in-Code',
+        'intro' => 'Erstellen Sie einen signierten Code, den Sie dem Veranstaltungspersonal auf dem Bildschirm oder als Ausdruck zeigen können.',
+        'privacy' => 'Der Code identifiziert nur diese Veranstaltungsregistrierung. Er enthält keinen Namen, keine E-Mail-Adresse und keine Telefonnummer.',
+        'notice_issued' => 'Ihr neuer Check-in-Code wird unten angezeigt.',
+        'notice_replaced' => 'Ihr bisheriger Code funktioniert nicht mehr. Der Ersatz wird unten angezeigt.',
+        'notice_revoked' => 'Ihr Check-in-Code wurde widerrufen.',
+        'notice_already_active' => 'Es gibt bereits einen aktiven Code. Ersetzen Sie ihn, wenn Ihre Kopie nicht verfügbar ist.',
+        'notice_invalid' => 'Bestätigen Sie die gewünschte Aktion und versuchen Sie es erneut.',
+        'notice_failed' => 'Der Check-in-Code konnte nicht geändert werden. Aktualisieren Sie die Seite und versuchen Sie es erneut.',
+        'status_heading' => 'Codestatus',
+        'status_active' => 'Aktiv',
+        'status_rotated' => 'Ersetzt',
+        'status_revoked' => 'Widerrufen',
+        'status_expired' => 'Abgelaufen',
+        'expires' => 'Läuft am :date ab',
+        'one_shot_heading' => 'Speichern Sie diesen Code jetzt',
+        'one_shot' => 'Aus Sicherheitsgründen wird der vollständige Code nur beim Erstellen oder Ersetzen angezeigt.',
+        'code_label' => 'Signierter Check-in-Code',
+        'code_hint' => 'Markieren und kopieren Sie den vollständigen Code, der mit nqx2_ beginnt.',
+        'print_hint' => 'Sie können diese Seite drucken oder eine barrierefreie Kopie speichern. Halten Sie den Code bis zum Check-in privat.',
+        'print' => 'Diesen Code drucken',
+        'issue_confirm' => 'Mir ist bewusst, dass der vollständige Code nur einmal angezeigt wird.',
+        'issue' => 'Check-in-Code erstellen',
+        'replace' => 'Kopierten oder verlorenen Code ersetzen',
+        'replace_hint' => 'Beim Ersetzen werden alle gespeicherten oder gedruckten Kopien sofort ungültig.',
+        'replace_confirm' => 'Mir ist bewusst, dass mein aktueller Code nicht mehr funktionieren wird.',
+        'revoke' => 'Code widerrufen',
+        'reason' => 'Grund für den Widerruf',
+        'reason_hint' => 'Geben Sie einen kurzen betrieblichen Grund ohne vertrauliche Informationen an.',
+        'revoke_confirm' => 'Mir ist bewusst, dass dieser Code sofort nicht mehr funktionieren wird.',
+    ],
+    'device' => [
+        'lost' => 'Widerrufen Sie ein verlorenes Mitarbeitergerät sofort im regulären Veranstaltungsbereich. Fahren Sie hier mit dem manuellen Namens- oder Code-Check-in fort.',
+    ],
+];

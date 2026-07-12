@@ -10,19 +10,15 @@ import { Chip } from '@/components/ui/Chip';
  * Non-critical — silently fails if the API is unavailable.
  */
 
-import { useState, useEffect } from 'react';import Megaphone from 'lucide-react/icons/megaphone';
+import { useEffect, useState } from 'react';
+import Megaphone from 'lucide-react/icons/megaphone';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import { api } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
-
-interface PinnedAnnouncement {
-  id: number;
-  title: string;
-  content: string;
-  author: { name: string };
-  created_at: string;
-  is_pinned?: boolean;
-}
+import {
+  GROUP_ANNOUNCEMENTS_CHANGED_EVENT,
+  getPinnedAnnouncements,
+  type GroupAnnouncement,
+} from '../api/announcements';
 
 interface PinnedAnnouncementsBannerProps {
   groupId: number;
@@ -31,30 +27,53 @@ interface PinnedAnnouncementsBannerProps {
 
 export function PinnedAnnouncementsBanner({ groupId, isMember = true }: PinnedAnnouncementsBannerProps) {
   const { t } = useTranslation('groups');
-  const [pinned, setPinned] = useState<PinnedAnnouncement[]>([]);
+  const [pinned, setPinned] = useState<GroupAnnouncement[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [refreshRevision, setRefreshRevision] = useState(0);
 
   useEffect(() => {
-    if (!isMember) { setLoaded(true); return; }
+    const handleChanged = (event: Event) => {
+      const changedGroupId = (event as CustomEvent<{ groupId?: number }>).detail?.groupId;
+      if (changedGroupId === groupId) setRefreshRevision((value) => value + 1);
+    };
+    window.addEventListener(GROUP_ANNOUNCEMENTS_CHANGED_EVENT, handleChanged);
+    return () => window.removeEventListener(GROUP_ANNOUNCEMENTS_CHANGED_EVENT, handleChanged);
+  }, [groupId]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let isCurrent = true;
+
+    setPinned([]);
+    setLoaded(false);
+
+    if (!isMember) {
+      setLoaded(true);
+      return () => {
+        isCurrent = false;
+        controller.abort();
+      };
+    }
+
     async function load() {
       try {
-        const res = await api.get(`/v2/groups/${groupId}/announcements?pinned=1`);
-        if (res.success) {
-          const payload = res.data;
-          const items = Array.isArray(payload)
-            ? payload
-            : (payload as { items?: PinnedAnnouncement[]; announcements?: PinnedAnnouncement[] })?.items
-              ?? (payload as { announcements?: PinnedAnnouncement[] })?.announcements
-              ?? [];
-          setPinned((items as PinnedAnnouncement[]).filter((a) => a.is_pinned !== false));
-        }
+        const items = await getPinnedAnnouncements(groupId, {
+          signal: controller.signal,
+        });
+        if (isCurrent) setPinned(items);
       } catch {
         // Silently fail — banner is non-critical
+      } finally {
+        if (isCurrent) setLoaded(true);
       }
-      setLoaded(true);
     }
     load();
-  }, [groupId, isMember]);
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
+  }, [groupId, isMember, refreshRevision]);
 
   if (!loaded || pinned.length === 0) return null;
 
@@ -63,12 +82,12 @@ export function PinnedAnnouncementsBanner({ groupId, isMember = true }: PinnedAn
       {pinned.map((announcement) => (
         <div
           key={announcement.id}
-          className="flex items-start gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20"
+          className="flex min-w-0 items-start gap-3 rounded-lg border border-accent/20 bg-accent/5 p-3"
         >
-          <Megaphone className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+          <Megaphone className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
-            <SafeHtml content={announcement.content} className="text-xs text-theme-subtle mt-0.5 line-clamp-2" as="p" />
+            <p className="break-words text-sm font-medium text-theme-primary">{announcement.title}</p>
+            <SafeHtml content={announcement.content} className="mt-0.5 line-clamp-2 break-words text-xs text-theme-subtle" as="p" />
           </div>
           <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">{t('announcements.pinned')}</Chip>
         </div>

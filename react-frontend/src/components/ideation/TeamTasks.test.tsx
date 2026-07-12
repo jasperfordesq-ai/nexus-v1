@@ -4,9 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
-import React from 'react';
 import userEvent from '@testing-library/user-event';
 
 // ─── Mock api ────────────────────────────────────────────────────────────────
@@ -16,7 +15,10 @@ const { mockApi } = vi.hoisted(() => ({
 
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '' }));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return { ...actual, resolveAvatarUrl: (url: string | null) => url ?? '' };
+});
 
 // ─── Context / hooks ──────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn(), showToast: vi.fn() };
@@ -48,33 +50,12 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
-// ─── Stub HeroUI Select so it renders reliably in jsdom ──────────────────────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...actual,
-    Select: ({ label, children }: { label?: string; children?: React.ReactNode }) => (
-      <div data-testid="select">
-        <span>{label}</span>
-        {children}
-      </div>
-    ),
-    SelectItem: ({ children }: { children?: React.ReactNode }) => (
-      <div data-testid="select-item">{children}</div>
-    ),
-    useConfirm: () => mockConfirm,
-    Modal: ({ isOpen, children }: { isOpen?: boolean; children?: React.ReactNode }) =>
-      isOpen ? <div role="dialog" aria-label="Dialog">{children}</div> : null,
-    ModalContent: ({ children }: { children?: ((onClose: () => void) => React.ReactNode) | React.ReactNode }) => (
-      <div>{typeof children === 'function' ? children(() => {}) : children}</div>
-    ),
-    ModalHeader: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
-    ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
-    ModalFooter: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
-  };
+// ─── Component dependencies ───────────────────────────────────────────────────
+vi.mock('@/components/ui/ConfirmDialog', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui/ConfirmDialog')>();
+  return { ...actual, useConfirm: () => mockConfirm };
 });
 
-// ─── Stub EmptyState ──────────────────────────────────────────────────────────
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }));
@@ -88,8 +69,12 @@ const makeTask = (overrides = {}) => ({
   status: 'todo' as const,
   priority: 'medium' as const,
   assigned_to: null,
+  created_by: 1,
   due_date: null,
   created_at: '2025-06-01T10:00:00Z',
+  can_update_status: true,
+  can_edit: true,
+  can_delete: true,
   assignee: null,
   ...overrides,
 });
@@ -157,7 +142,7 @@ describe('TeamTasks', () => {
     const { TeamTasks } = await import('./TeamTasks');
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
     await waitFor(() => {
-      expect(screen.getByText(/5/)).toBeInTheDocument(); // total count
+      expect(screen.getByText('5 tasks')).toBeInTheDocument();
     });
   });
 
@@ -169,73 +154,60 @@ describe('TeamTasks', () => {
     const { TeamTasks } = await import('./TeamTasks');
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
     await waitFor(() => {
-      expect(screen.getByText(/2/)).toBeInTheDocument();
+      expect(screen.getByText('2 Overdue')).toBeInTheDocument();
     });
   });
 
   it('renders filter buttons (All, todo, in_progress, done)', async () => {
     const { TeamTasks } = await import('./TeamTasks');
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
-    // The "All" button is always rendered
+    await screen.findByTestId('empty-state');
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'To Do' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'In Progress' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
   });
 
   it('renders Create task button', async () => {
     const { TeamTasks } = await import('./TeamTasks');
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
-    const buttons = screen.getAllByRole('button');
-    const createBtn = buttons.find((b) => b.textContent?.toLowerCase().includes('create') || b.textContent?.toLowerCase().includes('task'));
-    expect(createBtn).toBeDefined();
+    await screen.findByTestId('empty-state');
+    expect(screen.getByRole('button', { name: 'Add Task' })).toBeInTheDocument();
   });
 
   it('opens create modal when create button is pressed', async () => {
     const { TeamTasks } = await import('./TeamTasks');
     render(<TeamTasks groupId={10} isGroupAdmin={true} />);
-    const buttons = screen.getAllByRole('button');
-    const createBtn = buttons.find(
-      (b) => b.textContent?.toLowerCase().includes('create') || b.textContent?.toLowerCase().includes('task')
-    );
-    if (createBtn) await userEvent.click(createBtn);
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
+    await userEvent.click(screen.getByRole('button', { name: 'Add Task' }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
-  it('shows delete button for admin users and calls API on confirm', async () => {
+  it('shows delete button when the server grants can_delete and calls API on confirm', async () => {
     mockApi.get.mockImplementation((url: string) => {
       if (url.includes('task-stats')) return Promise.resolve(statsResponse());
       return Promise.resolve(taskResponse([makeTask({ id: 42 })]));
     });
     const { TeamTasks } = await import('./TeamTasks');
-    render(<TeamTasks groupId={10} isGroupAdmin={true} />);
-    await waitFor(() => screen.getByText('Fix the bug'));
-
-    const deleteBtn = screen.getAllByRole('button').find(
-      (b) => b.getAttribute('aria-label')?.toLowerCase().includes('delet') || b.getAttribute('aria-label')?.includes('task_deleted')
-    );
-    expect(deleteBtn).toBeDefined();
-    if (deleteBtn) {
-      await userEvent.click(deleteBtn);
-      await waitFor(() => {
-        expect(mockApi.delete).toHaveBeenCalledWith('/v2/team-tasks/42');
-      });
-    }
-  });
-
-  it('does not show delete button for non-admin non-owner users', async () => {
-    mockApi.get.mockImplementation((url: string) => {
-      if (url.includes('task-stats')) return Promise.resolve(statsResponse());
-      return Promise.resolve(taskResponse([makeTask({ id: 99, uploaded_by: 99 })]));
-    });
-    const { TeamTasks } = await import('./TeamTasks');
-    // user id=1, task assigned to nobody, isGroupAdmin=false
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
     await waitFor(() => screen.getByText('Fix the bug'));
-    // No delete buttons should be visible (aria-label matching task_deleted)
-    const deleteBtns = screen.queryAllByRole('button').filter(
-      (b) => b.getAttribute('aria-label')?.includes('task_deleted')
-    );
-    expect(deleteBtns).toHaveLength(0);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Delete: Fix the bug' }));
+    await waitFor(() => {
+      expect(mockApi.delete).toHaveBeenCalledWith('/v2/team-tasks/42');
+    });
+  });
+
+  it('hides delete when the server denies can_delete even for a group admin prop', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('task-stats')) return Promise.resolve(statsResponse());
+      return Promise.resolve(taskResponse([makeTask({ id: 99, can_delete: false })]));
+    });
+    const { TeamTasks } = await import('./TeamTasks');
+    render(<TeamTasks groupId={10} isGroupAdmin={true} />);
+    await waitFor(() => screen.getByText('Fix the bug'));
+    expect(
+      screen.queryByRole('button', { name: 'Delete: Fix the bug' }),
+    ).not.toBeInTheDocument();
   });
 
   it('calls PUT endpoint when task status toggle button is pressed', async () => {
@@ -247,23 +219,41 @@ describe('TeamTasks', () => {
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
     await waitFor(() => screen.getByText('Fix the bug'));
 
-    // The status toggle is an isIconOnly button (no text content, has aria-label from t())
-    // Find all icon-only buttons (short/no text) — the first non-text button is the toggle
-    const allBtns = screen.getAllByRole('button');
-    // Status toggle button has no text content or very short content (icon only)
-    const toggleBtn = allBtns.find((b) => {
-      const label = b.getAttribute('aria-label') ?? '';
-      const text = b.textContent?.trim() ?? '';
-      // Must have aria-label (status toggle has one), and no substantial text
-      return label.length > 0 && text.length === 0;
+    const taskCard = screen.getByText('Fix the bug').closest('[data-slot="card"]');
+    expect(taskCard).not.toBeNull();
+    expect(within(taskCard!).getByTestId('task-row')).toHaveClass(
+      'grid',
+      'grid-cols-[auto_minmax(0,1fr)_auto]',
+    );
+    const statusButton = within(taskCard!).getByRole('button', { name: 'Status: In Progress' });
+    expect(statusButton).toHaveClass('h-11', 'w-11', 'sm:h-8', 'sm:w-8');
+    await userEvent.click(statusButton);
+    await waitFor(() => {
+      expect(mockApi.put).toHaveBeenCalledWith('/v2/team-tasks/7', { status: 'in_progress' });
     });
-    expect(toggleBtn).toBeDefined();
-    if (toggleBtn) {
-      await userEvent.click(toggleBtn);
-      await waitFor(() => {
-        expect(mockApi.put).toHaveBeenCalledWith('/v2/team-tasks/7', expect.objectContaining({ status: expect.any(String) }));
-      });
-    }
+  });
+
+  it('renders a non-interactive status indicator when can_update_status is false', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('task-stats')) return Promise.resolve(statsResponse());
+      return Promise.resolve(taskResponse([makeTask({ can_update_status: false })]));
+    });
+    const { TeamTasks } = await import('./TeamTasks');
+    render(<TeamTasks groupId={10} isGroupAdmin={true} />);
+
+    const taskCard = (await screen.findByText('Fix the bug')).closest('[data-slot="card"]');
+    expect(taskCard).not.toBeNull();
+    expect(within(taskCard!).getByRole('img', { name: 'Status: To Do' })).toBeInTheDocument();
+    expect(within(taskCard!).queryByRole('button', { name: /Status:/ })).not.toBeInTheDocument();
+  });
+
+  it('uses a two-column mobile filter grid and full-width mobile create action', async () => {
+    const { TeamTasks } = await import('./TeamTasks');
+    render(<TeamTasks groupId={10} isGroupAdmin={false} />);
+    await screen.findByTestId('empty-state');
+
+    expect(screen.getByRole('group', { name: 'Status' })).toHaveClass('grid', 'grid-cols-2', 'sm:flex');
+    expect(screen.getByRole('button', { name: 'Add Task' })).toHaveClass('w-full', 'sm:w-auto');
   });
 
   it('shows task description when present', async () => {
@@ -278,6 +268,39 @@ describe('TeamTasks', () => {
     });
   });
 
+  it('renders the low, medium, and high priority chips', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('task-stats')) return Promise.resolve(statsResponse());
+      return Promise.resolve(taskResponse([
+        makeTask({ id: 1, title: 'Low priority', priority: 'low' }),
+        makeTask({ id: 2, title: 'Medium priority', priority: 'medium' }),
+        makeTask({ id: 3, title: 'High priority', priority: 'high' }),
+      ]));
+    });
+    const { TeamTasks } = await import('./TeamTasks');
+    render(<TeamTasks groupId={10} isGroupAdmin={false} />);
+
+    expect(await screen.findByText('Low')).toBeInTheDocument();
+    expect(screen.getByText('Medium')).toBeInTheDocument();
+    expect(screen.getByText('High')).toBeInTheDocument();
+  });
+
+  it('shows the assigned member name', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('task-stats')) return Promise.resolve(statsResponse());
+      return Promise.resolve(taskResponse([
+        makeTask({
+          assigned_to: 2,
+          assignee: { id: 2, name: 'Aisha Patel', avatar_url: null },
+        }),
+      ]));
+    });
+    const { TeamTasks } = await import('./TeamTasks');
+    render(<TeamTasks groupId={10} isGroupAdmin={false} />);
+
+    expect(await screen.findByText('Aisha Patel')).toBeInTheDocument();
+  });
+
   it('shows error toast when task deletion fails', async () => {
     mockApi.get.mockImplementation((url: string) => {
       if (url.includes('task-stats')) return Promise.resolve(statsResponse());
@@ -288,14 +311,9 @@ describe('TeamTasks', () => {
     render(<TeamTasks groupId={10} isGroupAdmin={true} />);
     await waitFor(() => screen.getByText('Fix the bug'));
 
-    const deleteBtn = screen.getAllByRole('button').find(
-      (b) => b.getAttribute('aria-label')?.includes('task_deleted')
-    );
-    if (deleteBtn) {
-      await userEvent.click(deleteBtn);
-      await waitFor(() => {
-        expect(mockToast.error).toHaveBeenCalled();
-      });
-    }
+    await userEvent.click(screen.getByRole('button', { name: 'Delete: Fix the bug' }));
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Something went wrong. Please try again.');
+    });
   });
 });

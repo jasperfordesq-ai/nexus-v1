@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
@@ -43,48 +43,54 @@ vi.mock('@/admin/api/adminApi', () => ({
 // ── mock DataTable + ConfirmModal to avoid HeroUI Table JSDOM rendering issues
 // HeroUI v3 Table uses React Aria collections which don't render rows in JSDOM.
 // We mock DataTable to a simple <ul> that renders each row via columns[].render().
-vi.mock('@/admin/components', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/admin/components')>();
-  return {
-    ...actual,
-    DataTable: ({ data, columns }: { data: unknown[]; columns: Array<{ key: string; render?: (item: unknown) => React.ReactNode }> }) => (
-      <ul data-testid="data-table">
-        {(data as Array<Record<string, unknown>>).map((item) => (
-          <li key={String(item['id'])} data-testid="data-table-row">
-            {columns.map((col) => (
-              <span key={col.key} data-col={col.key}>
-                {col.render ? col.render(item) : String(item[col.key] ?? '')}
-              </span>
-            ))}
-          </li>
-        ))}
-      </ul>
-    ),
-    ConfirmModal: ({
-      isOpen,
-      onClose,
-      onConfirm,
-      title,
-      confirmLabel,
-    }: {
-      isOpen: boolean;
-      onClose: () => void;
-      onConfirm: () => void;
-      title: string;
-      confirmLabel?: string;
-    }) =>
-      isOpen ? (
-        <div role="dialog" aria-label="Dialog" aria-modal="true">
-          <p>{title}</p>
-          <button onClick={onClose}>Cancel</button>
-          <button data-testid="confirm-btn" onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
-        </div>
-      ) : null,
-  };
-});
+vi.mock('../../components/DataTable', () => ({
+  DataTable: ({ data, columns }: { data: unknown[]; columns: Array<{ key: string; render?: (item: unknown) => React.ReactNode }> }) => (
+    <ul data-testid="data-table">
+      {(data as Array<Record<string, unknown>>).map((item) => (
+        <li key={String(item['id'])} data-testid="data-table-row">
+          {columns.map((col) => (
+            <span key={col.key} data-col={col.key}>
+              {col.render ? col.render(item) : String(item[col.key] ?? '')}
+            </span>
+          ))}
+        </li>
+      ))}
+    </ul>
+  ),
+}));
+
+vi.mock('../../components/ConfirmModal', () => ({
+  ConfirmModal: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    confirmLabel,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    confirmLabel?: string;
+  }) =>
+    isOpen ? (
+      <div role="dialog" aria-label={title} aria-modal="true">
+        <p>{title}</p>
+        <button onClick={onClose}>Cancel</button>
+        <button data-testid="confirm-btn" onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
+      </div>
+    ) : null,
+}));
 
 // ── mock @/contexts ───────────────────────────────────────────────────────────
-vi.mock('@/contexts', () => createMockContexts());
+const mockToast = vi.hoisted(() => ({
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+}));
+
+vi.mock('@/contexts', () => createMockContexts({ useToast: () => mockToast }));
 
 // ── mock usePageTitle ─────────────────────────────────────────────────────────
 vi.mock('@/hooks', () => ({
@@ -105,8 +111,7 @@ describe('GroupApprovals', () => {
   });
 
   it('shows loading spinner while fetching', async () => {
-    let resolve!: (v: unknown) => void;
-    getApprovalsMock.mockReturnValueOnce(new Promise((r) => (resolve = r)) as never);
+    getApprovalsMock.mockReturnValueOnce(new Promise(() => undefined) as never);
 
     render(<GroupApprovals />);
 
@@ -115,7 +120,6 @@ describe('GroupApprovals', () => {
     );
     expect(busyEl).toBeInTheDocument();
 
-    resolve({ success: true, data: [] });
   });
 
   it('hides loading spinner after data loads', async () => {
@@ -168,6 +172,7 @@ describe('GroupApprovals', () => {
 
   it('calls approveMember when approve button clicked', async () => {
     approveMock.mockResolvedValueOnce({ success: true } as never);
+    const user = userEvent.setup();
 
     render(<GroupApprovals />);
 
@@ -175,12 +180,8 @@ describe('GroupApprovals', () => {
       expect(screen.getByText('Alice Murphy')).toBeInTheDocument();
     });
 
-    // HeroUI v3 Button uses React Aria's useButton which listens to pointerdown/pointerup,
-    // not the click event. Fire the full pointer sequence so onPress triggers.
     const approveBtns = screen.getAllByRole('button', { name: /approve/i });
-    fireEvent.pointerDown(approveBtns[0]);
-    fireEvent.pointerUp(approveBtns[0]);
-    fireEvent.click(approveBtns[0]);
+    await user.click(approveBtns[0]);
 
     await waitFor(() => {
       expect(approveMock).toHaveBeenCalledWith(1);
@@ -207,8 +208,9 @@ describe('GroupApprovals', () => {
 
   it('calls rejectMember when reject is confirmed in modal', async () => {
     rejectMock.mockResolvedValueOnce({ success: true } as never);
-    // Reload after reject
-    getApprovalsMock.mockResolvedValueOnce({ success: true, data: [MOCK_APPROVALS[1]] } as never);
+    getApprovalsMock
+      .mockResolvedValueOnce({ success: true, data: MOCK_APPROVALS } as never)
+      .mockResolvedValueOnce({ success: true, data: [MOCK_APPROVALS[1]] } as never);
 
     const user = userEvent.setup();
     render(<GroupApprovals />);

@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "Analyse d'événements",
+    "subtitle": "Mesures de performance opérationnelle, de présence, de communications et de conversion respectueuses de la confidentialité.",
+    "generated_at": "Généré {{date}}",
+    "loading": "Chargement des analyses d'événements",
+    "load_error": "L'analyse des événements n'a pas pu être chargée.",
+    "retry": "Réessayez",
+    "refresh": "Actualiser",
+    "export": "Exporter au format CSV",
+    "exporting": "Exporter…",
+    "export_started": "Exportation analytique préparée.",
+    "download_error": "L'exportation d'analyses n'a pas pu être téléchargée.",
+    "privacy_title": "Rapports protégés par la confidentialité",
+    "privacy_note": "Les mesures facultatives sont masquées jusqu'à ce qu'au moins {{count}} personnes consentantes soient représentées.",
+    "consent_bound": "Lié au consentement",
+    "suppressed": "Supprimé",
+    "not_limited": "Aucune limite",
+    "finance_redacted": "Limité par votre rôle",
+    "columns": {
+      "metric": "Métrique",
+      "value": "Valeur"
+    },
+    "sections": {
+      "registration": "Inscription",
+      "acquisition": "Invitations et liste d'attente",
+      "attendance": "Participation",
+      "communications": "Communications",
+      "funnel": "Entonnoir sécurisé",
+      "finance": "Billets et crédits"
+    },
+    "metrics": {
+      "confirmed": "Inscriptions confirmées",
+      "pending": "Inscriptions en attente",
+      "cancelled": "Inscriptions annulées",
+      "capacity_remaining": "Capacité restante",
+      "invitations_issued": "Invitations émises",
+      "invitations_accepted": "Invitations acceptées",
+      "invitation_conversion": "Conversion d'invitations",
+      "waitlist_joined": "Inscriptions sur liste d'attente",
+      "waitlist_accepted": "Acceptations sur liste d'attente",
+      "waitlist_conversion": "Conversion de la liste d'attente",
+      "checked_in": "Actuellement enregistré",
+      "attended": "Participé",
+      "no_show": "Non-présentation",
+      "attendance_rate": "Taux de fréquentation",
+      "delivered": "Notifications envoyées",
+      "suppressed_deliveries": "Notifications supprimées",
+      "failed_deliveries": "Échec des notifications",
+      "dead_lettered": "Notifications nécessitant une intervention",
+      "delivery_rate": "Tarif de livraison",
+      "event_views": "Vues des événements",
+      "registration_starts": "Les inscriptions commencent",
+      "start_conversion": "Conversion de la vue en enregistrement",
+      "finance": "Paramètres financiers",
+      "ticket_units": "Unités de billets confirmées",
+      "ticket_credit_value": "Valeur du crédit de billet confirmée",
+      "completed_credit_claims": "Réclamations de crédit complétées",
+      "failed_credit_claims": "Réclamations de crédit échouées",
+      "guardian_consents": "Le tuteur consent"
+    }
+  }
+}

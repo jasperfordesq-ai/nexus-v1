@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { act, render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
@@ -80,6 +80,14 @@ describe('PinnedAnnouncementsBanner', () => {
     mockApi.get.mockResolvedValue({ success: true, data: [] });
   });
 
+  it('renders nothing while the initial request is still loading', async () => {
+    mockApi.get.mockImplementation(() => new Promise(() => {}));
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders nothing when no pinned announcements', async () => {
     mockApi.get.mockResolvedValue({ success: true, data: [] });
     const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
@@ -104,8 +112,58 @@ describe('PinnedAnnouncementsBanner', () => {
     const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
     render(<PinnedAnnouncementsBanner groupId={42} />);
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/42/announcements?pinned=1');
+      expect(mockApi.get).toHaveBeenCalledWith(
+        '/v2/groups/42/announcements?pinned=1',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
     });
+  });
+
+  it('clears the previous group announcement while the next group loads', async () => {
+    let resolveSecond: ((value: { success: boolean; data: object[] }) => void) | undefined;
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/groups/5/')) {
+        return Promise.resolve({ success: true, data: [makeAnnouncement({ title: 'Group A notice' })] });
+      }
+      return new Promise((resolve) => { resolveSecond = resolve; });
+    });
+
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { rerender } = render(<PinnedAnnouncementsBanner groupId={5} />);
+    expect(await screen.findByText('Group A notice')).toBeInTheDocument();
+
+    rerender(<PinnedAnnouncementsBanner groupId={6} />);
+    expect(screen.queryByText('Group A notice')).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveSecond?.({ success: true, data: [makeAnnouncement({ title: 'Group B notice' })] });
+    });
+    expect(await screen.findByText('Group B notice')).toBeInTheDocument();
+  });
+
+  it('ignores a late response from the previous group', async () => {
+    let resolveFirst: ((value: { success: boolean; data: object[] }) => void) | undefined;
+    let firstSignal: AbortSignal | undefined;
+    mockApi.get.mockImplementation((url: string, options?: { signal?: AbortSignal }) => {
+      if (url.includes('/groups/5/')) {
+        firstSignal = options?.signal;
+        return new Promise((resolve) => { resolveFirst = resolve; });
+      }
+      return Promise.resolve({ success: true, data: [makeAnnouncement({ title: 'Group B notice' })] });
+    });
+
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { rerender } = render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalled());
+    rerender(<PinnedAnnouncementsBanner groupId={6} />);
+    expect(firstSignal?.aborted).toBe(true);
+    expect(await screen.findByText('Group B notice')).toBeInTheDocument();
+
+    await act(async () => {
+      resolveFirst?.({ success: true, data: [makeAnnouncement({ title: 'Late Group A notice' })] });
+    });
+    expect(screen.queryByText('Late Group A notice')).not.toBeInTheDocument();
+    expect(screen.getByText('Group B notice')).toBeInTheDocument();
   });
 
   it('renders announcement title when pinned items are returned', async () => {
@@ -206,8 +264,52 @@ describe('PinnedAnnouncementsBanner', () => {
     const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
     const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
     await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledOnce();
       expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
     });
+    expect(mockToast.error).not.toHaveBeenCalled();
+  });
+
+  it('refreshes when the matching group announces a mutation', async () => {
+    mockApi.get
+      .mockResolvedValueOnce({ success: true, data: [] })
+      .mockResolvedValueOnce({
+        success: true,
+        data: [makeAnnouncement({ title: 'Freshly pinned notice' })],
+      });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { notifyGroupAnnouncementsChanged } = await import('../api/announcements');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledOnce());
+
+    act(() => notifyGroupAnnouncementsChanged(5));
+
+    expect(await screen.findByText('Freshly pinned notice')).toBeInTheDocument();
+    expect(mockApi.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('ignores mutation events for another group', async () => {
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { notifyGroupAnnouncementsChanged } = await import('../api/announcements');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalledOnce());
+
+    act(() => notifyGroupAnnouncementsChanged(6));
+
+    await Promise.resolve();
+    expect(mockApi.get).toHaveBeenCalledOnce();
+  });
+
+  it('silently handles thrown cancellation failures', async () => {
+    mockApi.get.mockRejectedValue(Object.assign(new Error('Request aborted'), { name: 'AbortError' }));
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledOnce();
+      expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
+    });
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
   it('renders nothing when API returns success=false', async () => {
@@ -215,6 +317,7 @@ describe('PinnedAnnouncementsBanner', () => {
     const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
     const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
     await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledOnce();
       expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
     });
   });

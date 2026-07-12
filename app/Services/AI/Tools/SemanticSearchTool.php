@@ -8,6 +8,7 @@ namespace App\Services\AI\Tools;
 
 use App\Core\TenantContext;
 use App\Services\EmbeddingService;
+use App\Support\Events\EventSearchVisibility;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -124,7 +125,7 @@ class SemanticSearchTool extends AbstractTool
             $query = DB::table($table)
                 ->where('tenant_id', $tenantId)
                 ->whereIn('id', array_keys($ids));
-            $this->applyVisibilityFilters($query, $type, $userId);
+            $this->applyVisibilityFilters($query, $type, $userId, $tenantId);
             $rows = $query->get();
             foreach ($rows as $row) {
                 $byId[$type][(int) $row->id] = $row;
@@ -148,7 +149,12 @@ class SemanticSearchTool extends AbstractTool
         return $out;
     }
 
-    private function applyVisibilityFilters(Builder $query, string $type, int $userId): void
+    private function applyVisibilityFilters(
+        Builder $query,
+        string $type,
+        int $userId,
+        int $tenantId,
+    ): void
     {
         switch ($type) {
             case 'listing':
@@ -165,8 +171,8 @@ class SemanticSearchTool extends AbstractTool
                 break;
 
             case 'event':
-                $query->where('status', 'active')
-                    ->where('start_time', '>=', now());
+                EventSearchVisibility::applyToQuery($query, $tenantId, 'events')
+                    ->where('events.start_time', '>=', now());
                 break;
 
             case 'group':

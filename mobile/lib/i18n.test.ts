@@ -21,7 +21,7 @@ jest.mock('expo-localization', () => ({
   getLocales: () => [{ languageCode: 'en' }],
 }));
 
-import { changeLanguage, restoreSavedLanguage, SUPPORTED_LANGUAGES } from './i18n';
+import { changeLanguage, loadLanguage, restoreSavedLanguage, SUPPORTED_LANGUAGES } from './i18n';
 import i18n from './i18n';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
@@ -63,4 +63,15 @@ describe('i18n language persistence', () => {
   it('supports the expected language set', () => {
     expect(SUPPORTED_LANGUAGES).toEqual(expect.arrayContaining(['en', 'ga', 'de', 'fr', 'it', 'pt', 'es']));
   });
+
+  it.each(['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'])(
+    'registers the event templates, tickets and communications bundles for %s',
+    (language) => {
+      loadLanguage(language);
+
+      expect(i18n.hasResourceBundle(language, 'event_templates')).toBe(true);
+      expect(i18n.hasResourceBundle(language, 'event_tickets')).toBe(true);
+      expect(i18n.hasResourceBundle(language, 'event_communications')).toBe(true);
+    },
+  );
 });

@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Veranstaltungstickets",
+      "gatewayDisabledTitle": "Bezahlter Checkout und Zeitguthaben-Checkout sind deaktiviert",
+      "gatewayDisabledDescription": "Dieser mobile Ablauf unterstützt nur die kostenlose Ticketzuteilung. Es belastet weder Geld noch Zeitguthaben und verändert Ihren Geldbeutel nicht.",
+      "loading": "Veranstaltungstickets werden geladen",
+      "loadFailedTitle": "Tickets können nicht geladen werden",
+      "loadFailedDescription": "Der Veranstaltungsticketkatalog konnte nicht geladen werden. Versuchen Sie es erneut.",
+      "myTicketsTitle": "Meine Tickets",
+      "noTickets": "Sie haben kein Ticket für diese Veranstaltung.",
+      "ticketFallback": "Veranstaltungsticket",
+      "entitlementSummary": "{{count}} Ticket · {{status}}",
+      "entitlementSummary_other": "{{count}} Tickets · {{status}}",
+      "cancelTicket": "Ticket stornieren",
+      "timeCreditCancelDisabled": "Die Stornierung von Zeitguthabentickets ist in diesem kostenlosen Ablauf nicht möglich. Es wurden keine Wallet-Maßnahmen ergriffen.",
+      "cancelTitle": "Dieses Freiticket stornieren?",
+      "cancelDescription": "Geben Sie einen kurzen Grund an. Die Menge geht zurück in die kostenlose Zuteilung.",
+      "reasonLabel": "Stornierungsgrund",
+      "confirmCancellation": "Stornierung bestätigen",
+      "reasonInvalidTitle": "Überprüfen Sie den Stornierungsgrund",
+      "reasonInvalidDescription": "Geben Sie einen Grund mit maximal 500 Zeichen ein.",
+      "cancelledTitle": "Freikarte storniert",
+      "cancelledDescription": "Die Menge wurde in die kostenlose Zuteilung zurückgeführt.",
+      "cancelFailedTitle": "Ticket kann nicht storniert werden",
+      "cancelFailedDescription": "Aktualisieren Sie den Katalog und versuchen Sie es erneut.",
+      "catalogueTitle": "Verfügbare Tickets",
+      "catalogueEmpty": "Für diese Veranstaltung sind keine Ticketarten verfügbar.",
+      "free": "Kostenlos",
+      "timeCreditPrice": "{{credits}} Zeitguthaben",
+      "remaining": "{{count}} übrig",
+      "remaining_other": "{{count}} übrig",
+      "timeCreditDisabledTitle": "Zeitguthaben-Kaufabwicklung nicht möglich",
+      "timeCreditDisabledDescription": "Das genehmigte Wallet-Gateway ist nicht verbunden. Von diesem Bildschirm aus können keine Credits abgebucht werden.",
+      "unitsLabel": "Menge (bis {{count}})",
+      "registrationRequired": "Für den Anspruch auf ein kostenloses Ticket ist eine bestätigte Veranstaltungsanmeldung erforderlich.",
+      "notEligible": "Sie erfüllen derzeit nicht die Teilnahmebedingungen dieser Ticketart.",
+      "salesClosed": "Für diesen Tickettyp ist derzeit keine Zuteilung möglich.",
+      "soldOut": "In diesem Kontingent verbleiben keine Freikarten für Sie.",
+      "claimFreeTicket": "Fordern Sie ein kostenloses Ticket an",
+      "unitsInvalidTitle": "Überprüfen Sie die Menge",
+      "unitsInvalidDescription": "Geben Sie eine ganze Zahl zwischen 1 und {{count}} ein.",
+      "allocatedTitle": "Freikarte zugeteilt",
+      "allocatedDescription": "Ihr Ticket ist nun bestätigt.",
+      "allocateFailedTitle": "Ticket kann nicht zugeordnet werden",
+      "allocateFailedDescription": "Überprüfen Sie Ihre Registrierung, Berechtigung und verbleibende Zuteilung und versuchen Sie es dann erneut."
+    },
+    "status": {
+      "confirmed": "Bestätigt",
+      "cancelled": "Abgesagt"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "analytics": {
+    "title": "تحليلات الحدث",
+    "subtitle": "الأداء التشغيلي والحضور والاتصالات ومقاييس التحويل الآمنة للخصوصية.",
+    "generated_at": "تم إنشاؤه {{date}}",
+    "loading": "جارٍ تحميل تحليلات الأحداث",
+    "load_error": "تعذر تحميل تحليلات الأحداث.",
+    "retry": "حاول مرة أخرى",
+    "refresh": "تحديث",
+    "export": "تصدير CSV",
+    "exporting": "جارٍ التصدير…",
+    "export_started": "تم إعداد تصدير التحليلات.",
+    "download_error": "تعذر تنزيل تصدير التحليلات.",
+    "privacy_title": "التقارير المحمية بالخصوصية",
+    "privacy_note": "يتم إخفاء المقاييس الاختيارية حتى يتم تمثيل {{count}} شخصًا على الأقل.",
+    "consent_bound": "ملزمة بالموافقة",
+    "suppressed": "قمعت",
+    "not_limited": "لا يوجد حد",
+    "finance_redacted": "مقيد بدورك",
+    "columns": {
+      "metric": "متري",
+      "value": "القيمة"
+    },
+    "sections": {
+      "registration": "التسجيل",
+      "acquisition": "الدعوات وقائمة الانتظار",
+      "attendance": "الحضور",
+      "communications": "الاتصالات",
+      "funnel": "قمع آمن للخصوصية",
+      "finance": "التذاكر والاعتمادات"
+    },
+    "metrics": {
+      "confirmed": "التسجيلات المؤكدة",
+      "pending": "التسجيلات في انتظار",
+      "cancelled": "التسجيلات الملغاة",
+      "capacity_remaining": "القدرة المتبقية",
+      "invitations_issued": "الدعوات الصادرة",
+      "invitations_accepted": "تم قبول الدعوات",
+      "invitation_conversion": "تحويل الدعوة",
+      "waitlist_joined": "تنضم قائمة الانتظار",
+      "waitlist_accepted": "قبولات قائمة الانتظار",
+      "waitlist_conversion": "تحويل قائمة الانتظار",
+      "checked_in": "تم تسجيل الوصول حاليًا",
+      "attended": "حضر",
+      "no_show": "عدم الحضور",
+      "attendance_rate": "معدل الحضور",
+      "delivered": "تم تسليم الإخطارات",
+      "suppressed_deliveries": "تم قمع الإخطارات",
+      "failed_deliveries": "فشلت الإخطارات",
+      "dead_lettered": "الإخطارات التي تتطلب التدخل",
+      "delivery_rate": "معدل التسليم",
+      "event_views": "مشاهدات الحدث",
+      "registration_starts": "يبدأ التسجيل",
+      "start_conversion": "تحويل العرض إلى التسجيل",
+      "finance": "المقاييس المالية",
+      "ticket_units": "وحدات التذاكر المؤكدة",
+      "ticket_credit_value": "تأكيد قيمة رصيد التذكرة",
+      "completed_credit_claims": "مطالبات الائتمان المكتملة",
+      "failed_credit_claims": "مطالبات الائتمان الفاشلة",
+      "guardian_consents": "يوافق الوصي"
+    }
+  }
+}

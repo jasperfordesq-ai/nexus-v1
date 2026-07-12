@@ -37,11 +37,21 @@ class GroupChatroomService
      * Get all chatrooms for a group.
      *
      * @param string|null $category  Optional category filter (e.g. 'general', 'announcements')
-     * @param int|null    $userId    Optional user ID for private-channel visibility check
+     * @param int|null    $userId    Viewer ID; null is denied (kept nullable for compatibility)
      */
-    public function getChatrooms(int $groupId, ?string $category = null, ?int $userId = null): array
+    public function getChatrooms(int $groupId, ?string $category = null, ?int $userId = null): ?array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if ($userId === null) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
+            return null;
+        }
+
+        if (!$this->authorizeParent($groupId, $userId, false)) {
+            return null;
+        }
 
         $query = DB::table('group_chatrooms')
             ->where('group_id', $groupId)
@@ -54,19 +64,6 @@ class GroupChatroomService
         }
 
         $chatrooms = $query->get();
-
-        // If a userId is supplied, filter out private chatrooms for non-members
-        if ($userId !== null) {
-            $isMember = DB::table('group_members')
-                ->where('group_id', $groupId)
-                ->where('user_id', $userId)
-                ->where('status', 'active')
-                ->exists();
-
-            if (! $isMember) {
-                $chatrooms = $chatrooms->filter(fn ($c) => ! $c->is_private);
-            }
-        }
 
         return $chatrooms->map(fn ($c) => [
             'id'          => (int) $c->id,
@@ -84,16 +81,10 @@ class GroupChatroomService
     /**
      * Get a single chatroom by ID.
      */
-    public function getById(int $chatroomId): ?array
+    public function getById(int $chatroomId, int $userId): ?array
     {
-        $tenantId = TenantContext::getId();
-
-        $chatroom = DB::table('group_chatrooms')
-            ->where('id', $chatroomId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $chatroom) {
+        $chatroom = $this->assertAccess($chatroomId, $userId);
+        if ($chatroom === null) {
             return null;
         }
 
@@ -118,6 +109,10 @@ class GroupChatroomService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
+        if (!$this->authorizeParent($groupId, $userId, true)) {
+            return null;
+        }
+
         $name = trim($data['name'] ?? '');
         if (empty($name)) {
             $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_chatroom_name_required'), 'field' => 'name'];
@@ -129,22 +124,11 @@ class GroupChatroomService
             return null;
         }
 
-        // Verify user is an active member of the group
-        $isMember = DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->exists();
-
-        if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_member_only_create')];
-            return null;
-        }
-
         // Name and description are immediately visible directed content for
         // every active group member, so chatroom creation is also a protected
         // group contact write.
         $recipientIds = DB::table('group_members')
+            ->where('tenant_id', $tenantId)
             ->where('group_id', $groupId)
             ->where('status', 'active')
             ->where('user_id', '!=', $userId)
@@ -202,7 +186,12 @@ class GroupChatroomService
      */
     public function ensureDefaultChatroom(int $groupId, int $userId): ?int
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if (!$this->authorizeParent($groupId, $userId, true)) {
+            return null;
+        }
 
         // Check if a default chatroom already exists
         $existing = DB::table('group_chatrooms')
@@ -219,8 +208,8 @@ class GroupChatroomService
         $id = DB::table('group_chatrooms')->insertGetId([
             'group_id'    => $groupId,
             'tenant_id'   => $tenantId,
-            'name'        => 'General',
-            'description' => 'Default group chatroom',
+            'name'        => __('api_controllers_1.group_chatroom.default_name'),
+            'description' => __('api_controllers_1.group_chatroom.default_description'),
             'created_by'  => $userId,
             'is_default'  => 1,
             'created_at'  => now(),
@@ -235,15 +224,10 @@ class GroupChatroomService
     public function delete(int $chatroomId, int $userId): bool
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
 
-        $chatroom = DB::table('group_chatrooms')
-            ->where('id', $chatroomId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
+        $chatroom = $this->findAccessibleChatroom($chatroomId, $userId, true);
+        if ($chatroom === null) {
             return false;
         }
 
@@ -252,14 +236,7 @@ class GroupChatroomService
             return false;
         }
 
-        // Check user is admin/owner of the group
-        $membership = DB::table('group_members')
-            ->where('group_id', $chatroom->group_id)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->first();
-
-        $isAdmin = $membership && in_array($membership->role, ['owner', 'admin']);
+        $isAdmin = GroupAccessService::canManage((int) $chatroom->group_id, $userId);
         $isCreator = (int) $chatroom->created_by === $userId;
 
         if (! $isAdmin && ! $isCreator) {
@@ -267,13 +244,39 @@ class GroupChatroomService
             return false;
         }
 
-        // Messages are cascade-deleted via FK
-        DB::table('group_chatrooms')
-            ->where('id', $chatroomId)
-            ->where('tenant_id', $tenantId)
-            ->delete();
+        return DB::transaction(function () use ($chatroomId, $userId, $tenantId): bool {
+            $chatroom = DB::table('group_chatrooms')
+                ->where('id', $chatroomId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if ($chatroom === null) {
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
+                return false;
+            }
 
-        return true;
+            // Messages are cascade-deleted via FK.
+            $deleted = DB::table('group_chatrooms')
+                ->where('id', $chatroomId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+            if ($deleted !== 1) {
+                return false;
+            }
+
+            GroupAuditService::log(
+                GroupAuditService::ACTION_CHATROOM_DELETED,
+                (int) $chatroom->group_id,
+                $userId,
+                [
+                    'chatroom_id' => $chatroomId,
+                    'name' => (string) $chatroom->name,
+                    'target_user_id' => (int) $chatroom->created_by,
+                ],
+            );
+
+            return true;
+        });
     }
 
     /**
@@ -283,16 +286,25 @@ class GroupChatroomService
      */
     public function getMessages(int $chatroomId, array $filters = [], ?int $userId = null): ?array
     {
+        $this->errors = [];
         $limit = min((int) ($filters['limit'] ?? 50), 100);
         $cursor = $filters['cursor'] ?? null;
         $tenantId = TenantContext::getId();
 
-        if ($userId !== null && $this->assertAccess($chatroomId, $userId) === null) {
+        if ($userId === null) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
+            return null;
+        }
+
+        if ($this->assertAccess($chatroomId, $userId) === null) {
             return null;
         }
 
         $query = DB::table('group_chatroom_messages as m')
-            ->join('users as u', 'm.user_id', '=', 'u.id')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('m.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->join('group_chatrooms as c', 'm.chatroom_id', '=', 'c.id')
             ->where('m.chatroom_id', $chatroomId)
             ->where('c.tenant_id', $tenantId)
@@ -349,35 +361,16 @@ class GroupChatroomService
     public function postMessage(int $chatroomId, int $userId, string $body): ?int
     {
         $this->errors = [];
+        $tenantId = (int) TenantContext::getId();
+
+        $chatroom = $this->findAccessibleChatroom($chatroomId, $userId, true);
+        if ($chatroom === null) {
+            return null;
+        }
 
         $body = trim($body);
         if (empty($body)) {
             $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.message_body_required'), 'field' => 'body'];
-            return null;
-        }
-
-        $tenantId = TenantContext::getId();
-
-        // Verify chatroom exists
-        $chatroom = DB::table('group_chatrooms')
-            ->where('id', $chatroomId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
-            return null;
-        }
-
-        // Verify user is an active member of the group
-        $isMember = DB::table('group_members')
-            ->where('group_id', $chatroom->group_id)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->exists();
-
-        if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_member_only_post')];
             return null;
         }
 
@@ -386,6 +379,7 @@ class GroupChatroomService
         // it so this parallel chat implementation cannot bypass the central DM
         // safeguarding boundary.
         $recipientIds = DB::table('group_members')
+            ->where('tenant_id', $tenantId)
             ->where('group_id', $chatroom->group_id)
             ->where('status', 'active')
             ->where('user_id', '!=', $userId)
@@ -439,41 +433,50 @@ class GroupChatroomService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        $message = DB::table('group_chatroom_messages as m')
-            ->join('group_chatrooms as c', 'm.chatroom_id', '=', 'c.id')
-            ->where('m.id', $messageId)
-            ->where('c.tenant_id', $tenantId)
-            ->select(['m.id', 'm.user_id', 'm.chatroom_id', 'c.group_id'])
-            ->first();
-
-        if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
-            return false;
-        }
-
-        // Allow deletion by author or group admin/owner
-        $isAuthor = (int) $message->user_id === $userId;
-
-        if (! $isAuthor) {
-            $membership = DB::table('group_members')
-                ->where('group_id', $message->group_id)
-                ->where('user_id', $userId)
-                ->where('status', 'active')
+        return DB::transaction(function () use ($messageId, $userId, $tenantId): bool {
+            $message = DB::table('group_chatroom_messages as m')
+                ->join('group_chatrooms as c', 'm.chatroom_id', '=', 'c.id')
+                ->where('m.id', $messageId)
+                ->where('c.tenant_id', $tenantId)
+                ->select(['m.id', 'm.user_id', 'm.chatroom_id', 'c.group_id'])
+                ->lockForUpdate()
                 ->first();
 
-            $isAdmin = $membership && in_array($membership->role, ['owner', 'admin']);
+            if (! $message) {
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
+                return false;
+            }
 
-            if (! $isAdmin) {
+            if (!$this->authorizeParent((int) $message->group_id, $userId, true)) {
+                return false;
+            }
+
+            $isAuthor = (int) $message->user_id === $userId;
+            if (!$isAuthor && !GroupAccessService::canManage((int) $message->group_id, $userId)) {
                 $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_message_delete_forbidden')];
                 return false;
             }
-        }
 
-        DB::table('group_chatroom_messages')
-            ->where('id', $messageId)
-            ->delete();
+            $deleted = DB::table('group_chatroom_messages')
+                ->where('id', $messageId)
+                ->delete();
+            if ($deleted !== 1) {
+                return false;
+            }
 
-        return true;
+            GroupAuditService::log(
+                GroupAuditService::ACTION_CHATROOM_MESSAGE_DELETED,
+                (int) $message->group_id,
+                $userId,
+                [
+                    'chatroom_id' => (int) $message->chatroom_id,
+                    'message_id' => $messageId,
+                    'target_user_id' => (int) $message->user_id,
+                ],
+            );
+
+            return true;
+        });
     }
 
     /**
@@ -483,45 +486,37 @@ class GroupChatroomService
     public function assertAccess(int $chatroomId, ?int $userId): ?object
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
 
-        $chatroom = DB::table('group_chatrooms')
-            ->where('id', $chatroomId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
+        if ($userId === null) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
             return null;
         }
 
-        if ($chatroom->is_private && $userId !== null) {
-            $isMember = DB::table('group_members')
-                ->where('group_id', $chatroom->group_id)
-                ->where('user_id', $userId)
-                ->where('status', 'active')
-                ->exists();
-
-            if (! $isMember) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
-                return null;
-            }
-        }
-
-        return $chatroom;
+        return $this->findAccessibleChatroom($chatroomId, $userId, false);
     }
 
     /**
      * Pin a message in a chatroom. Only group admins/owners may pin.
      */
-    public function pinMessage(int $chatroomId, int $messageId, int $userId): bool
+    public function pinMessage(int $groupId, int $chatroomId, int $messageId, int $userId): bool
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
 
-        // Verify chatroom
+        if (!$this->authorizeParent($groupId, $userId, true)) {
+            return false;
+        }
+
+        if (!GroupAccessService::canManage($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_pin')];
+            return false;
+        }
+
+        // The route's group ID is part of the authorization boundary. A valid
+        // chatroom from another group must not be accepted by ID alone.
         $chatroom = DB::table('group_chatrooms')
             ->where('id', $chatroomId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
@@ -541,51 +536,65 @@ class GroupChatroomService
             return false;
         }
 
-        // Require group admin/owner
-        $membership = DB::table('group_members')
-            ->where('group_id', $chatroom->group_id)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->first();
-
-        if (! $membership || ! in_array($membership->role, ['owner', 'admin'])) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_pin')];
-            return false;
-        }
-
         // Check if already pinned
-        $exists = DB::table('group_chatroom_pinned_messages')
-            ->where('chatroom_id', $chatroomId)
-            ->where('message_id', $messageId)
-            ->exists();
+        return DB::transaction(function () use ($groupId, $chatroomId, $messageId, $userId, $tenantId): bool {
+            DB::table('group_chatrooms')
+                ->where('id', $chatroomId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($exists) {
-            // Idempotent — already pinned
+            $exists = DB::table('group_chatroom_pinned_messages')
+                ->where('chatroom_id', $chatroomId)
+                ->where('message_id', $messageId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+
+            if ($exists) {
+                // Idempotent — already pinned
+                return true;
+            }
+
+            DB::table('group_chatroom_pinned_messages')->insert([
+                'chatroom_id' => $chatroomId,
+                'message_id'  => $messageId,
+                'pinned_by'   => $userId,
+                'tenant_id'   => $tenantId,
+                'created_at'  => now(),
+            ]);
+            GroupAuditService::log(
+                GroupAuditService::ACTION_CHATROOM_MESSAGE_PINNED,
+                $groupId,
+                $userId,
+                ['chatroom_id' => $chatroomId, 'message_id' => $messageId],
+            );
+
             return true;
-        }
-
-        DB::table('group_chatroom_pinned_messages')->insert([
-            'chatroom_id' => $chatroomId,
-            'message_id'  => $messageId,
-            'pinned_by'   => $userId,
-            'tenant_id'   => $tenantId,
-            'created_at'  => now(),
-        ]);
-
-        return true;
+        }, 3);
     }
 
     /**
      * Unpin a message from a chatroom. Only group admins/owners may unpin.
      */
-    public function unpinMessage(int $chatroomId, int $messageId, int $userId): bool
+    public function unpinMessage(int $groupId, int $chatroomId, int $messageId, int $userId): bool
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
+
+        if (!$this->authorizeParent($groupId, $userId, true)) {
+            return false;
+        }
+
+        if (!GroupAccessService::canManage($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_unpin')];
+            return false;
+        }
 
         // Verify chatroom
         $chatroom = DB::table('group_chatrooms')
             ->where('id', $chatroomId)
+            ->where('group_id', $groupId)
             ->where('tenant_id', $tenantId)
             ->first();
 
@@ -594,48 +603,85 @@ class GroupChatroomService
             return false;
         }
 
-        // Require group admin/owner
-        $membership = DB::table('group_members')
-            ->where('group_id', $chatroom->group_id)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->first();
-
-        if (! $membership || ! in_array($membership->role, ['owner', 'admin'])) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_unpin')];
-            return false;
-        }
-
-        $deleted = DB::table('group_chatroom_pinned_messages')
+        $messageExists = DB::table('group_chatroom_messages')
+            ->where('id', $messageId)
             ->where('chatroom_id', $chatroomId)
-            ->where('message_id', $messageId)
-            ->delete();
+            ->exists();
 
-        if ($deleted === 0) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_pinned_message_not_found')];
+        if (!$messageExists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_message_not_in_chatroom')];
             return false;
         }
 
-        return true;
+        return DB::transaction(function () use ($groupId, $chatroomId, $messageId, $userId, $tenantId): bool {
+            DB::table('group_chatrooms')
+                ->where('id', $chatroomId)
+                ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            $deleted = DB::table('group_chatroom_pinned_messages')
+                ->where('chatroom_id', $chatroomId)
+                ->where('message_id', $messageId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            if ($deleted === 0) {
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_pinned_message_not_found')];
+                return false;
+            }
+
+            GroupAuditService::log(
+                GroupAuditService::ACTION_CHATROOM_MESSAGE_UNPINNED,
+                $groupId,
+                $userId,
+                ['chatroom_id' => $chatroomId, 'message_id' => $messageId],
+            );
+
+            return true;
+        }, 3);
     }
 
     /**
      * Get all pinned messages for a chatroom.
      */
-    public function getPinnedMessages(int $chatroomId, ?int $userId = null): ?array
+    public function getPinnedMessages(int $groupId, int $chatroomId, ?int $userId = null): ?array
     {
-        $tenantId = TenantContext::getId();
+        $this->errors = [];
+        $tenantId = (int) TenantContext::getId();
 
-        if ($userId !== null && $this->assertAccess($chatroomId, $userId) === null) {
+        if ($userId === null) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
+            return null;
+        }
+
+        if (!$this->authorizeParent($groupId, $userId, false)) {
+            return null;
+        }
+
+        $chatroom = DB::table('group_chatrooms')
+            ->where('id', $chatroomId)
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$chatroom) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return null;
         }
 
         $pinned = DB::table('group_chatroom_pinned_messages as p')
-            ->join('group_chatroom_messages as m', 'p.message_id', '=', 'm.id')
-            ->join('users as u', 'm.user_id', '=', 'u.id')
-            ->join('group_chatrooms as c', 'p.chatroom_id', '=', 'c.id')
+            ->join('group_chatroom_messages as m', function ($join) {
+                $join->on('p.message_id', '=', 'm.id')
+                    ->on('p.chatroom_id', '=', 'm.chatroom_id');
+            })
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('m.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
             ->where('p.chatroom_id', $chatroomId)
-            ->where('c.tenant_id', $tenantId)
+            ->where('p.tenant_id', $tenantId)
             ->select([
                 'm.id',
                 'm.body',
@@ -663,5 +709,71 @@ class GroupChatroomService
             'pinned_by'  => (int) $row->pinned_by,
             'pinned_at'  => $row->pinned_at,
         ])->all();
+    }
+
+    private function authorizeParent(int $groupId, int $userId, bool $write): bool
+    {
+        $tenantId = (int) TenantContext::getId();
+        $exists = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$exists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
+            return false;
+        }
+
+        $allowed = $write
+            ? GroupAccessService::canWriteContent($groupId, $userId)
+            : GroupAccessService::canViewMemberContent($groupId, $userId);
+
+        if (!$allowed) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => $write
+                    ? __('api.group_chatroom_member_only_post')
+                    : __('api.group_chatroom_private_channel'),
+            ];
+            return false;
+        }
+
+        return true;
+    }
+
+    private function findAccessibleChatroom(
+        int $chatroomId,
+        int $userId,
+        bool $write,
+        ?int $expectedGroupId = null,
+    ): ?object {
+        $tenantId = (int) TenantContext::getId();
+
+        // When a route supplies the parent, authorize it before touching the
+        // child. Child-only routes first perform a tenant-concealed lookup to
+        // discover the parent, then immediately apply the same policy.
+        if ($expectedGroupId !== null && !$this->authorizeParent($expectedGroupId, $userId, $write)) {
+            return null;
+        }
+
+        $query = DB::table('group_chatrooms')
+            ->where('id', $chatroomId)
+            ->where('tenant_id', $tenantId);
+
+        if ($expectedGroupId !== null) {
+            $query->where('group_id', $expectedGroupId);
+        }
+
+        $chatroom = $query->first();
+        if (!$chatroom) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
+            return null;
+        }
+
+        if ($expectedGroupId === null && !$this->authorizeParent((int) $chatroom->group_id, $userId, $write)) {
+            return null;
+        }
+
+        return $chatroom;
     }
 }

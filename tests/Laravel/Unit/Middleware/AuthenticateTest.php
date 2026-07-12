@@ -189,6 +189,26 @@ class AuthenticateTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
+    public function test_legacy_jwt_authentication_does_not_create_a_parallel_raw_php_session(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+        TenantContext::setById($this->testTenantId);
+        unset($_SESSION['user_id']);
+        $token = app(TokenService::class)->generateToken(
+            (int) $user->id,
+            $this->testTenantId
+        );
+        $request = Request::create('/api/v2/feed', 'GET');
+        $request->headers->set('Authorization', 'Bearer ' . $token);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertArrayNotHasKey('user_id', $_SESSION ?? []);
+    }
+
     public function test_handle_no_authorization_header_returns_401(): void
     {
         $request = Request::create('/api/v2/feed', 'GET');

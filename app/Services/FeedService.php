@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Enums\GroupStatus;
 use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Like;
@@ -339,45 +340,25 @@ class FeedService
             });
         }
 
-        // Hide private group posts from non-members, including explicit group feeds.
+        // Group child content is member-only, even when the parent overview is
+        // public. The membership and parent lifecycle must both be active.
         if ($currentUserId) {
             $query->where(function ($q) use ($currentUserId, $tenantId) {
                 $q->whereNull('feed_activity.group_id')
                   ->orWhereExists(function ($sub) use ($currentUserId, $tenantId) {
                       $sub->select(DB::raw(1))
-                          ->from('group_members')
-                          ->whereColumn('group_members.group_id', 'feed_activity.group_id')
-                          ->where('group_members.user_id', $currentUserId)
-                          ->where('group_members.tenant_id', $tenantId)
-                          ->where('group_members.status', 'active');
-                  })
-                  ->orWhereExists(function ($sub) use ($tenantId) {
-                      $sub->select(DB::raw(1))
-                          ->from('groups')
-                          ->whereColumn('groups.id', 'feed_activity.group_id')
-                          ->where('groups.tenant_id', $tenantId)
-                          ->where('groups.visibility', 'public')
-                          ->where(function ($g) {
-                              $g->whereNull('groups.status')
-                                ->orWhere('groups.status', 'active');
-                          });
+                          ->from('group_members as visible_group_members')
+                          ->join('groups as visible_groups', 'visible_groups.id', '=', 'visible_group_members.group_id')
+                          ->whereColumn('visible_group_members.group_id', 'feed_activity.group_id')
+                          ->where('visible_group_members.user_id', $currentUserId)
+                          ->where('visible_group_members.tenant_id', $tenantId)
+                          ->where('visible_group_members.status', 'active')
+                          ->where('visible_groups.tenant_id', $tenantId)
+                          ->where('visible_groups.status', GroupStatus::Active->value);
                   });
             });
         } else {
-            $query->where(function ($q) use ($tenantId) {
-                $q->whereNull('feed_activity.group_id')
-                  ->orWhereExists(function ($sub) use ($tenantId) {
-                      $sub->select(DB::raw(1))
-                          ->from('groups')
-                          ->whereColumn('groups.id', 'feed_activity.group_id')
-                          ->where('groups.tenant_id', $tenantId)
-                          ->where('groups.visibility', 'public')
-                          ->where(function ($g) {
-                              $g->whereNull('groups.status')
-                                ->orWhere('groups.status', 'active');
-                          });
-                  });
-            });
+            $query->whereNull('feed_activity.group_id');
         }
 
         // Cursor pagination by (created_at, id) tuple

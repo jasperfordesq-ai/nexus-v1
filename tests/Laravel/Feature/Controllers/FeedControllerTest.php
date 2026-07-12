@@ -435,6 +435,72 @@ class FeedControllerTest extends TestCase
         $this->assertSame([], $response->json('data'));
     }
 
+    public function test_public_group_posts_are_still_member_only(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser();
+        $groupId = $this->createGroup($owner->id, 'public');
+        $canary = 'Public group member-content canary ' . uniqid();
+        $this->createFeedPost($owner->id, [
+            'content' => $canary,
+            'group_id' => $groupId,
+        ]);
+
+        $response = $this->apiGet('/v2/feed?group_id=' . $groupId);
+
+        $response->assertStatus(200);
+        $this->assertNotContains($canary, array_column($response->json('data') ?? [], 'content'));
+    }
+
+    public function test_active_group_member_can_view_group_posts(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $viewer = $this->authenticatedUser();
+        $groupId = $this->createGroup($owner->id, 'private');
+        $this->addGroupMember($groupId, $viewer->id);
+        $canary = 'Active member group canary ' . uniqid();
+        $this->createFeedPost($owner->id, [
+            'content' => $canary,
+            'group_id' => $groupId,
+        ]);
+
+        $response = $this->apiGet('/v2/feed?group_id=' . $groupId);
+
+        $response->assertStatus(200);
+        $this->assertContains($canary, array_column($response->json('data') ?? [], 'content'));
+    }
+
+    public function test_archived_group_posts_are_hidden_from_existing_members(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $viewer = $this->authenticatedUser();
+        $groupId = $this->createGroup($owner->id, 'private');
+        $this->addGroupMember($groupId, $viewer->id);
+        DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['status' => 'archived', 'is_active' => false]);
+        $canary = 'Archived group canary ' . uniqid();
+        $this->createFeedPost($owner->id, [
+            'content' => $canary,
+            'group_id' => $groupId,
+        ]);
+
+        $response = $this->apiGet('/v2/feed?group_id=' . $groupId);
+
+        $response->assertStatus(200);
+        $this->assertNotContains($canary, array_column($response->json('data') ?? [], 'content'));
+    }
+
     public function test_profile_feed_respects_connection_privacy(): void
     {
         $owner = User::factory()->forTenant($this->testTenantId)->create([
@@ -451,6 +517,19 @@ class FeedControllerTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertSame([], $response->json('data'));
+    }
+
+    private function addGroupMember(int $groupId, int $userId): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     public function test_connections_visibility_posts_are_visible_to_connected_users(): void

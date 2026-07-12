@@ -75,6 +75,27 @@ class ReindexEmbeddingJobTest extends TestCase
         ]);
     }
 
+    private function insertEvent(array $overrides = []): int
+    {
+        $userId = $this->insertEmbedUser();
+
+        return (int) DB::table('events')->insertGetId(array_merge([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $userId,
+            'title' => 'Embedding event ' . uniqid('', true),
+            'description' => 'Event embedding lifecycle test',
+            'status' => 'active',
+            'publication_status' => 'published',
+            'operational_status' => 'scheduled',
+            'lifecycle_version' => 1,
+            'is_recurring_template' => 0,
+            'start_time' => now()->addWeek(),
+            'end_time' => now()->addWeek()->addHour(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
     // ── tests ─────────────────────────────────────────────────────────────────
 
     /** Job exposes the expected $tries and $backoff values. */
@@ -178,6 +199,42 @@ class ReindexEmbeddingJobTest extends TestCase
 
         $job = new ReindexEmbeddingJob('user', $userId, self::TENANT_ID);
         $job->handle($service);
+        $this->assertTrue(true);
+    }
+
+    public function test_handle_generates_only_for_discoverable_event(): void
+    {
+        $eventId = $this->insertEvent();
+        $service = \Mockery::mock(EmbeddingService::class);
+        $service->shouldReceive('generateFor')
+            ->once()
+            ->with('event', \Mockery::on(static fn (mixed $row): bool =>
+                is_array($row) && (int) ($row['id'] ?? 0) === $eventId
+            ));
+        $service->shouldNotReceive('delete');
+
+        (new ReindexEmbeddingJob('event', $eventId, self::TENANT_ID))->handle($service);
+
+        $this->assertTrue(true);
+    }
+
+    public function test_handle_deletes_stale_embedding_for_non_discoverable_event(): void
+    {
+        foreach ([
+            ['status' => 'draft', 'publication_status' => 'draft'],
+            ['status' => 'cancelled', 'operational_status' => 'cancelled'],
+            ['is_recurring_template' => 1],
+        ] as $state) {
+            $eventId = $this->insertEvent($state);
+            $service = \Mockery::mock(EmbeddingService::class);
+            $service->shouldReceive('delete')
+                ->once()
+                ->with(self::TENANT_ID, 'event', $eventId);
+            $service->shouldNotReceive('generateFor');
+
+            (new ReindexEmbeddingJob('event', $eventId, self::TENANT_ID))->handle($service);
+        }
+
         $this->assertTrue(true);
     }
 

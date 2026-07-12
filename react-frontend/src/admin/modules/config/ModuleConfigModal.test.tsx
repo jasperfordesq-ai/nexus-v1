@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
+import i18n from '@/i18n';
 import type { ModuleDefinition } from './moduleRegistry';
 
 // ─── Mock adminApi ─────────────────────────────────────────────────────────────
@@ -268,6 +269,7 @@ describe('ModuleConfigModal', () => {
   });
 
   it('renders nothing visible when module prop is null', async () => {
+    const translationSpy = vi.spyOn(i18n, 't');
     const { default: ModuleConfigModal } = await import('./ModuleConfigModal');
     render(
       <ModuleConfigModal module={null} isOpen={true} onClose={vi.fn()} />
@@ -275,6 +277,8 @@ describe('ModuleConfigModal', () => {
     // Component returns null — no dialog or modal heading should appear
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(screen.queryByText('Exchange Workflow')).not.toBeInTheDocument();
+    expect(translationSpy.mock.calls.some(([key]) => key === '')).toBe(false);
+    translationSpy.mockRestore();
   });
 
   it('renders modal header with module name when isOpen=true', async () => {

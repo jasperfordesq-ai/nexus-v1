@@ -105,7 +105,9 @@ describe('module registry authentication modules', () => {
       'two_factor.backup_code_count',
     ]);
     expect(passkeys?.configOptions.map(option => option.key)).toEqual([
+      'passkeys.enrollment_enabled',
       'passkeys.conditional_autofill',
+      'passkeys.max_credentials_per_user',
     ]);
   });
 

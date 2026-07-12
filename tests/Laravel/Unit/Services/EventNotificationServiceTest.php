@@ -72,6 +72,12 @@ class EventNotificationServiceTest extends TestCase
                 (object) ['user_id' => 30, 'email' => null, 'name' => 'B', 'first_name' => 'B', 'preferred_language' => 'en'],
             ]));
 
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertManyLocalContactsAllowed')
+            ->once()
+            ->with(10, [20, 30], 2, 'event_broadcast');
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
         $this->notificationAlias->shouldReceive('create')->twice(); // 20 and 30 only
 
         $result = $this->service->notifyAttendees(2, 1, 'Event updated');
@@ -177,7 +183,7 @@ class EventNotificationServiceTest extends TestCase
 
     public function test_notifyEventUpdated_notifies_on_time_change(): void
     {
-        $event = (object) ['id' => 1, 'title' => 'Test', 'start_time' => '2026-04-01 10:00', 'location' => 'Cork', 'user_id' => 10];
+        $event = (object) ['id' => 1, 'title' => 'Test', 'start_time' => '2026-04-01 10:00', 'end_time' => '2026-04-01 11:00', 'location' => 'Cork', 'timezone' => 'Europe/Dublin', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
         // Attendees (organizer 10 excluded): 20 and 30 receive a notification.
         DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
@@ -189,6 +195,141 @@ class EventNotificationServiceTest extends TestCase
         $this->notificationAlias->shouldReceive('create')->twice();
 
         $this->service->notifyEventUpdated(1, ['start_time' => '2026-04-01 14:00']);
+    }
+
+    public function test_notifyEventUpdated_treats_end_time_as_a_localized_meaningful_change(): void
+    {
+        $event = (object) [
+            'id' => 1,
+            'title' => 'Test',
+            'start_time' => '2026-04-01 10:00',
+            'end_time' => '2026-04-01 11:00',
+            'location' => 'Cork',
+            'timezone' => 'Europe/Dublin',
+            'user_id' => 10,
+        ];
+        DB::shouldReceive('table->where->where->select->first')->andReturn($event);
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) [
+                    'user_id' => 20,
+                    'tenant_id' => 2,
+                    'email' => null,
+                    'name' => 'Attendee',
+                    'first_name' => 'Attendee',
+                    'preferred_language' => 'en',
+                ],
+            ]));
+
+        $this->notificationAlias
+            ->shouldReceive('create')
+            ->once()
+            ->withArgs(static fn (array $attributes): bool => str_contains(
+                (string) $attributes['message'],
+                __('notifications.event_change_end_time'),
+            ));
+
+        $this->service->notifyEventUpdated(1, ['end_time' => '2026-04-01 12:30']);
+    }
+
+    public function test_update_email_renders_end_time_as_a_separate_detail(): void
+    {
+        $method = new \ReflectionMethod(EventNotificationService::class, 'buildUpdateEmailHtml');
+        $event = (object) [
+            'id' => 1,
+            'title' => 'Test',
+            'start_time' => '2026-04-01 10:00',
+            'end_time' => '2026-04-01 11:00',
+            'timezone' => 'America/New_York',
+        ];
+        $recipient = (object) ['first_name' => 'Attendee'];
+
+        $html = $method->invoke(
+            $this->service,
+            $event,
+            ['end_time' => '2026-04-01 12:30'],
+            $recipient,
+        );
+
+        $this->assertStringContainsString(__('emails.events.change_label_end_time'), $html);
+        $this->assertStringContainsString('8:30 AM (America/New_York)', $html);
+        $this->assertSame(1, substr_count($html, '<li'));
+    }
+
+    public function test_notifyEventUpdated_treats_public_venue_accessibility_as_meaningful(): void
+    {
+        $event = (object) [
+            'id' => 1,
+            'title' => 'Test',
+            'start_time' => '2026-04-01 10:00',
+            'end_time' => '2026-04-01 11:00',
+            'location' => 'Cork',
+            'timezone' => 'Europe/Dublin',
+            'user_id' => 10,
+        ];
+        DB::shouldReceive('table->where->where->select->first')->andReturn($event);
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) [
+                    'user_id' => 20,
+                    'email' => null,
+                    'name' => 'Attendee',
+                    'first_name' => 'Attendee',
+                    'preferred_language' => 'en',
+                ],
+            ]));
+        $this->notificationAlias
+            ->shouldReceive('create')
+            ->once()
+            ->withArgs(static fn (array $attributes): bool => str_contains(
+                (string) $attributes['message'],
+                __('event_notifications.update.fields.accessibility'),
+            ));
+
+        $this->service->notifyEventUpdated(1, ['venue_accessibility' => true]);
+    }
+
+    public function test_update_email_preserves_false_and_null_meaningful_changes(): void
+    {
+        $method = new \ReflectionMethod(EventNotificationService::class, 'buildUpdateEmailHtml');
+        $event = (object) [
+            'id' => 1,
+            'title' => 'Test',
+            'start_time' => '2026-04-01 10:00',
+            'end_time' => '2026-04-01 11:00',
+            'timezone' => 'UTC',
+        ];
+        $recipient = (object) ['first_name' => 'Attendee'];
+
+        $html = $method->invoke(
+            $this->service,
+            $event,
+            [
+                'all_day' => false,
+                'max_attendees' => null,
+                'venue_accessibility' => true,
+            ],
+            $recipient,
+        );
+
+        $this->assertStringContainsString(__('event_notifications.update.fields.all_day'), $html);
+        $this->assertStringContainsString(__('event_notifications.update.fields.capacity'), $html);
+        $this->assertStringContainsString(__('event_notifications.update.fields.accessibility'), $html);
+        $this->assertSame(3, substr_count($html, '<li'));
+    }
+
+    public function test_event_time_formatter_falls_back_to_explicit_utc_for_invalid_zone(): void
+    {
+        $method = new \ReflectionMethod(EventNotificationService::class, 'formatEventDateTime');
+
+        $formatted = $method->invoke(
+            $this->service,
+            '2026-04-01 12:30:00',
+            'YYYY-MM-DD h:mm A',
+            'Invalid/Timezone',
+        );
+
+        $this->assertSame('2026-04-01 12:30 PM (UTC)', $formatted);
     }
 
     // =========================================================================

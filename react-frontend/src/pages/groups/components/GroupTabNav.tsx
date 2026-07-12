@@ -3,152 +3,168 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button } from '@/components/ui/Button';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
-import { ScrollShadow } from '@/components/ui/ScrollShadow';
-import { useTranslation } from 'react-i18next';import Users from 'lucide-react/icons/users';
-import MessageSquare from 'lucide-react/icons/message-square';
+import type { Key, ReactNode } from 'react';
+import { Dropdown } from '@heroui/react/dropdown';
+import { Label } from '@heroui/react/label';
+import { Tabs } from '@heroui/react/tabs';
+import { useTranslation } from 'react-i18next';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import Calendar from 'lucide-react/icons/calendar';
-import FolderTree from 'lucide-react/icons/folder-tree';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
+import ChevronDown from 'lucide-react/icons/chevron-down';
 import FileText from 'lucide-react/icons/file-text';
-import Image from 'lucide-react/icons/image';
-import Newspaper from 'lucide-react/icons/newspaper';
 import Flag from 'lucide-react/icons/flag';
 import FolderOpen from 'lucide-react/icons/folder-open';
+import FolderTree from 'lucide-react/icons/folder-tree';
+import Image from 'lucide-react/icons/image';
 import Megaphone from 'lucide-react/icons/megaphone';
-import ChevronDown from 'lucide-react/icons/chevron-down';
-import AlertCircle from 'lucide-react/icons/circle-alert';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Newspaper from 'lucide-react/icons/newspaper';
+import Users from 'lucide-react/icons/users';
+import Wrench from 'lucide-react/icons/wrench';
 import { useTenant } from '@/contexts';
+import { getAvailableGroupSections, type GroupSectionKey } from '../groupSections';
 
 interface GroupTabNavProps {
-  activeTab: string;
+  activeTab: GroupSectionKey;
+  children: ReactNode;
   userIsAdmin: boolean;
+  userIsMember: boolean;
   hasSubGroups: boolean;
   subGroupCount: number;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tab: GroupSectionKey) => void;
 }
 
 export function GroupTabNav({
   activeTab,
+  children,
   userIsAdmin,
+  userIsMember,
   hasSubGroups,
   subGroupCount,
   onTabChange,
 }: GroupTabNavProps) {
   const { t } = useTranslation('groups');
-  const { hasGroupTab } = useTenant();
+  const { hasGroupTab, hasFeature } = useTenant();
+  const keys = getAvailableGroupSections({
+    hasGroupTab,
+    hasSubgroups: hasSubGroups,
+    userIsAdmin,
+    userIsMember,
+    hasEventsFeature: hasFeature('events'),
+  });
+  const labels: Record<GroupSectionKey, string> = {
+    feed: t('detail.tab_feed'),
+    subgroups: t('detail.tab_subgroups_count', { count: subGroupCount }),
+    discussion: t('detail.tab_discussion'),
+    members: t('detail.tab_members'),
+    events: t('detail.tab_events'),
+    files: t('detail.tab_files'),
+    announcements: t('detail.tab_announcements'),
+    qa: t('detail.tab_qa'),
+    wiki: t('detail.tab_wiki'),
+    media: t('detail.tab_media'),
+    chatrooms: t('detail.tab_channels'),
+    tasks: t('detail.tab_tasks'),
+    challenges: t('detail.tab_challenges'),
+    analytics: t('detail.tab_analytics'),
+    automation: t('detail.tab_automation'),
+  };
+  const icons = {
+    feed: Newspaper,
+    subgroups: FolderTree,
+    discussion: MessageSquare,
+    members: Users,
+    events: Calendar,
+    files: FolderOpen,
+    announcements: Megaphone,
+    qa: AlertCircle,
+    wiki: FileText,
+    media: Image,
+    chatrooms: MessageSquare,
+    tasks: CheckCircle,
+    challenges: Flag,
+    analytics: Newspaper,
+    automation: Wrench,
+  } satisfies Record<GroupSectionKey, typeof Newspaper>;
+  const sections = keys.map((key) => ({ key, label: labels[key], icon: icons[key] }));
+  const activeSection = sections.find((section) => section.key === activeTab) ?? sections[0];
 
-  const primaryTabs = [
-    { key: 'feed', icon: Newspaper, label: t('detail.tab_feed') },
-    // Subgroups shown as a primary tab (not buried in More) so users can drill through hierarchy
-    ...(hasSubGroups ? [{ key: 'subgroups', icon: FolderTree, label: t('detail.tab_subgroups_count', { count: subGroupCount }) }] : []),
-    { key: 'discussion', icon: MessageSquare, label: t('detail.tab_discussion') },
-    { key: 'members', icon: Users, label: t('detail.tab_members') },
-    { key: 'events', icon: Calendar, label: t('detail.tab_events') },
-    { key: 'files', icon: FolderOpen, label: t('detail.tab_files') },
-  ].filter(tab => tab.key === 'subgroups' || hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
+  if (!activeSection) return <>{children}</>;
+  const ActiveIcon = activeSection.icon;
 
-  const secondaryTabs = [
-    // Content
-    { key: 'announcements', icon: Megaphone, label: t('detail.tab_announcements'), section: t('detail.tab_section_content') },
-    { key: 'qa', icon: AlertCircle, label: t('detail.tab_qa'), section: null },
-    { key: 'wiki', icon: FileText, label: t('detail.tab_wiki'), section: null },
-    { key: 'media', icon: Image, label: t('detail.tab_media'), section: null },
-    // Collaboration
-    { key: 'chatrooms', icon: MessageSquare, label: t('detail.tab_channels'), section: t('detail.tab_section_collab') },
-    { key: 'tasks', icon: CheckCircle, label: t('detail.tab_tasks'), section: null },
-    { key: 'challenges', icon: Flag, label: t('detail.tab_challenges'), section: null },
-    // Admin (conditional)
-    ...(userIsAdmin ? [{ key: 'analytics', icon: Newspaper, label: t('detail.tab_analytics'), section: t('detail.tab_section_admin') }] : []),
-  ].filter(tab => hasGroupTab(`tab_${tab.key}` as keyof import('@/types').GroupTabConfig));
-
-  const isSecondaryActive = secondaryTabs.some((tab) => tab.key === activeTab);
-  const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);
+  const selectSection = (key: Key) => {
+    const next = String(key) as GroupSectionKey;
+    if (keys.includes(next)) onTabChange(next);
+  };
 
   return (
-    <ScrollShadow
-      orientation="horizontal"
-      hideScrollBar
-      className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
-      role="tablist"
-      aria-label={t('detail.tab_nav_aria')}
-    >
-      {/* Primary tabs */}
-      {primaryTabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = activeTab === tab.key;
-        return (
-          <Button
-            key={tab.key}
-            variant="light"
-            role="tab"
-            aria-selected={isActive}
-            aria-label={tab.label}
-            onPress={() => onTabChange(tab.key)}
-            className={`flex h-10 min-w-10 flex-shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-all sm:min-w-0 sm:px-3 ${
-              isActive
-                ? 'bg-theme-hover text-theme-primary shadow-sm'
-                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
-            }`}
+    <>
+      <div className="sticky top-[var(--app-header-mobile-offset,5rem)] z-20 -mx-1 rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur sm:hidden">
+        <Dropdown>
+          <Dropdown.Trigger
+            className="flex h-11 w-full min-w-0 items-center justify-between gap-2 rounded-lg px-3 text-theme-primary"
+            aria-label={`${t('detail.tab_nav_aria')}: ${activeSection.label}`}
           >
-            <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span className="hidden max-w-36 truncate sm:inline">{tab.label}</span>
-          </Button>
-        );
-      })}
+            <span className="flex min-w-0 items-center gap-2">
+              <ActiveIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+              <span className="truncate font-medium">{activeSection.label}</span>
+            </span>
+            <ChevronDown className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+          </Dropdown.Trigger>
+          <Dropdown.Popover>
+            <Dropdown.Menu
+              aria-label={t('detail.tab_nav_aria')}
+              selectionMode="single"
+              selectedKeys={new Set([activeSection.key])}
+              onAction={selectSection}
+            >
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <Dropdown.Item key={section.key} id={section.key} textValue={section.label}>
+                    <Dropdown.ItemIndicator />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    <Label>{section.label}</Label>
+                  </Dropdown.Item>
+                );
+              })}
+            </Dropdown.Menu>
+          </Dropdown.Popover>
+        </Dropdown>
+      </div>
 
-      {/* Divider */}
-      {secondaryTabs.length > 0 && (
-        <div className="w-px h-6 bg-theme-default mx-1 flex-shrink-0" aria-hidden="true" />
-      )}
+      <Tabs
+        className="w-full min-w-0"
+        selectedKey={activeSection.key}
+        onSelectionChange={selectSection}
+      >
+        <div className="sticky top-[calc(var(--app-header-desktop-offset,5.5rem)+0.75rem)] z-20 hidden rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur sm:block">
+          <Tabs.ListContainer className="max-w-full overflow-x-auto">
+            <Tabs.List aria-label={t('detail.tab_nav_aria')} className="min-w-max gap-1">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <Tabs.Tab
+                    key={section.key}
+                    id={section.key}
+                    className="h-10 min-w-fit shrink-0 gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary data-[selected=true]:shadow-sm"
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    <span>{section.label}</span>
+                  </Tabs.Tab>
+                );
+              })}
+            </Tabs.List>
+          </Tabs.ListContainer>
+        </div>
 
-      {/* "More" dropdown for secondary tabs */}
-      {secondaryTabs.length > 0 && (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button
-            variant="light"
-            className={`flex h-10 min-w-10 flex-shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm font-medium transition-all sm:min-w-0 sm:px-3 ${
-              isSecondaryActive
-                ? 'bg-theme-hover text-theme-primary shadow-sm'
-                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover/50'
-            }`}
-            aria-label={t('detail.tab_more')}
-          >
-            {isSecondaryActive && activeSecondaryTab ? (
-              <>
-                {(() => { const Icon = activeSecondaryTab.icon; return <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />; })()}
-                <span className="hidden max-w-36 truncate sm:inline">{activeSecondaryTab.label}</span>
-              </>
-            ) : (
-              <span className="hidden sm:inline">{t('detail.tab_more_label')}</span>
-            )}
-            <ChevronDown className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-          aria-label={t('detail.tab_more_menu')}
-          onAction={(key) => onTabChange(key as string)}
-          selectedKeys={new Set([activeTab])}
-          selectionMode="single"
-        >
-          {secondaryTabs.map((tab, idx) => {
-            const Icon = tab.icon;
-            const showSection = tab.section && (idx === 0 || secondaryTabs[idx - 1]?.section !== tab.section);
-            return (
-              <DropdownItem
-                key={tab.key} id={tab.key}
-                startContent={<Icon className="w-4 h-4" />}
-                className={activeTab === tab.key ? 'bg-accent/10 text-accent' : ''}
-              >
-                {showSection ? t('detail.tab_section_label', { section: tab.section, label: tab.label }) : tab.label}
-              </DropdownItem>
-            );
-          })}
-        </DropdownMenu>
-      </Dropdown>
-      )}
-    </ScrollShadow>
+        {sections.map((section) => (
+          <Tabs.Panel key={section.key} id={section.key} className="pt-4 outline-none sm:pt-5">
+            {section.key === activeSection.key ? children : null}
+          </Tabs.Panel>
+        ))}
+      </Tabs>
+    </>
   );
 }

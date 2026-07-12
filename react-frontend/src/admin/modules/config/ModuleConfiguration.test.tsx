@@ -86,6 +86,13 @@ const MOCK_CONFIG: TenantConfig = {
     two_factor_authentication: true,
     biometric_login: true,
   },
+  security_impact: {
+    biometric_login: {
+      credential_count: 7,
+      registered_users: 3,
+      passkey_only_users: 1,
+    },
+  },
 };
 
 describe('ModuleConfiguration', () => {
@@ -127,7 +134,7 @@ describe('ModuleConfiguration', () => {
       expect(screen.getByText('Listings')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/search modules/i);
+    const searchInput = screen.getByRole('textbox', { name: 'Search modules' });
     await userEvent.type(searchInput, 'Wallet');
 
     // Only Wallet should appear; Listings should be gone
@@ -142,7 +149,7 @@ describe('ModuleConfiguration', () => {
       expect(screen.getByText('Listings')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/search modules/i);
+    const searchInput = screen.getByRole('textbox', { name: 'Search modules' });
     await userEvent.type(searchInput, 'xyznonexistent');
 
     await waitFor(() => {
@@ -197,5 +204,68 @@ describe('ModuleConfiguration', () => {
       expect(adminConfig.updateFeature).toHaveBeenCalledWith('two_factor_authentication', false);
       expect(mockRefreshTenant).toHaveBeenCalled();
     });
+  });
+
+  it('requires an impact confirmation before disabling passkey authentication', async () => {
+    vi.mocked(adminConfig.get).mockResolvedValue({ success: true, data: MOCK_CONFIG });
+    vi.mocked(adminConfig.updateFeature).mockResolvedValue({ success: true });
+    render(<ModuleConfiguration />);
+
+    const card = await screen.findByTestId('module-card-biometric_login');
+    const toggle = card.querySelector('button');
+    expect(toggle).not.toBeNull();
+    if (toggle) await userEvent.click(toggle);
+
+    expect(adminConfig.updateFeature).not.toHaveBeenCalled();
+    expect(await screen.findByText('Disable passkey authentication?')).toBeInTheDocument();
+    expect(screen.getByText(/1 member may have no other usable sign-in method/i)).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Disable passkey authentication' }));
+    await waitFor(() => {
+      expect(adminConfig.updateFeature).toHaveBeenCalledWith(
+        'biometric_login',
+        false,
+        { confirmDisable: true },
+      );
+      expect(mockRefreshTenant).toHaveBeenCalled();
+    });
+  });
+
+  it('fails closed when passkey disable impact data is unavailable', async () => {
+    const configWithoutImpact = { ...MOCK_CONFIG, security_impact: undefined };
+    vi.mocked(adminConfig.get).mockResolvedValue({ success: true, data: configWithoutImpact });
+    render(<ModuleConfiguration />);
+
+    const card = await screen.findByTestId('module-card-biometric_login');
+    const toggle = card.querySelector('button');
+    expect(toggle).not.toBeNull();
+    if (toggle) await userEvent.click(toggle);
+
+    const confirm = await screen.findByRole('button', { name: 'Disable passkey authentication' });
+    expect(confirm).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent(/security impact could not be loaded/i);
+    expect(adminConfig.updateFeature).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when passkey disable impact data is malformed', async () => {
+    const malformedConfig = {
+      ...MOCK_CONFIG,
+      security_impact: {
+        biometric_login: {
+          credential_count: 7,
+          registered_users: Number.NaN,
+          passkey_only_users: 1,
+        },
+      },
+    };
+    vi.mocked(adminConfig.get).mockResolvedValue({ success: true, data: malformedConfig });
+    render(<ModuleConfiguration />);
+
+    const card = await screen.findByTestId('module-card-biometric_login');
+    const toggle = card.querySelector('button');
+    if (toggle) await userEvent.click(toggle);
+
+    expect(await screen.findByRole('button', { name: 'Disable passkey authentication' })).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent(/security impact could not be loaded/i);
   });
 });

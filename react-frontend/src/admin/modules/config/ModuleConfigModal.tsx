@@ -81,8 +81,8 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
   const nameKey = module ? `config.module_name_${module.id}` : '';
   const descKey = module ? `config.module_desc_${module.id}` : '';
-  const translatedName = t(nameKey);
-  const translatedDesc = t(descKey);
+  const translatedName = module ? t(nameKey) : '';
+  const translatedDesc = module ? t(descKey) : '';
   const moduleName = module ? (translatedName === nameKey ? module.name : translatedName) : '';
   const moduleDesc = module ? (translatedDesc === descKey ? module.description : translatedDesc) : '';
   const { tenantPath, refreshTenant } = useTenant();
@@ -113,6 +113,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
   // Authentication config state (TOTP and passkey enrollment policies)
   const [authenticationConfig, setAuthenticationConfig] = useState<Record<string, boolean | number | string> | null>(null);
+  const [authenticationLoadError, setAuthenticationLoadError] = useState(false);
 
   // ── Loaders ───────────────────────────────────────────────────────────────
 
@@ -216,12 +217,19 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
   const loadAuthenticationConfig = useCallback(async () => {
     setLoading(true);
+    setAuthenticationLoadError(false);
     try {
       const res = await adminConfig.getAuthenticationConfig();
       if (res.success && res.data) {
         setAuthenticationConfig(res.data.config);
+      } else {
+        setAuthenticationConfig(null);
+        setAuthenticationLoadError(true);
+        toast.error(res.error || t('config.modal_authentication_load_failed'));
       }
     } catch {
+      setAuthenticationConfig(null);
+      setAuthenticationLoadError(true);
       toast.error(t('config.modal_authentication_load_failed'));
     } finally {
       setLoading(false);
@@ -245,6 +253,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setPodcastConfig(null);
       setIdentityConfig(null);
       setAuthenticationConfig(null);
+      setAuthenticationLoadError(false);
     }
   }
 
@@ -533,6 +542,17 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
             </div>
           )}
 
+          {isAuthenticationConfig && !loading && authenticationLoadError && (
+            <Card className="border-danger/40 bg-danger/10">
+              <CardBody className="flex flex-row items-center justify-between gap-3 py-3">
+                <p className="text-sm text-danger">{t('config.modal_authentication_load_failed')}</p>
+                <Button size="sm" variant="secondary" onPress={loadAuthenticationConfig}>
+                  {t('common.retry')}
+                </Button>
+              </CardBody>
+            </Card>
+          )}
+
           {/* Link-out: onboarding */}
           {isLinkOut && (
             <Card className="bg-surface-secondary">
@@ -569,7 +589,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           )}
 
           {/* Config options grouped by category */}
-          {!isLinkOut && (!isEditable || !loading) && categories.map(category => {
+          {!isLinkOut && (!isEditable || !loading) && !authenticationLoadError && categories.map(category => {
             const categoryOptions = module.configOptions.filter(o => o.category === category);
             return (
               <div key={category} className="mb-5 rounded-lg border border-border bg-surface-secondary/50">

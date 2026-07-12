@@ -124,6 +124,36 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('safeguarding-sla-escalate');
 
+        $schedule->command('events:expire-waitlist-offers --limit=250')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('events-expire-waitlist-offers');
+
+        $schedule->command('events:queue-reminders --limit=200')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('events-queue-reminders');
+
+        $schedule->command('events:process-notification-outbox --limit=50')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('events-process-notification-outbox');
+
+        $schedule->command('events:process-broadcasts --limit=50')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('events-process-broadcasts');
+
+        $schedule->command('events:process-federation --limit=50')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('events-process-federation');
+
         // Surface federated transactions stuck in 'pending' (saga safety-net).
         $schedule->job(new \App\Jobs\ReconcileFederationPendingTxJob())
             ->everyFiveMinutes()
@@ -262,6 +292,21 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->everyFiveMinutes()
             ->withoutOverlapping()
             ->name('groups-publish-scheduled');
+
+        $schedule->command('groups:dispatch-webhooks')
+            ->everyMinute()
+            ->withoutOverlapping(5)
+            ->name('groups-dispatch-webhooks');
+
+        $schedule->command('groups:check-inactive')
+            ->dailyAt('03:30')
+            ->withoutOverlapping()
+            ->name('groups-check-inactive');
+
+        $schedule->command('groups:prune-exports')
+            ->dailyAt('04:15')
+            ->withoutOverlapping()
+            ->name('groups-prune-exports');
 
         $schedule->command('listings:process-search-alerts')
             ->hourly()
@@ -460,6 +505,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // EnsureCorsHeaders runs as the outermost middleware to guarantee
         // CORS headers on ALL responses, including 401/403 from auth middleware.
         $middleware->prepend(\App\Http\Middleware\EnsureCorsHeaders::class);
+        // Prepended after CORS so this becomes the true outer edge and can
+        // preserve the Events contract Vary token on success and error paths.
+        $middleware->prepend(\App\Http\Middleware\NegotiateEventsContract::class);
         $middleware->append(\App\Http\Middleware\AssignRequestId::class);
 
         $middleware->api(prepend: [
@@ -478,6 +526,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'federation.api' => \App\Http\Middleware\FederationApiAuth::class,
             'partner.api' => \App\Http\Middleware\PartnerApiAuth::class,
             'onboarding-required' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'feature' => \App\Middleware\TenantFeatureMiddleware::class,
+            'group.tab' => \App\Middleware\GroupTabFeatureMiddleware::class,
             'module' => \App\Middleware\TenantModuleMiddleware::class,
         ]);
     })

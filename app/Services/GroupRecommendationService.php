@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Enums\GroupStatus;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,24 +22,39 @@ class GroupRecommendationService
      */
     public function getRecommendations(int $userId, int $limit = 10): array
     {
+        $tenantId = TenantContext::getId();
+        if (!DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists()) {
+            return [];
+        }
+
         $joinedIds = DB::table('group_members')
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
             ->pluck('group_id')
             ->all();
 
-        $tenantId = TenantContext::getId();
-
         $query = DB::table('groups as g')
-            ->leftJoin(DB::raw('(SELECT group_id, COUNT(*) as member_count FROM group_members GROUP BY group_id) as gm'), 'g.id', '=', 'gm.group_id')
+            ->leftJoin('group_members as gm', function ($join) use ($tenantId) {
+                $join->on('g.id', '=', 'gm.group_id')
+                    ->where('gm.tenant_id', $tenantId)
+                    ->where('gm.status', 'active');
+            })
             ->where('g.tenant_id', $tenantId)
-            ->where('g.status', 'active')
-            ->select('g.*', DB::raw('COALESCE(gm.member_count, 0) as member_count'));
+            ->where('g.status', GroupStatus::Active->value)
+            ->where(function ($query) {
+                $query->whereNull('g.visibility')->orWhere('g.visibility', 'public');
+            })
+            ->select('g.*', DB::raw('COUNT(gm.id) as member_count'));
 
         if (! empty($joinedIds)) {
             $query->whereNotIn('g.id', $joinedIds);
         }
 
-        $query->orderByDesc('member_count')->orderByDesc('g.created_at');
+        $query->groupBy('g.id')->orderByDesc('member_count')->orderByDesc('g.created_at');
 
         return $query
             ->limit($limit)
@@ -50,12 +66,41 @@ class GroupRecommendationService
     /**
      * Track a recommendation interaction (view, click, join).
      */
-    public function track(int $userId, int $groupId, string $action = 'view'): void
+    public function track(int $userId, int $groupId, string $action = 'view'): bool
     {
-        DB::table('group_recommendation_events')->insert([
+        $tenantId = (int) TenantContext::getId();
+        $normalizedAction = match ($action) {
+            'view', 'viewed' => 'viewed',
+            'click', 'clicked' => 'clicked',
+            'join', 'joined' => 'joined',
+            'dismiss', 'dismissed' => 'dismissed',
+            default => null,
+        };
+        if ($normalizedAction === null) {
+            return false;
+        }
+
+        $validUser = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        $validGroup = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', GroupStatus::Active->value)
+            ->where(function ($query) {
+                $query->whereNull('visibility')->orWhere('visibility', 'public');
+            })
+            ->exists();
+        if (!$validUser || !$validGroup) {
+            return false;
+        }
+
+        return DB::table('group_recommendation_interactions')->insert([
+            'tenant_id'  => $tenantId,
             'user_id'    => $userId,
             'group_id'   => $groupId,
-            'action'     => $action,
+            'action'     => $normalizedAction,
             'created_at' => now(),
         ]);
     }
@@ -66,19 +111,31 @@ class GroupRecommendationService
     public function similar(int $groupId, int $limit = 5): array
     {
         $tenantId = TenantContext::getId();
-        $group = DB::table('groups')->where('tenant_id', $tenantId)->where('id', $groupId)->first();
+        $group = DB::table('groups')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $groupId)
+            ->where('status', GroupStatus::Active->value)
+            ->where(function ($query) {
+                $query->whereNull('visibility')->orWhere('visibility', 'public');
+            })
+            ->first();
         if (! $group) {
             return [];
         }
 
         $memberIds = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
             ->pluck('user_id');
 
         if ($memberIds->isEmpty()) {
             return DB::table('groups')
                 ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
+                ->where('status', GroupStatus::Active->value)
+                ->where(function ($query) {
+                    $query->whereNull('visibility')->orWhere('visibility', 'public');
+                })
                 ->where('id', '!=', $groupId)
                 ->limit($limit)
                 ->get()
@@ -90,7 +147,12 @@ class GroupRecommendationService
             ->join('group_members as gm', 'g.id', '=', 'gm.group_id')
             ->where('g.tenant_id', $tenantId)
             ->where('g.id', '!=', $groupId)
-            ->where('g.status', 'active')
+            ->where('g.status', GroupStatus::Active->value)
+            ->where('gm.tenant_id', $tenantId)
+            ->where('gm.status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('g.visibility')->orWhere('g.visibility', 'public');
+            })
             ->whereIn('gm.user_id', $memberIds)
             ->select('g.*', DB::raw('COUNT(DISTINCT gm.user_id) as shared_members'))
             ->groupBy('g.id')

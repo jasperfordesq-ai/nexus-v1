@@ -296,6 +296,16 @@ describe('adminConfig', () => {
     expect(mockPut).toHaveBeenCalledWith('/v2/admin/config/features', { feature: 'events', enabled: true });
   });
 
+  it('updateFeature sends explicit confirmation for passkey disable', async () => {
+    mockPut.mockResolvedValueOnce({ success: true, data: {} });
+    await adminConfig.updateFeature('biometric_login', false, { confirmDisable: true });
+    expect(mockPut).toHaveBeenCalledWith('/v2/admin/config/features', {
+      feature: 'biometric_login',
+      enabled: false,
+      confirm_disable: true,
+    });
+  });
+
   it('updateModule puts module + enabled', async () => {
     mockPut.mockResolvedValueOnce({ success: true, data: {} });
     await adminConfig.updateModule('wallet', false);
@@ -1032,6 +1042,14 @@ describe('adminGroups', () => {
       group_id: 5,
       rule_type: 'location',
       rule_value: 'Dublin',
+    });
+  });
+
+  it('updateAutoAssignRule updates the tenant-scoped rule state', async () => {
+    mockPut.mockResolvedValueOnce({ success: true, data: { id: 17 } });
+    await adminGroups.updateAutoAssignRule(17, { is_active: false });
+    expect(mockPut).toHaveBeenCalledWith('/v2/admin/group-auto-assign-rules/17', {
+      is_active: false,
     });
   });
 });

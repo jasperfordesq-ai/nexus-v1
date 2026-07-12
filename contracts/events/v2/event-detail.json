@@ -1,0 +1,162 @@
+{
+  "contract_version": 2,
+  "id": 101,
+  "title": "Community repair morning",
+  "description": "Bring an item and learn how to repair it.",
+  "primary_image": {
+    "url": "/uploads/events/repair.jpg",
+    "alt_text": "Community repair morning"
+  },
+  "organizer": {
+    "id": 7,
+    "display_name": "Alex Morgan",
+    "avatar_url": "/uploads/avatars/alex.jpg",
+    "relationship": "member",
+    "actions": {
+      "view_profile": true,
+      "message": false
+    }
+  },
+  "category": {
+    "id": 4,
+    "name": "Workshops",
+    "slug": "workshops",
+    "colour": "#2563eb"
+  },
+  "location": {
+    "label": "Community Hall",
+    "latitude": 53.3498,
+    "longitude": -6.2603,
+    "mode": "hybrid"
+  },
+  "schedule": {
+    "start_at": "2030-05-01T10:15:00+00:00",
+    "end_at": "2030-05-01T12:00:00+00:00",
+    "timezone": "UTC",
+    "all_day": false,
+    "state": "upcoming",
+    "publication_state": "published",
+    "operational_state": "scheduled",
+    "lifecycle_version": 0,
+    "cancellation_reason": null
+  },
+  "relationship": {
+    "engagement": {
+      "state": "interested",
+      "can_change": true
+    },
+    "registration": {
+      "state": "waitlisted",
+      "waitlist_position": 3,
+      "can_register": false,
+      "can_withdraw": true,
+      "can_join_waitlist": false,
+      "can_leave_waitlist": true
+    },
+    "attendance": {
+      "state": "checked_in",
+      "checked_in_at": "2030-05-01T09:55:00+00:00",
+      "checked_out_at": null
+    },
+    "capacity": {
+      "limit": 20,
+      "confirmed": 18,
+      "remaining": 2,
+      "is_full": false,
+      "waitlist_count": 4
+    }
+  },
+  "online_access": {
+    "mode": "hybrid",
+    "reveal_state": "restricted",
+    "join_url": null,
+    "video_url": null,
+    "reveal_at": "2030-05-01T09:45:00+00:00",
+    "expires_at": "2030-05-01T14:00:00+00:00"
+  },
+  "series": {
+    "named": {
+      "id": 12,
+      "title": "Repair Together",
+      "description": "Monthly repair sessions.",
+      "event_count": 6
+    },
+    "recurrence": null
+  },
+  "permissions": {
+    "edit": false,
+    "cancel": false,
+    "manage_people": false,
+    "check_in": false,
+    "message": false,
+    "export": false,
+    "publish": false,
+    "manage_agenda": false,
+    "manage_staff": false,
+    "manage_registration": false,
+    "broadcast": false,
+    "manage_finance": false,
+    "reconcile_credits": false,
+    "reconcile_tickets": false,
+    "transfer_ownership": false
+  },
+  "metrics": {
+    "confirmed_count": 18,
+    "interested_count": 9,
+    "waitlist_count": 4
+  },
+  "created_at": "2030-04-01T08:00:00+00:00",
+  "updated_at": "2030-04-02T09:00:00+00:00",
+  "organizer_id": 7,
+  "user": {
+    "id": 7,
+    "name": "Alex Morgan",
+    "avatar": "/uploads/avatars/alex.jpg",
+    "avatar_url": "/uploads/avatars/alex.jpg"
+  },
+  "category_id": 4,
+  "category_name": "Workshops",
+  "category_slug": "workshops",
+  "location_label": "Community Hall",
+  "latitude": 53.3498,
+  "longitude": -6.2603,
+  "coordinates": {
+    "lat": 53.3498,
+    "lng": -6.2603
+  },
+  "start_time": "2030-05-01T10:15:00+00:00",
+  "end_time": "2030-05-01T12:00:00+00:00",
+  "start_date": "2030-05-01T10:15:00+00:00",
+  "end_date": "2030-05-01T12:00:00+00:00",
+  "status": "active",
+  "cancellation_reason": null,
+  "is_online": true,
+  "allow_remote_attendance": true,
+  "online_link": null,
+  "online_url": null,
+  "video_url": null,
+  "cover_image": "/uploads/events/repair.jpg",
+  "image_url": "/uploads/events/repair.jpg",
+  "max_attendees": 20,
+  "spots_left": 2,
+  "is_full": false,
+  "attendee_count": 18,
+  "attendees_count": 18,
+  "interested_count": 9,
+  "waitlist_count": 4,
+  "rsvp_counts": {
+    "going": 18,
+    "interested": 9
+  },
+  "my_rsvp": "interested",
+  "user_rsvp": "interested",
+  "rsvp_status": "interested",
+  "series_id": 12,
+  "is_series": false,
+  "parent_event_id": null,
+  "recurrence_frequency": null,
+  "series_count": null,
+  "series_occurrences": [],
+  "can_edit": false,
+  "group": null
+}

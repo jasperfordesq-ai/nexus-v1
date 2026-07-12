@@ -71,6 +71,30 @@ class SecurityHeadersTest extends TestCase
         $this->assertEquals('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
     }
 
+    public function test_handle_preserves_a_stricter_endpoint_referrer_policy(): void
+    {
+        $request = Request::create('/api/v2/events/calendar/feed-tokens', 'POST');
+        $response = $this->middleware->handle($request, static function ($request) {
+            return response()
+                ->json(['ok' => true])
+                ->header('Referrer-Policy', 'no-referrer');
+        });
+
+        $this->assertEquals('no-referrer', $response->headers->get('Referrer-Policy'));
+    }
+
+    public function test_handle_replaces_a_weaker_endpoint_referrer_policy(): void
+    {
+        $request = Request::create('/api/v2/feed', 'GET');
+        $response = $this->middleware->handle($request, static function ($request) {
+            return response()
+                ->json(['ok' => true])
+                ->header('Referrer-Policy', 'unsafe-url');
+        });
+
+        $this->assertEquals('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
+    }
+
     public function test_handle_sets_permissions_policy(): void
     {
         $request = Request::create('/api/v2/feed', 'GET');

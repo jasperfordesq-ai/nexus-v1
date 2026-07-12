@@ -1,0 +1,73 @@
+{
+  "subject": "Aktualizacja wydarzenia: :title",
+  "view_event": "Zobacz wydarzenie",
+  "accept_offer": "Przyjmij miejsce",
+  "reason": "Powód: :reason",
+  "states": {
+    "invited": "zaproszona",
+    "pending": "oczekująca",
+    "confirmed": "potwierdzona",
+    "declined": "odrzucona",
+    "cancelled": "anulowana",
+    "waiting": "na liście oczekujących",
+    "offered": "zaoferowana",
+    "accepted": "przyjęta",
+    "expired": "wygasła"
+  },
+  "lifecycle": {
+    "published": "Wydarzenie „:title” zostało opublikowane.",
+    "postponed": "Wydarzenie „:title” zostało przełożone.",
+    "cancelled": "Wydarzenie „:title” zostało odwołane.",
+    "archived": "Wydarzenie „:title” zostało zarchiwizowane.",
+    "restored": "Wydarzenie „:title” zostało przywrócone.",
+    "completed": "Wydarzenie „:title” zostało zakończone."
+  },
+  "registration": {
+    "invited": "Otrzymujesz zaproszenie na „:title”.",
+    "pending": "Twoja rejestracja na „:title” oczekuje na decyzję.",
+    "confirmed": "Twoja rejestracja na „:title” jest potwierdzona.",
+    "declined": "Twoja rejestracja na „:title” została odrzucona.",
+    "cancelled": "Twoja rejestracja na „:title” została anulowana.",
+    "organizer": "Rejestracja osoby :name na „:title” ma teraz status: :state."
+  },
+  "waitlist": {
+    "waiting": "Jesteś na liście oczekujących na „:title”.",
+    "offered": "Zwolniło się dla Ciebie miejsce na „:title”. Przyjmij je przed wygaśnięciem oferty.",
+    "accepted": "Przyjmujesz miejsce na „:title”.",
+    "expired": "Oferta miejsca na „:title” wygasła.",
+    "cancelled": "Nie jesteś już na liście oczekujących na „:title”.",
+    "organizer": "Status osoby :name na liście oczekujących na „:title” to teraz :state."
+  },
+  "staff_role": {
+    "granted": "Przydzielono Ci rolę :role dla „:title”.",
+    "revoked": "Usunięto Twoją rolę :role dla „:title”."
+  },
+  "reminder": {
+    "subject": "Przypomnienie o wydarzeniu: :title",
+    "message": "„:title” zaczyna się za :offset, :when."
+  },
+  "update": {
+    "message": "Wydarzenie „:title” zmieniło się: :changes.",
+    "separator": ", ",
+    "series_scope": "Ta zmiana dotyczy wszystkich przyszłych terminów.",
+    "fields": {
+      "title": "tytuł",
+      "time": "data lub godzina",
+      "timezone": "strefa czasowa",
+      "all_day": "ustawienie całodniowe",
+      "venue": "miejsce",
+      "online_access": "dostęp online",
+      "capacity": "liczba miejsc",
+      "accessibility": "dostępność miejsca",
+      "cancellation_policy": "zasady anulowania"
+    }
+  },
+  "roles": {
+    "co_organizer": "współorganizator",
+    "registration_manager": "koordynator rejestracji",
+    "communications_manager": "koordynator komunikacji",
+    "check_in_staff": "obsługa wejścia",
+    "finance_manager": "koordynator finansów",
+    "staff": "obsługa wydarzenia"
+  }
+}

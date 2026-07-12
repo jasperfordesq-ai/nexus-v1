@@ -9,11 +9,15 @@ import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
 // ─── Mock api ────────────────────────────────────────────────────────────────
-const { mockApi } = vi.hoisted(() => ({
-  mockApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+const { mockGetDashboard, mockDownloadExport } = vi.hoisted(() => ({
+  mockGetDashboard: vi.fn(),
+  mockDownloadExport: vi.fn(),
 }));
 
-vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
+vi.mock('../api/analytics', () => ({
+  getGroupAnalyticsDashboard: mockGetDashboard,
+  downloadGroupAnalyticsExport: mockDownloadExport,
+}));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ─── Chart colors (simple stubs avoid CSS var resolution errors) ──────────────
@@ -23,7 +27,10 @@ vi.mock('@/lib/chartColors', () => ({
   CHART_TOKEN_COLORS: { border: '#e5e7eb', surface: '#ffffff', foreground: '#111827' },
 }));
 
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '' }));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return { ...actual, resolveAvatarUrl: (url: string | null) => url ?? '' };
+});
 
 // ─── Stub recharts (heavy canvas library) ────────────────────────────────────
 vi.mock('recharts', () => ({
@@ -73,6 +80,7 @@ const makeFullDashboard = () => ({
   activity_breakdown: [
     { type: 'post', count: 40 },
     { type: 'comment', count: 25 },
+    { type: 'files', count: 3 },
   ],
   retention: [
     { month: '2025-01', joined: 20, still_active: 16, retention_pct: 80 },
@@ -87,13 +95,14 @@ const makeFullDashboard = () => ({
   },
 });
 
-const successResponse = (data: object) => ({ success: true, data });
+const successResponse = (data: object) => data;
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('GroupAnalyticsTab', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockApi.get.mockResolvedValue(successResponse(makeFullDashboard()));
+    mockGetDashboard.mockResolvedValue(successResponse(makeFullDashboard()));
+    mockDownloadExport.mockResolvedValue(undefined);
   });
 
   it('shows admin-only message when isAdmin=false', async () => {
@@ -101,7 +110,7 @@ describe('GroupAnalyticsTab', () => {
     render(<GroupAnalyticsTab groupId={1} isAdmin={false} />);
 
     // Should not fetch
-    expect(mockApi.get).not.toHaveBeenCalled();
+    expect(mockGetDashboard).not.toHaveBeenCalled();
     // Should show restricted message
     await waitFor(() => {
       // i18n returns key as value in test env
@@ -111,7 +120,7 @@ describe('GroupAnalyticsTab', () => {
   });
 
   it('shows loading spinner initially when isAdmin=true', async () => {
-    mockApi.get.mockImplementationOnce(() => new Promise(() => {}));
+    mockGetDashboard.mockImplementationOnce(() => new Promise(() => {}));
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
 
@@ -135,6 +144,7 @@ describe('GroupAnalyticsTab', () => {
     const items120 = screen.getAllByText('120');
     expect(items120.length).toBeGreaterThan(0); // total_members (may also appear in comparative)
     expect(screen.getByText('45')).toBeInTheDocument();  // active_members
+    expect(screen.getByText('Files: 3')).toBeInTheDocument();
   });
 
   it('renders top contributor names', async () => {
@@ -166,7 +176,7 @@ describe('GroupAnalyticsTab', () => {
       ...makeFullDashboard(),
       retention: [{ month: '2025-03', joined: 10, still_active: 5, retention_pct: null }],
     };
-    mockApi.get.mockResolvedValue(successResponse(degraded));
+    mockGetDashboard.mockResolvedValue(successResponse(degraded));
 
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
@@ -185,15 +195,17 @@ describe('GroupAnalyticsTab', () => {
     render(<GroupAnalyticsTab groupId={42} isAdmin={true} />);
 
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith(
-        expect.stringContaining('/v2/groups/42/analytics?days=30'),
+      expect(mockGetDashboard).toHaveBeenCalledWith(
+        42,
+        30,
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );
     });
   });
 
   it('shows "no growth data" message when growth array is empty', async () => {
     const emptyGrowth = { ...makeFullDashboard(), growth: [] };
-    mockApi.get.mockResolvedValue(successResponse(emptyGrowth));
+    mockGetDashboard.mockResolvedValue(successResponse(emptyGrowth));
 
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
@@ -211,7 +223,7 @@ describe('GroupAnalyticsTab', () => {
 
   it('shows "no contributors" message when top_contributors is empty', async () => {
     const noContribs = { ...makeFullDashboard(), top_contributors: [] };
-    mockApi.get.mockResolvedValue(successResponse(noContribs));
+    mockGetDashboard.mockResolvedValue(successResponse(noContribs));
 
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
@@ -227,8 +239,8 @@ describe('GroupAnalyticsTab', () => {
     expect(screen.queryByText('Bob')).toBeNull();
   });
 
-  it('shows toast error when API fails', async () => {
-    mockApi.get.mockRejectedValue(new Error('network'));
+  it('shows a retryable error instead of analytics-shaped zeroes when loading fails', async () => {
+    mockGetDashboard.mockRejectedValue(new Error('network'));
 
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
@@ -236,6 +248,11 @@ describe('GroupAnalyticsTab', () => {
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
     });
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed to load analytics');
+
+    mockGetDashboard.mockResolvedValueOnce(successResponse(makeFullDashboard()));
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    await waitFor(() => expect(screen.getByText('45')).toBeInTheDocument());
   });
 
   it('renders comparative stats section when data present', async () => {
@@ -249,9 +266,7 @@ describe('GroupAnalyticsTab', () => {
     });
   });
 
-  it('export members button is rendered', async () => {
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-
+  it('downloads member exports through the authenticated adapter', async () => {
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
 
@@ -268,11 +283,20 @@ describe('GroupAnalyticsTab', () => {
     );
     expect(exportBtn).toBeDefined();
     fireEvent.click(exportBtn!);
-    expect(openSpy).toHaveBeenCalledWith(
-      expect.stringContaining('/analytics/export/members'),
-      '_blank',
-    );
+    await waitFor(() => expect(mockDownloadExport).toHaveBeenCalledWith(1, 'members'));
+  });
 
+  it('reports a protected export failure without opening a new window', async () => {
+    mockDownloadExport.mockRejectedValueOnce(new Error('HTTP 401'));
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={7} isAdmin={true} />);
+    await screen.findByText('45');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Export members CSV' }));
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Failed to download file'));
+    expect(openSpy).not.toHaveBeenCalled();
     openSpy.mockRestore();
   });
 
@@ -281,7 +305,11 @@ describe('GroupAnalyticsTab', () => {
     render(<GroupAnalyticsTab groupId={5} isAdmin={true} />);
 
     await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('days=30'));
+      expect(mockGetDashboard).toHaveBeenCalledWith(
+        5,
+        30,
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
     });
 
     // Find the 7-day toggle button
@@ -289,8 +317,38 @@ describe('GroupAnalyticsTab', () => {
     if (btn7) {
       fireEvent.click(btn7);
       await waitFor(() => {
-        expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('days=7'));
+        expect(mockGetDashboard).toHaveBeenCalledWith(
+          5,
+          7,
+          expect.objectContaining({ signal: expect.any(AbortSignal) }),
+        );
       });
     }
+  });
+
+  it('aborts the analytics read when the tab unmounts', async () => {
+    mockGetDashboard.mockImplementationOnce(() => new Promise(() => {}));
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    const { unmount } = render(<GroupAnalyticsTab groupId={4} isAdmin={true} />);
+
+    await waitFor(() => expect(mockGetDashboard).toHaveBeenCalled());
+    const options = mockGetDashboard.mock.calls[0]?.[2] as { signal: AbortSignal };
+    expect(options.signal.aborted).toBe(false);
+
+    unmount();
+    expect(options.signal.aborted).toBe(true);
+  });
+
+  it('surfaces adapter rejection from a resolved API failure', async () => {
+    const { normalizeGroupApiError } = await import('../api/core');
+    mockGetDashboard.mockRejectedValue(normalizeGroupApiError({
+      success: false,
+      code: 'HTTP_403',
+      status: 403,
+    }));
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Failed to load analytics'));
   });
 });

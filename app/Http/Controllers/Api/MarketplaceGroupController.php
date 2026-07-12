@@ -9,8 +9,9 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Core\TenantContext;
+use App\Models\Group;
+use App\Services\GroupAccessService;
 use App\Services\MarketplaceGroupService;
-use Illuminate\Support\Facades\DB;
 
 /**
  * MarketplaceGroupController — Group-scoped marketplace endpoints.
@@ -31,7 +32,7 @@ class MarketplaceGroupController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403)
             );
         }
     }
@@ -39,20 +40,19 @@ class MarketplaceGroupController extends BaseApiController
     /**
      * Ensure the group exists and belongs to the current tenant.
      */
-    private function ensureGroup(int $groupId): object
+    private function ensureGroupAccess(int $groupId, int $userId): void
     {
-        $group = DB::table('groups')
-            ->where('id', $groupId)
-            ->where('tenant_id', TenantContext::getId())
-            ->first();
-
-        if (!$group) {
+        if (! Group::query()->whereKey($groupId)->exists()) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('NOT_FOUND', 'Group not found.', null, 404)
+                $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404)
             );
         }
 
-        return $group;
+        if (! GroupAccessService::canViewMemberContent($groupId, $userId)) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FORBIDDEN', __('api.group_marketplace_member_required'), null, 403)
+            );
+        }
     }
 
     // =====================================================================
@@ -68,17 +68,12 @@ class MarketplaceGroupController extends BaseApiController
     public function listings(Request $request, int $groupId): JsonResponse
     {
         $this->ensureFeature();
-        $this->ensureGroup($groupId);
 
         $userId = $request->user()?->id;
         if (!$userId) {
             return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_group.auth_required'), null, 401);
         }
-
-        // Verify group membership
-        if (!MarketplaceGroupService::isGroupMember($groupId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You must be a group member to view group marketplace listings.', null, 403);
-        }
+        $this->ensureGroupAccess($groupId, (int) $userId);
 
         $filters = [
             'category_id' => $request->integer('category_id') ?: null,
@@ -111,16 +106,12 @@ class MarketplaceGroupController extends BaseApiController
     public function stats(Request $request, int $groupId): JsonResponse
     {
         $this->ensureFeature();
-        $this->ensureGroup($groupId);
 
         $userId = $request->user()?->id;
         if (!$userId) {
             return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_group.auth_required'), null, 401);
         }
-
-        if (!MarketplaceGroupService::isGroupMember($groupId, $userId)) {
-            return $this->respondWithError('FORBIDDEN', 'You must be a group member to view group marketplace stats.', null, 403);
-        }
+        $this->ensureGroupAccess($groupId, (int) $userId);
 
         $stats = MarketplaceGroupService::getGroupMarketplaceStats($groupId);
 

@@ -15,12 +15,15 @@ class GroupCollectionController extends BaseApiController
 
     public function index(): JsonResponse
     {
-        return $this->successResponse(GroupCollectionService::getAll());
+        $userId = $this->requireUserId();
+
+        return $this->successResponse(GroupCollectionService::getAll($userId));
     }
 
     public function show(int $id): JsonResponse
     {
-        $col = GroupCollectionService::get($id);
+        $userId = $this->requireUserId();
+        $col = GroupCollectionService::get($id, $userId);
         return $col ? $this->successResponse($col) : $this->errorResponse(__('api.group_collection_not_found'), 404);
     }
 }

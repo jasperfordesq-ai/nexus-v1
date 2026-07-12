@@ -88,7 +88,7 @@ The default tenant (`EXPO_PUBLIC_DEFAULT_TENANT`) is `hour-timebank`; change thi
 | HTTP | Native `fetch` with typed wrapper (`lib/api/client.ts`) |
 | State | React Context + hooks (no external state library) |
 | Icons | `@expo/vector-icons` (Ionicons) |
-| Authentication | Password + WebAuthn / Passkeys (platform authenticator) |
+| Authentication | Password + authenticator-app 2FA (native passkeys planned) |
 | Real-time messaging | Pusher WebSockets (private channels, end-to-end encrypted transport) |
 | Push notifications | Firebase Cloud Messaging (FCM) via Expo Notifications |
 
@@ -140,7 +140,7 @@ See `docs/WRAPPER_POLICY.md` for the wrapper-vs-primitive policy and locale guid
 
 #### WebAuthn / Passkeys
 
-The app supports passkey-based authentication via the device platform authenticator (Face ID, Touch ID, Windows Hello, etc.). The WebAuthn flow uses the platform credential manager; no third-party biometrics library is required. Passkeys are registered and verified through the standard NEXUS WebAuthn API endpoints (`/api/v2/webauthn/register/*` and `/api/v2/webauthn/authenticate/*`). See `lib/security/pinning.ts` for certificate pinning applied to WebAuthn and API calls.
+Native passkey authentication is not implemented in the Expo app yet. The current mobile login flow is password/TOTP based; do not expose the web passkey module switch as mobile capability. A future native implementation must use the iOS/Android platform credential APIs, configure the required associated-domain/app-link files for every supported tenant RP ID, and conform to the web API's origin, tenant, user-verification, and recovery policy before this section can claim support.
 
 ### Multi-Tenancy
 

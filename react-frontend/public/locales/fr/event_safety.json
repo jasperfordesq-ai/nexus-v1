@@ -1,0 +1,316 @@
+{
+  "manage": {
+    "tab": "Sécurité",
+    "overview": "Exigences et examens de sécurité"
+  },
+  "safety": {
+    "actions": {
+      "retry": "Essayer à nouveau",
+      "save_draft": "Enregistrer le brouillon",
+      "publish": "Exigences de publication",
+      "archive": "Exigences en matière d'archivage",
+      "cancel": "Annuler",
+      "confirm_archive": "Archiver maintenant",
+      "acknowledge": "Reconnaître le code",
+      "withdraw_acknowledgement": "Retirer un accusé de réception",
+      "request_guardian_consent": "Demander le consentement du tuteur",
+      "withdraw_guardian_consent": "Retirer la demande de consentement",
+      "change_member": "Changer de membre",
+      "save_review": "Enregistrer la décision de révision",
+      "cancel_edit": "Annuler la modification",
+      "edit_review": "Mettre à jour la décision",
+      "withdraw_review": "Retirer la décision"
+    },
+    "organizer": {
+      "title": "Sécurité des événements",
+      "description": "Définissez des exigences de participation versionnées et conservez un enregistrement contrôlé et vérifiable des décisions de sécurité.",
+      "loading": "Sécurité des événements de chargement",
+      "load_error_title": "La sécurité de l'événement n'est pas disponible",
+      "load_error_description": "La politique de sécurité et le grand livre de révision n'ont pas pu être chargés. Aucune décision de sécurité n’a été modifiée.",
+      "configuration_invalid": "L'application de la sécurité n'est pas disponible car sa configuration n'est pas valide.",
+      "shadow_title": "Mode observation",
+      "shadow_description": "Les exigences sont évaluées et enregistrées, mais elles ne bloquent pas encore la participation.",
+      "read_only": "Vous pouvez consulter cette politique mais ne pouvez pas modifier ses exigences.",
+      "action_error": "La modification de sécurité n'a pas pu être enregistrée. Actualisez l'espace de travail et réessayez.",
+      "success": {
+        "saved": "Exigences de sécurité enregistrées sous forme de brouillon.",
+        "published": "Exigences de sécurité publiées.",
+        "archived": "Exigences de sécurité archivées."
+      }
+    },
+    "attendee": {
+      "title": "Conditions de participation",
+      "description": "Suivez les étapes de sécurité applicables avant de vous inscrire ou de rejoindre la liste d'attente.",
+      "loading": "Chargement des conditions de participation",
+      "load_error_title": "Les conditions de participation ne sont pas disponibles",
+      "load_error_description": "Nous n'avons pas pu vérifier les exigences de sécurité de l'événement. Réessayez avant de vous inscrire.",
+      "action_error": "Cette étape de sécurité n’a pas pu être complétée. Essayer à nouveau.",
+      "denial_title": "La participation n'est actuellement pas autorisée",
+      "attention_title": "Une action est requise",
+      "success": {
+        "acknowledge": "Code de conduite reconnu.",
+        "withdraw_code": "Accusé de réception du code retiré.",
+        "request_guardian": "Demande de consentement du tuteur envoyée.",
+        "withdraw_guardian": "Demande de consentement du tuteur retirée."
+      }
+    },
+    "rollout": {
+      "off": "Application désactivée",
+      "shadow": "Mode observation",
+      "enforce": "Application active"
+    },
+    "requirements": {
+      "title": "Politique de participation",
+      "description": "Les projets de modifications sont privés jusqu’à leur publication. La publication crée une version immuable pour la correspondance des preuves.",
+      "minimum_age": "Âge minimum",
+      "minimum_age_hint": "Laissez vide lorsque l’événement n’a pas d’âge minimum.",
+      "guardian_required": "Exiger le consentement du tuteur pour les mineurs",
+      "guardian_required_hint": "Le consentement est lié à la version exacte de l’exigence publiée et à la date de l’événement.",
+      "minor_threshold": "Seuil d'âge mineur",
+      "minor_threshold_hint": "Les membres en dessous de cet âge à l’événement doivent obtenir leur consentement.",
+      "code_required": "Exiger la reconnaissance du code de conduite",
+      "code_required_hint": "Les participants doivent reconnaître le texte exact publié avant de participer.",
+      "code_version": "Version texte du code",
+      "code_version_hint": "Utilisez un identifiant significatif, tel que event-conduct-2026-01.",
+      "code_text": "Code de conduite",
+      "code_text_hint": "Indiquez les conditions complètes que les participants doivent lire et reconnaître.",
+      "archive_title": "Archiver ces exigences de sécurité ?",
+      "archive_description": "Les exigences archivées ne constituent plus la politique de participation active. Les preuves et l’historique d’audit restent conservés.",
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Archivé"
+      }
+    },
+    "eligibility": {
+      "allow": "Exigences remplies",
+      "deny": "Participation bloquée",
+      "unavailable": "Vérification indisponible",
+      "not_evaluated": "Pas encore évalué"
+    },
+    "reasons": {
+      "unknown": "Une condition de participation doit encore être étudiée.",
+      "safeguarding_policy": "Sauvegarder la décision politique",
+      "minimum_age": "Âge minimum requis",
+      "guardian_consent": "Exigence de consentement du tuteur",
+      "code_of_conduct": "Exigence du code de conduite",
+      "conduct_violation": "Violation de conduite",
+      "safety_review": "Décision relative à l'examen de la sécurité",
+      "user_block": "Un blocage de membre empêche la participation",
+      "event_safety_unbound_guest_denied": "Connectez-vous pour vérifier les conditions de participation.",
+      "event_safety_user_not_active": "Votre compte membre n'est pas actif actuellement.",
+      "event_safety_bilateral_user_block": "Un blocage de membre empêche la participation à cet événement.",
+      "event_safety_requirements_not_published": "L'organisateur n'a pas encore publié les exigences de sécurité.",
+      "event_safety_requirements_integrity_invalid": "Les exigences de sécurité publiées n'ont pas pu être vérifiées.",
+      "event_safety_requirements_version_unavailable": "La version publiée des exigences n'est pas disponible.",
+      "event_safety_date_of_birth_required": "Ajoutez votre date de naissance afin que les conditions d'âge puissent être vérifiées.",
+      "event_safety_date_of_birth_invalid": "Votre date de naissance enregistrée n'a pas pu être vérifiée.",
+      "event_safety_minimum_age_not_met": "Vous n'avez pas l'âge minimum requis pour cet événement.",
+      "event_safety_minor_policy_unavailable": "La politique de participation mineure n’est pas disponible.",
+      "event_safety_guardian_consent_required": "Le consentement valide du tuteur est requis.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Reconnaissez le code de conduite actuel.",
+      "event_safety_active_participation_denial": "Une décision de sécurité active empêche la participation.",
+      "event_safety_safeguarding_policy_denied": "La politique de sauvegarde n’autorise actuellement pas la participation.",
+      "event_safety_safeguarding_policy_invalid": "La décision de sauvegarde n'a pas pu être vérifiée.",
+      "event_safety_safeguarding_policy_unavailable": "La vérification de la sauvegarde est temporairement indisponible.",
+      "event_safety_schema_unavailable": "La vérification de sécurité est temporairement indisponible.",
+      "event_safety_evaluation_unavailable": "La vérification de sécurité est temporairement indisponible.",
+      "event_safety_organizer_not_active": "L'organisateur de l'événement n'est pas actif actuellement.",
+      "event_safety_denial_safeguarding_policy": "Une décision politique de sauvegarde empêche la participation."
+    },
+    "code": {
+      "title": "Code de conduite",
+      "confirm_read": "J'ai lu et j'accepte le code de conduite complet.",
+      "status": {
+        "not_required": "Non requis",
+        "required": "Accusé de réception requis",
+        "acknowledged": "Prise en compte"
+      }
+    },
+    "guardian": {
+      "title": "Consentement du tuteur",
+      "description": "Le tuteur reçoit un lien privé et limité dans le temps. Leur identité et leur jeton de consentement ne sont jamais affichés dans la liste des événements.",
+      "name_label": "Nom du tuteur",
+      "email_label": "E-mail du tuteur",
+      "relationship_label": "Relation avec le participant",
+      "privacy_notice": "L'adresse est cryptée pour la livraison et retirée de l'enveloppe de livraison après traitement.",
+      "relationships": {
+        "parent": "Parent",
+        "guardian": "Tuteur",
+        "legal_guardian": "Tuteur légal",
+        "carer": "Aidant"
+      },
+      "status": {
+        "not_required": "Non requis",
+        "required": "Consentement requis",
+        "pending": "En attente d'un tuteur",
+        "active": "Consentement accordé",
+        "withdrawn": "Retirée",
+        "expired": "Expiré"
+      }
+    },
+    "decisions": {
+      "deny": "Refuser la participation",
+      "remove": "Supprimer de l'événement"
+    },
+    "review_status": {
+      "active": "Actif",
+      "withdrawn": "Retirée",
+      "expired": "Expiré"
+    },
+    "review_actions": {
+      "recorded": "Décision enregistrée",
+      "withdrawn": "Décision retirée",
+      "expired": "Décision expirée"
+    },
+    "reviews": {
+      "title": "Examens de participation",
+      "description": "Enregistrez les décisions contrôlées sans notes en texte libre, coordonnées ou enregistrements d'incidents.",
+      "new_title": "Enregistrer une décision",
+      "edit_title": "Mettre à jour cette décision",
+      "member_label": "Trouver un membre",
+      "member_hint": "Recherchez par nom, puis sélectionnez le bon membre.",
+      "member_search_error": "Les membres n'ont pas pu être recherchés. Essayer à nouveau.",
+      "decision_label": "Décision",
+      "reason_label": "Raison contrôlée",
+      "effective_from": "En vigueur à partir de",
+      "effective_until": "En vigueur jusqu'à",
+      "effective_until_hint": "Laissez vide lorsque la décision n’a pas de fin programmée.",
+      "no_notes_notice": "Pour des raisons de confidentialité, ce grand livre accepte uniquement les codes de motif contrôlés. Enregistrez les incidents et les preuves sensibles dans le système de sauvegarde approuvé.",
+      "saved": "Bilan de participation enregistré.",
+      "withdrawn": "Examen de la participation retiré.",
+      "action_error": "L'examen de la participation n'a pas pu être modifié. Actualisez et réessayez.",
+      "history_title": "Réviser le grand livre",
+      "total": "{{count}} décisions enregistrées",
+      "empty": "Aucun avis de participation n'a été enregistré pour cet événement.",
+      "reviewed_by": "Révisé par",
+      "version": "Version de la décision",
+      "audit_history": "Historique d'audit (entrées {{count}})",
+      "pagination": "Pages d'évaluation des participations"
+    },
+    "guardian_grant": {
+      "page_title": "Consentement du tuteur",
+      "title": "Vérifier le consentement du tuteur",
+      "description": "Confirmez l'adresse e-mail qui a reçu ce lien privé, puis autorisez le participant à participer conformément aux exigences de sécurité publiées de l'événement.",
+      "email_label": "Adresse e-mail du tuteur",
+      "email_hint": "Saisissez la même adresse que celle qui a reçu la demande de consentement.",
+      "confirm_label": "Je suis le parent, tuteur ou tuteur désigné et j'accepte que ce participant participe.",
+      "privacy_notice": "Le lien est limité dans le temps et ne peut être utilisé que pour cette version d'événement et d'exigence. La réponse ne révèle pas si une adresse e-mail est enregistrée.",
+      "submit": "Donner son consentement",
+      "success_title": "Consentement enregistré",
+      "success_description": "Le participant peut désormais continuer une fois que toutes les autres exigences de l'événement sont remplies.",
+      "invalid_title": "Ce lien de consentement ne peut pas être utilisé",
+      "invalid_description": "Le lien ou l'adresse e-mail est peut-être incorrect, expiré ou déjà renseigné. Demandez au participant d'envoyer une nouvelle demande.",
+      "browse_events": "Parcourir les événements"
+    }
+  },
+  "govuk": {
+    "link": "Exigences et examens de sécurité",
+    "back": "Retour à l'événement",
+    "title": "Sécurité des événements",
+    "intro": "Passez en revue les conditions de participation, effectuez toutes les étapes qui s'appliquent à vous ou gérez la politique de sécurité contrôlée de l'événement.",
+    "updated": "Le dossier de sécurité de l'événement a été mis à jour.",
+    "failed": "Le changement de sécurité n'a pas pu être effectué. Vérifiez les informations actuelles et réessayez.",
+    "unavailable_title": "La sécurité de l'événement n'est pas disponible",
+    "unavailable_body": "Les conditions de participation n'ont pas pu être vérifiées. Aucune décision de sécurité n’a été modifiée.",
+    "rollout": {
+      "off": "Application désactivée",
+      "shadow": "Mode observation",
+      "enforce": "Application active"
+    },
+    "requirement_status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "archived": "Archivé"
+    },
+    "policy_title": "Politique de participation",
+    "policy_intro": "Les projets de modifications restent privés jusqu'à leur publication. Chaque version publiée est conservée pour la mise en correspondance des preuves.",
+    "minimum_age": "Âge minimum",
+    "minimum_age_hint": "Laissez vide lorsque l’événement n’a pas d’âge minimum.",
+    "guardian_policy": "Consentement du tuteur",
+    "guardian_required": "Exiger le consentement du tuteur pour les mineurs",
+    "minor_threshold": "Seuil d'âge mineur",
+    "minor_threshold_hint": "Les membres en dessous de cet âge à l’événement ont besoin du consentement du tuteur.",
+    "code_policy": "Code de conduite",
+    "code_required": "Exiger des participants qu’ils reconnaissent le code de conduite",
+    "code_version": "Version texte du code",
+    "code_version_hint": "Utilisez un identifiant significatif, tel que event-conduct-2026-01.",
+    "code_text": "Texte complet du code de conduite",
+    "save_draft": "Enregistrer le brouillon",
+    "publish": "Exigences de publication",
+    "archive": "Exigences en matière d'archivage",
+    "archive_warning": "Les exigences archivées cessent d’être la stratégie active. Les preuves et l’historique des audits restent conservés.",
+    "confirm_archive": "Archiver maintenant",
+    "attendee_title": "Conditions de participation",
+    "eligibility": {
+      "allow": "Vos exigences applicables sont remplies.",
+      "deny": "La participation est actuellement bloquée jusqu'à ce que les exigences énumérées soient résolues.",
+      "unavailable": "Les exigences ne peuvent pas être vérifiées actuellement. Réessayez avant de vous inscrire.",
+      "not_evaluated": "Les conditions de participation n'ont pas encore été évaluées."
+    },
+    "action_required": "Une action est requise avant la participation",
+    "code_title": "Code de conduite",
+    "confirm_code": "J'ai lu et j'accepte le code de conduite complet.",
+    "acknowledge": "Reconnaître le code",
+    "withdraw_acknowledgement": "Retirer un accusé de réception",
+    "guardian_title": "Consentement du tuteur",
+    "guardian_status": {
+      "not_required": "Le consentement du tuteur n’est pas requis.",
+      "required": "Une demande de consentement du tuteur est requise.",
+      "pending": "La demande attend la réponse du tuteur.",
+      "active": "Le consentement du tuteur a été accordé.",
+      "withdrawn": "La demande de consentement du tuteur a été retirée.",
+      "expired": "La demande de consentement du tuteur a expiré."
+    },
+    "guardian_name": "Nom du tuteur",
+    "guardian_email": "Adresse e-mail du tuteur",
+    "guardian_relationship": "Relation avec le participant",
+    "relationships": {
+      "parent": "Parent",
+      "guardian": "Tuteur",
+      "legal_guardian": "Tuteur légal",
+      "carer": "Aidant"
+    },
+    "guardian_privacy": "L'adresse est cryptée pour la livraison et retirée de l'enveloppe de livraison après traitement.",
+    "request_guardian": "Envoyer une demande de consentement",
+    "withdraw_guardian": "Retirer la demande de consentement",
+    "reviews_title": "Examens de participation",
+    "reviews_intro": "Enregistrez les décisions contrôlées sans notes en texte libre, coordonnées ou enregistrements d'incidents.",
+    "review_member": "Participant à l'événement",
+    "review_member_choose": "Choisissez un participant",
+    "member_fallback": "Numéro de membre : id",
+    "review_decision": "Décision",
+    "decisions": {
+      "deny": "Refuser la participation",
+      "remove": "Supprimer de l'événement"
+    },
+    "review_reason": "Raison contrôlée",
+    "reasons": {
+      "unknown": "Une condition de participation doit encore être étudiée.",
+      "safeguarding_policy": "Sauvegarder la décision politique",
+      "minimum_age": "Âge minimum requis",
+      "guardian_consent": "Exigence de consentement du tuteur",
+      "code_of_conduct": "Exigence du code de conduite",
+      "conduct_violation": "Violation de conduite",
+      "safety_review": "Décision relative à l'examen de la sécurité",
+      "user_block": "Un blocage de membre empêche la participation"
+    },
+    "effective_from": "En vigueur à partir de",
+    "effective_until": "En vigueur jusqu'à",
+    "effective_until_hint": "Laissez vide lorsque la décision n’a pas de fin programmée.",
+    "no_notes": "Pour des raisons de confidentialité, utilisez uniquement des motifs contrôlés. Conservez les incidents et les preuves sensibles dans le système de sauvegarde approuvé.",
+    "save_review": "Enregistrer la décision de révision",
+    "no_people": "Aucun participant à l'événement n'est disponible pour un nouvel avis.",
+    "open_people": "Ouvrir l'espace de travail des personnes chargées de l'événement",
+    "ledger_title": "Réviser le grand livre",
+    "review_status": "Statut",
+    "review_states": {
+      "active": "Actif",
+      "withdrawn": "Retirée",
+      "expired": "Expiré"
+    },
+    "reviewed_by": "Révisé par",
+    "withdraw_review": "Retirer la décision",
+    "ledger_empty": "Aucun avis de participation n'a été enregistré pour cet événement."
+  }
+}

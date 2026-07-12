@@ -23,6 +23,7 @@
     "cta": "Brabhsáil Grúpaí"
   },
   "group_promoted": {
+    "role_admin": "riarthóir",
     "subject": "Is {{role}} de {{group_name}} thú anois — {{community}}",
     "title": "Nuashonrú Róil",
     "preview": "Comhghairdeas — rinneadh {{role}} de {{group_name}} díot",

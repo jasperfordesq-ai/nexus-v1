@@ -1,0 +1,94 @@
+{
+  "safety": {
+    "actions": {
+      "retry": "Try again",
+      "acknowledge": "Acknowledge the code",
+      "withdraw_acknowledgement": "Withdraw acknowledgement",
+      "request_guardian_consent": "Request guardian consent",
+      "withdraw_guardian_consent": "Withdraw consent request"
+    },
+    "attendee": {
+      "title": "Participation requirements",
+      "description": "Complete the applicable safety steps before registering or joining the waitlist.",
+      "loading": "Loading participation requirements",
+      "load_error_title": "Participation requirements are unavailable",
+      "load_error_description": "We could not verify the event's safety requirements. Try again before registering.",
+      "action_error": "That safety step could not be completed. Try again.",
+      "denial_title": "Participation is not currently permitted",
+      "attention_title": "Action is required",
+      "success": {
+        "acknowledge": "Code of conduct acknowledged.",
+        "withdraw_code": "Code acknowledgement withdrawn.",
+        "request_guardian": "Guardian consent request sent.",
+        "withdraw_guardian": "Guardian consent request withdrawn."
+      }
+    },
+    "eligibility": {
+      "allow": "Requirements complete",
+      "deny": "Participation blocked",
+      "unavailable": "Verification unavailable",
+      "not_evaluated": "Not yet evaluated"
+    },
+    "reasons": {
+      "unknown": "A participation requirement still needs attention.",
+      "safeguarding_policy": "Safeguarding policy decision",
+      "minimum_age": "Minimum age requirement",
+      "guardian_consent": "Guardian consent requirement",
+      "code_of_conduct": "Code-of-conduct requirement",
+      "conduct_violation": "Conduct violation",
+      "safety_review": "Safety review decision",
+      "user_block": "A member block prevents participation",
+      "event_safety_unbound_guest_denied": "Sign in to verify the participation requirements.",
+      "event_safety_user_not_active": "Your member account is not currently active.",
+      "event_safety_bilateral_user_block": "A member block prevents participation in this event.",
+      "event_safety_requirements_not_published": "The organizer has not published the safety requirements yet.",
+      "event_safety_requirements_integrity_invalid": "The published safety requirements could not be verified.",
+      "event_safety_requirements_version_unavailable": "The published requirement version is unavailable.",
+      "event_safety_date_of_birth_required": "Add your date of birth so age requirements can be checked.",
+      "event_safety_date_of_birth_invalid": "Your recorded date of birth could not be verified.",
+      "event_safety_minimum_age_not_met": "You do not meet this event's minimum age.",
+      "event_safety_minor_policy_unavailable": "The policy for minor participation is unavailable.",
+      "event_safety_guardian_consent_required": "Valid guardian consent is required.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Acknowledge the current code of conduct.",
+      "event_safety_active_participation_denial": "An active safety decision prevents participation.",
+      "event_safety_safeguarding_policy_denied": "The safeguarding policy does not currently permit participation.",
+      "event_safety_safeguarding_policy_invalid": "The safeguarding decision could not be verified.",
+      "event_safety_safeguarding_policy_unavailable": "Safeguarding verification is temporarily unavailable.",
+      "event_safety_schema_unavailable": "Safety verification is temporarily unavailable.",
+      "event_safety_evaluation_unavailable": "Safety verification is temporarily unavailable.",
+      "event_safety_organizer_not_active": "The event organizer is not currently active.",
+      "event_safety_denial_safeguarding_policy": "A safeguarding policy decision prevents participation."
+    },
+    "code": {
+      "title": "Code of conduct",
+      "confirm_read": "I have read and agree to the complete code of conduct.",
+      "status": {
+        "not_required": "Not required",
+        "required": "Acknowledgement required",
+        "acknowledged": "Acknowledged"
+      }
+    },
+    "guardian": {
+      "title": "Guardian consent",
+      "description": "The guardian receives a private, time-limited link. Their identity and consent token are never shown in the event roster.",
+      "name_label": "Guardian name",
+      "email_label": "Guardian email",
+      "relationship_label": "Relationship to the attendee",
+      "privacy_notice": "The address is encrypted for delivery and removed from the delivery envelope after processing.",
+      "relationships": {
+        "parent": "Parent",
+        "guardian": "Guardian",
+        "legal_guardian": "Legal guardian",
+        "carer": "Carer"
+      },
+      "status": {
+        "not_required": "Not required",
+        "required": "Consent required",
+        "pending": "Awaiting guardian",
+        "active": "Consent granted",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
+      }
+    }
+  }
+}

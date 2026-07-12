@@ -156,6 +156,22 @@
                     </div>
                 </fieldset>
 
+                @php
+                    $venueAccess = [
+                        'step_free_access' => $event['accessibility_step_free'] ?? null,
+                        'accessible_toilet' => $event['accessibility_toilet'] ?? null,
+                        'hearing_loop' => $event['accessibility_hearing_loop'] ?? null,
+                        'quiet_space' => $event['accessibility_quiet_space'] ?? null,
+                        'seating_available' => $event['accessibility_seating'] ?? null,
+                        'accessible_parking' => $event['accessibility_parking'] ?? null,
+                        'parking_details' => $event['accessibility_parking_details'] ?? null,
+                        'transit_details' => $event['accessibility_transit_details'] ?? null,
+                        'assistance_contact' => $event['accessibility_assistance_contact'] ?? null,
+                        'notes' => $event['accessibility_notes'] ?? null,
+                    ];
+                @endphp
+                @include('accessible-frontend::partials.event-venue-accessibility-fields', ['venueAccess' => $venueAccess])
+
                 <fieldset class="govuk-fieldset govuk-!-margin-top-7">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_capacity_title') }}</h2>

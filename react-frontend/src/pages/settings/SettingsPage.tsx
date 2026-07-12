@@ -202,6 +202,7 @@ export function SettingsPage() {
     email_connections: true,
     email_transactions: true,
     email_reviews: true,
+    email_events: true,
     email_gamification_digest: true,
     email_gamification_milestones: true,
     email_org_payments: true,

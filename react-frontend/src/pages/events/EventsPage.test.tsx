@@ -3,93 +3,156 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * Tests for EventsPage
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
+import { getFormattingLocale } from '@/lib/helpers';
+import { createCanonicalEventFixture, renderEventRoute } from '@/test/events-test-harness';
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
-
-vi.mock('@/lib/api', () => ({
-  api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: [], meta: {} }),
-    post: vi.fn().mockResolvedValue({ success: true }),
+const { mockApi, mockToast } = vi.hoisted(() => ({
+  mockApi: {
+    get: vi.fn(),
+    post: vi.fn(),
   },
-  tokenManager: { getTenantId: vi.fn() },
-}));
-
-vi.mock('@/contexts', () => ({
-  useAuth: vi.fn(() => ({
-    user: { id: 1, first_name: 'Test' },
-    isAuthenticated: true,
-  })),
-  useTenant: vi.fn(() => ({
-    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test${p}`,
-    hasFeature: vi.fn(() => true),
-    hasModule: vi.fn(() => true),
-  })),
-  useToast: vi.fn(() => ({
+  mockToast: {
     success: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
-  })),
-
-  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
-  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
-  usePusher: () => ({ channel: null, isConnected: false }),
-  usePusherOptional: () => null,
-  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
-  readStoredConsent: () => null,
-  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
-  useFeature: vi.fn(() => true),
-  useModule: vi.fn(() => true),
+    warning: vi.fn(),
+  },
 }));
 
-vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/lib/api', () => ({
+  api: mockApi,
+  tokenManager: { getTenantId: vi.fn() },
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 1, first_name: 'Test' },
+    isAuthenticated: true,
+  }),
+}));
+
+vi.mock('@/contexts/ToastContext', () => ({
+  useToast: () => mockToast,
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    tenantPath: (path: string) => `/test${path}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  }),
+}));
+
+vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
-  resolveAssetUrl: vi.fn((url) => url || '/placeholder.png'),
-  formatRelativeTime: vi.fn(() => '2 hours ago'),
-  formatDateTime: vi.fn(() => '10:00'),
-  formatDateValue: vi.fn(() => 'April 24, 2026'),
-  formatMonthShort: vi.fn(() => 'Apr'),
-  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
+vi.mock('@/components/proximity/ProximityFilter', () => ({
+  ProximityFilter: () => null,
 }));
-vi.mock('@/lib/map-config', () => ({ MAPS_ENABLED: false }));
-vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
-vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
-vi.mock('@/components/location', () => ({
-  EntityMapView: () => <div data-testid="map-view">Map</div>,
+vi.mock('./components/CalendarSubscriptionPanel', () => ({
+  CalendarSubscriptionPanel: () => null,
 }));
-vi.mock('@/components/feedback', () => ({
-  EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
-}));
-vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 import { EventsPage } from './EventsPage';
 
+async function renderLoadedEventsPage() {
+  renderEventRoute(<EventsPage />);
+
+  await waitFor(() => {
+    expect(mockApi.get).toHaveBeenCalledWith(
+      expect.stringContaining('/v2/events?'),
+      expect.objectContaining({ headers: expect.any(Headers), signal: expect.any(AbortSignal) }),
+    );
+  });
+  await screen.findByRole('heading', { name: 'No events found' });
+}
+
 describe('EventsPage', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
-
-  it('renders without crashing', () => {
-    render(<EventsPage />);
-    expect(screen.getByText('Events')).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: { has_more: false, total_items: 0 },
+    });
   });
 
-  it('shows the page description', () => {
-    render(<EventsPage />);
-    expect(screen.getByText(/Find local workshops, gatherings, and community events near you/i)).toBeInTheDocument();
+  it('renders the Events page heading', async () => {
+    await renderLoadedEventsPage();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Events' })).toBeInTheDocument();
   });
 
-  it('shows search input', () => {
-    render(<EventsPage />);
-    expect(screen.getByPlaceholderText(/Search events/i)).toBeInTheDocument();
+  it('shows the page description', async () => {
+    await renderLoadedEventsPage();
+
+    expect(screen.getAllByText(/Find local workshops, gatherings, and community events near you/i).length)
+      .toBeGreaterThan(0);
   });
 
-  it('shows Create Event button for authenticated users', () => {
-    render(<EventsPage />);
-    expect(screen.getByText('Create Event')).toBeInTheDocument();
+  it('exposes an accessible event search field', async () => {
+    await renderLoadedEventsPage();
+
+    expect(screen.getByRole('searchbox', { name: 'Search events' })).toBeInTheDocument();
+  });
+
+  it('loads the structured step-free venue filter from the URL', async () => {
+    renderEventRoute(<EventsPage />, { route: '/test/events?step_free=yes' });
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(
+        expect.stringContaining('step_free=yes'),
+        expect.objectContaining({ headers: expect.any(Headers), signal: expect.any(AbortSignal) }),
+      );
+    });
+
+    expect(screen.getByRole('button', { name: /Step-free venue access/ })).toBeInTheDocument();
+    expect(screen.getAllByText('Step-free access confirmed').length).toBeGreaterThan(0);
+  });
+
+  it('shows tenant-aware Create Event links for authenticated users', async () => {
+    await renderLoadedEventsPage();
+
+    const createLinks = screen.getAllByRole('link', { name: 'Create Event' });
+    expect(createLinks.length).toBeGreaterThan(0);
+    expect(createLinks[0]).toHaveAttribute('href', '/test/events/create');
+  });
+
+  it('keeps card day and time aligned to the event timezone', async () => {
+    const event = createCanonicalEventFixture({
+      schedule: {
+        ...createCanonicalEventFixture().schedule,
+        start_at: '2026-07-11T00:30:00+00:00',
+        end_at: '2026-07-11T01:30:00+00:00',
+        timezone: 'America/Los_Angeles',
+        all_day: false,
+      },
+    });
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [event],
+      meta: { has_more: false, total_items: 1 },
+    });
+
+    renderEventRoute(<EventsPage />);
+    await screen.findByRole('heading', { name: 'Community Garden Day' });
+
+    const locale = getFormattingLocale();
+    const start = new Date('2026-07-11T00:30:00+00:00');
+    const expectedTime = start.toLocaleString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Los_Angeles',
+      timeZoneName: 'short',
+    });
+    const expectedDay = start.toLocaleDateString(locale, {
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    });
+
+    expect(screen.getByText(expectedTime)).toBeInTheDocument();
+    expect(screen.getByText(expectedDay)).toBeInTheDocument();
   });
 });

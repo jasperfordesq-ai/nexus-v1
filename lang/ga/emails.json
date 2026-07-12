@@ -317,6 +317,7 @@
     "intro": "Seo achoimre ar an méid a chaill tú ar Project NEXUS:",
     "opted_in_notice": "Fuair tú an ríomhphost seo toisc gur roghnaigh tú achoimre {{frequency}}.",
     "manage_notifications": "Bainistigh Fógraí",
+    "unsubscribe_events": "Díliostáil ó ríomhphoist imeachtaí amháin",
     "view_item": "Féach",
     "frequency_instant": "Láithreach",
     "frequency_daily": "Laethúil",
@@ -394,6 +395,13 @@
     "updated_subject": "Nuashonraithe: \"{{title}}\" ({{changes}})",
     "rsvp_subject": "{{name}} {{status_label}} d'imeacht \"{{title}}\"",
     "view_event": "Féach ar Imeacht",
+    "broadcast_subject": "Teachtaireacht faoi {{title}}",
+    "follow_up_subject": "Obair leantach i ndiaidh {{title}}",
+    "review_request_subject": "Conas a bhí {{title}}?",
+    "broadcast_heading": "Teachtaireacht faoi {{title}}",
+    "follow_up_heading": "Obair leantach i ndiaidh {{title}}",
+    "review_request_heading": "Roinn d’eispéireas ar {{title}}",
+    "leave_event_review": "Fág léirmheas",
     "view_updated_event": "Féach ar Imeacht Nuashonraithe",
     "browse_events": "Brabhsáil Imeachtaí",
     "new_rsvp_heading": "RSVP Nua!",
@@ -409,6 +417,7 @@
     "updated_heading": "Imeacht Nuashonraithe",
     "updated_body": "Nuashonraíodh an t-imeacht <strong>\"{{title}}\"</strong>:",
     "change_label_date_time": "Dáta/Am:",
+    "change_label_end_time": "Am críochnaithe:",
     "change_label_location": "Suíomh:",
     "change_label_title": "Teideal:",
     "reminder_heading_24h": "Imeacht Amárach",
@@ -617,6 +626,16 @@
     "impact_minor": "Mionur",
     "impact_cosmetic": "Cosmaiteach"
   },
+  "event_guardian_consent": {
+    "subject": "Toiliú caomhnóra de dhíth le haghaidh :event",
+    "title": "Athbhreithnigh toiliú an chaomhnóra",
+    "greeting": "Dia duit, :name,",
+    "introduction": "Tá iarrtha ag :minor freastal ar :event. Athbhreithnigh riachtanais sábháilteachta na hócáide sula dtugann tú toiliú.",
+    "security_notice": "Baineann an nasc seo leis an iarratas toilithe seo amháin. Ná cuir ar aghaidh ná roinn é.",
+    "review_button": "Athbhreithnigh agus tabhair toiliú",
+    "expiry_notice": "Rachaidh an nasc in éag tar éis na hócáide nó má tharraingítear siar nó má chuirtear an t-iarratas ina ionad.",
+    "consent_text": "Deimhním go bhfuil údarás agam toiliú a thabhairt don mhionaoiseach freastal ar :event agus go bhfuil riachtanais sábháilteachta na hócáide athbhreithnithe agam."
+  },
   "donation_admin": {
     "created_subject": "Síntiús nua: :amount chuig :community",
     "created_title": "Síntiús nua faighte",
@@ -631,5 +650,16 @@
     "anonymous_donor": "Gan ainm",
     "anonymous_note": "(marcáilte gan ainm go poiblí)",
     "review_cta": "Féach ar Shíntiúis"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "Clárú aoi curtha ar ceal: :event",
+    "cancelled_message": "Cuireadh do chlárú mar aoi le haghaidh :event ar ceal.",
+    "view_event": "Féach ar an imeacht"
+  },
+  "event_invitation": {
+    "subject": "Tá cuireadh agat chuig :event",
+    "message": "Tugadh cuireadh duit freastal ar :event. Athbhreithnigh sonraí an imeachta agus freagair sula dtéann an cuireadh in éag.",
+    "expiry": "Téann an cuireadh seo in éag ag :expiry.",
+    "accept_button": "Athbhreithnigh an cuireadh"
   }
 }

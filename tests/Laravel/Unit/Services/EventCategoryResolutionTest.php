@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Tests\Laravel\TestCase;
 
 /**
@@ -54,11 +55,12 @@ class EventCategoryResolutionTest extends TestCase
         return $method->invoke(null, $data);
     }
 
-    public function test_foreign_tenant_category_id_resolves_to_null(): void
+    public function test_foreign_tenant_category_id_fails_closed(): void
     {
         $foreignId = $this->insertCategory(self::OTHER_TENANT_ID, 'Foreign Cat ' . uniqid());
 
-        $this->assertNull($this->resolve(['category_id' => $foreignId]));
+        $this->expectException(ValidationException::class);
+        $this->resolve(['category_id' => $foreignId]);
     }
 
     public function test_own_tenant_category_id_resolves_to_itself(): void
@@ -87,8 +89,9 @@ class EventCategoryResolutionTest extends TestCase
         $this->assertSame($ownId, $this->resolve(['category_name' => $name]));
     }
 
-    public function test_nonexistent_category_id_resolves_to_null(): void
+    public function test_nonexistent_category_id_fails_closed(): void
     {
-        $this->assertNull($this->resolve(['category_id' => 999999999]));
+        $this->expectException(ValidationException::class);
+        $this->resolve(['category_id' => 999999999]);
     }
 }

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
@@ -63,13 +63,9 @@ vi.mock('@/contexts', () =>
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-// Stub useConfirm from @/components/ui
-vi.mock('@/components/ui', async (importOriginal) => {
-  const orig = await importOriginal<Record<string, unknown>>();
-  return {
-    ...orig,
-    useConfirm: () => mockConfirm,
-  };
+vi.mock('@/components/ui/ConfirmDialog', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui/ConfirmDialog')>();
+  return { ...actual, useConfirm: () => mockConfirm };
 });
 
 // Stub feedback
@@ -155,6 +151,76 @@ describe('TeamChatrooms', () => {
       const matches = screen.getAllByText('general');
       expect(matches.length).toBeGreaterThan(0);
     });
+  });
+
+  it('renders the Channels heading', async () => {
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={false} />);
+
+    expect(await screen.findByRole('heading', { name: 'Channels' })).toBeInTheDocument();
+  });
+
+  it('uses a mobile channel navigator without forcing the desktop sidebar width', async () => {
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={false} />);
+
+    const navigator = await screen.findByRole('navigation', { name: 'Channels' });
+    expect(navigator).toHaveClass('w-full', 'md:w-48');
+    expect(navigator.parentElement).toHaveClass('flex-col', 'md:flex-row', 'min-w-0');
+
+    const activeChannel = screen.getByRole('button', { name: 'general' });
+    expect(activeChannel).toHaveAttribute('aria-current', 'page');
+    expect(activeChannel).toHaveClass('min-h-11', 'min-w-[9rem]', 'md:w-full');
+    expect(screen.getByRole('log')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('button', { name: 'Send' })).toHaveClass('h-11', 'w-11');
+  });
+
+  it('announces pinned-message expansion and controls the pinned region', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/messages')) return Promise.resolve(emptyMessages);
+      if (url.includes('/pinned')) {
+        return Promise.resolve({
+          success: true,
+          data: [{ ...makeMessage(), pinned_by: 1, pinned_at: '2025-01-01T10:06:00Z' }],
+        });
+      }
+      return Promise.resolve(okChatrooms);
+    });
+
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={false} />);
+
+    const toggle = await screen.findByRole('button', { name: 'Show pinned messages' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveAttribute('aria-controls', 'group-chatroom-pinned-messages');
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(document.getElementById('group-chatroom-pinned-messages')).toBeInTheDocument();
+  });
+
+  it('fetches the channel list and first channel messages', async () => {
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={false} />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/5/chatrooms');
+      expect(mockApi.get).toHaveBeenCalledWith('/v2/group-chatrooms/10/messages');
+    });
+  });
+
+  it('shows the authenticated message composer', async () => {
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={false} />);
+
+    expect(await screen.findByRole('textbox', { name: 'Type a message...' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+  });
+
+  it('shows the delete-channel action to group admins', async () => {
+    const { TeamChatrooms } = await import('./TeamChatrooms');
+    render(<TeamChatrooms groupId={5} isGroupAdmin={true} />);
+
+    expect(await screen.findByRole('button', { name: 'Delete Channel' })).toBeInTheDocument();
   });
 
   it('shows empty-state when no chatrooms and no active chatroom', async () => {
@@ -388,36 +454,19 @@ describe('TeamChatrooms', () => {
 
     await waitForChatroom();
 
-    const createBtn = screen.getAllByRole('button').find(
-      (b) =>
-        b.getAttribute('aria-label')?.toLowerCase().includes('creat') ||
-        b.getAttribute('aria-label')?.includes('chatrooms.create')
-    );
-    fireEvent.click(createBtn!);
+    fireEvent.click(screen.getByRole('button', { name: 'Create Channel' }));
 
-    await waitFor(() => document.querySelector('[role="dialog"]'));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.change(within(dialog).getByRole('textbox'), {
+      target: { value: 'my-new-channel' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Create Channel' }));
 
-    // Type in the input inside the modal
-    const modalInputs = document.querySelectorAll('[role="dialog"] input');
-    if (modalInputs.length > 0) {
-      fireEvent.change(modalInputs[0], { target: { value: 'my-new-channel' } });
-    }
-
-    // Click the create button in modal (labeled t('chatrooms.create'))
-    const createInModalBtn = screen.getAllByRole('button').find(
-      (b) =>
-        !b.getAttribute('aria-label') &&
-        (b.textContent?.toLowerCase().includes('creat') ||
-         b.textContent?.includes('chatrooms.create'))
-    );
-    if (createInModalBtn) {
-      fireEvent.click(createInModalBtn);
-      await waitFor(() => {
-        expect(mockApi.post).toHaveBeenCalledWith(
-          `/v2/groups/5/chatrooms`,
-          expect.objectContaining({ name: 'my-new-channel' }),
-        );
-      });
-    }
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith(
+        '/v2/groups/5/chatrooms',
+        expect.objectContaining({ name: 'my-new-channel' }),
+      );
+    });
   });
 });

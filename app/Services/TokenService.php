@@ -23,6 +23,7 @@ class TokenService
     private const REFRESH_TOKEN_EXPIRY = 63072000;          // 2 years
     private const REFRESH_TOKEN_EXPIRY_MOBILE = 157680000;  // 5 years (mobile)
     private const IMPERSONATION_TOKEN_EXPIRY = 300;         // 5 minutes
+    private const SECURITY_CONFIRMATION_EXPIRY = 300;       // 5 minutes
 
     private const ALGORITHM = 'HS256';
 
@@ -116,6 +117,36 @@ class TokenService
     }
 
     /**
+     * Issue a short-lived proof that a sensitive authenticator mutation was
+     * confirmed with an existing sign-in factor.
+     */
+    public function generateSecurityConfirmationToken(int $userId, int $tenantId, string $method): string
+    {
+        return $this->createToken([
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'type' => 'security_confirmation',
+            'method' => $method,
+            'jti' => bin2hex(random_bytes(16)),
+        ], self::SECURITY_CONFIRMATION_EXPIRY);
+    }
+
+    public function validateSecurityConfirmationToken(string $token, int $userId, int $tenantId): ?array
+    {
+        $payload = $this->validateSignedToken($token);
+        if (
+            $payload === null
+            || ($payload['type'] ?? null) !== 'security_confirmation'
+            || (int) ($payload['user_id'] ?? 0) !== $userId
+            || (int) ($payload['tenant_id'] ?? 0) !== $tenantId
+        ) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    /**
      * Validate an access token and return its payload if valid.
      */
     public function validateToken(string $token): ?array
@@ -173,7 +204,7 @@ class TokenService
         if ($userId && $iat) {
             $globalJti = 'global_revoke_' . $userId;
             $globalRevoke = DB::selectOne(
-                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at > FROM_UNIXTIME(?)",
+                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at >= FROM_UNIXTIME(?)",
                 [$globalJti, $iat]
             );
             if ($globalRevoke) {
@@ -299,7 +330,7 @@ class TokenService
     public function revokeAllTokensForUser(int $userId): int
     {
         try {
-            $specialJti = 'revoke_all_' . $userId . '_' . time();
+            $specialJti = 'revoke_all_' . $userId . '_' . bin2hex(random_bytes(12));
             $farFutureExpiry = time() + (10 * 365 * 24 * 60 * 60);
 
             DB::insert(
@@ -310,7 +341,12 @@ class TokenService
             $globalJti = 'global_revoke_' . $userId;
             DB::insert(
                 "INSERT INTO revoked_tokens (user_id, jti, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))
-                 ON DUPLICATE KEY UPDATE revoked_at = NOW()",
+                 ON DUPLICATE KEY UPDATE
+                    revoked_at = FROM_UNIXTIME(GREATEST(
+                        COALESCE(UNIX_TIMESTAMP(revoked_at) + 1, 0),
+                        UNIX_TIMESTAMP(NOW())
+                    )),
+                    expires_at = VALUES(expires_at)",
                 [$userId, $globalJti, $farFutureExpiry]
             );
 
@@ -435,7 +471,7 @@ class TokenService
 
             $globalJti = 'global_revoke_' . $userId;
             $globalRevoke = DB::selectOne(
-                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at > FROM_UNIXTIME(?)",
+                "SELECT revoked_at FROM revoked_tokens WHERE jti = ? AND revoked_at >= FROM_UNIXTIME(?)",
                 [$globalJti, $iat]
             );
             if ($globalRevoke) {
@@ -475,8 +511,12 @@ class TokenService
         ];
 
         $now = time();
+        $issuedAt = $this->issuedAtAfterGlobalRevocation($payload, $now);
         $payload = array_merge($payload, [
-            'iat' => $now,
+            'iat' => $issuedAt,
+            // Expiry remains anchored to wall-clock issuance. The logical iat
+            // may be advanced solely to clear a same-second revocation cutoff;
+            // it must not lengthen the token's real lifetime.
             'exp' => $now + $expirySeconds,
             'nbf' => $now,
         ]);
@@ -488,6 +528,35 @@ class TokenService
         $signatureEncoded = $this->base64UrlEncode($signature);
 
         return $headerEncoded . '.' . $payloadEncoded . '.' . $signatureEncoded;
+    }
+
+    /**
+     * Return an issuance time strictly newer than this user's global revocation
+     * cutoff. JWT NumericDate values and revoked_tokens.revoked_at both have
+     * one-second precision, so wall-clock time alone cannot distinguish tokens
+     * issued immediately before and after a revocation in the same second.
+     *
+     * `nbf` remains the real current time, allowing the newly issued token to be
+     * used immediately even when its logical `iat` is one second ahead.
+     */
+    private function issuedAtAfterGlobalRevocation(array $payload, int $now): int
+    {
+        $userId = (int) ($payload['user_id'] ?? 0);
+        if ($userId < 1) {
+            return $now;
+        }
+
+        $globalRevoke = DB::selectOne(
+            'SELECT UNIX_TIMESTAMP(revoked_at) AS cutoff
+             FROM revoked_tokens
+             WHERE jti = ?',
+            ['global_revoke_' . $userId]
+        );
+        if ($globalRevoke === null) {
+            return $now;
+        }
+
+        return max($now, (int) ($globalRevoke->cutoff ?? 0) + 1);
     }
 
     /**

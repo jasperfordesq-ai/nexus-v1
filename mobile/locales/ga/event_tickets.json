@@ -1,0 +1,53 @@
+{
+  "tickets": {
+    "mobile": {
+      "title": "Ticéid imeachta",
+      "gatewayDisabledTitle": "Tá seiceáil amach íoctha agus creidmheasa ama díchumasaithe",
+      "gatewayDisabledDescription": "Ní thacaíonn an sreabhadh soghluaiste seo ach le leithdháileadh ticéad saor in aisce. Ní ghearrann sé airgead nó creidmheasanna ama riamh agus ní athraíonn sé do sparán.",
+      "loading": "Ticéid imeachtaí á lódáil",
+      "loadFailedTitle": "Ní féidir ticéid a lódáil",
+      "loadFailedDescription": "Níorbh fhéidir catalóg na dticéad imeachta a lódáil. Bain triail eile as.",
+      "myTicketsTitle": "Mo ticéid",
+      "noTickets": "Níl ticéad agat don imeacht seo.",
+      "ticketFallback": "Ticéad imeachta",
+      "entitlementSummary": "{{count}} ticéad · {{status}}",
+      "entitlementSummary_other": "{{count}} ticéid · {{status}}",
+      "cancelTicket": "Cealaigh ticéad",
+      "timeCreditCancelDisabled": "Níl fáil ar chealú ticéad creidmheas ama sa sreabhadh saor in aisce seo. Níl aon ghníomh sparán déanta.",
+      "cancelTitle": "Cealaigh an ticéad saor in aisce seo?",
+      "cancelDescription": "Tabhair cúis ghearr. Fillfidh an chainníocht ar an leithdháileadh saor in aisce.",
+      "reasonLabel": "Cúis cealaithe",
+      "confirmCancellation": "Deimhnigh cealú",
+      "reasonInvalidTitle": "Seiceáil an chúis cealaithe",
+      "reasonInvalidDescription": "Cuir isteach cúis nach mó ná 500 carachtar.",
+      "cancelledTitle": "Ticéad saor in aisce curtha ar ceal",
+      "cancelledDescription": "Tá an chainníocht curtha ar ais chuig an leithdháileadh saor in aisce.",
+      "cancelFailedTitle": "Ní féidir ticéad a chur ar ceal",
+      "cancelFailedDescription": "Athnuaigh an chatalóg agus bain triail eile as.",
+      "catalogueTitle": "Ticéid ar fáil",
+      "catalogueEmpty": "Níl aon chineál ticéad ar fáil don imeacht seo.",
+      "free": "Saor",
+      "timeCreditPrice": "{{credits}} creidmheasanna ama",
+      "remaining": "{{count}} fágtha",
+      "remaining_other": "{{count}} fágtha",
+      "timeCreditDisabledTitle": "Níl fáil ar sheic amach creidmheas ama",
+      "timeCreditDisabledDescription": "Níl an geata sparán ceadaithe ceangailte. Ní féidir aon chreidmheas a chur chun dochair ón scáileán seo.",
+      "unitsLabel": "Cainníocht (suas go dtí {{count}})",
+      "registrationRequired": "Teastaíonn clárú dearbhaithe imeachta sula n-éilítear ticéad saor in aisce.",
+      "notEligible": "Ní chomhlíonann tú rialacha incháilitheachta an chineáil ticéid seo faoi láthair.",
+      "salesClosed": "Níl an cineál ticéad seo ar oscailt le leithdháileadh faoi láthair.",
+      "soldOut": "Níl aon ticéid saor in aisce fágtha agat sa leithdháileadh seo.",
+      "claimFreeTicket": "Éileamh ticéad saor in aisce",
+      "unitsInvalidTitle": "Seiceáil an chainníocht",
+      "unitsInvalidDescription": "Cuir isteach slánuimhir idir 1 agus {{count}}.",
+      "allocatedTitle": "Ticéad saor in aisce a leithdháileadh",
+      "allocatedDescription": "Tá do thicéad deimhnithe anois.",
+      "allocateFailedTitle": "Ní féidir ticéad a leithdháileadh",
+      "allocateFailedDescription": "Seiceáil do chlárú, incháilitheacht agus an leithdháileadh atá fágtha, agus ansin bain triail eile as."
+    },
+    "status": {
+      "confirmed": "Deimhnithe",
+      "cancelled": "Ar ceal"
+    }
+  }
+}

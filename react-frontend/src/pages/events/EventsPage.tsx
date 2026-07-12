@@ -11,6 +11,7 @@ import { SearchField } from '@/components/ui/SearchField';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { Label, ListBox, Select as HeroSelect } from '@heroui/react';
 /**
  * Events Page - Community events listing with category filtering
  */
@@ -30,10 +31,11 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Tag from 'lucide-react/icons/tag';
-import Star from 'lucide-react/icons/star';
 import Ban from 'lucide-react/icons/ban';
 import X from 'lucide-react/icons/x';
 import Repeat from 'lucide-react/icons/repeat';
+import List from 'lucide-react/icons/list';
+import Rows3 from 'lucide-react/icons/rows-3';
 import { useTranslation } from 'react-i18next';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,13 +43,17 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
-import { api } from '@/lib/api';
+import { eventsApi, type Event, type EventCategory } from '@/lib/events-api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
-import type { Event } from '@/types/api';
+import {
+  EventCalendarViews,
+  type EventCalendarView,
+} from './components/EventCalendarViews';
+import { CalendarSubscriptionPanel } from './components/CalendarSubscriptionPanel';
 
 const LazyProximityFilter = lazy(() =>
   import('@/components/proximity/ProximityFilter').then((module) => ({
@@ -56,9 +62,24 @@ const LazyProximityFilter = lazy(() =>
 );
 
 type EventFilter = 'upcoming' | 'past' | 'all';
+type StepFreeFilter = 'any' | 'yes' | 'no' | 'unknown';
+type EventsView = 'list' | EventCalendarView;
 
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+const STEP_FREE_FILTERS: readonly StepFreeFilter[] = ['any', 'yes', 'no', 'unknown'];
+
+function stepFreeFilterFrom(value: string | null): StepFreeFilter {
+  return STEP_FREE_FILTERS.includes(value as StepFreeFilter) ? value as StepFreeFilter : 'any';
+}
+
+function localDateKey(date = new Date()): string {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-');
+}
 
 const containerVariants = {
   hidden: {},
@@ -75,36 +96,28 @@ const itemVariants = {
 };
 
 /** Event category metadata — names resolved via t() inside the component */
-const EVENT_CATEGORY_IDS = [
-  { id: 'all', icon: Star, color: 'default' as const },
-  { id: 'workshop', icon: Tag, color: 'secondary' as const },
-  { id: 'social', icon: Users, color: 'success' as const },
-  { id: 'outdoor', icon: MapPin, color: 'warning' as const },
-  { id: 'online', icon: CalendarDays, color: 'primary' as const },
-  { id: 'meeting', icon: Calendar, color: 'danger' as const },
-  { id: 'training', icon: Clock, color: 'secondary' as const },
-  { id: 'other', icon: Filter, color: 'default' as const },
-] as const;
+const CATEGORY_ICONS: Record<string, typeof Tag> = {
+  social: Users,
+  outdoor: MapPin,
+  online: CalendarDays,
+  meeting: Calendar,
+  training: Clock,
+};
 
 export function EventsPage() {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation(['events', 'event_accessibility']);
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const EVENT_CATEGORIES = EVENT_CATEGORY_IDS.map((cat) => {
-    const key = `category.${cat.id}`;
-    const translated = t(key);
-    // Fall back to capitalized ID if translation key is missing (t() returns the key itself when missing)
-    const name = translated === key
-      ? cat.id.charAt(0).toUpperCase() + cat.id.slice(1)
-      : translated;
-    return { ...cat, name };
-  });
+  const requestedView = searchParams.get('view');
+  const activeView: EventsView = requestedView === 'month' || requestedView === 'agenda'
+    ? requestedView
+    : 'list';
 
   const [events, setEvents] = useState<Event[]>([]);
+  const [categories, setCategories] = useState<EventCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +129,7 @@ export function EventsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [filter, setFilter] = useState<EventFilter>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
+  const [stepFreeFilter, setStepFreeFilter] = useState<StepFreeFilter>(() => stepFreeFilterFrom(searchParams.get('step_free')));
   const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(null);
 
   const activeFilterCount = useMemo(() => {
@@ -123,14 +137,16 @@ export function EventsPage() {
     if (searchQuery.trim()) count += 1;
     if (filter !== 'upcoming') count += 1;
     if (selectedCategory !== 'all') count += 1;
+    if (stepFreeFilter !== 'any') count += 1;
     if (proximityParams) count += 1;
     return count;
-  }, [searchQuery, filter, selectedCategory, proximityParams]);
+  }, [searchQuery, filter, selectedCategory, stepFreeFilter, proximityParams]);
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');
     setFilter('upcoming');
     setSelectedCategory('all');
+    setStepFreeFilter('any');
     setProximityParams(null);
   }, []);
 
@@ -141,6 +157,18 @@ export function EventsPage() {
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    eventsApi.categories({ signal: controller.signal }).then((response) => {
+      if (!controller.signal.aborted && response.success && response.data) {
+        setCategories(response.data);
+      }
+    }).catch((err) => {
+      if (!controller.signal.aborted) logError('Failed to load event categories', err);
+    });
+    return () => controller.abort();
+  }, []);
 
   // Debounce search query
   useEffect(() => {
@@ -176,24 +204,17 @@ export function EventsPage() {
         setIsLoadingMore(true);
       }
 
-      const params = new URLSearchParams();
-      if (debouncedQuery) params.set('q', debouncedQuery);
-      if (filter !== 'all') params.set('when', filter);
-      params.set('per_page', String(ITEMS_PER_PAGE));
-      if (append && nextCursorRef.current) {
-        params.set('cursor', nextCursorRef.current);
-      }
-      if (selectedCategory && selectedCategory !== 'all') {
-        params.set('category', selectedCategory);
-      }
-
-      if (proximityParams) {
-        params.set('near_lat', String(proximityParams.near_lat));
-        params.set('near_lng', String(proximityParams.near_lng));
-        params.set('radius_km', String(proximityParams.radius_km));
-      }
-
-      const response = await api.get<Event[]>(`/v2/events?${params}`);
+      const response = await eventsApi.list({
+        q: debouncedQuery || undefined,
+        when: filter === 'all' ? undefined : filter,
+        per_page: ITEMS_PER_PAGE,
+        cursor: append ? nextCursorRef.current : undefined,
+        category_id: selectedCategory === 'all' ? undefined : selectedCategory,
+        step_free: stepFreeFilter === 'any' ? undefined : stepFreeFilter,
+        near_lat: proximityParams?.near_lat,
+        near_lng: proximityParams?.near_lng,
+        radius_km: proximityParams?.radius_km,
+      }, { signal: controller.signal });
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (controller.signal.aborted) return;
@@ -232,12 +253,17 @@ export function EventsPage() {
         setIsLoadingMore(false);
       }
     }
-  }, [debouncedQuery, filter, selectedCategory, proximityParams]);
+  }, [debouncedQuery, filter, selectedCategory, stepFreeFilter, proximityParams]);
 
   const loadEventsRef = useRef(loadEvents);
   loadEventsRef.current = loadEvents;
 
   useEffect(() => {
+    if (activeView !== 'list') {
+      abortControllerRef.current?.abort();
+      setIsLoading(false);
+      return;
+    }
     nextCursorRef.current = null;
     setNextCursor(null);
     setHasMore(true);
@@ -247,15 +273,43 @@ export function EventsPage() {
         abortControllerRef.current.abort();
       }
     };
-  }, [debouncedQuery, filter, selectedCategory, proximityParams]);
+  }, [activeView, debouncedQuery, filter, selectedCategory, stepFreeFilter, proximityParams]);
 
   // Update URL params
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
-    setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedCategory, setSearchParams]);
+    setSearchParams((current) => {
+      const params = new URLSearchParams(current);
+      if (searchQuery) params.set('q', searchQuery);
+      else params.delete('q');
+      if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
+      else params.delete('category');
+      if (stepFreeFilter !== 'any') params.set('step_free', stepFreeFilter);
+      else params.delete('step_free');
+      return params;
+    }, { replace: true });
+  }, [searchQuery, selectedCategory, stepFreeFilter, setSearchParams]);
+
+  const changeView = useCallback((view: EventsView) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('view', view);
+      const today = localDateKey();
+      if (view === 'month') {
+        next.set('month', today.slice(0, 7));
+        next.set('date', today);
+        next.delete('from');
+        next.delete('to');
+      } else if (view === 'agenda') {
+        const end = new Date();
+        end.setDate(end.getDate() + 30);
+        next.set('from', today);
+        next.set('to', localDateKey(end));
+        next.delete('month');
+        next.delete('date');
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const loadMoreEvents = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -264,8 +318,14 @@ export function EventsPage() {
 
   // Group events by month
   const groupedEvents = events.reduce((groups, event) => {
-    const date = new Date(event.start_date);
-    const key = formatDateValue(date, { month: 'long', year: 'numeric' });
+    const date = new Date(event.schedule.start_at ?? event.created_at ?? 0);
+    let timeZone = event.schedule.timezone || 'UTC';
+    try {
+      new Intl.DateTimeFormat(getFormattingLocale(), { timeZone }).format(date);
+    } catch {
+      timeZone = 'UTC';
+    }
+    const key = formatDateValue(date, { month: 'long', year: 'numeric', timeZone });
     if (!groups[key]) groups[key] = [];
     groups[key].push(event);
     return groups;
@@ -283,20 +343,56 @@ export function EventsPage() {
         stats={totalCount != null && !isLoading ? [{ label: t('hero_events_label'), value: totalCount.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated ? (
-            <Button as={Link} to={tenantPath('/events/create')}
-              color="primary"
-              className="font-semibold"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              {t('create_event')}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <CalendarSubscriptionPanel />
+              <Button as={Link} to={tenantPath('/events/create')}
+                color="primary"
+                className="font-semibold"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('create_event')}
+              </Button>
+            </div>
           ) : undefined
         }
       />
 
+      <GlassCard className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-semibold text-theme-primary">{t('calendar.view_heading')}</h2>
+          <p className="text-sm text-theme-muted">{t('calendar.view_description')}</p>
+        </div>
+        <ToggleButtonGroup
+          aria-label={t('calendar.view_aria')}
+          selectionMode="single"
+          disallowEmptySelection
+          isDetached
+          selectedKeys={new Set([activeView])}
+          onSelectionChange={(keys) => {
+            const [next] = Array.from(keys);
+            if (next === 'list' || next === 'month' || next === 'agenda') changeView(next);
+          }}
+          className="flex flex-wrap gap-2"
+        >
+          <ToggleButton id="list" variant="ghost">
+            <List className="h-4 w-4" aria-hidden="true" />
+            {t('calendar.view_list')}
+          </ToggleButton>
+          <ToggleButton id="month" variant="ghost">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            {t('calendar.view_month')}
+          </ToggleButton>
+          <ToggleButton id="agenda" variant="ghost">
+            <Rows3 className="h-4 w-4" aria-hidden="true" />
+            {t('calendar.view_agenda')}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </GlassCard>
+
       {/* Search & Time Filter */}
+      {activeView === 'list' && <>
       <GlassCard className="p-4 sm:p-5">
-        <div className="grid gap-3 lg:grid-cols-[minmax(260px,1fr)_auto_auto_auto_auto] lg:items-center">
+        <div className="grid gap-3 lg:grid-cols-[minmax(260px,1fr)_auto_auto_auto] lg:items-center">
           <div className="flex-1">
             <SearchField
               placeholder={t('search_placeholder')}
@@ -328,6 +424,39 @@ export function EventsPage() {
             <SelectItem key="all" id="all">{t('filter_all')}</SelectItem>
           </Select>
 
+          <HeroSelect
+            aria-label={t('event_accessibility:filters.step_free_label')}
+            value={stepFreeFilter}
+            onChange={(value) => {
+              const selected = Array.isArray(value) ? value[0] : value;
+              const next = selected === null || selected === undefined ? 'any' : String(selected);
+              setStepFreeFilter(stepFreeFilterFrom(next));
+            }}
+            placeholder={t('event_accessibility:filters.step_free_options.any')}
+            variant="secondary"
+            className="w-full lg:w-56"
+          >
+            <Label className="sr-only">{t('event_accessibility:filters.step_free_label')}</Label>
+            <HeroSelect.Trigger className="border border-theme-default bg-theme-elevated text-theme-primary hover:bg-theme-hover">
+              <HeroSelect.Value />
+              <HeroSelect.Indicator />
+            </HeroSelect.Trigger>
+            <HeroSelect.Popover>
+              <ListBox>
+                {STEP_FREE_FILTERS.map((option) => (
+                  <ListBox.Item
+                    key={option}
+                    id={option}
+                    textValue={t(`event_accessibility:filters.step_free_options.${option}`)}
+                  >
+                    {t(`event_accessibility:filters.step_free_options.${option}`)}
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </HeroSelect.Popover>
+          </HeroSelect>
+
           <Suspense fallback={null}>
             <LazyProximityFilter value={proximityParams} onFilter={setProximityParams} />
           </Suspense>
@@ -342,7 +471,14 @@ export function EventsPage() {
               {filter !== 'upcoming' && <Chip size="sm" variant="flat">{t(`filter_${filter}`)}</Chip>}
               {selectedCategory !== 'all' && (
                 <Chip size="sm" variant="flat">
-                  {EVENT_CATEGORIES.find((cat) => cat.id === selectedCategory)?.name ?? selectedCategory}
+                  {categories.find((cat) => String(cat.id) === selectedCategory)?.name ?? selectedCategory}
+                </Chip>
+              )}
+              {stepFreeFilter !== 'any' && (
+                <Chip size="sm" variant="flat">
+                  {t('event_accessibility:filters.step_free_active', {
+                    value: t(`event_accessibility:filters.step_free_options.${stepFreeFilter}`),
+                  })}
                 </Chip>
               )}
               {proximityParams && <Chip size="sm" variant="flat">{t('active_near_me', { radius: proximityParams.radius_km })}</Chip>}
@@ -371,12 +507,20 @@ export function EventsPage() {
         onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setSelectedCategory(String(k)); }}
         className="flex flex-wrap gap-2"
       >
-        {EVENT_CATEGORIES.map((cat) => {
-          const IconComp = cat.icon;
+        <ToggleButton
+          id="all"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted transition-colors hover:bg-theme-hover data-[selected=true]:bg-linear-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
+        >
+          <Tag className="w-3.5 h-3.5" aria-hidden="true" />
+          {t('category.all')}
+        </ToggleButton>
+        {categories.map((cat) => {
+          const IconComp = CATEGORY_ICONS[cat.slug] ?? Tag;
           return (
             <ToggleButton
               key={cat.id}
-              id={cat.id}
+              id={String(cat.id)}
               variant="ghost"
               className="bg-theme-elevated text-theme-muted transition-colors hover:bg-theme-hover data-[selected=true]:bg-linear-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
             >
@@ -386,9 +530,12 @@ export function EventsPage() {
           );
         })}
       </ToggleButtonGroup>
+      </>}
+
+      {activeView !== 'list' && <EventCalendarViews view={activeView} />}
 
       {/* Error State */}
-      {error && !isLoading && (
+      {activeView === 'list' && error && !isLoading && (
         <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
@@ -404,7 +551,7 @@ export function EventsPage() {
       )}
 
       {/* Events List / Map */}
-      {!error && (
+      {activeView === 'list' && !error && (
         <>
           {isLoading ? (
             <div role="status" className="space-y-6" aria-label={t('loading_aria')} aria-busy="true">
@@ -427,7 +574,7 @@ export function EventsPage() {
               title={t('no_events')}
               description={
                 selectedCategory !== 'all'
-                  ? t('no_events_category', { category: EVENT_CATEGORIES.find((c) => c.id === selectedCategory)?.name })
+                  ? t('no_events_category', { category: categories.find((c) => String(c.id) === selectedCategory)?.name })
                   : filter === 'upcoming'
                     ? t('no_events_upcoming')
                     : t('no_events_search')
@@ -515,25 +662,54 @@ interface EventCardProps {
 const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const { t } = useTranslation('events');
   const { tenantPath } = useTenant();
-  const startDate = new Date(event.start_date);
-  const isPast = startDate < new Date();
-  const isCancelled = event.status === 'cancelled';
-  const eventDateLabel = formatDateValue(startDate);
-  const monthLabel = formatMonthShort(startDate, true);
-  const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
-  const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
-  const coverImageProps = event.cover_image
-    ? responsiveThumbnailProps(event.cover_image, {
+  const startDate = new Date(event.schedule.start_at ?? event.created_at ?? 0);
+  const formattingLocale = getFormattingLocale();
+  let eventTimezone = event.schedule.timezone || 'UTC';
+  try {
+    new Intl.DateTimeFormat(formattingLocale, { timeZone: eventTimezone }).format(startDate);
+  } catch {
+    eventTimezone = 'UTC';
+  }
+  const isPast = event.schedule.state === 'ended' || event.schedule.state === 'completed';
+  const isCancelled = event.schedule.state === 'cancelled';
+  const eventDateLabel = formatDateValue(startDate, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: eventTimezone,
+  });
+  const monthLabel = formatDateValue(startDate, {
+    month: 'short',
+    timeZone: eventTimezone,
+  }).toLocaleUpperCase(formattingLocale);
+  const dayLabel = formatDateValue(startDate, {
+    day: 'numeric',
+    timeZone: eventTimezone,
+  });
+  const weekdayLabel = formatDateValue(startDate, {
+    weekday: 'short',
+    timeZone: eventTimezone,
+  });
+  const timeLabel = event.schedule.all_day
+    ? t('calendar.all_day')
+    : formatDateTime(startDate, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: eventTimezone,
+        timeZoneName: 'short',
+      });
+  const coverImageProps = event.primary_image?.url
+    ? responsiveThumbnailProps(event.primary_image.url, {
         width: 360,
         height: 220,
         sizes: '(min-width: 640px) 112px, 92vw',
       })
     : null;
-  const freq = event.recurrence_frequency;
+  const freq = event.series.recurrence?.frequency;
   const repeatsLabel = freq && ['daily', 'weekly', 'monthly', 'yearly'].includes(freq)
     ? t(`card.repeats_${freq}`)
     : t('card.repeats_generic');
-  const seriesCount = event.series_count ?? 0;
+  const seriesCount = event.series.recurrence?.occurrence_count ?? event.series.named?.event_count ?? 0;
 
   return (
     <Link to={tenantPath(`/events/${event.id}`)} aria-label={t('card.open_aria', { title: event.title, date: eventDateLabel })}>
@@ -551,12 +727,12 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
           <div className="flex gap-3 p-4 sm:gap-4 sm:p-5">
             {/* Date Box */}
             <div className="flex-shrink-0 w-14 sm:w-16 text-center">
-              <time dateTime={event.start_date} className="block rounded-lg border border-amber-500/25 bg-amber-500/10 p-2">
+              <time dateTime={event.schedule.start_at ?? undefined} className="block rounded-lg border border-amber-500/25 bg-amber-500/10 p-2">
                 <span className="text-amber-600 dark:text-amber-400 text-xs font-medium uppercase block">
                   {monthLabel}
                 </span>
                 <span className="text-theme-primary text-xl sm:text-2xl font-bold block">
-                  {startDate.getDate()}
+                  {dayLabel}
                 </span>
                 <span className="text-theme-subtle text-xs block">
                   {weekdayLabel}
@@ -570,13 +746,13 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-theme-primary text-base sm:text-lg leading-snug">{event.title}</h3>
-                    {event.category_name && (
+                    {event.category?.name && (
                       <Chip size="sm" variant="flat" color="secondary" className="text-xs">
-                        {event.category_name}
+                        {event.category.name}
                       </Chip>
                     )}
                   </div>
-                  <SafeHtml content={event.description} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
+                  <SafeHtml content={event.description ?? ''} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
                 </div>
                 {coverImageProps && (
                   <img
@@ -590,7 +766,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {event.is_series && (
+                {(event.series.recurrence || event.series.named) && (
                   <Chip
                     size="sm"
                     variant="flat"
@@ -607,12 +783,12 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                     {t('card.cancelled')}
                   </Chip>
                 )}
-                {event.is_full && !isCancelled && (
+                {event.relationship.capacity.is_full && !isCancelled && (
                   <Chip size="sm" variant="flat" color="danger">{t('card.full')}</Chip>
                 )}
-                {event.max_attendees != null && event.spots_left != null && event.spots_left > 0 && !isCancelled && (
-                  <Chip size="sm" variant="flat" color={event.spots_left <= 3 ? 'danger' : 'success'}>
-                    {t('card.spots_left', { count: event.spots_left })}
+                {event.relationship.capacity.limit != null && event.relationship.capacity.remaining != null && event.relationship.capacity.remaining > 0 && !isCancelled && (
+                  <Chip size="sm" variant="flat" color={event.relationship.capacity.remaining <= 3 ? 'danger' : 'success'}>
+                    {t('card.spots_left', { count: event.relationship.capacity.remaining })}
                   </Chip>
                 )}
               </div>
@@ -620,14 +796,14 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-sm text-theme-subtle">
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" aria-hidden="true" />
-                  <time dateTime={event.start_date}>
+                  <time dateTime={event.schedule.start_at ?? undefined}>
                     {timeLabel}
                   </time>
                 </span>
-                {event.location && (
+                {event.location.label && (
                   <span className="flex min-w-0 items-center gap-1.5">
                     <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                    <span className="truncate">{event.location}</span>
+                    <span className="truncate">{event.location.label}</span>
                   </span>
                 )}
                 {event.distance_km !== undefined && (
@@ -640,9 +816,9 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                 )}
                 <span className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  {t('going', { count: event.attendees_count ?? 0 })}
-                  {(event.interested_count ?? 0) > 0 && (
-                    <span className="text-theme-subtle">&middot; {t('interested', { count: event.interested_count })}</span>
+                  {t('going', { count: event.metrics.confirmed_count })}
+                  {event.metrics.interested_count > 0 && (
+                    <span className="text-theme-subtle">&middot; {t('interested', { count: event.metrics.interested_count })}</span>
                   )}
                 </span>
               </div>

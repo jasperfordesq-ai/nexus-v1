@@ -19,13 +19,14 @@ class GroupDiscussion extends Model
     protected $table = 'group_discussions';
 
     protected $fillable = [
-        'tenant_id', 'group_id', 'user_id', 'title', 'is_pinned',
+        'tenant_id', 'group_id', 'user_id', 'title', 'is_pinned', 'is_locked',
     ];
 
     protected $casts = [
         'group_id' => 'integer',
         'user_id' => 'integer',
         'is_pinned' => 'boolean',
+        'is_locked' => 'boolean',
     ];
 
     public function group(): BelongsTo

@@ -6,8 +6,10 @@
 
 namespace App\Observers;
 
+use App\Enums\GroupStatus;
 use App\Models\Group;
 use App\Observers\Concerns\IndexesEmbeddings;
+use App\Services\GroupSearchService;
 use App\Services\SearchService;
 use Illuminate\Support\Facades\Log;
 
@@ -24,6 +26,11 @@ class GroupObserver
 
     public function created(Group $group): void
     {
+        if ($group->status !== GroupStatus::Active) {
+            $this->removeFromDiscovery($group);
+            return;
+        }
+
         try {
             SearchService::indexGroup($group);
         } catch (\Throwable $e) {
@@ -37,10 +44,15 @@ class GroupObserver
 
     public function updated(Group $group): void
     {
-        $searchableFields = ['name', 'description', 'is_active', 'visibility'];
+        $searchableFields = ['name', 'description', 'status', 'is_active', 'visibility'];
         $dirty = array_keys($group->getDirty());
 
         if (empty(array_intersect($dirty, $searchableFields))) {
+            return;
+        }
+
+        if ($group->status !== GroupStatus::Active) {
+            $this->removeFromDiscovery($group);
             return;
         }
 
@@ -57,6 +69,13 @@ class GroupObserver
 
     public function deleted(Group $group): void
     {
+        $this->removeFromDiscovery($group);
+    }
+
+    private function removeFromDiscovery(Group $group): void
+    {
+        GroupSearchService::removeGroupContent((int) $group->id);
+
         try {
             SearchService::removeGroup($group->id);
         } catch (\Throwable $e) {

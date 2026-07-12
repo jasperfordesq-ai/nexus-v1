@@ -243,15 +243,30 @@ function syncEvents(int $tenantId, bool $dryRun): array
     $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT e.id, e.tenant_id, e.title, e.description, e.location,
                 COALESCE(e.status, 'active') as status,
+                e.publication_status,
+                e.operational_status,
+                e.is_recurring_template,
                 e.allow_remote_attendance as is_online,
                 UNIX_TIMESTAMP(COALESCE(e.start_time, e.start_date)) as start_time,
                 UNIX_TIMESTAMP(e.created_at) as created_at,
                 CONCAT(u.first_name, ' ', u.last_name) as organizer_name
          FROM events e
-         LEFT JOIN users u ON e.user_id = u.id
+         LEFT JOIN users u ON e.user_id = u.id AND e.tenant_id = u.tenant_id
          WHERE e.tenant_id = ?
            AND COALESCE(e.start_time, e.start_date) >= NOW()
-           AND COALESCE(e.status, 'active') != 'cancelled'
+           AND COALESCE(e.is_recurring_template, 0) = 0
+           AND (
+               (
+                   COALESCE(e.status, 'active') = 'active'
+                   AND (e.publication_status IS NULL OR e.publication_status = 'published')
+                   AND (e.operational_status IS NULL OR e.operational_status = 'scheduled')
+               )
+               OR (
+                   e.status = 'cancelled'
+                   AND (e.publication_status IS NULL OR e.publication_status = 'published')
+                   AND e.operational_status = 'postponed'
+               )
+           )
          ORDER BY e.id",
         [$tenantId]
     ));

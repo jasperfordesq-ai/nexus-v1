@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Switch } from '@/components/ui/Switch';
+import { Select, SelectItem } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 /**
  * Create/Edit Group Page
  * Includes image upload, location, and privacy settings
@@ -37,26 +38,21 @@ import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl } from '@/lib/helpers';
-import type { Group } from '@/types/api';
-
-interface FormData {
-  name: string;
-  description: string;
-  is_private: boolean;
-  location: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-const initialFormData: FormData = {
-  name: '',
-  description: '',
-  is_private: false,
-  location: '',
-};
+import { GroupApiError } from './api/core';
+import { getEditableGroup } from './api/createGroup';
+import {
+  createGroupFromDraft,
+  emptyGroupFormDraft,
+  emptyGroupImageDraft,
+  getGroupFormCapabilities,
+  groupFormFingerprint,
+  updateGroupFromDraft,
+  type GroupFormCapabilities,
+  type GroupFormDraft,
+  type GroupImageDraft,
+} from './api/groupForm';
 
 export function CreateGroupPage() {
   const { id } = useParams<{ id: string }>();
@@ -67,10 +63,10 @@ export function CreateGroupPage() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const confirm = useConfirm();
 
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [templates, setTemplates] = useState<Array<{ id: number; name: string; description?: string; icon?: string; default_visibility?: string }>>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
+  const [formData, setFormData] = useState<GroupFormDraft>(() => emptyGroupFormDraft());
+  const [capabilities, setCapabilities] = useState<GroupFormCapabilities | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Synchronous re-entry guard: setIsSubmitting(true) only flips the button's
@@ -80,45 +76,83 @@ export function CreateGroupPage() {
   // second submit in the same tick.
   const isSubmittingRef = useRef(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<'name' | 'description', string>>>({});
 
-  // Image upload state
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [existingImage, setExistingImage] = useState<string | null>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const groupLoadControllerRef = useRef<AbortController | null>(null);
+  const initialFingerprintRef = useRef(groupFormFingerprint(emptyGroupFormDraft()));
+  const formDirtyRef = useRef(false);
+  const historyIndexRef = useRef<number | null>(
+    typeof window.history.state?.idx === 'number' ? window.history.state.idx : null,
+  );
+  const allowedPopRef = useRef(false);
+  const restoringPopRef = useRef<{ delta: number } | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+
+  const setDraft = useCallback((updater: (previous: GroupFormDraft) => GroupFormDraft) => {
+    setFormData((previous) => {
+      const next = updater(previous);
+      formDirtyRef.current = groupFormFingerprint(next) !== initialFingerprintRef.current;
+      return next;
+    });
+  }, []);
 
   const loadGroup = useCallback(async () => {
     if (!id) return;
 
+    const groupId = Number(id);
+    if (!Number.isSafeInteger(groupId) || groupId <= 0) {
+      setLoadError(t('form.error_not_found'));
+      return;
+    }
+
+    groupLoadControllerRef.current?.abort();
+    const controller = new AbortController();
+    groupLoadControllerRef.current = controller;
+
     try {
       setIsLoading(true);
       setLoadError(null);
-      const response = await api.get<Group>(`/v2/groups/${id}`);
-      if (response.success && response.data) {
-        const group = response.data;
-        setFormData({
-          name: group.name,
-          description: group.description || '',
-          is_private: group.visibility === 'private' || group.visibility === 'secret',
-          location: group.location || '',
-          latitude: group.latitude ?? undefined,
-          longitude: group.longitude ?? undefined,
-        });
-        // Set existing image for preview
-        const imgUrl = group.image_url || group.cover_image_url || group.cover_image;
-        if (imgUrl) {
-          setExistingImage(resolveAssetUrl(imgUrl));
-        }
-      } else {
-        setLoadError(t('form.error_not_found'));
-      }
+      const group = await getEditableGroup(groupId, { signal: controller.signal });
+      if (controller.signal.aborted) return;
+      const nextDraft: GroupFormDraft = {
+        name: group.name,
+        description: group.description,
+        visibility: group.visibility,
+        location: {
+          label: group.location,
+          latitude: group.latitude ?? null,
+          longitude: group.longitude ?? null,
+        },
+        typeId: group.type_id ?? null,
+        parentId: group.parent_id ?? null,
+        templateId: group.template_id ?? null,
+        primaryColor: group.primary_color ?? null,
+        accentColor: group.accent_color ?? null,
+        avatar: emptyGroupImageDraft(group.image_url ? resolveAssetUrl(group.image_url) : null),
+        cover: emptyGroupImageDraft(
+          group.cover_image_url || group.cover_image
+            ? resolveAssetUrl(group.cover_image_url || group.cover_image || '')
+            : null,
+        ),
+      };
+      initialFingerprintRef.current = groupFormFingerprint(nextDraft);
+      formDirtyRef.current = false;
+      setFormData(nextDraft);
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load group', error);
-      setLoadError(t('form.error_load_failed'));
+      setLoadError(
+        error instanceof GroupApiError && error.code === 'NOT_FOUND'
+          ? t('form.error_not_found')
+          : t('form.error_load_failed'),
+      );
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted && groupLoadControllerRef.current === controller) {
+        setIsLoading(false);
+      }
     }
   }, [id, t]);
 
@@ -126,35 +160,43 @@ export function CreateGroupPage() {
     if (isEditing) {
       loadGroup();
     }
+    return () => groupLoadControllerRef.current?.abort();
   }, [isEditing, loadGroup]);
 
-  // Load templates for new group creation
+  // Load the authoritative form contract for both create and edit.
   useEffect(() => {
-    if (isEditing) return;
-    api.get('/v2/group-templates')
-      .then((resp) => setTemplates((resp.data ?? []) as Array<{ id: number; name: string; description?: string; icon?: string; default_visibility?: string }>))
-      .catch(() => {});
-  }, [isEditing]);
+    const controller = new AbortController();
+    getGroupFormCapabilities(controller.signal)
+      .then((value) => {
+        if (!controller.signal.aborted) setCapabilities(value);
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) logError('Failed to load group form capabilities', error);
+      });
+    return () => controller.abort();
+  }, []);
 
   const applyTemplate = (templateId: number) => {
-    const tmpl = templates.find((t) => t.id === templateId);
+    const tmpl = capabilities?.templates.find((template) => template.id === templateId);
     if (!tmpl) return;
-    setSelectedTemplate(templateId);
-    if (tmpl.default_visibility) {
-      setFormData((prev) => ({ ...prev, is_private: tmpl.default_visibility === 'private' }));
-    }
+    setDraft((previous) => ({
+      ...previous,
+      templateId,
+      visibility: tmpl.default_visibility,
+      typeId: tmpl.default_type_id,
+    }));
   };
 
   // Clean up object URLs on unmount
   useEffect(() => {
     return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
+      for (const preview of [formData.avatar.previewUrl, formData.cover.previewUrl]) {
+        if (preview) URL.revokeObjectURL(preview);
       }
     };
-  }, [imagePreview]);
+  }, [formData.avatar.previewUrl, formData.cover.previewUrl]);
 
-  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -166,69 +208,60 @@ export function CreateGroupPage() {
     }
 
     // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > (capabilities?.limits.imageMaxBytes ?? 8 * 1024 * 1024)) {
       toast.error(t('form.toast.image_size'));
       return;
     }
 
-    // Revoke old preview URL
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setExistingImage(null);
+    setDraft((previous) => {
+      const current = previous[type];
+      if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+      const image: GroupImageDraft = {
+        ...current,
+        action: 'replace',
+        file,
+        previewUrl: URL.createObjectURL(file),
+      };
+      return { ...previous, [type]: image };
+    });
+    e.target.value = '';
   }
 
-  function clearImage() {
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setImageFile(null);
-    setImagePreview(null);
-    setExistingImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }
-
-  async function uploadGroupImage(groupId: number | string): Promise<boolean> {
-    if (!imageFile) return true; // No image to upload is not a failure
-
-    try {
-      setIsUploadingImage(true);
-      const response = await api.upload(`/v2/groups/${groupId}/image`, imageFile, 'image');
-      if (response.success) {
-        return true;
-      }
-      toast.warning(t('form.toast.image_failed'));
-      return false;
-    } catch (err) {
-      logError('Failed to upload group image', err);
-      toast.warning(t('form.toast.image_failed_short'));
-      return false;
-    } finally {
-      setIsUploadingImage(false);
-    }
+  function clearImage(type: 'avatar' | 'cover') {
+    setDraft((previous) => {
+      const current = previous[type];
+      if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+      return {
+        ...previous,
+        [type]: {
+          ...current,
+          action: current.existingUrl ? 'remove' : 'keep',
+          file: null,
+          previewUrl: null,
+        },
+      };
+    });
+    const input = type === 'avatar' ? avatarInputRef.current : coverInputRef.current;
+    if (input) input.value = '';
   }
 
   function validateForm(): boolean {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    const newErrors: Partial<Record<'name' | 'description', string>> = {};
+    const limits = capabilities?.limits;
 
     if (!formData.name.trim()) {
       newErrors.name = t('form.validation.name_required');
-    } else if (formData.name.length < 3) {
+    } else if (formData.name.length < (limits?.nameMin ?? 3)) {
       newErrors.name = t('form.validation.name_min');
-    } else if (formData.name.length > 100) {
+    } else if (formData.name.length > (limits?.nameMax ?? 255)) {
       newErrors.name = t('form.validation.name_max');
     }
 
     if (!formData.description.trim()) {
       newErrors.description = t('form.validation.description_required');
-    } else if (formData.description.length < 20) {
+    } else if (formData.description.length < (limits?.descriptionMin ?? 10)) {
       newErrors.description = t('form.validation.description_min');
-    } else if (formData.description.length > 2000) {
+    } else if (formData.description.length > (limits?.descriptionMax ?? 5000)) {
       newErrors.description = t('form.validation.description_max');
     }
 
@@ -246,33 +279,14 @@ export function CreateGroupPage() {
       isSubmittingRef.current = true;
       setIsSubmitting(true);
 
-      const payload = {
-        name: formData.name,
-        description: formData.description,
-        visibility: formData.is_private ? 'private' : 'public',
-        location: formData.location || undefined,
-        latitude: formData.latitude,
-        longitude: formData.longitude,
-      };
+      const savedGroup = isEditing
+        ? await updateGroupFromDraft(Number(id), formData)
+        : await createGroupFromDraft(formData);
 
-      let response;
-      if (isEditing) {
-        response = await api.put(`/v2/groups/${id}`, payload);
-      } else {
-        response = await api.post<{ id: number }>('/v2/groups', payload);
-      }
-
-      if (response.success) {
-        // Upload image if one was selected
-        const groupId = isEditing ? id! : (response.data as { id: number })?.id;
-        if (imageFile && groupId) {
-          await uploadGroupImage(groupId);
-        }
-        toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
-        navigate(tenantPath('/groups'));
-      } else {
-        toast.error(response.error || t('form.toast.save_failed'));
-      }
+      initialFingerprintRef.current = groupFormFingerprint(formData);
+      formDirtyRef.current = false;
+      toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
+      navigate(tenantPath(`/groups/${savedGroup.id}`));
     } catch (error) {
       logError('Failed to save group', error);
       toast.error(t('form.toast.something_wrong'));
@@ -282,14 +296,128 @@ export function CreateGroupPage() {
     }
   }
 
-  function updateField<K extends keyof FormData>(field: K, value: FormData[K]) {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  function updateField<K extends 'name' | 'description'>(field: K, value: GroupFormDraft[K]) {
+    setDraft((previous) => ({ ...previous, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   }
 
-  const displayImage = imagePreview || existingImage;
+  const displayAvatar = formData.avatar.action === 'remove'
+    ? null
+    : formData.avatar.previewUrl || formData.avatar.existingUrl;
+  const displayCover = formData.cover.action === 'remove'
+    ? null
+    : formData.cover.previewUrl || formData.cover.existingUrl;
+
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      if (formDirtyRef.current) event.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+
+  const requestDiscard = useCallback(async (): Promise<boolean> => {
+    if (formDirtyRef.current) {
+      const confirmed = await confirm({
+        title: tRef.current('form.discard_title'),
+        body: tRef.current('form.discard_description'),
+        confirmLabel: tRef.current('form.discard_confirm'),
+        cancelLabel: tRef.current('form.discard_stay'),
+        status: 'warning',
+      });
+      if (!confirmed) return false;
+    }
+    return true;
+  }, [confirm]);
+
+  const guardedNavigate = useCallback(async (destination: string) => {
+    if (!await requestDiscard()) return;
+    formDirtyRef.current = false;
+    navigate(destination);
+  }, [navigate, requestDiscard]);
+
+  // BrowserRouter does not expose useBlocker. Capture same-origin links before
+  // React Router handles them so sidebar, breadcrumb, and other in-app links all
+  // share the same translated discard confirmation.
+  useEffect(() => {
+    const handleLinkClick = (event: MouseEvent) => {
+      if (!formDirtyRef.current || event.defaultPrevented || event.button !== 0
+        || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const element = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!(element instanceof HTMLAnchorElement) || element.target === '_blank' || element.hasAttribute('download')) return;
+
+      const destination = new URL(element.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+      const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const next = `${destination.pathname}${destination.search}${destination.hash}`;
+      if (current === next) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      void guardedNavigate(next);
+    };
+
+    document.addEventListener('click', handleLinkClick, true);
+    return () => document.removeEventListener('click', handleLinkClick, true);
+  }, [guardedNavigate]);
+
+  // Back/Forward changes history before popstate is delivered. Restore the
+  // current entry immediately, ask asynchronously, then replay the exact delta
+  // only after confirmation. BrowserRouter supplies the monotonic state.idx.
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const nextIndex = typeof event.state?.idx === 'number' ? event.state.idx : null;
+      if (allowedPopRef.current) {
+        allowedPopRef.current = false;
+        historyIndexRef.current = nextIndex;
+        return;
+      }
+
+      const restoring = restoringPopRef.current;
+      if (restoring) {
+        restoringPopRef.current = null;
+        historyIndexRef.current = nextIndex;
+        void requestDiscard().then((confirmed) => {
+          if (!confirmed) return;
+          formDirtyRef.current = false;
+          allowedPopRef.current = true;
+          window.history.go(-restoring.delta);
+        });
+        return;
+      }
+
+      if (!formDirtyRef.current) {
+        historyIndexRef.current = nextIndex;
+        return;
+      }
+
+      const currentIndex = historyIndexRef.current;
+      if (currentIndex === null || nextIndex === null || currentIndex === nextIndex) {
+        // BrowserRouter normally always provides idx; preserve the form on
+        // non-conforming history implementations with a synchronous fallback.
+        if (!window.confirm(tRef.current('form.discard_description'))) {
+          window.history.forward();
+        } else {
+          formDirtyRef.current = false;
+          historyIndexRef.current = nextIndex;
+        }
+        return;
+      }
+
+      const delta = currentIndex - nextIndex;
+      event.stopImmediatePropagation();
+      restoringPopRef.current = { delta };
+      window.history.go(delta);
+    };
+
+    window.addEventListener('popstate', handlePopState, true);
+    return () => window.removeEventListener('popstate', handlePopState, true);
+  }, [requestDiscard]);
+
+  const templates = capabilities?.templates ?? [];
+  const isPrivate = formData.visibility !== 'public';
 
   if (isLoading) {
     return <LoadingScreen message={t('form.loading')} />;
@@ -339,8 +467,8 @@ export function CreateGroupPage() {
       <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <Chip size="sm" variant="flat" color={formData.is_private ? 'warning' : 'success'} className="mb-3 font-medium">
-              {formData.is_private ? t('form.private_group') : t('form.public_group')}
+            <Chip size="sm" variant="flat" color={isPrivate ? 'warning' : 'success'} className="mb-3 font-medium">
+              {isPrivate ? t('form.private_group') : t('form.public_group')}
             </Chip>
             <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
               {pageTitle}
@@ -352,7 +480,7 @@ export function CreateGroupPage() {
           <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-72">
             <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('form.summary_visibility')}</span>
             <span className="mt-1 block font-semibold text-theme-primary">
-              {formData.is_private ? t('form.private_desc') : t('form.public_desc')}
+              {isPrivate ? t('form.private_desc') : t('form.public_desc')}
             </span>
           </div>
         </div>
@@ -365,60 +493,62 @@ export function CreateGroupPage() {
           {t('form.essentials_section')}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Group Image Upload */}
-          <div>
-            <label className="block text-sm font-medium text-theme-muted mb-2">
-              {t('form.image_label')}
-            </label>
-            <div className="flex items-center gap-4">
-              {displayImage ? (
-                <div className="relative">
-                  <Avatar
-                    src={displayImage}
-                    className="w-20 h-20 ring-2 ring-white/20"
-                    radius="lg"
-                    alt={t('form.image_preview_alt')}
-                  />
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="flat"
-                    className="absolute -top-2 -right-2 bg-red-500/80 text-white rounded-full min-w-6 w-6 h-6"
-                    aria-label={t('form.remove_image_aria')}
-                    onPress={clearImage}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
+        <form onSubmit={handleSubmit} noValidate className="space-y-8">
+          {/* Avatar and cover are staged locally until Save. */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {([
+              ['avatar', displayAvatar, avatarInputRef, t('form.image_label')],
+              ['cover', displayCover, coverInputRef, t('detail.settings_cover_label')],
+            ] as const).map(([type, displayImage, inputRef, label]) => (
+              <div key={type} className="rounded-xl border border-theme-default bg-theme-elevated p-4">
+                <p className="mb-3 text-sm font-medium text-theme-muted">{label}</p>
+                <div className="flex items-center gap-4">
+                  {displayImage ? (
+                    <div className="relative">
+                      {type === 'avatar' ? (
+                        <Avatar src={displayImage} className="h-20 w-20 ring-2 ring-white/20" radius="lg" alt={t('form.image_preview_alt')} />
+                      ) : (
+                        <img src={displayImage} className="h-20 w-32 rounded-lg object-cover" alt={t('detail.image_alt_cover')} />
+                      )}
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="flat"
+                        className="absolute -right-2 -top-2 h-6 min-w-6 rounded-full bg-red-500/80 text-white"
+                        aria-label={t('form.remove_image_aria')}
+                        onPress={() => clearImage(type)}
+                      >
+                        <X className="h-3 w-3" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex h-20 w-20 items-center justify-center rounded-xl border-2 border-dashed border-theme-default">
+                      <ImagePlus className="h-8 w-8 text-theme-subtle" aria-hidden="true" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <Button
+                      type="button"
+                      variant="flat"
+                      className="bg-theme-surface text-theme-primary"
+                      startContent={<ImagePlus className="h-4 w-4" aria-hidden="true" />}
+                      onPress={() => inputRef.current?.click()}
+                    >
+                      {displayImage ? t('form.change_image') : t('form.upload_image')}
+                    </Button>
+                    <p className="mt-1 text-xs text-theme-subtle">{t('form.image_hint')}</p>
+                    <input
+                      ref={inputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      aria-label={type === 'avatar' ? t('form.upload_image_aria') : t('detail.upload_cover')}
+                      onChange={(event) => handleImageSelect(event, type)}
+                    />
+                  </div>
                 </div>
-              ) : (
-                <div className="w-20 h-20 rounded-xl bg-theme-elevated border-2 border-dashed border-theme-default flex items-center justify-center">
-                  <ImagePlus className="w-8 h-8 text-theme-subtle" aria-hidden="true" />
-                </div>
-              )}
-              <div className="flex-1">
-                <Button
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-primary"
-                  startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => fileInputRef.current?.click()}
-                >
-                  {displayImage ? t('form.change_image') : t('form.upload_image')}
-                </Button>
-                <p className="text-xs text-theme-subtle mt-1">
-                  {t('form.image_hint')}
-                </p>
-                {/* Hidden file input */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  className="hidden"
-                  onChange={handleImageSelect}
-                  aria-label={t('form.upload_image_aria')}
-                />
               </div>
-            </div>
+            ))}
           </div>
 
           {/* Template Selector (new groups only) */}
@@ -433,8 +563,8 @@ export function CreateGroupPage() {
                     key={tmpl.id}
                     type="button"
                     size="sm"
-                    variant={selectedTemplate === tmpl.id ? 'flat' : 'bordered'}
-                    color={selectedTemplate === tmpl.id ? 'primary' : 'default'}
+                    variant={formData.templateId === tmpl.id ? 'flat' : 'bordered'}
+                    color={formData.templateId === tmpl.id ? 'primary' : 'default'}
                     onPress={() => applyTemplate(tmpl.id)}
                     className="px-3 py-2"
                   >
@@ -443,6 +573,53 @@ export function CreateGroupPage() {
                   </Button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {(capabilities?.fields.type || capabilities?.fields.parent) && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {capabilities.fields.type && capabilities.groupTypes.length > 0 && (
+                <Select
+                  label={t('form.type_label')}
+                  selectedKeys={new Set([formData.typeId === null ? '__none__' : String(formData.typeId)])}
+                  onSelectionChange={(keys) => {
+                    const [key] = Array.from(keys);
+                    setDraft((previous) => ({
+                      ...previous,
+                      typeId: !key || key === '__none__' ? null : Number(key),
+                    }));
+                  }}
+                >
+                  <SelectItem id="__none__">{t('form.type_none')}</SelectItem>
+                  {capabilities.groupTypes.map((type) => (
+                    <SelectItem key={type.id} id={String(type.id)} textValue={type.name}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </Select>
+              )}
+              {capabilities.fields.parent && capabilities.parentCandidates.length > 0 && (
+                <Select
+                  label={t('form.parent_label')}
+                  selectedKeys={new Set([formData.parentId === null ? '__none__' : String(formData.parentId)])}
+                  onSelectionChange={(keys) => {
+                    const [key] = Array.from(keys);
+                    setDraft((previous) => ({
+                      ...previous,
+                      parentId: !key || key === '__none__' ? null : Number(key),
+                    }));
+                  }}
+                >
+                  <SelectItem id="__none__">{t('form.parent_none')}</SelectItem>
+                  {capabilities.parentCandidates
+                    .filter((parent) => !isEditing || parent.id !== Number(id))
+                    .map((parent) => (
+                      <SelectItem key={parent.id} id={String(parent.id)} textValue={parent.name}>
+                        {parent.name}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
             </div>
           )}
 
@@ -489,22 +666,23 @@ export function CreateGroupPage() {
             <PlaceAutocompleteInput
               label={t('form.location_label')}
               placeholder={t('form.location_placeholder')}
-              value={formData.location}
-              onChange={(val) => updateField('location', val)}
+              value={formData.location.label}
+              onChange={(label) => setDraft((previous) => ({
+                ...previous,
+                location: label === previous.location.label
+                  ? previous.location
+                  : { label, latitude: null, longitude: null },
+              }))}
               onPlaceSelect={(place) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  location: place.formattedAddress,
-                  latitude: place.lat,
-                  longitude: place.lng,
+                setDraft((previous) => ({
+                  ...previous,
+                  location: { label: place.formattedAddress, latitude: place.lat, longitude: place.lng },
                 }));
               }}
               onClear={() => {
-                setFormData((prev) => ({
-                  ...prev,
-                  location: '',
-                  latitude: undefined,
-                  longitude: undefined,
+                setDraft((previous) => ({
+                  ...previous,
+                  location: { label: '', latitude: null, longitude: null },
                 }));
               }}
               classNames={{
@@ -515,34 +693,43 @@ export function CreateGroupPage() {
             />
           </div>
 
-          {/* Privacy Setting */}
+          {/* Visibility */}
           <div className="rounded-xl border border-theme-default bg-theme-elevated p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                {formData.is_private ? (
+                {isPrivate ? (
                   <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 ) : (
                   <Globe className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                 )}
                 <div>
                   <p className="font-medium text-theme-primary">
-                    {formData.is_private ? t('form.private_group') : t('form.public_group')}
+                    {isPrivate ? t('form.private_group') : t('form.public_group')}
                   </p>
                   <p className="text-sm text-theme-subtle">
-                    {formData.is_private
+                    {isPrivate
                       ? t('form.private_desc')
                       : t('form.public_desc')}
                   </p>
                 </div>
               </div>
-              <Switch
-                aria-label={formData.is_private ? t('form.make_public_aria') : t('form.make_private_aria')}
-                isSelected={formData.is_private}
-                onValueChange={(checked) => updateField('is_private', checked)}
-                classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-amber-500',
+              <Select
+                aria-label={t('form.visibility_label')}
+                className="w-full sm:w-48"
+                selectedKeys={new Set([formData.visibility])}
+                onSelectionChange={(keys) => {
+                  const [key] = Array.from(keys);
+                  if (key === 'public' || key === 'private' || key === 'secret') {
+                    setDraft((previous) => ({ ...previous, visibility: key }));
+                  }
                 }}
-              />
+              >
+                {(capabilities?.allowedVisibility ?? ['public', 'private']).map((option) => (
+                  <SelectItem key={option} id={option} textValue={t(`form.visibility_${option}`)}>
+                    {t(`form.visibility_${option}`)}
+                  </SelectItem>
+                ))}
+              </Select>
             </div>
           </div>
 
@@ -552,15 +739,17 @@ export function CreateGroupPage() {
               type="submit"
               className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
-              isLoading={isSubmitting || isUploadingImage}
+              isLoading={isSubmitting}
             >
-              {isUploadingImage ? t('form.submit_uploading') : isEditing ? t('form.submit_update') : t('form.submit_create')}
+              {isEditing ? t('form.submit_update') : t('form.submit_create')}
             </Button>
             <Button
               type="button"
               variant="flat"
               className="bg-theme-elevated text-theme-primary sm:min-w-32"
-              onPress={() => navigate(tenantPath('/groups'))}
+              onPress={() => void guardedNavigate(
+                isEditing ? tenantPath(`/groups/${id}`) : tenantPath('/groups'),
+              )}
             >
               {t('form.cancel')}
             </Button>

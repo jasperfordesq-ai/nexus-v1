@@ -128,6 +128,50 @@ class ImageUploader
     }
 
     /**
+     * Remove a tenant-scoped upload created by this service.
+     *
+     * The directory and tenant prefix are both enforced before resolving the
+     * path, so a failed domain mutation can clean up its file without exposing
+     * a general-purpose arbitrary-file delete primitive.
+     */
+    public static function deleteTenantUpload(?string $publicPath, string $directory): bool
+    {
+        if ($publicPath === null || $publicPath === '') {
+            return true;
+        }
+
+        $directory = trim(str_replace('\\', '/', $directory), '/');
+        if ($directory === '' || str_contains($directory, '..')) {
+            return false;
+        }
+
+        $tenant = TenantContext::get();
+        $slug = $tenant['slug'] ?? 'default';
+        if (($tenant['id'] ?? null) == 1 && empty($tenant['slug'])) {
+            $slug = 'master';
+        }
+
+        $tenantDirectory = 'tenants/' . $slug . '/' . $directory;
+        $expectedPrefix = '/uploads/' . $tenantDirectory . '/';
+        if (!str_starts_with($publicPath, $expectedPrefix)) {
+            return false;
+        }
+
+        $basePath = realpath(__DIR__ . '/../../httpdocs/uploads/' . $tenantDirectory);
+        $targetPath = realpath(__DIR__ . '/../../httpdocs' . $publicPath);
+        if ($basePath === false || $targetPath === false || !is_file($targetPath)) {
+            return false;
+        }
+
+        $basePrefix = rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (!str_starts_with($targetPath, $basePrefix)) {
+            return false;
+        }
+
+        return @unlink($targetPath);
+    }
+
+    /**
      * Enable or disable automatic WebP conversion.
      */
     public static function setAutoConvertWebP(bool $enabled): void

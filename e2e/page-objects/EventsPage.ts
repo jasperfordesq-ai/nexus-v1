@@ -43,8 +43,8 @@ export class EventsPage extends BasePage {
     this.searchCard = page.locator('[class*="glass"]').filter({ has: page.locator('input[placeholder*="Search events"]') });
     this.searchInput = page.locator('input[placeholder*="Search events"]');
 
-    // HeroUI Select uses button trigger, not <select> or role="combobox"
-    this.timeFilterSelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Upcoming|Past|All Events|Filter/ });
+    // HeroUI v3 Select exposes a button trigger and ARIA listbox options.
+    this.timeFilterSelect = page.getByRole('button', { name: 'Filter events by time' });
 
     // Category filter chips - HeroUI Chip components with aria-pressed
     this.categoryChips = page.locator('[aria-pressed]').filter({ hasText: /Workshop|Social|Outdoor|Online|Meeting|Training|Other/ });
@@ -108,14 +108,8 @@ export class EventsPage extends BasePage {
    * Filter events by time (Upcoming, Past, All Events)
    */
   async filterByTime(filter: 'upcoming' | 'past' | 'all'): Promise<void> {
-    // Click the Select button to open dropdown
-    await this.timeFilterSelect.click();
-    await this.page.waitForTimeout(200);
-
-    // Click the option from the dropdown
     const filterText = filter === 'upcoming' ? 'Upcoming' : filter === 'past' ? 'Past' : 'All Events';
-    const option = this.page.locator(`li[role="option"]:has-text("${filterText}")`).first();
-    await option.click();
+    await this.selectHeroUiOption(this.timeFilterSelect, filterText);
     await this.page.waitForTimeout(500);
   }
 
@@ -123,9 +117,17 @@ export class EventsPage extends BasePage {
    * Filter events by category
    */
   async filterByCategory(category: string): Promise<void> {
-    const chip = this.page.locator(`button:has-text("${category}")`).first();
+    const chip = this.page.getByRole('button', { name: category, exact: true });
     await chip.click();
     await this.page.waitForTimeout(500);
+  }
+
+  private async selectHeroUiOption(trigger: Locator, optionName: string): Promise<void> {
+    await trigger.click();
+    const option = this.page.getByRole('option', { name: optionName, exact: true });
+    await expect(option).toBeVisible();
+    await option.click();
+    await expect(trigger).toContainText(optionName);
   }
 
   /**
@@ -223,21 +225,21 @@ export class CreateEventPage extends BasePage {
     this.pageHeading = page.locator('h1:has-text("Create"), h1:has-text("Edit")');
 
     // Form fields with HeroUI Input components
-    this.titleInput = page.locator('label:has-text("Event Title")').locator('..').locator('input').first();
-    this.categorySelect = page.locator('button[aria-haspopup="listbox"]').filter({ hasText: /Select a category|Category|Workshop|Social/ }).first();
-    this.descriptionTextarea = page.locator('textarea[placeholder*="Describe"]').first();
+    this.titleInput = page.getByRole('textbox', { name: 'Event Title' });
+    this.categorySelect = page.getByRole('button', { name: 'Event category' });
+    this.descriptionTextarea = page.getByRole('textbox', { name: 'Description' });
 
     // Date/time inputs
-    this.startDateInput = page.locator('input[type="date"]').first();
-    this.startTimeInput = page.locator('input[type="time"]').first();
-    this.endDateInput = page.locator('input[type="date"]').nth(1);
-    this.endTimeInput = page.locator('input[type="time"]').nth(1);
+    this.startDateInput = page.getByRole('textbox', { name: 'Start Date' });
+    this.startTimeInput = page.getByRole('group', { name: 'Start Time' });
+    this.endDateInput = page.getByRole('textbox', { name: 'End Date (optional)' });
+    this.endTimeInput = page.getByRole('group', { name: 'End Time (optional)' });
 
-    this.locationInput = page.locator('label:has-text("Location")').locator('..').locator('input').first();
-    this.maxAttendeesInput = page.locator('label:has-text("Max Attendees")').locator('..').locator('input').first();
+    this.locationInput = page.getByRole('textbox', { name: 'Location (optional)' });
+    this.maxAttendeesInput = page.getByRole('spinbutton', { name: 'Max Attendees (optional)' });
 
     // Image upload
-    this.imageUploadArea = page.locator('text=Click to upload or drag and drop');
+    this.imageUploadArea = page.getByRole('button', { name: 'Upload cover image' });
     this.imagePreview = page.locator('img[alt*="cover preview"]');
     this.removeImageButton = page.locator('button[aria-label="Remove image"]');
 
@@ -260,7 +262,7 @@ export class CreateEventPage extends BasePage {
    * Navigate to edit event page
    */
   async navigateToEdit(id: number | string): Promise<void> {
-    await this.goto(`events/${id}/edit`);
+    await this.goto(`events/edit/${id}`);
   }
 
   /**
@@ -310,8 +312,21 @@ export class CreateEventPage extends BasePage {
     }
 
     if (data.category) {
-      await this.categorySelect.selectOption(data.category);
+      await this.selectCategory(data.category);
     }
+  }
+
+  async selectCategory(category: string): Promise<void> {
+    const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+    await this.selectHeroUiOption(this.categorySelect, categoryLabel);
+  }
+
+  private async selectHeroUiOption(trigger: Locator, optionName: string): Promise<void> {
+    await trigger.click();
+    const option = this.page.getByRole('option', { name: optionName, exact: true });
+    await expect(option).toBeVisible();
+    await option.click();
+    await expect(trigger).toContainText(optionName);
   }
 
   /**
@@ -384,7 +399,8 @@ export class EventDetailPage extends BasePage {
 
   // Actions
   readonly editButton: Locator;
-  readonly deleteButton: Locator;
+  readonly archiveButton: Locator;
+  readonly manageButton: Locator;
   readonly shareButton: Locator;
 
   // Attendees list
@@ -399,15 +415,15 @@ export class EventDetailPage extends BasePage {
 
     // Event info
     this.title = page.locator('h1').first();
-    this.description = page.locator('text=About this event').locator('..').locator('p');
+    this.description = page.getByRole('heading', { name: 'About this event' }).locator('..');
     this.dateTime = page.locator('time').first();
-    this.location = page.locator('text=Location').locator('..').locator('div').filter({ hasText: /\w+/ }).last();
-    this.organizer = page.locator('text=Organized by').locator('..').locator('span').filter({ hasText: /\w+ \w+/ });
+    this.location = page.getByText('Location', { exact: true }).locator('..');
+    this.organizer = page.getByRole('heading', { name: 'Organized by' }).locator('..').locator('span.text-theme-primary');
     this.categoryChip = page.locator('[class*="chip"]').filter({ hasText: /Workshop|Social|Outdoor|Online/ }).first();
 
     // Attendee counts
-    this.attendeeCount = page.locator('text=/\\d+ going/');
-    this.interestedCount = page.locator('text=/\\d+ interested/');
+    this.attendeeCount = page.getByText('going', { exact: true }).locator('../..').getByText(/^\d+$/);
+    this.interestedCount = page.getByText('interested', { exact: true }).locator('../..').getByText(/^\d+$/);
 
     // RSVP buttons
     this.goingButton = page.locator('button:has-text("Going")');
@@ -416,18 +432,19 @@ export class EventDetailPage extends BasePage {
     this.rsvpStatusChip = page.locator('[class*="chip"]:has-text("You\'re Going"), [class*="chip"]:has-text("You\'re Interested")');
 
     // Tabs
-    this.detailsTab = page.locator('button[role="tab"]:has-text("Details")');
-    this.attendeesTab = page.locator('button[role="tab"]:has-text("Attendees")');
-    this.checkinTab = page.locator('button[role="tab"]:has-text("Check-in")');
+    this.detailsTab = page.getByRole('tab', { name: 'Details' });
+    this.attendeesTab = page.getByRole('tab', { name: /^Attendees/ });
+    this.checkinTab = page.getByRole('tab', { name: /^Check-in/ });
 
     // Actions
     this.editButton = page.locator('a[href*="/edit"], button:has-text("Edit")').first();
-    this.deleteButton = page.locator('button:has-text("Delete")');
-    this.shareButton = page.locator('button:has-text("Share")');
+    this.archiveButton = page.getByRole('button', { name: /^Archive / });
+    this.manageButton = page.getByRole('link', { name: /^Manage / });
+    this.shareButton = page.getByRole('button', { name: /^Copy link to / });
 
     // Attendees
-    this.attendeesList = page.locator('[key="attendees"]').or(
-      page.locator('text=Attendees').locator('..').locator('..')
+    this.attendeesList = page.getByRole('heading', { name: 'No attendees yet' }).or(
+      page.locator('div.grid').filter({ has: page.locator('p.text-theme-primary') }).first()
     );
     this.attendeeItems = this.page.locator('.bg-theme-elevated').filter({ has: page.locator('img[alt], .avatar') });
   }

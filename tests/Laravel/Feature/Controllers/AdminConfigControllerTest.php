@@ -46,6 +46,34 @@ class AdminConfigControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_get_config_reports_passkey_disable_impact(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $passwordUser = User::factory()->forTenant($this->testTenantId)->create();
+        $passkeyOnlyUser = User::factory()->forTenant($this->testTenantId)->create([
+            'password_hash' => null,
+            'password' => null,
+        ]);
+        Sanctum::actingAs($admin);
+
+        foreach ([$passwordUser, $passkeyOnlyUser] as $index => $user) {
+            DB::table('webauthn_credentials')->insert([
+                'user_id' => $user->id,
+                'tenant_id' => $this->testTenantId,
+                'credential_id' => str_repeat($index === 0 ? 'A' : 'B', 43),
+                'user_handle' => str_repeat($index === 0 ? 'C' : 'D', 43),
+                'public_key' => 'test-public-key',
+                'created_at' => now(),
+            ]);
+        }
+
+        $this->apiGet('/v2/admin/config')
+            ->assertOk()
+            ->assertJsonPath('data.security_impact.biometric_login.credential_count', 2)
+            ->assertJsonPath('data.security_impact.biometric_login.registered_users', 2)
+            ->assertJsonPath('data.security_impact.biometric_login.passkey_only_users', 1);
+    }
+
     public function test_get_config_returns_403_for_regular_member(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
@@ -75,6 +103,36 @@ class AdminConfigControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('errors.0.message', __('api.missing_required_field', ['field' => 'settings']));
         $this->assertStringNotContainsString('Settings array is required', $response->getContent());
+    }
+
+    public function test_group_config_validation_errors_are_translated(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $missingKey = $this->apiPut('/v2/admin/config/groups', ['value' => true]);
+        $missingKey->assertStatus(422);
+        $missingKey->assertJsonPath('errors.0.message', __('api.group_config_key_required'));
+
+        $unknownKey = $this->apiPut('/v2/admin/config/groups', [
+            'key' => 'not_a_supported_groups_setting',
+            'value' => true,
+        ]);
+        $unknownKey->assertStatus(422);
+        $unknownKey->assertJsonPath(
+            'errors.0.message',
+            __('api.group_config_key_invalid', ['key' => 'not_a_supported_groups_setting']),
+        );
+
+        $missingValue = $this->apiPut('/v2/admin/config/groups', [
+            'key' => 'allow_private_groups',
+        ]);
+        $missingValue->assertStatus(422);
+        $missingValue->assertJsonPath('errors.0.message', __('api.group_config_value_required'));
+
+        $missingSettings = $this->apiPut('/v2/admin/config/groups/bulk', []);
+        $missingSettings->assertStatus(422);
+        $missingSettings->assertJsonPath('errors.0.message', __('api.group_config_settings_required'));
     }
 
     // ================================================================
@@ -382,6 +440,41 @@ class AdminConfigControllerTest extends TestCase
 
         $this->apiPut('/v2/admin/settings', ['domain' => 'api.project-nexus.ie'])
             ->assertStatus(422);
+    }
+
+    public function test_domain_change_reports_passkey_rp_impact_and_preserves_the_current_domain(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'is_super_admin' => true,
+        ]);
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'domain' => 'current-passkey.example.test',
+        ]);
+        DB::table('webauthn_credentials')->insert([
+            'user_id' => $member->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => str_repeat('R', 43),
+            'user_handle' => str_repeat('H', 43),
+            'public_key' => 'test-public-key',
+            'rp_id' => 'current-passkey.example.test',
+            'registration_origin' => 'https://current-passkey.example.test',
+            'created_at' => now(),
+        ]);
+
+        $this->apiPut('/v2/admin/settings', [
+            'domain' => 'replacement.example.test',
+        ])
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'PASSKEY_RP_CHANGE_BLOCKED')
+            ->assertJsonPath('meta.security_impact.credential_count', 1)
+            ->assertJsonPath('meta.security_impact.registered_users', 1);
+
+        $this->assertSame(
+            'current-passkey.example.test',
+            DB::table('tenants')->where('id', $this->testTenantId)->value('domain')
+        );
     }
 
     public function test_render_affecting_setting_schedules_tenant_prerender_refresh(): void
@@ -795,6 +888,7 @@ class AdminConfigControllerTest extends TestCase
             $this->apiPut('/v2/admin/config/features', [
                 'feature' => $feature,
                 'enabled' => false,
+                ...($feature === 'biometric_login' ? ['confirm_disable' => true] : []),
             ])->assertStatus(200);
         }
 
@@ -803,6 +897,24 @@ class AdminConfigControllerTest extends TestCase
             ->value('features'), true);
         $this->assertFalse($features['two_factor_authentication']);
         $this->assertFalse($features['biometric_login']);
+    }
+
+    public function test_super_admin_must_explicitly_confirm_disabling_passkey_authentication(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/config/features', [
+            'feature' => 'biometric_login',
+            'enabled' => false,
+        ])
+            ->assertStatus(409)
+            ->assertJsonPath('errors.0.code', 'PASSKEY_DISABLE_CONFIRMATION_REQUIRED');
+
+        $features = json_decode((string) DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->value('features'), true);
+        $this->assertNotFalse($features['biometric_login'] ?? true);
     }
 
     private function resetAuthenticationConfig(): void

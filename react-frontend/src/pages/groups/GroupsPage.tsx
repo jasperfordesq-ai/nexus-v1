@@ -34,12 +34,12 @@ import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
-import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
+import { listGroupDirectory } from './api';
 
 type GroupFilter = 'all' | 'joined' | 'public' | 'private';
 
@@ -65,6 +65,21 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+function readDirectoryFilter(searchParams: URLSearchParams, isAuthenticated: boolean): GroupFilter {
+  if (isAuthenticated && searchParams.get('scope') === 'joined') return 'joined';
+  const visibility = searchParams.get('visibility');
+  return visibility === 'public' || visibility === 'private' ? visibility : 'all';
+}
+
+function dedupeGroups(groups: Group[]): Group[] {
+  const seen = new Set<number>();
+  return groups.filter((group) => {
+    if (seen.has(group.id)) return false;
+    seen.add(group.id);
+    return true;
+  });
+}
+
 export function GroupsPage() {
   const { t } = useTranslation('groups');
   usePageTitle(t('title'));
@@ -80,13 +95,16 @@ export function GroupsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const searchQuery = searchParams.get('q') || '';
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const [filter, setFilter] = useState<GroupFilter>('all');
+  const filter = readDirectoryFilter(searchParams, isAuthenticated);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextCursorRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const appendAbortControllerRef = useRef<AbortController | null>(null);
+  const requestGenerationRef = useRef(0);
+  const loadMoreInFlightRef = useRef(false);
 
   // Debounce search query
   useEffect(() => {
@@ -105,11 +123,24 @@ export function GroupsPage() {
   }, [searchQuery]);
 
   const loadGroups = useCallback(async (append = false) => {
-    if (!append && abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const controller = new AbortController();
+    if (append && loadMoreInFlightRef.current) return;
+
     if (!append) {
+      abortControllerRef.current?.abort();
+      appendAbortControllerRef.current?.abort();
+      loadMoreInFlightRef.current = false;
+      requestGenerationRef.current += 1;
+    }
+
+    const generation = requestGenerationRef.current;
+    const requestCursor = append ? nextCursorRef.current : null;
+    if (append && !requestCursor) return;
+
+    const controller = new AbortController();
+    if (append) {
+      loadMoreInFlightRef.current = true;
+      appendAbortControllerRef.current = controller;
+    } else {
       abortControllerRef.current = controller;
     }
 
@@ -122,42 +153,33 @@ export function GroupsPage() {
         setIsLoadingMore(true);
       }
 
-      const params = new URLSearchParams();
-      if (debouncedQuery) params.set('q', debouncedQuery);
-      // Map the UI filter value to the PHP-supported query params
-      if (filter === 'public') {
-        params.set('visibility', 'public');
-      } else if (filter === 'private') {
-        params.set('visibility', 'private');
-      } else if (filter === 'joined' && user?.id) {
-        params.set('user_id', String(user.id));
-      }
-      params.set('per_page', String(ITEMS_PER_PAGE));
-      // Cursor-based pagination: only send cursor when loading more pages
-      if (append && nextCursorRef.current) {
-        params.set('cursor', nextCursorRef.current);
-      }
-
-      const response = await api.get<Group[]>(`/v2/groups?${params}`, { signal: controller.signal });
-      if (controller.signal.aborted) return;
-      if (response.success && response.data) {
-        if (append) {
-          setGroups((prev) => [...prev, ...(response.data ?? [])]);
-        } else {
-          setGroups(response.data);
-        }
-        // Always use server-reported has_more; assume false when meta is absent
-        const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
-        nextCursorRef.current = nextCursor;
-        setCursor(nextCursor);
-        setHasMore(response.meta?.has_more ?? false);
-        if (response.meta?.total_items !== undefined) {
-          setTotalCount(response.meta.total_items);
-        }
+      const page = await listGroupDirectory({
+        search: debouncedQuery || undefined,
+        visibility: filter === 'public' || filter === 'private' ? filter : undefined,
+        memberUserId: filter === 'joined' && user?.id ? user.id : undefined,
+        perPage: ITEMS_PER_PAGE,
+        cursor: requestCursor,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || generation !== requestGenerationRef.current) return;
+      if (append) {
+        setGroups((prev) => {
+          const seen = new Set(prev.map((group) => group.id));
+          const uniquePage = page.groups.filter((group) => {
+            if (seen.has(group.id)) return false;
+            seen.add(group.id);
+            return true;
+          });
+          return [...prev, ...uniquePage];
+        });
       } else {
-        if (!append) {
-          setError(t('load_error'));
-        }
+        setGroups(dedupeGroups(page.groups));
+      }
+      nextCursorRef.current = page.nextCursor;
+      setCursor(page.nextCursor);
+      setHasMore(page.hasMore && (!append || page.nextCursor !== requestCursor));
+      if (page.totalCount !== null) {
+        setTotalCount(page.totalCount);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -169,7 +191,14 @@ export function GroupsPage() {
         toast.error(t('load_more_error'));
       }
     } finally {
-      if (!controller.signal.aborted) {
+      if (append && appendAbortControllerRef.current === controller) {
+        appendAbortControllerRef.current = null;
+        loadMoreInFlightRef.current = false;
+      }
+      if (!append && abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+      }
+      if (!controller.signal.aborted && generation === requestGenerationRef.current) {
         setIsLoading(false);
         setIsLoadingMore(false);
       }
@@ -186,23 +215,33 @@ export function GroupsPage() {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      appendAbortControllerRef.current?.abort();
     };
   }, [debouncedQuery, filter]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on filter change; loadGroups excluded to avoid loop
 
-  // Update URL params
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    setSearchParams(params, { replace: true });
-  }, [searchQuery, setSearchParams]);
-
   const loadMoreGroups = useCallback(() => {
     if (isLoadingMore || !hasMore || !cursor) return;
-    loadGroups(true);
+    void loadGroups(true);
   }, [isLoadingMore, hasMore, cursor, loadGroups]);
 
+  function updateSearch(value: string) {
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set('q', value);
+    else params.delete('q');
+    setSearchParams(params, { replace: true });
+  }
+
+  function updateFilter(value: GroupFilter) {
+    const params = new URLSearchParams(searchParams);
+    params.delete('scope');
+    params.delete('visibility');
+    if (value === 'joined') params.set('scope', 'joined');
+    else if (value === 'public' || value === 'private') params.set('visibility', value);
+    setSearchParams(params);
+  }
+
   function resetSearch() {
-    setSearchQuery('');
+    updateSearch('');
     setDebouncedQuery('');
   }
 
@@ -253,7 +292,7 @@ export function GroupsPage() {
         isDetached
         size="sm"
         selectedKeys={new Set([filter])}
-        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setFilter(k as typeof filter); }}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) updateFilter(k as GroupFilter); }}
         className="flex flex-wrap items-center gap-2"
       >
         <ToggleButton
@@ -300,8 +339,8 @@ export function GroupsPage() {
               placeholder={t('search_placeholder')}
               aria-label={t('search_placeholder')}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              isClearable
+              onChange={(e) => updateSearch(e.target.value)}
+              isClearable={Boolean(searchQuery)}
               onClear={resetSearch}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
@@ -468,6 +507,9 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const { t } = useTranslation('groups');
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
+  const privacyLabel = group.visibility === 'private' || group.visibility === 'secret'
+    ? t('private_title')
+    : t('public_title');
   const groupImageSource = group.cover_image_url || group.cover_image || group.image_url;
   const imageProps = groupImageSource
     ? responsiveThumbnailProps(groupImageSource, {
@@ -478,7 +520,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
     : null;
 
   return (
-    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`} className="block h-full">
+    <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${privacyLabel} - ${t('members', { count: memberCount })}`} className="block h-full">
       <article className="h-full">
         <GlassCard className={`overflow-hidden hover:scale-[1.01] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
           <div className="relative h-24 bg-theme-elevated">
@@ -496,21 +538,21 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
               </div>
             )}
             <div className="absolute inset-0 bg-linear-to-t from-black/35 to-transparent" aria-hidden="true" />
-            {group.visibility === 'private' ? (
+            {group.visibility === 'private' || group.visibility === 'secret' ? (
               <Tooltip content={t('private_title')}>
-                <span className="absolute right-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
+                <span className="absolute end-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
                   <Lock className="w-4 h-4" aria-hidden="true" />
                 </span>
               </Tooltip>
             ) : (
               <Tooltip content={t('public_title')}>
-                <span className="absolute right-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
+                <span className="absolute end-3 top-3 shrink-0 rounded-full bg-black/45 p-1.5 text-white backdrop-blur-sm">
                   <Globe className="w-4 h-4" aria-hidden="true" />
                 </span>
               </Tooltip>
             )}
           </div>
-          <div className="flex flex-1 flex-col p-5">
+          <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
             {featured && (
               <div className="flex items-center gap-1.5 mb-2" role="img" aria-label={t('featured_badge')}>
                 <Star className="w-3.5 h-3.5 text-[var(--color-warning)] fill-amber-500" aria-hidden="true" />
@@ -527,7 +569,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
             {group.tags && group.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {group.tags.slice(0, MAX_VISIBLE_TAGS).map((tag: { id: number; name: string }) => (
-                  <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-accent/10 text-accent">
+                  <span key={tag.id} className="inline-flex max-w-full items-center break-all rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">
                     {tag.name}
                   </span>
                 ))}
@@ -538,8 +580,8 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
             )}
 
             {/* Group Stats */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-theme-subtle">
+            <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-4 text-sm text-theme-subtle">
                 <Tooltip content={t('members_count_label', { count: memberCount })}>
                   <span className="flex items-center gap-1" aria-label={t('members_count_label', { count: memberCount })}>
                     <Users className="w-4 h-4" aria-hidden="true" />

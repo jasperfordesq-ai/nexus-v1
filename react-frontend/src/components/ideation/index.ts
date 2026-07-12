@@ -5,4 +5,3 @@
 
 export { TeamChatrooms } from './TeamChatrooms';
 export { TeamTasks } from './TeamTasks';
-export { TeamDocuments } from './TeamDocuments';

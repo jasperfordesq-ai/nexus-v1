@@ -1,11 +1,12 @@
-import { getFormattingLocale } from '@/lib/helpers';
-import { useDisclosure, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { getFormattingLocale } from '@/lib/helpers';
+import { useDisclosure, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@/components/ui';
 
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Pencil from 'lucide-react/icons/pencil';
@@ -18,25 +19,34 @@ import Tablet from 'lucide-react/icons/tablet';
 import Laptop from 'lucide-react/icons/laptop';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
-import { useTenant, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import {
-  isBiometricAvailable,
+  isWebAuthnSupported,
   registerBiometric,
   getWebAuthnCredentials,
+  getWebAuthnStatus,
+  confirmWebAuthnSecurity,
   removeWebAuthnCredential,
   renameWebAuthnCredential,
   removeAllWebAuthnCredentials,
   detectPlatform,
   type DevicePlatform,
   type AuthenticatorAttachment,
+  type WebAuthnCredential,
+  type WebAuthnSecurityConfirmationInput,
 } from '@/lib/webauthn';
 
-interface Credential {
-  credential_id: string;
-  device_name: string | null;
-  authenticator_type: string | null;
-  created_at: string;
-  last_used_at: string | null;
+type Credential = WebAuthnCredential;
+type SecurityConfirmationMethod = 'password' | 'totp' | 'backup';
+type PendingSecurityAction =
+  | { kind: 'register'; attachment?: AuthenticatorAttachment }
+  | { kind: 'remove'; credentialId: string }
+  | { kind: 'removeAll' }
+  | { kind: 'rename'; credentialId: string; deviceName: string };
+
+interface CachedSecurityConfirmation {
+  token: string;
+  expiresAt: number;
 }
 
 function getDeviceIcon(cred: Credential) {
@@ -119,141 +129,356 @@ function getPlatformInstructions(platform: DevicePlatform, t: (key: string, opti
 export function BiometricSettings() {
   const { t } = useTranslation('settings');
   const toast = useToast();
-  const { hasFeature } = useTenant();
-  const passkeyEnrollmentAllowed = hasFeature('biometric_login');
+  const { logout } = useAuth();
+  const { hasFeature, authenticationConfig } = useTenant();
+  const passkeyAuthenticationEnabled = hasFeature('biometric_login');
+  const passkeyEnrollmentAllowed = passkeyAuthenticationEnabled
+    && ((authenticationConfig as { 'passkeys.enrollment_enabled'?: boolean } | undefined)?.['passkeys.enrollment_enabled'] ?? true);
 
   const [supported, setSupported] = useState<boolean | null>(null);
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [currentRpId, setCurrentRpId] = useState<string | null>(null);
+  const [maxCredentials, setMaxCredentials] = useState<number | null>(null);
   const [registering, setRegistering] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removingAll, setRemovingAll] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [pendingRemoval, setPendingRemoval] = useState<Credential | null>(null);
   const [showInstructions, setShowInstructions] = useState(true); // Auto-show on first visit
+  const [confirmationMethods, setConfirmationMethods] = useState({
+    password: true,
+    passkey: false,
+    totp: false,
+  });
+  const [confirmationMethod, setConfirmationMethod] = useState<SecurityConfirmationMethod>('password');
+  const [confirmationValue, setConfirmationValue] = useState('');
+  const [confirmationError, setConfirmationError] = useState<string | null>(null);
+  const [confirmingSecurity, setConfirmingSecurity] = useState(false);
+  const [securityActionBusy, setSecurityActionBusy] = useState(false);
+  const [pendingSecurityAction, setPendingSecurityAction] = useState<PendingSecurityAction | null>(null);
+  const securityConfirmationRef = useRef<CachedSecurityConfirmation | null>(null);
+  const recentSessionCheckedRef = useRef(false);
+  const securityActionInFlightRef = useRef(false);
 
   const platform = detectPlatform();
   const instructions = getPlatformInstructions(platform, (key, options) => t(key, options));
   const removeAllConfirm = useDisclosure();
+  const securityConfirm = useDisclosure();
 
   const loadCredentials = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
     try {
-      const creds = await getWebAuthnCredentials();
+      const [creds, status] = await Promise.all([
+        getWebAuthnCredentials(),
+        getWebAuthnStatus(),
+      ]);
       setCredentials(creds);
+      setCurrentRpId(status.current_rp_id ?? null);
+      setMaxCredentials(
+        typeof status.max_credentials === 'number' && status.max_credentials > 0
+          ? status.max_credentials
+          : null,
+      );
+      const methods = status.confirmation_methods;
+      if (methods) {
+        const available = {
+          password: methods.password === true,
+          passkey: methods.passkey === true,
+          totp: methods.totp === true,
+        };
+        setConfirmationMethods(available);
+        setConfirmationMethod(available.password ? 'password' : available.totp ? 'totp' : 'backup');
+      }
     } catch {
-      // silently fail — user might not have any credentials
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    isBiometricAvailable().then(setSupported).catch(() => setSupported(false));
-    loadCredentials();
-  }, [loadCredentials]);
+    if (!passkeyAuthenticationEnabled) {
+      setSupported(false);
+      setLoading(false);
+      return;
+    }
 
-  const handleRegister = async (attachment?: AuthenticatorAttachment) => {
+    setSupported(isWebAuthnSupported());
+    void loadCredentials();
+  }, [loadCredentials, passkeyAuthenticationEnabled]);
+
+  const confirmationExpiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (confirmationExpiryTimerRef.current) clearTimeout(confirmationExpiryTimerRef.current);
+    securityConfirmationRef.current = null;
+  }, []);
+
+  const clearSecurityConfirmation = () => {
+    securityConfirmationRef.current = null;
+    if (confirmationExpiryTimerRef.current) {
+      clearTimeout(confirmationExpiryTimerRef.current);
+      confirmationExpiryTimerRef.current = null;
+    }
+  };
+
+  const cacheSecurityConfirmation = (token: string, expiresIn: number) => {
+    clearSecurityConfirmation();
+    const lifetimeMs = Math.max(1, expiresIn) * 1000;
+    securityConfirmationRef.current = { token, expiresAt: Date.now() + lifetimeMs };
+    confirmationExpiryTimerRef.current = setTimeout(() => {
+      securityConfirmationRef.current = null;
+      confirmationExpiryTimerRef.current = null;
+    }, lifetimeMs);
+  };
+
+  const getCachedSecurityConfirmation = (): string | null => {
+    const cached = securityConfirmationRef.current;
+    if (!cached || cached.expiresAt <= Date.now() + 5_000) {
+      clearSecurityConfirmation();
+      return null;
+    }
+    return cached.token;
+  };
+
+  const openSecurityConfirmation = (action: PendingSecurityAction, error?: string) => {
+    setPendingSecurityAction(action);
+    setConfirmationValue('');
+    setConfirmationError(error ?? null);
+    setConfirmationMethod(confirmationMethods.password ? 'password' : confirmationMethods.totp ? 'totp' : 'backup');
+    securityConfirm.onOpen();
+  };
+
+  const confirmationWasRejected = (errorCode?: string) =>
+    errorCode === 'SECURITY_CONFIRMATION_REQUIRED';
+
+  const finishRevokedSession = async () => {
+    clearSecurityConfirmation();
+    toast.success(t('passkey_sessions_revoked'));
+    await logout();
+  };
+
+  const performRegister = async (
+    action: Extract<PendingSecurityAction, { kind: 'register' }>,
+    securityToken: string,
+  ) => {
+    if (!passkeyEnrollmentAllowed || !supported) return;
     setRegistering(true);
-    const result = await registerBiometric(undefined, attachment);
-    setRegistering(false);
-
-    if (result.success) {
-      toast.success(t('biometric_registered'));
-      loadCredentials();
-    } else if (result.errorCode === 'domain_not_allowed') {
-      // Server issued an RP ID that isn't valid for this domain — a platform
-      // configuration problem, not something the user can fix locally.
-      console.error('[webauthn] RP ID rejected for this origin:', result.error);
-      toast.error(t('passkey_error_domain'));
-    } else if (result.errorCode === 'cancelled') {
-      toast.error(t('passkey_cancelled'));
-    } else if (result.errorCode === 'unknown') {
-      // Raw browser exception text is untranslated and cryptic — log it for
-      // diagnostics, show the user a translated generic failure.
-      console.error('[webauthn] registration failed:', result.error);
-      toast.error(t('passkey_registration_failed'));
-    } else {
-      // No errorCode: the failure came from our API (already localized).
-      toast.error(result.error || t('passkey_registration_failed'));
-    }
-  };
-
-  const handleRemove = async (credentialId: string) => {
-    setRemovingId(credentialId);
-    const result = await removeWebAuthnCredential(credentialId);
-    setRemovingId(null);
-
-    if (result.success) {
-      toast.success(t('biometric_removed'));
-      setCredentials(prev => prev.filter(c => c.credential_id !== credentialId));
-    } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
-      toast.error(t('common:oauth.cannot_disconnect_last'));
-    } else {
-      toast.error(t('passkey_remove_failed'));
-    }
-  };
-
-  const handleRemoveAll = async () => {
-    setRemovingAll(true);
-    const result = await removeAllWebAuthnCredentials();
-    setRemovingAll(false);
-
-    if (result.success) {
-      toast.success(
-        t('biometric_all_removed', {
-          count: result.removedCount,
-        }),
+    try {
+      const result = await registerBiometric(
+        t('passkey_default_device_name'),
+        action.attachment,
+        securityToken,
       );
-      setCredentials([]);
-    } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
-      toast.error(t('common:oauth.cannot_disconnect_last'));
-    } else {
+
+      if (result.success) {
+        toast.success(t('biometric_registered'));
+        void loadCredentials();
+      } else if (confirmationWasRejected(result.errorCode)) {
+        clearSecurityConfirmation();
+        openSecurityConfirmation(action, t('passkey_security_confirm_failed'));
+      } else if (
+        result.errorCode === 'domain_not_allowed'
+        || result.errorCode === 'AUTH_WEBAUTHN_ORIGIN_NOT_ALLOWED'
+      ) {
+        console.error('[webauthn] RP ID rejected for this origin:', result.error);
+        toast.error(t('passkey_error_domain'));
+      } else if (result.errorCode === 'cancelled') {
+        toast.error(t('passkey_cancelled'));
+      } else if (result.errorCode === 'FEATURE_DISABLED') {
+        toast.error(t('passkey_enrollment_disabled'));
+      } else if (result.errorCode === 'WEBAUTHN_CREDENTIAL_LIMIT') {
+        toast.error(t('passkey_limit_reached', { count: maxCredentials ?? credentials.length }));
+      } else {
+        if (result.errorCode === 'unknown') {
+          console.error('[webauthn] registration failed:', result.error);
+        }
+        toast.error(t('passkey_registration_failed'));
+      }
+    } catch (err) {
+      console.error('[webauthn] registration failed:', err);
+      toast.error(t('passkey_registration_failed'));
+    } finally {
+      setRegistering(false);
+    }
+  };
+
+  const performRemove = async (
+    action: Extract<PendingSecurityAction, { kind: 'remove' }>,
+    securityToken: string,
+  ) => {
+    setRemovingId(action.credentialId);
+    try {
+      const result = await removeWebAuthnCredential(action.credentialId, securityToken);
+      if (result.success) {
+        setCredentials(prev => prev.filter(c => c.credential_id !== action.credentialId));
+        if (result.sessionsRevoked) {
+          await finishRevokedSession();
+        } else {
+          toast.success(t('biometric_removed'));
+        }
+      } else if (confirmationWasRejected(result.errorCode)) {
+        clearSecurityConfirmation();
+        openSecurityConfirmation(action, t('passkey_security_confirm_failed'));
+      } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
+        toast.error(t('common:oauth.cannot_disconnect_last'));
+      } else {
+        toast.error(t('passkey_remove_failed'));
+      }
+    } catch {
+      toast.error(t('passkey_remove_failed'));
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
+  const performRemoveAll = async (
+    action: Extract<PendingSecurityAction, { kind: 'removeAll' }>,
+    securityToken: string,
+  ) => {
+    setRemovingAll(true);
+    try {
+      const result = await removeAllWebAuthnCredentials(securityToken);
+      if (result.success) {
+        setCredentials([]);
+        if (result.sessionsRevoked) {
+          await finishRevokedSession();
+        } else {
+          toast.success(t('biometric_all_removed', { count: result.removedCount }));
+        }
+      } else if (confirmationWasRejected(result.errorCode)) {
+        clearSecurityConfirmation();
+        openSecurityConfirmation(action, t('passkey_security_confirm_failed'));
+      } else if (result.errorCode === 'LAST_SIGN_IN_METHOD') {
+        toast.error(t('common:oauth.cannot_disconnect_last'));
+      } else {
+        toast.error(t('passkey_remove_all_failed'));
+      }
+    } catch {
       toast.error(t('passkey_remove_all_failed'));
+    } finally {
+      setRemovingAll(false);
+    }
+  };
+
+  const performRename = async (
+    action: Extract<PendingSecurityAction, { kind: 'rename' }>,
+    securityToken: string,
+  ) => {
+    try {
+      const result = await renameWebAuthnCredential(
+        action.credentialId,
+        action.deviceName,
+        securityToken,
+      );
+      if (result.success) {
+        setCredentials(prev => prev.map(c => c.credential_id === action.credentialId
+          ? { ...c, device_name: action.deviceName }
+          : c));
+        toast.success(t('passkey_renamed'));
+      } else if (confirmationWasRejected(result.errorCode)) {
+        clearSecurityConfirmation();
+        openSecurityConfirmation(action, t('passkey_security_confirm_failed'));
+      } else {
+        toast.error(t('passkey_rename_failed'));
+      }
+    } catch {
+      toast.error(t('passkey_rename_failed'));
+    }
+  };
+
+  const executeSecurityAction = async (action: PendingSecurityAction, securityToken: string) => {
+    if (action.kind === 'register') await performRegister(action, securityToken);
+    if (action.kind === 'remove') await performRemove(action, securityToken);
+    if (action.kind === 'removeAll') await performRemoveAll(action, securityToken);
+    if (action.kind === 'rename') await performRename(action, securityToken);
+  };
+
+  const requestSecurityAction = async (action: PendingSecurityAction) => {
+    if (securityActionInFlightRef.current) return;
+    securityActionInFlightRef.current = true;
+    setSecurityActionBusy(true);
+    try {
+      const cachedToken = getCachedSecurityConfirmation();
+      if (cachedToken) {
+        await executeSecurityAction(action, cachedToken);
+        return;
+      }
+
+      // Passkey and federated logins carry a five-minute, UV-backed proof. Ask
+      // the server once whether this session is still inside that window before
+      // showing another prompt.
+      if (!recentSessionCheckedRef.current) {
+        recentSessionCheckedRef.current = true;
+        const recentSession = await confirmWebAuthnSecurity();
+        if (
+          recentSession.success
+          && recentSession.securityConfirmationToken
+          && recentSession.expiresIn
+        ) {
+          cacheSecurityConfirmation(recentSession.securityConfirmationToken, recentSession.expiresIn);
+          await executeSecurityAction(action, recentSession.securityConfirmationToken);
+          return;
+        }
+      }
+
+      openSecurityConfirmation(action);
+    } finally {
+      securityActionInFlightRef.current = false;
+      setSecurityActionBusy(false);
     }
   };
 
   const handleRename = async (credentialId: string) => {
     const trimmed = editName.trim();
-    if (!trimmed) {
-      setEditingId(null);
+    setEditingId(null);
+    if (!trimmed) return;
+    const credential = credentials.find((candidate) => candidate.credential_id === credentialId);
+    if (credential && trimmed === getDeviceLabel(credential, (key, options) => t(key, options)).trim()) {
       return;
     }
-    const success = await renameWebAuthnCredential(credentialId, trimmed);
-    if (success) {
-      setCredentials(prev =>
-        prev.map(c => c.credential_id === credentialId ? { ...c, device_name: trimmed } : c),
-      );
-      toast.success(t('passkey_renamed'));
-    } else {
-      toast.error(t('passkey_rename_failed'));
-    }
-    setEditingId(null);
+    await requestSecurityAction({ kind: 'rename', credentialId, deviceName: trimmed });
   };
 
-  // Not supported — show info message
-  if (!loading && !passkeyEnrollmentAllowed && credentials.length === 0) {
-    return null;
-  }
+  const submitSecurityConfirmation = async () => {
+    if (!pendingSecurityAction || !confirmationValue.trim() || securityActionInFlightRef.current) return;
+    securityActionInFlightRef.current = true;
+    setSecurityActionBusy(true);
+    setConfirmingSecurity(true);
+    setConfirmationError(null);
+    try {
+      const value = confirmationValue.trim();
+      const input: WebAuthnSecurityConfirmationInput = confirmationMethod === 'password'
+        ? { current_password: confirmationValue }
+        : confirmationMethod === 'totp'
+          ? { totp_code: value.replace(/\s+/g, '') }
+          : { backup_code: value };
+      const result = await confirmWebAuthnSecurity(input);
+      if (!result.success || !result.securityConfirmationToken || !result.expiresIn) {
+        setConfirmationError(t('passkey_security_confirm_failed'));
+        return;
+      }
 
-  if (supported === false) {
-    return (
-      <div className="w-full p-4 rounded-lg bg-theme-elevated text-left">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-amber-500/20">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="font-medium text-theme-primary">
-              {t('biometric_title')}
-            </p>
-            <p className="text-sm text-theme-subtle">
-              {t('biometric_not_supported')}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      const action = pendingSecurityAction;
+      cacheSecurityConfirmation(result.securityConfirmationToken, result.expiresIn);
+      setPendingSecurityAction(null);
+      setConfirmationValue('');
+      securityConfirm.onClose();
+      await executeSecurityAction(action, result.securityConfirmationToken);
+    } catch {
+      setConfirmationError(t('passkey_security_confirm_failed'));
+    } finally {
+      setConfirmingSecurity(false);
+      securityActionInFlightRef.current = false;
+      setSecurityActionBusy(false);
+    }
+  };
+
+  if (!passkeyAuthenticationEnabled) return null;
 
   // Still checking
   if (supported === null || loading) {
@@ -274,7 +499,31 @@ export function BiometricSettings() {
     );
   }
 
+  if (loadError) {
+    return (
+      <div className="w-full p-4 rounded-lg bg-theme-elevated text-left" role="alert">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-amber-500/20">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-theme-primary">{t('biometric_title')}</p>
+            <p className="text-sm text-theme-subtle">{t('passkey_load_failed')}</p>
+          </div>
+          <Button size="sm" variant="secondary" onPress={() => { void loadCredentials(); }}>
+            {t('try_again')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const hasCredentials = credentials.length > 0;
+  const credentialLimitReached = maxCredentials !== null && credentials.length >= maxCredentials;
+  const canEnroll = passkeyEnrollmentAllowed && supported && !credentialLimitReached;
+  const pendingRemovalLabel = pendingRemoval
+    ? getDeviceLabel(pendingRemoval, (key, options) => t(key, options))
+    : '';
 
   return (
     <div className="w-full p-4 rounded-lg bg-theme-elevated text-left space-y-4">
@@ -303,7 +552,7 @@ export function BiometricSettings() {
           </div>
         </div>
 
-        {passkeyEnrollmentAllowed && <Tooltip content={t('passkey_setup_tooltip')}>
+        {canEnroll && <Tooltip content={t('passkey_setup_tooltip')}>
           <Button
             isIconOnly
             size="sm"
@@ -317,8 +566,31 @@ export function BiometricSettings() {
         </Tooltip>}
       </div>
 
+      {supported === false && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3" role="status">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          <p className="text-sm text-theme-subtle">{t('biometric_not_supported')}</p>
+        </div>
+      )}
+
+      {!passkeyEnrollmentAllowed && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3" role="status">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          <p className="text-sm text-theme-subtle">{t('passkey_enrollment_disabled')}</p>
+        </div>
+      )}
+
+      {passkeyEnrollmentAllowed && credentialLimitReached && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3" role="status">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+          <p className="text-sm text-theme-subtle">
+            {t('passkey_limit_reached', { count: maxCredentials })}
+          </p>
+        </div>
+      )}
+
       {/* Platform-specific instructions */}
-      {passkeyEnrollmentAllowed && showInstructions && (
+      {canEnroll && showInstructions && (
         <div className="p-3 rounded-lg bg-accent/5 border border-accent/20 space-y-2">
           <p className="text-sm font-medium text-accent dark:text-accent">
             {instructions.title} - {t('passkey_setup_subtitle')}
@@ -337,11 +609,12 @@ export function BiometricSettings() {
       )}
 
       {/* Registration button — no attachment restriction, let browser show all options */}
-      {passkeyEnrollmentAllowed && <Button
+      {canEnroll && <Button
         size="md"
         className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
-        onPress={() => handleRegister(undefined)}
+        onPress={() => { void requestSecurityAction({ kind: 'register' }); }}
         isLoading={registering}
+        isDisabled={securityActionBusy}
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
       >
         {hasCredentials ? t('passkey_add_another') : t('passkey_create')}
@@ -349,14 +622,18 @@ export function BiometricSettings() {
 
       {/* Registered credentials list */}
       {hasCredentials && (
-        <div className="space-y-2 pt-2 border-t border-theme-default">
-          {credentials.map((cred) => {
-            const DeviceIcon = getDeviceIcon(cred);
-            return (
-              <div
-                key={cred.credential_id}
-                className="flex items-center justify-between p-2.5 rounded-lg bg-theme-hover/50"
-              >
+        <div className="pt-2 border-t border-theme-default">
+          <ul className="space-y-2" aria-label={t('biometric_title')}>
+            {credentials.map((cred) => {
+              const DeviceIcon = getDeviceIcon(cred);
+              const credentialLabel = getDeviceLabel(cred, (key, options) => t(key, options));
+              const needsLegacyUpgrade = cred.credential_discoverable === null
+                || cred.credential_discoverable === false;
+              return (
+                <li
+                  key={cred.credential_id}
+                  className="flex items-center justify-between p-2.5 rounded-lg bg-theme-hover/50"
+                >
                 <div className="flex items-center gap-3 min-w-0">
                   <DeviceIcon className="w-4 h-4 text-theme-muted flex-shrink-0" aria-hidden="true" />
                   <div className="min-w-0">
@@ -377,7 +654,7 @@ export function BiometricSettings() {
                       />
                     ) : (
                       <p className="text-sm font-medium text-theme-primary truncate">
-                        {getDeviceLabel(cred, (key, options) => t(key, options))}{' '}
+                        {credentialLabel}{' '}
                         <span className="text-theme-subtle font-mono text-xs">
                           ...{cred.credential_id.slice(-8)}
                         </span>
@@ -398,6 +675,18 @@ export function BiometricSettings() {
                         </>
                       )}
                     </div>
+                    {cred.rp_id ? (
+                      <p className={`mt-0.5 text-xs ${currentRpId && cred.rp_id !== currentRpId ? 'text-warning' : 'text-theme-muted'}`}>
+                        {currentRpId && cred.rp_id !== currentRpId
+                          ? t('passkey_rp_mismatch', { rpId: cred.rp_id, currentRpId })
+                          : t('passkey_rp_label', { rpId: cred.rp_id })}
+                      </p>
+                    ) : null}
+                    {(!cred.rp_id || needsLegacyUpgrade) && (
+                      <p className="mt-0.5 text-xs text-warning">
+                        {t('passkey_rp_unknown')}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
@@ -408,9 +697,10 @@ export function BiometricSettings() {
                     className="text-theme-subtle hover:bg-theme-hover"
                     onPress={() => {
                       setEditingId(cred.credential_id);
-                      setEditName(getDeviceLabel(cred, (key, options) => t(key, options)));
+                      setEditName(credentialLabel);
                     }}
-                    aria-label={t('passkey_rename')}
+                    isDisabled={securityActionBusy}
+                    aria-label={t('passkey_rename_named', { name: credentialLabel })}
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </Button>
@@ -419,16 +709,18 @@ export function BiometricSettings() {
                     size="sm"
                     variant="light"
                     className="text-[var(--color-error)] hover:bg-red-500/10"
-                    onPress={() => handleRemove(cred.credential_id)}
+                    onPress={() => setPendingRemoval(cred)}
                     isLoading={removingId === cred.credential_id}
-                    aria-label={t('biometric_remove')}
+                    isDisabled={securityActionBusy}
+                    aria-label={t('passkey_remove_named', { name: credentialLabel })}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 </div>
-              </div>
-            );
-          })}
+                </li>
+              );
+            })}
+          </ul>
 
           {/* Remove all button */}
           {credentials.length > 1 && (
@@ -439,6 +731,7 @@ export function BiometricSettings() {
                 className="bg-red-500/10 text-[var(--color-error)]"
                 onPress={removeAllConfirm.onOpen}
                 isLoading={removingAll}
+                isDisabled={securityActionBusy}
                 startContent={!removingAll ? <Trash2 className="w-3 h-3" /> : undefined}
               >
                 {t('biometric_remove_all')}
@@ -449,7 +742,7 @@ export function BiometricSettings() {
       )}
 
       {/* Multi-device tip */}
-      {passkeyEnrollmentAllowed && !showInstructions && (
+      {canEnroll && !showInstructions && (
         <p className="text-xs text-theme-muted">
           {t('passkey_device_tip')}{' '}
           <Button
@@ -462,6 +755,57 @@ export function BiometricSettings() {
           </Button>
         </p>
       )}
+
+      {/* Individual passkey confirmation modal */}
+      <Modal
+        isOpen={pendingRemoval !== null}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !removingId) setPendingRemoval(null);
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {t('biometric_remove')}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-theme-subtle">
+                  {t('passkey_remove_warning', { name: pendingRemovalLabel })}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="light"
+                  onPress={() => {
+                    setPendingRemoval(null);
+                    onClose();
+                  }}
+                  isDisabled={removingId !== null}
+                >
+                  {t('cancel')}
+                </Button>
+                <Button
+                  color="danger"
+                  isLoading={removingId !== null}
+                  isDisabled={securityActionBusy}
+                  onPress={async () => {
+                    if (!pendingRemoval) return;
+                    await requestSecurityAction({
+                      kind: 'remove',
+                      credentialId: pendingRemoval.credential_id,
+                    });
+                    setPendingRemoval(null);
+                    onClose();
+                  }}
+                >
+                  {t('biometric_remove')}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       {/* Remove All confirmation modal */}
       <Modal isOpen={removeAllConfirm.isOpen} onOpenChange={removeAllConfirm.onOpenChange}>
@@ -482,13 +826,139 @@ export function BiometricSettings() {
                 </Button>
                 <Button
                   color="danger"
+                  isDisabled={securityActionBusy}
                   onPress={() => {
-                    handleRemoveAll();
+                    void requestSecurityAction({ kind: 'removeAll' });
                     onClose();
                   }}
                 >
                   {t('passkey_remove_all_confirm')}
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Re-authentication for sensitive authenticator changes */}
+      <Modal
+        isOpen={securityConfirm.isOpen}
+        onOpenChange={(isOpen) => {
+          securityConfirm.onOpenChange(isOpen);
+          if (!isOpen && !confirmingSecurity) {
+            setPendingSecurityAction(null);
+            setConfirmationValue('');
+            setConfirmationError(null);
+          }
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {t('passkey_security_confirm_title')}
+              </ModalHeader>
+              <ModalBody className="space-y-4">
+                <p className="text-sm text-theme-subtle">
+                  {t('passkey_security_confirm_description')}
+                </p>
+
+                {!confirmationMethods.password && !confirmationMethods.totp ? (
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-theme-subtle" role="alert">
+                    {t('passkey_security_confirm_no_method')}
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap gap-2" role="group" aria-label={t('passkey_security_confirm_method_label')}>
+                      {confirmationMethods.password && (
+                        <Button
+                          size="sm"
+                          variant={confirmationMethod === 'password' ? 'primary' : 'secondary'}
+                          aria-pressed={confirmationMethod === 'password'}
+                          onPress={() => {
+                            setConfirmationMethod('password');
+                            setConfirmationValue('');
+                            setConfirmationError(null);
+                          }}
+                        >
+                          {t('passkey_security_confirm_password')}
+                        </Button>
+                      )}
+                      {confirmationMethods.totp && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant={confirmationMethod === 'totp' ? 'primary' : 'secondary'}
+                            aria-pressed={confirmationMethod === 'totp'}
+                            onPress={() => {
+                              setConfirmationMethod('totp');
+                              setConfirmationValue('');
+                              setConfirmationError(null);
+                            }}
+                          >
+                            {t('passkey_security_confirm_totp')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={confirmationMethod === 'backup' ? 'primary' : 'secondary'}
+                            aria-pressed={confirmationMethod === 'backup'}
+                            onPress={() => {
+                              setConfirmationMethod('backup');
+                              setConfirmationValue('');
+                              setConfirmationError(null);
+                            }}
+                          >
+                            {t('passkey_security_confirm_backup')}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+
+                    <Input
+                      autoFocus
+                      type={confirmationMethod === 'password' ? 'password' : 'text'}
+                      inputMode={confirmationMethod === 'totp' ? 'numeric' : 'text'}
+                      autoComplete={confirmationMethod === 'password' ? 'current-password' : 'one-time-code'}
+                      label={confirmationMethod === 'password'
+                        ? t('passkey_security_confirm_password')
+                        : confirmationMethod === 'totp'
+                          ? t('passkey_security_confirm_totp')
+                          : t('passkey_security_confirm_backup')}
+                      value={confirmationValue}
+                      onValueChange={setConfirmationValue}
+                      isInvalid={confirmationError !== null}
+                      errorMessage={confirmationError ?? undefined}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          void submitSecurityConfirmation();
+                        }
+                      }}
+                    />
+                  </>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="light"
+                  onPress={() => {
+                    setPendingSecurityAction(null);
+                    onClose();
+                  }}
+                  isDisabled={confirmingSecurity}
+                >
+                  {t('cancel')}
+                </Button>
+                {(confirmationMethods.password || confirmationMethods.totp) && (
+                  <Button
+                    color="primary"
+                    onPress={() => { void submitSecurityConfirmation(); }}
+                    isLoading={confirmingSecurity}
+                    isDisabled={!confirmationValue.trim() || securityActionBusy}
+                  >
+                    {t('passkey_security_confirm_action')}
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}

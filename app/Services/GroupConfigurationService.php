@@ -20,6 +20,24 @@ use Illuminate\Support\Facades\Log;
  */
 class GroupConfigurationService
 {
+    /** @var array<string, string> */
+    private const TAB_CONFIG_KEYS = [
+        'feed' => self::CONFIG_TAB_FEED,
+        'discussion' => self::CONFIG_TAB_DISCUSSION,
+        'members' => self::CONFIG_TAB_MEMBERS,
+        'events' => self::CONFIG_TAB_EVENTS,
+        'files' => self::CONFIG_TAB_FILES,
+        'announcements' => self::CONFIG_TAB_ANNOUNCEMENTS,
+        'qa' => self::CONFIG_TAB_QA,
+        'wiki' => self::CONFIG_TAB_WIKI,
+        'media' => self::CONFIG_TAB_MEDIA,
+        'chatrooms' => self::CONFIG_TAB_CHATROOMS,
+        'tasks' => self::CONFIG_TAB_TASKS,
+        'challenges' => self::CONFIG_TAB_CHALLENGES,
+        'analytics' => self::CONFIG_TAB_ANALYTICS,
+        'subgroups' => self::CONFIG_TAB_SUBGROUPS,
+    ];
+
     // =========================================================================
     // Core configuration keys
     // =========================================================================
@@ -195,6 +213,20 @@ class GroupConfigurationService
         $stored = self::getStoredValues($tenantId);
 
         return array_merge(self::DEFAULTS, $stored);
+    }
+
+    public static function isTabEnabled(string $tab): bool
+    {
+        $configKey = self::TAB_CONFIG_KEYS[$tab] ?? null;
+        if ($configKey === null || ! (bool) self::get($configKey)) {
+            return false;
+        }
+
+        if ($tab === 'discussion') {
+            return (bool) self::get(self::CONFIG_ENABLE_DISCUSSIONS, true);
+        }
+
+        return true;
     }
 
     /**

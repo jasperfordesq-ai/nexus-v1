@@ -1,0 +1,94 @@
+{
+  "safety": {
+    "actions": {
+      "retry": "Riprova",
+      "acknowledge": "Riconoscere il codice",
+      "withdraw_acknowledgement": "Ritirare il riconoscimento",
+      "request_guardian_consent": "Richiedi il consenso del tutore",
+      "withdraw_guardian_consent": "Ritirare la richiesta di consenso"
+    },
+    "attendee": {
+      "title": "Requisiti di partecipazione",
+      "description": "Completa i passaggi di sicurezza applicabili prima di registrarti o iscriverti alla lista d'attesa.",
+      "loading": "Caricamento requisiti di partecipazione",
+      "load_error_title": "I requisiti di partecipazione non sono disponibili",
+      "load_error_description": "Non abbiamo potuto verificare i requisiti di sicurezza dell'evento. Riprova prima di registrarti.",
+      "action_error": "Non è stato possibile completare la fase di sicurezza. Riprova.",
+      "denial_title": "Al momento la partecipazione non è consentita",
+      "attention_title": "È necessaria un'azione",
+      "success": {
+        "acknowledge": "Codice di condotta riconosciuto.",
+        "withdraw_code": "Riconoscimento del codice ritirato.",
+        "request_guardian": "Richiesta di consenso del tutore inviata.",
+        "withdraw_guardian": "Richiesta di consenso del tutore ritirata."
+      }
+    },
+    "eligibility": {
+      "allow": "Requisiti completati",
+      "deny": "Partecipazione bloccata",
+      "unavailable": "Verifica non disponibile",
+      "not_evaluated": "Non ancora valutato"
+    },
+    "reasons": {
+      "unknown": "Un requisito di partecipazione necessita ancora di attenzione.",
+      "safeguarding_policy": "Salvaguardare la decisione politica",
+      "minimum_age": "Requisito di età minima",
+      "guardian_consent": "Obbligo del consenso del tutore",
+      "code_of_conduct": "Requisito del codice di condotta",
+      "conduct_violation": "Comportamento in violazione",
+      "safety_review": "Decisione sulla revisione della sicurezza",
+      "user_block": "Un blocco membro impedisce la partecipazione",
+      "event_safety_unbound_guest_denied": "Accedi per verificare i requisiti di partecipazione.",
+      "event_safety_user_not_active": "Il tuo account membro non è attualmente attivo.",
+      "event_safety_bilateral_user_block": "Un blocco membro impedisce la partecipazione a questo evento.",
+      "event_safety_requirements_not_published": "L'organizzatore non ha ancora pubblicato i requisiti di sicurezza.",
+      "event_safety_requirements_integrity_invalid": "Non è stato possibile verificare i requisiti di sicurezza pubblicati.",
+      "event_safety_requirements_version_unavailable": "La versione dei requisiti pubblicata non è disponibile.",
+      "event_safety_date_of_birth_required": "Aggiungi la tua data di nascita in modo da poter verificare i requisiti di età.",
+      "event_safety_date_of_birth_invalid": "Non è stato possibile verificare la data di nascita registrata.",
+      "event_safety_minimum_age_not_met": "Non raggiungi l'età minima per questo evento.",
+      "event_safety_minor_policy_unavailable": "La politica per la partecipazione dei minori non è disponibile.",
+      "event_safety_guardian_consent_required": "È richiesto il consenso valido del tutore.",
+      "event_safety_code_of_conduct_acknowledgement_required": "Riconoscere l'attuale codice di condotta.",
+      "event_safety_active_participation_denial": "Una decisione di sicurezza attiva impedisce la partecipazione.",
+      "event_safety_safeguarding_policy_denied": "La politica di salvaguardia attualmente non consente la partecipazione.",
+      "event_safety_safeguarding_policy_invalid": "Non è stato possibile verificare la decisione di salvaguardia.",
+      "event_safety_safeguarding_policy_unavailable": "La verifica di salvaguardia è temporaneamente non disponibile.",
+      "event_safety_schema_unavailable": "La verifica di sicurezza è temporaneamente non disponibile.",
+      "event_safety_evaluation_unavailable": "La verifica di sicurezza è temporaneamente non disponibile.",
+      "event_safety_organizer_not_active": "L'organizzatore dell'evento non è attualmente attivo.",
+      "event_safety_denial_safeguarding_policy": "Una decisione politica di salvaguardia impedisce la partecipazione."
+    },
+    "code": {
+      "title": "Codice di comportamento",
+      "confirm_read": "Ho letto e accetto il codice di condotta completo.",
+      "status": {
+        "not_required": "Non richiesto",
+        "required": "È richiesto il riconoscimento",
+        "acknowledged": "Acknowledged"
+      }
+    },
+    "guardian": {
+      "title": "Consenso del tutore",
+      "description": "Il tutore riceve un collegamento privato limitato nel tempo. La loro identità e il token di consenso non vengono mai mostrati nell'elenco degli eventi.",
+      "name_label": "Nome del tutore",
+      "email_label": "E-mail del tutore",
+      "relationship_label": "Rapporto con il partecipante",
+      "privacy_notice": "L'indirizzo viene crittografato per la consegna e rimosso dalla busta di consegna dopo l'elaborazione.",
+      "relationships": {
+        "parent": "Parent",
+        "guardian": "Guardian",
+        "legal_guardian": "Tutore legale",
+        "carer": "Carer"
+      },
+      "status": {
+        "not_required": "Non richiesto",
+        "required": "Consenso richiesto",
+        "pending": "In attesa del tutore",
+        "active": "Consenso concesso",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
+      }
+    }
+  }
+}

@@ -8,6 +8,7 @@ namespace App\Services\AI\Tools;
 
 use App\Core\TenantContext;
 use App\Services\TenantFeatureConfig;
+use App\Support\Events\EventSearchVisibility;
 use Illuminate\Support\Facades\DB;
 
 class SearchEventsTool extends AbstractTool
@@ -56,9 +57,8 @@ class SearchEventsTool extends AbstractTool
         $location = $this->stringArg($arguments, 'location');
         $limit = $this->intArg($arguments, 'limit', 5, 1, 8);
 
-        $q = DB::table('events')
-            ->where('tenant_id', $tenantId)
-            ->where('start_time', '>=', now());
+        $q = DB::table('events')->where('start_time', '>=', now());
+        EventSearchVisibility::applyToQuery($q, $tenantId, 'events');
 
         if ($query !== '') {
             $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $query) . '%';

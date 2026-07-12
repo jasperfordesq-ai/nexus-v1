@@ -333,6 +333,19 @@ class UsersControllerTest extends TestCase
     // LANGUAGE — Validation
     // ================================================================
 
+    public function test_update_language_accepts_platform_supported_arabic_when_tenant_uses_defaults(): void
+    {
+        $user = $this->authenticatedUser(['preferred_language' => 'en']);
+
+        $response = $this->apiPut('/v2/users/me/language', [
+            'language' => 'ar',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.language', 'ar');
+        $this->assertSame('ar', DB::table('users')->where('id', $user->id)->value('preferred_language'));
+    }
+
     public function test_update_language_returns_400_for_invalid_language(): void
     {
         $this->authenticatedUser();

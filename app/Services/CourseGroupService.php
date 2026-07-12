@@ -20,7 +20,7 @@ class CourseGroupService
     /** Attach a course to a group (idempotent). */
     public static function attach(int $courseId, int $groupId): CourseGroupLink
     {
-        if (!Group::where('id', $groupId)->exists()) {
+        if (!Group::query()->active()->whereKey($groupId)->exists()) {
             throw new \RuntimeException('group_not_found');
         }
 
@@ -56,6 +56,10 @@ class CourseGroupService
      */
     public static function coursesForGroup(int $groupId, ?int $viewerUserId = null): array
     {
+        if ($viewerUserId === null || ! GroupAccessService::canViewMemberContent($groupId, $viewerUserId)) {
+            return [];
+        }
+
         $courseIds = CourseGroupLink::where('group_id', $groupId)->pluck('course_id')->all();
         if (!$courseIds) {
             return [];

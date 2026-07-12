@@ -29,6 +29,7 @@ import { GroupWikiTab } from '../tabs/GroupWikiTab';
 import { GroupMediaTab } from '../tabs/GroupMediaTab';
 import { GroupAnalyticsTab } from '../tabs/GroupAnalyticsTab';
 import { GroupChallengesTab } from '../tabs/GroupChallengesTab';
+import { GroupAutomationTab } from '../tabs/GroupAutomationTab';
 
 interface GroupTabContentProps {
   activeTab: string;
@@ -45,6 +46,7 @@ interface GroupTabContentProps {
   // Feed
   feedItems: FeedItem[];
   feedLoading: boolean;
+  feedError?: boolean;
   feedHasMore: boolean;
   feedLoadingMore: boolean;
   onComposeOpen: () => void;
@@ -61,28 +63,43 @@ interface GroupTabContentProps {
   // Discussions
   discussions: Discussion[];
   discussionsLoading: boolean;
+  discussionsError?: boolean;
   discussionsHasMore: boolean;
   expandedDiscussionId: number | null;
   expandedDiscussion: DiscussionDetail | null;
   expandedLoading: boolean;
+  loadingEarlierReplies: boolean;
   replyContent: string;
   sendingReply: boolean;
   onShowNewDiscussion: () => void;
   onExpandDiscussion: (id: number) => void;
   onLoadMoreDiscussions: () => void;
+  onLoadEarlierReplies: () => void;
+  onRetryDiscussions?: () => void;
   onReplyContentChange: (value: string) => void;
   onSendReply: () => void;
 
   // Members
   members: GroupMember[];
   membersLoading: boolean;
+  membersLoadingMore: boolean;
+  membersHasMore: boolean;
+  membersError?: boolean;
   updatingMember: number | null;
   onUpdateMemberRole: (userId: number, role: 'member' | 'admin') => void;
   onRemoveMember: (userId: number) => void;
+  onSearchMembers: (query: string) => void;
+  onLoadMoreMembers: () => void;
+  onRetryMembers?: () => void;
 
   // Events
   events: Event[];
   eventsLoading: boolean;
+  eventsLoadingMore: boolean;
+  eventsHasMore: boolean;
+  eventsError?: boolean;
+  onLoadMoreEvents: () => void;
+  onRetryEvents?: () => void;
 
   // Join/leave
   onJoinLeave: () => void;
@@ -101,6 +118,7 @@ export function GroupTabContent({
   subGroups,
   feedItems,
   feedLoading,
+  feedError = false,
   feedHasMore,
   feedLoadingMore,
   onComposeOpen,
@@ -115,28 +133,56 @@ export function GroupTabContent({
   onVotePoll,
   discussions,
   discussionsLoading,
+  discussionsError = false,
   discussionsHasMore,
   expandedDiscussionId,
   expandedDiscussion,
   expandedLoading,
+  loadingEarlierReplies,
   replyContent,
   sendingReply,
   onShowNewDiscussion,
   onExpandDiscussion,
   onLoadMoreDiscussions,
+  onLoadEarlierReplies,
+  onRetryDiscussions,
   onReplyContentChange,
   onSendReply,
   members,
   membersLoading,
+  membersLoadingMore,
+  membersHasMore,
+  membersError = false,
   updatingMember,
   onUpdateMemberRole,
   onRemoveMember,
+  onSearchMembers,
+  onLoadMoreMembers,
+  onRetryMembers,
   events,
   eventsLoading,
+  eventsLoadingMore,
+  eventsHasMore,
+  eventsError = false,
+  onLoadMoreEvents,
+  onRetryEvents,
   onJoinLeave,
 }: GroupTabContentProps) {
   const { t } = useTranslation('groups');
   const { isAuthenticated } = useAuth();
+
+  const loadError = (message: string, onRetry?: () => void | Promise<void>) => (
+    <GlassCard className="p-6">
+      <div role="alert" className="flex flex-col items-center gap-3 text-center">
+        <p className="text-sm text-danger">{message}</p>
+        {onRetry && (
+          <Button variant="flat" onPress={() => void onRetry()}>
+            {t('try_again')}
+          </Button>
+        )}
+      </div>
+    </GlassCard>
+  );
 
   const MembersOnlyFallback = (
     <GlassCard className="p-6">
@@ -161,7 +207,7 @@ export function GroupTabContent({
 
   return (
     <div>
-      {activeTab === 'feed' && (
+      {activeTab === 'feed' && (feedError ? loadError(t('toast.feed_load_failed'), onRefreshFeed) : (
         <GroupFeedTab
           isMember={userIsMember}
           isJoining={isJoining}
@@ -181,9 +227,9 @@ export function GroupTabContent({
           onDeletePost={onDeletePost}
           onVotePoll={onVotePoll}
         />
-      )}
+      ))}
 
-      {activeTab === 'discussion' && (
+      {activeTab === 'discussion' && (discussionsError ? loadError(t('toast.discussions_load_failed'), onRetryDiscussions) : (
         <GroupDiscussionTab
           isMember={userIsMember}
           isJoining={isJoining}
@@ -193,21 +239,25 @@ export function GroupTabContent({
           expandedDiscussionId={expandedDiscussionId}
           expandedDiscussion={expandedDiscussion}
           expandedLoading={expandedLoading}
+          loadingEarlierReplies={loadingEarlierReplies}
           replyContent={replyContent}
           sendingReply={sendingReply}
           onJoinLeave={onJoinLeave}
           onShowNewDiscussion={onShowNewDiscussion}
           onExpandDiscussion={onExpandDiscussion}
           onLoadMoreDiscussions={onLoadMoreDiscussions}
+          onLoadEarlierReplies={onLoadEarlierReplies}
           onReplyContentChange={onReplyContentChange}
           onSendReply={onSendReply}
         />
-      )}
+      ))}
 
-      {activeTab === 'members' && (
+      {activeTab === 'members' && (membersError ? loadError(t('toast.something_wrong'), onRetryMembers) : (
         <GroupMembersTab
           members={members}
           membersLoading={membersLoading}
+          membersLoadingMore={membersLoadingMore}
+          membersHasMore={membersHasMore}
           userIsAdmin={userIsAdmin}
           currentUserId={currentUserId}
           groupOwnerId={groupOwnerId}
@@ -215,17 +265,22 @@ export function GroupTabContent({
           updatingMember={updatingMember}
           onUpdateMemberRole={onUpdateMemberRole}
           onRemoveMember={onRemoveMember}
+          onSearchMembers={onSearchMembers}
+          onLoadMoreMembers={onLoadMoreMembers}
         />
-      )}
+      ))}
 
-      {activeTab === 'events' && (
+      {activeTab === 'events' && (eventsError ? loadError(t('toast.something_wrong'), onRetryEvents) : (
         <GroupEventsTab
           groupId={groupId}
           events={events}
           eventsLoading={eventsLoading}
+          eventsLoadingMore={eventsLoadingMore}
+          eventsHasMore={eventsHasMore}
           isMember={userIsMember}
+          onLoadMoreEvents={onLoadMoreEvents}
         />
-      )}
+      ))}
 
       {activeTab === 'files' && (userIsMember ? (
         <GroupFilesTab
@@ -277,6 +332,10 @@ export function GroupTabContent({
 
       {activeTab === 'analytics' && userIsAdmin && (
         <GroupAnalyticsTab groupId={groupId} isAdmin={userIsAdmin} />
+      )}
+
+      {activeTab === 'automation' && userIsAdmin && (
+        <GroupAutomationTab groupId={groupId} isAdmin={userIsAdmin} />
       )}
 
       {activeTab === 'subgroups' && hasSubGroups && subGroups && (

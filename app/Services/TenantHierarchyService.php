@@ -10,6 +10,7 @@ use App\Services\TenantFeatureConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * TenantHierarchyService — Native Laravel implementation.
@@ -28,7 +29,7 @@ class TenantHierarchyService
      * general-settings endpoints. A malformed/reserved/duplicate route key can
      * make both tenant resolution and authoritative prerendering ambiguous.
      *
-     * @return array{success:bool,data?:array<string,string|null>,error?:string}
+     * @return array{success:bool,data?:array<string,string|null>,error?:string,code?:string,security_impact?:array<string,int>}
      */
     public static function validateRoutingUpdate(int $tenantId, array $data, ?object $tenant = null): array
     {
@@ -91,7 +92,252 @@ class TenantHierarchyService
             }
         }
 
+        foreach (['domain', 'accessible_domain'] as $field) {
+            if (!array_key_exists($field, $normalized)) {
+                continue;
+            }
+            $currentHost = strtolower(rtrim(trim((string) ($tenant->{$field} ?? '')), '.'));
+            $newHost = (string) ($normalized[$field] ?? '');
+            if ($currentHost === '' || $currentHost === $newHost) {
+                continue;
+            }
+
+            $impact = self::passkeyRpChangeImpact($tenantId, $currentHost);
+            if ($impact['credential_count'] > 0) {
+                Log::warning('[TenantHierarchy] Routing change blocked by RP-bound passkeys', [
+                    'tenant_id' => $tenantId,
+                    'field' => $field,
+                    'current_domain' => $currentHost,
+                    'requested_domain' => $newHost,
+                    'impact' => $impact,
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => __('api.validation_failed'),
+                    'code' => 'PASSKEY_RP_CHANGE_BLOCKED',
+                    'security_impact' => $impact,
+                ];
+            }
+        }
+
         return ['success' => true, 'data' => $normalized];
+    }
+
+    /**
+     * Apply only tenant routing fields with the same registration locks and
+     * authoritative in-transaction recheck used by hierarchy mutations. This
+     * intentionally omits cache/audit side effects so callers can compose it
+     * inside a larger transaction and roll everything back together.
+     *
+     * @return array{success:bool,data?:array<string,string|null>,error?:string,code?:string,security_impact?:array<string,int>}
+     */
+    public static function applyRoutingUpdateAtomically(int $tenantId, array $routingInput): array
+    {
+        return DB::transaction(function () use ($tenantId, $routingInput): array {
+            self::lockPasskeyRoutingBoundary($tenantId);
+            $tenant = DB::table('tenants')->where('id', $tenantId)->first();
+            if ($tenant === null) {
+                return ['success' => false, 'error' => 'Tenant not found'];
+            }
+
+            $validation = self::validateRoutingUpdate($tenantId, $routingInput, $tenant);
+            if (!$validation['success']) {
+                return $validation;
+            }
+
+            $update = $validation['data'] ?? [];
+            if ($update !== []) {
+                DB::table('tenants')->where('id', $tenantId)->update([
+                    ...$update,
+                    'updated_at' => now(),
+                ]);
+            }
+
+            return ['success' => true, 'data' => $update];
+        });
+    }
+
+    /** @return array{credential_count:int,registered_users:int,affected_tenants:int} */
+    private static function passkeyRpChangeImpact(int $tenantId, string $currentRpId): array
+    {
+        return self::passkeyRpImpactForTenants(
+            self::passkeyInheritanceSubtreeTenantIds($tenantId),
+            [$currentRpId]
+        );
+    }
+
+    /**
+     * Return the moved tenant and every descendant that inherits its routing
+     * because it has no primary custom domain. A domain-owning descendant is a
+     * new WebAuthn boundary, so traversal does not continue through it.
+     *
+     * @return list<int>
+     */
+    private static function passkeyInheritanceSubtreeTenantIds(
+        int $tenantId,
+        bool $lockForUpdate = false
+    ): array
+    {
+        if ($lockForUpdate) {
+            DB::table('tenants')
+                ->where('id', $tenantId)
+                ->lockForUpdate()
+                ->get(['id']);
+        }
+
+        $tenantIds = [$tenantId];
+        $frontier = [$tenantId];
+
+        while ($frontier !== []) {
+            $query = DB::table('tenants')
+                ->whereIn('parent_id', $frontier)
+                ->where(static function ($query): void {
+                    $query->whereNull('domain')->orWhere('domain', '');
+                });
+            if ($lockForUpdate) {
+                $query->lockForUpdate();
+            }
+            $children = $query->pluck('id')
+                ->map(static fn (mixed $id): int => (int) $id)
+                ->all();
+            $frontier = array_values(array_diff($children, $tenantIds));
+            $tenantIds = array_values(array_unique(array_merge($tenantIds, $frontier)));
+        }
+
+        return $tenantIds;
+    }
+
+    /**
+     * Serialize RP-affecting mutations with passkey registration. Registration
+     * locks its tenant row before its user row; keeping that same lock order
+     * closes the check/insert gap without deadlocking concurrent ceremonies.
+     *
+     * @return list<int>
+     */
+    private static function lockPasskeyRoutingBoundary(int $tenantId): array
+    {
+        $tenantIds = self::passkeyInheritanceSubtreeTenantIds($tenantId, true);
+        DB::table('users')
+            ->whereIn('tenant_id', $tenantIds)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get(['id']);
+
+        return $tenantIds;
+    }
+
+    /**
+     * Resolve custom RP IDs for a tenant, including inherited ancestor hosts
+     * while the primary domain remains empty. Platform RP IDs are deliberately
+     * excluded because hierarchy moves do not change them.
+     *
+     * @param list<int> $visited
+     * @return list<string>
+     */
+    private static function effectiveCustomRpIds(?int $tenantId, array $visited = []): array
+    {
+        if ($tenantId === null || $tenantId <= 0 || in_array($tenantId, $visited, true)) {
+            return [];
+        }
+
+        $tenant = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->select('id', 'parent_id', 'domain', 'accessible_domain')
+            ->first();
+        if ($tenant === null) {
+            return [];
+        }
+
+        $domain = strtolower(rtrim(trim((string) ($tenant->domain ?? '')), '.'));
+        $accessibleDomain = strtolower(rtrim(trim((string) ($tenant->accessible_domain ?? '')), '.'));
+        $rpIds = array_values(array_filter([$domain, $accessibleDomain]));
+
+        if ($domain === '' && !empty($tenant->parent_id)) {
+            $rpIds = array_merge(
+                $rpIds,
+                self::effectiveCustomRpIds((int) $tenant->parent_id, array_merge($visited, [$tenantId]))
+            );
+        }
+
+        return array_values(array_unique($rpIds));
+    }
+
+    /**
+     * @param list<int> $tenantIds
+     * @param list<string> $rpIds
+     * @return array{credential_count:int,registered_users:int,affected_tenants:int}
+     */
+    private static function passkeyRpImpactForTenants(array $tenantIds, array $rpIds): array
+    {
+        if (
+            $tenantIds === []
+            || !Schema::hasTable('webauthn_credentials')
+            || !Schema::hasColumn('webauthn_credentials', 'rp_id')
+        ) {
+            return ['credential_count' => 0, 'registered_users' => 0, 'affected_tenants' => 0];
+        }
+
+        $normalizedRpIds = array_values(array_unique(array_filter(array_map(
+            static fn (string $rpId): string => strtolower(rtrim(trim($rpId), '.')),
+            $rpIds
+        ))));
+        $query = DB::table('webauthn_credentials')
+            ->whereIn('tenant_id', $tenantIds)
+            ->where(static function ($query) use ($normalizedRpIds): void {
+                if ($normalizedRpIds !== []) {
+                    $query->whereIn('rp_id', $normalizedRpIds)->orWhereNull('rp_id');
+                    return;
+                }
+                $query->whereNull('rp_id');
+            });
+
+        return [
+            'credential_count' => (int) (clone $query)->count(),
+            'registered_users' => (int) (clone $query)->distinct()->count('user_id'),
+            'affected_tenants' => (int) (clone $query)->distinct()->count('tenant_id'),
+        ];
+    }
+
+    /**
+     * @return array{success:false,error:string,code:string,security_impact:array<string,int>}|null
+     */
+    private static function passkeyMoveBoundaryFailure(object $tenant, int $newParentId): ?array
+    {
+        if (trim((string) ($tenant->domain ?? '')) !== '') {
+            return null;
+        }
+
+        $oldParentId = $tenant->parent_id === null ? null : (int) $tenant->parent_id;
+        $oldRpIds = self::effectiveCustomRpIds($oldParentId);
+        $newRpIds = self::effectiveCustomRpIds($newParentId);
+        $removedRpIds = array_values(array_diff($oldRpIds, $newRpIds));
+        if ($removedRpIds === []) {
+            return null;
+        }
+
+        $impact = self::passkeyRpImpactForTenants(
+            self::passkeyInheritanceSubtreeTenantIds((int) $tenant->id),
+            $removedRpIds
+        );
+        if ($impact['credential_count'] < 1) {
+            return null;
+        }
+
+        Log::warning('[TenantHierarchy] Move blocked by RP-bound passkeys', [
+            'tenant_id' => (int) $tenant->id,
+            'old_parent_id' => $oldParentId,
+            'new_parent_id' => $newParentId,
+            'removed_rp_ids' => $removedRpIds,
+            'impact' => $impact,
+        ]);
+
+        return [
+            'success' => false,
+            'error' => __('api.validation_failed'),
+            'code' => 'PASSKEY_RP_CHANGE_BLOCKED',
+            'security_impact' => $impact,
+        ];
     }
 
     /** Core service hosts can never be assigned as a tenant custom domain. */
@@ -307,7 +553,7 @@ class TenantHierarchyService
     /**
      * Update an existing tenant.
      *
-     * @return array{success: bool, error?: string}
+     * @return array{success: bool, error?: string, code?: string, security_impact?: array<string,int>}
      */
     public static function updateTenant(int $tenantId, array $data): array
     {
@@ -324,7 +570,18 @@ class TenantHierarchyService
             if ($routingInput !== []) {
                 $routingValidation = self::validateRoutingUpdate($tenantId, $routingInput, $tenant);
                 if (!$routingValidation['success']) {
-                    return ['success' => false, 'error' => $routingValidation['error'] ?? __('api.no_valid_fields_to_update')];
+                    $failure = [
+                        'success' => false,
+                        'error' => $routingValidation['error'] ?? __('api.no_valid_fields_to_update'),
+                    ];
+                    if (isset($routingValidation['code'])) {
+                        $failure['code'] = $routingValidation['code'];
+                    }
+                    if (isset($routingValidation['security_impact'])) {
+                        $failure['security_impact'] = $routingValidation['security_impact'];
+                    }
+
+                    return $failure;
                 }
                 $data = array_replace($data, $routingValidation['data'] ?? []);
             }
@@ -433,17 +690,50 @@ class TenantHierarchyService
             }
 
             $update['updated_at'] = now();
-            $routingFields = ['slug', 'domain', 'is_active'];
+            $routingFields = ['slug', 'domain', 'accessible_domain', 'is_active'];
             $routingChanged = array_intersect(array_keys($update), $routingFields) !== [];
             $purgeUnexpected = array_intersect(array_keys($update), ['features', 'configuration']) !== [];
 
-            DB::transaction(function () use (
+            $transactionFailure = DB::transaction(function () use (
                 $tenantId,
                 $tenant,
                 $update,
                 $routingChanged,
-                $purgeUnexpected
-            ): void {
+                $purgeUnexpected,
+                $routingInput
+            ): ?array {
+                if ($routingInput !== []) {
+                    self::lockPasskeyRoutingBoundary($tenantId);
+                    $lockedTenant = DB::table('tenants')->where('id', $tenantId)->first();
+                    if ($lockedTenant === null) {
+                        return ['success' => false, 'error' => 'Tenant not found'];
+                    }
+
+                    // The preflight response is useful to admins, but it is not
+                    // authoritative until registrations on this routing boundary
+                    // are serialized. Re-run every routing/passkey check while
+                    // holding those locks immediately before the mutation.
+                    $revalidation = self::validateRoutingUpdate(
+                        $tenantId,
+                        $routingInput,
+                        $lockedTenant
+                    );
+                    if (!$revalidation['success']) {
+                        $failure = [
+                            'success' => false,
+                            'error' => $revalidation['error'] ?? __('api.no_valid_fields_to_update'),
+                        ];
+                        if (isset($revalidation['code'])) {
+                            $failure['code'] = $revalidation['code'];
+                        }
+                        if (isset($revalidation['security_impact'])) {
+                            $failure['security_impact'] = $revalidation['security_impact'];
+                        }
+
+                        return $failure;
+                    }
+                }
+
                 DB::table('tenants')->where('id', $tenantId)->update($update);
 
                 $invalidator = app(PrerenderContentInvalidator::class);
@@ -454,7 +744,12 @@ class TenantHierarchyService
                 } elseif ((int) ($tenant->is_active ?? 0) === 1) {
                     $invalidator->refreshTenantOrFail($tenantId, true, $purgeUnexpected);
                 }
+
+                return null;
             });
+            if (is_array($transactionFailure)) {
+                return $transactionFailure;
+            }
 
             // Audit
             SuperAdminAuditService::log(
@@ -497,7 +792,8 @@ class TenantHierarchyService
     /**
      * Delete (soft or hard) a tenant.
      *
-     * Soft delete sets is_active = 0. Hard delete removes the row entirely.
+     * Soft delete sets is_active = 0. The legacy hard-delete flag is rejected;
+     * populated or permanent deletion belongs to the audited purge service.
      * Cannot delete the Master tenant (ID 1) or tenants with active children.
      *
      * @return array{success: bool, error?: string}
@@ -514,6 +810,13 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Tenant not found'];
             }
 
+            if ($hardDelete) {
+                return [
+                    'success' => false,
+                    'error' => __('api.super_hard_delete_disabled'),
+                ];
+            }
+
             // Check for active children
             $activeChildren = DB::table('tenants')
                 ->where('parent_id', $tenantId)
@@ -524,33 +827,11 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Cannot delete a tenant with active sub-tenants. Deactivate or move them first.'];
             }
 
-            DB::transaction(function () use ($tenantId, $tenant, $hardDelete): void {
-                if ($hardDelete) {
-                    // WARNING: This only moves users and child tenants. Other tenant-scoped
-                    // data (listings, transactions, messages, events, groups, etc.) will be
-                    // orphaned. Hard delete should only be used for empty/test tenants.
-                    $parentId = $tenant->parent_id ?? 1;
-
-                    // Move users to parent tenant before deleting
-                    DB::table('users')->where('tenant_id', $tenantId)->update(['tenant_id' => $parentId]);
-
-                    // Reassign orphaned child tenants to parent
-                    DB::table('tenants')->where('parent_id', $tenantId)->update([
-                        'parent_id' => $parentId,
-                    ]);
-
-                    // Clean up tenant-specific seed data
-                    DB::table('tenant_settings')->where('tenant_id', $tenantId)->delete();
-                    DB::table('categories')->where('tenant_id', $tenantId)->delete();
-                    DB::table('federation_tenant_features')->where('tenant_id', $tenantId)->delete();
-
-                    DB::table('tenants')->where('id', $tenantId)->delete();
-                } else {
-                    DB::table('tenants')->where('id', $tenantId)->update([
-                        'is_active' => 0,
-                        'updated_at' => now(),
-                    ]);
-                }
+            DB::transaction(function () use ($tenantId): void {
+                DB::table('tenants')->where('id', $tenantId)->update([
+                    'is_active' => 0,
+                    'updated_at' => now(),
+                ]);
 
                 app(PrerenderContentInvalidator::class)->refreshAllOrFail();
             });
@@ -562,8 +843,8 @@ class TenantHierarchyService
                 $tenantId,
                 $tenant->name,
                 ['is_active' => $tenant->is_active],
-                ['hard_delete' => $hardDelete],
-                ($hardDelete ? 'Hard deleted' : 'Soft deleted (deactivated)') . " tenant '{$tenant->name}'"
+                ['hard_delete' => false],
+                "Soft deleted (deactivated) tenant '{$tenant->name}'"
             );
 
             self::bustBootstrapCache($tenantId, (int) ($tenant->parent_id ?? 0));
@@ -578,7 +859,7 @@ class TenantHierarchyService
     /**
      * Move a tenant to a new parent in the hierarchy.
      *
-     * @return array{success: bool, error?: string}
+     * @return array{success: bool, error?: string, code?: string, security_impact?: array<string,int>}
      */
     public static function moveTenant(int $tenantId, int $newParentId): array
     {
@@ -611,18 +892,42 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Cannot move a tenant under one of its own descendants'];
             }
 
-            $oldParentId = $tenant->parent_id;
-            $oldPath = $tenant->path;
-            $newDepth = ($newParent->depth ?? 0) + 1;
-            $newPath = ($newParent->path ?? ('/' . $newParentId . '/')) . $tenantId . '/';
+            $move = DB::transaction(function () use ($tenantId, $newParentId): array {
+                // Lock both hierarchy endpoints in deterministic order, then the
+                // complete RP-inheriting subtree and its users. Passkey
+                // registration takes tenant -> user locks in the same order.
+                DB::table('tenants')
+                    ->whereIn('id', [$tenantId, $newParentId])
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get(['id']);
+                self::lockPasskeyRoutingBoundary($tenantId);
 
-            DB::transaction(function () use (
-                $tenantId,
-                $newParentId,
-                $newDepth,
-                $newPath,
-                $oldPath
-            ): void {
+                $lockedTenant = DB::table('tenants')->where('id', $tenantId)->first();
+                $lockedNewParent = DB::table('tenants')->where('id', $newParentId)->first();
+                if ($lockedTenant === null) {
+                    return ['success' => false, 'error' => 'Tenant not found'];
+                }
+                if ($lockedNewParent === null) {
+                    return ['success' => false, 'error' => 'New parent tenant not found'];
+                }
+                if (empty($lockedTenant->path) || empty($lockedNewParent->path)) {
+                    return ['success' => false, 'error' => 'Cannot move tenant: hierarchy path data is missing. Re-save the affected tenants to rebuild paths.'];
+                }
+                if (str_starts_with($lockedNewParent->path, $lockedTenant->path)) {
+                    return ['success' => false, 'error' => 'Cannot move a tenant under one of its own descendants'];
+                }
+
+                $passkeyFailure = self::passkeyMoveBoundaryFailure($lockedTenant, $newParentId);
+                if ($passkeyFailure !== null) {
+                    return $passkeyFailure;
+                }
+
+                $oldParentId = $lockedTenant->parent_id;
+                $oldPath = (string) $lockedTenant->path;
+                $newDepth = ((int) ($lockedNewParent->depth ?? 0)) + 1;
+                $newPath = (string) $lockedNewParent->path . $tenantId . '/';
+
                 DB::table('tenants')->where('id', $tenantId)->update([
                     'parent_id'  => $newParentId,
                     'depth'      => $newDepth,
@@ -631,34 +936,50 @@ class TenantHierarchyService
                 ]);
 
                 // Update materialized paths and depth for all descendants.
-                if ($oldPath) {
-                    $descendants = DB::table('tenants')
-                        ->where('path', 'LIKE', $oldPath . '%')
-                        ->where('id', '!=', $tenantId)
-                        ->get();
+                $descendants = DB::table('tenants')
+                    ->where('path', 'LIKE', $oldPath . '%')
+                    ->where('id', '!=', $tenantId)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get();
 
-                    foreach ($descendants as $desc) {
-                        $updatedPath = str_replace($oldPath, $newPath, $desc->path);
-                        $updatedDepth = substr_count(trim($updatedPath, '/'), '/');
-                        DB::table('tenants')->where('id', $desc->id)->update([
-                            'path'  => $updatedPath,
-                            'depth' => $updatedDepth,
-                        ]);
-                    }
+                foreach ($descendants as $desc) {
+                    $updatedPath = str_replace($oldPath, $newPath, (string) $desc->path);
+                    $updatedDepth = substr_count(trim($updatedPath, '/'), '/');
+                    DB::table('tenants')->where('id', $desc->id)->update([
+                        'path'  => $updatedPath,
+                        'depth' => $updatedDepth,
+                    ]);
                 }
 
                 app(PrerenderContentInvalidator::class)->refreshAllOrFail();
+
+                return [
+                    'success' => true,
+                    'tenant_name' => (string) $lockedTenant->name,
+                    'old_parent_id' => $oldParentId,
+                    'old_path' => $oldPath,
+                    'new_path' => $newPath,
+                ];
             });
+            if (!($move['success'] ?? false)) {
+                return $move;
+            }
+
+            $oldParentId = $move['old_parent_id'] ?? null;
+            $oldPath = (string) ($move['old_path'] ?? '');
+            $newPath = (string) ($move['new_path'] ?? '');
+            $tenantName = (string) ($move['tenant_name'] ?? $tenant->name);
 
             // Audit
             SuperAdminAuditService::log(
                 'tenant_moved',
                 'tenant',
                 $tenantId,
-                $tenant->name,
+                $tenantName,
                 ['parent_id' => $oldParentId, 'path' => $oldPath],
                 ['parent_id' => $newParentId, 'path' => $newPath],
-                "Moved tenant '{$tenant->name}' from parent ID {$oldParentId} to {$newParentId}"
+                "Moved tenant '{$tenantName}' from parent ID {$oldParentId} to {$newParentId}"
             );
 
             // The moved tenant's parent_domain changed, and both parent switcher lists changed.

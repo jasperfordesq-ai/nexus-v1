@@ -738,10 +738,15 @@ class FederationExternalApiClient
                     throw new \RuntimeException('HMAC signing secret not configured for partner');
                 }
                 $decryptedSecret = self::decryptCredential($partner['signing_secret']);
+                $platformId = self::resolveHmacPlatformId($partner);
                 $timestamp = (string) time();
                 $nonce = bin2hex(random_bytes(16));
                 $signature = self::generateHmacSignature($decryptedSecret, $method, $url, $timestamp, $body, $nonce);
 
+                // The inbound verifier uses this identifier to select the
+                // signing key before checking the signature. Omitting it made
+                // every HMAC request fail before signature verification.
+                $headers['X-Federation-Platform-ID'] = $platformId;
                 $headers['X-Federation-Signature'] = $signature;
                 $headers['X-Federation-Timestamp'] = $timestamp;
                 $headers['X-Federation-Nonce'] = $nonce;
@@ -757,6 +762,53 @@ class FederationExternalApiClient
         }
 
         return $headers;
+    }
+
+    /**
+     * Resolve the identifier assigned to this Nexus instance by the remote
+     * partner. partner_metadata is the explicit, rotation-safe source. The API
+     * key prefix fallback preserves the documented legacy onboarding contract.
+     *
+     * @param array<string,mixed> $partner
+     */
+    private static function resolveHmacPlatformId(array $partner): string
+    {
+        $metadata = $partner['partner_metadata'] ?? null;
+        if (is_string($metadata) && trim($metadata) !== '') {
+            $metadata = json_decode($metadata, true);
+        }
+        if (is_array($metadata)) {
+            foreach (['outbound_platform_id', 'local_platform_id', 'platform_id'] as $key) {
+                $candidate = self::validPlatformId($metadata[$key] ?? null);
+                if ($candidate !== null) {
+                    return $candidate;
+                }
+            }
+        }
+
+        if (! empty($partner['api_key'])) {
+            $apiKey = self::decryptCredential((string) $partner['api_key']);
+            $candidate = self::validPlatformId(substr($apiKey, 0, 8));
+            if ($candidate !== null) {
+                return $candidate;
+            }
+        }
+
+        throw new \RuntimeException('HMAC platform identifier not configured for partner');
+    }
+
+    private static function validPlatformId(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+        $value = trim((string) $value);
+        if ($value === '' || strlen($value) > 100
+            || preg_match('/\A[A-Za-z0-9._:@\-]+\z/', $value) !== 1) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

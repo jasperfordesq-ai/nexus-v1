@@ -17,7 +17,7 @@ import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { TimeInput, type TimeInputValue, Button, Input, Textarea } from '@/components/ui';
-import { api } from '@/lib/api';
+import { eventsApi } from '@/lib/events-api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { AiAssistButton } from '../shared/AiAssistButton';
@@ -56,6 +56,7 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
   const { register, unregister } = useComposeSubmit();
   const isMobile = useMediaQuery('(max-width: 639px)');
   const submitRef = useRef<() => void>(() => {});
+  const geocodedAddressRef = useRef<string | null>(null);
 
   const [draft, setDraft, clearDraft] = useDraftPersistence<EventDraft>(
     'compose-draft-event',
@@ -125,7 +126,7 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
       if (groupId) payload.group_id = groupId;
       if (sdgGoals.length > 0) payload.sdg_goals = sdgGoals;
 
-      const res = await api.post<{ id: number }>('/v2/events', payload);
+      const res = await eventsApi.create(payload);
       if (res.success) {
         clearDraft();
         toast.success(t('compose.event_created'));
@@ -234,11 +235,23 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
         placeholder={t('compose.location_placeholder')}
         value={location}
         onPlaceSelect={(place) => {
+          geocodedAddressRef.current = place.formattedAddress;
           setLocation(place.formattedAddress);
           setLatitude(place.lat);
           setLongitude(place.lng);
         }}
-        onChange={setLocation}
+        onChange={(value) => {
+          if (
+            geocodedAddressRef.current !== null
+            && value.trim().replace(/\s+/g, ' ').toLocaleLowerCase()
+              !== geocodedAddressRef.current.trim().replace(/\s+/g, ' ').toLocaleLowerCase()
+          ) {
+            geocodedAddressRef.current = null;
+            setLatitude(undefined);
+            setLongitude(undefined);
+          }
+          setLocation(value);
+        }}
       />
 
       <SdgGoalsPicker selected={sdgGoals} onChange={setSdgGoals} />

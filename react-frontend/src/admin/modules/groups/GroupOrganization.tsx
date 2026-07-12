@@ -106,6 +106,7 @@ export default function GroupOrganization() {
     rule_value: '',
   });
   const [ruleSaving, setRuleSaving] = useState(false);
+  const [ruleToggleLoadingId, setRuleToggleLoadingId] = useState<number | null>(null);
   const [deleteRuleTarget, setDeleteRuleTarget] = useState<GroupAutoAssignRule | null>(null);
   const [deleteRuleLoading, setDeleteRuleLoading] = useState(false);
   const { isOpen: isRuleOpen, onOpen: onRuleOpen, onClose: onRuleClose } = useDisclosure();
@@ -392,6 +393,26 @@ export default function GroupOrganization() {
     }
   };
 
+  const handleToggleRule = async (rule: GroupAutoAssignRule, isActive: boolean) => {
+    if (ruleToggleLoadingId !== null) return;
+    setRuleToggleLoadingId(rule.id);
+    try {
+      const res = await adminGroups.updateAutoAssignRule(rule.id, { is_active: isActive });
+      if (res.success) {
+        setRules((current) => current.map((candidate) => (
+          candidate.id === rule.id ? { ...candidate, is_active: isActive } : candidate
+        )));
+        success(t('group_organization.rule_updated'));
+      } else {
+        error(res.error || t('group_organization.rule_update_failed'));
+      }
+    } catch {
+      error(t('group_organization.rule_update_failed'));
+    } finally {
+      setRuleToggleLoadingId(null);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -590,11 +611,19 @@ export default function GroupOrganization() {
                     </TableCell>
                     <TableCell>{rule.rule_value}</TableCell>
                     <TableCell>
-                      <Chip size="sm" color={Number(rule.is_active) ? 'success' : 'default'} variant="soft">
+                      <Switch
+                        size="sm"
+                        isSelected={Boolean(Number(rule.is_active))}
+                        isDisabled={ruleToggleLoadingId !== null}
+                        aria-label={t('group_organization.toggle_rule', {
+                          group: rule.group_name || `#${rule.group_id}`,
+                        })}
+                        onValueChange={(isActive) => void handleToggleRule(rule, isActive)}
+                      >
                         {Number(rule.is_active)
                           ? t('group_organization.status_active')
                           : t('group_organization.status_inactive')}
-                      </Chip>
+                      </Switch>
                     </TableCell>
                     <TableCell>{formatDate(rule.created_at)}</TableCell>
                     <TableCell>

@@ -115,6 +115,7 @@ class ApiErrorCodesTest extends TestCase
         $this->assertIsString(ApiErrorCodes::RESOURCE_NOT_FOUND);
         $this->assertIsString(ApiErrorCodes::RESOURCE_ALREADY_EXISTS);
         $this->assertIsString(ApiErrorCodes::RESOURCE_CONFLICT);
+        $this->assertIsString(ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED);
         $this->assertIsString(ApiErrorCodes::RESOURCE_DELETED);
         $this->assertIsString(ApiErrorCodes::RESOURCE_FORBIDDEN);
     }
@@ -211,6 +212,7 @@ class ApiErrorCodesTest extends TestCase
         $this->assertEquals(409, ApiErrorCodes::getHttpStatus(ApiErrorCodes::VALIDATION_DUPLICATE));
         $this->assertEquals(409, ApiErrorCodes::getHttpStatus(ApiErrorCodes::RESOURCE_ALREADY_EXISTS));
         $this->assertEquals(409, ApiErrorCodes::getHttpStatus(ApiErrorCodes::RESOURCE_CONFLICT));
+        $this->assertEquals(409, ApiErrorCodes::getHttpStatus(ApiErrorCodes::USER_MOVE_PASSKEY_RECOVERY_REQUIRED));
     }
 
     // =========================================================================

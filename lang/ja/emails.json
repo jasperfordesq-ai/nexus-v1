@@ -317,6 +317,7 @@
     "intro": "Project NEXUS で見逃したものをまとめました：",
     "opted_in_notice": "{{frequency}} サマリーを選択したためこのメールをお送りしました。",
     "manage_notifications": "通知を管理する",
+    "unsubscribe_events": "イベントメールのみ停止",
     "view_item": "表示",
     "frequency_instant": "即時",
     "frequency_daily": "毎日",
@@ -394,6 +395,13 @@
     "updated_subject": "更新：「{{title}}」({{changes}})",
     "rsvp_subject": "{{name}} が「{{title}}」に {{status_label}}",
     "view_event": "イベントを見る",
+    "broadcast_subject": "{{title}} に関するメッセージ",
+    "follow_up_subject": "{{title}} 終了後のフォローアップ",
+    "review_request_subject": "{{title}} はいかがでしたか？",
+    "broadcast_heading": "{{title}} に関するメッセージ",
+    "follow_up_heading": "{{title}} 終了後のフォローアップ",
+    "review_request_heading": "{{title}} の体験を共有してください",
+    "leave_event_review": "レビューを投稿",
     "view_updated_event": "更新されたイベントを見る",
     "browse_events": "イベントを探す",
     "new_rsvp_heading": "新しいRSVP！",
@@ -409,6 +417,7 @@
     "updated_heading": "イベント更新",
     "updated_body": "イベント <strong>「{{title}}」</strong> が更新されました：",
     "change_label_date_time": "日時：",
+    "change_label_end_time": "終了時刻：",
     "change_label_location": "場所：",
     "change_label_title": "タイトル：",
     "reminder_heading_24h": "明日のイベント",
@@ -617,6 +626,16 @@
     "impact_minor": "軽微",
     "impact_cosmetic": "外観上のみ"
   },
+  "event_guardian_consent": {
+    "subject": ":event への参加には保護者の同意が必要です",
+    "title": "保護者同意の確認",
+    "greeting": ":name 様",
+    "introduction": ":minor さんが :event への参加を希望しています。同意する前に、イベントの安全要件をご確認ください。",
+    "security_notice": "このリンクは、この同意依頼専用です。転送または共有しないでください。",
+    "review_button": "確認して同意する",
+    "expiry_notice": "リンクはイベント終了後、または依頼が撤回・置換された時点で無効になります。",
+    "consent_text": "私は、未成年者が :event に参加することに同意する権限を有し、イベントの安全要件を確認したことを表明します。"
+  },
   "donation_admin": {
     "created_subject": "新しい寄付: :community に :amount",
     "created_title": "新しい寄付を受け取りました",
@@ -631,5 +650,16 @@
     "anonymous_donor": "匿名",
     "anonymous_note": "（公開上は匿名に設定）",
     "review_cta": "寄付を表示"
+  },
+  "event_registration_guest": {
+    "cancelled_subject": "ゲスト登録がキャンセルされました: :event",
+    "cancelled_message": ":event のゲスト登録がキャンセルされました。",
+    "view_event": "イベントを見る"
+  },
+  "event_invitation": {
+    "subject": ":event への招待が届いています",
+    "message": ":event に招待されました。招待の有効期限前にイベント詳細を確認し、回答してください。",
+    "expiry": "この招待の有効期限は :expiry です。",
+    "accept_button": "招待を確認"
   }
 }

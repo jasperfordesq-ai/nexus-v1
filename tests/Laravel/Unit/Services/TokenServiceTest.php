@@ -7,11 +7,15 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Models\User;
 use App\Services\TokenService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
 class TokenServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private TokenService $service;
 
     protected function setUp(): void
@@ -163,5 +167,93 @@ class TokenServiceTest extends TestCase
     public function test_getTimeRemaining_returns_negative_one_for_invalid(): void
     {
         $this->assertEquals(-1, $this->service->getTimeRemaining('bad'));
+    }
+
+    public function test_global_revocation_invalidates_tokens_issued_in_the_same_second(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $token = $this->service->generateToken(
+            (int) $user->id,
+            $this->testTenantId,
+            [],
+            false
+        );
+        $parts = explode('.', $token);
+        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true, 512, JSON_THROW_ON_ERROR);
+
+        DB::table('revoked_tokens')->insert([
+            'user_id' => $user->id,
+            'jti' => 'global_revoke_' . $user->id,
+            'revoked_at' => date('Y-m-d H:i:s', (int) $payload['iat']),
+            'expires_at' => now()->addYear(),
+        ]);
+
+        $this->assertNull($this->service->validateToken($token));
+    }
+
+    public function test_tokens_issued_immediately_after_global_revocation_remain_valid(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $userId = (int) $user->id;
+        $accessBeforeRevocation = $this->service->generateToken(
+            $userId,
+            $this->testTenantId,
+            [],
+            false
+        );
+        $refreshBeforeRevocation = $this->service->generateRefreshToken(
+            $userId,
+            $this->testTenantId,
+            false
+        );
+
+        $this->assertGreaterThan(0, $this->service->revokeAllTokensForUser($userId));
+
+        $accessAfterRevocation = $this->service->generateToken(
+            $userId,
+            $this->testTenantId,
+            [],
+            false
+        );
+        $refreshAfterRevocation = $this->service->generateRefreshToken(
+            $userId,
+            $this->testTenantId,
+            false
+        );
+
+        $this->assertNull($this->service->validateToken($accessBeforeRevocation));
+        $this->assertNull($this->service->validateRefreshToken($refreshBeforeRevocation));
+        $this->assertNotNull($this->service->validateToken($accessAfterRevocation));
+        $this->assertNotNull($this->service->validateRefreshToken($refreshAfterRevocation));
+
+        $parts = explode('.', $accessAfterRevocation);
+        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(7200, (int) $payload['exp'] - (int) $payload['nbf']);
+    }
+
+    public function test_repeated_same_second_global_revocation_advances_the_cutoff(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $userId = (int) $user->id;
+
+        $this->assertGreaterThan(0, $this->service->revokeAllTokensForUser($userId));
+        $tokenAfterFirstRevocation = $this->service->generateToken(
+            $userId,
+            $this->testTenantId,
+            [],
+            false
+        );
+        $this->assertNotNull($this->service->validateToken($tokenAfterFirstRevocation));
+
+        $this->assertGreaterThan(0, $this->service->revokeAllTokensForUser($userId));
+        $tokenAfterSecondRevocation = $this->service->generateToken(
+            $userId,
+            $this->testTenantId,
+            [],
+            false
+        );
+
+        $this->assertNull($this->service->validateToken($tokenAfterFirstRevocation));
+        $this->assertNotNull($this->service->validateToken($tokenAfterSecondRevocation));
     }
 }

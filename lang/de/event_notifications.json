@@ -1,0 +1,73 @@
+{
+  "subject": "Veranstaltungsupdate: :title",
+  "view_event": "Veranstaltung ansehen",
+  "accept_offer": "Platz annehmen",
+  "reason": "Grund: :reason",
+  "states": {
+    "invited": "eingeladen",
+    "pending": "ausstehend",
+    "confirmed": "best\u00e4tigt",
+    "declined": "abgelehnt",
+    "cancelled": "storniert",
+    "waiting": "auf der Warteliste",
+    "offered": "angeboten",
+    "accepted": "angenommen",
+    "expired": "abgelaufen"
+  },
+  "lifecycle": {
+    "published": "Die Veranstaltung \u201e:title\u201c wurde ver\u00f6ffentlicht.",
+    "postponed": "Die Veranstaltung \u201e:title\u201c wurde verschoben.",
+    "cancelled": "Die Veranstaltung \u201e:title\u201c wurde abgesagt.",
+    "archived": "Die Veranstaltung \u201e:title\u201c wurde archiviert.",
+    "restored": "Die Veranstaltung \u201e:title\u201c wurde wiederhergestellt.",
+    "completed": "Die Veranstaltung \u201e:title\u201c wurde abgeschlossen."
+  },
+  "registration": {
+    "invited": "Sie wurden zu \u201e:title\u201c eingeladen.",
+    "pending": "Ihre Anmeldung f\u00fcr \u201e:title\u201c steht aus.",
+    "confirmed": "Ihre Anmeldung f\u00fcr \u201e:title\u201c ist best\u00e4tigt.",
+    "declined": "Ihre Anmeldung f\u00fcr \u201e:title\u201c wurde abgelehnt.",
+    "cancelled": "Ihre Anmeldung f\u00fcr \u201e:title\u201c wurde storniert.",
+    "organizer": "Der Anmeldestatus von :name f\u00fcr \u201e:title\u201c ist jetzt :state."
+  },
+  "waitlist": {
+    "waiting": "Sie stehen auf der Warteliste f\u00fcr \u201e:title\u201c.",
+    "offered": "F\u00fcr \u201e:title\u201c ist ein Platz frei. Nehmen Sie ihn an, bevor das Angebot abl\u00e4uft.",
+    "accepted": "Sie haben Ihren Platz bei \u201e:title\u201c angenommen.",
+    "expired": "Ihr Platzangebot f\u00fcr \u201e:title\u201c ist abgelaufen.",
+    "cancelled": "Sie stehen nicht mehr auf der Warteliste f\u00fcr \u201e:title\u201c.",
+    "organizer": "Der Wartelistenstatus von :name f\u00fcr \u201e:title\u201c ist jetzt :state."
+  },
+  "staff_role": {
+    "granted": "Ihnen wurde die Rolle :role f\u00fcr \u201e:title\u201c zugewiesen.",
+    "revoked": "Ihre Rolle :role f\u00fcr \u201e:title\u201c wurde entfernt."
+  },
+  "reminder": {
+    "subject": "Veranstaltungserinnerung: :title",
+    "message": "\u201e:title\u201c beginnt in :offset am :when."
+  },
+  "update": {
+    "message": "\u201e:title\u201c wurde ge\u00e4ndert: :changes.",
+    "separator": ", ",
+    "series_scope": "Diese \u00c4nderung gilt f\u00fcr alle zuk\u00fcnftigen Termine.",
+    "fields": {
+      "title": "Titel",
+      "time": "Datum oder Uhrzeit",
+      "timezone": "Zeitzone",
+      "all_day": "Ganztagseinstellung",
+      "venue": "Veranstaltungsort",
+      "online_access": "Online-Zugang",
+      "capacity": "Kapazit\u00e4t",
+      "accessibility": "Barrierefreiheit des Veranstaltungsorts",
+      "cancellation_policy": "Stornierungsrichtlinie"
+    }
+  },
+  "roles": {
+    "co_organizer": "Mitorganisator/in",
+    "registration_manager": "Anmeldungsverwaltung",
+    "communications_manager": "Kommunikationsverwaltung",
+    "check_in_staff": "Check-in-Team",
+    "finance_manager": "Finanzverwaltung",
+    "staff": "Veranstaltungsteam"
+  }
+}

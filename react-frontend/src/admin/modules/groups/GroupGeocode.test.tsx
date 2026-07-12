@@ -39,18 +39,14 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ─── Stub admin layout components ────────────────────────────────────────────
-vi.mock('@/admin/components', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/admin/components')>();
-  return {
-    ...orig,
-    PageHeader: ({ title, description }: { title?: string; description?: string }) => (
-      <div data-testid="page-header">
-        {title && <h1>{title}</h1>}
-        {description && <p>{description}</p>}
-      </div>
-    ),
-  };
-});
+vi.mock('../../components/PageHeader', () => ({
+  PageHeader: ({ title, description }: { title?: string; description?: string }) => (
+    <div data-testid="page-header">
+      {title && <h1>{title}</h1>}
+      {description && <p>{description}</p>}
+    </div>
+  ),
+}));
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('GroupGeocode', () => {

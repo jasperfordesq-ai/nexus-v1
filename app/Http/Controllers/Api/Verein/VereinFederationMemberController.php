@@ -139,7 +139,18 @@ class VereinFederationMemberController extends BaseApiController
 
         $tenantId = TenantContext::getId();
         $period = (string) $request->query('period', 'month');
-        return $this->respondWithData($this->service->getMunicipalityCalendar($tenantId, $municipalityCode, $period));
+        try {
+            [$from, $until] = $this->municipalityInterval($request);
+            return $this->respondWithData($this->service->getMunicipalityCalendar(
+                $tenantId,
+                $municipalityCode,
+                $period,
+                $from,
+                $until,
+            ));
+        } catch (InvalidArgumentException $exception) {
+            return $this->respondWithError('INVALID_DATE_RANGE', $exception->getMessage(), 'from', 422);
+        }
     }
 
     /**
@@ -167,7 +178,18 @@ class VereinFederationMemberController extends BaseApiController
             return $this->respondWithData($this->emptyMunicipalityCalendar($period));
         }
 
-        return $this->respondWithData($this->service->getMunicipalityCalendar($tenantId, (string) $municipalityCode, $period));
+        try {
+            [$from, $until] = $this->municipalityInterval($request);
+            return $this->respondWithData($this->service->getMunicipalityCalendar(
+                $tenantId,
+                (string) $municipalityCode,
+                $period,
+                $from,
+                $until,
+            ));
+        } catch (InvalidArgumentException $exception) {
+            return $this->respondWithError('INVALID_DATE_RANGE', $exception->getMessage(), 'from', 422);
+        }
     }
 
     /**
@@ -189,6 +211,38 @@ class VereinFederationMemberController extends BaseApiController
             'end' => $end->toDateString(),
             'buckets' => [],
         ];
+    }
+
+    /** @return array{string|null,string|null} */
+    private function municipalityInterval(Request $request): array
+    {
+        $from = $request->query('from');
+        $until = $request->query('to');
+        if ($from === null && $until === null) {
+            return [null, null];
+        }
+        if (!is_string($from) || !is_string($until)) {
+            throw new InvalidArgumentException(__('api.invalid_date'));
+        }
+
+        $start = \DateTimeImmutable::createFromFormat('!Y-m-d', trim($from), new \DateTimeZone('UTC'));
+        $end = \DateTimeImmutable::createFromFormat('!Y-m-d', trim($until), new \DateTimeZone('UTC'));
+        $startErrors = \DateTimeImmutable::getLastErrors();
+        if (!$start instanceof \DateTimeImmutable
+            || !$end instanceof \DateTimeImmutable
+            || (is_array($startErrors)
+                && (($startErrors['warning_count'] ?? 0) > 0
+                    || ($startErrors['error_count'] ?? 0) > 0))
+            || $start->format('Y-m-d') !== trim($from)
+            || $end->format('Y-m-d') !== trim($until)) {
+            throw new InvalidArgumentException(__('api.invalid_date'));
+        }
+        $days = (int) $start->diff($end)->format('%r%a');
+        if ($days <= 0 || $days > 366) {
+            throw new InvalidArgumentException(__('api.invalid_date'));
+        }
+
+        return [$start->format('Y-m-d'), $end->format('Y-m-d')];
     }
 
     private function guardCaringCommunity(): ?JsonResponse

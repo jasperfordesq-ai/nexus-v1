@@ -77,7 +77,7 @@ class GroupExchangeController extends BaseApiController
                 );
             }
 
-            return $this->respondWithError('INTERNAL_ERROR', __('api.create_failed', ['resource' => 'exchange']), null, 500);
+            return $this->respondWithError('INTERNAL_ERROR', __('api.server_error'), null, 500);
         }
 
         $exchange = $this->groupExchangeService->get($id);
@@ -93,7 +93,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if (!$this->canViewExchange($exchange, $userId)) {
@@ -113,7 +113,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
@@ -140,7 +140,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
@@ -160,7 +160,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get((int) $id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
@@ -213,7 +213,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get((int) $id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $actingUserId) {
@@ -235,7 +235,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {
@@ -266,7 +266,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if (!$this->isExchangeParticipant($exchange, $userId)) {
@@ -303,7 +303,7 @@ class GroupExchangeController extends BaseApiController
         $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
-            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.group_exchange_not_found'), null, 404);
         }
 
         if ((int) $exchange['organizer_id'] !== $userId) {

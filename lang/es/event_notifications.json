@@ -1,0 +1,73 @@
+{
+  "subject": "Actualización del evento: :title",
+  "view_event": "Ver evento",
+  "accept_offer": "Aceptar tu plaza",
+  "reason": "Motivo: :reason",
+  "states": {
+    "invited": "invitada",
+    "pending": "pendiente",
+    "confirmed": "confirmada",
+    "declined": "rechazada",
+    "cancelled": "cancelada",
+    "waiting": "en lista de espera",
+    "offered": "ofrecida",
+    "accepted": "aceptada",
+    "expired": "caducada"
+  },
+  "lifecycle": {
+    "published": "El evento «:title» se ha publicado.",
+    "postponed": "El evento «:title» se ha pospuesto.",
+    "cancelled": "El evento «:title» se ha cancelado.",
+    "archived": "El evento «:title» se ha archivado.",
+    "restored": "El evento «:title» se ha restaurado.",
+    "completed": "El evento «:title» ha finalizado."
+  },
+  "registration": {
+    "invited": "Te han invitado a «:title».",
+    "pending": "Tu inscripción en «:title» está pendiente.",
+    "confirmed": "Tu inscripción en «:title» está confirmada.",
+    "declined": "Tu inscripción en «:title» fue rechazada.",
+    "cancelled": "Tu inscripción en «:title» fue cancelada.",
+    "organizer": "La inscripción de :name en «:title» ahora está :state."
+  },
+  "waitlist": {
+    "waiting": "Estás en la lista de espera de «:title».",
+    "offered": "Hay una plaza disponible para ti en «:title». Acéptala antes de que caduque.",
+    "accepted": "Has aceptado tu plaza en «:title».",
+    "expired": "Tu oferta de plaza para «:title» ha caducado.",
+    "cancelled": "Ya no estás en la lista de espera de «:title».",
+    "organizer": "El estado de :name en la lista de espera de «:title» ahora es :state."
+  },
+  "staff_role": {
+    "granted": "Se te ha asignado el rol :role para «:title».",
+    "revoked": "Se ha retirado tu rol :role para «:title»."
+  },
+  "reminder": {
+    "subject": "Recordatorio del evento: :title",
+    "message": "«:title» comienza dentro de :offset, el :when."
+  },
+  "update": {
+    "message": "«:title» ha cambiado: :changes.",
+    "separator": ", ",
+    "series_scope": "Este cambio se aplica a todas las sesiones futuras.",
+    "fields": {
+      "title": "título",
+      "time": "fecha u hora",
+      "timezone": "zona horaria",
+      "all_day": "configuración de todo el día",
+      "venue": "lugar",
+      "online_access": "acceso en línea",
+      "capacity": "capacidad",
+      "accessibility": "accesibilidad del lugar",
+      "cancellation_policy": "política de cancelación"
+    }
+  },
+  "roles": {
+    "co_organizer": "coorganizador/a",
+    "registration_manager": "responsable de inscripciones",
+    "communications_manager": "responsable de comunicaciones",
+    "check_in_staff": "personal de acreditación",
+    "finance_manager": "responsable financiero",
+    "staff": "personal del evento"
+  }
+}

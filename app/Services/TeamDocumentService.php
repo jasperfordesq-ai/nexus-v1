@@ -4,289 +4,205 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Core\TenantContext;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 /**
- * TeamDocumentService — Native Eloquent/DB implementation for team document management.
+ * Backward-compatible facade for the retired team-document storage model.
  *
- * Manages file uploads/listing within groups (ideation challenge teams).
- * Uses cursor-based pagination for listing.
+ * New writes and reads use the canonical private GroupFileService pipeline.
+ * The legacy team_documents table is retained only as a migration registry for
+ * pre-existing public files; no endpoint returns a physical storage path.
  */
-class TeamDocumentService
+final class TeamDocumentService
 {
+    private const FOLDER = 'team-documents';
+
+    /** @var list<array{code: string, message: string, field?: string}> */
     private array $errors = [];
 
+    public function __construct(
+        private readonly GroupFileService $fileService = new GroupFileService(),
+    ) {}
+
+    /** @return list<array{code: string, message: string, field?: string}> */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
     /**
-     * Get documents for a group with cursor pagination.
-     *
-     * @return array{items: array, cursor: string|null, has_more: bool}
+     * @return array{items: list<array<string, mixed>>, cursor: string|null, has_more: bool}
      */
     public function getDocuments(int $groupId, array $filters = [], ?int $userId = null): array
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
-        $limit = $filters['limit'] ?? 50;
-
-        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
+        if ($userId === null || $userId < 1) {
             $this->errors[] = [
                 'code' => 'FORBIDDEN',
                 'message' => __('api.group_member_required_view_discussions'),
             ];
+
             return ['items' => [], 'cursor' => null, 'has_more' => false];
         }
 
-        $query = DB::table('team_documents')
-            ->where('tenant_id', $tenantId)
-            ->where('group_id', $groupId);
-
-        if (!empty($filters['cursor'])) {
-            $query->where('id', '<', (int) $filters['cursor']);
+        $cursor = $filters['cursor'] ?? null;
+        // The retired endpoint originally accepted a plain numeric cursor. Keep
+        // that input compatible while emitting only the canonical opaque cursor.
+        if (is_string($cursor) && ctype_digit($cursor)) {
+            $cursor = base64_encode($cursor);
         }
 
-        $docs = $query->orderByDesc('id')
-            ->limit($limit + 1)
-            ->get()
-            ->toArray();
+        $result = $this->fileService->list($groupId, $userId, [
+            'limit' => max(1, min((int) ($filters['limit'] ?? 50), 100)),
+            'cursor' => $cursor,
+            'folder' => self::FOLDER,
+        ]);
+        if ($result === null) {
+            $this->errors = $this->fileService->getErrors();
 
-        $hasMore = count($docs) > $limit;
-        if ($hasMore) {
-            array_pop($docs);
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
         }
 
-        $items = array_map(fn ($row) => (array) $row, $docs);
-        $cursor = !empty($items) ? (string) end($items)['id'] : null;
+        $items = array_map(
+            static fn (array $file): array => [
+                'id' => (int) $file['id'],
+                'group_id' => (int) $file['group_id'],
+                'title' => (string) ($file['description'] ?: $file['file_name']),
+                // Compatibility field now points at an authenticated controller
+                // route. It never reveals the private filesystem key.
+                'file_path' => sprintf(
+                    '/api/v2/groups/%d/files/%d/download',
+                    (int) $file['group_id'],
+                    (int) $file['id'],
+                ),
+                'download_url' => sprintf(
+                    '/api/v2/groups/%d/files/%d/download',
+                    (int) $file['group_id'],
+                    (int) $file['id'],
+                ),
+                'file_type' => (string) $file['file_type'],
+                'file_size' => (int) $file['file_size'],
+                'uploaded_by' => (int) $file['uploaded_by'],
+                'created_at' => (string) $file['created_at'],
+                'capabilities' => $file['capabilities'],
+            ],
+            $result['items'],
+        );
 
         return [
             'items' => $items,
-            'cursor' => $cursor,
-            'has_more' => $hasMore,
+            'cursor' => $result['cursor'],
+            'has_more' => $result['has_more'],
         ];
     }
 
     /**
-     * Upload a document to a group.
-     *
-     * @param int $groupId Group to attach the document to
-     * @param int $userId Uploader user ID
-     * @param array $fileData File data in $_FILES format (name, type, tmp_name, error, size)
-     * @param string|null $title Optional display title (defaults to filename)
-     * @return int|null Inserted document ID, or null on failure
+     * Store a compatibility upload through the canonical private Groups file
+     * validator, quota checks, authorization, and storage compensation.
      */
     public function upload(int $groupId, int $userId, array $fileData, ?string $title = null): ?int
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
-
-        // Validate file data
-        if (empty($fileData) || empty($fileData['tmp_name'])) {
+        $temporaryPath = $fileData['tmp_name'] ?? null;
+        if (! is_string($temporaryPath) || $temporaryPath === '' || ! is_file($temporaryPath)) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
                 'message' => __('svc_notifications_2.team_document.no_file_provided'),
                 'field' => 'file',
             ];
+
             return null;
         }
 
-        if (($fileData['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        $uploadError = (int) ($fileData['error'] ?? UPLOAD_ERR_OK);
+        if ($uploadError !== UPLOAD_ERR_OK) {
             $this->errors[] = [
                 'code' => 'VALIDATION_ERROR',
                 'message' => __('svc_notifications_2.team_document.file_upload_failed'),
                 'field' => 'file',
             ];
+
             return null;
         }
 
-        if (!$this->isActiveGroupMember($groupId, $userId)) {
-            $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_member_required_post'),
-                'field' => 'group_id',
-            ];
-            return null;
-        }
-
-        // Validate MIME type using file content (not user-provided type)
-        $allowedMimes = [
-            'application/pdf',
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'text/plain',
-            'text/csv',
-        ];
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $fileData['tmp_name']);
-        finfo_close($finfo);
-
-        if (!in_array($mimeType, $allowedMimes, true)) {
-            $this->errors[] = [
-                'code' => 'VALIDATION_ERROR',
-                'message' => __('svc_notifications_2.team_document.file_type_not_allowed'),
-                'field' => 'file',
-            ];
-            return null;
-        }
-
-        // Validate file size (20MB max)
-        $maxSize = 20 * 1024 * 1024;
-        $fileSize = $fileData['size'] ?? filesize($fileData['tmp_name']);
-        if ($fileSize > $maxSize) {
-            $this->errors[] = [
-                'code' => 'VALIDATION_ERROR',
-                'message' => __('svc_notifications_2.team_document.file_must_be_under_20mb'),
-                'field' => 'file',
-            ];
-            return null;
-        }
-
-        // Determine file extension from MIME
-        $extMap = [
-            'application/pdf' => 'pdf',
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/gif' => 'gif',
-            'application/msword' => 'doc',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-            'application/vnd.ms-excel' => 'xls',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
-            'text/plain' => 'txt',
-            'text/csv' => 'csv',
-        ];
-        $ext = $extMap[$mimeType] ?? 'bin';
-        $displayTitle = $title ?: ($fileData['name'] ?? 'document.' . $ext);
-
-        GroupService::assertSafeguardingBroadcastAllowed(
-            $groupId,
-            $userId,
-            (int) $tenantId,
-            'team_document_upload',
-            (string) $displayTitle,
+        $name = (string) ($fileData['name'] ?? basename($temporaryPath));
+        $file = new UploadedFile(
+            $temporaryPath,
+            $name,
+            is_string($fileData['type'] ?? null) ? $fileData['type'] : null,
+            $uploadError,
+            true,
         );
 
-        // Store file — anchored to httpdocs/ to ensure consistent path resolution
-        $uploadDir = base_path("httpdocs/uploads/team_documents/{$tenantId}/{$groupId}");
-        $filename = 'doc_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+        $result = $this->fileService->upload($groupId, $userId, [
+            'file' => $file,
+            'folder' => self::FOLDER,
+            'description' => $title,
+        ]);
+        if ($result === null) {
+            $this->errors = $this->fileService->getErrors();
 
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        $destPath = "{$uploadDir}/{$filename}";
-        if (!copy($fileData['tmp_name'], $destPath)) {
-            $this->errors[] = [
-                'code' => 'SERVER_ERROR',
-                'message' => __('svc_notifications_2.team_document.failed_to_save_file'),
-            ];
             return null;
         }
 
-        $publicPath = "/uploads/team_documents/{$tenantId}/{$groupId}/{$filename}";
-
-        try {
-            GroupService::assertSafeguardingBroadcastAllowed(
-                $groupId,
-                $userId,
-                (int) $tenantId,
-                'team_document_upload',
-                (string) $displayTitle,
-            );
-        } catch (\Throwable $e) {
-            if (is_file($destPath)) {
-                @unlink($destPath);
-            }
-            throw $e;
-        }
-
-        $id = DB::table('team_documents')->insertGetId([
-            'group_id' => $groupId,
-            'tenant_id' => $tenantId,
-            'title' => $displayTitle,
-            'file_path' => $publicPath,
-            'file_type' => $mimeType,
-            'file_size' => (int) $fileSize,
-            'uploaded_by' => $userId,
-            'created_at' => now(),
-        ]);
-
-        return (int) $id;
+        return (int) $result['id'];
     }
 
-    /**
-     * Delete a document by ID.
-     */
+    /** Delete only canonical files created/migrated for this compatibility surface. */
     public function delete(int $documentId, int $userId): bool
     {
         $this->errors = [];
-        $tenantId = TenantContext::getId();
-
-        $doc = DB::table('team_documents')
+        $tenantId = (int) TenantContext::getId();
+        $legacy = DB::table('team_documents')
             ->where('id', $documentId)
             ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (!$doc) {
+            ->first(['id', 'group_file_id']);
+        if ($legacy !== null && $legacy->group_file_id === null) {
+            // An unmigrated public record is not safe to treat as a canonical
+            // group_files ID: the two auto-increment domains can collide.
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
                 'message' => __('svc_notifications_2.team_document.document_not_found'),
             ];
+
             return false;
         }
+        $fileId = $legacy !== null && $legacy->group_file_id !== null
+            ? (int) $legacy->group_file_id
+            : $documentId;
 
-        if (!$this->canManageDocument($doc, $userId)) {
+        $file = DB::table('group_files')
+            ->where('id', $fileId)
+            ->where('tenant_id', $tenantId)
+            ->where('folder', self::FOLDER)
+            ->first(['id', 'group_id']);
+
+        if ($file === null) {
             $this->errors[] = [
-                'code' => 'FORBIDDEN',
-                'message' => __('api.group_modify_forbidden'),
+                'code' => 'RESOURCE_NOT_FOUND',
+                'message' => __('svc_notifications_2.team_document.document_not_found'),
             ];
+
             return false;
         }
 
-        // Delete the physical file if it exists
-        if (!empty($doc->file_path) && file_exists($doc->file_path)) {
-            @unlink($doc->file_path);
+        if (! $this->fileService->delete((int) $file->group_id, $fileId, $userId)) {
+            $this->errors = $this->fileService->getErrors();
+
+            return false;
         }
 
         DB::table('team_documents')
-            ->where('id', $documentId)
             ->where('tenant_id', $tenantId)
+            ->where('group_file_id', $fileId)
             ->delete();
 
         return true;
-    }
-
-    private function isActiveGroupMember(int $groupId, int $userId): bool
-    {
-        return DB::table('group_members')
-            ->where('group_id', $groupId)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->exists();
-    }
-
-    private function canManageDocument(object $doc, int $userId): bool
-    {
-        if ((int) ($doc->uploaded_by ?? 0) === $userId) {
-            return true;
-        }
-
-        $membership = DB::table('group_members')
-            ->where('group_id', (int) $doc->group_id)
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->first();
-
-        return $membership && in_array((string) $membership->role, ['owner', 'admin'], true);
     }
 }

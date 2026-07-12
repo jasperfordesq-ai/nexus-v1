@@ -67,7 +67,6 @@ use App\Listeners\NotifySafeguardingContactAttemptBlocked;
 use App\Listeners\NotifySafeguardingCoordinationRequested;
 use App\Listeners\NotifySafeguardingStaff;
 use App\Listeners\NotifyTransactionCompleted;
-use App\Listeners\PushCommunityEventToFederatedPartners;
 use App\Listeners\PushConnectionAcceptedToFederatedPartner;
 use App\Listeners\PushGroupMembershipToFederatedPartners;
 use App\Listeners\PushGroupToFederatedPartners;
@@ -168,12 +167,7 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         CommunityEventCreated::class => [
-            PushCommunityEventToFederatedPartners::class,
             NotifyAdminOfNewCommunityEvent::class,
-        ],
-
-        CommunityEventUpdated::class => [
-            PushCommunityEventToFederatedPartners::class,
         ],
 
         FederatedGroupReceived::class => [

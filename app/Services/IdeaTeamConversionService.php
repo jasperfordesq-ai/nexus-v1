@@ -75,7 +75,7 @@ class IdeaTeamConversionService
             ->first();
 
         if (!$idea) {
-            $this->addError('RESOURCE_NOT_FOUND', 'Idea not found');
+            $this->addError('RESOURCE_NOT_FOUND', __('api.idea_not_found'));
             return null;
         }
 
@@ -90,14 +90,14 @@ class IdeaTeamConversionService
         $isAdmin = $this->isAdmin($userId);
 
         if (!$isAuthor && !$isChallengeOwner && !$isAdmin) {
-            $this->addError('RESOURCE_FORBIDDEN', 'Only the idea author, challenge creator, or an admin can convert ideas to teams');
+            $this->addError('RESOURCE_FORBIDDEN', __('api.idea_team_conversion_forbidden'));
             return null;
         }
 
         // Check if already converted
         $existingLink = IdeaTeamLink::where('idea_id', $ideaId)->first();
         if ($existingLink) {
-            $this->addError('RESOURCE_CONFLICT', 'This idea has already been converted to a team');
+            $this->addError('RESOURCE_CONFLICT', __('api.idea_team_conversion_conflict'));
             return null;
         }
 
@@ -126,19 +126,33 @@ class IdeaTeamConversionService
                     );
                 }
 
-                // Create the group
-                $groupId = DB::table('groups')->insertGetId([
-                    'tenant_id'            => $tenantId,
-                    'owner_id'             => $userId,
-                    'name'                 => $groupName,
-                    'description'          => $groupDescription,
-                    'visibility'           => $visibility,
-                    'source_idea_id'       => $ideaId,
-                    'source_challenge_id'  => $idea->challenge_id,
-                    'cached_member_count'  => 1,
-                    'created_at'           => now(),
-                    'updated_at'           => now(),
-                ]);
+                // Route the conversion through the same creation limits,
+                // approval policy, lifecycle mirror, audit, and events used by
+                // the normal Groups API. This prevents background workflows
+                // from creating lifecycle-less rows that bypass tenant policy.
+                $group = GroupService::createFromIdea(
+                    $userId,
+                    [
+                        'name' => $groupName,
+                        'description' => $groupDescription,
+                        'visibility' => $visibility,
+                    ],
+                    $ideaId,
+                    (int) $idea->challenge_id,
+                );
+                if ($group === null) {
+                    $this->errors = GroupService::getErrors();
+                    if ($this->errors === []) {
+                        $this->addError(
+                            'GROUP_CREATE_FAILED',
+                            __('api.idea_team_conversion_group_create_failed'),
+                        );
+                    }
+
+                    return null;
+                }
+
+                $groupId = (int) $group->id;
 
                 // Record the conversion link
                 $link = IdeaTeamLink::create([
@@ -148,18 +162,8 @@ class IdeaTeamConversionService
                     'converted_by' => $userId,
                 ]);
 
-                // Add the converting user as a group member (admin role)
-                DB::table('group_members')->insertOrIgnore([
-                    'tenant_id'  => $tenantId,
-                    'group_id'   => $groupId,
-                    'user_id'    => $userId,
-                    'role'       => 'admin',
-                    'status'     => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-                // If the idea author is different from the converter, add them too
+                // GroupService already adds the converter as canonical owner.
+                // If the idea author is different, add them as an active member.
                 if ((int) $idea->user_id !== $userId) {
                     DB::table('group_members')->insertOrIgnore([
                         'tenant_id'  => $tenantId,
@@ -173,6 +177,7 @@ class IdeaTeamConversionService
 
                     // Update cached member count
                     DB::table('groups')
+                        ->where('tenant_id', $tenantId)
                         ->where('id', $groupId)
                         ->update(['cached_member_count' => 2]);
 
@@ -221,7 +226,7 @@ class IdeaTeamConversionService
                 'idea_id' => $ideaId,
                 'user_id' => $userId,
             ]);
-            $this->addError('SERVER_INTERNAL_ERROR', 'Failed to convert idea to team');
+            $this->addError('SERVER_INTERNAL_ERROR', __('api.idea_team_conversion_failed'));
             return null;
         }
     }
