@@ -666,6 +666,26 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               </Button>
             </div>
           )}
+
+          {isGroupConfig && module.detailPageUrl && (
+            <Card className="bg-surface-secondary">
+              <CardBody className="flex flex-col items-start justify-between gap-3 py-4 sm:flex-row sm:items-center">
+                <div>
+                  <p className="text-sm font-medium">{t('config.modal_group_management_title')}</p>
+                  <p className="mt-1 text-xs text-muted">{t('config.modal_group_management_desc')}</p>
+                </div>
+                <Button
+                  className="w-full sm:w-auto"
+                  variant="tertiary"
+                  size="sm"
+                  startContent={<ExternalLink size={14} aria-hidden="true" />}
+                  onPress={handleNavigateToDetail}
+                >
+                  {t('config.modal_open_group_management')}
+                </Button>
+              </CardBody>
+            </Card>
+          )}
         </ModalBody>
 
         <ModalFooter>

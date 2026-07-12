@@ -85,4 +85,27 @@ class GroupConfigurationServiceTest extends TestCase
 
         $this->assertFalse(GroupConfigurationService::isTabEnabled('discussion'));
     }
+
+    public function testNormalizeEnforcesTypesRangesAndChoices(): void
+    {
+        $this->assertSame(25, GroupConfigurationService::normalize('max_groups_per_user', '25'));
+        $this->assertFalse(GroupConfigurationService::normalize('allow_private_groups', 'false'));
+        $this->assertSame('private', GroupConfigurationService::normalize('default_visibility', 'private'));
+
+        foreach ([
+            ['max_groups_per_user', 0],
+            ['max_members_per_group', 10001],
+            ['min_description_length', -1],
+            ['max_description_length', 50001],
+            ['default_visibility', 'secret'],
+            ['allow_private_groups', 'not-a-boolean'],
+        ] as [$key, $value]) {
+            try {
+                GroupConfigurationService::normalize($key, $value);
+                $this->fail("{$key} accepted an invalid value");
+            } catch (\InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
 }

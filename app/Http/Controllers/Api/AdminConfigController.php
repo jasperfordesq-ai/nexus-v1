@@ -2680,12 +2680,10 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_value_required'), 'value', 422);
         }
 
-        // Type coercion based on default type
-        $defaultValue = GroupConfigurationService::DEFAULTS[$key];
-        if (is_bool($defaultValue)) {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        } elseif (is_int($defaultValue)) {
-            $value = (int) $value;
+        try {
+            $value = GroupConfigurationService::normalize($key, $value);
+        } catch (\InvalidArgumentException) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), 'value', 422);
         }
 
         GroupConfigurationService::set($key, $value);
@@ -2710,26 +2708,33 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_settings_required'), 'settings', 422);
         }
 
-        $updated = [];
+        $normalized = [];
         foreach ($settings as $key => $value) {
             if (!is_string($key) || !array_key_exists($key, GroupConfigurationService::DEFAULTS)) {
-                continue;
+                return $this->respondWithError('VALIDATION_ERROR', __('api.group_config_key_invalid', ['key' => (string) $key]), 'settings', 422);
             }
 
-            $defaultValue = GroupConfigurationService::DEFAULTS[$key];
-            if (is_bool($defaultValue)) {
-                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-            } elseif (is_int($defaultValue)) {
-                $value = (int) $value;
+            try {
+                $value = GroupConfigurationService::normalize($key, $value);
+            } catch (\InvalidArgumentException) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), $key, 422);
             }
 
+            $normalized[$key] = $value;
+        }
+
+        $effective = array_merge(GroupConfigurationService::getAll(), $normalized);
+        if ($effective[GroupConfigurationService::CONFIG_MIN_DESCRIPTION_LENGTH] > $effective[GroupConfigurationService::CONFIG_MAX_DESCRIPTION_LENGTH]) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_input'), GroupConfigurationService::CONFIG_MIN_DESCRIPTION_LENGTH, 422);
+        }
+
+        foreach ($normalized as $key => $value) {
             GroupConfigurationService::set($key, $value);
-            $updated[$key] = $value;
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
-        return $this->respondWithData(['updated' => $updated]);
+        return $this->respondWithData(['updated' => $normalized]);
     }
 
     // =========================================================================

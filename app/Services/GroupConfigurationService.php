@@ -117,6 +117,49 @@ class GroupConfigurationService
         self::CONFIG_TAB_SUBGROUPS      => true,
     ];
 
+    /** @var array<string, array{min?: int, max?: int, choices?: list<string>}> */
+    public const VALIDATION_RULES = [
+        self::CONFIG_MAX_GROUPS_PER_USER => ['min' => 1, 'max' => 100],
+        self::CONFIG_MAX_MEMBERS_PER_GROUP => ['min' => 2, 'max' => 10000],
+        self::CONFIG_MIN_DESCRIPTION_LENGTH => ['min' => 0, 'max' => 1000],
+        self::CONFIG_MAX_DESCRIPTION_LENGTH => ['min' => 10, 'max' => 50000],
+        self::CONFIG_DEFAULT_VISIBILITY => ['choices' => ['public', 'private']],
+    ];
+
+    public static function normalize(string $key, mixed $value): mixed
+    {
+        if (!array_key_exists($key, self::DEFAULTS)) {
+            throw new \InvalidArgumentException("Unknown group configuration key: {$key}");
+        }
+
+        $default = self::DEFAULTS[$key];
+        if (is_bool($default)) {
+            if (!is_bool($value) && !in_array($value, [0, 1, '0', '1', 'true', 'false'], true)) {
+                throw new \InvalidArgumentException("Invalid boolean value for {$key}");
+            }
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if (is_int($default)) {
+            if (filter_var($value, FILTER_VALIDATE_INT) === false) {
+                throw new \InvalidArgumentException("Invalid integer value for {$key}");
+            }
+            $value = (int) $value;
+            $rules = self::VALIDATION_RULES[$key] ?? [];
+            if (($rules['min'] ?? $value) > $value || ($rules['max'] ?? $value) < $value) {
+                throw new \InvalidArgumentException("Value outside allowed range for {$key}");
+            }
+            return $value;
+        }
+
+        $value = (string) $value;
+        $choices = self::VALIDATION_RULES[$key]['choices'] ?? null;
+        if ($choices !== null && !in_array($value, $choices, true)) {
+            throw new \InvalidArgumentException("Invalid choice for {$key}");
+        }
+        return $value;
+    }
+
     /** Cache TTL in seconds (1 hour). */
     private const CACHE_TTL = 3600;
 

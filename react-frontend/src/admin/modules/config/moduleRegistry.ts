@@ -272,6 +272,7 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     icon: Users,
     type: 'feature',
     configSource: 'group_config',
+    detailPageUrl: '/admin/groups',
     configOptions: [
       // Creation & Membership
       { key: 'allow_user_group_creation', label: 'Allow User Group Creation', description: 'Members can create their own groups', type: 'boolean', defaultValue: true, category: 'Creation & Membership' },
@@ -282,13 +283,8 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'default_visibility', label: 'Default Visibility', description: 'Default visibility for new groups', type: 'select', defaultValue: 'public', category: 'Creation & Membership', choices: [{ value: 'public', label: 'Public' }, { value: 'private', label: 'Private' }] },
       // Features
       { key: 'enable_discussions', label: 'Enable Discussions', description: 'Allow group discussion threads', type: 'boolean', defaultValue: true, category: 'Features' },
-      { key: 'enable_feedback', label: 'Enable Feedback', description: 'Allow group feedback features', type: 'boolean', defaultValue: true, category: 'Features' },
-      { key: 'enable_achievements', label: 'Enable Achievements', description: 'Enable achievement tracking within groups', type: 'boolean', defaultValue: true, category: 'Features' },
-      // Moderation
-      { key: 'moderation_enabled', label: 'Moderation Enabled', description: 'Enable content moderation in groups', type: 'boolean', defaultValue: true, category: 'Moderation' },
-      { key: 'content_filter_enabled', label: 'Content Filter', description: 'Automatically filter inappropriate content', type: 'boolean', defaultValue: false, category: 'Moderation' },
-      { key: 'profanity_filter_enabled', label: 'Profanity Filter', description: 'Enable profanity filtering in group posts', type: 'boolean', defaultValue: false, category: 'Moderation' },
       { key: 'min_description_length', label: 'Min Description Length', description: 'Minimum characters for group descriptions', type: 'number', defaultValue: 10, category: 'Content', min: 0, max: 1000 },
+      { key: 'max_description_length', label: 'Max Description Length', description: 'Maximum characters for group descriptions', type: 'number', defaultValue: 5000, category: 'Content', min: 10, max: 50000 },
       // Tab Visibility — control which tabs appear in group detail view
       { key: 'tab_feed', label: 'Feed Tab', description: 'Show the activity feed tab in groups', type: 'boolean', defaultValue: true, category: 'Tab Visibility' },
       { key: 'tab_discussion', label: 'Discussion Tab', description: 'Show the threaded discussion tab', type: 'boolean', defaultValue: true, category: 'Tab Visibility' },

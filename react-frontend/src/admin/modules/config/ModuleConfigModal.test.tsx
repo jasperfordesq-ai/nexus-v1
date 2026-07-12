@@ -173,6 +173,7 @@ const makeGroupModule = (): ModuleDefinition => ({
   icon: Users,
   type: 'feature',
   configSource: 'group_config',
+  detailPageUrl: '/admin/groups',
   configOptions: [
     {
       key: 'groups.allow_private',
@@ -418,6 +419,7 @@ describe('ModuleConfigModal', () => {
     await waitFor(() => {
       expect(screen.getByText('Allow Private Groups')).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: /open groups administration/i })).toBeInTheDocument();
   });
 
   it('calls updateGroupConfigBulk when saving group config', async () => {

@@ -90,6 +90,29 @@ describe('module registry newsletter module', () => {
   });
 });
 
+describe('module registry groups module', () => {
+  it('only exposes enforced policies and links to operational administration', () => {
+    const groups = getFeatureModules().find(module => module.id === 'groups');
+    const keys = groups?.configOptions.map(option => option.key) ?? [];
+
+    expect(groups?.detailPageUrl).toBe('/admin/groups');
+    expect(keys).toContain('max_description_length');
+    expect(keys).not.toEqual(expect.arrayContaining([
+      'enable_feedback',
+      'enable_achievements',
+      'moderation_enabled',
+      'content_filter_enabled',
+      'profanity_filter_enabled',
+    ]));
+
+    for (const option of groups?.configOptions ?? []) {
+      const token = optionToken(option.key);
+      expect(adminLocale.config[`option_${token}_label`], `${option.key} label`).toBeTypeOf('string');
+      expect(adminLocale.config[`option_${token}_desc`], `${option.key} description`).toBeTypeOf('string');
+    }
+  });
+});
+
 describe('module registry authentication modules', () => {
   it('registers lockout-safe two-factor and passkey enrollment controls', () => {
     const modules = getFeatureModules();
