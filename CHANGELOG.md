@@ -12,12 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Groups configuration now distinguishes tenant policy from day-to-day administration.** The Module Configuration dialog exposes only settings with real runtime enforcement, adds the previously omitted maximum description length, links directly to the full Groups administration area for approvals, moderation, types, organisation, recommendations, ranking, analytics, and group records, and uses a responsive management card on mobile and desktop. The Groups configuration API now rejects unknown keys, malformed booleans, invalid visibility values, out-of-range limits, and contradictory description bounds instead of silently coercing or ignoring them.
+- **Events enterprise CI now exercises the authoritative notification outbox.** The destructive lifecycle journey drains the disposable CI app's Events outbox before verifying recipient-visible cancellation notifications and targets HeroUI v3 data grids by their actual accessible role.
+- **Page-builder image uploads now use polished, responsive spacing by default.** Images inserted or replaced through the GrapesJS page builder receive a dedicated Nexus presentation class with responsive sizing, rounded corners, and consistent separation from following content; a narrowly scoped compatibility rule also repairs existing custom pages where a bare uploaded image directly touches the following Nexus card grid.
 
 ### Fixed
 
 - **Fresh schema imports no longer retain a production-only MariaDB trigger definer.** Schema refreshes strip account-specific `DEFINER` clauses so CI, tests, and new installations create triggers under their own import account instead of failing writes with error 1449 when `nexus@%` does not exist.
-
-- **Page-builder image uploads now use polished, responsive spacing by default.** Images inserted or replaced through the GrapesJS page builder receive a dedicated Nexus presentation class with responsive sizing, rounded corners, and consistent separation from following content; a narrowly scoped compatibility rule also repairs existing custom pages where a bare uploaded image directly touches the following Nexus card grid.
 
 ### Added
 

@@ -1368,6 +1368,7 @@ jobs:
           E2E_API_URL: http://localhost:3000
           E2E_TENANT: hour-timebank
           E2E_TENANT_ID: 2
+          E2E_EVENT_OUTBOX_CONTAINER: nexus-ci-app
           E2E_USER_EMAIL: e2e-member@example.test
           E2E_USER_PASSWORD: password
           E2E_ADMIN_EMAIL: e2e-admin@example.test

@@ -16,6 +16,7 @@ import {
 } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { CreateEventPage, EventDetailPage } from '../../page-objects/EventsPage';
 
 const TENANT = process.env.E2E_TENANT || 'hour-timebank';
@@ -27,6 +28,22 @@ const API_BASE_URL = (
 ).replace(/\/+$/, '');
 const EVENTS_CONTRACT_HEADERS = { 'X-Events-Contract': '2' };
 const CANCELLATION_REASON = 'E2E enterprise journey cancellation evidence.';
+
+function processAuthoritativeEventOutbox(): void {
+  const container = process.env.E2E_EVENT_OUTBOX_CONTAINER?.trim();
+  if (!container) return;
+
+  execFileSync('docker', [
+    'exec',
+    container,
+    'php',
+    'artisan',
+    'events:process-notification-outbox',
+    `--tenant=${process.env.E2E_TENANT_ID || '2'}`,
+    '--limit=100',
+    '--json',
+  ], { stdio: 'inherit' });
+}
 
 interface ActorSession {
   id: number;
@@ -707,6 +724,8 @@ test.describe('Events enterprise lifecycle @events @enterprise @journey', () => 
     expect(cancelResponse.status(), JSON.stringify(await responseBody(cancelResponse))).toBe(200);
     await expect(page.getByText('Event Cancelled', { exact: true }).first()).toBeVisible();
     await expect(page.getByText(`Reason: ${CANCELLATION_REASON}`, { exact: true })).toBeVisible();
+
+    processAuthoritativeEventOutbox();
 
     const notificationBrowser = await openNotificationPage(browser, current.participant);
     try {
