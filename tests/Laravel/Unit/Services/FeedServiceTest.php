@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use App\Services\FeedService;
 use App\Models\FeedActivity;
 use App\Models\FeedPost;
+use App\Core\TenantContext;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -28,7 +29,11 @@ class FeedServiceTest extends TestCase
      * @param  list<list<object>>  $selectSequence  Ordered arrays of result rows
      * @return FeedService  A fresh service instance using the mocked connection
      */
-    private function mockEloquentConnectionAndBuildService(array $selectSequence = []): FeedService
+    private function mockEloquentConnectionAndBuildService(
+        array $selectSequence = [],
+        ?int $groupOwnerId = null,
+        int $groupId = 5,
+    ): FeedService
     {
         $mockGrammar = Mockery::mock(\Illuminate\Database\Query\Grammars\MySqlGrammar::class)->makePartial();
         $mockGrammar->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
@@ -48,8 +53,34 @@ class FeedServiceTest extends TestCase
         $mockConnection->shouldReceive('getName')->andReturn('mysql');
         $mockConnection->shouldReceive('getConfig')->andReturn(null);
 
-        // Build the full return sequence: user-provided rows + trailing empties
-        $allReturns = array_merge($selectSequence ?: [[]], [[], [], [], [], [], [], [], [], [], []]);
+        // Group-filtered feeds now authorize through GroupAccessService before
+        // running the feed query. Model that Eloquent sequence explicitly:
+        // active group lookup, same-tenant user existence, then role lookup.
+        $groupAccessReturns = $groupOwnerId === null ? [] : [
+            [(object) [
+                'id' => $groupId,
+                'tenant_id' => (int) TenantContext::getId(),
+                'owner_id' => $groupOwnerId,
+                'visibility' => 'public',
+                'status' => 'active',
+            ]],
+            [(object) ['exists' => 1]],
+            [(object) [
+                'id' => $groupOwnerId,
+                'tenant_id' => (int) TenantContext::getId(),
+                'role' => 'member',
+                'is_super_admin' => false,
+                'is_tenant_super_admin' => false,
+            ]],
+        ];
+
+        // Build the full return sequence: optional access rows, user-provided
+        // feed rows, then trailing empties for enrichment queries.
+        $allReturns = array_merge(
+            $groupAccessReturns,
+            $selectSequence ?: [[]],
+            [[], [], [], [], [], [], [], [], [], []],
+        );
         $mockConnection->shouldReceive('select')->andReturnValues($allReturns);
 
         $mockConnection->shouldReceive('selectOne')
@@ -206,6 +237,8 @@ class FeedServiceTest extends TestCase
      */
     private function mockCreatePostDb(&$capturedActivityData, int $userId = 10): void
     {
+        $this->mockGroupOwnerAccessThroughEloquent(5, $userId);
+
         Schema::shouldReceive('hasColumn')->andReturn(true);
         Schema::shouldReceive('hasTable')->andReturn(true);
 
@@ -244,6 +277,50 @@ class FeedServiceTest extends TestCase
             }
             return $builder;
         });
+    }
+
+    /**
+     * Provide the Eloquent lookups used by GroupAccessService while keeping the
+     * table-aware DB facade mock above available for createPost() side effects.
+     */
+    private function mockGroupOwnerAccessThroughEloquent(int $groupId, int $userId): void
+    {
+        $mockGrammar = Mockery::mock(\Illuminate\Database\Query\Grammars\MySqlGrammar::class)->makePartial();
+        $mockGrammar->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $mockGrammar->shouldReceive('compileSelect')->andReturn('SELECT 1');
+
+        $mockProcessor = Mockery::mock(\Illuminate\Database\Query\Processors\MySqlProcessor::class)->makePartial();
+
+        $mockConnection = Mockery::mock(\Illuminate\Database\MySqlConnection::class)->makePartial();
+        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockGrammar);
+        $mockConnection->shouldReceive('getPostProcessor')->andReturn($mockProcessor);
+        $mockConnection->shouldReceive('getTablePrefix')->andReturn('');
+        $mockConnection->shouldReceive('getDatabaseName')->andReturn('nexus_test');
+        $mockConnection->shouldReceive('getName')->andReturn('mysql');
+        $mockConnection->shouldReceive('getConfig')->andReturn(null);
+        $mockConnection->shouldReceive('select')->andReturnValues([
+            [(object) [
+                'id' => $groupId,
+                'tenant_id' => (int) TenantContext::getId(),
+                'owner_id' => $userId,
+                'visibility' => 'public',
+                'status' => 'active',
+            ]],
+            [(object) ['exists' => 1]],
+            [(object) [
+                'id' => $userId,
+                'tenant_id' => (int) TenantContext::getId(),
+                'role' => 'member',
+                'is_super_admin' => false,
+                'is_tenant_super_admin' => false,
+            ]],
+        ]);
+
+        $mockResolver = Mockery::mock(\Illuminate\Database\DatabaseManager::class);
+        $mockResolver->shouldReceive('connection')->andReturn($mockConnection);
+
+        $this->originalDbResolver ??= Model::getConnectionResolver();
+        Model::setConnectionResolver($mockResolver);
     }
 
     // ── Helper: build a feed_activity row object ──────────────────────
@@ -854,7 +931,7 @@ class FeedServiceTest extends TestCase
             'group_id' => 5,
         ]);
 
-        $service = $this->mockEloquentConnectionAndBuildService([[$row]]);
+        $service = $this->mockEloquentConnectionAndBuildService([[$row]], groupOwnerId: 10);
 
         $result = $service->getFeed(10, ['group_id' => 5]);
 

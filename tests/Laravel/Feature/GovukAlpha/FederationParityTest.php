@@ -490,11 +490,12 @@ class FederationParityTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/accessible/federation");
 
         $response->assertOk();
-        $response->assertSeeInOrder([
-            __('govuk_alpha.federation.hub.stat_messages'),
-            '8',
-        ]);
-        $response->assertDontSee('16');
+        $label = preg_quote((string) __('govuk_alpha.federation.hub.stat_messages'), '#');
+        $this->assertMatchesRegularExpression(
+            '#<dt class="govuk-summary-list__key">\s*' . $label
+                . '\s*</dt>\s*<dd class="govuk-summary-list__value">\s*8\s*</dd>#u',
+            (string) $response->getContent(),
+        );
     }
 
     public function test_accessible_federation_read_screens_require_member_opt_in(): void

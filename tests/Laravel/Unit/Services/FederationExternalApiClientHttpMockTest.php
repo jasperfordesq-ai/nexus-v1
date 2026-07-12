@@ -163,7 +163,14 @@ class FederationExternalApiClientHttpMockTest extends TestCase
             $this->markTestSkipped('Crypt unavailable');
         }
 
-        if (!$this->seedPartner(['auth_method' => 'hmac', 'signing_secret' => $secret, 'api_key' => ''])) {
+        if (!$this->seedPartner([
+            'auth_method' => 'hmac',
+            'signing_secret' => $secret,
+            'api_key' => '',
+            'partner_metadata' => json_encode([
+                'outbound_platform_id' => 'nexus-http-mock-test',
+            ], JSON_THROW_ON_ERROR),
+        ])) {
             $this->markTestSkipped('DB unavailable');
         }
 
@@ -174,10 +181,12 @@ class FederationExternalApiClientHttpMockTest extends TestCase
             $sig = $request->header('X-Federation-Signature')[0] ?? '';
             $ts  = $request->header('X-Federation-Timestamp')[0] ?? '';
             $n   = $request->header('X-Federation-Nonce')[0] ?? '';
+            $platformId = $request->header('X-Federation-Platform-ID')[0] ?? '';
 
             return preg_match('/^[a-f0-9]{64}$/', $sig) === 1
                 && ctype_digit($ts)
-                && preg_match('/^[a-f0-9]{32}$/', $n) === 1;
+                && preg_match('/^[a-f0-9]{32}$/', $n) === 1
+                && $platformId === 'nexus-http-mock-test';
         });
     }
 

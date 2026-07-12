@@ -180,7 +180,7 @@ class CourseControllerTest extends TestCase
         $this->assertSame(200, $groupMember->status());
     }
 
-    public function test_group_recommendations_hide_group_only_courses_from_non_members(): void
+    public function test_group_recommendations_require_membership_and_filter_course_visibility(): void
     {
         $this->enableCourses(true);
         $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
@@ -205,7 +205,9 @@ class CourseControllerTest extends TestCase
         $outsiderResponse = $this->apiGet('/v2/groups/' . $group->id . '/courses', $this->authHeaders($outsider));
         $this->assertSame(200, $outsiderResponse->status());
         $outsiderIds = collect($outsiderResponse->json('data'))->pluck('id')->all();
-        $this->assertContains($publicCourse->id, $outsiderIds);
+        // A public group exposes its privacy-safe overview to same-tenant users,
+        // but recommendations are child content and remain member-only.
+        $this->assertSame([], $outsiderIds);
         $this->assertNotContains($groupCourse->id, $outsiderIds);
 
         $memberResponse = $this->apiGet('/v2/groups/' . $group->id . '/courses', $this->authHeaders($member));

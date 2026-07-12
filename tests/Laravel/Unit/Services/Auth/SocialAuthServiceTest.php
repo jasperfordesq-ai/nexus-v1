@@ -334,8 +334,8 @@ class SocialAuthServiceTest extends TestCase
     public function test_unlink_removes_identity_when_password_exists(): void
     {
         $userId = $this->insertUser([
-            'email'    => 'unlink.pw@example.test',
-            'password' => password_hash('secret', PASSWORD_BCRYPT),
+            'email'         => 'unlink.pw@example.test',
+            'password_hash' => password_hash('secret', PASSWORD_BCRYPT),
         ]);
         $this->insertIdentity($userId, 'google', 'google-uid-unlink-001');
 

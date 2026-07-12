@@ -120,6 +120,9 @@ class PushReviewToFederatedPartnerTest extends TestCase
             'api_path'       => '/api/v1/federation',
             'auth_method'    => 'hmac',
             'signing_secret' => $encryptedSecret,
+            'partner_metadata' => json_encode([
+                'outbound_platform_id' => 'nexus-review-listener-test',
+            ], JSON_THROW_ON_ERROR),
             'protocol_type'  => 'nexus',
             'status'         => $status,
             'created_at'     => now(),

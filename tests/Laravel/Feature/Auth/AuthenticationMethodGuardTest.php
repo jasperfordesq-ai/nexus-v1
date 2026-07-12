@@ -182,6 +182,17 @@ final class AuthenticationMethodGuardTest extends TestCase
             'google'
         ));
 
+        config([
+            'webauthn.authentication_enabled' => true,
+            'webauthn.rp_id' => 'localhost',
+            'webauthn.allowed_origins' => ['http://localhost'],
+        ]);
+        $features = TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['biometric_login'] = true;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features, JSON_THROW_ON_ERROR),
+        ]);
+
         $this->insertPasskey($userId, $this->testTenantId, 'same-tenant-passkey');
         $this->assertTrue(AuthenticationMethodGuard::hasAlternativeToOauthProvider(
             $userId,

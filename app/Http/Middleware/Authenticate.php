@@ -246,7 +246,20 @@ class Authenticate
     {
         $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
         $response->headers->set('Pragma', 'no-cache');
-        $response->setVary(['Authorization', 'Cookie'], false);
+
+        // Symfony represents an array passed to setVary() as separate header
+        // values. HeaderBag::get() (and some proxy integrations) then exposes
+        // only the first value, which can hide the Cookie cache dimension.
+        // Preserve any controller-provided dimensions while emitting one
+        // unambiguous, standards-compliant Vary field.
+        $vary = $response->getVary();
+        foreach (['Authorization', 'Cookie'] as $requiredHeader) {
+            $existingHeaders = array_map('strtolower', array_map('trim', explode(',', implode(',', $vary))));
+            if (!in_array(strtolower($requiredHeader), $existingHeaders, true)) {
+                $vary[] = $requiredHeader;
+            }
+        }
+        $response->headers->set('Vary', implode(', ', $vary));
 
         return $response;
     }

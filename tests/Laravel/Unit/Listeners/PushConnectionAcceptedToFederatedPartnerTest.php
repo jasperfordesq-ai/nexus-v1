@@ -100,6 +100,9 @@ class PushConnectionAcceptedToFederatedPartnerTest extends TestCase
             'api_path'          => '/api/v1/federation',
             'auth_method'       => 'hmac',
             'signing_secret'    => $encryptedSecret,
+            'partner_metadata'  => json_encode([
+                'outbound_platform_id' => 'nexus-connection-listener-test',
+            ], JSON_THROW_ON_ERROR),
             'protocol_type'     => 'nexus',
             'status'            => 'active',
             'allow_connections' => $allowConnections ? 1 : 0,
