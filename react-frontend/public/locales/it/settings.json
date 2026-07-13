@@ -4,6 +4,12 @@
     "denied": "Ha bloccato le notifiche. Aggiorni le impostazioni del browser per riattivarle.",
     "subscribed": "È iscritto su questo dispositivo."
   },
+  "push_errors": {
+    "not_configured": "Le notifiche push non sono ancora configurate.",
+    "not_ready": "Le notifiche push non sono ancora pronte. Ricarichi la pagina e riprovi.",
+    "enable_failed": "Non è stato possibile attivare le notifiche push. Riprovi.",
+    "disable_failed": "Non è stato possibile disattivare le notifiche push. Riprovi."
+  },
   "identity": {
     "page_title": "Verifica Identità",
     "page_title_dob": "Verifica Identità — Data di Nascita",

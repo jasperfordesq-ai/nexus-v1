@@ -14,20 +14,16 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import Smartphone from 'lucide-react/icons/smartphone';
 import Trash2 from 'lucide-react/icons/trash-2';
 import WifiOff from 'lucide-react/icons/wifi-off';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Input,
-  Pagination,
-  Select,
-  SelectItem,
-  Spinner,
-  Textarea,
-  useConfirm,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventOfflineCheckinApi,

@@ -244,7 +244,7 @@ function markdownReport(results) {
 }
 
 function markdownRow(cells) {
-  return `| ${cells.map((cell) => String(cell).replace(/\|/g, '\\|')).join(' | ')} |`;
+  return `| ${cells.map((cell) => String(cell).replace(/\\/g, '\\\\').replace(/\|/g, '\\|')).join(' | ')} |`;
 }
 
 async function main() {

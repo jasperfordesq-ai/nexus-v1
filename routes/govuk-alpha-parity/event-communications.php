@@ -14,16 +14,16 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
     Route::get('/events/{id}/communications', [AlphaController::class, 'eventsCommunications'])
         ->whereNumber('id')->name('events.communications.index');
     Route::post('/events/{id}/communications/preview', [AlphaController::class, 'eventsCommunicationsPreview'])
-        ->whereNumber('id')->middleware('throttle:60,1')->name('events.communications.preview');
+        ->whereNumber('id')->middleware('throttle:nexus-route-60-per-1m')->name('events.communications.preview');
     Route::post('/events/{id}/communications', [AlphaController::class, 'eventsCommunicationsCreate'])
-        ->whereNumber('id')->middleware('throttle:20,1')->name('events.communications.create');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('events.communications.create');
     Route::post('/events/{id}/communications/{broadcastId}/schedule', [AlphaController::class, 'eventsCommunicationsSchedule'])
-        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:20,1')
+        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.communications.schedule');
     Route::post('/events/{id}/communications/{broadcastId}/cancel', [AlphaController::class, 'eventsCommunicationsCancel'])
-        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:20,1')
+        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.communications.cancel');
     Route::post('/events/{id}/communications/{broadcastId}/retry', [AlphaController::class, 'eventsCommunicationsRetry'])
-        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:20,1')
+        ->whereNumber('id')->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.communications.retry');
 });

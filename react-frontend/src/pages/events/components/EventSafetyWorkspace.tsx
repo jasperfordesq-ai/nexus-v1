@@ -15,21 +15,17 @@ import Search from 'lucide-react/icons/search';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Undo2 from 'lucide-react/icons/undo-2';
 import UserRoundX from 'lucide-react/icons/user-round-x';
-import {
-  Alert,
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  Checkbox,
-  Chip,
-  Input,
-  Pagination,
-  Select,
-  SelectItem,
-  Spinner,
-  Textarea,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {

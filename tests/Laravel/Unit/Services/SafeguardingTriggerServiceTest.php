@@ -39,7 +39,15 @@ class SafeguardingTriggerServiceTest extends TestCase
         $preferences->shouldReceive('where')->with('user_id', $userId)->once()->andReturnSelf();
         $preferences->shouldReceive('whereNull')->with('revoked_at')->once()->andReturnSelf();
         $preferences->shouldReceive('orderBy')->with('id')->once()->andReturnSelf();
-        $preferences->shouldReceive('pluck')->with('option_id')->once()->andReturn(collect($optionIds));
+        $preferences->shouldReceive('get')->with(['option_id', 'selected_value'])->once()->andReturn(collect(
+            array_map(
+                static fn (int $optionId): object => (object) [
+                    'option_id' => $optionId,
+                    'selected_value' => '1',
+                ],
+                $optionIds,
+            ),
+        ));
         DB::shouldReceive('table')
             ->with('user_safeguarding_preferences')
             ->once()
@@ -54,8 +62,16 @@ class SafeguardingTriggerServiceTest extends TestCase
         $options->shouldReceive('whereIn')->with('id', $optionIds)->once()->andReturnSelf();
         $options->shouldReceive('where')->with('is_active', true)->once()->andReturnSelf();
         $options->shouldReceive('orderBy')->with('id')->once()->andReturnSelf();
-        $options->shouldReceive('get')->with(['triggers'])->once()->andReturn(collect(
-            array_map(static fn (array $triggers): object => (object) ['triggers' => $triggers], $triggerSets)
+        $options->shouldReceive('get')->with(['id', 'option_type', 'triggers'])->once()->andReturn(collect(
+            array_map(
+                static fn (array $triggers, int $optionId): object => (object) [
+                    'id' => $optionId,
+                    'option_type' => 'checkbox',
+                    'triggers' => $triggers,
+                ],
+                $triggerSets,
+                $optionIds,
+            ),
         ));
         DB::shouldReceive('table')
             ->with('tenant_safeguarding_options')
@@ -252,8 +268,40 @@ class SafeguardingTriggerServiceTest extends TestCase
         $rows = collect([
             (object) [
                 'user_id' => 5,
+                'selected_value' => '1',
+                'option_type' => 'checkbox',
                 'triggers' => json_encode([
                     'notify_admin_on_selection' => true,
+                    'vetting_type_required' => 'dbs_enhanced',
+                ]),
+            ],
+        ]);
+
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn($rows);
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5],
+            $this->testTenantId
+        );
+
+        $this->assertSame([5 => []], $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_ignoresFalseCheckboxSelections(): void
+    {
+        $rows = collect([
+            (object) [
+                'user_id' => 5,
+                'selected_value' => '0',
+                'option_type' => 'checkbox',
+                'triggers' => json_encode([
+                    'requires_vetted_interaction' => true,
                     'vetting_type_required' => 'dbs_enhanced',
                 ]),
             ],
@@ -280,11 +328,11 @@ class SafeguardingTriggerServiceTest extends TestCase
         // Simulated rows: user 5 has two options, one with garda_vetting and one with dbs_enhanced.
         // user 10 has one informational provider declaration. user 15 has an option with no vetting_type.
         $rows = collect([
-            (object) ['user_id' => 5, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 5, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'dbs_enhanced'])],
-            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])], // duplicate — should dedupe
-            (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 15, 'triggers' => json_encode(['requires_broker_approval' => true])],
+            (object) ['user_id' => 5, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 5, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'dbs_enhanced'])],
+            (object) ['user_id' => 5, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])], // duplicate — should dedupe
+            (object) ['user_id' => 10, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 15, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => json_encode(['requires_broker_approval' => true])],
         ]);
 
         DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
@@ -363,7 +411,7 @@ class SafeguardingTriggerServiceTest extends TestCase
         // Some rows may return triggers as a decoded array rather than a JSON string,
         // depending on the driver / Eloquent casting. Both paths must work.
         $rows = collect([
-            (object) ['user_id' => 5, 'triggers' => ['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting']],
+            (object) ['user_id' => 5, 'selected_value' => '1', 'option_type' => 'checkbox', 'triggers' => ['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting']],
         ]);
 
         DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();

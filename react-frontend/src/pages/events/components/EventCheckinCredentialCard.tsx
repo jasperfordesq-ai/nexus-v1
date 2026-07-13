@@ -11,16 +11,13 @@ import QrCode from 'lucide-react/icons/qr-code';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import QRCode from 'qrcode';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Spinner,
-  Textarea,
-  useConfirm,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventOfflineCheckinApi,

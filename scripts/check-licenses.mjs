@@ -42,7 +42,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const WRITE = process.argv.includes('--write');
 
-const PERMISSIVE = /^(MIT|BSD|Apache|ISC|0BSD|Unlicense|WTFPL|Zlib|CC0|Python|Unicode|BlueOak|MIT-0)/i;
+// Match complete SPDX-like licence tokens. In particular, do not treat the
+// metadata sentinel `UNLICENSED` as the permissive `Unlicense` licence.
+const PERMISSIVE = /^(?:MIT(?:\*|-0)?|BSD(?:-\d-Clause)?|Apache-\d+(?:\.\d+)?|ISC|0BSD|Unlicense|WTFPL|Zlib|CC0-\d+(?:\.\d+)?|Python-\d+(?:\.\d+)?|Unicode(?:-[\w.-]+)?|BlueOak-\d+(?:\.\d+)*)(?:$|\s+AND\b)/i;
 const WEAK = /^(MPL|LGPL|EPL|CDDL|Ms-PL)/i;
 const USE_RESTRICTED = /Hippocratic|SSPL-restricted/i;
 const STRONG = /^(GPL|AGPL|SSPL|OSL|EUPL|CeCILL|GNU)/i;
@@ -54,6 +56,18 @@ const STRONG = /^(GPL|AGPL|SSPL|OSL|EUPL|CeCILL|GNU)/i;
 // wamania/php-stemmer → joomla/string (GPL-2.0). Keep it empty so any new
 // strong-copyleft dependency fails CI.
 const KNOWN_EXCEPTIONS = {};
+
+// Non-permissive dependencies whose exact licence expression has been
+// reviewed and documented in THIRD_PARTY_NOTICES.md. These are reported
+// separately from unresolved warnings; a licence metadata change stops
+// matching and returns the package to the warning/blocker path.
+const REVIEWED_NON_PERMISSIVE = {
+  'james-heinrich/getid3': {
+    ecosystem: 'composer',
+    license: 'GPL-1.0-or-later OR LGPL-3.0-only OR MPL-2.0',
+    election: 'MPL-2.0; retain notices and provide source for covered files on distribution',
+  },
+};
 
 function classifyOption(opt) {
   // Strip SPDX-expression parens/brackets so "(MIT AND Zlib)" classifies as MIT.
@@ -104,7 +118,9 @@ function readNpmProd() {
       maxBuffer: 64 * 1024 * 1024,
     });
     const data = JSON.parse(out);
-    return Object.entries(data).map(([id, v]) => ({
+    const frontendPackage = JSON.parse(fs.readFileSync(path.join(ROOT, 'react-frontend', 'package.json'), 'utf8'));
+    const frontendPackageId = `${frontendPackage.name}@${frontendPackage.version}`;
+    return Object.entries(data).filter(([id]) => id !== frontendPackageId).map(([id, v]) => ({
       ecosystem: 'npm',
       name: id,
       version: '',
@@ -123,18 +139,28 @@ const all = [...composer, ...(npm || [])];
 
 const blockers = [];
 const warnings = [];
+const reviewed = [];
 for (const p of all) {
   const kind = classifyLicense(p.license);
   if (kind === 'strong') {
     if (KNOWN_EXCEPTIONS[p.name]) warnings.push(`(known) ${p.name} — ${p.license} — ${KNOWN_EXCEPTIONS[p.name]}`);
     else blockers.push(`${p.name}@${p.version} — ${p.license} (${p.ecosystem})`);
   } else if (kind === 'weak' || kind === 'restricted' || kind === 'unknown') {
-    warnings.push(`${kind}: ${p.name} — ${p.license} (${p.ecosystem})`);
+    const review = REVIEWED_NON_PERMISSIVE[p.name];
+    if (review && review.ecosystem === p.ecosystem && review.license === p.license) {
+      reviewed.push(`${p.name} — ${review.election}`);
+    } else {
+      warnings.push(`${kind}: ${p.name} — ${p.license} (${p.ecosystem})`);
+    }
   }
 }
 
 console.log(`\nDependency licence audit — composer prod: ${composer.length}, npm prod: ${npm ? npm.length : 'skipped'}`);
-console.log(`  blockers: ${blockers.length}, warnings: ${warnings.length}`);
+console.log(`  blockers: ${blockers.length}, warnings: ${warnings.length}, reviewed non-permissive: ${reviewed.length}`);
+if (reviewed.length) {
+  console.log('\nREVIEWED (exact licence expression pinned; obligations documented):');
+  reviewed.forEach((entry) => console.log('  - ' + entry));
+}
 if (warnings.length) {
   console.log('\nWARN (weak/use-restricted/known-exception — review for a proprietary sale):');
   warnings.forEach((w) => console.log('  - ' + w));

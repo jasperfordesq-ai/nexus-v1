@@ -7,7 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import History from 'lucide-react/icons/history';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { Alert, Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
 import {
   eventLifecycleHistoryApi,
   type EventLifecycleHistoryEntry,

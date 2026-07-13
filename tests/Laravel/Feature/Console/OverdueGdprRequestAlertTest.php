@@ -8,7 +8,6 @@ namespace Tests\Laravel\Feature\Console;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 /**
@@ -28,10 +27,6 @@ class OverdueGdprRequestAlertTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (! Schema::hasTable('gdpr_requests')) {
-            $this->markTestSkipped('gdpr_requests table not present in this environment.');
-        }
 
         // Clear the slate (rolled back by DatabaseTransactions) so pre-existing
         // rows in the shared nexus_test DB don't skew the assertions.

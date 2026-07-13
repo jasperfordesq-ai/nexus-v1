@@ -16,18 +16,18 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
         ->name('events.check-in.credential');
     Route::post('/events/{id}/check-in/credential/issue', [AlphaController::class, 'eventsIssueAttendeeCheckinCredential'])
         ->whereNumber('id')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.check-in.credential.issue');
     Route::post('/events/{id}/check-in/credential/rotate', [AlphaController::class, 'eventsRotateAttendeeCheckinCredential'])
         ->whereNumber('id')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.check-in.credential.rotate');
     Route::post('/events/{id}/check-in/credential/revoke', [AlphaController::class, 'eventsRevokeAttendeeCheckinCredential'])
         ->whereNumber('id')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.check-in.credential.revoke');
     Route::post('/events/{id}/check-in/code', [AlphaController::class, 'eventsOfflineCheckinCode'])
         ->whereNumber('id')
-        ->middleware('throttle:60,1')
+        ->middleware('throttle:nexus-route-60-per-1m')
         ->name('events.check-in.code');
 });

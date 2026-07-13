@@ -4,6 +4,12 @@
     "denied": "Zablokowano powiadomienia. Zaktualizuj ustawienia przeglądarki, aby je ponownie włączyć.",
     "subscribed": "Jesteś zasubskrybowany na tym urządzeniu."
   },
+  "push_errors": {
+    "not_configured": "Powiadomienia push nie są jeszcze skonfigurowane.",
+    "not_ready": "Powiadomienia push nie są jeszcze gotowe. Odśwież stronę i spróbuj ponownie.",
+    "enable_failed": "Nie udało się włączyć powiadomień push. Spróbuj ponownie.",
+    "disable_failed": "Nie udało się wyłączyć powiadomień push. Spróbuj ponownie."
+  },
   "identity": {
     "page_title": "Zweryfikuj tożsamość",
     "page_title_dob": "Zweryfikuj tożsamość — Data urodzenia",

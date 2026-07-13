@@ -8,8 +8,6 @@
  *
  * Real tile/canvas rendering is NOT tested here — Leaflet requires a browser
  * canvas/WebGL environment that jsdom does not provide. Instead:
- *  - 'react-leaflet' is mocked with simple div passthroughs (MapContainer,
- *    TileLayer, useMap) so the component tree renders without error.
  *  - 'leaflet' (and all its CSS imports) is fully mocked.
  *  - 'leaflet.markercluster' and its CSS imports are stubbed to empty modules.
  *  - 'react-dom/server' renderToStaticMarkup is stubbed (used by buildPinIcon).
@@ -19,8 +17,8 @@
  * We assert:
  *  - The map wrapper element mounts with nexus-osm-map-wrapper class.
  *  - The wrapper receives the correct height style.
- *  - The TileLayer receives OSM attribution and URL by default.
- *  - The MapContainer (mocked) appears in the DOM.
+ *  - The Leaflet tile layer receives OSM attribution and URL by default.
+ *  - The Leaflet-owned container appears in the DOM.
  *  - Various prop combinations mount without throwing.
  *
  * NOTE: vi.hoisted() is used to define mock factory values before vi.mock()
@@ -44,41 +42,25 @@ vi.mock('@/contexts', () => createMockContexts());
 // over (avoids TDZ ReferenceError from hoisted mocks referencing later consts)
 // ---------------------------------------------------------------------------
 
-const { MapContainerMock, TileLayerMock, useMapMock, fakeMap } = vi.hoisted(() => {
+const { fakeMap, tileLayerMock, tileLayerInstance } = vi.hoisted(() => {
   const fakeMap = {
-    addLayer: vi.fn().mockReturnThis(),
-    removeLayer: vi.fn().mockReturnThis(),
+    remove: vi.fn(),
     setView: vi.fn().mockReturnThis(),
     getZoom: vi.fn().mockReturnValue(12),
     fitBounds: vi.fn().mockReturnThis(),
   };
+  const tileLayerInstance = {
+    addTo: vi.fn().mockReturnThis(),
+    removeFrom: vi.fn().mockReturnThis(),
+  };
+  const tileLayerMock = vi.fn(() => tileLayerInstance);
 
-  const MapContainerMock = vi.fn(
-    ({ children }: { children?: import('react').ReactNode }) => (
-      <div data-testid="map-container">{children}</div>
-    )
-  );
-
-  const TileLayerMock = vi.fn(
-    ({ attribution, url }: { attribution?: string; url?: string }) => (
-      <div data-testid="tile-layer" data-attribution={attribution} data-url={url} />
-    )
-  );
-
-  const useMapMock = vi.fn(() => fakeMap);
-
-  return { MapContainerMock, TileLayerMock, useMapMock, fakeMap };
+  return { fakeMap, tileLayerMock, tileLayerInstance };
 });
 
 // ---------------------------------------------------------------------------
 // Module mocks
 // ---------------------------------------------------------------------------
-
-vi.mock('react-leaflet', () => ({
-  MapContainer: MapContainerMock,
-  TileLayer: TileLayerMock,
-  useMap: useMapMock,
-}));
 
 vi.mock('leaflet', () => {
   const layerGroupInstance = {
@@ -95,6 +77,8 @@ vi.mock('leaflet', () => {
     removeFrom: vi.fn().mockReturnThis(),
   };
   const leafletMock = {
+    map: vi.fn(() => fakeMap),
+    tileLayer: tileLayerMock,
     divIcon: vi.fn(() => ({})),
     marker: vi.fn(() => markerInstance),
     layerGroup: vi.fn(() => layerGroupInstance),
@@ -139,9 +123,9 @@ const MARKER_B: MapMarker = { id: 2, lat: 51.898, lng: -8.475, title: 'Cork City
 describe('OpenStreetMapView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fakeMap.addLayer.mockReturnThis();
-    fakeMap.removeLayer.mockReturnThis();
     fakeMap.getZoom.mockReturnValue(12);
+    tileLayerInstance.addTo.mockReturnThis();
+    tileLayerInstance.removeFrom.mockReturnThis();
   });
 
   it('renders the map wrapper div with nexus-osm-map-wrapper class', () => {
@@ -168,21 +152,25 @@ describe('OpenStreetMapView', () => {
     expect(wrapper).toHaveClass('my-custom-class');
   });
 
-  it('renders the MapContainer (react-leaflet mock)', () => {
+  it('renders the Leaflet-owned map container', () => {
     render(<OpenStreetMapView markers={[MARKER_A]} />);
     expect(screen.getByTestId('map-container')).toBeInTheDocument();
   });
 
-  it('renders the TileLayer with OSM fallback attribution by default', () => {
+  it('creates a tile layer with OSM fallback attribution by default', () => {
     render(<OpenStreetMapView markers={[MARKER_A]} />);
-    const tile = screen.getByTestId('tile-layer');
-    expect(tile.dataset.attribution).toContain('OpenStreetMap');
+    expect(tileLayerMock).toHaveBeenCalledWith(
+      expect.stringContaining('tile.openstreetmap.org'),
+      expect.objectContaining({ attribution: expect.stringContaining('OpenStreetMap') })
+    );
   });
 
-  it('passes the fallback OSM tile URL to TileLayer by default', () => {
+  it('passes the fallback OSM tile URL to Leaflet by default', () => {
     render(<OpenStreetMapView markers={[MARKER_A]} />);
-    const tile = screen.getByTestId('tile-layer');
-    expect(tile.dataset.url).toContain('tile.openstreetmap.org');
+    expect(tileLayerMock).toHaveBeenCalledWith(
+      expect.stringContaining('tile.openstreetmap.org'),
+      expect.any(Object)
+    );
   });
 
   it('mounts without throwing when markers array is empty', () => {

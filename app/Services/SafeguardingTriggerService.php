@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  * Computes and activates behavioral triggers from safeguarding preferences.
  *
  * When a member selects safeguarding options during onboarding, this service:
- * 1. Merges triggers from all selected (non-revoked) options
+ * 1. Merges triggers from all affirmatively selected, non-revoked options
  * 2. Writes only explicit broker-approval workflow flags to the existing
  *    user_messaging_restrictions infrastructure
  * 3. Syncs user-level safeguarding flags (works_with_children, etc.)
@@ -77,9 +77,9 @@ class SafeguardingTriggerService
     public static function getActiveTriggersUncached(int $userId, ?int $tenantId = null): array
     {
         $tenantId = $tenantId ?? TenantContext::getId();
-        $optionIds = self::activePreferenceOptionIds($userId, $tenantId, false);
+        $selections = self::activePreferenceSelections($userId, $tenantId, false);
 
-        return self::mergedTriggersForOptions($optionIds, $tenantId, false);
+        return self::mergedTriggersForSelections($selections, $tenantId, false);
     }
 
     /**
@@ -95,9 +95,9 @@ class SafeguardingTriggerService
             throw new \LogicException('Safeguarding trigger locks require an active database transaction.');
         }
 
-        $optionIds = self::activePreferenceOptionIds($userId, $tenantId, true);
+        $selections = self::activePreferenceSelections($userId, $tenantId, true);
 
-        return self::mergedTriggersForOptions($optionIds, $tenantId, true);
+        return self::mergedTriggersForSelections($selections, $tenantId, true);
     }
 
     /**
@@ -156,7 +156,15 @@ class SafeguardingTriggerService
                         ->get();
 
                     foreach ($prefs as $pref) {
-                        $key = $pref->option?->option_key;
+                        $option = $pref->option;
+                        if (! $option || ! UserSafeguardingPreference::isEffectivelySelected(
+                            $option->option_type,
+                            $pref->selected_value,
+                        )) {
+                            continue;
+                        }
+
+                        $key = $option->option_key;
                         if ($key === 'works_with_children') {
                             $updates['works_with_children'] = true;
                         }
@@ -300,11 +308,18 @@ class SafeguardingTriggerService
                 ->where('p.tenant_id', $tenantId)
                 ->whereIn('p.user_id', $uniqueIds)
                 ->whereNull('p.revoked_at')
-                ->select('p.user_id', 'o.triggers')
+                ->select('p.user_id', 'p.selected_value', 'o.option_type', 'o.triggers')
                 ->get();
 
             foreach ($rows as $row) {
                 $userId = (int) $row->user_id;
+                if (! UserSafeguardingPreference::isEffectivelySelected(
+                    $row->option_type ?? null,
+                    $row->selected_value ?? null,
+                )) {
+                    continue;
+                }
+
                 $triggers = is_string($row->triggers)
                     ? (json_decode($row->triggers, true) ?: [])
                     : (array) ($row->triggers ?? []);
@@ -332,8 +347,8 @@ class SafeguardingTriggerService
         return !empty($triggers['requires_vetted_interaction']);
     }
 
-    /** @return list<int> */
-    private static function activePreferenceOptionIds(int $userId, int $tenantId, bool $forUpdate): array
+    /** @return array<int, string> option_id => selected_value */
+    private static function activePreferenceSelections(int $userId, int $tenantId, bool $forUpdate): array
     {
         $query = DB::table('user_safeguarding_preferences')
             ->where('tenant_id', $tenantId)
@@ -344,26 +359,29 @@ class SafeguardingTriggerService
             $query->lockForUpdate();
         }
 
-        return $query
-            ->pluck('option_id')
-            ->map(static fn (mixed $id): int => (int) $id)
-            ->filter(static fn (int $id): bool => $id > 0)
-            ->unique()
-            ->sort()
-            ->values()
-            ->all();
+        $selections = [];
+        foreach ($query->get(['option_id', 'selected_value']) as $preference) {
+            $optionId = (int) $preference->option_id;
+            if ($optionId > 0) {
+                $selections[$optionId] = (string) ($preference->selected_value ?? '');
+            }
+        }
+        ksort($selections);
+
+        return $selections;
     }
 
     /**
-     * @param list<int> $optionIds
+     * @param array<int, string> $selections option_id => selected_value
      * @return array<string, mixed>
      */
-    private static function mergedTriggersForOptions(array $optionIds, int $tenantId, bool $forUpdate): array
+    private static function mergedTriggersForSelections(array $selections, int $tenantId, bool $forUpdate): array
     {
-        if ($optionIds === []) {
+        if ($selections === []) {
             return self::TRIGGER_DEFAULTS;
         }
 
+        $optionIds = array_keys($selections);
         $query = DB::table('tenant_safeguarding_options')
             ->where('tenant_id', $tenantId)
             ->whereIn('id', $optionIds)
@@ -375,7 +393,16 @@ class SafeguardingTriggerService
 
         $merged = self::TRIGGER_DEFAULTS;
         $vettingTypes = [];
-        foreach ($query->get(['triggers']) as $option) {
+        foreach ($query->get(['id', 'option_type', 'triggers']) as $option) {
+            $optionId = (int) $option->id;
+            if (! array_key_exists($optionId, $selections)
+                || ! UserSafeguardingPreference::isEffectivelySelected(
+                    $option->option_type ?? null,
+                    $selections[$optionId],
+                )) {
+                continue;
+            }
+
             $triggers = is_string($option->triggers ?? null)
                 ? json_decode((string) $option->triggers, true)
                 : (array) ($option->triggers ?? []);

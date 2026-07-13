@@ -646,7 +646,7 @@ class MessagesController extends BaseApiController
 
             // Transcribe the audio (non-blocking — failures are logged, not thrown)
             try {
-                $audioPath = $file->getRealPath();
+                $audioPath = $audioResult['local_path'] ?? null;
                 if ($audioPath && file_exists($audioPath)) {
                     $transcription = TranscriptionService::transcribe($audioPath);
                     if ($transcription && !empty($transcription['text'])) {

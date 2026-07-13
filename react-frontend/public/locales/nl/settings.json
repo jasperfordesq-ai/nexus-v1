@@ -4,6 +4,12 @@
     "denied": "Je hebt meldingen geblokkeerd. Werk je browserinstellingen bij om ze opnieuw in te schakelen.",
     "subscribed": "Je bent geabonneerd op dit apparaat."
   },
+  "push_errors": {
+    "not_configured": "Pushmeldingen zijn nog niet geconfigureerd.",
+    "not_ready": "Pushmeldingen zijn nog niet gereed. Laad de pagina opnieuw en probeer het nogmaals.",
+    "enable_failed": "We konden pushmeldingen niet inschakelen. Probeer het nogmaals.",
+    "disable_failed": "We konden pushmeldingen niet uitschakelen. Probeer het nogmaals."
+  },
   "identity": {
     "page_title": "Identiteit Verifiëren",
     "page_title_dob": "Identiteit Verifiëren — Geboortedatum",

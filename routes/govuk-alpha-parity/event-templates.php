@@ -18,11 +18,11 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
     Route::get('/events/{id}/template-preview', [AlphaController::class, 'eventsTemplateCapturePreview'])
         ->whereNumber('id')->name('events.templates.capture.preview');
     Route::post('/events/{id}/templates', [AlphaController::class, 'eventsTemplateCapture'])
-        ->whereNumber('id')->middleware('throttle:20,1')->name('events.templates.capture');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('events.templates.capture');
     Route::get('/event-templates/{templateId}/materialize', [AlphaController::class, 'eventsTemplateMaterializeForm'])
         ->whereNumber('templateId')->name('events.templates.materialize.form');
     Route::post('/event-templates/{templateId}/materialize/preview', [AlphaController::class, 'eventsTemplateMaterializePreview'])
-        ->whereNumber('templateId')->middleware('throttle:60,1')->name('events.templates.materialize.preview');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-60-per-1m')->name('events.templates.materialize.preview');
     Route::post('/event-templates/{templateId}/materialize', [AlphaController::class, 'eventsTemplateMaterialize'])
-        ->whereNumber('templateId')->middleware('throttle:20,1')->name('events.templates.materialize');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-20-per-1m')->name('events.templates.materialize');
 });

@@ -82,7 +82,15 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '', cn: (...classes: unknown[]) => classes.filter(Boolean).join(' ') }));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@/lib/helpers')>();
+
+  return {
+    ...original,
+    resolveAvatarUrl: (url: string | null) => url ?? '',
+    cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
+  };
+});
 
 // PageMeta is imported via the deep path `@/components/seo/PageMeta`, which the
 // global `@/components/seo` mock in src/test/setup.ts does NOT intercept. Left

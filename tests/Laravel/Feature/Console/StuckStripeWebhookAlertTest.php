@@ -8,7 +8,6 @@ namespace Tests\Laravel\Feature\Console;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 /**
@@ -26,10 +25,6 @@ class StuckStripeWebhookAlertTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        if (! Schema::hasTable('stripe_webhook_events')) {
-            $this->markTestSkipped('stripe_webhook_events table not present in this environment.');
-        }
 
         // Clear the slate (rolled back by DatabaseTransactions) so pre-existing
         // failed rows in the shared nexus_test DB don't skew the assertions.

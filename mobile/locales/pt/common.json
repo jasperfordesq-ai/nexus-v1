@@ -30,6 +30,8 @@
     "boundaryTitle": "Algo correu mal",
     "generic": "Algo correu mal. Tente novamente.",
     "network": "Erro de rede. Verifique a sua ligação.",
+    "timeout": "O pedido excedeu o tempo limite. Verifique a sua ligação.",
+    "requestFailedWithStatus": "O pedido falhou com o estado {{status}}",
     "unauthorized": "A sua sessão expirou. Inicie sessão novamente.",
     "notFound": "Não encontrado.",
     "alertTitle": "Error"

@@ -23,7 +23,7 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
         ->name('events.moderation.approve.confirm');
     Route::post('/events/moderation/{id}/approve', [AlphaController::class, 'eventsModerationApprove'])
         ->whereNumber('id')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.moderation.approve');
 
     Route::get('/events/moderation/{id}/reject', [AlphaController::class, 'eventsModerationRejectConfirmation'])
@@ -31,6 +31,6 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
         ->name('events.moderation.reject.confirm');
     Route::post('/events/moderation/{id}/reject', [AlphaController::class, 'eventsModerationReject'])
         ->whereNumber('id')
-        ->middleware('throttle:20,1')
+        ->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.moderation.reject');
 });

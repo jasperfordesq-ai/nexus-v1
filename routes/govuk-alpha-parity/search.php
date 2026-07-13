@@ -25,7 +25,7 @@ Route::get('/search/advanced', [AlphaController::class, 'searchAdvanced'])
 
 // Save the current search. Static segment, before {id}.
 Route::post('/search/saved', [AlphaController::class, 'searchSaveSearch'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('search.saved.save');
 
 // Per-saved-search actions (numeric id).
@@ -34,9 +34,9 @@ Route::get('/search/saved/{id}/delete', [AlphaController::class, 'searchDeleteSa
     ->name('search.saved.delete.confirm');
 Route::post('/search/saved/{id}/delete', [AlphaController::class, 'searchDeleteSaved'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('search.saved.delete');
 Route::post('/search/saved/{id}/run', [AlphaController::class, 'searchRunSaved'])
     ->whereNumber('id')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('search.saved.run');

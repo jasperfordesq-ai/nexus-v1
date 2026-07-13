@@ -1122,6 +1122,7 @@ return [
     'donation_failed_check_recipient' => 'فشل التبرع. تحقق من رصيدك والمستلم.',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes' => '{1} عدد محاولات تسجيل الدخول كبير جدًا. يُرجى المحاولة مرة أخرى بعد دقيقة واحدة.|[2,*] عدد محاولات تسجيل الدخول كبير جدًا. يُرجى المحاولة مرة أخرى بعد :count دقائق.',
     'legal' => [
         'no_documents_require_acceptance' => 'No documents require acceptance',
         'all_documents_accepted' => 'All documents accepted',

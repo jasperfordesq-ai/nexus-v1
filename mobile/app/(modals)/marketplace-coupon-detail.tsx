@@ -3,13 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Image, Share, View } from 'react-native';
+import { Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Text } from 'heroui-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import QRCode from 'react-native-qrcode-svg';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
@@ -122,7 +123,14 @@ function MarketplaceCouponDetailScreen() {
             </View>
             {qr ? (
               <View className="items-center gap-3">
-                <Image source={{ uri: qrImageUrl(qr.token) }} className="size-56 rounded-2xl" accessibilityLabel={t('publicCoupons.qrAlt')} />
+                <View
+                  className="rounded-2xl bg-white p-2"
+                  accessible
+                  accessibilityRole="image"
+                  accessibilityLabel={t('publicCoupons.qrAlt')}
+                >
+                  <QRCode value={qr.token} size={208} backgroundColor="#ffffff" color="#000000" />
+                </View>
                 <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>{t('publicCoupons.scanAtCheckout')}</Text>
                 <Text className="text-xs" style={{ color: theme.textSecondary }}>
                   {t('publicCoupons.qrExpires', { time: new Date(qr.expires_at).toLocaleTimeString(dateLocale()) })}
@@ -239,8 +247,4 @@ function couponTerms(
     terms.push(t(`publicCoupons.appliesTo.${coupon.applies_to}`));
   }
   return terms;
-}
-
-function qrImageUrl(token: string): string {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(token)}`;
 }

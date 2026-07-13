@@ -237,7 +237,7 @@ describe('ExternalPartners', () => {
     // Fill in name and URL inputs
     const inputs = screen.getAllByRole('textbox');
     const nameInput = inputs.find((el) => el.getAttribute('aria-label')?.toLowerCase().includes('name') || el.getAttribute('placeholder')?.toLowerCase().includes('name'));
-    const urlInput = inputs.find((el) => el.getAttribute('placeholder')?.includes('https://api.partner'));
+    const urlInput = inputs.find((el) => el.getAttribute('placeholder') === 'https://api.partner.example');
     if (nameInput) await userEvent.type(nameInput, 'My Partner');
     if (urlInput) await userEvent.type(urlInput, 'https://partner.example.org');
 
@@ -308,7 +308,7 @@ describe('ExternalPartners', () => {
 
     const inputs = screen.getAllByRole('textbox');
     const nameInput = inputs.find((el) => el.getAttribute('aria-label')?.toLowerCase().includes('name') || el.getAttribute('placeholder')?.toLowerCase().includes('name'));
-    const urlInput = inputs.find((el) => el.getAttribute('placeholder')?.includes('https://api.partner'));
+    const urlInput = inputs.find((el) => el.getAttribute('placeholder') === 'https://api.partner.example');
     if (nameInput) await userEvent.type(nameInput, 'Test Partner');
     if (urlInput) await userEvent.type(urlInput, 'https://test.example.org');
 

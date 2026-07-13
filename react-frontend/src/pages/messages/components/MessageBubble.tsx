@@ -28,6 +28,36 @@ import { MessageLinkPreview } from './MessageLinkPreview';
 // Available reaction emojis
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
+function normalizeReactionEntries(rawReactions: unknown): Array<[string, number]> {
+  let candidate = rawReactions;
+
+  // Older API responses exposed the MariaDB JSON column as a string. Parse it
+  // defensively so a staggered deployment cannot turn character offsets into
+  // reaction buttons, while still excluding the private legacy `_users` map.
+  if (typeof candidate === 'string') {
+    try {
+      candidate = JSON.parse(candidate) as unknown;
+    } catch {
+      return [];
+    }
+  }
+
+  if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+    return [];
+  }
+
+  return Object.entries(candidate).flatMap(([emoji, count]) => {
+    if (!REACTION_EMOJIS.includes(emoji)
+      || typeof count !== 'number'
+      || !Number.isFinite(count)
+      || count <= 0) {
+      return [];
+    }
+
+    return [[emoji, Math.trunc(count)] as [string, number]];
+  });
+}
+
 // Human-readable language names for translate button labels
 const LANG_NAMES: Record<string, string> = {
   en: 'English', fr: 'French', de: 'German', es: 'Spanish',
@@ -120,9 +150,8 @@ export const MessageBubble = memo(function MessageBubble({
     }
   }, [showReactionPicker, showMessageMenu]);
 
-  // Parse reactions from message (format: { emoji: count, ... } or array)
-  const reactions = message.reactions || {};
-  const hasReactions = Object.keys(reactions).length > 0;
+  const reactionEntries = normalizeReactionEntries(message.reactions);
+  const hasReactions = reactionEntries.length > 0;
 
   // Translation: determine if content is translatable and if already in user's language
   const messageText = message.body || message.content || '';
@@ -478,7 +507,7 @@ export const MessageBubble = memo(function MessageBubble({
         {/* Display existing reactions */}
         {hasReactions && (
           <div className={`flex max-w-full flex-wrap gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'} px-2`}>
-            {Object.entries(reactions).map(([emoji, count]) => (
+            {reactionEntries.map(([emoji, count]) => (
               <Button
                 key={emoji}
                 size="sm"
@@ -488,7 +517,7 @@ export const MessageBubble = memo(function MessageBubble({
                 aria-label={t('aria_toggle_reaction', { emoji })}
               >
                 <span>{emoji}</span>
-                {typeof count === 'number' && count > 1 && (
+                {count > 1 && (
                   <span className="text-theme-subtle">{count}</span>
                 )}
               </Button>

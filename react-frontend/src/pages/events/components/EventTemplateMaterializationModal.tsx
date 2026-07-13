@@ -8,18 +8,12 @@ import { useTranslation } from 'react-i18next';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import CopyPlus from 'lucide-react/icons/copy-plus';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventTemplatesApi,

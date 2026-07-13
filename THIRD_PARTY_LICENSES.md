@@ -4,7 +4,7 @@
 Regenerate with `node scripts/check-licenses.mjs --write`. Summary and human-facing
 attribution live in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-composer prod: 120 · npm prod: 400
+composer prod: 120 · npm prod: 397
 
 | Package | Version | Licence | Ecosystem | Source |
 |---|---|---|---|---|
@@ -209,7 +209,6 @@ composer prod: 120 · npm prod: 400
 | @react-aria/interactions@3.28.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
 | @react-aria/ssr@3.10.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
 | @react-aria/utils@3.34.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
-| @react-leaflet/core@3.0.0 | — | Hippocratic-2.1 | npm | https://github.com/PaulLeCam/react-leaflet |
 | @react-spectrum/color@3.2.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
 | @react-spectrum/provider@3.11.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
 | @react-stately/color@3.10.0 | — | Apache-2.0 | npm | https://github.com/adobe/react-spectrum |
@@ -427,7 +426,6 @@ composer prod: 120 · npm prod: 400
 | mjml-browser@4.18.0 | — | MIT | npm | https://github.com/mjmlio/mjml |
 | ms@2.1.3 | — | MIT | npm | https://github.com/vercel/ms |
 | nanoid@3.3.11 | — | MIT | npm | https://github.com/ai/nanoid |
-| nexus-react-frontend@1.5.5 | — | UNLICENSED | npm |  |
 | node-fetch@2.7.0 | — | MIT | npm | https://github.com/bitinn/node-fetch |
 | object-assign@4.1.1 | — | MIT | npm | https://github.com/sindresorhus/object-assign |
 | p-limit@2.3.0 | — | MIT | npm | https://github.com/sindresorhus/p-limit |
@@ -456,7 +454,6 @@ composer prod: 120 · npm prod: 400
 | react-i18next@16.5.4 | — | MIT | npm | https://github.com/i18next/react-i18next |
 | react-is@16.13.1 | — | MIT | npm | https://github.com/facebook/react |
 | react-is@17.0.2 | — | MIT | npm | https://github.com/facebook/react |
-| react-leaflet@5.0.0 | — | Hippocratic-2.1 | npm | https://github.com/PaulLeCam/react-leaflet |
 | react-markdown@10.1.0 | — | MIT | npm | https://github.com/remarkjs/react-markdown |
 | react-redux@9.2.0 | — | MIT | npm | https://github.com/reduxjs/react-redux |
 | react-router-dom@6.30.4 | — | MIT | npm | https://github.com/remix-run/react-router |

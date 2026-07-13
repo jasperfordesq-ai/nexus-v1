@@ -30,6 +30,11 @@ env:
   E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
   E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
+# This workflow only reads repository contents and uploads test artifacts.
+# Keep the default GITHUB_TOKEN read-only for every job.
+permissions:
+  contents: read
+
 # Cancel superseded runs on the same ref so rapid pushes during a fix session
 # don't stack full E2E matrices in the runner queue.
 concurrency:

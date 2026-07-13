@@ -116,20 +116,22 @@ class SecurityHeaders
 
         // CSP notes:
         // - script-src: 'unsafe-inline' removed; per-request nonce required for
-        //   any inline <script> blocks. Bundled React assets are served with
-        //   src="..." from the React origin and are covered by 'self' https:.
+        //   any inline <script> blocks. Scheme-wide https: is deliberately not
+        //   allowed for executable or connection sources.
         // - style-src: 'unsafe-inline' retained because HeroUI / Tailwind /
         //   Framer Motion inject runtime inline style attributes (e.g. style="...")
         //   and removing it would break the UI. Narrowed from "https:" wildcard
         //   to 'self' + explicit https: origins only.
         //   TODO: migrate to nonce/hash-based style-src once HeroUI exposes a
         //   nonce prop and inline style attributes are eliminated.
-        $csp = "default-src 'self' https:; "
-            . "script-src 'self' 'nonce-{$nonce}' https:; "
-            . "style-src 'self' 'unsafe-inline' https:; "
-            . "connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; "
+        $csp = "default-src 'self'; "
+            . "script-src 'self' 'nonce-{$nonce}' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.ggpht.com https://*.googleusercontent.com https://challenges.cloudflare.com; "
+            . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            . "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.google.com https://challenges.cloudflare.com https://api.pwnedpasswords.com; "
             . "img-src 'self' https: data: blob:; "
-            . "font-src 'self' https: data:; "
+            . "font-src 'self' https://fonts.gstatic.com data:; "
+            . "frame-src 'self' https://*.google.com https://challenges.cloudflare.com https://www.openstreetmap.org; "
+            . "media-src 'self' https:; "
             . "worker-src 'self' blob:; "
             . "frame-ancestors 'self'; "
             . "form-action 'self'; "

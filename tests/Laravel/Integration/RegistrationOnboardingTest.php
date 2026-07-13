@@ -33,7 +33,7 @@ class RegistrationOnboardingTest extends TestCase
 
         // The registration endpoint applies an IP-keyed rate limit
         // (RegistrationController::register -> rateLimit('registration', 3, 300))
-        // plus a route-level throttle:30,1. In the test environment the limiter is
+        // plus a route-level throttle:nexus-route-30-per-1m. In the test environment the limiter is
         // backed by a persistent cache store (Redis), so attempts accumulate across
         // tests AND across PHPUnit runs from the fixed test IP (127.0.0.1), producing
         // spurious 429s. Rebind the RateLimiter onto an ephemeral array cache store

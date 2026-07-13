@@ -38,7 +38,7 @@ Route::get('/goals/{id}/checkin', [AlphaController::class, 'goalsCheckin'])
     ->name('goals.checkin');
 Route::post('/goals/{id}/checkin', [AlphaController::class, 'goalsStoreCheckin'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('goals.checkin.store');
 
 // Reminder settings (owner, or any member for a public goal).
@@ -47,11 +47,11 @@ Route::get('/goals/{id}/reminder', [AlphaController::class, 'goalsReminder'])
     ->name('goals.reminder');
 Route::post('/goals/{id}/reminder', [AlphaController::class, 'goalsSaveReminder'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('goals.reminder.save');
 Route::post('/goals/{id}/reminder/delete', [AlphaController::class, 'goalsDeleteReminder'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('goals.reminder.delete');
 
 // Buddy actions (buddy only): choose nudge / encouragement / offer_help.
@@ -60,7 +60,7 @@ Route::get('/goals/{id}/buddy-actions', [AlphaController::class, 'goalsBuddyActi
     ->name('goals.buddy-actions');
 Route::post('/goals/{id}/buddy-actions', [AlphaController::class, 'goalsStoreBuddyAction'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('goals.buddy-actions.send');
 
 // Full progress-history timeline (owner / buddy / public viewer).
@@ -76,14 +76,14 @@ Route::get('/goals/{id}/social', [AlphaController::class, 'goalsSocial'])
     ->name('goals.social');
 Route::post('/goals/{id}/like', [AlphaController::class, 'goalsToggleLike'])
     ->whereNumber('id')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('goals.like');
 Route::post('/goals/{id}/comments', [AlphaController::class, 'goalsStoreComment'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('goals.comments.store');
 Route::post('/goals/{id}/comments/{commentId}/delete', [AlphaController::class, 'goalsDeleteComment'])
     ->whereNumber('id')
     ->whereNumber('commentId')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('goals.comments.delete');

@@ -240,6 +240,43 @@ describe('ConversationPage', () => {
     });
   });
 
+  it('hides the generic review notice only when broker visibility is explicitly disabled', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.resolve({
+          success: true,
+          data: {
+            messaging_disabled: false,
+            under_monitoring: false,
+            restriction_reason: null,
+            review_notice_required: false,
+          },
+        });
+      }
+      return Promise.resolve(mockConversationResponse);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('Hello Bob!')).toBeDefined());
+    await waitFor(() => expect(screen.queryByText('safeguarding_notice')).toBeNull());
+  });
+
+  it('keeps the generic review notice when policy status cannot be loaded', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url === '/v2/messages/restriction-status') {
+        return Promise.reject(new Error('policy status unavailable'));
+      }
+      return Promise.resolve(mockConversationResponse);
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('safeguarding_notice')).toBeDefined());
+  });
+
   it('renders message input area', async () => {
     mockApi.get.mockResolvedValue(mockConversationResponse);
     mockApi.put.mockResolvedValue({ success: true });

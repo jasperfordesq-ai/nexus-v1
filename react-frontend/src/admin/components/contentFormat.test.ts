@@ -31,6 +31,25 @@ describe('contentFormat utils', () => {
       expect(out).not.toContain('<h1>');
       expect(out).not.toContain('<strong>');
     });
+
+    it('preserves useful block boundaries and decoded text', () => {
+      expect(stripToPlainText('<p>First&nbsp;line<br>continued</p><div>Second</div>'))
+        .toBe('First line\ncontinued\nSecond');
+    });
+
+    it('does not reinterpret hostile or malformed markup', () => {
+      const out = stripToPlainText(`
+        <p onclick="alert(1)">Visible</p>
+        <script><script>alert('xss')</script></script>
+        <img src=x onerror=alert(2)>
+        <style>body{display:none}</style>
+        <div>Still visible</div>
+      `);
+
+      expect(out).toContain('Visible');
+      expect(out).toContain('Still visible');
+      expect(out).not.toMatch(/alert|display:none|onclick|onerror|<script/i);
+    });
   });
 
   describe('isDestructiveSwitch', () => {

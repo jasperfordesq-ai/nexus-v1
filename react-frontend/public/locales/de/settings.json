@@ -4,6 +4,12 @@
     "denied": "Sie haben Benachrichtigungen blockiert. Aktualisieren Sie Ihre Browsereinstellungen, um sie wieder zu aktivieren.",
     "subscribed": "Sie sind auf diesem Gerät angemeldet."
   },
+  "push_errors": {
+    "not_configured": "Push-Benachrichtigungen sind noch nicht eingerichtet.",
+    "not_ready": "Push-Benachrichtigungen sind noch nicht bereit. Laden Sie die Seite neu und versuchen Sie es erneut.",
+    "enable_failed": "Push-Benachrichtigungen konnten nicht aktiviert werden. Versuchen Sie es erneut.",
+    "disable_failed": "Push-Benachrichtigungen konnten nicht deaktiviert werden. Versuchen Sie es erneut."
+  },
   "identity": {
     "page_title": "Identität verifizieren",
     "page_title_dob": "Identität verifizieren — Geburtsdatum",

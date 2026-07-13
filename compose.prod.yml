@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 60s
     ports:
-      - "8090:80"
+      - "127.0.0.1:8090:80"
     volumes:
       # Read-only mounts for security
       - ./httpdocs:/var/www/html/httpdocs:ro
@@ -122,7 +122,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     ports:
-      - "3000:80"
+      - "127.0.0.1:3000:80"
     volumes:
       # Persist per-tenant pre-rendered HTML across frontend container rebuilds.
       # Deploys can then serve the previous good render immediately and refresh

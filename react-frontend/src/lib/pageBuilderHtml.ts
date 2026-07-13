@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import DOMPurify from 'dompurify';
+
 const BUILDER_SCOPE = '.nexus-custom-page-builder';
 
 const PAGE_BUILDER_BASELINE_CSS = `
@@ -46,7 +48,37 @@ const UNSAFE_CSS_PATTERNS = [
   /file\s*:/i,
   /behavior\s*:/i,
   /-moz-binding\s*:/i,
+  /<\/style\b/i,
+  /<\/script\b/i,
 ];
+
+export const PAGE_BUILDER_ALLOWED_TAGS = [
+  'p', 'br', 'hr', 'div', 'span',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'blockquote', 'pre', 'code',
+  'ul', 'ol', 'li',
+  'strong', 'em', 'b', 'i', 'u', 's', 'sub', 'sup', 'mark', 'small',
+  'a', 'img', 'figure', 'figcaption',
+  'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
+  'ins', 'del',
+  'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
+  'form', 'label', 'input', 'textarea', 'select', 'option', 'button',
+  // Kept only while an exported builder document is being normalised. Public
+  // rendering extracts and scopes this CSS before sanitising the body again.
+  'style',
+];
+
+export const PAGE_BUILDER_ALLOWED_ATTR = [
+  'href', 'src', 'alt', 'title', 'class', 'id',
+  'colspan', 'rowspan', 'scope',
+  'width', 'height', 'loading',
+  'target', 'rel', 'style',
+  'role', 'aria-label', 'aria-labelledby', 'aria-describedby',
+  'type', 'name', 'value', 'placeholder', 'checked', 'selected', 'disabled',
+  'required', 'for', 'action', 'method',
+];
+
+const URL_BEARING_ATTRIBUTES = ['href', 'src', 'action', 'formaction', 'xlink:href'] as const;
 
 const GLOBAL_SELECTOR_PARTS = [
   ':root',
@@ -82,6 +114,49 @@ type CssNode = CssRule | CssAtRule;
 
 function isUnsafeCss(css: string): boolean {
   return UNSAFE_CSS_PATTERNS.some((pattern) => pattern.test(css));
+}
+
+/** Remove CSS comments without treating comment markers inside strings as syntax. */
+function stripCssComments(css: string): string {
+  let output = '';
+  let index = 0;
+  let quote: '"' | "'" | null = null;
+
+  while (index < css.length) {
+    const char = css[index] ?? '';
+    const next = css[index + 1] ?? '';
+
+    if (quote) {
+      output += char;
+      if (char === '\\' && index + 1 < css.length) {
+        output += next;
+        index += 2;
+        continue;
+      }
+      if (char === quote) quote = null;
+      index += 1;
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char;
+      output += char;
+      index += 1;
+      continue;
+    }
+
+    if (char === '/' && next === '*') {
+      const end = css.indexOf('*/', index + 2);
+      if (end === -1) break;
+      index = end + 2;
+      continue;
+    }
+
+    output += char;
+    index += 1;
+  }
+
+  return output;
 }
 
 function splitSelectorList(selectors: string): string[] {
@@ -144,6 +219,11 @@ function isSafeCssDeclaration(property: string, value: string): boolean {
   const normalizedValue = normalizeCssValue(value);
 
   if (!normalizedProperty || !normalizedValue) return false;
+  // CSS escapes can disguise blocked property names, functions, and schemes.
+  // GrapesJS emits ordinary CSS identifiers, so reject escaped declarations
+  // instead of trying to implement the browser's full CSS escape decoder here.
+  if (normalizedProperty.includes('\\') || normalizedValue.includes('\\')) return false;
+  if (!/^(?:--[a-z0-9_-]+|[a-z][a-z0-9-]*)$/i.test(normalizedProperty)) return false;
   if (isUnsafeCss(`${normalizedProperty}:${normalizedValue}`)) return false;
   if (normalizedProperty === 'position' && ['fixed', 'sticky'].includes(normalizedValue)) return false;
   if (normalizedProperty === 'z-index') return false;
@@ -302,9 +382,9 @@ function parseCssNodes(css: string): CssNode[] {
   return nodes;
 }
 
-function serializeSafeDeclarations(rule: CssRule): string {
+function serializeSafeDeclarations(rule: CssRule, tokenizeLegacyValues = true): string {
   const declarations: string[] = [];
-  const shouldTokenize = shouldTokenizeLegacyNexusRule(rule);
+  const shouldTokenize = tokenizeLegacyValues && shouldTokenizeLegacyNexusRule(rule);
 
   rule.declarations.forEach((declaration) => {
     if (!isSafeCssDeclaration(declaration.prop, declaration.value)) return;
@@ -343,9 +423,54 @@ function scopeCssContainer(nodes: CssNode[]): string {
   return output.join('\n');
 }
 
+function sanitizeCssContainerForStorage(nodes: CssNode[]): string {
+  const output: string[] = [];
+
+  nodes.forEach((node) => {
+    if (node.type === 'rule') {
+      const safeSelectors = splitSelectorList(node.selector)
+        .map((selector) => selector.trim())
+        .filter((selector) => selector && !selector.startsWith('@') && !isGlobalSelector(selector));
+      const safeBody = serializeSafeDeclarations(node, false);
+
+      if (safeSelectors.length > 0 && safeBody) {
+        output.push(`${safeSelectors.join(',')}{${safeBody}}`);
+      }
+      return;
+    }
+
+    const atRuleName = node.name.toLowerCase();
+    if (!['media', 'supports'].includes(atRuleName) || !node.params) return;
+
+    const nested = sanitizeCssContainerForStorage(node.nodes);
+    if (nested) output.push(`@${atRuleName} ${node.params}{${nested}}`);
+  });
+
+  return output.join('\n');
+}
+
+/**
+ * Sanitize GrapesJS CSS before embedding it in a stored <style> element.
+ * Selectors remain unscoped so the stylesheet still works inside the editor;
+ * public rendering applies the NEXUS wrapper scope separately.
+ */
+export function sanitizePageBuilderCssForStorage(css: string | null | undefined): string {
+  if (!css) return '';
+  const withoutComments = stripCssComments(css);
+  // These tokens can escape the style container or fetch CSS before the rule
+  // parser has a chance to inspect declarations, so reject the whole sheet.
+  const lowered = withoutComments.toLowerCase();
+  if (lowered.includes('@import') || lowered.includes('</style') || lowered.includes('</script')) return '';
+  try {
+    return sanitizeCssContainerForStorage(parseCssNodes(withoutComments)).trim();
+  } catch {
+    return '';
+  }
+}
+
 export function scopePageBuilderCss(css: string | null | undefined): string {
   if (!css) return '';
-  const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const withoutComments = stripCssComments(css);
   if (isUnsafeCss(withoutComments)) return '';
   try {
     return scopeCssContainer(parseCssNodes(withoutComments)).trim();
@@ -356,7 +481,7 @@ export function scopePageBuilderCss(css: string | null | undefined): string {
 
 export function sanitizePageBuilderInlineStyle(style: string | null | undefined): string {
   if (!style) return '';
-  const withoutComments = style.replace(/\/\*[\s\S]*?\*\//g, '');
+  const withoutComments = stripCssComments(style);
   try {
     return serializeSafeDeclarations({
       type: 'rule',
@@ -368,25 +493,97 @@ export function sanitizePageBuilderInlineStyle(style: string | null | undefined)
   }
 }
 
+function isSafePageBuilderUrl(value: string, attribute: string): boolean {
+  const candidate = value.trim();
+  if (!candidate) return false;
+
+  try {
+    const parsed = new URL(candidate, document.baseURI || window.location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return true;
+    return attribute === 'href' && parsed.protocol === 'mailto:';
+  } catch {
+    return false;
+  }
+}
+
+function sanitizePageBuilderFragment(html: string): DocumentFragment {
+  const fragment = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: PAGE_BUILDER_ALLOWED_TAGS,
+    ALLOWED_ATTR: PAGE_BUILDER_ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    FORCE_BODY: true,
+    KEEP_CONTENT: true,
+    RETURN_DOM_FRAGMENT: true,
+  });
+
+  fragment.querySelectorAll<HTMLElement>('[style]').forEach((element) => {
+    const safeStyle = sanitizePageBuilderInlineStyle(element.getAttribute('style'));
+    if (safeStyle) element.setAttribute('style', safeStyle);
+    else element.removeAttribute('style');
+  });
+
+  fragment.querySelectorAll<HTMLElement>('*').forEach((element) => {
+    URL_BEARING_ATTRIBUTES.forEach((attribute) => {
+      if (!element.hasAttribute(attribute)) return;
+      if (!isSafePageBuilderUrl(element.getAttribute(attribute) ?? '', attribute)) {
+        element.removeAttribute(attribute);
+      }
+    });
+  });
+
+  fragment.querySelectorAll('style').forEach((style) => {
+    const safeCss = sanitizePageBuilderCssForStorage(style.textContent);
+    if (safeCss) style.textContent = safeCss;
+    else style.remove();
+  });
+
+  return fragment;
+}
+
+function serializePageBuilderFragment(fragment: DocumentFragment): string {
+  const container = document.createElement('div');
+  container.append(fragment);
+  return container.innerHTML.trim();
+}
+
+export interface SanitizedPageBuilderDocument {
+  bodyHtml: string;
+  css: string;
+}
+
+/** Return separately sanitized builder HTML and unscoped CSS for safe storage or editing. */
+export function sanitizePageBuilderDocument(html: string | null | undefined): SanitizedPageBuilderDocument {
+  if (!html) return { bodyHtml: '', css: '' };
+
+  const fragment = sanitizePageBuilderFragment(html);
+  const css = Array.from(fragment.querySelectorAll('style'))
+    .map((style) => style.textContent ?? '')
+    .filter(Boolean)
+    .join('\n');
+  fragment.querySelectorAll('style').forEach((style) => style.remove());
+
+  return { bodyHtml: serializePageBuilderFragment(fragment), css };
+}
+
+/**
+ * Sanitize an exported GrapesJS HTML fragment before it is stored or reparsed.
+ *
+ * This function deliberately uses DOMPurify's parser-backed DOM output. Regex
+ * tag filters can be bypassed by malformed or nested markup and are not a
+ * security boundary. CSS and URLs receive their own policy before serialization.
+ */
 export function stripUnsafePageBuilderHtml(html: string): string {
-  return html
-    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
-    .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    .replace(/<[^>]*\bjoomla\b[^>]*>/gi, '');
+  const { bodyHtml, css } = sanitizePageBuilderDocument(html);
+  return `${css ? `<style>${css}</style>` : ''}${bodyHtml}`;
 }
 
 export function scopePageBuilderHtml(html: string | null | undefined): string {
   if (!html) return '';
-  const doc = new DOMParser().parseFromString(stripUnsafePageBuilderHtml(html), 'text/html');
-  const scopedCss = Array.from(doc.querySelectorAll('style'))
-    .map((style) => scopePageBuilderCss(style.textContent || ''))
-    .filter(Boolean)
-    .join('\n');
-
-  doc.querySelectorAll('style, script').forEach((node) => node.remove());
-  const body = doc.body.innerHTML.trim();
+  const { bodyHtml, css: unscopedCss } = sanitizePageBuilderDocument(html);
+  const scopedCss = scopePageBuilderCss(unscopedCss);
   const css = [PAGE_BUILDER_BASELINE_CSS, scopedCss, PAGE_BUILDER_THEME_OVERRIDE_CSS].filter(Boolean).join('\n');
-  return `${css ? `<style>${css}</style>` : ''}<div class="nexus-custom-page-builder">${body}</div>`;
+  return `${css ? `<style>${css}</style>` : ''}<div class="nexus-custom-page-builder">${bodyHtml}</div>`;
 }
 
 export function exportScopedPageBuilderHtml(bodyHtml: string, css: string): string {

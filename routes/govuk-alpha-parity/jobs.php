@@ -31,7 +31,7 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // Throttled to match the API (AdminJobsController::biasAudit, 10/min) — caps
 // rapid re-querying that could harvest PII patterns from the aggregations.
 Route::get('/jobs/bias-audit', [AlphaController::class, 'jobsBiasAudit'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:nexus-route-10-per-1m')
     ->name('jobs.bias-audit');
 
 // Talent search — employer-only candidate discovery (static, before wildcards).
@@ -72,7 +72,7 @@ Route::get('/jobs/{id}/qualified', [AlphaController::class, 'jobsQualification']
 // aware (mirrors JobVacanciesController::downloadCv). Throttled like the API.
 Route::get('/jobs/applications/{applicationId}/cv', [AlphaController::class, 'jobsDownloadCv'])
     ->whereNumber('applicationId')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('jobs.applications.cv');
 
 // Application status-history timeline — applicant / owner / admin only
@@ -85,18 +85,18 @@ Route::get('/jobs/applications/{applicationId}/history', [AlphaController::class
 // Each service method carries its own owner + state checks; throttled POSTs.
 Route::post('/jobs/interviews/{interviewId}/accept', [AlphaController::class, 'jobsAcceptInterview'])
     ->whereNumber('interviewId')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('jobs.interviews.accept');
 Route::post('/jobs/interviews/{interviewId}/decline', [AlphaController::class, 'jobsDeclineInterview'])
     ->whereNumber('interviewId')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('jobs.interviews.decline');
 Route::post('/jobs/offers/{offerId}/accept', [AlphaController::class, 'jobsAcceptOffer'])
     ->whereNumber('offerId')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('jobs.offers.accept');
 Route::post('/jobs/offers/{offerId}/reject', [AlphaController::class, 'jobsRejectOffer'])
     ->whereNumber('offerId')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('jobs.offers.reject');
 });

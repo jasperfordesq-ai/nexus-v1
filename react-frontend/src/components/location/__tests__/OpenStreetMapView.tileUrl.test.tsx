@@ -13,23 +13,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 
-vi.mock('react-leaflet', () => {
-  const mockTileLayer = vi.fn(() => null);
-  return {
-    MapContainer: ({ children }: { children?: React.ReactNode }) => (
-      <div data-testid="map-container">{children}</div>
-    ),
-    TileLayer: (props: { url: string; attribution: string }) => {
-      mockTileLayer(props);
-      return <div data-testid="tile-layer" data-url={props.url} data-attribution={props.attribution} />;
-    },
-    useMap: () => ({ setView: vi.fn(), fitBounds: vi.fn(), getZoom: () => 12 }),
-    __mockTileLayer: mockTileLayer,
+const { tileLayerMock, tileLayerInstance, mapInstance } = vi.hoisted(() => {
+  const tileLayerInstance = {
+    addTo: vi.fn().mockReturnThis(),
+    removeFrom: vi.fn().mockReturnThis(),
   };
+  const tileLayerMock = vi.fn(() => tileLayerInstance);
+  const mapInstance = {
+    remove: vi.fn(),
+    setView: vi.fn().mockReturnThis(),
+    fitBounds: vi.fn().mockReturnThis(),
+    getZoom: vi.fn(() => 12),
+  };
+  return { tileLayerMock, tileLayerInstance, mapInstance };
 });
 
 vi.mock('leaflet', async () => ({
   default: {
+    map: vi.fn(() => mapInstance),
+    tileLayer: tileLayerMock,
     divIcon: vi.fn(() => ({})),
     latLngBounds: vi.fn(() => ({})),
     marker: vi.fn(() => ({
@@ -58,6 +60,9 @@ import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 
 describe('OpenStreetMapView — runtime tile URL', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+    tileLayerInstance.addTo.mockReturnThis();
+    tileLayerInstance.removeFrom.mockReturnThis();
     resetGoogleMapsConfigForTests();
   });
 
@@ -81,13 +86,15 @@ describe('OpenStreetMapView — runtime tile URL', () => {
       )
     );
 
-    const { container } = render(
+    render(
       <OpenStreetMapView markers={[{ id: 1, lat: 53.35, lng: -6.26, title: 'Dublin' }]} />
     );
 
     await waitFor(() => {
-      const tile = container.querySelector('[data-testid="tile-layer"]');
-      expect(tile?.getAttribute('data-url')).toContain('api.maptiler.com');
+      expect(tileLayerMock).toHaveBeenCalledWith(
+        expect.stringContaining('api.maptiler.com'),
+        expect.objectContaining({ attribution: '&copy; MapTiler &copy; OSM' })
+      );
     });
   });
 
@@ -111,28 +118,32 @@ describe('OpenStreetMapView — runtime tile URL', () => {
       )
     );
 
-    const { container } = render(
+    render(
       <OpenStreetMapView markers={[{ id: 1, lat: 53.35, lng: -6.26, title: 'Dublin' }]} />
     );
 
     await waitFor(() => {
-      const tile = container.querySelector('[data-testid="tile-layer"]');
-      expect(tile?.getAttribute('data-url')).toContain('tile.openstreetmap.org');
+      expect(tileLayerMock).toHaveBeenCalledWith(
+        expect.stringContaining('tile.openstreetmap.org'),
+        expect.any(Object)
+      );
     });
   });
 
   it('uses fallback OSM URL when the config fetch fails entirely', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('boom', { status: 500 })));
 
-    const { container } = render(
+    render(
       <OpenStreetMapView markers={[{ id: 1, lat: 53.35, lng: -6.26, title: 'Dublin' }]} />
     );
 
     // The initial state already uses the OSM fallback URL; even after the
     // failed fetch resolves, the URL must remain valid (not blank).
     await waitFor(() => {
-      const tile = container.querySelector('[data-testid="tile-layer"]');
-      expect(tile?.getAttribute('data-url')).toContain('tile.openstreetmap.org');
+      expect(tileLayerMock).toHaveBeenCalledWith(
+        expect.stringContaining('tile.openstreetmap.org'),
+        expect.any(Object)
+      );
     });
   });
 });

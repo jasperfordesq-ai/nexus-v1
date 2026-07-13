@@ -21,6 +21,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 
 export type WebPushPermission = 'default' | 'granted' | 'denied' | 'unsupported';
@@ -69,6 +70,7 @@ function readPermission(): WebPushPermission {
 }
 
 export function useWebPush() {
+  const { t } = useTranslation('settings');
   const [state, setState] = useState<WebPushState>(() => ({
     isSupported: SUPPORTED,
     permission: readPermission(),
@@ -98,7 +100,7 @@ export function useWebPush() {
 
   const subscribe = useCallback(async (): Promise<boolean> => {
     if (!SUPPORTED) {
-      setState((s) => ({ ...s, error: 'Web Push is not supported in this browser.' }));
+      setState((s) => ({ ...s, error: t('push_status.unsupported') }));
       return false;
     }
     setState((s) => ({ ...s, isPending: true, error: null }));
@@ -112,13 +114,13 @@ export function useWebPush() {
       const keyRes = await api.get<VapidKeyResponse>('/push/vapid-key');
       const vapidPublicKey = keyRes?.data?.vapid_public_key;
       if (!vapidPublicKey) {
-        setState((s) => ({ ...s, isPending: false, error: 'Push notifications are not configured on the server yet.' }));
+        setState((s) => ({ ...s, isPending: false, error: t('push_errors.not_configured') }));
         return false;
       }
 
       const reg = await getRegistration();
       if (!reg) {
-        setState((s) => ({ ...s, isPending: false, error: 'Service worker not ready.' }));
+        setState((s) => ({ ...s, isPending: false, error: t('push_errors.not_ready') }));
         return false;
       }
 
@@ -137,18 +139,17 @@ export function useWebPush() {
         keys: json.keys,
       });
       if (!sendRes.success) {
-        setState((s) => ({ ...s, isPending: false, error: sendRes.error || 'Failed to register push subscription.' }));
+        setState((s) => ({ ...s, isPending: false, error: t('push_errors.enable_failed') }));
         return false;
       }
 
       setState((s) => ({ ...s, isPending: false, isSubscribed: true, permission: 'granted', error: null }));
       return true;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Push subscription failed.';
-      setState((s) => ({ ...s, isPending: false, error: msg }));
+    } catch {
+      setState((s) => ({ ...s, isPending: false, error: t('push_errors.enable_failed') }));
       return false;
     }
-  }, []);
+  }, [t]);
 
   const unsubscribe = useCallback(async (): Promise<boolean> => {
     if (!SUPPORTED) return false;
@@ -165,12 +166,11 @@ export function useWebPush() {
       }
       setState((s) => ({ ...s, isPending: false, isSubscribed: false, error: null }));
       return true;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Unsubscribe failed.';
-      setState((s) => ({ ...s, isPending: false, error: msg }));
+    } catch {
+      setState((s) => ({ ...s, isPending: false, error: t('push_errors.disable_failed') }));
       return false;
     }
-  }, []);
+  }, [t]);
 
   return { ...state, subscribe, unsubscribe, refresh };
 }

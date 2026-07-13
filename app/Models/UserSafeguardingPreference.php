@@ -61,6 +61,62 @@ class UserSafeguardingPreference extends Model
     }
 
     /**
+     * Canonicalise a submitted value without changing preference lifecycle.
+     *
+     * A non-revoked row records the member's latest response, including an
+     * explicit checkbox "no". Consumers must use isEffectivelySelected()
+     * rather than treating every non-revoked row as an affirmative selection.
+     */
+    public static function normalizeSelectedValue(?string $optionType, mixed $value): string
+    {
+        $optionType = strtolower(trim($optionType ?? ''));
+
+        return match ($optionType) {
+            'checkbox' => self::isTruthyCheckboxValue($value) ? '1' : '0',
+            'select' => trim(self::stringValue($value)),
+            default => '0',
+        };
+    }
+
+    /**
+     * Whether a stored response affirmatively selects its typed option.
+     */
+    public static function isEffectivelySelected(?string $optionType, mixed $value): bool
+    {
+        $optionType = strtolower(trim($optionType ?? ''));
+
+        return match ($optionType) {
+            'checkbox' => self::isTruthyCheckboxValue($value),
+            'select' => trim(self::stringValue($value)) !== '',
+            default => false,
+        };
+    }
+
+    private static function isTruthyCheckboxValue(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return in_array(strtolower(trim(self::stringValue($value))), ['1', 'true', 'yes', 'on'], true);
+    }
+
+    private static function stringValue(mixed $value): string
+    {
+        if (is_string($value) || is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+        if (is_bool($value)) {
+            return $value ? '1' : '';
+        }
+        if ($value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return '';
+    }
+
+    /**
      * Scope to only active (non-revoked) preferences.
      */
     public function scopeActive($query)

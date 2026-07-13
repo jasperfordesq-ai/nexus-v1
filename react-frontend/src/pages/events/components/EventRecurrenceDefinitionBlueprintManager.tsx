@@ -12,19 +12,13 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Chip,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 import {
   eventsApi,
   type EventRecurrenceDefinitionCommit,
@@ -113,7 +107,6 @@ export function EventRecurrenceDefinitionBlueprintManager({
     allowedSections.agenda,
     allowedSections.registration,
     allowedSections.safety,
-    allowedSections.staff,
     allowedSections.ticket_types,
   ]);
   const [sections, setSections] = useState<EventRecurrenceDefinitionSections>(() => ({
@@ -131,7 +124,7 @@ export function EventRecurrenceDefinitionBlueprintManager({
   const [isCommitting, setIsCommitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [expiryTick, setExpiryTick] = useState(0);
+  const [, setExpiryTick] = useState(0);
   const [historyItems, setHistoryItems] = useState<EventRecurrenceDefinitionHistoryItem[]>([]);
   const [nextBeforeVersion, setNextBeforeVersion] = useState<number | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
@@ -140,11 +133,11 @@ export function EventRecurrenceDefinitionBlueprintManager({
   const [loadMoreError, setLoadMoreError] = useState(false);
 
   const chosenSections = useMemo(() => selectedKeys(sections), [sections]);
-  const previewIsExpired = useMemo(() => {
+  const previewIsExpired = (() => {
     if (!preview) return false;
     const expiry = Date.parse(preview.preview_expires_at);
     return Number.isNaN(expiry) || expiry <= Date.now();
-  }, [expiryTick, preview]);
+  })();
 
   const dateLabel = useCallback((value: string): string => {
     const parsed = new Date(value);

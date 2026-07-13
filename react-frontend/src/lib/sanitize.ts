@@ -32,7 +32,12 @@
  */
 
 import DOMPurify from 'dompurify';
-import { sanitizePageBuilderInlineStyle, scopePageBuilderHtml } from './pageBuilderHtml';
+import {
+  PAGE_BUILDER_ALLOWED_ATTR,
+  PAGE_BUILDER_ALLOWED_TAGS,
+  sanitizePageBuilderInlineStyle,
+  scopePageBuilderHtml,
+} from './pageBuilderHtml';
 
 /* ───────────────────────── Allow-lists ───────────────────────── */
 
@@ -53,25 +58,11 @@ const RICH_TEXT_ALLOWED_TAGS = [
   'ins', 'del',
 ];
 
-const PAGE_BUILDER_ALLOWED_TAGS = [
-  ...RICH_TEXT_ALLOWED_TAGS,
-  'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
-  'form', 'label', 'input', 'textarea', 'select', 'option', 'button',
-];
-
 const RICH_TEXT_ALLOWED_ATTR = [
   'href', 'src', 'alt', 'title', 'class', 'id',
   'colspan', 'rowspan', 'scope',
   'width', 'height', 'loading',
   'target', 'rel',
-];
-
-const PAGE_BUILDER_ALLOWED_ATTR = [
-  ...RICH_TEXT_ALLOWED_ATTR,
-  'style',
-  'role', 'aria-label', 'aria-labelledby', 'aria-describedby',
-  'type', 'name', 'value', 'placeholder', 'checked', 'selected', 'disabled',
-  'required', 'for', 'action', 'method',
 ];
 
 const INLINE_ALLOWED_TAGS = [
@@ -199,20 +190,23 @@ export function sanitizeCustomPageHtml(html: string | null | undefined): string 
   if (!html) return '';
   installHooksOnce();
   const scoped = scopePageBuilderHtml(html);
-  const doc = new DOMParser().parseFromString(scoped, 'text/html');
-  const scopedCss = Array.from(doc.querySelectorAll('style'))
-    .map((style) => style.textContent || '')
-    .filter(Boolean)
-    .join('\n');
-  doc.querySelectorAll('style').forEach((node) => node.remove());
-  const sanitizedBody = DOMPurify.sanitize(doc.body.innerHTML, {
+  const fragment = DOMPurify.sanitize(scoped, {
     ALLOWED_TAGS: PAGE_BUILDER_ALLOWED_TAGS,
     ALLOWED_ATTR: PAGE_BUILDER_ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
     ALLOW_UNKNOWN_PROTOCOLS: false,
     KEEP_CONTENT: true,
+    RETURN_DOM_FRAGMENT: true,
   });
-  return `${scopedCss ? `<style>${scopedCss}</style>` : ''}${sanitizedBody}`;
+  const scopedCss = Array.from(fragment.querySelectorAll('style'))
+    .map((style) => style.textContent || '')
+    .filter(Boolean)
+    .join('\n');
+  fragment.querySelectorAll('style').forEach((node) => node.remove());
+  const container = document.createElement('div');
+  container.append(fragment);
+
+  return `${scopedCss ? `<style>${scopedCss}</style>` : ''}${container.innerHTML}`;
 }
 
 /**

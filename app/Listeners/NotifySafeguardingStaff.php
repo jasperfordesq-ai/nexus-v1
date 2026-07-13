@@ -13,6 +13,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\TenantSafeguardingOption;
 use App\Models\User;
+use App\Models\UserSafeguardingPreference;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
@@ -82,11 +83,18 @@ class NotifySafeguardingStaff implements ShouldQueue
 
             // Build a summary of what was selected
             $selectedOptions = DB::select(
-                "SELECT tso.option_key, tso.preset_source, tso.label FROM user_safeguarding_preferences usp
+                "SELECT usp.selected_value, tso.option_key, tso.option_type, tso.preset_source, tso.label FROM user_safeguarding_preferences usp
                  JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
                  WHERE usp.user_id = ? AND usp.tenant_id = ? AND usp.revoked_at IS NULL AND tso.is_active = 1",
                 [$flaggedUserId, $tenantId]
             );
+            $selectedOptions = array_values(array_filter(
+                $selectedOptions,
+                static fn (object $option): bool => UserSafeguardingPreference::isEffectivelySelected(
+                    $option->option_type ?? null,
+                    $option->selected_value ?? null,
+                ),
+            ));
             // Find all admin, tenant_admin, broker, and super_admin users for this tenant
             $staffUsers = DB::select(
                 "SELECT id, email, first_name, name, role, preferred_language FROM users

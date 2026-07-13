@@ -9,20 +9,12 @@ import Clock3 from 'lucide-react/icons/clock-3';
 import Network from 'lucide-react/icons/network';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 

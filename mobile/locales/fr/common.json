@@ -30,6 +30,8 @@
     "boundaryTitle": "Une erreur s'est produite",
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion.",
+    "timeout": "La requête a expiré. Vérifiez votre connexion.",
+    "requestFailedWithStatus": "La requête a échoué avec le statut {{status}}",
     "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
     "notFound": "Introuvable.",
     "alertTitle": "Error"

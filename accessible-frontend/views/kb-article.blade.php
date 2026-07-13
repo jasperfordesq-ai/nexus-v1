@@ -27,9 +27,9 @@
                 @if ($updated){{ __('govuk_alpha.kb.updated_label') }}: {{ \Illuminate\Support\Str::of((string) $updated)->before('T') }}@endif
             </p>
 
-            {{-- Content is sanitized on save by the knowledge base service. --}}
+            {{-- Re-sanitize at the render boundary for imported/legacy/manual rows. --}}
             <div class="legal-content govuk-body">
-                {!! $article['content'] ?? '' !!}
+                {!! \App\Helpers\HtmlSanitizer::sanitizeCms((string) ($article['content'] ?? '')) !!}
             </div>
 
             @if (! empty($children))

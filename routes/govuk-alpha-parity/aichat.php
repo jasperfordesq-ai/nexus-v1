@@ -17,4 +17,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/chat', [AlphaController::class, 'aiChat'])->name('chat.index');
 Route::post('/chat', [AlphaController::class, 'aiChatSend'])
-    ->middleware('throttle:20,1')->name('chat.send');
+    ->middleware('throttle:nexus-route-20-per-1m')->name('chat.send');

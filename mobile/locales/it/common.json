@@ -30,6 +30,8 @@
     "boundaryTitle": "Qualcosa è andato storto",
     "generic": "Qualcosa è andato storto. Riprova.",
     "network": "Errore di rete. Controlla la connessione.",
+    "timeout": "La richiesta è scaduta. Controlla la connessione.",
+    "requestFailedWithStatus": "La richiesta non è riuscita con stato {{status}}",
     "unauthorized": "La sessione è scaduta. Accedi di nuovo.",
     "notFound": "Non trovato.",
     "alertTitle": "Error"

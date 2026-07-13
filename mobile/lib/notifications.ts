@@ -23,6 +23,7 @@ import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 
 import { api } from '@/lib/api/client';
+import i18n from 'i18next';
 
 /** Callback registered by RealtimeContext to handle background data pushes. */
 let onRefreshCallback: (() => void) | null = null;
@@ -74,7 +75,7 @@ export async function registerForPushNotifications(): Promise<void> {
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+        name: i18n.t('notifications:title'),
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         // Brand color — tenant-specific theming not available at notification channel setup time

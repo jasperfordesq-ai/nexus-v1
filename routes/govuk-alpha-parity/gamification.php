@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/achievements/shop', [AlphaController::class, 'gamificationShop'])
     ->name('gamification.shop');
 Route::post('/achievements/shop/purchase', [AlphaController::class, 'gamificationPurchase'])
-    ->middleware('throttle:10,1')->name('gamification.shop.purchase');
+    ->middleware('throttle:nexus-route-10-per-1m')->name('gamification.shop.purchase');
 
 // --- Achievements: badge collections ---
 Route::get('/achievements/collections', [AlphaController::class, 'gamificationCollections'])
@@ -33,7 +33,7 @@ Route::get('/achievements/collections', [AlphaController::class, 'gamificationCo
 Route::get('/achievements/showcase', [AlphaController::class, 'gamificationShowcase'])
     ->name('gamification.showcase');
 Route::post('/achievements/showcase', [AlphaController::class, 'gamificationUpdateShowcase'])
-    ->middleware('throttle:10,1')->name('gamification.showcase.update');
+    ->middleware('throttle:nexus-route-10-per-1m')->name('gamification.showcase.update');
 
 // --- Achievements: engagement history ---
 Route::get('/achievements/engagement', [AlphaController::class, 'gamificationEngagement'])
@@ -64,7 +64,7 @@ Route::get('/nexus-score/tiers', [AlphaController::class, 'gamificationTierLadde
 Route::get('/polls/parity/create', [AlphaController::class, 'gamificationCreatePoll'])
     ->name('gamification.poll.create');
 Route::post('/polls/parity/create', [AlphaController::class, 'gamificationStorePoll'])
-    ->middleware('throttle:10,1')->name('gamification.poll.store');
+    ->middleware('throttle:nexus-route-10-per-1m')->name('gamification.poll.store');
 Route::get('/polls/parity/manage', [AlphaController::class, 'gamificationManagePolls'])
     ->name('gamification.poll.manage');
 
@@ -72,18 +72,18 @@ Route::get('/polls/parity/manage', [AlphaController::class, 'gamificationManageP
 Route::get('/polls/{pollId}/rank', [AlphaController::class, 'gamificationRankedVote'])
     ->whereNumber('pollId')->name('gamification.poll.rank');
 Route::post('/polls/{pollId}/rank', [AlphaController::class, 'gamificationStoreRankedVote'])
-    ->whereNumber('pollId')->middleware('throttle:20,1')->name('gamification.poll.rank.store');
+    ->whereNumber('pollId')->middleware('throttle:nexus-route-20-per-1m')->name('gamification.poll.rank.store');
 Route::get('/polls/{pollId}/export', [AlphaController::class, 'gamificationExportPoll'])
-    ->whereNumber('pollId')->middleware('throttle:10,1')->name('gamification.poll.export');
+    ->whereNumber('pollId')->middleware('throttle:nexus-route-10-per-1m')->name('gamification.poll.export');
 Route::post('/polls/{pollId}/delete', [AlphaController::class, 'gamificationDeletePoll'])
-    ->whereNumber('pollId')->middleware('throttle:10,1')->name('gamification.poll.delete');
+    ->whereNumber('pollId')->middleware('throttle:nexus-route-10-per-1m')->name('gamification.poll.delete');
 
 // --- Polls: detail + social (like / comment), mirroring the React poll card's
 //     SocialInteractionPanel. Static sub-segments (/rank, /export, /delete,
 //     /like, /comment) are registered BEFORE the bare /polls/{pollId} detail. ---
 Route::post('/polls/{pollId}/like', [AlphaController::class, 'gamificationPollLike'])
-    ->whereNumber('pollId')->middleware('throttle:60,1')->name('gamification.poll.like');
+    ->whereNumber('pollId')->middleware('throttle:nexus-route-60-per-1m')->name('gamification.poll.like');
 Route::post('/polls/{pollId}/comment', [AlphaController::class, 'gamificationPollComment'])
-    ->whereNumber('pollId')->middleware('throttle:30,1')->name('gamification.poll.comment');
+    ->whereNumber('pollId')->middleware('throttle:nexus-route-30-per-1m')->name('gamification.poll.comment');
 Route::get('/polls/{pollId}', [AlphaController::class, 'gamificationPollDetail'])
     ->whereNumber('pollId')->name('gamification.poll.detail');

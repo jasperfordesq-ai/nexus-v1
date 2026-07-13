@@ -6,12 +6,14 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
-use App\Services\BrokerMessageVisibilityService;
+use App\Models\User;
 use App\Services\BrokerControlConfigService;
+use App\Services\BrokerMessageVisibilityService;
+use App\Services\SafeguardingTriggerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Mockery;
+use Tests\Laravel\TestCase;
 
 class BrokerMessageVisibilityServiceTest extends TestCase
 {
@@ -56,6 +58,44 @@ class BrokerMessageVisibilityServiceTest extends TestCase
 
         $result = $this->service->shouldCopyMessage(1, 2);
         $this->assertSame('flagged_user', $result);
+    }
+
+    public function test_shouldCopyMessage_rejects_and_clears_legacy_preference_monitoring(): void
+    {
+        $sender = User::factory()->forTenant($this->testTenantId)->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('user_messaging_restrictions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sender->id,
+            'under_monitoring' => 1,
+            'requires_broker_approval' => 1,
+            'messaging_disabled' => 0,
+            'monitoring_reason' => SafeguardingTriggerService::MONITORING_REASON_ONBOARDING,
+            'monitoring_started_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->mockConfig->shouldReceive('isBrokerVisibilityEnabled')->once()->andReturn(true);
+        $this->mockConfig->shouldReceive('isFirstContactMonitoringEnabled')->once()->andReturn(false);
+        $this->mockConfig->shouldReceive('getConfig')
+            ->once()
+            ->with('broker_visibility')
+            ->andReturn([
+                'copy_new_member_messages' => false,
+                'copy_high_risk_listing_messages' => false,
+                'random_sample_percentage' => 0,
+            ]);
+
+        $this->assertNull($this->service->shouldCopyMessage($sender->id, $receiver->id));
+        $this->assertDatabaseHas('user_messaging_restrictions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sender->id,
+            'under_monitoring' => 0,
+            'requires_broker_approval' => 0,
+            'monitoring_reason' => SafeguardingTriggerService::MONITORING_REASON_ONBOARDING,
+        ]);
     }
 
     public function test_copyMessageForBroker_returns_null_when_message_not_found(): void
@@ -224,6 +264,7 @@ class BrokerMessageVisibilityServiceTest extends TestCase
 
     public function test_getUserRestrictionStatus_returns_defaults_when_no_record(): void
     {
+        $this->mockConfig->shouldReceive('isBrokerVisibilityEnabled')->once()->andReturn(true);
         DB::shouldReceive('table')->with('user_messaging_restrictions')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturnNull();
@@ -232,5 +273,77 @@ class BrokerMessageVisibilityServiceTest extends TestCase
         $this->assertFalse($result['messaging_disabled']);
         $this->assertFalse($result['under_monitoring']);
         $this->assertNull($result['restriction_reason']);
+        $this->assertTrue($result['review_notice_required']);
+    }
+
+    public function test_getUserRestrictionStatus_does_not_expose_legacy_preference_monitoring(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $this->mockConfig->shouldReceive('isBrokerVisibilityEnabled')->once()->andReturn(true);
+
+        DB::table('user_messaging_restrictions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 1,
+            'requires_broker_approval' => 1,
+            'messaging_disabled' => 0,
+            'monitoring_reason' => SafeguardingTriggerService::MONITORING_REASON_ONBOARDING,
+            'monitoring_started_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $result = $this->service->getUserRestrictionStatus($user->id);
+
+        $this->assertFalse($result['under_monitoring']);
+        $this->assertFalse($result['messaging_disabled']);
+        $this->assertNull($result['restriction_reason']);
+        $this->assertTrue($result['review_notice_required']);
+        $this->assertDatabaseHas('user_messaging_restrictions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 0,
+            'requires_broker_approval' => 0,
+        ]);
+    }
+
+    public function test_getUserRestrictionStatus_hides_generic_notice_when_visibility_is_disabled(): void
+    {
+        $this->mockConfig->shouldReceive('isBrokerVisibilityEnabled')->once()->andReturn(false);
+        DB::shouldReceive('table')->with('user_messaging_restrictions')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('first')->andReturnNull();
+
+        $result = $this->service->getUserRestrictionStatus(1);
+
+        $this->assertFalse($result['review_notice_required']);
+    }
+
+    public function test_messaging_disabled_remains_effective_when_legacy_monitoring_is_cleared(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('user_messaging_restrictions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 1,
+            'requires_broker_approval' => 1,
+            'messaging_disabled' => 1,
+            'monitoring_reason' => SafeguardingTriggerService::MONITORING_REASON_ONBOARDING,
+            'restriction_reason' => 'Independent administrative messaging restriction',
+            'monitoring_started_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->assertTrue($this->service->isMessagingDisabledForUser($user->id));
+        $this->assertDatabaseHas('user_messaging_restrictions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'under_monitoring' => 0,
+            'requires_broker_approval' => 0,
+            'messaging_disabled' => 1,
+            'restriction_reason' => 'Independent administrative messaging restriction',
+        ]);
     }
 }

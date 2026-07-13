@@ -232,6 +232,77 @@ class MemberVettingAttestationWorkflowTest extends TestCase
         ]);
     }
 
+    public function test_false_checkbox_preference_is_preserved_without_activating_contact_gate_or_readers(): void
+    {
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $optionId = (int) DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'false_checkbox_regression_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'False checkbox regression',
+            'description' => 'False checkbox regression',
+            'sort_order' => 999,
+            'is_active' => 1,
+            'is_required' => 0,
+            'triggers' => json_encode([
+                'requires_vetted_interaction' => true,
+                'vetting_type_required' => 'dbs_enhanced',
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        SafeguardingPreferenceService::saveUserPreferences($recipient->id, [[
+            'option_id' => $optionId,
+            'value' => false,
+        ]], '127.0.0.1');
+
+        $storedPreference = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $recipient->id)
+            ->where('option_id', $optionId)
+            ->first();
+        $this->assertNotNull($storedPreference);
+        $this->assertSame('0', $storedPreference->selected_value);
+        $this->assertNull($storedPreference->revoked_at);
+
+        $triggers = SafeguardingTriggerService::getActiveTriggers($recipient->id, $this->testTenantId);
+        $this->assertFalse((bool) ($triggers['requires_vetted_interaction'] ?? false));
+        $this->assertSame([], SafeguardingTriggerService::getRequiredVettingTypes(
+            $recipient->id,
+            $this->testTenantId,
+        ));
+        $this->assertSame(
+            [$recipient->id => []],
+            SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+                [$recipient->id],
+                $this->testTenantId,
+            ),
+        );
+
+        $this->assertSame([], SafeguardingPreferenceService::getUserPreferences(
+            $this->testTenantId,
+            $recipient->id,
+            $recipient->id,
+            'member',
+            'false_checkbox_regression',
+        ));
+
+        Sanctum::actingAs($recipient);
+        $this->apiGet('/v2/safeguarding/my-preferences')
+            ->assertOk()
+            ->assertJsonPath('data.count', 0)
+            ->assertJsonCount(0, 'data.preferences');
+
+        Sanctum::actingAs($sender);
+        $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'A false safeguarding checkbox must not block contact',
+        ])->assertStatus(201);
+    }
+
     public function test_legacy_verified_dbs_row_does_not_clear_the_new_contact_gate_without_controlled_import_or_reconfirmation(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
@@ -369,6 +440,71 @@ class MemberVettingAttestationWorkflowTest extends TestCase
         $this->assertDatabaseMissing('tenant_safeguarding_settings', [
             'tenant_id' => $this->testTenantId,
         ]);
+    }
+
+    public function test_policy_transition_to_custom_deactivates_false_preset_checkbox_without_review(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $this->configureEnglandAndWales($admin);
+        [$optionId, $preferenceId] = $this->protectRecipientWithPreset($recipient);
+        DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->update(['selected_value' => '0']);
+
+        Sanctum::actingAs($admin);
+        $transition = $this->apiPut('/v2/admin/vetting/policy', [
+            'jurisdiction' => 'custom',
+        ]);
+        $transition->assertStatus(200)
+            ->assertJsonPath('data.policy.jurisdiction', 'custom')
+            ->assertJsonPath('data.preference_transition.review_required_count', 0);
+
+        $this->assertContains(
+            'requires_vetted_partners',
+            $transition->json('data.preference_transition.deactivated'),
+        );
+        $this->assertNotContains(
+            'requires_vetted_partners',
+            $transition->json('data.preference_transition.preserved'),
+        );
+        $this->assertSame(0, (int) DB::table('tenant_safeguarding_options')
+            ->where('id', $optionId)
+            ->value('is_active'));
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('revoked_at'));
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('policy_review_required_at'));
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('policy_review_reason_code'));
+    }
+
+    public function test_preset_replacement_does_not_request_review_for_false_checkbox_response(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $this->configureEnglandAndWales($admin);
+        [, $preferenceId] = $this->protectRecipientWithPreset($recipient);
+        DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->update(['selected_value' => '0']);
+
+        $result = SafeguardingPreferenceService::replaceCountryPreset(
+            $this->testTenantId,
+            'scotland',
+            true,
+        );
+
+        $this->assertSame(0, $result['review_required_count']);
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('policy_review_required_at'));
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('policy_review_reason_code'));
     }
 
     public function test_policy_transition_to_custom_preserves_selected_preset_protection_and_fails_closed(): void

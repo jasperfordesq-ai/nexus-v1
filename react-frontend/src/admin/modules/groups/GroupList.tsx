@@ -33,7 +33,7 @@ import type { AdminGroup, GroupStatus } from '../../api/types';
 
 import { resolveAssetUrl, getFormattingLocale } from '@/lib/helpers';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Avatar, Tabs, Tab } from '@/components/ui';
-import { AlertDialog } from '@heroui/react';
+import { AlertDialog } from '@heroui/react/alert-dialog';
 
 const statusColors: Record<GroupStatus, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',

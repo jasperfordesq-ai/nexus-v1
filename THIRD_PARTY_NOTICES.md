@@ -17,11 +17,11 @@ condition of their permissive (BSD / MIT / Apache / ISC) licences.
 
 | Ecosystem | Packages | Licence spread |
 |---|---|---|
-| npm (browser frontend) | ~362 | MIT (302), Apache-2.0 (29), ISC (15), BSD-3 (5), BSD-2 (2), 0BSD/Unlicense, `MIT AND Zlib`; `MPL-2.0 OR Apache-2.0` (DOMPurify → elect Apache-2.0); Hippocratic-2.1 (react-leaflet) |
+| npm (browser frontend) | 397 | MIT (325), Apache-2.0 (29), ISC (23), BSD-3 (12), BSD-2 (2), 0BSD/Unlicense, `MIT AND Zlib`, `MIT AND ISC`; `MPL-2.0 OR Apache-2.0` (DOMPurify → elect Apache-2.0) |
 | Composer (PHP backend) | 120 | MIT-dominant, plus BSD-3 / Apache-2.0 / BSD-2 / ISC and the dual/tri-licensed items noted below |
 
-**No pure GPL/AGPL licence appears in either tree.** The Composer tree is fully
-permissive after removing `rubix/ml` (an optional, `class_exists`-guarded
+**No pure GPL/AGPL licence appears in either tree.** The Composer tree has no
+strong-copyleft-only dependency after removing `rubix/ml` (an optional, `class_exists`-guarded
 accelerator that transitively pulled `wamania/php-stemmer` → `joomla/string`, GPL-2.0).
 
 ## Highlighted components
@@ -43,7 +43,6 @@ The newsletter email builder and the wider platform build on, among others:
 | **React Native QR Code SVG** (mobile attendee credential rendering) | MIT | <https://github.com/Expensify/react-native-qrcode-svg> |
 | **TweetNaCl.js** (mobile authenticated secretbox and Ed25519 verification) | Unlicense | <https://github.com/dchest/tweetnacl-js> |
 | **Leaflet** (maps) | BSD-2-Clause | <https://github.com/Leaflet/Leaflet> |
-| **react-leaflet** (maps React wrapper) | Hippocratic-2.1 | <https://github.com/PaulLeCam/react-leaflet> |
 | **DOMPurify** | MPL-2.0 OR Apache-2.0 | <https://github.com/cure53/DOMPurify> |
 | **Laravel framework** | MIT | <https://github.com/laravel/framework> |
 | **Symfony components** | MIT | <https://github.com/symfony> |
@@ -61,9 +60,11 @@ permissive option:
 - **nette/schema**, **nette/utils** — `BSD-3-Clause OR GPL-2.0 OR GPL-3.0` → **BSD-3-Clause**.
 - **james-heinrich/getid3** — `GPL-1.0-or-later OR LGPL-3.0-only OR MPL-2.0` → **MPL-2.0**
   (weak/file-level copyleft; usable in proprietary distributions with file-level obligations).
-- **react-leaflet / @react-leaflet/core** — Hippocratic-2.1 is an *ethical-source* licence
-  with a "no human-rights violations" field-of-use restriction; it is not copyleft. The
-  underlying Leaflet library is BSD-2-Clause.
+
+The frontend integrates the BSD-2-Clause **Leaflet** API directly. The former
+`react-leaflet` / `@react-leaflet/core` wrapper dependency was removed because its
+Hippocratic-2.1 field-of-use restriction is not an OSI-approved open-source licence
+and was unnecessary for the map implementation.
 
 **No strong-copyleft (GPL/AGPL) dependency remains.** The previously-tracked
 `joomla/string` (GPL-2.0-or-later) was removed by dropping `rubix/ml` — an optional

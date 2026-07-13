@@ -22,15 +22,15 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 Route::get('/ideation/campaigns', [AlphaController::class, 'ideationCampaigns'])
     ->name('ideation.campaigns');
 Route::post('/ideation/campaigns', [AlphaController::class, 'ideationStoreCampaign'])
-    ->middleware('throttle:20,1')->name('ideation.campaigns.store');
+    ->middleware('throttle:nexus-route-20-per-1m')->name('ideation.campaigns.store');
 Route::get('/ideation/campaigns/{id}', [AlphaController::class, 'ideationCampaignDetail'])
     ->whereNumber('id')->name('ideation.campaign');
 Route::post('/ideation/campaigns/{id}', [AlphaController::class, 'ideationUpdateCampaign'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.campaign.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.campaign.update');
 Route::post('/ideation/campaigns/{id}/delete', [AlphaController::class, 'ideationDeleteCampaign'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.campaign.delete');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.campaign.delete');
 Route::post('/ideation/campaigns/{id}/challenges/{challengeId}/unlink', [AlphaController::class, 'ideationUnlinkCampaignChallenge'])
-    ->whereNumber('id')->whereNumber('challengeId')->middleware('throttle:20,1')->name('ideation.campaign.unlink');
+    ->whereNumber('id')->whereNumber('challengeId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.campaign.unlink');
 
 // --- Outcomes dashboard (static prefix before challenge {id}) ---
 Route::get('/ideation/outcomes', [AlphaController::class, 'ideationOutcomes'])
@@ -44,7 +44,7 @@ Route::get('/ideation/tags', [AlphaController::class, 'ideationPopularTags'])
 Route::get('/ideation/new', [AlphaController::class, 'ideationCreateChallenge'])
     ->name('ideation.create');
 Route::post('/ideation/new', [AlphaController::class, 'ideationStoreChallenge'])
-    ->middleware('throttle:10,1')->name('ideation.store');
+    ->middleware('throttle:nexus-route-10-per-1m')->name('ideation.store');
 
 // --- Challenge edit / lifecycle / favorite / duplicate / delete / link / outcome ---
 Route::get('/ideation/{id}/manage', [AlphaController::class, 'ideationManageChallenge'])
@@ -52,43 +52,43 @@ Route::get('/ideation/{id}/manage', [AlphaController::class, 'ideationManageChal
 Route::get('/ideation/{id}/edit', [AlphaController::class, 'ideationEditChallenge'])
     ->whereNumber('id')->name('ideation.edit');
 Route::post('/ideation/{id}/edit', [AlphaController::class, 'ideationUpdateChallenge'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('ideation.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('ideation.update');
 Route::post('/ideation/{id}/status', [AlphaController::class, 'ideationChallengeStatus'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.challenge.status');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.challenge.status');
 Route::post('/ideation/{id}/favorite', [AlphaController::class, 'ideationToggleFavorite'])
-    ->whereNumber('id')->middleware('throttle:40,1')->name('ideation.favorite');
+    ->whereNumber('id')->middleware('throttle:nexus-route-40-per-1m')->name('ideation.favorite');
 Route::post('/ideation/{id}/duplicate', [AlphaController::class, 'ideationDuplicateChallenge'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('ideation.duplicate');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('ideation.duplicate');
 Route::post('/ideation/{id}/delete', [AlphaController::class, 'ideationDeleteChallenge'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('ideation.delete');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('ideation.delete');
 Route::post('/ideation/{id}/link-campaign', [AlphaController::class, 'ideationLinkCampaign'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.link-campaign');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.link-campaign');
 Route::get('/ideation/{id}/outcome', [AlphaController::class, 'ideationOutcomeEdit'])
     ->whereNumber('id')->name('ideation.outcome');
 Route::post('/ideation/{id}/outcome', [AlphaController::class, 'ideationStoreOutcome'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.outcome.store');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.outcome.store');
 
 // --- Draft ideas (list + save/publish an existing draft) ---
 Route::get('/ideation/{id}/drafts', [AlphaController::class, 'ideationDrafts'])
     ->whereNumber('id')->name('ideation.drafts');
 Route::post('/ideation/{id}/drafts/{ideaId}', [AlphaController::class, 'ideationUpdateDraftIdea'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.drafts.update');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.drafts.update');
 
 // --- Idea detail + interactions (deepest path) ---
 Route::get('/ideation/{id}/ideas/{ideaId}', [AlphaController::class, 'ideationIdeaDetail'])
     ->whereNumber('id')->whereNumber('ideaId')->name('ideation.idea');
 Route::post('/ideation/{id}/ideas/{ideaId}/comments', [AlphaController::class, 'ideationStoreComment'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.idea.comments.store');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.idea.comments.store');
 Route::post('/ideation/{id}/ideas/{ideaId}/comments/{commentId}/delete', [AlphaController::class, 'ideationDeleteComment'])
-    ->whereNumber('id')->whereNumber('ideaId')->whereNumber('commentId')->middleware('throttle:20,1')->name('ideation.idea.comments.delete');
+    ->whereNumber('id')->whereNumber('ideaId')->whereNumber('commentId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.idea.comments.delete');
 Route::post('/ideation/{id}/ideas/{ideaId}/toggle-vote', [AlphaController::class, 'ideationIdeaVote'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:30,1')->name('ideation.idea.vote');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-30-per-1m')->name('ideation.idea.vote');
 Route::post('/ideation/{id}/ideas/{ideaId}/status', [AlphaController::class, 'ideationIdeaStatus'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.idea.status');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.idea.status');
 Route::post('/ideation/{id}/ideas/{ideaId}/delete', [AlphaController::class, 'ideationDeleteIdea'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.idea.delete');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.idea.delete');
 Route::post('/ideation/{id}/ideas/{ideaId}/media', [AlphaController::class, 'ideationAddMedia'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.idea.media.store');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-20-per-1m')->name('ideation.idea.media.store');
 Route::post('/ideation/{id}/ideas/{ideaId}/convert', [AlphaController::class, 'ideationConvertToGroup'])
-    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:10,1')->name('ideation.idea.convert');
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:nexus-route-10-per-1m')->name('ideation.idea.convert');
 });

@@ -1122,6 +1122,7 @@ return [
     'donation_failed_check_recipient' => 'Darowizna nie powiodła się. Sprawdź swoje saldo i odbiorcę.',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes' => '{1} Zbyt wiele prób logowania. Spróbuj ponownie za 1 minutę.|[2,*] Zbyt wiele prób logowania. Spróbuj ponownie za :count min.',
     'legal' => [
         'no_documents_require_acceptance' => 'No documents require acceptance',
         'all_documents_accepted' => 'All documents accepted',

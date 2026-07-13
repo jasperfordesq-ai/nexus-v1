@@ -14,11 +14,11 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function (): vo
     Route::get('/events/{id}/tickets', [AlphaController::class, 'eventsTickets'])
         ->whereNumber('id')->name('events.tickets.index');
     Route::post('/events/{id}/tickets/{ticketTypeId}/allocate', [AlphaController::class, 'eventsTicketAllocate'])
-        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:20,1')
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.tickets.allocate');
     Route::get('/events/{id}/tickets/entitlements/{entitlementId}/cancel', [AlphaController::class, 'eventsTicketCancelForm'])
         ->whereNumber('id')->whereNumber('entitlementId')->name('events.tickets.cancel.form');
     Route::post('/events/{id}/tickets/entitlements/{entitlementId}/cancel', [AlphaController::class, 'eventsTicketCancel'])
-        ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:20,1')
+        ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:nexus-route-20-per-1m')
         ->name('events.tickets.cancel');
 });

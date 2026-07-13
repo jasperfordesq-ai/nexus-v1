@@ -4,6 +4,12 @@
     "denied": "Vous avez bloqué les notifications. Mettez à jour les paramètres de votre navigateur pour les réactiver.",
     "subscribed": "Vous êtes abonné sur cet appareil."
   },
+  "push_errors": {
+    "not_configured": "Les notifications push ne sont pas encore configurées.",
+    "not_ready": "Les notifications push ne sont pas encore prêtes. Rechargez la page et réessayez.",
+    "enable_failed": "Impossible d’activer les notifications push. Réessayez.",
+    "disable_failed": "Impossible de désactiver les notifications push. Réessayez."
+  },
   "identity": {
     "page_title": "Vérifier l'identité",
     "page_title_dob": "Vérifier l'identité — Date de naissance",

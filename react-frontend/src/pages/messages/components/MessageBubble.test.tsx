@@ -31,6 +31,8 @@ vi.mock('@/lib/motion', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  formatNumber: (value: number) => String(value),
+  getFormattingLocale: () => 'en-US',
 }));
 
 vi.mock('@/contexts/TenantContext', () => ({
@@ -143,5 +145,53 @@ describe('MessageBubble', () => {
     // Hover to reveal actions (or look for reaction button)
     const reactionBtns = screen.queryAllByRole('button');
     expect(reactionBtns.length).toBeGreaterThan(0);
+  });
+
+  it('renders a valid reaction count without exposing internal metadata', () => {
+    const thumbsUp = '\u{1F44D}';
+    const message = {
+      ...mockMessage,
+      reactions: {
+        [thumbsUp]: 2,
+        _users: { [`20_${thumbsUp}`]: true },
+      },
+    } as unknown as Message;
+
+    render(<MessageBubble {...defaultProps} message={message} />);
+
+    expect(screen.getByRole('button', { name: 'aria_toggle_reaction' })).toBeInTheDocument();
+    expect(screen.getByText(thumbsUp)).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.queryByText('_users')).toBeNull();
+  });
+
+  it('normalizes a legacy JSON reaction string instead of rendering character offsets', () => {
+    const thumbsUp = '\u{1F44D}';
+    const message = {
+      ...mockMessage,
+      reactions: JSON.stringify({
+        [thumbsUp]: 1,
+        _users: { [`20_${thumbsUp}`]: true },
+      }),
+    } as unknown as Message;
+
+    render(<MessageBubble {...defaultProps} message={message} />);
+
+    expect(screen.getByRole('button', { name: 'aria_toggle_reaction' })).toBeInTheDocument();
+    expect(screen.getByText(thumbsUp)).toBeInTheDocument();
+    expect(screen.queryByText('0')).toBeNull();
+    expect(screen.queryByText('_users')).toBeNull();
+  });
+
+  it('ignores malformed reaction arrays', () => {
+    const message = {
+      ...mockMessage,
+      reactions: Array.from({ length: 52 }, (_, index) => index),
+    } as unknown as Message;
+
+    render(<MessageBubble {...defaultProps} message={message} />);
+
+    expect(screen.queryByRole('button', { name: 'aria_toggle_reaction' })).toBeNull();
+    expect(screen.queryByText('51')).toBeNull();
   });
 });

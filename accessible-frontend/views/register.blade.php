@@ -259,7 +259,7 @@
     <script src="/assets/js/password-strength.js" defer></script>
     <script src="/assets/js/register-enhancements.js" defer></script>
     @if (!empty($googleMapsApiKey) && ($geocodingProvider ?? 'google') === 'google')
-        <script async defer
+        <script nonce="{{ $cspNonce ?? request()->attributes->get('csp_nonce', '') }}" async defer
                 src="https://maps.googleapis.com/maps/api/js?key={{ $googleMapsApiKey }}&libraries=places&callback=__nexusRegisterPlacesInit"></script>
     @endif
 @endsection

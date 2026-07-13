@@ -73,13 +73,13 @@ describe('extractToken', () => {
 
   it('throws when neither token field is set', () => {
     const response = { ...baseResponse, access_token: undefined as unknown as string, token: undefined };
-    expect(() => extractToken(response)).toThrow('Auth response did not contain a token');
+    expect(() => extractToken(response)).toThrow('Unable to sign in. Please try again.');
   });
 
   it('returns empty-string access_token when that is the actual value', () => {
     // Empty string is falsy but still a string — extractToken should throw since '' is falsy
     const response: AuthResponse = { ...baseResponse, access_token: '' };
-    expect(() => extractToken(response)).toThrow('Auth response did not contain a token');
+    expect(() => extractToken(response)).toThrow('Unable to sign in. Please try again.');
   });
 });
 

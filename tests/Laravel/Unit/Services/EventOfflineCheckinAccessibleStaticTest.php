@@ -66,8 +66,8 @@ final class EventOfflineCheckinAccessibleStaticTest extends TestCase
         self::assertStringContainsString("name('events.check-in.credential.issue')", $route);
         self::assertStringContainsString("name('events.check-in.credential.rotate')", $route);
         self::assertStringContainsString("name('events.check-in.credential.revoke')", $route);
-        self::assertSame(3, substr_count($route, "middleware('throttle:20,1')"));
-        self::assertStringContainsString("middleware('throttle:60,1')", $route);
+        self::assertSame(3, substr_count($route, "middleware('throttle:nexus-route-20-per-1m')"));
+        self::assertStringContainsString("middleware('throttle:nexus-route-60-per-1m')", $route);
         self::assertStringContainsString("name('events.check-in.code')", $route);
     }
 
@@ -97,7 +97,8 @@ final class EventOfflineCheckinAccessibleStaticTest extends TestCase
         self::assertStringContainsString("route('govuk-alpha.events.check-in.credential.rotate'", $view);
         self::assertStringContainsString("route('govuk-alpha.events.check-in.credential.revoke'", $view);
         self::assertStringContainsString('readonly spellcheck="false"', $view);
-        self::assertStringContainsString('onclick="window.print()"', $view);
+        self::assertStringContainsString('data-alpha-print-page', $view);
+        self::assertStringNotContainsString('onclick=', $view);
         self::assertStringContainsString('name="confirmation"', $view);
         self::assertStringContainsString('name="idempotency_key"', $view);
         self::assertStringContainsString('name="expected_version"', $view);
@@ -161,7 +162,7 @@ final class EventOfflineCheckinAccessibleStaticTest extends TestCase
         }
         self::assertSame(14, substr_count($offlineBlock, 'EventOfflineCheckinController::class'));
         self::assertSame(14, substr_count($offlineBlock, "middleware('throttle:"));
-        self::assertStringContainsString("middleware('throttle:300,1')", $offlineBlock);
+        self::assertStringContainsString("middleware('throttle:nexus-route-300-per-1m')", $offlineBlock);
     }
 
     public function test_accessible_translations_have_exact_key_parity_and_real_locale_content(): void

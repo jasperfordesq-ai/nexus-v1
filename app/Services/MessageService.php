@@ -13,6 +13,8 @@ use App\Events\SafeguardingContactAttemptBlocked;
 use App\Events\SafeguardingCoordinationRequested;
 use App\Models\Message;
 use App\Models\User;
+use App\Support\EmojiConstants;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -173,6 +175,8 @@ class MessageService
             ->orderByDesc('id')
             ->get();
 
+        $reactionCounts = self::publicReactionCountsForMessages($messages, $userId);
+
         // Batch-fetch unread counts per partner (avoids N+1)
         $partnerIds = $messages->map(function (Message $msg) use ($userId) {
             return $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
@@ -197,8 +201,9 @@ class MessageService
             }
         }
 
-        $items = $messages->map(function (Message $msg) use ($userId, $unreadCounts) {
+        $items = $messages->map(function (Message $msg) use ($userId, $unreadCounts, $reactionCounts) {
             $data = $msg->toArray();
+            $data['reactions'] = $reactionCounts[(int) $msg->id] ?? [];
             $partnerId = $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
             $partner = $msg->sender_id === $userId ? $msg->receiver : $msg->sender;
             $data['partner_id'] = $partnerId;
@@ -291,13 +296,100 @@ class MessageService
 
         // Note: markAsRead is called by the controller, not here, to avoid double-calling.
 
-        $items = $messages->map(fn (Message $msg) => $msg->toArray())->all();
+        $reactionCounts = self::publicReactionCountsForMessages($messages, $userId);
+        $items = $messages->map(function (Message $msg) use ($reactionCounts): array {
+            $data = $msg->toArray();
+            $data['reactions'] = $reactionCounts[(int) $msg->id] ?? [];
+
+            return $data;
+        })->all();
 
         return [
             'items'    => array_values($items),
             'cursor'   => $hasMore && $messages->isNotEmpty() ? base64_encode((string) $messages->last()->id) : null,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Build the public reaction-count contract for a page of messages.
+     *
+     * The normalized message_reactions table is authoritative. The legacy JSON
+     * column remains a fallback for reactions created before dual writes were
+     * introduced, but its private `_users` map is never returned to clients.
+     *
+     * @param Collection<int, Message> $messages
+     * @return array<int, array<string, int>> Message ID => emoji/count map
+     */
+    private static function publicReactionCountsForMessages(Collection $messages, int $viewerId): array
+    {
+        $messageIds = $messages
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter(static fn (int $id): bool => $id > 0)
+            ->values()
+            ->all();
+
+        if ($messageIds === []) {
+            return [];
+        }
+
+        $canonicalRows = Message::getReactionsBatch($messageIds, $viewerId);
+        $result = [];
+
+        foreach ($messages as $message) {
+            $messageId = (int) $message->id;
+            $counts = [];
+
+            foreach ($canonicalRows[$messageId] ?? [] as $row) {
+                $emoji = $row['emoji'] ?? null;
+                $count = $row['count'] ?? null;
+                if (! is_string($emoji)
+                    || ! in_array($emoji, EmojiConstants::MESSAGE_REACTIONS, true)
+                    || ! is_numeric($count)
+                    || (int) $count <= 0) {
+                    continue;
+                }
+
+                $counts[$emoji] = (int) $count;
+            }
+
+            if ($counts === []) {
+                $counts = self::decodeLegacyReactionCounts($message->getRawOriginal('reactions'));
+            }
+
+            $result[$messageId] = $counts;
+        }
+
+        return $result;
+    }
+
+    /** @return array<string, int> */
+    private static function decodeLegacyReactionCounts(mixed $rawReactions): array
+    {
+        if (is_string($rawReactions)) {
+            $rawReactions = json_decode($rawReactions, true);
+        } elseif (is_object($rawReactions)) {
+            $rawReactions = (array) $rawReactions;
+        }
+
+        if (! is_array($rawReactions)) {
+            return [];
+        }
+
+        $counts = [];
+        foreach ($rawReactions as $emoji => $count) {
+            if (! is_string($emoji)
+                || ! in_array($emoji, EmojiConstants::MESSAGE_REACTIONS, true)
+                || ! is_numeric($count)
+                || (int) $count <= 0) {
+                continue;
+            }
+
+            $counts[$emoji] = (int) $count;
+        }
+
+        return $counts;
     }
 
     /**
@@ -1333,14 +1425,19 @@ class MessageService
         return DB::transaction(function () use ($messageId, $userId, $emoji, $tenantId) {
             // Toggle in message_reactions table
             $existing = DB::table('message_reactions')
+                ->where('tenant_id', $tenantId)
                 ->where('message_id', $messageId)
                 ->where('user_id', $userId)
                 ->where('emoji', $emoji)
+                ->lockForUpdate()
                 ->first();
 
             $wasAdded = false;
             if ($existing) {
-                DB::table('message_reactions')->where('id', $existing->id)->delete();
+                DB::table('message_reactions')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $existing->id)
+                    ->delete();
             } else {
                 DB::table('message_reactions')->insert([
                     'tenant_id' => $tenantId,
@@ -1355,7 +1452,11 @@ class MessageService
             // Also update the JSON reactions column for backward compatibility
             if (self::hasReactionsColumn()) {
                 $reactions = [];
-                $rawReactions = DB::table('messages')->where('id', $messageId)->lockForUpdate()->value('reactions');
+                $rawReactions = DB::table('messages')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $messageId)
+                    ->lockForUpdate()
+                    ->value('reactions');
                 if (! empty($rawReactions)) {
                     $reactions = json_decode($rawReactions, true) ?? [];
                 }

@@ -11,7 +11,9 @@ import { SearchField } from '@/components/ui/SearchField';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
-import { Label, ListBox, Select as HeroSelect } from '@heroui/react';
+import { Label } from '@heroui/react/label';
+import { ListBox } from '@heroui/react/list-box';
+import { Select as HeroSelect } from '@heroui/react/select';
 /**
  * Events Page - Community events listing with category filtering
  */

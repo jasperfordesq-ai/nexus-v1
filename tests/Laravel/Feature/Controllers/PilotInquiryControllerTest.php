@@ -11,7 +11,6 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -19,17 +18,8 @@ class PilotInquiryControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private function requirePilotInquiryTable(): void
-    {
-        if (! Schema::hasTable('pilot_inquiries')) {
-            $this->markTestSkipped('Pilot inquiries table is not present in the test database.');
-        }
-    }
-
     public function test_public_pilot_inquiry_scores_and_auto_qualifies_strong_fit(): void
     {
-        $this->requirePilotInquiryTable();
-
         $response = $this->apiPost('/v2/pilot-inquiry', [
             'municipality_name' => 'Gemeinde Testwil',
             'region' => 'Zurich',
@@ -60,8 +50,6 @@ class PilotInquiryControllerTest extends TestCase
 
     public function test_admin_can_advance_pilot_inquiry_stage(): void
     {
-        $this->requirePilotInquiryTable();
-
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 

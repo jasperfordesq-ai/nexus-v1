@@ -310,7 +310,7 @@ final class MessageErasureConcurrencyTest extends TestCase
             throw new RuntimeException('message_erasure_voice_directory_failed');
         }
 
-        $filename = 'voice_erasure_race_' . bin2hex(random_bytes(16)) . '.webm';
+        $filename = 'voice_' . bin2hex(random_bytes(16)) . '.webm';
         $this->voicePath = $directory . DIRECTORY_SEPARATOR . $filename;
         if (file_put_contents($this->voicePath, 'voice bytes staged before erasure') === false) {
             throw new RuntimeException('message_erasure_voice_fixture_failed');

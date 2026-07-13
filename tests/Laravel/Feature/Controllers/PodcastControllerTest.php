@@ -2121,10 +2121,10 @@ class PodcastControllerTest extends TestCase
         }
 
         $this->assertContains('throttle:podcast-media', $middleware['api/v2/podcasts/media/{tenantId}/{episodeId}/audio'] ?? []);
-        $this->assertContains('throttle:60,1', $middleware['api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt'] ?? []);
-        $this->assertContains('throttle:60,1', $middleware['api/v2/podcasts/chapters/{tenantId}/{episodeId}.json'] ?? []);
-        $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/feed/{tenantId}/{showSlug}.xml'] ?? []);
-        $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/{showSlug}/feed.xml'] ?? []);
+        $this->assertContains('throttle:nexus-route-60-per-1m', $middleware['api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt'] ?? []);
+        $this->assertContains('throttle:nexus-route-60-per-1m', $middleware['api/v2/podcasts/chapters/{tenantId}/{episodeId}.json'] ?? []);
+        $this->assertContains('throttle:nexus-route-30-per-1m', $middleware['api/v2/podcasts/feed/{tenantId}/{showSlug}.xml'] ?? []);
+        $this->assertContains('throttle:nexus-route-30-per-1m', $middleware['api/v2/podcasts/{showSlug}/feed.xml'] ?? []);
         foreach ([
             'api/v2/podcasts/media/{tenantId}/{episodeId}/audio',
             'api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt',

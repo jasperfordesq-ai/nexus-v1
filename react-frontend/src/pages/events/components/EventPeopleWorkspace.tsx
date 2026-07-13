@@ -13,29 +13,16 @@ import History from 'lucide-react/icons/history';
 import Search from 'lucide-react/icons/search';
 import UserPlus from 'lucide-react/icons/user-plus';
 import { useTranslation } from 'react-i18next';
-import {
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Pagination,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
+import { Pagination } from '@/components/ui/Pagination';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
+import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventsApi,

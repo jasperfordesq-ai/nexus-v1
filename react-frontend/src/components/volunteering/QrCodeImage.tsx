@@ -6,8 +6,8 @@
 /**
  * Renders a QR code entirely on the client. The generator (`qrcode`) is loaded
  * with a dynamic import so it lands in its own async chunk and never inflates the
- * initial bundle. This replaces the previous `<img src="api.qrserver.com/...">`
- * that leaked the check-in token URL to a third-party service.
+ * initial bundle. This replaces the previous third-party image-service request
+ * that leaked the check-in token URL outside the platform.
  */
 
 import { useEffect, useState } from 'react';
@@ -17,9 +17,16 @@ interface QrCodeImageProps {
   alt: string;
   size?: number;
   className?: string;
+  fallbackToLink?: boolean;
 }
 
-export function QrCodeImage({ value, alt, size = 200, className }: QrCodeImageProps) {
+export function QrCodeImage({
+  value,
+  alt,
+  size = 200,
+  className,
+  fallbackToLink = true,
+}: QrCodeImageProps) {
   const [dataUrl, setDataUrl] = useState<string>('');
   const [failed, setFailed] = useState(false);
 
@@ -39,7 +46,7 @@ export function QrCodeImage({ value, alt, size = 200, className }: QrCodeImagePr
     // The qrcode chunk failed to load (stale deploy / offline). Fall back to a
     // usable link so check-in can still proceed, instead of an aria-busy
     // placeholder that appears to load forever.
-    return (
+    return fallbackToLink ? (
       <a
         href={value}
         className={`inline-block max-w-full break-all ${className ?? ''}`}
@@ -47,6 +54,14 @@ export function QrCodeImage({ value, alt, size = 200, className }: QrCodeImagePr
       >
         {alt}
       </a>
+    ) : (
+      <div
+        className={`inline-flex items-center justify-center max-w-full break-words ${className ?? ''}`}
+        role="img"
+        aria-label={alt}
+      >
+        {alt}
+      </div>
     );
   }
 

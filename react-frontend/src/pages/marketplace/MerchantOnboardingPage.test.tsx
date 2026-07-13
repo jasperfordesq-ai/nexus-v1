@@ -280,6 +280,33 @@ describe('MerchantOnboardingPage', () => {
     });
   });
 
+  it('does not place an active API-provided avatar scheme in the DOM', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: makeStatus({
+        has_profile: true,
+        onboarding_completed: false,
+        profile: { avatar_url: 'javascript:alert(document.domain)' },
+      }),
+    });
+    const { MerchantOnboardingPage } = await import('./MerchantOnboardingPage');
+    const { container } = render(<MerchantOnboardingPage />);
+    await waitFor(() => screen.getAllByRole('button').length > 0);
+
+    for (let i = 0; i < 2; i++) {
+      const nextButton = screen.getAllByRole('button').find(
+        (button) => button.textContent?.toLowerCase().includes('next')
+          || button.textContent?.toLowerCase().includes('continue'),
+      );
+      expect(nextButton).toBeDefined();
+      fireEvent.click(nextButton as HTMLElement);
+      await waitFor(() => expect(mockApi.post.mock.calls.length).toBeGreaterThanOrEqual(i + 1));
+    }
+
+    expect(container.querySelector('img[src^="javascript:"]')).toBeNull();
+    expect(screen.getByDisplayValue('javascript:alert(document.domain)')).toBeInTheDocument();
+  });
+
   it('shows badge granted message when complete returns badge_granted true', async () => {
     mockApi.post.mockResolvedValue({ success: true, data: { badge_granted: true } });
     const { MerchantOnboardingPage } = await import('./MerchantOnboardingPage');

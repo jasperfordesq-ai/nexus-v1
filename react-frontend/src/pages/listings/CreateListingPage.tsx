@@ -41,6 +41,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveThumbnailUrl } from '@/lib/helpers';
+import { safeImageSource } from '@/lib/safeImageSource';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import type { Listing, Category } from '@/types/api';
@@ -108,6 +109,11 @@ export function CreateListingPage() {
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const selectedCategoryName = categories.find((c) => c.id.toString() === formData.category_id)?.name;
+  const safeLocalImagePreview = safeImageSource(imagePreview, { allowBlob: true });
+  const safeExistingImagePreview = existingImageUrl
+    ? safeImageSource(resolveThumbnailUrl(existingImageUrl, { width: 640, height: 360 }))
+    : null;
+  const previewImageSource = safeLocalImagePreview ?? safeExistingImagePreview;
 
   // Cleanup object URL on unmount or when preview changes
   useEffect(() => {
@@ -800,10 +806,10 @@ export function CreateListingPage() {
               <h2 className="text-lg font-semibold text-theme-primary">{t('form.media_section')}</h2>
               <p className="mt-1 text-sm text-theme-muted">{t('form.media_section_hint')}</p>
             </div>
-            {(imagePreview || existingImageUrl) ? (
+            {previewImageSource ? (
               <div className="relative inline-block">
                 <img
-                  src={imagePreview || resolveThumbnailUrl(existingImageUrl, { width: 640, height: 360 }) || ''}
+                  src={previewImageSource}
                   alt={t('form.image_preview_alt')}
                   className="h-56 w-full max-w-md rounded-xl border border-theme-default object-cover"
                 />

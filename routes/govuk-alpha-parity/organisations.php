@@ -34,7 +34,7 @@ Route::get('/organisations/browse', [AlphaController::class, 'organisationsBrows
 Route::get('/organisations/register', [AlphaController::class, 'organisationsRegisterForm'])
     ->name('organisations.register.form');
 Route::post('/organisations/register', [AlphaController::class, 'organisationsRegister'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:nexus-route-10-per-1m')
     ->name('organisations.register');
 
 // "Manage my organisations" entry page.

@@ -35,7 +35,11 @@ import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 import { BuilderPreviewModal } from './BuilderPreviewModal';
 import { resolveUploadedUrl, isEphemeralSrc, type GjsComp } from './builderImage';
-import { stripUnsafePageBuilderHtml } from '@/lib/pageBuilderHtml';
+import {
+  sanitizePageBuilderDocument,
+  sanitizePageBuilderCssForStorage,
+  stripUnsafePageBuilderHtml,
+} from '@/lib/pageBuilderHtml';
 
 const AssetLibraryModal = lazy(() =>
   import('./AssetLibraryModal').then((module) => ({ default: module.AssetLibraryModal })),
@@ -108,7 +112,7 @@ function resolvePlugin(plugin: unknown): PluginFn | null {
 
 function exportHtml(ed: Editor): string {
   const body = stripUnsafePageBuilderHtml(ed.getHtml() || '');
-  const css = stripUnsafePageBuilderHtml(ed.getCss() || '');
+  const css = sanitizePageBuilderCssForStorage(ed.getCss() || '');
   return `<style>${css}</style>${body}`;
 }
 
@@ -301,11 +305,9 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       if (!restored) {
         const seed = htmlSeedRef.current.trim();
         if (seed) {
-          const doc = new DOMParser().parseFromString(seed, 'text/html');
-          const styleText = Array.from(doc.querySelectorAll('style')).map((style) => style.textContent || '').join('\n');
-          doc.querySelectorAll('style, script').forEach((node) => node.remove());
-          ed.setComponents(doc.body.innerHTML || pageStarterHtml(t, tenantRoot));
-          ed.addStyle(styleText || DEFAULT_PAGE_CSS);
+          const { bodyHtml, css } = sanitizePageBuilderDocument(seed);
+          ed.setComponents(bodyHtml || pageStarterHtml(t, tenantRoot));
+          ed.addStyle(css || DEFAULT_PAGE_CSS);
         } else {
           ed.setComponents(pageStarterHtml(t, tenantRoot));
         }

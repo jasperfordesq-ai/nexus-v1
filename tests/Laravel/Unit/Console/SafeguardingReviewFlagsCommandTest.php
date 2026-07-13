@@ -212,6 +212,17 @@ class SafeguardingReviewFlagsCommandTest extends TestCase
         $this->assertNull($pref->review_reminder_sent_at);
     }
 
+    public function test_false_checkbox_response_is_skipped_for_reminder(): void
+    {
+        $prefId = $this->insertPreference(['selected_value' => '0']);
+
+        $this->artisan('safeguarding:review-flags')->assertExitCode(0);
+
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $prefId)
+            ->value('review_reminder_sent_at'));
+    }
+
     // -----------------------------------------------------------------------
     // 6. 'none_apply' option key is excluded from reminders
     // -----------------------------------------------------------------------
@@ -343,6 +354,20 @@ class SafeguardingReviewFlagsCommandTest extends TestCase
 
         $pref = DB::table('user_safeguarding_preferences')->find($prefId);
         $this->assertNull($pref->review_escalated_at);
+    }
+
+    public function test_false_checkbox_response_is_skipped_for_escalation(): void
+    {
+        $prefId = $this->insertPreference([
+            'selected_value' => '0',
+            'review_reminder_sent_at' => now()->subDays(35),
+        ]);
+
+        $this->artisan('safeguarding:review-flags')->assertExitCode(0);
+
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $prefId)
+            ->value('review_escalated_at'));
     }
 
     // -----------------------------------------------------------------------

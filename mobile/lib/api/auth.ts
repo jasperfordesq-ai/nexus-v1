@@ -5,6 +5,7 @@
 
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import i18n from 'i18next';
 
 /**
  * User shape as returned by /api/v2/users/me (own profile, private fields included).
@@ -189,7 +190,7 @@ export function refreshToken(token: string): Promise<AuthResponse> {
 export function extractToken(response: AuthResponse): string {
   const token = response.access_token ?? response.token;
   if (!token) {
-    throw new Error('Auth response did not contain a token');
+    throw new Error(i18n.t('auth:errors.unableToSignIn'));
   }
   return token;
 }
@@ -197,5 +198,5 @@ export function extractToken(response: AuthResponse): string {
 /** Helper: build a display name from first/last name fields */
 export function buildDisplayName(user: LoginUser | User): string {
   const parts = [user.first_name, user.last_name].filter(Boolean);
-  return parts.length > 0 ? parts.join(' ') : 'Member';
+  return parts.length > 0 ? parts.join(' ') : i18n.t('common:labels.member');
 }

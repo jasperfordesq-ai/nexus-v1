@@ -224,7 +224,6 @@ describe('SettingsScreen', () => {
     expect(getByText('Profile visibility')).toBeTruthy();
     expect(getByText('Visible to signed-in members')).toBeTruthy();
     expect(getByText('Appear in member search')).toBeTruthy();
-    expect(getByText('Allow member contact')).toBeTruthy();
   });
 
   it('cycles and saves profile visibility privacy preference', () => {

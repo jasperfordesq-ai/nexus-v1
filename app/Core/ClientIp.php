@@ -12,8 +12,8 @@ namespace App\Core;
  * Handles the full proxy chain: Client -> Cloudflare -> Docker -> Apache -> PHP.
  *
  * Priority order:
- *   1. CF-Connecting-IP  (Cloudflare's verified real client IP)
- *   2. X-Forwarded-For   (left-most IP after stripping trusted proxies)
+ *   1. CF-Connecting-IP  (only after a Cloudflare hop is proven by the chain)
+ *   2. X-Forwarded-For   (first untrusted hop, evaluated right-to-left)
  *   3. X-Real-IP         (single-IP header from reverse proxies)
  *   4. REMOTE_ADDR       (fallback)
  */
@@ -22,7 +22,7 @@ class ClientIp
     /**
      * Trusted proxy CIDRs.
      */
-    private const TRUSTED_PROXIES = [
+    private const INTERNAL_PROXIES = [
         // Docker bridge networks
         '172.16.0.0/12',
         '10.0.0.0/8',
@@ -30,6 +30,10 @@ class ClientIp
         // Localhost
         '127.0.0.0/8',
         '::1',
+    ];
+
+    /** @var list<string> */
+    private const CLOUDFLARE_PROXIES = [
         // Cloudflare IPv4 ranges
         '173.245.48.0/20',
         '103.21.244.0/22',
@@ -93,14 +97,17 @@ class ClientIp
             return $remoteAddr;
         }
 
-        // 1. CF-Connecting-IP
+        $xff = self::getHeader('HTTP_X_FORWARDED_FOR');
+        $hasVerifiedCloudflareHop = self::hasVerifiedCloudflareHop($remoteAddr, $xff);
+
+        // 1. CF-Connecting-IP. An internal/Docker hop alone is not proof that
+        // Cloudflare supplied this header: direct-origin clients can choose it.
         $cfIp = self::getHeader('HTTP_CF_CONNECTING_IP');
-        if ($cfIp !== null && filter_var($cfIp, FILTER_VALIDATE_IP)) {
+        if ($hasVerifiedCloudflareHop && $cfIp !== null && filter_var($cfIp, FILTER_VALIDATE_IP)) {
             return $cfIp;
         }
 
         // 2. X-Forwarded-For
-        $xff = self::getHeader('HTTP_X_FORWARDED_FOR');
         if ($xff !== null) {
             $ips = array_map('trim', explode(',', $xff));
             for ($i = count($ips) - 1; $i >= 0; $i--) {
@@ -115,9 +122,11 @@ class ClientIp
             }
         }
 
-        // 3. X-Real-IP
+        // 3. X-Real-IP is accepted only across a verified Cloudflare edge.
+        // A generic private/Docker peer can otherwise forward an attacker-
+        // supplied value unchanged.
         $realIp = self::getHeader('HTTP_X_REAL_IP');
-        if ($realIp !== null && filter_var($realIp, FILTER_VALIDATE_IP)) {
+        if ($hasVerifiedCloudflareHop && $realIp !== null && filter_var($realIp, FILTER_VALIDATE_IP)) {
             return $realIp;
         }
 
@@ -130,11 +139,55 @@ class ClientIp
      */
     private static function isTrustedProxy(string $ip): bool
     {
-        foreach (self::TRUSTED_PROXIES as $cidr) {
+        return self::isInternalProxy($ip) || self::isCloudflareProxy($ip);
+    }
+
+    private static function isInternalProxy(string $ip): bool
+    {
+        return self::ipInCidrs($ip, self::INTERNAL_PROXIES);
+    }
+
+    private static function isCloudflareProxy(string $ip): bool
+    {
+        return self::ipInCidrs($ip, self::CLOUDFLARE_PROXIES);
+    }
+
+    /** @param list<string> $cidrs */
+    private static function ipInCidrs(string $ip, array $cidrs): bool
+    {
+        foreach ($cidrs as $cidr) {
             if (self::ipInCidr($ip, $cidr)) {
                 return true;
             }
         }
+        return false;
+    }
+
+    private static function hasVerifiedCloudflareHop(string $remoteAddr, ?string $xff): bool
+    {
+        if (self::isCloudflareProxy($remoteAddr)) {
+            return true;
+        }
+
+        if (! self::isInternalProxy($remoteAddr) || $xff === null) {
+            return false;
+        }
+
+        $ips = array_reverse(array_map('trim', explode(',', $xff)));
+        foreach ($ips as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP)) {
+                return false;
+            }
+            if (self::isInternalProxy($ip)) {
+                continue;
+            }
+
+            // The first externally visible hop before our internal proxy must
+            // be Cloudflare. A direct client is therefore never allowed to
+            // authenticate its own CF-Connecting-IP header.
+            return self::isCloudflareProxy($ip);
+        }
+
         return false;
     }
 

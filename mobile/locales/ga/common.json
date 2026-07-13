@@ -30,6 +30,8 @@
     "boundaryTitle": "Chuaigh rud éigin mícheart",
     "generic": "Chuaigh rud éigin mícheart. Déan iarracht arís.",
     "network": "Earráid líonra. Seiceáil do nasc.",
+    "timeout": "Chuaigh an t-iarratas thar am. Seiceáil do nasc.",
+    "requestFailedWithStatus": "Theip ar an iarratas le stádas {{status}}",
     "unauthorized": "Tá do sheisiún imithe in éag. Logáil isteach arís.",
     "notFound": "Gan aimsiú.",
     "alertTitle": "Error"

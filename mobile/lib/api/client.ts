@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { API_BASE_URL, DEFAULT_TENANT, STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
+import i18n from 'i18next';
 import { storage } from '@/lib/storage';
 
 /**
@@ -223,9 +224,9 @@ async function request<T>(
   } catch (err) {
     clearTimeout(timeoutId);
     if (err instanceof Error && err.name === 'AbortError') {
-      throw new ApiResponseError(0, 'Request timed out. Please check your connection.');
+      throw new ApiResponseError(0, i18n.t('common:errors.timeout'));
     }
-    throw new ApiResponseError(0, 'Network error. Please check your connection.');
+    throw new ApiResponseError(0, i18n.t('common:errors.network'));
   }
 
   clearTimeout(timeoutId);
@@ -251,8 +252,8 @@ async function request<T>(
       } catch (retryErr) {
         clearTimeout(retryTimeoutId);
         throw retryErr instanceof Error && retryErr.name === 'AbortError'
-          ? new ApiResponseError(0, 'Request timed out. Please check your connection.')
-          : new ApiResponseError(0, 'Network error. Please check your connection.');
+          ? new ApiResponseError(0, i18n.t('common:errors.timeout'))
+          : new ApiResponseError(0, i18n.t('common:errors.network'));
       }
       clearTimeout(retryTimeoutId);
 
@@ -267,7 +268,10 @@ async function request<T>(
           const eb = retryData as { errors?: Record<string, string[]> } | null;
           throw new ApiResponseError(
             retryRes.status,
-            extractErrorMessage(retryData, `Request failed with status ${retryRes.status}`),
+            extractErrorMessage(
+              retryData,
+              i18n.t('common:errors.requestFailedWithStatus', { status: retryRes.status }),
+            ),
             eb?.errors,
           );
         }
@@ -282,7 +286,7 @@ async function request<T>(
       storage.remove(STORAGE_KEYS.USER_DATA),
     ]);
     onUnauthorizedCallback?.();
-    throw new ApiResponseError(401, 'Your session has expired. Please log in again.');
+    throw new ApiResponseError(401, i18n.t('common:errors.unauthorized'));
   }
 
   // Parse response body (some endpoints return no body on 204)
@@ -298,7 +302,10 @@ async function request<T>(
     const errBody = data as { errors?: Record<string, string[]> } | null;
     throw new ApiResponseError(
       response.status,
-      extractErrorMessage(data, `Request failed with status ${response.status}`),
+      extractErrorMessage(
+        data,
+        i18n.t('common:errors.requestFailedWithStatus', { status: response.status }),
+      ),
       errBody?.errors,
     );
   }

@@ -3121,6 +3121,14 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_t1safety_two_factor_setup_renders_and_rejects_bad_code(): void
     {
+        $features = \App\Services\TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['two_factor_authentication'] = true;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
         $user = $this->authenticatedUser(['name' => 'TwoFactor Member']);
         Sanctum::actingAs($user, ['*']);
 
@@ -3485,6 +3493,33 @@ class GovukAlphaFrontendTest extends TestCase
         $revoke->assertRedirectContains('status=safeguarding-revoked');
         $this->assertNotNull(DB::table('user_safeguarding_preferences')
             ->where('option_id', $optionId)->where('user_id', $user->id)->value('revoked_at'));
+    }
+
+    public function test_profile_settings_hides_false_safeguarding_checkbox_response(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Safeguarding No Response']);
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'false_accessible_preference_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'False safeguarding preference must stay hidden',
+            'triggers' => json_encode(['requires_vetted_interaction' => true]),
+            'is_active' => 1,
+            'sort_order' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'option_id' => $optionId,
+            'selected_value' => '0',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/accessible/profile/settings")
+            ->assertOk()
+            ->assertDontSee('False safeguarding preference must stay hidden');
     }
 
     public function test_profile_settings_shows_private_metadata_only_vetting_status(): void

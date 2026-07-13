@@ -1,0 +1,13 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Timebank Global",
+    "NSCameraUsageDescription": "Timebank Global utilise l’appareil photo uniquement lorsque vous choisissez de prendre une photo ou de scanner un code QR.",
+    "NSPhotoLibraryUsageDescription": "Choisissez une photo dans votre photothèque pour votre profil ou une publication.",
+    "NSPhotoLibraryAddUsageDescription": "Enregistrez des photos dans votre photothèque.",
+    "NSMicrophoneUsageDescription": "Enregistrez un message vocal lorsque vous choisissez d’en envoyer un.",
+    "NSLocationWhenInUseUsageDescription": "Timebank Global utilise votre position uniquement lorsque vous choisissez de rechercher des annonces à proximité sur la place de marché."
+  },
+  "android": {
+    "app_name": "Timebank Global"
+  }
+}

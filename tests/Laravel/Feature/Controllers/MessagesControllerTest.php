@@ -552,6 +552,132 @@ class MessagesControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function test_show_conversation_normalizes_legacy_reactions_without_internal_metadata(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+        $thumbsUp = "\u{1F44D}";
+
+        DB::table('messages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $otherUser->id,
+            'receiver_id' => $viewer->id,
+            'body' => 'Legacy reaction payload',
+            'reactions' => json_encode([
+                $thumbsUp => 1,
+                '_users' => ["{$viewer->id}_{$thumbsUp}" => true],
+            ], JSON_UNESCAPED_UNICODE),
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/messages/' . $otherUser->id);
+
+        $response->assertStatus(200);
+        $this->assertSame([$thumbsUp => 1], $response->json('data.0.reactions'));
+        $this->assertArrayNotHasKey('_users', $response->json('data.0.reactions'));
+    }
+
+    public function test_show_conversation_returns_only_counts_from_canonical_reactions(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+        $thumbsUp = "\u{1F44D}";
+
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $otherUser->id,
+            'receiver_id' => $viewer->id,
+            'body' => 'Canonical reaction payload',
+            'created_at' => now(),
+        ]);
+        DB::table('message_reactions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'message_id' => $messageId,
+            'user_id' => $viewer->id,
+            'emoji' => $thumbsUp,
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/messages/' . $otherUser->id);
+
+        $response->assertStatus(200);
+        $this->assertSame([$thumbsUp => 1], $response->json('data.0.reactions'));
+        $this->assertArrayNotHasKey('user_ids', $response->json('data.0.reactions'));
+    }
+
+    public function test_reactions_batch_returns_public_counts_without_reactor_ids(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $unrelatedSender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $unrelatedReceiver = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $thumbsUp = "\u{1F44D}";
+
+        $visibleMessageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $otherUser->id,
+            'receiver_id' => $viewer->id,
+            'body' => 'Visible reaction counts',
+            'created_at' => now(),
+        ]);
+        $unrelatedMessageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $unrelatedSender->id,
+            'receiver_id' => $unrelatedReceiver->id,
+            'body' => 'Unrelated reaction counts',
+            'created_at' => now(),
+        ]);
+
+        DB::table('message_reactions')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'message_id' => $visibleMessageId,
+                'user_id' => $viewer->id,
+                'emoji' => $thumbsUp,
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'message_id' => $visibleMessageId,
+                'user_id' => $otherUser->id,
+                'emoji' => $thumbsUp,
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'message_id' => $unrelatedMessageId,
+                'user_id' => $unrelatedSender->id,
+                'emoji' => $thumbsUp,
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'message_id' => $visibleMessageId,
+                'user_id' => $viewer->id,
+                'emoji' => 'invalid',
+                'created_at' => now(),
+            ],
+        ]);
+
+        $response = $this->apiGet(
+            "/v2/messages/reactions/batch?ids={$visibleMessageId},{$unrelatedMessageId}"
+        );
+
+        $response->assertStatus(200);
+        $payload = $response->json('data.reactions');
+        $this->assertIsArray($payload);
+        $this->assertArrayHasKey($visibleMessageId, $payload);
+        $this->assertArrayNotHasKey($unrelatedMessageId, $payload);
+        $this->assertCount(1, $payload[$visibleMessageId]);
+        $this->assertSame($thumbsUp, $payload[$visibleMessageId][0]['emoji']);
+        $this->assertSame(2, $payload[$visibleMessageId][0]['count']);
+        $this->assertArrayNotHasKey('user_ids', $payload[$visibleMessageId][0]);
+    }
+
     // ================================================================
     // MARK READ — Authentication required
     // ================================================================

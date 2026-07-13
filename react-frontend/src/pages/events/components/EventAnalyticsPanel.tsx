@@ -9,7 +9,10 @@ import Download from 'lucide-react/icons/download';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventAnalyticsApi,

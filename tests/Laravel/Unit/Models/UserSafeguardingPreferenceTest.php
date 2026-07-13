@@ -126,6 +126,38 @@ class UserSafeguardingPreferenceTest extends TestCase
 
     // ─── scopeActive query scope ───────────────────────────────────────────────
 
+    public function test_effective_selection_is_type_aware_and_checkbox_values_are_normalized(): void
+    {
+        $this->assertTrue(UserSafeguardingPreference::isEffectivelySelected('checkbox', '1'));
+        $this->assertTrue(UserSafeguardingPreference::isEffectivelySelected('checkbox', 'yes'));
+        $this->assertFalse(UserSafeguardingPreference::isEffectivelySelected('checkbox', '0'));
+        $this->assertFalse(UserSafeguardingPreference::isEffectivelySelected('checkbox', false));
+
+        // "0" can be a legitimate select value, but is false for a checkbox.
+        $this->assertTrue(UserSafeguardingPreference::isEffectivelySelected('select', '0'));
+        $this->assertFalse(UserSafeguardingPreference::isEffectivelySelected('select', '   '));
+        $this->assertFalse(UserSafeguardingPreference::isEffectivelySelected('info', '1'));
+
+        $this->assertSame('1', UserSafeguardingPreference::normalizeSelectedValue('checkbox', true));
+        $this->assertSame('1', UserSafeguardingPreference::normalizeSelectedValue('checkbox', 'on'));
+        $this->assertSame('0', UserSafeguardingPreference::normalizeSelectedValue('checkbox', false));
+        $this->assertSame('0', UserSafeguardingPreference::normalizeSelectedValue('checkbox', '0'));
+    }
+
+    public function test_false_checkbox_row_remains_lifecycle_active_without_being_effectively_selected(): void
+    {
+        $model = new UserSafeguardingPreference([
+            'selected_value' => '0',
+            'revoked_at' => null,
+        ]);
+
+        $this->assertTrue($model->isActive());
+        $this->assertFalse(UserSafeguardingPreference::isEffectivelySelected(
+            'checkbox',
+            $model->selected_value,
+        ));
+    }
+
     public function test_scope_active_filters_out_revoked_rows(): void
     {
         // Seed a safeguarding option for this tenant

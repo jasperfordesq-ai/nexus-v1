@@ -30,7 +30,7 @@ Route::get('/listings/{id}/analytics', [AlphaController::class, 'listingsAnalyti
 // AI description helper — no-JS generate round-trip for the create/edit forms.
 // Static segment, registered before any wildcard listing routes in this file.
 Route::post('/listings/generate-description', [AlphaController::class, 'listingsGenerateDescription'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:nexus-route-5-per-1m')
     ->name('listings.generate-description');
 
 // Listing comment thread — server-rendered list + add-comment form. The
@@ -40,6 +40,6 @@ Route::get('/listings/{id}/comments', [AlphaController::class, 'listingsComments
     ->name('listings.comments');
 Route::post('/listings/{id}/comments', [AlphaController::class, 'listingsStoreComment'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('listings.comments.store');
 });

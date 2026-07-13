@@ -137,8 +137,16 @@ function parseDetailedStatus(locale, rawOutput) {
     }
   }
 
-  const summaryMatch = output.match(new RegExp(`Summary: Found (\\d+) incomplete translations for "${locale}"`, 'u'));
-  const expectedCount = summaryMatch ? Number(summaryMatch[1]) : 0;
+  const summaryPrefix = 'Summary: Found ';
+  const summaryMarker = ` incomplete translations for "${locale}"`;
+  const summaryLine = output
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith(summaryPrefix) && line.includes(summaryMarker));
+  const markerIndex = summaryLine?.indexOf(summaryMarker, summaryPrefix.length) ?? -1;
+  const summaryCount = markerIndex > summaryPrefix.length
+    ? summaryLine.slice(summaryPrefix.length, markerIndex)
+    : null;
+  const expectedCount = summaryCount && /^\d+$/u.test(summaryCount) ? Number(summaryCount) : 0;
   if (records.length !== expectedCount) {
     throw new Error(
       `Detailed status parse mismatch for ${locale}: parsed ${records.length}, CLI reported ${expectedCount}.`,

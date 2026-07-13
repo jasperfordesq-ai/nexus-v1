@@ -481,7 +481,7 @@ export function AdminSettings() {
                 <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                   <img
                     src={form.partner_logo_url}
-                    alt="Partner logo preview"
+                    alt={t('admin_settings.partner_logo_label')}
                     className="h-14 w-auto max-w-[180px] object-contain rounded"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
@@ -762,7 +762,7 @@ export function AdminSettings() {
                   <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                     <img
                       src={form.powered_by_image_light}
-                      alt="Light mode preview"
+                      alt={t('system.label_powered_by_image_light')}
                       className="h-14 w-auto max-w-[180px] object-contain rounded"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
@@ -805,7 +805,7 @@ export function AdminSettings() {
                   <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                     <img
                       src={form.powered_by_image_dark}
-                      alt="Dark mode preview"
+                      alt={t('system.label_powered_by_image_dark')}
                       className="h-14 w-auto max-w-[180px] object-contain rounded"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />

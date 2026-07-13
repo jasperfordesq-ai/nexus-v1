@@ -11,18 +11,14 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Undo2 from 'lucide-react/icons/undo-2';
 import UserRoundCheck from 'lucide-react/icons/user-round-check';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Checkbox,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {

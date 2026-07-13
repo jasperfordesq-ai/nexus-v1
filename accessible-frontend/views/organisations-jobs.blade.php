@@ -45,7 +45,7 @@
     @endphp
 
     @push('alpha_head')
-        <script type="application/ld+json">{!! json_encode($ld, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
+        <script type="application/ld+json" nonce="{{ $cspNonce ?? request()->attributes->get('csp_nonce', '') }}">{!! json_encode($ld, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
     @endpush
 
     @if ($orgId > 0)

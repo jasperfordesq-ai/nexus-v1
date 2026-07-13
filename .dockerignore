@@ -23,11 +23,19 @@ vendor/
 .DS_Store
 Thumbs.db
 
-# Environment files (use .env.docker instead)
+# Environment files (loaded by host/Compose tooling, never sent as build input)
 .env
 .env.local
 .env.*.local
 .env.testing
+
+# Private root-level deployment/runtime inputs must never enter the build
+# context. Compose and deployment scripts read these from the host directly.
+/.secrets.local/
+/.env.docker
+/env
+/env.docker
+/env.testing
 
 # Logs
 logs/

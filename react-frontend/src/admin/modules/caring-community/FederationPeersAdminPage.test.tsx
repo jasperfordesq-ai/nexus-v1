@@ -155,7 +155,7 @@ describe('FederationPeersAdminPage', () => {
     render(<FederationPeersAdminPage />);
 
     await waitFor(() => {
-      const link = screen.getByRole('link', { name: /cork.example.com/i });
+      const link = screen.getByRole('link', { name: 'https://cork.example.com' });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', 'https://cork.example.com');
     });

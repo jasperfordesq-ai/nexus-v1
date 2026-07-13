@@ -13,27 +13,17 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Send from 'lucide-react/icons/send';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import XCircle from 'lucide-react/icons/x-circle';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Checkbox,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Pagination,
-  Select,
-  SelectItem,
-  Spinner,
-  Textarea,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardFooter, CardHeader } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
+import { Pagination } from '@/components/ui/Pagination';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventCommunicationsApi,

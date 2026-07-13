@@ -11,6 +11,7 @@ use App\Exceptions\SafeguardingPolicyException;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\TenantSafeguardingOption;
+use App\Models\UserSafeguardingPreference;
 use App\Services\MemberVettingAttestationService;
 use App\Services\SafeguardingPreferenceService;
 use Illuminate\Http\JsonResponse;
@@ -81,6 +82,7 @@ class SafeguardingMemberController extends BaseApiController
                 'p.policy_review_required_at',
                 'p.policy_review_reason_code',
                 'o.option_key',
+                'o.option_type',
                 'o.preset_source',
                 'o.label',
                 'o.description',
@@ -88,6 +90,12 @@ class SafeguardingMemberController extends BaseApiController
             ])
             ->orderBy('o.sort_order')
             ->get();
+
+        $rows = $rows->filter(static fn ($row): bool => UserSafeguardingPreference::isEffectivelySelected(
+                $row->option_type ?? null,
+                $row->selected_value ?? null,
+            ))
+            ->values();
 
         $preferences = $rows->map(function ($row) {
             $triggers = is_string($row->triggers)

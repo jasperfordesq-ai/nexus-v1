@@ -70,6 +70,7 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAssetUrl: vi.fn((url) => url || null),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url || ''),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -403,6 +404,26 @@ describe('CreateListingPage', () => {
         });
         expect(mockNavigate).toHaveBeenCalledWith('/test/listings/42');
         expect(errorToast).not.toHaveBeenCalled();
+      });
+
+      it('does not place an active API-provided image scheme in the DOM', async () => {
+        api.get.mockImplementation((url: string) => {
+          if (url.includes('/v2/listings/42')) {
+            return Promise.resolve({
+              success: true,
+              data: { ...existingListing, image_url: 'javascript:alert(document.domain)' },
+            });
+          }
+          return Promise.resolve({ success: true, data: mockCategories });
+        });
+
+        const { container } = render(<CreateListingPage />);
+        await waitFor(() => {
+          expect(screen.getByDisplayValue('Existing listing title')).toBeInTheDocument();
+        });
+
+        expect(container.querySelector('img[src^="javascript:"]')).toBeNull();
+        expect(screen.getByText('Click to add a photo')).toBeInTheDocument();
       });
     });
   });

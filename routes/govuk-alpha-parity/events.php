@@ -38,27 +38,27 @@ Route::get('/events/{id}/map', [AlphaController::class, 'eventsMap'])
 Route::get('/events/{id}/recurring-edit', [AlphaController::class, 'eventsRecurringEdit'])
     ->whereNumber('id')->name('events.recurring.edit');
 Route::post('/events/{id}/recurring-edit', [AlphaController::class, 'eventsUpdateRecurring'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurring.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('events.recurring.update');
 Route::post('/events/{id}/recurring-edit/commit', [AlphaController::class, 'eventsCommitRecurringRevision'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurring.commit');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('events.recurring.commit');
 
 // --- Future occurrence definition blueprints (preview-first, immutable) ---
 Route::get('/events/{id}/recurrence-definition-blueprints', [AlphaController::class, 'eventsRecurrenceDefinitionBlueprints'])
     ->whereNumber('id')->name('events.recurrence-definitions.index');
 Route::post('/events/{id}/recurrence-definition-blueprints/preview', [AlphaController::class, 'eventsPreviewRecurrenceDefinitions'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurrence-definitions.preview');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('events.recurrence-definitions.preview');
 Route::post('/events/{id}/recurrence-definition-blueprints/commit', [AlphaController::class, 'eventsCommitRecurrenceDefinitions'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('events.recurrence-definitions.commit');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('events.recurrence-definitions.commit');
 
 // --- Attach / detach polls to an owned event ---
 Route::get('/events/{id}/polls', [AlphaController::class, 'eventsPolls'])
     ->whereNumber('id')->name('events.polls');
 Route::post('/events/{id}/polls', [AlphaController::class, 'eventsUpdatePolls'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('events.polls.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('events.polls.update');
 
 // --- On-demand description translation ---
 Route::get('/events/{id}/translate', [AlphaController::class, 'eventsTranslate'])
     ->whereNumber('id')->name('events.translate');
 Route::post('/events/{id}/translate', [AlphaController::class, 'eventsRunTranslate'])
-    ->whereNumber('id')->middleware('throttle:30,1')->name('events.translate.run');
+    ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m')->name('events.translate.run');
 });

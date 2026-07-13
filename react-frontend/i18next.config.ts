@@ -13,7 +13,12 @@ export default defineConfig({
   extract: {
     input: ['src/**/*.{ts,tsx}'],
     output: 'public/locales/{{language}}/{{namespace}}.json',
-    ignore: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'dist/**', 'node_modules/**'],
+    ignore: [
+      'src/**/*.test.{ts,tsx}',
+      'src/test/**',
+      'dist/**',
+      'node_modules/**',
+    ],
     functions: ['t', '*.t', 'i18n.t'],
     transComponents: ['Trans', 'Translation'],
     useTranslationNames: ['useTranslation'],
@@ -42,9 +47,13 @@ export default defineConfig({
     ],
   },
   lint: {
-    ignoredAttributes: ['data-testid', 'aria-label', 'aria-hidden', 'role'],
+    ignoredAttributes: ['data-testid', 'aria-hidden', 'role'],
     ignoredTags: ['code', 'pre'],
-    ignore: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/admin/**', 'src/pages/platform/**'],
+    ignore: [
+      'src/**/*.test.{ts,tsx}',
+      'src/test/**',
+      'src/pages/platform/**',
+    ],
     checkInterpolationParams: true,
   },
   types: {

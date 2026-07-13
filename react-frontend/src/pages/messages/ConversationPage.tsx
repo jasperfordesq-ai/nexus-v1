@@ -340,6 +340,7 @@ export function ConversationPage() {
     messaging_disabled: boolean;
     under_monitoring: boolean;
     restriction_reason: string | null;
+    review_notice_required?: boolean;
   } | null>(null);
 
   // ── Translation hint banner (dismissed per-user, scoped to tenant) ──
@@ -817,7 +818,12 @@ export function ConversationPage() {
 
   // Fetch messaging restriction status (broker monitoring)
   const refreshRestrictionStatus = useCallback(() => {
-    api.get<{ messaging_disabled: boolean; under_monitoring: boolean; restriction_reason: string | null }>(
+    api.get<{
+      messaging_disabled: boolean;
+      under_monitoring: boolean;
+      restriction_reason: string | null;
+      review_notice_required?: boolean;
+    }>(
       '/v2/messages/restriction-status'
     ).then((res) => {
       if (isMountedRef.current && res.success && res.data) {
@@ -1917,7 +1923,7 @@ export function ConversationPage() {
       )}
 
       {/* Safeguarding / Broker Monitoring Notice */}
-      {!isSafeguardingDismissed && (
+      {!isSafeguardingDismissed && messagingRestriction?.review_notice_required !== false && (
         <div className="flex shrink-0 items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3" role="alert">
           <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">

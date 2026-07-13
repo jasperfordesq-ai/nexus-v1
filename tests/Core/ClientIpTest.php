@@ -150,6 +150,18 @@ class ClientIpTest extends TestCase
         $this->assertSame('203.0.113.42', ClientIp::get());
     }
 
+    public function testBehindDockerProxy_RejectsForgedCloudflareHeaderWithoutCloudflareHop(): void
+    {
+        $this->setServer([
+            'REMOTE_ADDR' => '172.21.0.1',
+            'HTTP_CF_CONNECTING_IP' => '10.0.0.2',
+            // Host Apache appends the direct caller as the rightmost peer.
+            'HTTP_X_FORWARDED_FOR' => '192.168.1.25, 198.51.100.99',
+        ]);
+
+        $this->assertSame('198.51.100.99', ClientIp::get());
+    }
+
     // =====================================================================
     // (d) Malicious spoof attempts
     // =====================================================================
@@ -255,6 +267,7 @@ class ClientIpTest extends TestCase
         $this->setServer([
             'REMOTE_ADDR' => '172.21.0.1',
             'HTTP_CF_CONNECTING_IP' => '203.0.113.42',
+            'HTTP_X_FORWARDED_FOR' => '203.0.113.42, 162.158.90.1',
         ]);
 
         $first = ClientIp::get();
@@ -272,6 +285,7 @@ class ClientIpTest extends TestCase
         $this->setServer([
             'REMOTE_ADDR' => '172.21.0.1',
             'HTTP_CF_CONNECTING_IP' => '203.0.113.42',
+            'HTTP_X_FORWARDED_FOR' => '203.0.113.42, 162.158.90.1',
         ]);
 
         $first = ClientIp::get();
@@ -294,14 +308,14 @@ class ClientIpTest extends TestCase
         $this->assertSame('127.0.0.1', ClientIp::get());
     }
 
-    public function testXRealIP_FallbackWhenNoOtherHeaders(): void
+    public function testXRealIP_IsIgnoredWithoutVerifiedEdge(): void
     {
         $this->setServer([
             'REMOTE_ADDR' => '172.21.0.1',
             'HTTP_X_REAL_IP' => '203.0.113.42',
         ]);
 
-        $this->assertSame('203.0.113.42', ClientIp::get());
+        $this->assertSame('172.21.0.1', ClientIp::get());
     }
 
     public function testDebug_ReturnsExpectedKeys(): void
@@ -309,6 +323,7 @@ class ClientIpTest extends TestCase
         $this->setServer([
             'REMOTE_ADDR' => '172.21.0.1',
             'HTTP_CF_CONNECTING_IP' => '203.0.113.42',
+            'HTTP_X_FORWARDED_FOR' => '203.0.113.42, 162.158.90.1',
         ]);
 
         $debug = ClientIp::debug();

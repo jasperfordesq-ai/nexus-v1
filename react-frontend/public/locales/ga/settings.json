@@ -4,6 +4,12 @@
     "denied": "Bhac tú fógraí. Nuashonraigh socruithe do bhrabhsálaí chun iad a athchumasú.",
     "subscribed": "Tá tú liostaithe ar an ngléas seo."
   },
+  "push_errors": {
+    "not_configured": "Níl fógraí brú cumraithe fós.",
+    "not_ready": "Níl fógraí brú réidh fós. Athlódáil an leathanach agus bain triail eile as.",
+    "enable_failed": "Níorbh fhéidir fógraí brú a chumasú. Bain triail eile as.",
+    "disable_failed": "Níorbh fhéidir fógraí brú a dhíchumasú. Bain triail eile as."
+  },
   "identity": {
     "page_title": "Fíoraigh Céannacht",
     "page_title_dob": "Fíoraigh Céannacht — Dáta Breithe",

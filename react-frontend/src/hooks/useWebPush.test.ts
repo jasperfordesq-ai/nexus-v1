@@ -185,7 +185,7 @@ describe('useWebPush — unsupported browser (SUPPORTED=false)', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Web Push is not supported in this browser.');
+    expect(result.current.error).toBe('Your browser does not support push notifications.');
     expect(api.get).not.toHaveBeenCalled();
     expect(api.post).not.toHaveBeenCalled();
     unmount();
@@ -324,7 +324,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Push notifications are not configured on the server yet.');
+    expect(result.current.error).toBe('Push notifications are not configured yet.');
     unmount();
     await act(async () => {});
     removeGlobals();
@@ -343,7 +343,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Push notifications are not configured on the server yet.');
+    expect(result.current.error).toBe('Push notifications are not configured yet.');
     unmount();
     await act(async () => {});
     removeGlobals();
@@ -362,7 +362,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Service worker not ready.');
+    expect(result.current.error).toBe('Push notifications are not ready. Reload the page and try again.');
     unmount();
     await act(async () => {});
     removeGlobals();
@@ -431,7 +431,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Server rejected.');
+    expect(result.current.error).toBe("We couldn't enable push notifications. Please try again.");
     expect(result.current.isSubscribed).toBe(false);
     unmount();
     await act(async () => {});
@@ -451,7 +451,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Failed to register push subscription.');
+    expect(result.current.error).toBe("We couldn't enable push notifications. Please try again.");
     unmount();
     await act(async () => {});
     removeGlobals();
@@ -470,7 +470,7 @@ describe('useWebPush — subscribe()', () => {
     await act(async () => { ret = await result.current.subscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('Network failure');
+    expect(result.current.error).toBe("We couldn't enable push notifications. Please try again.");
     expect(result.current.isPending).toBe(false);
     unmount();
     await act(async () => {});
@@ -489,7 +489,7 @@ describe('useWebPush — subscribe()', () => {
     let ret: boolean;
     await act(async () => { ret = await result.current.subscribe(); });
 
-    expect(result.current.error).toBe('Push subscription failed.');
+    expect(result.current.error).toBe("We couldn't enable push notifications. Please try again.");
     unmount();
     await act(async () => {});
     removeGlobals();
@@ -565,7 +565,7 @@ describe('useWebPush — unsubscribe()', () => {
     await act(async () => { ret = await result.current.unsubscribe(); });
 
     expect(ret!).toBe(false);
-    expect(result.current.error).toBe('SW getSubscription failed');
+    expect(result.current.error).toBe("We couldn't disable push notifications. Please try again.");
     expect(result.current.isPending).toBe(false);
     unmount();
     await act(async () => {});

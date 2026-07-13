@@ -2114,6 +2114,7 @@ return [
 
     // Auth rate limit with seconds (hardcoded-string audit — 2026-04-14)
     'too_many_login_attempts_seconds'      => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes'      => '{1} Too many login attempts. Please try again in 1 minute.|[2,*] Too many login attempts. Please try again in :count minutes.',
 
     // Federation API errors (hardcoded-string audit — 2026-04-13)
     'federation' => [

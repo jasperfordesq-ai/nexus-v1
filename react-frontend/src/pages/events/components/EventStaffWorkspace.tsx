@@ -20,18 +20,14 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
-import {
-  AlertDialog,
-  Avatar,
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@/components/ui';
+import { AlertDialog } from '@/components/ui/AlertDialog';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/contexts/ToastContext';
 import {
   eventsApi,

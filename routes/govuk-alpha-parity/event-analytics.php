@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(RequireAccessibleAuthentication::class)->group(function (): void {
     Route::get('/events/{id}/analytics/export.csv', [AlphaController::class, 'eventsAnalyticsExport'])
-        ->whereNumber('id')->middleware('throttle:20,1')->name('events.analytics.export');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('events.analytics.export');
     Route::get('/events/{id}/analytics', [AlphaController::class, 'eventsAnalytics'])
         ->whereNumber('id')->name('events.analytics.show');
 });

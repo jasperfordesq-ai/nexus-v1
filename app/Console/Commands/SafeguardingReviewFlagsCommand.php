@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
+use App\Models\UserSafeguardingPreference;
 use App\Services\EmailDispatchService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -89,6 +90,8 @@ class SafeguardingReviewFlagsCommand extends Command
                 'p.id as preference_id',
                 'p.tenant_id',
                 'p.user_id',
+                'p.selected_value',
+                'o.option_type',
                 'u.email',
                 'u.first_name',
                 'u.last_name',
@@ -97,6 +100,12 @@ class SafeguardingReviewFlagsCommand extends Command
                 't.name as community_name',
             ])
             ->get();
+        $dueRows = $dueRows
+            ->filter(static fn ($row): bool => UserSafeguardingPreference::isEffectivelySelected(
+                $row->option_type ?? null,
+                $row->selected_value ?? null,
+            ))
+            ->values();
 
         $byUser = [];
         foreach ($dueRows as $row) {
@@ -164,11 +173,19 @@ class SafeguardingReviewFlagsCommand extends Command
                 'p.id as preference_id',
                 'p.tenant_id',
                 'p.user_id',
+                'p.selected_value',
+                'o.option_type',
                 'u.first_name',
                 'u.last_name',
                 'u.name as display_name',
             ])
             ->get();
+        $dueRows = $dueRows
+            ->filter(static fn ($row): bool => UserSafeguardingPreference::isEffectivelySelected(
+                $row->option_type ?? null,
+                $row->selected_value ?? null,
+            ))
+            ->values();
 
         $byUser = [];
         foreach ($dueRows as $row) {

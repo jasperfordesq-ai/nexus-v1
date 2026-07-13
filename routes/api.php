@@ -36,9 +36,9 @@ Route::get('/v2/health', fn () => response()->json(['status' => 'ok']));
 // controller using the configured bearer/HMAC secret, so this route must stay
 // outside the Sanctum admin group.
 Route::post('/v2/prerender/invalidate', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'invalidate'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 Route::post('/v2/sales/orders', [\App\Http\Controllers\Api\SalesOrderController::class, 'submit'])
-    ->middleware('throttle:5,1');
+    ->middleware('throttle:nexus-route-5-per-1m');
 
 // ============================================
 // MIGRATED ROUTES — Tenant Bootstrap
@@ -46,27 +46,27 @@ Route::post('/v2/sales/orders', [\App\Http\Controllers\Api\SalesOrderController:
 // ============================================
 Route::get('/v2/tenant/bootstrap', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'bootstrap']);
 Route::get('/v2/pwa/manifest', [\App\Http\Controllers\Api\PwaManifestController::class, 'show'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 Route::get('/v2/tenants', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'list']);
 Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'platformStats']);
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigController::class, 'show'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 Route::get('/v2/media/thumbnail', [\App\Http\Controllers\Api\MediaThumbnailController::class, 'show'])
-    ->middleware('throttle:300,1');
+    ->middleware('throttle:nexus-route-300-per-1m');
 // UPRN-backed UK address lookup (OS Places API proxy; active only when
 // the tenant's geocoding_provider is os_places)
 Route::get('/v2/geo/os-places/search', [\App\Http\Controllers\Api\OsPlacesController::class, 'search'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 
 // ============================================
 
 // PUBLIC ROUTES — Job Feed (RSS/XML and JSON for aggregator syndication)
 // No auth required, tenant-scoped via subdomain/header (Agent D)
 // ============================================
-Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed'])->middleware('throttle:30,1');
-Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed'])->middleware('throttle:30,1');
-Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml'])->middleware('throttle:30,1');
+Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed'])->middleware('throttle:nexus-route-30-per-1m');
+Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed'])->middleware('throttle:nexus-route-30-per-1m');
+Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml'])->middleware('throttle:nexus-route-30-per-1m');
 
 // ============================================
 // PUBLIC ROUTES — Clubs / Verein directory (AG15, no auth required)
@@ -152,7 +152,7 @@ Route::middleware(['auth:sanctum', 'feature:groups'])
 // These are outside the auth:sanctum group so Sanctum middleware doesn't interfere.
 // ============================================
 Route::post('/v2/provisioning-requests', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'submit'])
-    ->middleware('throttle:5,60');
+    ->middleware('throttle:nexus-route-5-per-60m');
 Route::get('/v2/provisioning-requests/check-slug/{slug}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'checkSlug']);
 Route::get('/v2/provisioning-requests/status/{token}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'status']);
 
@@ -167,7 +167,7 @@ Route::get('/v2/events/calendar/personal/{tenantSlug}/{secret}.ics', [
     ->where('secret', 'nxc_[a-f0-9]{64}')
     ->middleware([
         \App\Http\Middleware\RedactEventCalendarFeedSecret::class,
-        'throttle:60,1',
+        'throttle:nexus-route-60-per-1m',
     ]);
 
 // One-use external guardian capability. Tenant scope still comes from the
@@ -175,7 +175,7 @@ Route::get('/v2/events/calendar/personal/{tenantSlug}/{secret}.ics', [
 Route::post('/v2/events/safety/guardian-consents/grant', [
     \App\Http\Controllers\Api\EventSafetyController::class,
     'grantGuardianConsent',
-])->middleware(['feature:events', 'throttle:10,1']);
+])->middleware(['feature:events', 'throttle:nexus-route-10-per-1m']);
 
 // ============================================
 // Authenticated routes — Sanctum token authentication required
@@ -187,7 +187,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // Support reports — in-app problem reporting
 // ============================================
 Route::post('/v2/support/reports', [\App\Http\Controllers\Api\SupportReportController::class, 'store'])
-    ->middleware('throttle:10,1');
+    ->middleware('throttle:nexus-route-10-per-1m');
 
 // Explore — authenticated actions (tracking, dismissals, experiments)
 Route::post('/v2/explore/track', [\App\Http\Controllers\Api\ExploreController::class, 'track']);
@@ -235,7 +235,7 @@ Route::middleware('feature:events')->group(function () {
     Route::get('/v2/events/calendar/feed.ics', [\App\Http\Controllers\Api\EventCalendarController::class, 'tenantFeed']);
     Route::get('/v2/events/calendar/feed-tokens', [\App\Http\Controllers\Api\EventCalendarController::class, 'tokens']);
     Route::post('/v2/events/calendar/feed-tokens', [\App\Http\Controllers\Api\EventCalendarController::class, 'createToken'])
-        ->middleware('throttle:10,1');
+        ->middleware('throttle:nexus-route-10-per-1m');
     Route::delete('/v2/events/calendar/feed-tokens/{tokenId}', [\App\Http\Controllers\Api\EventCalendarController::class, 'revokeToken'])
         ->whereNumber('tokenId');
     Route::post('/v2/events/recurring', [\App\Http\Controllers\Api\EventsController::class, 'createRecurring']);
@@ -248,17 +248,17 @@ Route::middleware('feature:events')->group(function () {
     Route::get('/v2/event-templates/{templateId}/history', [\App\Http\Controllers\Api\EventTemplateController::class, 'history'])
         ->whereNumber('templateId');
     Route::post('/v2/events/{sourceEventId}/template-preview', [\App\Http\Controllers\Api\EventTemplateController::class, 'previewCapture'])
-        ->whereNumber('sourceEventId')->middleware('throttle:60,1');
+        ->whereNumber('sourceEventId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{sourceEventId}/templates', [\App\Http\Controllers\Api\EventTemplateController::class, 'capture'])
-        ->whereNumber('sourceEventId')->middleware('throttle:20,1');
+        ->whereNumber('sourceEventId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-templates/{templateId}/revisions', [\App\Http\Controllers\Api\EventTemplateController::class, 'revise'])
-        ->whereNumber('templateId')->middleware('throttle:20,1');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-templates/{templateId}/archive', [\App\Http\Controllers\Api\EventTemplateController::class, 'archive'])
-        ->whereNumber('templateId')->middleware('throttle:20,1');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-templates/{templateId}/materialization-preview', [\App\Http\Controllers\Api\EventTemplateController::class, 'previewMaterialization'])
-        ->whereNumber('templateId')->middleware('throttle:60,1');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/event-templates/{templateId}/materializations', [\App\Http\Controllers\Api\EventTemplateController::class, 'materialize'])
-        ->whereNumber('templateId')->middleware('throttle:20,1');
+        ->whereNumber('templateId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'store']);
     Route::get('/v2/events/{id}/calendar.ics', [\App\Http\Controllers\Api\EventCalendarController::class, 'eventFeed'])
         ->whereNumber('id');
@@ -267,40 +267,40 @@ Route::middleware('feature:events')->group(function () {
     Route::get('/v2/events/{id}/federation-status', [\App\Http\Controllers\Api\EventFederationStatusController::class, 'show'])
         ->whereNumber('id');
     Route::get('/v2/events/{id}/analytics', [\App\Http\Controllers\Api\EventAnalyticsController::class, 'show'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/analytics/export.csv', [\App\Http\Controllers\Api\EventAnalyticsController::class, 'export'])
-        ->whereNumber('id')->middleware('throttle:10,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::get('/v2/events/{id}/tickets', [\App\Http\Controllers\Api\EventTicketController::class, 'index'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/tickets/reconciliation', [\App\Http\Controllers\Api\EventTicketController::class, 'reconcile'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/tickets/{ticketTypeId}/quote', [\App\Http\Controllers\Api\EventTicketController::class, 'quote'])
-        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:120,1');
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/events/{id}/ticket-types', [\App\Http\Controllers\Api\EventTicketController::class, 'createType'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::put('/v2/events/{id}/ticket-types/{ticketTypeId}', [\App\Http\Controllers\Api\EventTicketController::class, 'updateType'])
-        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/ticket-types/{ticketTypeId}/{action}', [\App\Http\Controllers\Api\EventTicketController::class, 'transitionType'])
         ->whereNumber('id')->whereNumber('ticketTypeId')->whereIn('action', ['activate', 'pause', 'archive'])
-        ->middleware('throttle:30,1');
+        ->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/tickets/{ticketTypeId}/allocate', [\App\Http\Controllers\Api\EventTicketController::class, 'allocateSelf'])
-        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('ticketTypeId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/tickets/{ticketTypeId}/allocate/{userId}', [\App\Http\Controllers\Api\EventTicketController::class, 'allocateForMember'])
-        ->whereNumber('id')->whereNumber('ticketTypeId')->whereNumber('userId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('ticketTypeId')->whereNumber('userId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/ticket-entitlements/{entitlementId}/cancel', [\App\Http\Controllers\Api\EventTicketController::class, 'cancelEntitlement'])
-        ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('entitlementId')->middleware('throttle:nexus-route-30-per-1m');
     Route::get('/v2/events/{id}/lifecycle-history', [\App\Http\Controllers\Api\EventLifecycleHistoryController::class, 'index'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/events/{id}/recurrence-revisions/preview', [\App\Http\Controllers\Api\EventRecurrenceRevisionController::class, 'preview'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/recurrence-revisions/commit', [\App\Http\Controllers\Api\EventRecurrenceRevisionController::class, 'commit'])
-        ->whereNumber('id')->middleware('throttle:10,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::get('/v2/events/{id}/recurrence-definition-blueprints', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'history'])
-        ->whereNumber('id')->middleware('throttle:60,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{id}/recurrence-definition-blueprints/preview', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'preview'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/recurrence-definition-blueprints/commit', [\App\Http\Controllers\Api\EventRecurrenceDefinitionBlueprintController::class, 'commit'])
-        ->whereNumber('id')->middleware('throttle:10,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show'])->whereNumber('id');
     Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update'])->whereNumber('id');
     Route::post('/v2/events/{id}/submit', [\App\Http\Controllers\Api\EventsController::class, 'submitForReview'])->whereNumber('id');
@@ -315,7 +315,7 @@ Route::middleware('feature:events')->group(function () {
     Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist'])->whereNumber('id');
     Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist'])->whereNumber('id');
     Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::put('/v2/events/{id}/recurring', [\App\Http\Controllers\Api\EventsController::class, 'updateRecurring'])->whereNumber('id');
     Route::get('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist'])->whereNumber('id');
     Route::get('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'getReminders'])->whereNumber('id');
@@ -327,10 +327,10 @@ Route::middleware('feature:events')->group(function () {
     Route::post('/v2/events/{id}/safety/requirements/archive', [\App\Http\Controllers\Api\EventSafetyController::class, 'archiveRequirements'])->whereNumber('id');
     Route::post('/v2/events/{id}/safety/code-of-conduct/acknowledgements', [\App\Http\Controllers\Api\EventSafetyController::class, 'acknowledgeCode'])->whereNumber('id');
     Route::delete('/v2/events/{id}/safety/code-of-conduct/acknowledgements/{acknowledgementId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawCode'])->whereNumber('id')->whereNumber('acknowledgementId');
-    Route::post('/v2/events/{id}/safety/guardian-consents', [\App\Http\Controllers\Api\EventSafetyController::class, 'requestGuardianConsent'])->whereNumber('id')->middleware('throttle:5,1');
+    Route::post('/v2/events/{id}/safety/guardian-consents', [\App\Http\Controllers\Api\EventSafetyController::class, 'requestGuardianConsent'])->whereNumber('id')->middleware('throttle:nexus-route-5-per-1m');
     Route::delete('/v2/events/{id}/safety/guardian-consents/{consentId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawGuardianConsent'])->whereNumber('id')->whereNumber('consentId');
     Route::get('/v2/events/{id}/safety/reviews', [\App\Http\Controllers\Api\EventSafetyController::class, 'reviews'])->whereNumber('id');
-    Route::post('/v2/events/{id}/safety/reviews', [\App\Http\Controllers\Api\EventSafetyController::class, 'recordReview'])->whereNumber('id')->middleware('throttle:30,1');
+    Route::post('/v2/events/{id}/safety/reviews', [\App\Http\Controllers\Api\EventSafetyController::class, 'recordReview'])->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::delete('/v2/events/{id}/safety/reviews/{denialId}', [\App\Http\Controllers\Api\EventSafetyController::class, 'withdrawReview'])->whereNumber('id')->whereNumber('denialId');
     Route::get('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'getAttendance'])->whereNumber('id');
     Route::post('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'markAttendance'])->whereNumber('id');
@@ -345,112 +345,112 @@ Route::middleware('feature:events')->group(function () {
     Route::get('/v2/events/{id}/agenda', [\App\Http\Controllers\Api\EventAgendaController::class, 'index'])
         ->whereNumber('id');
     Route::post('/v2/events/{id}/agenda/sessions', [\App\Http\Controllers\Api\EventAgendaController::class, 'store'])
-        ->whereNumber('id')->middleware('throttle:60,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-60-per-1m');
     Route::put('/v2/events/{id}/agenda/order', [\App\Http\Controllers\Api\EventAgendaController::class, 'reorder'])
-        ->whereNumber('id')->middleware('throttle:60,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-60-per-1m');
     Route::put('/v2/events/{id}/agenda/sessions/{sessionId}', [\App\Http\Controllers\Api\EventAgendaController::class, 'update'])
-        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:60,1');
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/cancel', [\App\Http\Controllers\Api\EventAgendaController::class, 'cancel'])
-        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/registration', [\App\Http\Controllers\Api\EventAgendaController::class, 'register'])
-        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/agenda/sessions/{sessionId}/registration/withdraw', [\App\Http\Controllers\Api\EventAgendaController::class, 'withdraw'])
-        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('sessionId')->middleware('throttle:nexus-route-30-per-1m');
     Route::get('/v2/events/{id}/offline-checkin', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'workspace'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/offline-checkin/credentials/me', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'myCredential'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/credentials', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'issueCredential'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/credentials/{credentialId}/rotate', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'rotateCredential'])
-        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/credentials/{credentialId}/revoke', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'revokeCredential'])
-        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('credentialId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/devices', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'registerDevice'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/devices/{deviceId}/rotate', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'rotateDevice'])
-        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/devices/{deviceId}/revoke', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'revokeDevice'])
-        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('deviceId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/manifest', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'manifest'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/sync', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'stage'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/offline-checkin/batches/{batchId}', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'batch'])
-        ->whereNumber('id')->whereNumber('batchId')->middleware('throttle:120,1');
+        ->whereNumber('id')->whereNumber('batchId')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/offline-checkin/conflicts', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'conflicts'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/conflicts/{itemId}', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'resolveConflict'])
-        ->whereNumber('id')->whereNumber('itemId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('itemId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/offline-checkin/scan', [\App\Http\Controllers\Api\EventOfflineCheckinController::class, 'scan'])
-        ->whereNumber('id')->middleware('throttle:300,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-300-per-1m');
     Route::get('/v2/events/{eventId}/broadcasts', [\App\Http\Controllers\Api\EventBroadcastController::class, 'index'])
-        ->whereNumber('eventId')->middleware('throttle:120,1');
+        ->whereNumber('eventId')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/events/{eventId}/broadcasts/preview', [\App\Http\Controllers\Api\EventBroadcastController::class, 'preview'])
-        ->whereNumber('eventId')->middleware('throttle:60,1');
+        ->whereNumber('eventId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{eventId}/broadcasts', [\App\Http\Controllers\Api\EventBroadcastController::class, 'store'])
-        ->whereNumber('eventId')->middleware('throttle:20,1');
+        ->whereNumber('eventId')->middleware('throttle:nexus-route-20-per-1m');
     Route::get('/v2/event-broadcasts/{broadcastId}', [\App\Http\Controllers\Api\EventBroadcastController::class, 'show'])
-        ->whereNumber('broadcastId')->middleware('throttle:120,1');
+        ->whereNumber('broadcastId')->middleware('throttle:nexus-route-120-per-1m');
     Route::post('/v2/event-broadcasts/{broadcastId}/revisions', [\App\Http\Controllers\Api\EventBroadcastController::class, 'revise'])
-        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+        ->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-broadcasts/{broadcastId}/schedule', [\App\Http\Controllers\Api\EventBroadcastController::class, 'schedule'])
-        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+        ->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-broadcasts/{broadcastId}/cancel', [\App\Http\Controllers\Api\EventBroadcastController::class, 'cancel'])
-        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+        ->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/event-broadcasts/{broadcastId}/retry', [\App\Http\Controllers\Api\EventBroadcastController::class, 'retry'])
-        ->whereNumber('broadcastId')->middleware('throttle:20,1');
+        ->whereNumber('broadcastId')->middleware('throttle:nexus-route-20-per-1m');
     Route::get('/v2/events/{id}/registration-product', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'attendeeState'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::get('/v2/events/{id}/registration-product/manage', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'organizerOverview'])
-        ->whereNumber('id')->middleware('throttle:120,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-120-per-1m');
     Route::put('/v2/events/{id}/registration-product/settings', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'saveSettings'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/settings/publish', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'publishSettings'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/forms', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'createForm'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::put('/v2/events/{id}/registration-product/forms/{formId}', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'updateForm'])
-        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/forms/{formId}/fork', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'forkForm'])
-        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/forms/{formId}/publish', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'publishForm'])
-        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('formId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/submissions', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'saveSubmission'])
-        ->whereNumber('id')->middleware('throttle:30,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/submit', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'submit'])
-        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/amend', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'amend'])
-        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:30,1');
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/registration-product/submissions/{submissionId}/answers', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'answers'])
-        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:60,1');
+        ->whereNumber('id')->whereNumber('submissionId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{id}/registration-product/submissions/export', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'export'])
-        ->whereNumber('id')->middleware('throttle:10,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/events/{id}/registration-product/campaigns/preview', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'previewCampaign'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/schedule', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'scheduleCampaign'])
-        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:10,1');
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/issue', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'issueCampaign'])
-        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:10,1');
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/events/{id}/registration-product/campaigns/{campaignId}/cancel', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'cancelCampaign'])
-        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('campaignId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/invitations/{invitationId}/revoke', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'revokeInvitation'])
-        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/invitations/accept', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'acceptInvitation'])
-        ->whereNumber('id')->middleware('throttle:20,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/invitations/{invitationId}/accept', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'acceptMemberInvitation'])
-        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('invitationId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/registrations/{registrationId}/guests', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'captureGuest'])
-        ->whereNumber('id')->whereNumber('registrationId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('registrationId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/guests/{guestId}/cancel', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'cancelGuest'])
-        ->whereNumber('id')->whereNumber('guestId')->middleware('throttle:20,1');
+        ->whereNumber('id')->whereNumber('guestId')->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/events/{id}/registration-product/guests/{guestId}/attendance/{action}', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'transitionGuestAttendance'])
         ->whereNumber('id')->whereNumber('guestId')->whereIn('action', ['check_in', 'check_out', 'no_show', 'undo'])
-        ->middleware('throttle:30,1');
+        ->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/events/{id}/registration-product/retention/dry-run', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'retentionDryRun'])
-        ->whereNumber('id')->middleware('throttle:10,1');
+        ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/events/{id}/registration-product/retention/{dryRunId}/apply', [\App\Http\Controllers\Api\EventRegistrationProductController::class, 'retentionApply'])
-        ->whereNumber('id')->whereNumber('dryRunId')->middleware('throttle:5,1');
+        ->whereNumber('id')->whereNumber('dryRunId')->middleware('throttle:nexus-route-5-per-1m');
 });
 
 // Canonical registration/People API. Legacy RSVP and waitlist endpoints above
@@ -487,7 +487,7 @@ Route::middleware(['auth:sanctum', 'feature:events'])->group(function () {
     Route::get('/v2/events/{id}/people/export.csv', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'exportPeople',
-    ])->whereNumber('id')->middleware('throttle:10,1');
+    ])->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/events/{id}/people/bulk', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'bulk',
@@ -499,7 +499,7 @@ Route::middleware(['auth:sanctum', 'feature:events'])->group(function () {
     Route::post('/v2/events/{id}/people/{userId}/attendance', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'attendance',
-    ])->whereNumber('id')->whereNumber('userId')->middleware('throttle:60,1');
+    ])->whereNumber('id')->whereNumber('userId')->middleware('throttle:nexus-route-60-per-1m');
     Route::post('/v2/events/{id}/people/{userId}/approve', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'approve',
@@ -534,13 +534,13 @@ Route::middleware('module:listings')->group(function () {
     Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show']);
     Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
     Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
-    Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing'])->middleware('throttle:30,1');
-    Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing'])->middleware('throttle:30,1');
-    Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage'])->middleware('throttle:20,1');
-    Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage'])->middleware('throttle:20,1');
-    Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages'])->middleware('throttle:20,1');
-    Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage'])->middleware('throttle:20,1');
-    Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages'])->middleware('throttle:30,1');
+    Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing'])->middleware('throttle:nexus-route-30-per-1m');
+    Route::delete('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'unsaveListing'])->middleware('throttle:nexus-route-30-per-1m');
+    Route::post('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImage'])->middleware('throttle:nexus-route-20-per-1m');
+    Route::delete('/v2/listings/{id}/image', [\App\Http\Controllers\Api\ListingsController::class, 'deleteImage'])->middleware('throttle:nexus-route-20-per-1m');
+    Route::post('/v2/listings/{id}/images', [\App\Http\Controllers\Api\ListingsController::class, 'uploadImages'])->middleware('throttle:nexus-route-20-per-1m');
+    Route::delete('/v2/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\ListingsController::class, 'deleteListingImage'])->middleware('throttle:nexus-route-20-per-1m');
+    Route::put('/v2/listings/{id}/images/reorder', [\App\Http\Controllers\Api\ListingsController::class, 'reorderImages'])->middleware('throttle:nexus-route-30-per-1m');
     Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
     Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
     Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
@@ -620,7 +620,7 @@ Route::get('/v2/groups/recommendations', [\App\Http\Controllers\Api\GroupRecomme
 Route::post('/v2/groups/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/v2/groups/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
 Route::put('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'update']);
-Route::post('/v2/groups/{id}/settings', [\App\Http\Controllers\Api\GroupsController::class, 'updateForm'])->middleware('throttle:20,1');
+Route::post('/v2/groups/{id}/settings', [\App\Http\Controllers\Api\GroupsController::class, 'updateForm'])->middleware('throttle:nexus-route-20-per-1m');
 Route::delete('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'destroy']);
 Route::get('/v2/groups/{id}/similar', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::post('/v2/groups/{id}/join', [\App\Http\Controllers\Api\GroupsController::class, 'join'])->middleware('throttle:groups-join');
@@ -634,7 +634,7 @@ Route::post('/v2/groups/{id}/discussions', [\App\Http\Controllers\Api\GroupsCont
 Route::get('/v2/groups/{id}/discussions/{discussionId}', [\App\Http\Controllers\Api\GroupsController::class, 'discussionMessages'])->middleware('group.tab:discussion');
 Route::post('/v2/groups/{id}/discussions/{discussionId}/messages', [\App\Http\Controllers\Api\GroupsController::class, 'postToDiscussion'])->middleware('group.tab:discussion');
 Route::post('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'uploadImage'])->middleware('throttle:groups-upload');
-Route::delete('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'removeImage'])->middleware('throttle:20,1');
+Route::delete('/v2/groups/{id}/image', [\App\Http\Controllers\Api\GroupsController::class, 'removeImage'])->middleware('throttle:nexus-route-20-per-1m');
 Route::get('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'announcements'])->middleware('group.tab:announcements');
 Route::post('/v2/groups/{id}/announcements', [\App\Http\Controllers\Api\GroupsController::class, 'createAnnouncement'])->middleware('group.tab:announcements');
 Route::put('/v2/groups/{id}/announcements/{announcementId}', [\App\Http\Controllers\Api\GroupsController::class, 'updateAnnouncement'])->middleware('group.tab:announcements');
@@ -798,34 +798,34 @@ Route::get('/v2/users/{id}/verification-badges', [\App\Http\Controllers\Api\Memb
 // NOTE: Admin badge management routes moved to admin middleware group below
 // Federation (user-facing — NOT admin-only)
 Route::get('/v2/federation/status', [\App\Http\Controllers\Api\FederationV2Controller::class, 'status']);
-Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn'])->middleware('throttle:10,1');
-Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup'])->middleware('throttle:10,1');
-Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut'])->middleware('throttle:10,1');
+Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut'])->middleware('throttle:nexus-route-10-per-1m');
 Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partners']);
 Route::get('/v2/federation/partners/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partnerDetail'])
     ->where('id', '(?:[0-9]+|ext-[0-9]+)');
 Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
 Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
-Route::get('/v2/federation/groups', [\App\Http\Controllers\Api\FederationV2Controller::class, 'groups'])->middleware('throttle:60,1');
-Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings'])->middleware('throttle:60,1');
-Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members'])->middleware('throttle:60,1');
+Route::get('/v2/federation/groups', [\App\Http\Controllers\Api\FederationV2Controller::class, 'groups'])->middleware('throttle:nexus-route-60-per-1m');
+Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings'])->middleware('throttle:nexus-route-60-per-1m');
+Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members'])->middleware('throttle:nexus-route-60-per-1m');
 Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member'])
     ->where('id', '(?:[0-9]+|ext-[0-9]+-.+)');
 Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\FederationV2Controller::class, 'memberReviews'])
     ->where('id', '.*');
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
-Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage'])->middleware('throttle:20,1');
-Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch'])->middleware('throttle:60,1');
-Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead'])->middleware('throttle:60,1');
+Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage'])->middleware('throttle:nexus-route-20-per-1m');
+Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch'])->middleware('throttle:nexus-route-60-per-1m');
+Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead'])->middleware('throttle:nexus-route-60-per-1m');
 Route::post('/v2/federation/messages/{id}/translate', [\App\Http\Controllers\Api\FederationV2Controller::class, 'translateMessage']);
-Route::post('/v2/federation/transactions', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendTransaction'])->middleware('throttle:20,1');
+Route::post('/v2/federation/transactions', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendTransaction'])->middleware('throttle:nexus-route-20-per-1m');
 Route::get('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'getSettings']);
-Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings'])->middleware('throttle:20,1');
+Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings'])->middleware('throttle:nexus-route-20-per-1m');
 Route::get('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connections']);
-Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest'])->middleware('throttle:10,1');
-Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection'])->middleware('throttle:20,1');
-Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection'])->middleware('throttle:20,1');
-Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection'])->middleware('throttle:20,1');
+Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection'])->middleware('throttle:nexus-route-20-per-1m');
+Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection'])->middleware('throttle:nexus-route-20-per-1m');
+Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection'])->middleware('throttle:nexus-route-20-per-1m');
 Route::get('/v2/federation/connections/status/{userId}/{tenantId}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connectionStatus']);
 // Sub-Accounts
 Route::get('/v2/users/me/sub-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getChildAccounts']);
@@ -909,7 +909,7 @@ Route::get('/v2/comments/{id}/reactions', [\App\Http\Controllers\Api\ReactionCon
 Route::get('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'show']);
 Route::post('/v2/link-preview', [\App\Http\Controllers\Api\LinkPreviewController::class, 'fetch']);
 // Post Media (carousel / multi-image)
-Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaController::class, 'uploadMedia'])->middleware('throttle:20,1');
+Route::post('/v2/posts/{id}/media', [\App\Http\Controllers\Api\PostMediaController::class, 'uploadMedia'])->middleware('throttle:nexus-route-20-per-1m');
 Route::put('/v2/posts/{id}/media/reorder', [\App\Http\Controllers\Api\PostMediaController::class, 'reorderMedia']);
 Route::delete('/v2/posts/media/{mediaId}', [\App\Http\Controllers\Api\PostMediaController::class, 'removeMedia']);
 Route::put('/v2/posts/media/{mediaId}/alt', [\App\Http\Controllers\Api\PostMediaController::class, 'updateAltText']);
@@ -1275,10 +1275,10 @@ Route::get('/v2/donations/{id}/receipt', [\App\Http\Controllers\Api\DonationPaym
 Route::post('/v2/marketplace/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'store']);
 Route::put('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'update']);
 Route::delete('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'destroy']);
-Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages'])->middleware('throttle:20,1');
+Route::post('/v2/marketplace/listings/{id}/images', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadImages'])->middleware('throttle:nexus-route-20-per-1m');
 Route::put('/v2/marketplace/listings/{id}/images/reorder', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'reorderImages']);
 Route::delete('/v2/marketplace/listings/{id}/images/{imageId}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteImage']);
-Route::post('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadVideo'])->middleware('throttle:10,1');
+Route::post('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'uploadVideo'])->middleware('throttle:nexus-route-10-per-1m');
 Route::delete('/v2/marketplace/listings/{id}/video', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'deleteVideo']);
 Route::post('/v2/marketplace/listings/{id}/renew', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'renew']);
 Route::get('/v2/marketplace/listings/{id}/analytics', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'analytics']);
@@ -1530,15 +1530,15 @@ Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Control
     ->middleware('throttle:podcast-media');
 Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])
     ->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])
     ->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 Route::get('/v2/podcasts/feed/{tenantId}/{showSlug}.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rssForTenant'])
     ->where(['tenantId' => '[0-9]+', 'showSlug' => '[A-Za-z0-9_-]+'])
-    ->middleware('throttle:30,1');
+    ->middleware('throttle:nexus-route-30-per-1m');
 Route::get('/v2/podcasts/{showSlug}/feed.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rss'])
-    ->middleware('throttle:30,1');
+    ->middleware('throttle:nexus-route-30-per-1m');
 
 // ============================================
 // Courses, podcasts, and marketplace contain member identity and require auth.
@@ -1580,7 +1580,7 @@ Route::get('/v2/marketplace/listings/{id}/pickup-slots', [\App\Http\Controllers\
 // has not opted in. Each query is signed and logged for 12 months.
 // ============================================
 Route::get('/v2/federation/aggregates', [\App\Http\Controllers\Api\FederationAggregateController::class, 'show'])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 
 // ============================================
 // Admin routes — Sanctum auth + admin middleware
@@ -1763,10 +1763,10 @@ Route::post('/v2/admin/config/onboarding/apply-preset', [\App\Http\Controllers\A
 // the other broker decision endpoints. See BrokerModerationAuthorizationTest.
 Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
     Route::get('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'index']);
-    Route::post('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'store'])->middleware('throttle:60,1');
-    Route::put('/v2/admin/safeguarding/options/reorder', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'reorder'])->middleware('throttle:60,1');
-    Route::put('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'update'])->middleware('throttle:60,1');
-    Route::delete('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'store'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::put('/v2/admin/safeguarding/options/reorder', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'reorder'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::put('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'update'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::delete('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'destroy'])->middleware('throttle:nexus-route-60-per-1m');
 });
 
 Route::get('/v2/admin/system/cron-jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getCronJobs']);
@@ -1802,8 +1802,8 @@ Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function
     Route::get('/v2/admin/matching/approvals/{id}', [\App\Http\Controllers\Api\AdminMatchingController::class, 'show']);
     // Mutations throttled to 60/min/user like the other broker decision
     // endpoints — far above interactive speed, blocks scripted abuse.
-    Route::post('/v2/admin/matching/approvals/{id}/approve', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approve'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/matching/approvals/{id}/reject', [\App\Http\Controllers\Api\AdminMatchingController::class, 'reject'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/matching/approvals/{id}/approve', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approve'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/matching/approvals/{id}/reject', [\App\Http\Controllers\Api\AdminMatchingController::class, 'reject'])->middleware('throttle:nexus-route-60-per-1m');
 });
 Route::get('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'adminGetFaqs']);
 Route::post('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'adminCreateFaq']);
@@ -1825,18 +1825,18 @@ Route::post('/v2/admin/blog/{id}/toggle-status', [\App\Http\Controllers\Api\Admi
 Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
     Route::get('/v2/admin/feed/posts', [\App\Http\Controllers\Api\AdminFeedController::class, 'index']);
     Route::get('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'show']);
-    Route::post('/v2/admin/feed/posts/{id}/hide', [\App\Http\Controllers\Api\AdminFeedController::class, 'hide'])->middleware('throttle:60,1');
-    Route::delete('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/feed/posts/{id}/hide', [\App\Http\Controllers\Api\AdminFeedController::class, 'hide'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::delete('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'destroy'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/feed/stats', [\App\Http\Controllers\Api\AdminFeedController::class, 'stats']);
     Route::get('/v2/admin/comments', [\App\Http\Controllers\Api\AdminCommentsController::class, 'index']);
     Route::get('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'show']);
-    Route::post('/v2/admin/comments/{id}/hide', [\App\Http\Controllers\Api\AdminCommentsController::class, 'hide'])->middleware('throttle:60,1');
-    Route::delete('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/comments/{id}/hide', [\App\Http\Controllers\Api\AdminCommentsController::class, 'hide'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::delete('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'destroy'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/reviews', [\App\Http\Controllers\Api\AdminReviewsController::class, 'index']);
     Route::get('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'show']);
-    Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide'])->middleware('throttle:60,1');
-    Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy'])->middleware('throttle:nexus-route-60-per-1m');
 });
 // AG14: Municipal Announcer role management — admin-only (privilege mgmt).
 Route::post('/v2/admin/feed/grant-announcer', [\App\Http\Controllers\Api\AdminFeedController::class, 'grantAnnouncer']);
@@ -1851,16 +1851,16 @@ Route::patch('/v2/admin/support-reports/{id}', [\App\Http\Controllers\Api\AdminS
 // Public caring community endpoint — no auth required (invite lookup)
 Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'lookupInvite'])
     ->withoutMiddleware(['auth:sanctum', 'admin', \App\Http\Middleware\EnsureIsAdmin::class])
-    ->middleware('throttle:60,1');
+    ->middleware('throttle:nexus-route-60-per-1m');
 
 // Member-facing caring community endpoints (auth:sanctum via global middleware)
 Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
     Route::post('/v2/caring-community/request-help', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelp'])
-        ->middleware('throttle:10,1');
+        ->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/caring-community/request-help/voice', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'requestHelpVoice'])
-        ->middleware('throttle:20,1');
+        ->middleware('throttle:nexus-route-20-per-1m');
     Route::post('/v2/caring-community/offer-favour', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'offerFavour'])
-        ->middleware('throttle:10,1');
+        ->middleware('throttle:nexus-route-10-per-1m');
 });
 
 Route::get('/v2/admin/caring-community/workflow', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'workflow']);
@@ -1988,10 +1988,10 @@ Route::post('/v2/me/verein-invitations/{id}/respond', [\App\Http\Controllers\Api
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 // Public municipality events calendar (consent-gated upstream; throttled)
 Route::get('/v2/municipality/events-calendar', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'defaultMunicipalityCalendar'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->withoutMiddleware(['auth:sanctum', \App\Http\Middleware\EnsureIsAdmin::class]);
 Route::get('/v2/municipality/{municipalityCode}/events-calendar', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'municipalityCalendar'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->withoutMiddleware(['auth:sanctum', \App\Http\Middleware\EnsureIsAdmin::class]);
 
 // Caring Community — Safeguarding reports (K9)
@@ -2190,7 +2190,7 @@ Route::get('/v2/admin/caring-community/integration-showcase', [\App\Http\Control
 // AG94 — Newsletter and Pilot-Region Lead Nurture
 Route::post('/v2/caring-community/leads/capture', [\App\Http\Controllers\Api\LeadCaptureController::class, 'capture'])
     ->withoutMiddleware(['auth:sanctum', 'admin'])
-    ->middleware('throttle:10,1');
+    ->middleware('throttle:nexus-route-10-per-1m');
 Route::get('/v2/admin/caring-community/leads/summary', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'summary']);
 Route::get('/v2/admin/caring-community/leads/export.csv', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'exportCsv']);
 Route::get('/v2/admin/caring-community/leads', [\App\Http\Controllers\Api\Admin\LeadNurtureAdminController::class, 'index']);
@@ -2274,8 +2274,8 @@ Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function
     Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
     Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
     Route::get('/v2/admin/reports/{id}', [\App\Http\Controllers\Api\AdminReportsController::class, 'show']);
-    Route::post('/v2/admin/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminReportsController::class, 'resolve'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/reports/{id}/dismiss', [\App\Http\Controllers\Api\AdminReportsController::class, 'dismiss'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminReportsController::class, 'resolve'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/reports/{id}/dismiss', [\App\Http\Controllers\Api\AdminReportsController::class, 'dismiss'])->middleware('throttle:nexus-route-60-per-1m');
 });
 Route::get('/v2/admin/gamification/stats', [\App\Http\Controllers\Api\AdminGamificationController::class, 'stats']);
 Route::get('/v2/admin/gamification/badges', [\App\Http\Controllers\Api\AdminGamificationController::class, 'badges']);
@@ -2442,32 +2442,32 @@ Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function
     // unbounded. 60/min is well above any reasonable interactive use
     // (one decision every second is already very fast for a human
     // reviewer) but blocks scripted abuse.
-    Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/exchanges/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveExchange'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/broker/exchanges/{id}/reject', [\App\Http\Controllers\Api\AdminBrokerController::class, 'rejectExchange'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/broker/risk-tags', [\App\Http\Controllers\Api\AdminBrokerController::class, 'riskTags']);
     Route::get('/v2/admin/broker/messages', [\App\Http\Controllers\Api\AdminBrokerController::class, 'messages']);
     Route::get('/v2/admin/broker/messages/unreviewed-count', [\App\Http\Controllers\Api\AdminBrokerController::class, 'unreviewedCount']);
-    Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/messages/{id}/review', [\App\Http\Controllers\Api\AdminBrokerController::class, 'reviewMessage'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/broker/monitoring', [\App\Http\Controllers\Api\AdminBrokerController::class, 'monitoring']);
-    Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag'])->middleware('throttle:60,1');
-    Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/messages/{id}/flag', [\App\Http\Controllers\Api\AdminBrokerController::class, 'flagMessage'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/broker/monitoring/{userId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'setMonitoring'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveRiskTag'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::delete('/v2/admin/broker/risk-tags/{listingId}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'removeRiskTag'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'getConfiguration']);
-    Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration'])->middleware('throttle:30,1');
+    Route::post('/v2/admin/broker/configuration', [\App\Http\Controllers\Api\AdminBrokerController::class, 'saveConfiguration'])->middleware('throttle:nexus-route-30-per-1m');
     Route::get('/v2/admin/broker/exchanges/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showExchange']);
     Route::get('/v2/admin/broker/messages/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showMessage']);
-    Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/broker/messages/{id}/approve', [\App\Http\Controllers\Api\AdminBrokerController::class, 'approveMessage'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/broker/archives', [\App\Http\Controllers\Api\AdminBrokerController::class, 'archives']);
     Route::get('/v2/admin/broker/archives/{id}', [\App\Http\Controllers\Api\AdminBrokerController::class, 'showArchive']);
     Route::get('/v2/admin/vetting/stats', [\App\Http\Controllers\Api\AdminVettingController::class, 'stats']);
     Route::get('/v2/admin/vetting/policy', [\App\Http\Controllers\Api\AdminVettingController::class, 'policy']);
-    Route::put('/v2/admin/vetting/policy', [\App\Http\Controllers\Api\AdminVettingController::class, 'updatePolicy'])->middleware('throttle:20,1');
-    Route::post('/v2/admin/vetting/policy/rotate', [\App\Http\Controllers\Api\AdminVettingController::class, 'rotatePolicy'])->middleware('throttle:5,1');
+    Route::put('/v2/admin/vetting/policy', [\App\Http\Controllers\Api\AdminVettingController::class, 'updatePolicy'])->middleware('throttle:nexus-route-20-per-1m');
+    Route::post('/v2/admin/vetting/policy/rotate', [\App\Http\Controllers\Api\AdminVettingController::class, 'rotatePolicy'])->middleware('throttle:nexus-route-5-per-1m');
     Route::get('/v2/admin/vetting/user/{userId}', [\App\Http\Controllers\Api\AdminVettingController::class, 'getUserRecords']);
-    Route::post('/v2/admin/vetting/user/{userId}/confirm', [\App\Http\Controllers\Api\AdminVettingController::class, 'confirm'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/vetting/user/{userId}/revoke', [\App\Http\Controllers\Api\AdminVettingController::class, 'revoke'])->middleware('throttle:60,1');
-    Route::post('/v2/admin/vetting/reviews/{reviewId}/resolve', [\App\Http\Controllers\Api\AdminVettingController::class, 'resolveReview'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/vetting/user/{userId}/confirm', [\App\Http\Controllers\Api\AdminVettingController::class, 'confirm'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/vetting/user/{userId}/revoke', [\App\Http\Controllers\Api\AdminVettingController::class, 'revoke'])->middleware('throttle:nexus-route-60-per-1m');
+    Route::post('/v2/admin/vetting/reviews/{reviewId}/resolve', [\App\Http\Controllers\Api\AdminVettingController::class, 'resolveReview'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/vetting', [\App\Http\Controllers\Api\AdminVettingController::class, 'list']);
     Route::get('/v2/admin/vetting/{id}', [\App\Http\Controllers\Api\AdminVettingController::class, 'show']);
     Route::get('/v2/admin/insurance/stats', [\App\Http\Controllers\Api\AdminInsuranceCertificateController::class, 'stats']);
@@ -2862,14 +2862,14 @@ Route::get('/v2/admin/safeguarding/members/{userId}/activity.csv', [\App\Http\Co
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/v2/safeguarding/my-preferences', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myPreferences']);
     Route::get('/v2/safeguarding/my-vetting-status', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'myVettingStatus']);
-    Route::post('/v2/safeguarding/confirm-policy-review', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'confirmPolicyReview'])->middleware('throttle:10,1');
-    Route::post('/v2/safeguarding/vetting-review-request', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'requestVettingReview'])->middleware('throttle:10,1');
+    Route::post('/v2/safeguarding/confirm-policy-review', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'confirmPolicyReview'])->middleware('throttle:nexus-route-10-per-1m');
+    Route::post('/v2/safeguarding/vetting-review-request', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'requestVettingReview'])->middleware('throttle:nexus-route-10-per-1m');
     Route::post('/v2/safeguarding/revoke', [\App\Http\Controllers\Api\SafeguardingMemberController::class, 'revoke']);
 });
 
 // AG23 follow-up — Public inbound federation endpoint (HMAC signature auth, no session)
 Route::post('/v2/federation/hour-transfer/inbound', [\App\Http\Controllers\Api\FederationHourTransferController::class, 'inbound'])
-    ->middleware('throttle:30,1');
+    ->middleware('throttle:nexus-route-30-per-1m');
 
 // AG54 — Verein membership dues (member-facing + verein-admin scoped)
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -3016,58 +3016,58 @@ Route::get('/v2/admin/crm/export/dashboard', [\App\Http\Controllers\Api\AdminCrm
 Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
 Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
 // Session management — rate-limited to prevent abuse (30 req/min per IP)
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
     Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
     Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
     Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
 });
 // Rate-limited auth endpoints (30 requests/minute per IP — DoS protection; brute-force handled by DB limiter in controller)
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
     Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
     Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
     Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
 });
 // TOTP verify — strict throttle (5/min) to prevent 6-digit code brute-force during 2FA login
-Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo'])->middleware('throttle:30,1');
-Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
-Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify'])->middleware('throttle:5,1');
+Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo'])->middleware('throttle:nexus-route-30-per-1m');
+Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify'])->middleware('throttle:nexus-route-5-per-1m');
 // Password reset endpoints — stricter throttle to mitigate email enumeration/spam (5/min per IP)
-Route::middleware('throttle:5,1')->group(function () {
+Route::middleware('throttle:nexus-route-5-per-1m')->group(function () {
     Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
     Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
 });
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
     Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
     Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
 });
 
 // Auth utilities — rate-limited to prevent token enumeration/abuse (30 req/min per IP)
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
     Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
     Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
     Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
 });
 // CSRF tokens are high-frequency, rate-limit more generously (60 req/min per IP)
-Route::middleware('throttle:60,1')->group(function () {
+Route::middleware('throttle:nexus-route-60-per-1m')->group(function () {
     Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
     Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
     Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 });
 
 // Newsletter unsubscribe/tracking — public (recipients may not be logged in)
-Route::get('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
-Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:30,1');
+Route::get('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:nexus-route-30-per-1m');
+Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])->middleware('throttle:nexus-route-30-per-1m');
 Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
-Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackClick'])->middleware('throttle:120,1');
+Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackClick'])->middleware('throttle:nexus-route-120-per-1m');
 
 // SOC13 — Social login (OAuth). Redirect/callback are public so anonymous
 // visitors can start a sign-in flow. Link/unlink/identities live inside
 // auth:sanctum below.
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::get('/v2/auth/oauth/enabled-providers', [\App\Http\Controllers\Auth\SocialAuthController::class, 'enabledProviders']);
     Route::post('/v2/auth/oauth/exchange', [\App\Http\Controllers\Auth\SocialAuthController::class, 'exchange']);
     Route::get('/v2/auth/oauth/{provider}/redirect', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
@@ -3079,7 +3079,7 @@ Route::middleware('throttle:30,1')->group(function () {
 // SSO engine (IT-Sec-05) — tenant-configured OIDC providers (Entra ID,
 // Hivebrite, …). Public so anonymous visitors can start a sign-in flow;
 // token exchange reuses /v2/auth/oauth/exchange above.
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:nexus-route-30-per-1m')->group(function () {
     Route::get('/v2/auth/sso/providers', [\App\Http\Controllers\Auth\SsoAuthController::class, 'providers']);
     Route::get('/v2/auth/sso/callback', [\App\Http\Controllers\Auth\SsoAuthController::class, 'callback']);
     Route::get('/v2/auth/sso/{provider}/redirect', [\App\Http\Controllers\Auth\SsoAuthController::class, 'redirect'])
@@ -3095,7 +3095,7 @@ Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index'])
 Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
 Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
 Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
-Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit'])->middleware('throttle:5,1');
+Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit'])->middleware('throttle:nexus-route-5-per-1m');
 
 // API documentation
 Route::get('/docs', [\App\Http\Controllers\Api\OpenApiDocController::class, 'ui']);
@@ -3129,10 +3129,10 @@ Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::
 // high-frequency small-file uploads. Canonical path is /v2/upload (matches the
 // controller's $isV2Api contract and every frontend caller, e.g. the newsletter
 // builder's asset manager). /upload is kept as a legacy alias.
-Route::middleware('throttle:30,1')->post('/v2/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
-Route::middleware('throttle:30,1')->post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
+Route::middleware('throttle:nexus-route-30-per-1m')->post('/v2/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
+Route::middleware('throttle:nexus-route-30-per-1m')->post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 // Asset library — list the tenant's previously-uploaded images (newsletter builder).
-Route::middleware('throttle:60,1')->get('/v2/upload/list', [\App\Http\Controllers\Api\UploadController::class, 'index']);
+Route::middleware('throttle:nexus-route-60-per-1m')->get('/v2/upload/list', [\App\Http\Controllers\Api\UploadController::class, 'index']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
 Route::post('/push/send', [\App\Http\Controllers\Api\PushController::class, 'send']);
@@ -3144,13 +3144,13 @@ Route::post('/auth/revoke-all', [\App\Http\Controllers\Api\AuthController::class
 Route::post('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
-Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification'])->middleware('throttle:10,1');
+Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification'])->middleware('throttle:nexus-route-10-per-1m');
 
 // Optional identity verification (for active users wanting an ID Verified badge)
 Route::get('/v2/identity/status', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'getStatus']);
-Route::post('/v2/identity/start', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'startVerification'])->middleware('throttle:5,1');
-Route::post('/v2/identity/save-dob', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'saveDob'])->middleware('throttle:10,1');
-Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'createPaymentIntent'])->middleware('throttle:5,1');
+Route::post('/v2/identity/start', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'startVerification'])->middleware('throttle:nexus-route-5-per-1m');
+Route::post('/v2/identity/save-dob', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'saveDob'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'createPaymentIntent'])->middleware('throttle:nexus-route-5-per-1m');
 // NOTE: identity webhook route moved to public webhook section (below auth group)
 // NOTE: /docs, /auth/forgot-password, /auth/reset-password, /auth/verify-email,
 // /auth/resend-verification, /auth/resend-verification-by-email are public routes (registered above auth group)
@@ -3158,19 +3158,19 @@ Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalId
 Route::get('/totp/status', [\App\Http\Controllers\Api\TotpController::class, 'status']);
 // SOC13 — Social login (OAuth) authenticated routes
 Route::post('/v2/auth/oauth/{provider}/link', [\App\Http\Controllers\Auth\SocialAuthController::class, 'link'])
-    ->where('provider', 'google|facebook')->middleware('throttle:10,1');
+    ->where('provider', 'google|facebook')->middleware('throttle:nexus-route-10-per-1m');
 Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\SocialAuthController::class, 'unlink'])
-    ->where('provider', 'google|facebook')->middleware('throttle:10,1');
+    ->where('provider', 'google|facebook')->middleware('throttle:nexus-route-10-per-1m');
 Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities'])
-    ->middleware('throttle:30,1');
+    ->middleware('throttle:nexus-route-30-per-1m');
 
-Route::get('/v2/auth/2fa/status', [\App\Http\Controllers\Api\TwoFactorController::class, 'status'])->middleware('throttle:30,1');
-Route::post('/v2/auth/2fa/setup', [\App\Http\Controllers\Api\TwoFactorController::class, 'setup'])->middleware('throttle:5,1');
-Route::post('/v2/auth/2fa/verify', [\App\Http\Controllers\Api\TwoFactorController::class, 'verify'])->middleware('throttle:5,1');
-Route::post('/v2/auth/2fa/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable'])->middleware('throttle:5,1');
+Route::get('/v2/auth/2fa/status', [\App\Http\Controllers\Api\TwoFactorController::class, 'status'])->middleware('throttle:nexus-route-30-per-1m');
+Route::post('/v2/auth/2fa/setup', [\App\Http\Controllers\Api\TwoFactorController::class, 'setup'])->middleware('throttle:nexus-route-5-per-1m');
+Route::post('/v2/auth/2fa/verify', [\App\Http\Controllers\Api\TwoFactorController::class, 'verify'])->middleware('throttle:nexus-route-5-per-1m');
+Route::post('/v2/auth/2fa/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable'])->middleware('throttle:nexus-route-5-per-1m');
 Route::post('/app/check-version', [\App\Http\Controllers\Api\AppController::class, 'checkVersion'])->withoutMiddleware('auth:sanctum');
 Route::get('/app/version', [\App\Http\Controllers\Api\AppController::class, 'version'])->withoutMiddleware('auth:sanctum');
-Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])->withoutMiddleware('auth:sanctum')->middleware('throttle:10,1');
+Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])->withoutMiddleware('auth:sanctum')->middleware('throttle:nexus-route-10-per-1m');
 Route::post('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
@@ -3179,16 +3179,16 @@ Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class,
 Route::get('/v2/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
 // WebAuthn state-changing endpoints — rate-limited (10 req/min per IP) to prevent abuse of
 // challenge generation and credential mutation. Public pre-login WebAuthn endpoints
-// (/webauthn/auth-challenge, /webauthn/auth-verify) are throttled separately at throttle:30,1
+// (/webauthn/auth-challenge, /webauthn/auth-verify) are throttled separately at throttle:nexus-route-30-per-1m
 // in the public auth group above.
-Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge'])->middleware('throttle:10,1');
-Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify'])->middleware('throttle:10,1');
-Route::post('/webauthn/security-confirm', [\App\Http\Controllers\Api\WebAuthnController::class, 'confirmSecurityAction'])->middleware('throttle:10,1');
+Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/webauthn/security-confirm', [\App\Http\Controllers\Api\WebAuthnController::class, 'confirmSecurityAction'])->middleware('throttle:nexus-route-10-per-1m');
 // NOTE: POST /webauthn/auth-challenge and /webauthn/auth-verify are public
 // routes (registered above this auth group) because they are pre-login flows.
-Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove'])->middleware('throttle:10,1');
-Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename'])->middleware('throttle:10,1');
-Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll'])->middleware('throttle:10,1');
+Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename'])->middleware('throttle:nexus-route-10-per-1m');
+Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll'])->middleware('throttle:nexus-route-10-per-1m');
 Route::get('/webauthn/credentials', [\App\Http\Controllers\Api\WebAuthnController::class, 'credentials']);
 Route::get('/webauthn/status', [\App\Http\Controllers\Api\WebAuthnController::class, 'status']);
 Route::post('/ai/chat', [\App\Http\Controllers\Api\AiChatController::class, 'chat']);
@@ -3201,7 +3201,7 @@ Route::post('/ai/conversations', [\App\Http\Controllers\Api\AiChatController::cl
 Route::delete('/ai/conversations/{id}', [\App\Http\Controllers\Api\AiChatController::class, 'deleteConversation']);
 Route::get('/ai/providers', [\App\Http\Controllers\Api\AiChatController::class, 'getProviders']);
 Route::get('/ai/limits', [\App\Http\Controllers\Api\AiChatController::class, 'getLimits']);
-Route::post('/ai/test-provider', [\App\Http\Controllers\Api\AiChatController::class, 'testProvider'])->middleware(['admin', 'throttle:10,1']);
+Route::post('/ai/test-provider', [\App\Http\Controllers\Api\AiChatController::class, 'testProvider'])->middleware(['admin', 'throttle:nexus-route-10-per-1m']);
 Route::post('/ai/generate/listing', [\App\Http\Controllers\Api\AiChatController::class, 'generateListing']);
 Route::post('/ai/generate/event', [\App\Http\Controllers\Api\AiChatController::class, 'generateEvent']);
 Route::post('/ai/generate/message', [\App\Http\Controllers\Api\AiChatController::class, 'generateMessage']);
@@ -3287,8 +3287,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v2/onboarding/config', [\App\Http\Controllers\Api\OnboardingController::class, 'getConfig']);
     Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
     Route::get('/v2/onboarding/safeguarding-options', [\App\Http\Controllers\Api\OnboardingController::class, 'safeguardingOptions']);
-    Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding'])->middleware('throttle:5,1');
-    Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete'])->middleware('throttle:5,1');
+    Route::post('/v2/onboarding/safeguarding', [\App\Http\Controllers\Api\OnboardingController::class, 'saveSafeguarding'])->middleware('throttle:nexus-route-5-per-1m');
+    Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete'])->middleware('throttle:nexus-route-5-per-1m');
 });
 Route::middleware('feature:groups')
     ->where([
@@ -3330,7 +3330,7 @@ Route::post('/v2/volunteering/certificates', [\App\Http\Controllers\Api\Voluntee
 Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'verifyCertificate'])->middleware('auth:sanctum');
 Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'certificateHtml'])->middleware('auth:sanctum');
 Route::get('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCredentials']);
-Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential'])->middleware('throttle:20,1');
+Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential'])->middleware('throttle:nexus-route-20-per-1m');
 Route::get('/v2/volunteering/credentials/{id}/download', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'downloadCredential']);
 Route::delete('/v2/volunteering/credentials/{id}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'deleteCredential']);
 Route::get('/v2/volunteering/emergency-alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'myEmergencyAlerts']);
@@ -3461,7 +3461,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // See BrokerModerationAuthorizationTest.
 Route::middleware(['auth:sanctum', 'broker-or-admin'])->group(function () {
     Route::get('/v2/admin/moderation/queue', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationQueue']);
-    Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview'])->middleware('throttle:nexus-route-60-per-1m');
     Route::get('/v2/admin/moderation/stats', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationStats']);
 });
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -3545,17 +3545,17 @@ Route::get('/v1/federation/messages', [\App\Http\Controllers\Api\FederationContr
 Route::get('/v1/federation/reviews', [\App\Http\Controllers\Api\FederationController::class, 'getReviews']);
 Route::get('/v1/federation/transactions/{id}', [\App\Http\Controllers\Api\FederationController::class, 'getTransaction']);
 // Write operations rate-limited to prevent abuse (20 req/min per IP)
-Route::middleware('throttle:20,1')->group(function () {
+Route::middleware('throttle:nexus-route-20-per-1m')->group(function () {
     Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationController::class, 'sendMessage']);
     Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
     Route::post('/v1/federation/reviews', [\App\Http\Controllers\Api\FederationController::class, 'createReview']);
 });
-Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken'])->middleware('throttle:10,1');
+Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken'])->middleware('throttle:nexus-route-10-per-1m');
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
 
 // External federation partner webhook receiver — HMAC-authenticated, no Sanctum.
 // TimeOverflow and other external partners POST events here.
-Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\Api\FederationExternalWebhookController::class, 'receive'])->middleware('throttle:200,1');
+Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\Api\FederationExternalWebhookController::class, 'receive'])->middleware('throttle:nexus-route-200-per-1m');
 
 // ============================================
 // FEDERATION PROTOCOL ENDPOINTS — Komunitin (JSON:API) & Credit Commons
@@ -3563,7 +3563,7 @@ Route::post('/v2/federation/external/webhooks/receive', [\App\Http\Controllers\A
 // These endpoints serve NEXUS data in protocol-native formats so that
 // external platforms can query us as a compatible federation partner.
 // ============================================
-Route::middleware(['federation.api', 'throttle:200,1'])->group(function () {
+Route::middleware(['federation.api', 'throttle:nexus-route-200-per-1m'])->group(function () {
     // --- Komunitin (JSON:API accounting protocol) ---
     // Full spec: https://github.com/community-exchange-network/komunitin
     Route::get('/v2/federation/komunitin/currencies', [\App\Http\Controllers\Api\FederationKomunitinController::class, 'currencies']);
@@ -3645,17 +3645,17 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public — Postmark cannot present a Sanctum token; authenticated in the
 // controller via HTTP Basic auth (or X-Postmark-Webhook-Secret) against
 // POSTMARK_WEBHOOK_SECRET.
-Route::post('/v2/webhooks/postmark', [\App\Http\Controllers\Api\PostmarkWebhookController::class, 'events'])->middleware('throttle:120,1');
+Route::post('/v2/webhooks/postmark', [\App\Http\Controllers\Api\PostmarkWebhookController::class, 'events'])->middleware('throttle:nexus-route-120-per-1m');
 
 // Identity verification provider webhooks (e.g., Onfido, Jumio)
 // Must be public — providers send callbacks without Sanctum tokens.
-Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook'])->middleware('throttle:60,1');
+Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook'])->middleware('throttle:nexus-route-60-per-1m');
 
 // Stripe webhook (no auth, no CSRF — signature verified in controller)
-Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
+Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:nexus-route-120-per-1m');
 
 // Marketplace Stripe webhook (separate endpoint for Connect events with marketplace-specific secret)
-Route::post('/v2/marketplace/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
+Route::post('/v2/marketplace/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:nexus-route-120-per-1m');
 
 // AG42 — Swiss FADP Compliance Pack
 // Audit 2026-07-09 P2 #4: route-level auth added (controllers self-check too,
@@ -3786,7 +3786,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 // AG71 — Pilot Region Inquiry & Qualification Funnel
 // Deliberately public: logged-out lead-capture form (throttled). Do NOT wrap.
-Route::post('/v2/pilot-inquiry', [\App\Http\Controllers\Api\PilotInquiryController::class, 'submitInquiry'])->middleware('throttle:5,1');
+Route::post('/v2/pilot-inquiry', [\App\Http\Controllers\Api\PilotInquiryController::class, 'submitInquiry'])->middleware('throttle:nexus-route-5-per-1m');
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/pilot-inquiries', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminList']);
     Route::get('/v2/admin/pilot-inquiries/stats', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminPipelineStats']);

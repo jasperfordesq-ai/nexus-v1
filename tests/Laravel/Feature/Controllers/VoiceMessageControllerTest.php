@@ -58,4 +58,15 @@ class VoiceMessageControllerTest extends TestCase
         $this->assertStringNotContainsString('EmailDispatchService::sendRaw', $source);
         $this->assertStringNotContainsString('voice_message.email_subject', $source);
     }
+
+    public function test_transcription_uses_the_server_owned_uploaded_path_without_refetching(): void
+    {
+        $controller = file_get_contents(app_path('Http/Controllers/Api/VoiceMessageController.php'));
+        $messages = file_get_contents(app_path('Http/Controllers/Api/MessagesController.php'));
+
+        $this->assertStringContainsString('$audioResult[\'local_path\'] ?? null', $controller);
+        $this->assertStringContainsString('$audioResult[\'local_path\'] ?? null', $messages);
+        $this->assertStringNotContainsString('safeDownloadAudio', $controller);
+        $this->assertStringContainsString('TranscriptionService::transcribe($audioPath)', $messages);
+    }
 }

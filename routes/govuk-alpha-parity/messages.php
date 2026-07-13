@@ -26,7 +26,7 @@ Route::get('/messages/groups/new', [AlphaController::class, 'messagesCreateGroup
     ->name('messages.groups.create');
 
 Route::post('/messages/groups', [AlphaController::class, 'messagesStoreGroup'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:nexus-route-10-per-1m')
     ->name('messages.groups.store');
 
 // --- a single group conversation (wildcard) ---
@@ -35,23 +35,23 @@ Route::get('/messages/groups/{conversationId}', [AlphaController::class, 'messag
     ->name('messages.groups.show');
 
 Route::post('/messages/groups/{conversationId}', [AlphaController::class, 'messagesStoreGroupMessage'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->whereNumber('conversationId')
     ->name('messages.groups.message');
 
 Route::post('/messages/groups/{conversationId}/members', [AlphaController::class, 'messagesGroupAddMember'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->whereNumber('conversationId')
     ->name('messages.groups.members.add');
 
 Route::post('/messages/groups/{conversationId}/members/{targetUserId}/remove', [AlphaController::class, 'messagesGroupRemoveMember'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->whereNumber('conversationId')
     ->whereNumber('targetUserId')
     ->name('messages.groups.members.remove');
 
 Route::post('/messages/groups/{conversationId}/m/{messageId}/react', [AlphaController::class, 'messagesToggleReaction'])
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->whereNumber('conversationId')
     ->whereNumber('messageId')
     ->name('messages.groups.react');
@@ -60,7 +60,7 @@ Route::post('/messages/groups/{conversationId}/m/{messageId}/react', [AlphaContr
 //     the React MessageBubble translate button). The static "groups" segment
 //     above is registered first, so this {userId} route never swallows it. ---
 Route::post('/messages/{userId}/m/{messageId}/translate', [AlphaController::class, 'messagesTranslateMessage'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->whereNumber('userId')
     ->whereNumber('messageId')
     ->name('messages.translate');
@@ -69,6 +69,6 @@ Route::post('/messages/{userId}/m/{messageId}/translate', [AlphaController::clas
 //     audio clip (mobile `capture` opens the recorder). Mirrors the React
 //     MediaRecorder voice send via the same AudioUploader + voice send path. ---
 Route::post('/messages/{userId}/voice', [AlphaController::class, 'storeVoiceMessage'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:nexus-route-10-per-1m')
     ->whereNumber('userId')
     ->name('messages.voice');

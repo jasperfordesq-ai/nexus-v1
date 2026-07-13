@@ -23,10 +23,15 @@ const { mockApi } = vi.hoisted(() => ({
 
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({
-  formatRelativeTime: (s: string) => `relative(${s})`,
-  resolveAvatarUrl: (s: unknown) => (s ? String(s) : null),
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@/lib/helpers')>();
+
+  return {
+    ...original,
+    formatRelativeTime: (s: string) => `relative(${s})`,
+    resolveAvatarUrl: (s: unknown) => (s ? String(s) : null),
+  };
+});
 
 // ─── Context mocks ─────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn(), showToast: vi.fn() };
@@ -96,8 +101,7 @@ describe('GoalInsightsPanel', () => {
     mockApi.get.mockImplementationOnce(() => new Promise(() => {}));
     const { GoalInsightsPanel } = await import('./GoalInsightsPanel');
     render(<GoalInsightsPanel goalId={42} />);
-    const skeletons = screen.getAllByTestId('skeleton');
-    expect(skeletons.length).toBeGreaterThan(0);
+    expect(screen.getByRole('status', { name: 'Loading goal insights' })).toHaveAttribute('aria-busy', 'true');
   });
 
   it('calls GET /v2/goals/:id/insights with correct goalId', async () => {
@@ -168,9 +172,8 @@ describe('GoalInsightsPanel', () => {
     const { GoalInsightsPanel } = await import('./GoalInsightsPanel');
     render(<GoalInsightsPanel goalId={1} />);
     await waitFor(() => {
-      const chips = screen.getAllByTestId('chip');
-      const successChip = chips.find((c) => c.getAttribute('data-color') === 'success');
-      expect(successChip).toBeDefined();
+      const successChip = screen.getByText('Done').closest('[data-slot="chip"]');
+      expect(successChip).toHaveClass('chip--success');
     });
   });
 

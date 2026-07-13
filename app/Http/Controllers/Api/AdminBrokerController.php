@@ -291,6 +291,10 @@ class AdminBrokerController extends BaseApiController
                  FROM user_safeguarding_preferences usp
                  JOIN tenant_safeguarding_options tso ON tso.id = usp.option_id
                  WHERE {$uspWhere} AND usp.revoked_at IS NULL AND tso.is_active = 1
+                 AND (
+                     (tso.option_type = 'checkbox' AND LOWER(TRIM(COALESCE(usp.selected_value, ''))) IN ('1', 'true', 'yes', 'on'))
+                     OR (tso.option_type = 'select' AND TRIM(COALESCE(usp.selected_value, '')) <> '')
+                 )
                  AND tso.triggers IS NOT NULL
                  AND NOT EXISTS (
                      SELECT 1 FROM activity_log al

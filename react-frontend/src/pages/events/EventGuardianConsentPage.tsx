@@ -8,14 +8,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  Checkbox,
-  Input,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Input } from '@/components/ui/Input';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';

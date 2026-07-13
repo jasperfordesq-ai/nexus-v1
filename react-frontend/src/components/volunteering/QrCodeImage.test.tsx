@@ -38,4 +38,14 @@ describe('QrCodeImage', () => {
     // The perpetual aria-busy placeholder must be gone.
     expect(document.querySelector('[aria-busy="true"]')).toBeNull();
   });
+
+  it('does not turn an opaque token into a link when link fallback is disabled', async () => {
+    toDataURL.mockRejectedValue(new Error('chunk 404'));
+
+    render(<QrCodeImage value="private-redemption-token" alt="Coupon QR" fallbackToLink={false} />);
+
+    const fallback = await screen.findByRole('img', { name: 'Coupon QR' });
+    expect(fallback).toHaveTextContent('Coupon QR');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
 });

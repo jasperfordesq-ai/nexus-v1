@@ -1161,6 +1161,7 @@ return [
     'donation_failed_check_recipient' => 'Theip ar an deonachán. Seiceáil d\'iarmhéid agus an faighteoir.',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes' => '{1} An iomarca iarrachtaí logála isteach. Bain triail eile as i gceann 1 nóiméad.|[2,*] An iomarca iarrachtaí logála isteach. Bain triail eile as i gceann :count nóiméad.',
     'legal' => [
         'no_documents_require_acceptance' => 'No documents require acceptance',
         'all_documents_accepted' => 'All documents accepted',

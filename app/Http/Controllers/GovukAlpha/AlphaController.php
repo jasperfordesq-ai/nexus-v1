@@ -22,6 +22,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\ListingImage;
 use App\Models\User;
+use App\Models\UserSafeguardingPreference;
 use App\Policies\EventPolicy;
 use App\Services\BrokerControlConfigService;
 use App\Services\Auth\AuthenticationMethodGuard;
@@ -10878,9 +10879,11 @@ class AlphaController extends Controller
                 ->whereNull('p.revoked_at')
                 ->select([
                     'p.option_id',
+                    'p.selected_value',
                     'p.policy_review_required_at',
                     'p.policy_review_reason_code',
                     'o.option_key',
+                    'o.option_type',
                     'o.preset_source',
                     'o.label',
                     'o.description',
@@ -10889,31 +10892,37 @@ class AlphaController extends Controller
                 ->orderBy('o.sort_order')
                 ->get();
 
-            return $rows->map(static function ($row): array {
-                $triggers = is_string($row->triggers) ? (json_decode($row->triggers, true) ?: []) : (array) ($row->triggers ?? []);
+            return $rows
+                ->filter(static fn ($row): bool => UserSafeguardingPreference::isEffectivelySelected(
+                    $row->option_type ?? null,
+                    $row->selected_value ?? null,
+                ))
+                ->values()
+                ->map(static function ($row): array {
+                    $triggers = is_string($row->triggers) ? (json_decode($row->triggers, true) ?: []) : (array) ($row->triggers ?? []);
 
-                return [
-                    'option_id' => (int) $row->option_id,
-                    'label' => \App\Models\TenantSafeguardingOption::localizeOptionText(
-                        $row->preset_source,
-                        $row->option_key,
-                        'label',
-                        $row->label,
-                    ),
-                    'description' => \App\Models\TenantSafeguardingOption::localizeOptionText(
-                        $row->preset_source,
-                        $row->option_key,
-                        'description',
-                        $row->description,
-                    ),
-                    'restricts_messaging' => (bool) ($triggers['restricts_messaging'] ?? false),
-                    'restricts_matching' => (bool) ($triggers['restricts_matching'] ?? false),
-                    'requires_broker_approval' => (bool) ($triggers['requires_broker_approval'] ?? false),
-                    'requires_vetted_interaction' => (bool) ($triggers['requires_vetted_interaction'] ?? false),
-                    'policy_review_required' => $row->policy_review_required_at !== null,
-                    'policy_review_reason_code' => $row->policy_review_reason_code,
-                ];
-            })->all();
+                    return [
+                        'option_id' => (int) $row->option_id,
+                        'label' => \App\Models\TenantSafeguardingOption::localizeOptionText(
+                            $row->preset_source,
+                            $row->option_key,
+                            'label',
+                            $row->label,
+                        ),
+                        'description' => \App\Models\TenantSafeguardingOption::localizeOptionText(
+                            $row->preset_source,
+                            $row->option_key,
+                            'description',
+                            $row->description,
+                        ),
+                        'restricts_messaging' => (bool) ($triggers['restricts_messaging'] ?? false),
+                        'restricts_matching' => (bool) ($triggers['restricts_matching'] ?? false),
+                        'requires_broker_approval' => (bool) ($triggers['requires_broker_approval'] ?? false),
+                        'requires_vetted_interaction' => (bool) ($triggers['requires_vetted_interaction'] ?? false),
+                        'policy_review_required' => $row->policy_review_required_at !== null,
+                        'policy_review_reason_code' => $row->policy_review_reason_code,
+                    ];
+                })->all();
         } catch (\Throwable $e) {
             report($e);
 

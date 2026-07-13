@@ -34,7 +34,7 @@ class AudioUploader
      *
      * @param array $file $_FILES['audio'] array
      * @param int $duration Duration in seconds (from frontend)
-     * @return array ['url' => '/uploads/...', 'duration' => 30]
+     * @return array{url: string, duration: int, local_path: string}
      * @throws \Exception On upload error or validation failure
      */
     public static function upload($file, int $duration = 0): array
@@ -91,6 +91,9 @@ class AudioUploader
         return [
             'url' => $publicPath,
             'duration' => max(1, $duration),
+            // Internal filesystem identity for immediate server-side work such
+            // as transcription. Controllers must never expose this value.
+            'local_path' => $targetPath,
         ];
     }
 
@@ -100,7 +103,7 @@ class AudioUploader
      * @param string $base64Data Base64 encoded audio
      * @param string $mimeType MIME type of the audio
      * @param int $duration Duration in seconds
-     * @return array ['url' => '/uploads/...', 'duration' => 30]
+     * @return array{url: string, duration: int, local_path: string}
      * @throws \Exception On upload error or validation failure
      */
     public static function uploadFromBase64(string $base64Data, string $mimeType, int $duration = 0): array
@@ -168,6 +171,7 @@ class AudioUploader
         return [
             'url' => $publicPath,
             'duration' => max(1, $duration),
+            'local_path' => $targetPath,
         ];
     }
 
@@ -248,19 +252,20 @@ class AudioUploader
         }
 
         $filename = substr($path, strlen($prefix));
-        if ($filename === ''
-            || $filename === '.'
-            || $filename === '..'
-            || str_contains($filename, '/')
-            || str_contains($filename, '\\')) {
+        // Voice URLs are server-issued with a `voice_` prefix and MIME-derived
+        // extension. The bounded portable basename alphabet keeps historical
+        // server-issued variants valid while preventing wrappers and traversal
+        // from reaching any filesystem operation.
+        if (preg_match('/\Avoice_[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.(?:webm|ogg|mp3|wav|m4a|aac)\z/D', $filename) !== 1) {
             return null;
         }
 
-        $documentRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
-        if ($documentRoot === '' || !is_dir($documentRoot)) {
-            $documentRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
+        $configuredRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
+        if ($configuredRoot === '') {
+            $configuredRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
         }
-        if ($documentRoot === '') {
+        $documentRoot = $configuredRoot !== '' ? realpath($configuredRoot) : false;
+        if ($documentRoot === false) {
             return null;
         }
 
@@ -273,18 +278,16 @@ class AudioUploader
             return null;
         }
 
-        $candidate = $voiceRoot . DIRECTORY_SEPARATOR . $filename;
-        if (!is_file($candidate)) {
-            return null;
-        }
-
-        $resolved = realpath($candidate);
+        $resolved = realpath($voiceRoot . DIRECTORY_SEPARATOR . $filename);
         $rootPrefix = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         if ($resolved === false || !str_starts_with($resolved, $rootPrefix)) {
             return null;
         }
 
-        return $resolved;
+        // nosemgrep: tainted-filename -- $resolved is canonical, its source
+        // basename passed the exact server-issued allowlist above, and the
+        // preceding prefix check proves containment inside $resolvedRoot.
+        return is_file($resolved) ? $resolved : null;
     }
 
     /**

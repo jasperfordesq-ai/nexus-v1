@@ -136,7 +136,12 @@ class SafeguardingPreferenceService
                 $updates['help_url'] = self::validateUrl($updates['help_url']);
             }
 
-            $activeSelectionUserIds = self::activeSelectionUserIds($tenantId, $optionId, true);
+            $activeSelectionUserIds = self::activeSelectionUserIds(
+                $tenantId,
+                $optionId,
+                $option->option_type,
+                true,
+            );
             if ($activeSelectionUserIds !== [] && self::mutationWeakensProtection($option, $updates)) {
                 throw new SafeguardingPolicyException(
                     'SAFEGUARDING_POLICY_UNAVAILABLE',
@@ -190,7 +195,12 @@ class SafeguardingPreferenceService
                 return null;
             }
 
-            $affectedUserIds = self::activeSelectionUserIds($tenantId, $optionId, true);
+            $affectedUserIds = self::activeSelectionUserIds(
+                $tenantId,
+                $optionId,
+                $option->option_type,
+                true,
+            );
             if ($affectedUserIds !== [] && self::hasProtectiveTriggers($option->triggers ?? [])) {
                 throw new SafeguardingPolicyException(
                     'SAFEGUARDING_POLICY_UNAVAILABLE',
@@ -244,17 +254,28 @@ class SafeguardingPreferenceService
     }
 
     /** @return list<int> */
-    private static function activeSelectionUserIds(int $tenantId, int $optionId, bool $lock): array
-    {
+    private static function activeSelectionUserIds(
+        int $tenantId,
+        int $optionId,
+        ?string $optionType,
+        bool $lock,
+    ): array {
         $query = UserSafeguardingPreference::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
             ->where('option_id', $optionId)
-            ->whereNull('revoked_at');
+            ->whereNull('revoked_at')
+            ->orderBy('id');
         if ($lock) {
             $query->lockForUpdate();
         }
 
-        return $query->pluck('user_id')
+        return $query->get(['user_id', 'selected_value'])
+            ->filter(static fn (UserSafeguardingPreference $preference): bool =>
+                UserSafeguardingPreference::isEffectivelySelected(
+                    $optionType,
+                    $preference->selected_value,
+                ))
+            ->pluck('user_id')
             ->map(static fn ($id): int => (int) $id)
             ->unique()
             ->values()
@@ -368,17 +389,31 @@ class SafeguardingPreferenceService
             ->pluck('user_id')
             ->map(static fn ($userId): int => (int) $userId)
             ->all();
-        $reviewUserIds = $requireMemberReview
+        $reviewSelections = $requireMemberReview
             ? DB::table('user_safeguarding_preferences as p')
                 ->join('tenant_safeguarding_options as o', 'o.id', '=', 'p.option_id')
                 ->where('p.tenant_id', $tenantId)
                 ->whereNull('p.revoked_at')
                 ->whereNotNull('o.preset_source')
-                ->distinct()
-                ->pluck('p.user_id')
-                ->map(static fn ($userId): int => (int) $userId)
-                ->all()
-            : [];
+                ->get(['p.id', 'p.user_id', 'p.selected_value', 'o.option_type'])
+                ->filter(static fn (object $preference): bool =>
+                    UserSafeguardingPreference::isEffectivelySelected(
+                        $preference->option_type ?? null,
+                        $preference->selected_value ?? null,
+                    ))
+                ->values()
+            : collect();
+        $reviewUserIds = $reviewSelections
+            ->pluck('user_id')
+            ->map(static fn ($userId): int => (int) $userId)
+            ->unique()
+            ->values()
+            ->all();
+        $reviewPreferenceIds = $reviewSelections
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->values()
+            ->all();
 
         DB::transaction(function () use (
             $tenantId,
@@ -403,7 +438,12 @@ class SafeguardingPreferenceService
                 ->get();
 
             foreach ($stale as $option) {
-                $activeSelectionUserIds = self::activeSelectionUserIds($tenantId, (int) $option->id, true);
+                $activeSelectionUserIds = self::activeSelectionUserIds(
+                    $tenantId,
+                    (int) $option->id,
+                    $option->option_type,
+                    true,
+                );
                 if ($activeSelectionUserIds !== [] && self::hasProtectiveTriggers($option->triggers ?? [])) {
                     $preserved[] = (string) $option->option_key;
                     continue;
@@ -461,7 +501,7 @@ class SafeguardingPreferenceService
         if ($reviewUserIds !== [] && Schema::hasColumn('user_safeguarding_preferences', 'policy_review_required_at')) {
             DB::table('user_safeguarding_preferences')
                 ->where('tenant_id', $tenantId)
-                ->whereIn('user_id', $reviewUserIds)
+                ->whereIn('id', $reviewPreferenceIds)
                 ->whereNull('revoked_at')
                 ->update([
                     'policy_review_required_at' => now(),
@@ -510,7 +550,7 @@ class SafeguardingPreferenceService
                 ->whereNotNull('preset_source')
                 ->where('is_active', true)
                 ->lockForUpdate()
-                ->get(['id', 'option_key']);
+                ->get(['id', 'option_key', 'option_type']);
             if ($options->isEmpty()) {
                 return [
                     'deactivated' => [],
@@ -520,13 +560,25 @@ class SafeguardingPreferenceService
             }
 
             $optionIds = $options->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $optionTypes = $options->mapWithKeys(
+                static fn (TenantSafeguardingOption $option): array => [
+                    (int) $option->id => $option->option_type,
+                ],
+            );
             $activePreferences = UserSafeguardingPreference::withoutGlobalScopes()
                 ->where('tenant_id', $tenantId)
                 ->whereIn('option_id', $optionIds)
                 ->whereNull('revoked_at')
                 ->lockForUpdate()
-                ->get(['id', 'user_id', 'option_id']);
-            $selectedOptionIds = $activePreferences
+                ->get(['id', 'user_id', 'option_id', 'selected_value']);
+            $selectedPreferences = $activePreferences
+                ->filter(static fn (UserSafeguardingPreference $preference): bool =>
+                    UserSafeguardingPreference::isEffectivelySelected(
+                        $optionTypes->get((int) $preference->option_id),
+                        $preference->selected_value,
+                    ))
+                ->values();
+            $selectedOptionIds = $selectedPreferences
                 ->pluck('option_id')
                 ->map(static fn ($id): int => (int) $id)
                 ->unique()
@@ -551,7 +603,7 @@ class SafeguardingPreferenceService
                     ->update(['is_active' => false]);
             }
 
-            $reviewUserIds = $activePreferences
+            $reviewUserIds = $selectedPreferences
                 ->pluck('user_id')
                 ->map(static fn ($id): int => (int) $id)
                 ->unique()
@@ -559,9 +611,13 @@ class SafeguardingPreferenceService
                 ->all();
             if ($reviewUserIds !== []
                 && Schema::hasColumn('user_safeguarding_preferences', 'policy_review_required_at')) {
+                $selectedPreferenceIds = $selectedPreferences
+                    ->pluck('id')
+                    ->map(static fn ($id): int => (int) $id)
+                    ->all();
                 UserSafeguardingPreference::withoutGlobalScopes()
                     ->where('tenant_id', $tenantId)
-                    ->whereIn('option_id', $selectedOptionIds)
+                    ->whereIn('id', $selectedPreferenceIds)
                     ->whereNull('revoked_at')
                     ->update([
                         'policy_review_required_at' => now(),
@@ -653,6 +709,13 @@ class SafeguardingPreferenceService
             ->active()
             ->with('option')
             ->get()
+            ->filter(static fn (UserSafeguardingPreference $preference): bool =>
+                $preference->option instanceof TenantSafeguardingOption
+                && UserSafeguardingPreference::isEffectivelySelected(
+                    $preference->option->option_type,
+                    $preference->selected_value,
+                ))
+            ->values()
             ->map(fn ($pref) => [
                 'id' => $pref->id,
                 'option_id' => $pref->option_id,
@@ -685,7 +748,16 @@ class SafeguardingPreferenceService
         // real option selections, real options win (they activate protections;
         // none_apply cancels them). Strips none_apply silently so a direct API
         // call cannot simultaneously decline and self-identify as needing support.
-        $submittedIds = array_map(fn ($p) => (int) ($p['option_id'] ?? 0), $preferences);
+        $submittedIds = array_values(array_unique(array_map(
+            static fn (array $preference): int => (int) ($preference['option_id'] ?? 0),
+            array_filter(
+                $preferences,
+                static fn (array $preference): bool => UserSafeguardingPreference::isEffectivelySelected(
+                    $preference['option_type'] ?? null,
+                    $preference['value'] ?? null,
+                ),
+            ),
+        )));
         $submittedIds = array_filter($submittedIds);
         if (!empty($submittedIds)) {
             $noneApplyIds = DB::table('tenant_safeguarding_options')
@@ -736,7 +808,6 @@ class SafeguardingPreferenceService
 
             foreach ($preferences as $pref) {
                 $optionId = (int) ($pref['option_id'] ?? 0);
-                $value = (string) ($pref['value'] ?? '1');
                 $notes = $pref['notes'] ?? null;
 
                 if ($optionId <= 0) {
@@ -750,6 +821,11 @@ class SafeguardingPreferenceService
                 if (! $option instanceof TenantSafeguardingOption || ! $option->is_active) {
                     throw new \InvalidArgumentException(__('api.safeguarding_preference_option_invalid'));
                 }
+
+                $value = UserSafeguardingPreference::normalizeSelectedValue(
+                    $option->option_type,
+                    $pref['value'] ?? null,
+                );
 
                 // For select-type options, validate submitted value against allowlist
                 if ($option->option_type === 'select') {
@@ -828,7 +904,10 @@ class SafeguardingPreferenceService
 
             /** @var TenantSafeguardingOption $option */
             $option = $activeOptions->get($optionId);
-            $value = array_key_exists('value', $pref) ? (string) $pref['value'] : '1';
+            $value = UserSafeguardingPreference::normalizeSelectedValue(
+                $option->option_type,
+                array_key_exists('value', $pref) ? $pref['value'] : '1',
+            );
 
             if ($option->option_type === 'select') {
                 $allowedValues = self::allowedSelectValues($option);
@@ -839,6 +918,7 @@ class SafeguardingPreferenceService
 
             $validated[] = [
                 'option_id' => $optionId,
+                'option_type' => $option->option_type,
                 'value' => $value,
                 'notes' => $pref['notes'] ?? null,
             ];
@@ -851,9 +931,10 @@ class SafeguardingPreferenceService
             }
 
             $value = $submittedValues[(int) $option->id] ?? null;
-            $isMissing = $option->option_type === 'select'
-                ? $value === null || trim((string) $value) === ''
-                : $value === null || !self::isTruthyPreferenceValue($value);
+            $isMissing = $value === null || ! UserSafeguardingPreference::isEffectivelySelected(
+                $option->option_type,
+                $value,
+            );
 
             if ($isMissing) {
                 throw new \InvalidArgumentException(__('api.safeguarding_required_option_missing', [
@@ -885,15 +966,6 @@ class SafeguardingPreferenceService
             ),
             fn ($value) => $value !== null && $value !== ''
         ));
-    }
-
-    private static function isTruthyPreferenceValue(mixed $value): bool
-    {
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        return in_array(strtolower(trim((string) $value)), ['1', 'true', 'yes', 'on'], true);
     }
 
     /**

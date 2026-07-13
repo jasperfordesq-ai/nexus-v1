@@ -86,9 +86,9 @@ class AuthController extends BaseApiController
         // Login Turnstile gate removed 2026-05-16 — member feedback found the
         // widget too confusing and the false-positive rate unacceptable. Bot
         // defence on this endpoint is the DB-backed per-email + per-IP brute
-        // force limiter below + route-level throttle:30,1.
+        // force limiter below + route-level throttle:nexus-route-30-per-1m.
         // SECURITY: Database-based brute force protection (tracks FAILED attempts only)
-        // Route-level throttle:30,1 middleware handles general request-rate DoS protection.
+        // Route-level throttle:nexus-route-30-per-1m middleware handles general request-rate DoS protection.
         $ip = \App\Core\ClientIp::get();
         if (!empty($email)) {
             $emailLimit = \App\Core\RateLimiter::check($email, 'email');

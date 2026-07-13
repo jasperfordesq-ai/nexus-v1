@@ -123,12 +123,14 @@ class AudioUploaderTest extends TestCase
 
     public function test_uploadFromBase64_throws_when_duration_too_long(): void
     {
-        // uploadFromBase64() validates the decoded content's real MIME type (finfo)
-        // BEFORE checking duration — correct, security-first ordering. Fake
-        // 'small-data' is detected as text/plain and rejected first, so the duration
-        // limit can't be reached here without real audio bytes. The file-path
-        // upload() variant (test_upload_throws_when_duration_too_long) covers it.
-        $this->markTestSkipped('uploadFromBase64 validates content MIME before duration; needs real audio bytes to reach the duration check.');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('too long');
+
+        AudioUploader::uploadFromBase64(
+            base64_encode(self::mp4Bytes('M4A ', 'M4A mp42isom')),
+            'audio/mp4',
+            301,
+        );
     }
 
     public function test_uploadFromBase64_strips_codec_from_mime(): void
@@ -184,8 +186,60 @@ class AudioUploaderTest extends TestCase
         $result = AudioUploader::uploadFromBase64(base64_encode($content), $claimedMime, 5);
 
         $this->assertStringStartsWith('/uploads/', $result['url']);
-        $this->assertFileExists($this->docRoot . $result['url']);
-        $this->assertSame($content, file_get_contents($this->docRoot . $result['url']));
+        $this->assertSame($this->docRoot . $result['url'], $result['local_path']);
+        $this->assertFileExists($result['local_path']);
+        $this->assertSame($content, file_get_contents($result['local_path']));
+    }
+
+    public function test_resolveTenantVoiceFilePath_accepts_only_canonical_server_issued_file(): void
+    {
+        $voiceDir = $this->docRoot . '/uploads/42/voice_messages';
+        mkdir($voiceDir, 0755, true);
+        $filename = 'voice_' . str_repeat('a', 32) . '.webm';
+        $path = $voiceDir . '/' . $filename;
+        file_put_contents($path, 'audio');
+
+        $this->assertSame(
+            realpath($path),
+            AudioUploader::resolveTenantVoiceFilePath('/uploads/42/voice_messages/' . $filename, 42),
+        );
+        $this->assertTrue(AudioUploader::isTenantVoiceFile('/uploads/42/voice_messages/' . $filename, 42));
+        $this->assertNull(AudioUploader::resolveTenantVoiceFilePath('/uploads/42/voice_messages/' . $filename, 43));
+    }
+
+    public function test_resolveTenantVoiceFilePath_rejects_traversal_and_free_form_names(): void
+    {
+        $voiceDir = $this->docRoot . '/uploads/42/voice_messages';
+        mkdir($voiceDir, 0755, true);
+        file_put_contents($voiceDir . '/recording.webm', 'audio');
+
+        $this->assertNull(AudioUploader::resolveTenantVoiceFilePath(
+            '/uploads/42/voice_messages/%2e%2e%2foutside.webm',
+            42,
+        ));
+        $this->assertNull(AudioUploader::resolveTenantVoiceFilePath(
+            '/uploads/42/voice_messages/recording.webm',
+            42,
+        ));
+        $this->assertNull(AudioUploader::resolveTenantVoiceFilePath(
+            'https://attacker.example/uploads/42/voice_messages/voice_' . str_repeat('a', 32) . '.webm',
+            42,
+        ));
+    }
+
+    public function test_resolveTenantVoiceFilePath_rejects_symlink_escape(): void
+    {
+        $voiceDir = $this->docRoot . '/uploads/42/voice_messages';
+        mkdir($voiceDir, 0755, true);
+        $outside = $this->docRoot . '/outside.webm';
+        file_put_contents($outside, 'audio');
+        $link = $voiceDir . '/voice_' . str_repeat('b', 32) . '.webm';
+        $this->assertTrue(symlink($outside, $link));
+
+        $this->assertNull(AudioUploader::resolveTenantVoiceFilePath(
+            '/uploads/42/voice_messages/' . basename($link),
+            42,
+        ));
     }
 
     // -------------------------------------------------------

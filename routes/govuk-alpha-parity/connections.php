@@ -29,5 +29,5 @@ Route::get('/matches/board', [AlphaController::class, 'connectionsMatchesBoard']
 
 Route::post('/matches/board/{listingId}/dismiss', [AlphaController::class, 'connectionsDismissMatch'])
     ->whereNumber('listingId')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('connections.matches-board.dismiss');

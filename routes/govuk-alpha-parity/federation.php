@@ -27,5 +27,5 @@ Route::get('/federation/onboarding', [AlphaController::class, 'federationOnboard
     ->name('federation.onboarding');
 
 Route::post('/federation/onboarding', [AlphaController::class, 'federationOnboardingStore'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('federation.onboarding.store');

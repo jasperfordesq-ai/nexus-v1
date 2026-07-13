@@ -11,6 +11,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { api } from '@/lib/api';
 
+const toDataURL = vi.fn();
+vi.mock('qrcode', () => ({ toDataURL: (...args: unknown[]) => toDataURL(...args) }));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -105,6 +108,7 @@ const COUPON_BOGO = {
 describe('CouponDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    toDataURL.mockResolvedValue('data:image/png;base64,LOCAL');
   });
 
   it('shows a loading spinner initially', () => {
@@ -212,6 +216,30 @@ describe('CouponDetailPage', () => {
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/v2/coupons/42/qr', {});
     });
+  });
+
+  it('renders redemption QR data locally without a third-party image request', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: COUPON_PERCENT });
+    vi.mocked(api.post).mockResolvedValue({
+      success: true,
+      data: { token: 'private-redemption-token', expires_at: '2024-01-15T11:00:00Z', coupon_code: 'SAVE20' },
+    });
+    render(<CouponDetailPage />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /qr|store|redeem/i }));
+
+    await waitFor(() => {
+      expect(toDataURL).toHaveBeenCalledWith(
+        'private-redemption-token',
+        expect.objectContaining({ width: 300 }),
+      );
+      expect(screen.getByRole('img', { name: /qr/i })).toHaveAttribute(
+        'src',
+        'data:image/png;base64,LOCAL',
+      );
+    });
+
+    expect(document.querySelector('img[src^="http"]')).toBeNull();
   });
 
   it('shows "not found" fallback (back button) when coupon data is null', async () => {

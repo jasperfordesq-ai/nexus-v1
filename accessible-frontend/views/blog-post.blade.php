@@ -26,7 +26,7 @@
     @if ($ogImage !== '')<meta property="og:image" content="{{ $ogImage }}">@endif
     @if ($published)<meta property="article:published_time" content="{{ \Illuminate\Support\Carbon::parse($published)->toIso8601String() }}">@endif
     @if ($updated)<meta property="article:modified_time" content="{{ \Illuminate\Support\Carbon::parse($updated)->toIso8601String() }}">@endif
-    <script type="application/ld+json">{!! json_encode(array_filter([
+    <script type="application/ld+json" nonce="{{ $cspNonce ?? request()->attributes->get('csp_nonce', '') }}">{!! json_encode(array_filter([
         '@context' => 'https://schema.org',
         '@type' => 'Article',
         'headline' => (string) ($post['title'] ?? ''),
@@ -59,9 +59,9 @@
                 </div>
             @endif
 
-            {{-- Content is run through HtmlSanitizer::sanitizeCms in BlogService::getBySlug before it reaches here. --}}
+            {{-- Re-sanitize at the render boundary for imported/legacy/manual rows. --}}
             <div class="legal-content govuk-body">
-                {!! $post['content'] ?? '' !!}
+                {!! \App\Helpers\HtmlSanitizer::sanitizeCms((string) ($post['content'] ?? '')) !!}
             </div>
 
             {{-- Post-level like (parity with the React social panel). --}}

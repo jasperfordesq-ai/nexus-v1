@@ -63,7 +63,8 @@ describe('FeatureErrorBoundary', () => {
       </FeatureErrorBoundary>
     );
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText(/couldn't load Dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText('An unexpected error occurred. Please try again or go back to the home page.')).toBeInTheDocument();
+    expect(screen.queryByText(/Dashboard/i)).not.toBeInTheDocument();
   });
 
   it('renders custom fallback when provided', () => {

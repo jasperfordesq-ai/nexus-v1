@@ -41,6 +41,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeImageSource } from '@/lib/safeImageSource';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -199,13 +200,25 @@ export function MerchantOnboardingPage() {
   // Step 3
   const [avatarUrl, setAvatarUrl] = useState('');
   const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [avatarPreview, setAvatarPreview] = useState('');
-  const [coverPreview, setCoverPreview] = useState('');
+  const [avatarObjectUrl, setAvatarObjectUrl] = useState('');
+  const [coverObjectUrl, setCoverObjectUrl] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const avatarPreviewSource = safeImageSource(avatarObjectUrl, { allowBlob: true })
+    ?? safeImageSource(avatarUrl);
+  const coverPreviewSource = safeImageSource(coverObjectUrl, { allowBlob: true })
+    ?? safeImageSource(coverImageUrl);
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => () => {
+    if (avatarObjectUrl) URL.revokeObjectURL(avatarObjectUrl);
+  }, [avatarObjectUrl]);
+
+  useEffect(() => () => {
+    if (coverObjectUrl) URL.revokeObjectURL(coverObjectUrl);
+  }, [coverObjectUrl]);
 
   // ── Auth / feature guard ──────────────────────────────────────────────────
   useEffect(() => {
@@ -246,11 +259,9 @@ export function MerchantOnboardingPage() {
           if (p.business_registration) setBusinessReg(p.business_registration);
           if (p.avatar_url) {
             setAvatarUrl(p.avatar_url);
-            setAvatarPreview(p.avatar_url);
           }
           if (p.cover_image_url) {
             setCoverImageUrl(p.cover_image_url);
-            setCoverPreview(p.cover_image_url);
           }
           // Hydrate address
           if (p.business_address) {
@@ -392,10 +403,10 @@ export function MerchantOnboardingPage() {
         const res = await api.upload<{ url: string }>('/v2/merchant-onboarding/image', file, 'avatar');
         const url = res.data?.url ?? '';
         setAvatarUrl(url);
-        setAvatarPreview(URL.createObjectURL(file));
+        setAvatarObjectUrl(URL.createObjectURL(file));
       } catch {
         // Fallback: show URL input instead (graceful degradation)
-        setAvatarPreview(URL.createObjectURL(file));
+        setAvatarObjectUrl(URL.createObjectURL(file));
       } finally {
         setUploadingAvatar(false);
       }
@@ -410,9 +421,9 @@ export function MerchantOnboardingPage() {
         const res = await api.upload<{ url: string }>('/v2/merchant-onboarding/image', file, 'cover_image');
         const url = res.data?.url ?? '';
         setCoverImageUrl(url);
-        setCoverPreview(URL.createObjectURL(file));
+        setCoverObjectUrl(URL.createObjectURL(file));
       } catch {
-        setCoverPreview(URL.createObjectURL(file));
+        setCoverObjectUrl(URL.createObjectURL(file));
       } finally {
         setUploadingCover(false);
       }
@@ -671,9 +682,9 @@ export function MerchantOnboardingPage() {
 
             {/* Avatar */}
             <div className="flex flex-col items-center gap-4">
-              {avatarPreview ? (
+              {avatarPreviewSource ? (
                 <img
-                  src={avatarPreview}
+                  src={avatarPreviewSource}
                   alt={t('steps.photo')}
                   className="w-24 h-24 rounded-full object-cover border-2 border-accent"
                 />
@@ -703,16 +714,13 @@ export function MerchantOnboardingPage() {
                 {t('upload_photo')}
               </Button>
               {/* Fallback: manual URL input if upload fails */}
-              {!avatarPreview && (
+              {!avatarPreviewSource && (
                 <Input
                   label={t('paste_image_url')}
                   variant="secondary"
                   size="sm"
                   value={avatarUrl}
-                  onValueChange={v => {
-                    setAvatarUrl(v);
-                    setAvatarPreview(v);
-                  }}
+                  onValueChange={setAvatarUrl}
                   className="max-w-xs"
                 />
               )}
@@ -720,9 +728,9 @@ export function MerchantOnboardingPage() {
 
             {/* Cover image */}
             <div className="space-y-3">
-              {coverPreview && (
+              {coverPreviewSource && (
                 <img
-                  src={coverPreview}
+                  src={coverPreviewSource}
                   alt={t('upload_cover')}
                   className="w-full h-32 object-cover rounded-xl border border-separator"
                 />
@@ -786,10 +794,10 @@ export function MerchantOnboardingPage() {
                   <span className="text-[var(--color-text)]">{address.city}, {address.country}</span>
                 </div>
               )}
-              {avatarPreview && (
+              {avatarPreviewSource && (
                 <div className="flex items-center gap-2 pt-1">
                   <img
-                    src={avatarPreview}
+                    src={avatarPreviewSource}
                     alt={t('steps.photo')}
                     className="w-10 h-10 rounded-full object-cover border border-separator"
                   />

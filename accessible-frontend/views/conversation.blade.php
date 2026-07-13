@@ -145,7 +145,9 @@
                 @endphp
                 <li class="nexus-alpha-card" id="m-{{ $messageId }}">
                     <div class="nexus-alpha-card-head">
-                        @php($senderAvatar = $message['sender']['avatar_url'] ?? null)
+                        @php
+                            $senderAvatar = $message['sender']['avatar_url'] ?? null;
+                        @endphp
                         @if (!empty($senderAvatar))
                             <img class="nexus-alpha-avatar" src="{{ $senderAvatar }}" alt="" loading="lazy" decoding="async" width="48" height="48">
                         @else

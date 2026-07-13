@@ -13,7 +13,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Textarea } from '@/components/ui/Textarea';
 import { useDisclosure } from '@/components/ui/useDisclosure';
-import { AlertDialog } from '@heroui/react';
+import { AlertDialog } from '@heroui/react/alert-dialog';
 /**
  * Group Challenges Tab
  * Active and completed challenges with progress tracking, countdown timers, * and admin challenge creation.

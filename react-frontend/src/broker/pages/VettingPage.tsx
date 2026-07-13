@@ -418,7 +418,7 @@ export function VettingRecords() {
         </div>
       ),
     },
-  ], [canRecordDecision, t]);
+  ], [canRecordDecision, policyData?.review_resolution_codes, t]);
 
   const emptyContent = (
     <BrokerEmptyState

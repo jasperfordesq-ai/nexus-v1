@@ -24,45 +24,45 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 Route::get('/groups/{id}/invite', [AlphaController::class, 'groupsInvite'])
     ->whereNumber('id')->name('groups.invite');
 Route::post('/groups/{id}/invite/link', [AlphaController::class, 'groupsCreateInviteLink'])
-    ->whereNumber('id')->middleware('throttle:15,1')->name('groups.invite.link');
+    ->whereNumber('id')->middleware('throttle:nexus-route-15-per-1m')->name('groups.invite.link');
 Route::post('/groups/{id}/invite/email', [AlphaController::class, 'groupsSendInvites'])
-    ->whereNumber('id')->middleware('throttle:10,1')->name('groups.invite.email');
+    ->whereNumber('id')->middleware('throttle:nexus-route-10-per-1m')->name('groups.invite.email');
 Route::post('/groups/{id}/invite/{inviteId}/revoke', [AlphaController::class, 'groupsRevokeInvite'])
-    ->whereNumber('id')->whereNumber('inviteId')->middleware('throttle:20,1')->name('groups.invite.revoke');
+    ->whereNumber('id')->whereNumber('inviteId')->middleware('throttle:nexus-route-20-per-1m')->name('groups.invite.revoke');
 
 // --- Per-group notification preferences (members + admins) ---
 Route::get('/groups/{id}/notifications', [AlphaController::class, 'groupsNotificationPrefs'])
     ->whereNumber('id')->name('groups.notifications');
 Route::post('/groups/{id}/notifications', [AlphaController::class, 'groupsUpdateNotificationPrefs'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('groups.notifications.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('groups.notifications.update');
 
 // --- Avatar + cover image management (owner/admin) ---
 Route::get('/groups/{id}/image', [AlphaController::class, 'groupsImage'])
     ->whereNumber('id')->name('groups.image');
 Route::post('/groups/{id}/image', [AlphaController::class, 'groupsUpdateImage'])
-    ->whereNumber('id')->middleware('throttle:15,1')->name('groups.image.update');
+    ->whereNumber('id')->middleware('throttle:nexus-route-15-per-1m')->name('groups.image.update');
 
 // --- Files (list + upload visible to members; delete by uploader or admin) ---
 Route::get('/groups/{id}/files', [AlphaController::class, 'groupsFiles'])
     ->whereNumber('id')->name('groups.files.index');
 Route::post('/groups/{id}/files', [AlphaController::class, 'groupsUploadFile'])
-    ->whereNumber('id')->middleware('throttle:20,1')->name('groups.files.upload');
+    ->whereNumber('id')->middleware('throttle:nexus-route-20-per-1m')->name('groups.files.upload');
 Route::get('/groups/{id}/files/{fileId}/download', [AlphaController::class, 'groupsDownloadFile'])
     ->whereNumber('id')->whereNumber('fileId')->name('groups.files.download');
 Route::post('/groups/{id}/files/{fileId}/delete', [AlphaController::class, 'groupsDeleteFile'])
-    ->whereNumber('id')->whereNumber('fileId')->middleware('throttle:20,1')->name('groups.files.delete');
+    ->whereNumber('id')->whereNumber('fileId')->middleware('throttle:nexus-route-20-per-1m')->name('groups.files.delete');
 
 // --- Announcements (list visible to members; create/edit/delete/pin admin-only) ---
 Route::get('/groups/{id}/announcements', [AlphaController::class, 'groupsAnnouncements'])
     ->whereNumber('id')->name('groups.announcements');
 Route::post('/groups/{id}/announcements', [AlphaController::class, 'groupsCreateAnnouncement'])
-    ->whereNumber('id')->middleware('throttle:30,1')->name('groups.announcements.create');
+    ->whereNumber('id')->middleware('throttle:nexus-route-30-per-1m')->name('groups.announcements.create');
 Route::get('/groups/{id}/announcements/{annId}/edit', [AlphaController::class, 'groupsEditAnnouncement'])
     ->whereNumber('id')->whereNumber('annId')->name('groups.announcements.edit');
 Route::post('/groups/{id}/announcements/{annId}/edit', [AlphaController::class, 'groupsUpdateAnnouncement'])
-    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.update');
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:nexus-route-30-per-1m')->name('groups.announcements.update');
 Route::post('/groups/{id}/announcements/{annId}/delete', [AlphaController::class, 'groupsDeleteAnnouncement'])
-    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.delete');
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:nexus-route-30-per-1m')->name('groups.announcements.delete');
 Route::post('/groups/{id}/announcements/{annId}/pin', [AlphaController::class, 'groupsPinAnnouncement'])
-    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.pin');
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:nexus-route-30-per-1m')->name('groups.announcements.pin');
 });

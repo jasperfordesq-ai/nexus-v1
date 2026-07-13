@@ -369,7 +369,7 @@ describe('NewJobRoute', () => {
         video_url: '',
         company_size: '51-200',
         benefits: ['Mentoring'],
-        deadline: '2026-07-01T00:00:00Z',
+        deadline: '2099-07-01T00:00:00Z',
         status: 'closed',
       },
     });

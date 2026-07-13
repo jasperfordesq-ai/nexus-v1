@@ -280,6 +280,38 @@ class AdminSafeguardingControllerTest extends TestCase
         $this->assertContains('Test Consent Option', $optionLabels, 'Option label should be present in response');
     }
 
+    public function test_member_preferences_omits_false_checkbox_responses(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        Sanctum::actingAs($admin);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'false_admin_preference_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'False admin preference',
+            'is_active' => 1,
+            'sort_order' => 0,
+            'triggers' => json_encode(['requires_vetted_interaction' => true]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'option_id' => $optionId,
+            'selected_value' => '0',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/safeguarding/member-preferences');
+
+        $response->assertOk();
+        $this->assertNull(collect($response->json('data'))->firstWhere('user_id', $member->id));
+    }
+
     // ================================================================
     // MEMBER PREFERENCES — audit log on access
     // ================================================================

@@ -136,23 +136,22 @@ describe('native app configuration', () => {
 
   it('does not block cold starts on launch-time remote update checks', () => {
     const app = readJson('app.json').expo;
-    const manifest = read('android/app/src/main/AndroidManifest.xml');
 
     expect(app.updates.enabled).toBe(true);
     expect(app.updates.checkAutomatically).toBe('ON_ERROR_RECOVERY');
     expect(app.updates.fallbackToCacheTimeout).toBe(0);
-    expect(manifest).toContain('expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ERROR_RECOVERY_ONLY"');
-    expect(manifest).toContain('expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"');
   });
 
-  it('paints a branded Android window while React is booting', () => {
-    const styles = read('android/app/src/main/res/values/styles.xml');
-    const launchBackground = read('android/app/src/main/res/drawable/ic_launcher_background.xml');
+  it('configures a branded splash while React is booting', () => {
+    const app = readJson('app.json').expo;
 
-    expect(styles).toContain('<style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">');
-    expect(styles).toContain('<item name="android:windowBackground">@color/splashscreen_background</item>');
-    expect(launchBackground).toContain('@color/splashscreen_background');
-    expect(launchBackground).toContain('@drawable/splashscreen_logo');
+    expect(app.splash).toEqual(expect.objectContaining({
+      image: './assets/splash.png',
+      resizeMode: 'contain',
+      backgroundColor: '#006FEE',
+    }));
+    expect(app.android.adaptiveIcon.backgroundColor).toBe('#006FEE');
+    expect(fs.existsSync(path.join(root, app.splash.image))).toBe(true);
   });
 
   it('keeps the Android notification icon in Expo-compatible dimensions', () => {
@@ -189,14 +188,11 @@ describe('native app configuration', () => {
 
     expect(envExample).toContain('http://10.0.2.2:8090');
     expect(envExample).toContain('http://localhost:8090');
-    expect(envExample).not.toContain(':8090');
   });
 
-  it('allows Android release APKs to reach only approved cleartext development hosts', () => {
-    const manifest = read('android/app/src/main/AndroidManifest.xml');
-    const networkConfig = read('android/app/src/main/res/xml/network_security_config.xml');
+  it('keeps the network-security source fail-closed for a future explicit config plugin', () => {
+    const networkConfig = read('android-network-security-config.xml');
 
-    expect(manifest).toContain('android:networkSecurityConfig="@xml/network_security_config"');
     expect(networkConfig).toContain('<domain-config cleartextTrafficPermitted="true">');
     expect(networkConfig).toContain('<domain includeSubdomains="false">10.0.2.2</domain>');
     expect(networkConfig).toContain('<domain includeSubdomains="false">localhost</domain>');

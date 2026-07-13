@@ -114,6 +114,56 @@ class NotifySafeguardingStaffTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function test_handle_omits_false_checkbox_from_staff_summary(): void
+    {
+        $member = $this->seedUser(['role' => 'member', 'status' => 'active']);
+        $admin = $this->seedUser(['role' => 'admin', 'status' => 'active']);
+        $hiddenLabel = 'False safeguarding option must not reach staff summary';
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'false_staff_summary_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => $hiddenLabel,
+            'is_active' => 1,
+            'sort_order' => 1,
+            'triggers' => json_encode(['notify_admin_on_selection' => true]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'option_id' => $optionId,
+            'selected_value' => '0',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $this->notificationAlias->shouldReceive('create')->once();
+        $this->emailAlias
+            ->shouldReceive('sendRaw')
+            ->once()
+            ->with(
+                $admin->email,
+                Mockery::type('string'),
+                Mockery::on(static fn (string $html): bool => ! str_contains($html, $hiddenLabel)),
+                null,
+                null,
+                null,
+                'safeguarding',
+                Mockery::type('array'),
+            )
+            ->andReturn(true);
+
+        (new NotifySafeguardingStaff())->handle(new SafeguardingFlaggedEvent(
+            $member->id,
+            $this->testTenantId,
+            ['notify_admin_on_selection' => true],
+        ));
+
+        $this->assertTrue(true);
+    }
+
     // -------------------------------------------------------------------------
     // Fan-out to multiple staff
     // -------------------------------------------------------------------------

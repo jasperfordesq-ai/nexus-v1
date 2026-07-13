@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Services\PrerenderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -24,14 +23,6 @@ use Tests\Laravel\TestCase;
 class AdminPrerenderControllerTest extends TestCase
 {
     use DatabaseTransactions;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        if (! Schema::hasTable('prerender_jobs')) {
-            $this->markTestSkipped('prerender_jobs table not present (migration not run).');
-        }
-    }
 
     public function test_summary_requires_auth(): void
     {
@@ -239,10 +230,6 @@ class AdminPrerenderControllerTest extends TestCase
 
     public function test_reset_queue_preserves_long_running_job_with_recent_heartbeat(): void
     {
-        if (!Schema::hasColumn('prerender_jobs', 'heartbeat_at')) {
-            $this->markTestSkipped('heartbeat_at migration is not available');
-        }
-
         Sanctum::actingAs($this->makeSuperAdmin());
         $jobId = DB::table('prerender_jobs')->insertGetId([
             'status' => 'running',

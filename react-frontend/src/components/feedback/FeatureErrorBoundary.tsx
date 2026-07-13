@@ -19,6 +19,7 @@ import { logError } from '@/lib/logger';
 
 interface FeatureErrorBoundaryProps {
   children: ReactNode;
+  /** Internal telemetry tag. Never render this value: route declarations may use stable English identifiers. */
   featureName: string;
   fallback?: ReactNode;
   onRetry?: () => void;
@@ -93,7 +94,7 @@ export class FeatureErrorBoundary extends Component<
               {i18n.t('error_boundary.title', { ns: 'common' })}
             </h3>
             <p className="text-theme-muted text-sm mb-4">
-              {i18n.t('feature_error.load_failed', { ns: 'common', feature: this.props.featureName })}
+              {i18n.t('error_boundary.description', { ns: 'common' })}
             </p>
             <Button
               variant="tertiary"

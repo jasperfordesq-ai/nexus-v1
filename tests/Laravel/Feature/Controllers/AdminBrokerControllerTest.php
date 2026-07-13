@@ -38,6 +38,42 @@ class AdminBrokerControllerTest extends TestCase
         $response->assertJsonMissingPath('data.vetting_expiring');
     }
 
+    public function test_dashboard_does_not_count_false_safeguarding_checkbox_as_a_flag(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        Sanctum::actingAs($admin);
+
+        $baseline = $this->apiGet('/v2/admin/broker/dashboard');
+        $baseline->assertOk();
+        $baselineCount = $baseline->json('data.onboarding_safeguarding_flags');
+        $this->assertIsInt($baselineCount);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'false_dashboard_preference_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'False dashboard preference',
+            'is_active' => 1,
+            'sort_order' => 0,
+            'triggers' => json_encode(['requires_vetted_interaction' => true]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'option_id' => $optionId,
+            'selected_value' => '0',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $this->apiGet('/v2/admin/broker/dashboard')
+            ->assertOk()
+            ->assertJsonPath('data.onboarding_safeguarding_flags', $baselineCount);
+    }
+
     public function test_dashboard_returns_403_for_regular_member(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();

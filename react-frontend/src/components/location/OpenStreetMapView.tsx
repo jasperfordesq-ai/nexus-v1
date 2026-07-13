@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * OpenStreetMapView — react-leaflet implementation matching LocationMapProps.
+ * OpenStreetMapView — direct Leaflet implementation matching LocationMapProps.
  *
  * Renders an interactive Leaflet map with OSM tiles, custom SVG pins, popups,
  * optional fitBounds, and marker clustering. Used as the OSM branch of
@@ -21,7 +21,6 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
@@ -87,73 +86,6 @@ function buildPinIcon(color: string, glyph?: string): L.DivIcon {
   });
 }
 
-/**
- * Inner component that has access to the Leaflet map instance.
- * Uses leaflet.markercluster for marker grouping at low zoom levels and
- * handles fitBounds when the marker set changes.
- */
-function MarkersAndBounds({
-  markers,
-  fitBounds,
-  cluster,
-  onMarkerClick,
-}: Pick<LocationMapProps, 'markers' | 'fitBounds' | 'cluster' | 'onMarkerClick'>) {
-  const map = useMap();
-  const clusterGroupRef = useRef<L.MarkerClusterGroup | L.LayerGroup | null>(null);
-  const lastSignatureRef = useRef<string>('');
-
-  const useCluster = cluster ?? markers.length > CLUSTER_AUTO_THRESHOLD;
-
-  useEffect(() => {
-    // Build (or rebuild) the layer that holds all markers
-    const layer = useCluster
-      ? L.markerClusterGroup({ chunkedLoading: true, showCoverageOnHover: false })
-      : L.layerGroup();
-
-    for (const m of markers) {
-      const leafletMarker = L.marker([m.lat, m.lng], {
-        icon: buildPinIcon(m.pinColor ?? '#1976D2', m.pinGlyph),
-        title: m.title,
-      });
-      const popupHtml = m.title.replace(/[<>&"]/g, (c) =>
-        ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c] ?? c
-      );
-      leafletMarker.bindPopup(`<div style="font-weight:600">${popupHtml}</div>`);
-      if (onMarkerClick) {
-        leafletMarker.on('click', () => onMarkerClick(m));
-      }
-      leafletMarker.addTo(layer);
-    }
-
-    layer.addTo(map);
-    clusterGroupRef.current = layer;
-
-    return () => {
-      layer.removeFrom(map);
-      clusterGroupRef.current = null;
-    };
-  }, [markers, useCluster, onMarkerClick, map]);
-
-  useEffect(() => {
-    if (!fitBounds || markers.length === 0) return;
-
-    const signature = markers.map((m) => `${m.id}:${m.lat},${m.lng}`).join('|');
-    if (signature === lastSignatureRef.current) return;
-    lastSignatureRef.current = signature;
-
-    if (markers.length === 1) {
-      const only = markers[0]!;
-      map.setView([only.lat, only.lng], Math.max(map.getZoom(), 14), { animate: true });
-      return;
-    }
-
-    const bounds = L.latLngBounds(markers.map((m) => [m.lat, m.lng] as [number, number]));
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16, animate: true });
-  }, [markers, fitBounds, map]);
-
-  return null;
-}
-
 export function OpenStreetMapView({
   markers,
   center,
@@ -164,6 +96,13 @@ export function OpenStreetMapView({
   fitBounds = false,
   cluster,
 }: LocationMapProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const markerLayerRef = useRef<L.MarkerClusterGroup | L.LayerGroup | null>(null);
+  const lastBoundsSignatureRef = useRef('');
+  const [mapReady, setMapReady] = useState(false);
+
   // Runtime tile URL — chosen by the server. If the tenant has set a
   // MapTiler key, the URL embeds it and we render production-grade tiles
   // with proper attribution. Otherwise we fall back to free OSM tiles.
@@ -192,6 +131,99 @@ export function OpenStreetMapView({
     return DEFAULT_CENTER;
   }, [center, markers]);
 
+  // Leaflet owns the contents of this element. Keeping map creation separate
+  // from tile and marker updates avoids tearing down the map when runtime
+  // configuration or marker data changes.
+  const initialCenterRef = useRef(initialCenter);
+  const initialZoomRef = useRef(zoom);
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const map = L.map(container, {
+      center: initialCenterRef.current,
+      zoom: initialZoomRef.current,
+      scrollWheelZoom: true,
+    });
+    mapRef.current = map;
+    setMapReady(true);
+
+    return () => {
+      mapRef.current = null;
+      tileLayerRef.current = null;
+      markerLayerRef.current = null;
+      map.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map) return;
+
+    tileLayerRef.current?.removeFrom(map);
+    const tileLayer = L.tileLayer(tileUrl, {
+      attribution: tileAttribution,
+      maxZoom: 19,
+    }).addTo(map);
+    tileLayerRef.current = tileLayer;
+
+    return () => {
+      // The map-owning effect may already have removed the Leaflet instance
+      // during unmount. Dependency updates still remove the current layer.
+      if (mapRef.current === map) tileLayer.removeFrom(map);
+      if (tileLayerRef.current === tileLayer) tileLayerRef.current = null;
+    };
+  }, [mapReady, tileAttribution, tileUrl]);
+
+  const useCluster = cluster ?? markers.length > CLUSTER_AUTO_THRESHOLD;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map) return;
+
+    const layer = useCluster
+      ? L.markerClusterGroup({ chunkedLoading: true, showCoverageOnHover: false })
+      : L.layerGroup();
+
+    for (const marker of markers) {
+      const leafletMarker = L.marker([marker.lat, marker.lng], {
+        icon: buildPinIcon(marker.pinColor ?? '#1976D2', marker.pinGlyph),
+        title: marker.title,
+      });
+      const popupHtml = marker.title.replace(/[<>&"]/g, (character) =>
+        ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[character] ?? character
+      );
+      leafletMarker.bindPopup(`<div style="font-weight:600">${popupHtml}</div>`);
+      if (onMarkerClick) leafletMarker.on('click', () => onMarkerClick(marker));
+      leafletMarker.addTo(layer);
+    }
+
+    layer.addTo(map);
+    markerLayerRef.current = layer;
+
+    return () => {
+      if (mapRef.current === map) layer.removeFrom(map);
+      if (markerLayerRef.current === layer) markerLayerRef.current = null;
+    };
+  }, [mapReady, markers, onMarkerClick, useCluster]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map || !fitBounds || markers.length === 0) return;
+
+    const signature = markers.map((marker) => `${marker.id}:${marker.lat},${marker.lng}`).join('|');
+    if (signature === lastBoundsSignatureRef.current) return;
+    lastBoundsSignatureRef.current = signature;
+
+    if (markers.length === 1) {
+      const only = markers[0]!;
+      map.setView([only.lat, only.lng], Math.max(map.getZoom(), 14), { animate: true });
+      return;
+    }
+
+    const bounds = L.latLngBounds(markers.map((marker) => [marker.lat, marker.lng]));
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16, animate: true });
+  }, [fitBounds, mapReady, markers]);
+
   return (
     <div
       className={`nexus-osm-map-wrapper rounded-xl overflow-hidden ${className}`}
@@ -205,18 +237,7 @@ export function OpenStreetMapView({
         }
         .nexus-osm-map-wrapper .leaflet-popup-content-wrapper { border-radius: 12px; }
       `}</style>
-      <MapContainer center={initialCenter} zoom={zoom} scrollWheelZoom>
-        {/* `key` forces a fresh TileLayer when the URL flips from free OSM
-            to MapTiler after runtime config arrives, so the new attribution
-            and tile pyramid replace the placeholder cleanly. */}
-        <TileLayer key={tileUrl} attribution={tileAttribution} url={tileUrl} maxZoom={19} />
-        <MarkersAndBounds
-          markers={markers}
-          fitBounds={fitBounds}
-          cluster={cluster}
-          onMarkerClick={onMarkerClick}
-        />
-      </MapContainer>
+      <div ref={containerRef} data-testid="map-container" className="h-full w-full" />
     </div>
   );
 }

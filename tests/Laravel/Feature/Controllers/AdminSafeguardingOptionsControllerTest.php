@@ -179,6 +179,30 @@ class AdminSafeguardingOptionsControllerTest extends TestCase
         $this->assertContactRemainsBlocked($sender, $recipient, 'Deactivation must not open contact');
     }
 
+    public function test_update_can_remove_protection_when_the_only_checkbox_response_is_false(): void
+    {
+        [$admin, , , $option, $preferenceId] = $this->seedLivePresetProtection();
+        DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->update(['selected_value' => '0']);
+
+        Sanctum::actingAs($admin);
+        $this->apiPut("/v2/admin/safeguarding/options/{$option->id}", [
+            'triggers' => [
+                'requires_vetted_interaction' => false,
+                'restricts_matching' => true,
+                'notify_admin_on_selection' => true,
+                'vetting_type_required' => 'dbs_enhanced',
+            ],
+        ])->assertStatus(200);
+
+        $option->refresh();
+        $this->assertFalse($option->getTrigger('requires_vetted_interaction'));
+        $this->assertNull(DB::table('user_safeguarding_preferences')
+            ->where('id', $preferenceId)
+            ->value('revoked_at'));
+    }
+
     public function test_delete_cannot_revoke_a_live_protected_selection(): void
     {
         [$admin, $sender, $recipient, $option, $preferenceId] = $this->seedLivePresetProtection();

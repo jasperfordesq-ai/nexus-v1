@@ -71,7 +71,10 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 RUN printf '<IfModule remoteip_module>\n\
-  RemoteIPHeader CF-Connecting-IP\n\
+  # The host Apache proxy appends its actual peer to X-Forwarded-For. Parsing\n\
+  # that chain right-to-left prevents a direct-origin caller from choosing\n\
+  # REMOTE_ADDR through a forged CF-Connecting-IP header.\n\
+  RemoteIPHeader X-Forwarded-For\n\
   RemoteIPTrustedProxy 173.245.48.0/20\n\
   RemoteIPTrustedProxy 103.21.244.0/22\n\
   RemoteIPTrustedProxy 103.22.200.0/22\n\
@@ -117,13 +120,13 @@ RUN echo 'ServerTokens Prod' >> /etc/apache2/conf-available/security.conf \
     && echo 'ServerSignature Off' >> /etc/apache2/conf-available/security.conf \
     && a2enconf security
 
+# CSP is emitted once by Laravel SecurityHeaders so its per-request nonce remains authoritative.
 RUN a2enmod headers \
     && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"\n\
 Header always set X-Frame-Options "SAMEORIGIN"\n\
 Header always set X-Content-Type-Options "nosniff"\n\
 Header always set Referrer-Policy "strict-origin-when-cross-origin"\n\
-Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n\
-Header always set Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"' https://js.stripe.com https://maps.googleapis.com https://challenges.cloudflare.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' data: https:; connect-src '"'"'self'"'"' wss: https://api.stripe.com https://maps.googleapis.com https://challenges.cloudflare.com https://api.pwnedpasswords.com; frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com; object-src '"'"'none'"'"'; base-uri '"'"'self'"'"'; form-action '"'"'self'"'"'; report-uri /api/v2/csp-report"\n' \
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n' \
     > /etc/apache2/conf-available/security-headers.conf \
     && a2enconf security-headers
 

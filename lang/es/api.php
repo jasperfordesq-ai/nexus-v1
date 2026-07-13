@@ -1161,6 +1161,7 @@ return [
     'donation_failed_check_recipient' => 'La donación falló. Comprueba tu saldo y el destinatario.',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes' => '{1} Demasiados intentos de inicio de sesión. Inténtalo de nuevo en 1 minuto.|[2,*] Demasiados intentos de inicio de sesión. Inténtalo de nuevo en :count minutos.',
     'legal' => [
         'no_documents_require_acceptance' => 'No documents require acceptance',
         'all_documents_accepted' => 'All documents accepted',

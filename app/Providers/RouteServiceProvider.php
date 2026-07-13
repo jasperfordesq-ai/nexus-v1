@@ -31,6 +31,34 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/';
 
     /**
+     * Legacy numeric route policies expressed as explicit named limiters.
+     *
+     * Every declaration using one of these names receives an endpoint-specific
+     * tenant/actor bucket plus a broader IP envelope. This preserves the
+     * existing ceilings without Laravel's numeric-throttle behaviour, where
+     * unrelated routes for the same authenticated user share one cache key.
+     *
+     * @var array<string, array{attempts: int, minutes: int}>
+     */
+    private const ROUTE_RATE_POLICIES = [
+        'nexus-route-1-per-1m' => ['attempts' => 1, 'minutes' => 1],
+        'nexus-route-2-per-1m' => ['attempts' => 2, 'minutes' => 1],
+        'nexus-route-3-per-60m' => ['attempts' => 3, 'minutes' => 60],
+        'nexus-route-5-per-1m' => ['attempts' => 5, 'minutes' => 1],
+        'nexus-route-5-per-5m' => ['attempts' => 5, 'minutes' => 5],
+        'nexus-route-5-per-60m' => ['attempts' => 5, 'minutes' => 60],
+        'nexus-route-10-per-1m' => ['attempts' => 10, 'minutes' => 1],
+        'nexus-route-15-per-1m' => ['attempts' => 15, 'minutes' => 1],
+        'nexus-route-20-per-1m' => ['attempts' => 20, 'minutes' => 1],
+        'nexus-route-30-per-1m' => ['attempts' => 30, 'minutes' => 1],
+        'nexus-route-40-per-1m' => ['attempts' => 40, 'minutes' => 1],
+        'nexus-route-60-per-1m' => ['attempts' => 60, 'minutes' => 1],
+        'nexus-route-120-per-1m' => ['attempts' => 120, 'minutes' => 1],
+        'nexus-route-200-per-1m' => ['attempts' => 200, 'minutes' => 1],
+        'nexus-route-300-per-1m' => ['attempts' => 300, 'minutes' => 1],
+    ];
+
+    /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
@@ -55,6 +83,17 @@ class RouteServiceProvider extends ServiceProvider
             );
         });
 
+        foreach (self::ROUTE_RATE_POLICIES as $name => $policy) {
+            RateLimiter::for(
+                $name,
+                static fn (Request $request): array => self::routeRateLimits(
+                    $request,
+                    $policy['attempts'],
+                    $policy['minutes'],
+                ),
+            );
+        }
+
         // Event People bulk mutations must not share Laravel's default numeric
         // throttle bucket with unrelated API routes. Keep the existing allowance,
         // but isolate it per tenant and authenticated actor.
@@ -70,7 +109,7 @@ class RouteServiceProvider extends ServiceProvider
 
         // Bulk data export / import — 1 per minute keyed by authenticated user
         // (falls back to IP for unauthenticated, but all current callers are
-        // behind auth:sanctum). This replaces the per-IP `throttle:1,1` that
+        // behind auth:sanctum). This replaces the old per-IP numeric throttle that
         // allowed multiple admins behind a shared NAT to starve each other.
         RateLimiter::for('bulk-export', function (Request $request) {
             return Limit::perMinute(1)->by(
@@ -160,12 +199,12 @@ class RouteServiceProvider extends ServiceProvider
             // prefix. Already-sent emails must keep resolving.
             Route::middleware('api')->group(function () {
                 Route::get('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])
-                    ->middleware('throttle:30,1');
+                    ->middleware('throttle:nexus-route-30-per-1m');
                 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe'])
-                    ->middleware('throttle:30,1');
+                    ->middleware('throttle:nexus-route-30-per-1m');
                 Route::get('/v2/newsletter/pixel/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackOpen']);
                 Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\NewsletterController::class, 'trackClick'])
-                    ->middleware('throttle:120,1');
+                    ->middleware('throttle:nexus-route-120-per-1m');
             });
 
             Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index']);
@@ -204,5 +243,33 @@ class RouteServiceProvider extends ServiceProvider
         $actor = $userId !== null ? 'user:' . $userId : 'ip:' . $request->ip();
 
         return "groups:{$family}:tenant:{$tenantId}:{$actor}:all";
+    }
+
+    /** @return array{0: Limit, 1: Limit} */
+    private static function routeRateLimits(Request $request, int $attempts, int $minutes): array
+    {
+        $tenantId = (int) (TenantContext::currentId() ?? 0);
+        $userId = $request->user()?->getAuthIdentifier();
+        $ip = (string) $request->ip();
+        $actor = $userId !== null ? 'user:' . $userId : 'ip:' . $ip;
+
+        $route = $request->route();
+        $routeName = is_object($route) && method_exists($route, 'getName')
+            ? $route->getName()
+            : null;
+        $routeUri = is_object($route) && method_exists($route, 'uri')
+            ? $route->uri()
+            : $request->path();
+        $routeIdentity = hash('sha256', $request->method() . ':' . ($routeName ?: $routeUri));
+
+        return [
+            Limit::perMinutes($minutes, $attempts)->by(
+                "nexus-route:tenant:{$tenantId}:{$actor}:route:{$routeIdentity}"
+            ),
+            // Preserve a broad abuse ceiling for this policy tier after
+            // isolating endpoint buckets. It is intentionally IP-wide so
+            // tenant/domain hopping cannot multiply that tier's allowance.
+            Limit::perMinute(600)->by('nexus-route:ip:' . $ip . ':all'),
+        ];
     }
 }

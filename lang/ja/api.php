@@ -1122,6 +1122,7 @@ return [
     'donation_failed_check_recipient' => '寄付に失敗しました。残高と受取人を確認してください。',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
+    'too_many_login_attempts_minutes' => '{1} ログイン試行回数が多すぎます。1分後にもう一度お試しください。|[2,*] ログイン試行回数が多すぎます。:count分後にもう一度お試しください。',
     'legal' => [
         'no_documents_require_acceptance' => 'No documents require acceptance',
         'all_documents_accepted' => 'All documents accepted',

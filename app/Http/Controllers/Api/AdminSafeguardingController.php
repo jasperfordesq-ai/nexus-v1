@@ -10,6 +10,7 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\TenantSafeguardingOption;
+use App\Models\UserSafeguardingPreference;
 use App\Services\EmailDispatchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -712,7 +713,9 @@ class AdminSafeguardingController extends BaseApiController
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
                     u.avatar_url as user_avatar,
                     usp.consent_given_at,
+                    usp.selected_value,
                     tso.option_key,
+                    tso.option_type,
                     tso.preset_source,
                     tso.label as option_label,
                     tso.triggers
@@ -727,6 +730,13 @@ class AdminSafeguardingController extends BaseApiController
             // Group by user
             $grouped = [];
             foreach ($rows as $row) {
+                if (! UserSafeguardingPreference::isEffectivelySelected(
+                    $row->option_type ?? null,
+                    $row->selected_value ?? null,
+                )) {
+                    continue;
+                }
+
                 $uid = (int) $row->user_id;
                 if (!isset($grouped[$uid])) {
                     $grouped[$uid] = [

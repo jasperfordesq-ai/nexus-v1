@@ -602,7 +602,7 @@ function ClusterChooser({
 // Map provider:
 //   - 'google'        → @vis.gl/react-google-maps + GoogleMapsProvider
 //                       (existing implementation, paid)
-//   - 'openstreetmap' → react-leaflet + OSM tiles (free, see
+//   - 'openstreetmap' → direct Leaflet integration + OSM tiles (free, see
 //                       OpenStreetMapView.tsx)
 //   - 'ordnance_survey' → same Leaflet view; the server-issued tile URL
 //                       points at the OS Maps API (UK basemaps)

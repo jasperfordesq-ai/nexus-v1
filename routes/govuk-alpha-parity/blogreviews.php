@@ -28,15 +28,15 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // "comments" can never be captured as a post slug.
 Route::post('/blog/comments/{id}/update', [AlphaController::class, 'blogReviewsUpdateComment'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('blogreviews.blog.comments.update');
 Route::post('/blog/comments/{id}/delete', [AlphaController::class, 'blogReviewsDeleteComment'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('blogreviews.blog.comments.delete');
 Route::post('/blog/comments/{id}/react', [AlphaController::class, 'blogReviewsCommentReaction'])
     ->whereNumber('id')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('blogreviews.blog.comments.react');
 
 // Per-post comment thread + post-level reactions/likers (slug param).
@@ -48,11 +48,11 @@ Route::get('/blog/{slug}/comments', [AlphaController::class, 'blogReviewsPostCom
 // silently overwrites a same-method+path route, which would unname the base one.
 Route::post('/blog/{slug}/comments/add', [AlphaController::class, 'blogReviewsStorePostComment'])
     ->where('slug', '[a-zA-Z0-9_-]+')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('blogreviews.blog.comments.store');
 Route::post('/blog/{slug}/react', [AlphaController::class, 'blogReviewsPostReaction'])
     ->where('slug', '[a-zA-Z0-9_-]+')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('blogreviews.blog.react');
 Route::get('/blog/{slug}/likers/{reaction}', [AlphaController::class, 'blogReviewsPostLikers'])
     ->where('slug', '[a-zA-Z0-9_-]+')
@@ -71,10 +71,10 @@ Route::get('/reviews/{id}/comments', [AlphaController::class, 'blogReviewsReview
     ->name('blogreviews.reviews.comments');
 Route::post('/reviews/{id}/comments', [AlphaController::class, 'blogReviewsStoreReviewComment'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('blogreviews.reviews.comments.store');
 Route::post('/reviews/{id}/react', [AlphaController::class, 'blogReviewsReviewReaction'])
     ->whereNumber('id')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('blogreviews.reviews.react');
 });

@@ -21,6 +21,7 @@ import { api } from '@/lib/api';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
+import { QrCodeImage } from '@/components/volunteering/QrCodeImage';
 import { logError } from '@/lib/logger';
 
 interface CouponDetail {
@@ -122,10 +123,6 @@ export default function CouponDetailPage() {
     return t('coupon.type_bogo');
   };
 
-  // Use a public QR encoder (free, no API key needed). Falls back to text if blocked.
-  const qrImageUrl = qr
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr.token)}`
-    : null;
   const couponMetaDescription = (
     coupon.description ||
     t('coupon.detail_meta_description_named', { title: coupon.title, code: coupon.code })
@@ -200,8 +197,14 @@ export default function CouponDetailPage() {
         <ModalContent>
           <ModalHeader>{t('coupon.show_qr')}</ModalHeader>
           <ModalBody className="text-center pb-6">
-            {qrImageUrl && (
-              <img src={qrImageUrl} alt={t('coupon.qr_code_alt')} className="mx-auto mb-4 max-w-full" />
+            {qr && (
+              <QrCodeImage
+                value={qr.token}
+                alt={t('coupon.qr_code_alt')}
+                size={300}
+                className="mx-auto mb-4 max-w-full"
+                fallbackToLink={false}
+              />
             )}
             <p className="text-sm text-[var(--color-text-secondary)] mb-2">
               {t('coupon.scan_at_checkout')}

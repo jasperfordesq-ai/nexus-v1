@@ -185,8 +185,12 @@ export function resolveThumbnailSrcSet(url: string | null | undefined, options: 
     return '';
   }
 
-  const firstUrl = parts[0]?.replace(/\s+\d+w$/, '');
-  const allSame = parts.every((part) => part.replace(/\s+\d+w$/, '') === firstUrl);
+  const srcsetUrl = (part: string): string => {
+    const descriptorSeparator = part.lastIndexOf(' ');
+    return descriptorSeparator === -1 ? part : part.slice(0, descriptorSeparator);
+  };
+  const firstUrl = parts[0] ? srcsetUrl(parts[0]) : '';
+  const allSame = parts.every((part) => srcsetUrl(part) === firstUrl);
 
   return allSame ? '' : parts.join(', ');
 }

@@ -203,7 +203,8 @@ test.describe('real-browser accessibility gate', () => {
       const listingsLink = page.locator(`a[href="${tenantUrl('listings')}"]:visible`).first();
       await expect(listingsLink).toBeVisible();
       await listingsLink.click();
-      await expect(page).toHaveURL(new RegExp(`${tenantUrl('listings').replace(/\//g, '\\/')}/?$`));
+      const escapedListingsUrl = tenantUrl('listings').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      await expect(page).toHaveURL(new RegExp(`${escapedListingsUrl}/?$`));
 
       await expect.poll(
         () => page.evaluate(() => {

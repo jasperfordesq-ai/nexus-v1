@@ -4,6 +4,12 @@
     "denied": "You have blocked notifications. Update your browser settings to re-enable.",
     "subscribed": "You are subscribed on this device."
   },
+  "push_errors": {
+    "not_configured": "Push notifications are not configured yet.",
+    "not_ready": "Push notifications are not ready. Reload the page and try again.",
+    "enable_failed": "We couldn't enable push notifications. Please try again.",
+    "disable_failed": "We couldn't disable push notifications. Please try again."
+  },
   "identity": {
     "page_title": "Verify Identity",
     "page_title_dob": "Verify Identity — Date of Birth",

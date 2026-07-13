@@ -9,21 +9,15 @@ import MailCheck from 'lucide-react/icons/mail-check';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UserPlus from 'lucide-react/icons/user-plus';
 import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Checkbox,
-  CheckboxGroup,
-  Chip,
-  Input,
-  Radio,
-  RadioGroup,
-  Spinner,
-  Textarea,
-} from '@/components/ui';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Radio, RadioGroup } from '@/components/ui/Radio';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/contexts/ToastContext';
 import {

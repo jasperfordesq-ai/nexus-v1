@@ -26,7 +26,7 @@ use Tests\Laravel\TestCase;
  * Feature tests for TotpController — TOTP two-factor verification + status.
  *
  * Routes under test (routes/api.php):
- *   POST /api/totp/verify   — PUBLIC pre-login endpoint (throttle:5,1).
+ *   POST /api/totp/verify   — PUBLIC pre-login endpoint (throttle:nexus-route-5-per-1m).
  *                             Verifies a TOTP/backup code against either a
  *                             stateless two_factor_token (cache-backed) or a
  *                             session+CSRF flow, then completes login.
@@ -50,7 +50,7 @@ class TotpControllerTest extends TestCase
         // POST /totp/verify is rate-limited two ways for anonymous callers, both
         // keyed by IP and backed by the array cache that is shared across every
         // test in this PHP process:
-        //   - the route middleware throttle:5,1
+        //   - the route middleware throttle:nexus-route-5-per-1m
         //   - the controller's internal rateLimit('totp_verify', 5, 300)
         // Flushing the cache between tests guarantees each verify test starts
         // with a clean rate-limit bucket (and no leftover challenge tokens), so

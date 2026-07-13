@@ -8,6 +8,10 @@ import './app.scss';
 
 initAll();
 
+document.querySelectorAll<HTMLElement>('[data-alpha-print-page]').forEach((button) => {
+  button.addEventListener('click', () => window.print());
+});
+
 document.querySelectorAll<HTMLFormElement>('[data-alpha-auto-submit]').forEach((form) => {
   form.querySelectorAll<HTMLSelectElement>('select').forEach((select) => {
     select.addEventListener('change', () => form.requestSubmit());

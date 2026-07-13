@@ -274,7 +274,7 @@ function createMotionComponent(tag: string) {
         children,
         onPointerDown: userPointerDown,
         ...rest
-      } = props as MotionProps & Record<string, any>;
+      } = props as MotionProps & Record<string, unknown>;
 
       const presence = React.use(PresenceContext);
       const parentVariants = React.use(VariantContext);
@@ -443,7 +443,7 @@ function createMotionComponent(tag: string) {
 
       const handlePointerDown = React.useCallback(
         (e: React.PointerEvent) => {
-          userPointerDown?.(e);
+          (userPointerDown as React.PointerEventHandler | undefined)?.(e);
           if (!drag) return;
           (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
           dragData.current = {
@@ -504,17 +504,17 @@ function createMotionComponent(tag: string) {
       const handlers: Record<string, unknown> = {};
       if (whileHover !== undefined) {
         const prevEnter = rest.onPointerEnter; const prevLeave = rest.onPointerLeave;
-        handlers.onPointerEnter = (e: React.PointerEvent) => { setHovered(true); (prevEnter as any)?.(e); };
-        handlers.onPointerLeave = (e: React.PointerEvent) => { setHovered(false); setTapped(false); (prevLeave as any)?.(e); };
+        handlers.onPointerEnter = (e: React.PointerEvent) => { setHovered(true); (prevEnter as React.PointerEventHandler)?.(e); };
+        handlers.onPointerLeave = (e: React.PointerEvent) => { setHovered(false); setTapped(false); (prevLeave as React.PointerEventHandler)?.(e); };
       }
       if (whileTap !== undefined) {
         const prevDown = rest.onPointerDown; const prevUp = rest.onPointerUp;
-        handlers.onPointerDown = (e: React.PointerEvent) => { setTapped(true); (prevDown as any)?.(e); };
-        handlers.onPointerUp = (e: React.PointerEvent) => { setTapped(false); (prevUp as any)?.(e); };
+        handlers.onPointerDown = (e: React.PointerEvent) => { setTapped(true); (prevDown as React.PointerEventHandler)?.(e); };
+        handlers.onPointerUp = (e: React.PointerEvent) => { setTapped(false); (prevUp as React.PointerEventHandler)?.(e); };
       }
       if (whileFocus !== undefined) {
-        handlers.onFocus = (e: React.FocusEvent) => { setFocused(true); (rest.onFocus as any)?.(e); };
-        handlers.onBlur = (e: React.FocusEvent) => { setFocused(false); (rest.onBlur as any)?.(e); };
+        handlers.onFocus = (e: React.FocusEvent) => { setFocused(true); (rest.onFocus as React.FocusEventHandler)?.(e); };
+        handlers.onBlur = (e: React.FocusEvent) => { setFocused(false); (rest.onBlur as React.FocusEventHandler)?.(e); };
       }
 
       // Provide a variant context to descendants when acting as a stagger container.

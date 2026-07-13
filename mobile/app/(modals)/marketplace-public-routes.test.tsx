@@ -75,6 +75,10 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('react-native-qrcode-svg', () => {
+  const { View } = require('react-native');
+  return ({ value }: { value: string }) => <View testID="merchant-coupon-qr" accessibilityLabel={value} />;
+});
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
 jest.mock('@/components/ui/AppToast', () => {
   const show = jest.fn();
@@ -272,7 +276,7 @@ describe('public marketplace routes', () => {
       },
     } as never);
 
-    const { getByText, findByText } = render(<MarketplaceCouponDetailRoute />);
+    const { getByText, findByText, findByTestId } = render(<MarketplaceCouponDetailRoute />);
 
     expect(getByText('Community discount')).toBeTruthy();
     expect(getByText('COMMUNITY10')).toBeTruthy();
@@ -281,5 +285,8 @@ describe('public marketplace routes', () => {
 
     expect(await findByText('Show QR code')).toBeTruthy();
     expect(await findByText('coupon-token')).toBeTruthy();
+    expect(await findByTestId('merchant-coupon-qr')).toBeTruthy();
+    const source = require('fs').readFileSync(require.resolve('./marketplace-coupon-detail'), 'utf8');
+    expect(source).not.toContain('api.qrserver.com');
   });
 });

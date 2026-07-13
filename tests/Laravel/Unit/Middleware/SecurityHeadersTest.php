@@ -27,6 +27,27 @@ class SecurityHeadersTest extends TestCase
         };
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
+    private function parseCsp(string $policy): array
+    {
+        $directives = [];
+        foreach (explode(';', $policy) as $segment) {
+            $tokens = preg_split('/\s+/', trim($segment)) ?: [];
+            if ($tokens === []) {
+                continue;
+            }
+
+            $name = array_shift($tokens);
+            if (is_string($name) && $name !== '') {
+                $directives[$name] = array_values($tokens);
+            }
+        }
+
+        return $directives;
+    }
+
     public function test_handle_sets_x_frame_options(): void
     {
         $request = Request::create('/api/v2/feed', 'GET');
@@ -58,9 +79,46 @@ class SecurityHeadersTest extends TestCase
 
         $csp = $response->headers->get('Content-Security-Policy');
         $this->assertNotNull($csp);
-        $this->assertStringContainsString("default-src 'self'", $csp);
-        $this->assertStringContainsString("frame-ancestors 'self'", $csp);
-        $this->assertStringContainsString('wss://*.pusher.com', $csp);
+        $directives = $this->parseCsp($csp);
+
+        $requiredSources = [
+            'default-src' => ["'self'"],
+            'script-src' => [
+                "'self'",
+                'https://*.googleapis.com',
+                'https://*.gstatic.com',
+                'https://*.google.com',
+                'https://*.ggpht.com',
+                'https://*.googleusercontent.com',
+                'https://challenges.cloudflare.com',
+            ],
+            'connect-src' => [
+                "'self'",
+                'https://*.googleapis.com',
+                'https://*.gstatic.com',
+                'https://*.google.com',
+                'https://challenges.cloudflare.com',
+                'https://api.pwnedpasswords.com',
+            ],
+            'frame-src' => [
+                "'self'",
+                'https://*.google.com',
+                'https://challenges.cloudflare.com',
+                'https://www.openstreetmap.org',
+            ],
+            'frame-ancestors' => ["'self'"],
+        ];
+        foreach ($requiredSources as $directive => $sources) {
+            $this->assertArrayHasKey($directive, $directives);
+            foreach ($sources as $source) {
+                $this->assertContains($source, $directives[$directive], "{$directive} must allow {$source}");
+            }
+        }
+
+        $this->assertMatchesRegularExpression("/'nonce-[a-f0-9]{32}'/", $csp);
+        $this->assertStringNotContainsString('stripe.com', $csp);
+        $this->assertStringNotContainsString('pusher.com', $csp);
+        $this->assertDoesNotMatchRegularExpression('/(?:default|script|connect)-src[^;]*\\shttps:(?:\\s|;)/', $csp);
     }
 
     public function test_handle_sets_referrer_policy(): void

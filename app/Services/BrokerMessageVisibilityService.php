@@ -299,29 +299,37 @@ class BrokerMessageVisibilityService
             ->where('tenant_id', $tenantId)
             ->first();
 
-        if (!$restriction || !$restriction->messaging_disabled) {
+        if (!$restriction) {
             return false;
         }
 
-        // If monitoring has expired, auto-clear
-        if ($restriction->under_monitoring && $restriction->monitoring_expires_at
-            && strtotime($restriction->monitoring_expires_at) <= time()) {
-            $this->clearExpiredMonitoring($userId, $tenantId);
-            return false;
-        }
+        // Resolve monitoring through the same fail-closed predicate used by
+        // broker copying and member-facing status. This also repairs the exact
+        // legacy self-selection marker without changing an independent
+        // messaging-disabled decision on the same row.
+        $this->isActiveAuthorizedMonitoring($restriction, $userId, $tenantId);
 
-        return true;
+        return (bool) ($restriction->messaging_disabled ?? false);
     }
 
     /**
      * Get the messaging restriction status for a user.
      *
      * @param int $userId User ID
-     * @return array{messaging_disabled: bool, under_monitoring: bool, restriction_reason: string|null}
+     * @return array{
+     *     messaging_disabled: bool,
+     *     under_monitoring: bool,
+     *     restriction_reason: string|null,
+     *     review_notice_required: bool
+     * }
      */
     public function getUserRestrictionStatus(int $userId): array
     {
         $tenantId = TenantContext::getId();
+        // This is deliberately tenant-policy state, not a participant-pair
+        // signal. Pair-specific disclosure could reveal that the other member
+        // is monitored; the generic notice safely covers every copy criterion.
+        $reviewNoticeRequired = $this->configService->isBrokerVisibilityEnabled();
 
         $row = DB::table('user_messaging_restrictions')
             ->where('user_id', $userId)
@@ -333,22 +341,25 @@ class BrokerMessageVisibilityService
                 'messaging_disabled' => false,
                 'under_monitoring' => false,
                 'restriction_reason' => null,
+                'review_notice_required' => $reviewNoticeRequired,
             ];
         }
 
-        $underMonitoring = (bool) ($row->under_monitoring ?? 0);
+        $underMonitoring = $this->isActiveAuthorizedMonitoring($row, $userId, $tenantId);
         $messagingDisabled = (bool) ($row->messaging_disabled ?? 0);
 
-        if ($underMonitoring && $row->monitoring_expires_at && strtotime($row->monitoring_expires_at) <= time()) {
-            $this->clearExpiredMonitoring($userId, $tenantId);
-            $underMonitoring = false;
-            $messagingDisabled = false;
+        $restrictionReason = $underMonitoring
+            ? ($row->monitoring_reason ?? $row->restriction_reason ?? null)
+            : ($messagingDisabled ? ($row->restriction_reason ?? null) : null);
+        if ($restrictionReason === SafeguardingTriggerService::MONITORING_REASON_ONBOARDING) {
+            $restrictionReason = null;
         }
 
         return [
             'messaging_disabled' => $messagingDisabled,
             'under_monitoring' => $underMonitoring,
-            'restriction_reason' => $row->monitoring_reason ?? $row->restriction_reason ?? null,
+            'restriction_reason' => $restrictionReason,
+            'review_notice_required' => $reviewNoticeRequired,
         ];
     }
 
@@ -375,12 +386,39 @@ class BrokerMessageVisibilityService
             ->where('tenant_id', $tenantId)
             ->first();
 
-        if (!$restriction || !$restriction->under_monitoring) {
+        if (!$restriction) {
             return false;
         }
 
-        if ($restriction->monitoring_expires_at && strtotime($restriction->monitoring_expires_at) <= time()) {
+        return $this->isActiveAuthorizedMonitoring($restriction, $userId, $tenantId);
+    }
+
+    /**
+     * Resolve whether a restriction row represents active, authorised content
+     * monitoring. The historical onboarding marker came from a member's own
+     * safeguarding preference and never authorised brokers to read message
+     * bodies, so it must fail closed everywhere monitoring state is consumed.
+     */
+    private function isActiveAuthorizedMonitoring(object $restriction, int $userId, int $tenantId): bool
+    {
+        if (($restriction->monitoring_reason ?? null) === SafeguardingTriggerService::MONITORING_REASON_ONBOARDING) {
+            $this->clearLegacyPreferenceMonitoring($userId, $tenantId);
+            $restriction->under_monitoring = 0;
+            $restriction->requires_broker_approval = 0;
+
+            return false;
+        }
+
+        if (! (bool) ($restriction->under_monitoring ?? false)) {
+            return false;
+        }
+
+        $monitoringExpiresAt = $restriction->monitoring_expires_at ?? null;
+        if ($monitoringExpiresAt && strtotime((string) $monitoringExpiresAt) <= time()) {
             $this->clearExpiredMonitoring($userId, $tenantId);
+            $restriction->under_monitoring = 0;
+            $restriction->messaging_disabled = 0;
+
             return false;
         }
 
@@ -441,6 +479,27 @@ class BrokerMessageVisibilityService
                 ]);
         } catch (\Throwable $e) {
             Log::warning('[BrokerMessageVisibilityService] Failed to clear expired monitoring: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove only the monitoring flags historically written from a member's
+     * self-selected safeguarding preference. Preserve independent restrictions
+     * and audit fields so legitimate administrative decisions are untouched.
+     */
+    private function clearLegacyPreferenceMonitoring(int $userId, int $tenantId): void
+    {
+        try {
+            DB::table('user_messaging_restrictions')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where('monitoring_reason', SafeguardingTriggerService::MONITORING_REASON_ONBOARDING)
+                ->update([
+                    'under_monitoring' => 0,
+                    'requires_broker_approval' => 0,
+                ]);
+        } catch (\Throwable $e) {
+            Log::warning('[BrokerMessageVisibilityService] Failed to clear legacy preference monitoring: ' . $e->getMessage());
         }
     }
 

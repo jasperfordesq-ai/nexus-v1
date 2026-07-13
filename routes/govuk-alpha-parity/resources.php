@@ -27,12 +27,12 @@ Route::get('/resources/library', [AlphaController::class, 'resourcesLibrary'])
 Route::get('/resources/upload', [AlphaController::class, 'resourcesUploadForm'])
     ->name('resources.upload.form');
 Route::post('/resources/upload', [AlphaController::class, 'resourcesUpload'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('resources.upload');
 
 // Admin reorder (single up/down move).
 Route::post('/resources/reorder', [AlphaController::class, 'resourcesReorder'])
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('resources.reorder');
 
 // Per-resource actions (numeric id).
@@ -44,7 +44,7 @@ Route::get('/resources/{id}/delete', [AlphaController::class, 'resourcesDeleteCo
     ->name('resources.delete.confirm');
 Route::post('/resources/{id}/delete', [AlphaController::class, 'resourcesDelete'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('resources.delete');
 
 // Social interactions — react + comment thread.
@@ -52,18 +52,18 @@ Route::post('/resources/{id}/delete', [AlphaController::class, 'resourcesDelete'
 // (same pattern as blogreviews.blog.comments.store).
 Route::post('/resources/{id}/react', [AlphaController::class, 'resourcesReact'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('resources.react');
 Route::get('/resources/{id}/comments', [AlphaController::class, 'resourcesComments'])
     ->whereNumber('id')
     ->name('resources.comments');
 Route::post('/resources/{id}/comments/add', [AlphaController::class, 'resourcesStoreComment'])
     ->whereNumber('id')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('resources.comments.store');
 Route::post('/resources/{id}/comments/{commentId}/delete', [AlphaController::class, 'resourcesDeleteComment'])
     ->whereNumber('id')
     ->whereNumber('commentId')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('resources.comments.delete');
 });

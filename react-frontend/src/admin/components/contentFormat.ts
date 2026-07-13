@@ -11,6 +11,8 @@
  * conversions lose information and therefore need a confirm dialog.
  */
 
+import DOMPurify from 'dompurify';
+
 export type ContentFormat = 'plaintext' | 'richtext' | 'html' | 'builder';
 
 /** Formats selectable in the editor UI. */
@@ -26,19 +28,44 @@ export function escapePlainToHtml(text: string): string {
   return escaped.replace(/\r?\n/g, '<br>\n');
 }
 
-/** Strip HTML down to plain text (best-effort, DOM-based). */
-export function stripToPlainText(html: string): string {
-  if (typeof document === 'undefined') {
-    // SSR / test fallback: naive tag strip.
-    return html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+const PLAIN_TEXT_BLOCK_TAGS = new Set([
+  'address', 'article', 'aside', 'blockquote', 'div', 'footer', 'header',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'main', 'nav', 'p',
+  'section', 'table', 'tr',
+]);
+
+const PLAIN_TEXT_ALLOWED_TAGS = [...PLAIN_TEXT_BLOCK_TAGS, 'br'];
+
+function appendPlainText(node: Node, output: string[]): void {
+  if (node.nodeType === Node.TEXT_NODE) {
+    output.push(node.textContent ?? '');
+    return;
   }
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  // Turn <br> and block boundaries into newlines before reading text.
-  doc.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
-  doc.querySelectorAll('p, div, li, tr, h1, h2, h3, h4').forEach((el) => {
-    el.append('\n');
+  if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
+
+  const element = node.nodeType === Node.ELEMENT_NODE ? node as Element : null;
+  const tagName = element?.tagName.toLowerCase() ?? '';
+  if (tagName === 'br') {
+    output.push('\n');
+    return;
+  }
+
+  node.childNodes.forEach((child) => appendPlainText(child, output));
+  if (PLAIN_TEXT_BLOCK_TAGS.has(tagName)) output.push('\n');
+}
+
+/** Strip HTML down to plain text through DOMPurify's parser-backed DOM output. */
+export function stripToPlainText(html: string): string {
+  const fragment = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: PLAIN_TEXT_ALLOWED_TAGS,
+    ALLOWED_ATTR: [],
+    ALLOW_DATA_ATTR: false,
+    KEEP_CONTENT: true,
+    RETURN_DOM_FRAGMENT: true,
   });
-  return (doc.body.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  const output: string[] = [];
+  appendPlainText(fragment, output);
+  return output.join('').replace(/\u00a0/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 /**

@@ -10,7 +10,14 @@
 const fallbackListenSessions = new Map<number, string>();
 
 function createListenSessionId(episodeId: number): string {
-  const randomId = globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2);
+  const cryptoApi = globalThis.crypto;
+  const randomId = cryptoApi?.randomUUID?.() ?? (() => {
+    if (!cryptoApi?.getRandomValues) {
+      throw new Error('A cryptographically secure random source is required for podcast listen sessions.');
+    }
+    const bytes = cryptoApi.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  })();
   return `${episodeId}:${randomId}`;
 }
 

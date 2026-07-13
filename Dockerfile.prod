@@ -91,8 +91,10 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 # This makes $_SERVER['REMOTE_ADDR'] correct for ALL PHP code, even code that
 # doesn't use ClientIp::get(). Only trusted proxy IPs are allowed to set headers.
 RUN printf '<IfModule remoteip_module>\n\
-  # Trust Cloudflare CF-Connecting-IP header (most reliable)\n\
-  RemoteIPHeader CF-Connecting-IP\n\
+  # Parse the host proxy's appended X-Forwarded-For chain right-to-left.\n\
+  # Trusting CF-Connecting-IP from a Docker hop lets direct-origin callers\n\
+  # choose REMOTE_ADDR when the edge has not normalised that header.\n\
+  RemoteIPHeader X-Forwarded-For\n\
   # Cloudflare IPv4 ranges (https://www.cloudflare.com/ips-v4/)\n\
   RemoteIPTrustedProxy 173.245.48.0/20\n\
   RemoteIPTrustedProxy 103.21.244.0/22\n\
@@ -145,16 +147,14 @@ RUN echo 'ServerTokens Prod' >> /etc/apache2/conf-available/security.conf \
     && echo 'ServerSignature Off' >> /etc/apache2/conf-available/security.conf \
     && a2enconf security
 
-# Security headers (HSTS, clickjacking, MIME-sniff, referrer).
-# CSP intentionally omitted — requires per-app tuning (Pusher, Stripe, Google Maps, etc.)
-# and must be tested before rollout. Add in a follow-up PR.
+# Static security headers (HSTS, clickjacking, MIME-sniff, referrer).
+# CSP is emitted once by Laravel SecurityHeaders so its per-request nonce remains authoritative.
 RUN a2enmod headers \
     && printf 'Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"\n\
 Header always set X-Frame-Options "SAMEORIGIN"\n\
 Header always set X-Content-Type-Options "nosniff"\n\
 Header always set Referrer-Policy "strict-origin-when-cross-origin"\n\
-Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n\
-Header always set Content-Security-Policy "default-src '"'"'self'"'"'; script-src '"'"'self'"'"' https://js.stripe.com https://maps.googleapis.com https://challenges.cloudflare.com; style-src '"'"'self'"'"' '"'"'unsafe-inline'"'"' https://fonts.googleapis.com; font-src '"'"'self'"'"' https://fonts.gstatic.com; img-src '"'"'self'"'"' data: https:; connect-src '"'"'self'"'"' wss: https://api.stripe.com https://maps.googleapis.com https://challenges.cloudflare.com https://api.pwnedpasswords.com; frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com; object-src '"'"'none'"'"'; base-uri '"'"'self'"'"'; form-action '"'"'self'"'"'; report-uri /api/v2/csp-report"\n' \
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(self)"\n' \
     > /etc/apache2/conf-available/security-headers.conf \
     && a2enconf security-headers
 

@@ -47,12 +47,12 @@ Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
     Route::post('/feed/items/{type}/{id}/not-interested', [AlphaController::class, 'feedItemNotInterested'])
         ->where('type', '[a-z]+')
         ->whereNumber('id')
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:nexus-route-30-per-1m')
         ->name('feed.items.not-interested');
 
     Route::post('/feed/items/{type}/{id}/react', [AlphaController::class, 'feedItemReaction'])
         ->where('type', '[a-z]+')
         ->whereNumber('id')
-        ->middleware('throttle:60,1')
+        ->middleware('throttle:nexus-route-60-per-1m')
         ->name('feed.items.react');
 });

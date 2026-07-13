@@ -83,7 +83,7 @@
                 <textarea class="govuk-textarea" id="attendee-checkin-code" rows="8" readonly spellcheck="false" aria-describedby="attendee-checkin-code-hint">{{ $token }}</textarea>
             </div>
             <p class="govuk-body">{{ __('event_offline_checkin.attendee.print_hint') }}</p>
-            <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="window.print()">
+            <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-alpha-print-page>
                 {{ __('event_offline_checkin.attendee.print') }}
             </button>
         </section>

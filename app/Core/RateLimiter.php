@@ -48,6 +48,8 @@ class RateLimiter
         self::ensureTableExists();
         self::cleanupOldAttempts();
 
+        $identifier = self::scopeLoginIdentifier($identifier, $type);
+
         $cutoff = date('Y-m-d H:i:s', time() - self::ATTEMPT_WINDOW);
 
         $result = DB::selectOne(
@@ -92,6 +94,8 @@ class RateLimiter
     {
         self::ensureTableExists();
 
+        $identifier = self::scopeLoginIdentifier($identifier, $type);
+
         $ip = ClientIp::get();
 
         DB::insert(
@@ -102,7 +106,7 @@ class RateLimiter
 
         // On successful login, clear failed attempts for this identifier
         if ($success) {
-            self::clearAttempts($identifier, $type);
+            self::clearScopedAttempts($identifier, $type);
         }
     }
 
@@ -111,7 +115,29 @@ class RateLimiter
      */
     public static function clearAttempts(string $identifier, string $type = 'email'): void
     {
+        self::clearScopedAttempts(self::scopeLoginIdentifier($identifier, $type), $type);
+    }
+
+    private static function clearScopedAttempts(string $identifier, string $type): void
+    {
         DB::delete("DELETE FROM login_attempts WHERE identifier = ? AND type = ? AND success = 0", [$identifier, $type]);
+    }
+
+    private static function scopeLoginIdentifier(string $identifier, string $type): string
+    {
+        if ($type !== 'email') {
+            return $identifier;
+        }
+
+        $tenantId = TenantContext::currentId();
+
+        // Keep the persisted identifier comfortably inside the legacy
+        // VARCHAR(255) column even when the submitted email is at its maximum
+        // valid length. The raw address is not needed to enforce or clear the
+        // bucket, so a stable digest also avoids retaining it in this table.
+        $emailDigest = hash('sha256', mb_strtolower(trim($identifier)));
+
+        return 'tenant:' . ($tenantId ?? 0) . ':email:' . $emailDigest;
     }
 
     /**
@@ -119,11 +145,9 @@ class RateLimiter
      */
     public static function getRetryMessage(int $retryAfter): string
     {
-        $minutes = ceil($retryAfter / 60);
-        if ($minutes <= 1) {
-            return "Too many login attempts. Please try again in 1 minute.";
-        }
-        return "Too many login attempts. Please try again in {$minutes} minutes.";
+        $minutes = max(1, (int) ceil($retryAfter / 60));
+
+        return trans_choice('api.too_many_login_attempts_minutes', $minutes, ['count' => $minutes]);
     }
 
     /**

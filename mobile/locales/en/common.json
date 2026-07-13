@@ -57,6 +57,8 @@
     "boundaryTitle": "Something went wrong",
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",
+    "timeout": "Request timed out. Please check your connection.",
+    "requestFailedWithStatus": "Request failed with status {{status}}",
     "unauthorized": "Your session has expired. Please log in again.",
     "notFound": "Not found.",
     "alertTitle": "Error"

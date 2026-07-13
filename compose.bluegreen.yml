@@ -22,7 +22,7 @@ services:
         reservations:
           memory: 512M
     ports:
-      - "${NEXUS_API_PORT:-8190}:80"
+      - "127.0.0.1:${NEXUS_API_PORT:-8190}:80"
     volumes:
       - nexus-php-uploads:/var/www/html/httpdocs/uploads
       - nexus-php-logs:/var/log
@@ -86,7 +86,7 @@ services:
         reservations:
           memory: 128M
     ports:
-      - "${NEXUS_FRONTEND_PORT:-3100}:80"
+      - "127.0.0.1:${NEXUS_FRONTEND_PORT:-3100}:80"
     environment:
       - NEXUS_API_UPSTREAM=nexus-${NEXUS_COLOR:-green}-php-app
       - PRERENDER_PHP_UID=${PRERENDER_PHP_UID:-33}

@@ -29,7 +29,7 @@ Route::get('/me/collections', [AlphaController::class, 'savedMyCollections'])
     ->name('saved.collections');
 
 Route::post('/me/collections', [AlphaController::class, 'savedCreateCollection'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('saved.collections.store');
 
 // Static action segments under a collection id are declared with the {id}
@@ -41,18 +41,18 @@ Route::get('/me/collections/{id}', [AlphaController::class, 'savedCollectionDeta
 
 Route::post('/me/collections/{id}/update', [AlphaController::class, 'savedUpdateCollection'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('saved.collections.update');
 
 Route::post('/me/collections/{id}/delete', [AlphaController::class, 'savedDeleteCollection'])
     ->whereNumber('id')
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:nexus-route-20-per-1m')
     ->name('saved.collections.delete');
 
 Route::post('/me/collections/{id}/items/{itemId}/remove', [AlphaController::class, 'savedRemoveItem'])
     ->whereNumber('id')
     ->whereNumber('itemId')
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:nexus-route-30-per-1m')
     ->name('saved.collections.item-remove');
 
 // ===== Public collections + appreciation wall (by member) =====
@@ -66,10 +66,10 @@ Route::get('/users/{userId}/appreciations', [AlphaController::class, 'savedAppre
 
 Route::post('/users/{userId}/appreciations', [AlphaController::class, 'savedSendAppreciation'])
     ->whereNumber('userId')
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:nexus-route-10-per-1m')
     ->name('saved.appreciations.send');
 
 Route::post('/appreciations/{id}/react', [AlphaController::class, 'savedReactAppreciation'])
     ->whereNumber('id')
-    ->middleware('throttle:60,1')
+    ->middleware('throttle:nexus-route-60-per-1m')
     ->name('saved.appreciations.react');

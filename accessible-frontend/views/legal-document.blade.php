@@ -38,9 +38,9 @@
                     </p>
                 @endif
 
-                {{-- Content is sanitized on save by the legal document service. --}}
+                {{-- Re-sanitize at the render boundary for imported/legacy/manual rows. --}}
                 <div class="legal-content govuk-body">
-                    {!! $document['content'] !!}
+                    {!! \App\Helpers\HtmlSanitizer::sanitizeCms((string) $document['content']) !!}
                 </div>
             @else
                 {{-- No tenant-managed document published: render the general GOV.UK-structured policy. --}}

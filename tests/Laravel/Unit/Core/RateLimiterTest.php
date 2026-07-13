@@ -7,7 +7,7 @@
 namespace Tests\Laravel\Unit\Core;
 
 use App\Core\RateLimiter;
-use PHPUnit\Framework\TestCase;
+use Tests\Laravel\TestCase;
 
 class RateLimiterTest extends TestCase
 {
@@ -40,13 +40,13 @@ class RateLimiterTest extends TestCase
     public function test_getRetryMessage_one_minute_or_less(): void
     {
         $msg = RateLimiter::getRetryMessage(30);
-        $this->assertStringContainsString('1 minute', $msg);
+        $this->assertSame('Too many login attempts. Please try again in 1 minute.', $msg);
     }
 
     public function test_getRetryMessage_multiple_minutes(): void
     {
         $msg = RateLimiter::getRetryMessage(180);
-        $this->assertStringContainsString('3 minutes', $msg);
+        $this->assertSame('Too many login attempts. Please try again in 3 minutes.', $msg);
     }
 
     public function test_getRetryMessage_exactly_sixty_seconds(): void

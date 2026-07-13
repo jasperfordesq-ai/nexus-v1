@@ -100,7 +100,7 @@ export function LoginPage() {
 
   // Cloudflare Turnstile removed from login 2026-05-16 — member feedback
   // found the widget confusing. Bot defence is now the DB-backed per-email
-  // + per-IP brute force limiter plus route-level throttle:30,1.
+  // + per-IP brute force limiter plus the named route-level login throttle.
 
   // 2FA state
   const [twoFactorCode, setTwoFactorCode] = useState('');

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\Support\EmojiConstants;
 
 class Message extends Model
 {
@@ -112,7 +113,9 @@ class Message extends Model
     }
 
     /**
-     * Get reactions for multiple messages (batch).
+     * Get public reaction counts for multiple messages (batch).
+     *
+     * Reactor identities are deliberately not part of the API contract.
      */
     public static function getReactionsBatch(array $messageIds, ?int $viewerId = null): array
     {
@@ -122,16 +125,18 @@ class Message extends Model
 
         $tenantId = TenantContext::getId();
 
-        // message_reactions has no tenant_id column — scope via JOIN to messages table
+        // Scope both sides of the join: the message establishes conversation
+        // membership, while the reaction-row check rejects corrupt tenant data.
         $results = DB::table('message_reactions')
             ->join('messages', 'message_reactions.message_id', '=', 'messages.id')
             ->select([
                 'message_reactions.message_id',
                 'message_reactions.emoji',
                 DB::raw('COUNT(*) as count'),
-                DB::raw('GROUP_CONCAT(message_reactions.user_id) as user_ids'),
             ])
             ->where('messages.tenant_id', $tenantId)
+            ->where('message_reactions.tenant_id', $tenantId)
+            ->whereIn('message_reactions.emoji', EmojiConstants::MESSAGE_REACTIONS)
             ->whereIn('message_reactions.message_id', $messageIds)
             ->when($viewerId !== null, function ($query) use ($viewerId): void {
                 $query->where(function ($q) use ($viewerId): void {
@@ -153,7 +158,6 @@ class Message extends Model
             $grouped[$msgId][] = [
                 'emoji' => $row->emoji,
                 'count' => (int) $row->count,
-                'user_ids' => array_map('intval', explode(',', $row->user_ids)),
             ];
         }
 

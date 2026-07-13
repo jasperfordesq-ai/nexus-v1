@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Fragment, isValidElement, type ComponentProps, type ReactNode } from 'react';
+import { Fragment, isValidElement, type ComponentProps, type Key, type ReactNode } from 'react';
 import { Description } from '@heroui/react/description';
 import { FieldError } from '@heroui/react/field-error';
 import { Header } from '@heroui/react/header';
@@ -21,7 +21,6 @@ type HeroListBoxItemProps = ComponentProps<typeof ListBox.Item>;
 type HeroListBoxSectionProps = ComponentProps<typeof ListBox.Section>;
 type SelectKey = string | number;
 type SelectionLike = 'all' | Iterable<SelectKey>;
-const HeroSelectCompat = HeroSelect as any;
 
 interface LegacySelectClassNames {
   base?: string;
@@ -54,6 +53,7 @@ export interface SelectProps<T extends object = object>
     | 'selectionMode'
     | 'size'
     | 'value'
+    | 'validate'
     | 'variant'
   > {
   children?: ReactNode | ((item: T) => ReactNode);
@@ -73,7 +73,7 @@ export interface SelectProps<T extends object = object>
   labelPlacement?: string;
   listboxProps?: Partial<HeroListBoxProps> & Record<string, unknown>;
   onChange?: (event: { target: { value: string }; currentTarget: { value: string } }) => void;
-  onSelectionChange?: (keys: any) => void;
+  onSelectionChange?: (keys: 'all' | Set<Key>) => void;
   onValueChange?: (value: string) => void;
   popoverProps?: Partial<HeroSelectPopoverProps> & Record<string, unknown>;
   renderValue?: (items: Array<{ key: SelectKey | null; textValue?: string }>) => ReactNode;
@@ -123,7 +123,7 @@ export function Select<T extends object = object>({
   const resolvedDefaultValue = defaultValue ?? selectionToValue(defaultSelectedKeys, selectionMode);
 
   return (
-    <HeroSelectCompat
+    <HeroSelect
       {...props}
       className={cn(classNames?.base, classNames?.mainWrapper, className)}
       data-loading={isLoading || undefined}
@@ -135,7 +135,7 @@ export function Select<T extends object = object>({
         const values = valueToArray(nextValue);
         const firstValue = values[0] == null ? '' : String(values[0]);
 
-        onSelectionChange?.(new Set(values));
+        onSelectionChange?.(new Set<Key>(values));
         onValueChange?.(firstValue);
         onChange?.({ target: { value: firstValue }, currentTarget: { value: firstValue } });
       }}
@@ -183,7 +183,7 @@ export function Select<T extends object = object>({
         </ListBox>
       </HeroSelect.Popover>
       {errorMessage && <FieldError className={classNames?.errorMessage}>{errorMessage}</FieldError>}
-    </HeroSelectCompat>
+    </HeroSelect>
   );
 }
 

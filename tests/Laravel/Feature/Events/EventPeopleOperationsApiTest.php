@@ -244,18 +244,18 @@ final class EventPeopleOperationsApiTest extends TestCase
         );
 
         // Keep this behavioural regression fast while still exercising the real
-        // route middleware and its separation from Laravel's numeric bucket.
+        // route middleware and its separation from another named route bucket.
         RateLimiter::for('events-people-bulk', static fn (Request $request): Limit => Limit::perMinute(2)->by(
             'test:events-people-bulk:user:' . $request->user()?->getAuthIdentifier()
         ));
-        Route::get('/api/_test/events/unrelated-numeric-throttle', static fn () => response()->json([
+        Route::get('/api/_test/events/unrelated-route-throttle', static fn () => response()->json([
             'ok' => true,
-        ]))->middleware(['api', 'auth:sanctum', 'throttle:2,1']);
+        ]))->middleware(['api', 'auth:sanctum', 'throttle:nexus-route-2-per-1m']);
 
         for ($attempt = 1; $attempt <= 2; $attempt++) {
-            $this->apiGet('/_test/events/unrelated-numeric-throttle')->assertOk();
+            $this->apiGet('/_test/events/unrelated-route-throttle')->assertOk();
         }
-        $this->apiGet('/_test/events/unrelated-numeric-throttle')->assertTooManyRequests();
+        $this->apiGet('/_test/events/unrelated-route-throttle')->assertTooManyRequests();
 
         for ($attempt = 1; $attempt <= 2; $attempt++) {
             $this->apiPost("/v2/events/{$eventId}/people/bulk", [])

@@ -75,7 +75,7 @@
 </head>
 <body class="govuk-template__body">
     {{-- GOV.UK progressive enhancement: only claim JS support when JS actually runs --}}
-    <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+    <script nonce="{{ $cspNonce ?? request()->attributes->get('csp_nonce', '') }}">document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
     {{-- GOV.UK cookie banner — first thing in the body, before the skip link (no-JS). --}}
     @include('accessible-frontend::partials.cookie-banner')
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">{{ __('govuk_alpha.skip_to_content') }}</a>
