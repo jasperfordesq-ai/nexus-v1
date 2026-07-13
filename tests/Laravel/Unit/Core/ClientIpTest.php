@@ -46,11 +46,20 @@ class ClientIpTest extends TestCase
         $this->assertSame('203.0.113.50', ClientIp::get());
     }
 
-    public function test_get_returns_cf_connecting_ip_when_remote_is_trusted(): void
+    public function test_get_returns_cf_connecting_ip_when_cloudflare_hop_is_verified(): void
     {
         $_SERVER['REMOTE_ADDR'] = '172.20.0.1'; // Docker bridge (trusted)
         $_SERVER['HTTP_CF_CONNECTING_IP'] = '198.51.100.10';
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = '198.51.100.10, 162.158.10.20, 172.20.0.2';
         $this->assertSame('198.51.100.10', ClientIp::get());
+    }
+
+    public function test_get_rejects_spoofed_cf_connecting_ip_from_internal_hop(): void
+    {
+        $_SERVER['REMOTE_ADDR'] = '172.20.0.1'; // Docker bridge (trusted)
+        $_SERVER['HTTP_CF_CONNECTING_IP'] = '198.51.100.10';
+
+        $this->assertSame('172.20.0.1', ClientIp::get());
     }
 
     public function test_get_returns_x_forwarded_for_when_cf_absent(): void
@@ -60,11 +69,20 @@ class ClientIpTest extends TestCase
         $this->assertSame('203.0.113.100', ClientIp::get());
     }
 
-    public function test_get_returns_x_real_ip_when_others_absent(): void
+    public function test_get_returns_x_real_ip_when_cloudflare_hop_is_verified(): void
     {
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1'; // Trusted
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.200, 162.158.10.20';
         $_SERVER['HTTP_X_REAL_IP'] = '203.0.113.200';
         $this->assertSame('203.0.113.200', ClientIp::get());
+    }
+
+    public function test_get_rejects_spoofed_x_real_ip_from_internal_hop(): void
+    {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1'; // Trusted internal hop only
+        $_SERVER['HTTP_X_REAL_IP'] = '203.0.113.200';
+
+        $this->assertSame('127.0.0.1', ClientIp::get());
     }
 
     public function test_get_returns_fallback_when_no_server_vars(): void

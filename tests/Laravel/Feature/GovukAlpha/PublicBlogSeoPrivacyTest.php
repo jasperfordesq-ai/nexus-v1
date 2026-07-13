@@ -66,16 +66,13 @@ class PublicBlogSeoPrivacyTest extends TestCase
         $detail->assertSee('Search-visible community editorial content.');
         $this->assertNoAuthorIdentity($detail->getContent(), (int) $author->id);
 
-        $this->assertMatchesRegularExpression(
-            '#<script type="application/ld\+json">(.+?)</script>#s',
-            $detail->getContent()
-        );
-        preg_match(
-            '#<script type="application/ld\+json">(.+?)</script>#s',
+        $this->assertSame(1, preg_match(
+            '#<script type="application/ld\+json" nonce="([a-f0-9]{32})">(.+?)</script>#s',
             $detail->getContent(),
             $schemaMatch
-        );
-        $schema = json_decode($schemaMatch[1], true, 512, JSON_THROW_ON_ERROR);
+        ));
+        $detail->assertHeaderContains('Content-Security-Policy', "'nonce-{$schemaMatch[1]}'");
+        $schema = json_decode($schemaMatch[2], true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('Article', $schema['@type'] ?? null);
         $this->assertSame('Organization', $schema['author']['@type'] ?? null);
         $this->assertSame('Organization', $schema['publisher']['@type'] ?? null);

@@ -21,7 +21,10 @@
          Both must be set to nexus_test to prevent RefreshDatabase from wiping the dev DB. -->
     <env name="DB_NAME" value="nexus_test" force="true"/>
     <env name="DB_DATABASE" value="nexus_test" force="true"/>
-    <env name="CACHE_DRIVER" value="array"/>
+    <!-- The container defines CACHE_DRIVER=redis. Force the isolated array store
+         before providers boot so named rate limiters retain their registrations
+         without sharing counters across tests or PHPUnit runs. -->
+    <env name="CACHE_DRIVER" value="array" force="true"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="MAIL_DRIVER" value="array"/>

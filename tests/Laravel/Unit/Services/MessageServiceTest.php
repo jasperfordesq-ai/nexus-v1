@@ -49,7 +49,7 @@ class MessageServiceTest extends TestCase
         $query->shouldReceive('with')->andReturnSelf();
         $query->shouldReceive('whereIn')->andReturnSelf();
         $query->shouldReceive('orderByDesc')->andReturnSelf();
-        $query->shouldReceive('get')->andReturn(collect([]));
+        $query->shouldReceive('get')->andReturn(new \Illuminate\Database\Eloquent\Collection());
         $this->messageAlias->shouldReceive('query')->andReturn($query);
 
         $result = MessageService::getConversations(1);
