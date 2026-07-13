@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
@@ -39,7 +39,7 @@ vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
     useTenant: () => ({
-      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenant: { id: 2, name: 'Test', slug: 'test', currency: 'EUR' },
       tenantPath: (p: string) => `/test${p}`,
       hasFeature: vi.fn(() => true),
       hasModule: vi.fn(() => true),
@@ -53,80 +53,12 @@ vi.mock('@/components/seo/PageMeta', () => ({
   PageMeta: () => null,
 }));
 
-// ─── Stub admin components ────────────────────────────────────────────────────
-vi.mock('../../components', () => ({
-  PageHeader: ({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) => (
-    <div data-testid="page-header">
-      <h1>{title}</h1>
-      {description && <p>{description}</p>}
-      {actions}
-    </div>
-  ),
-  DataTable: ({
-    data,
-    isLoading,
-    columns,
-    emptyContent,
-    onSearch,
-  }: {
-    data: unknown[];
-    isLoading: boolean;
-    columns: { key: string; label: string; render?: (item: Record<string, unknown>) => React.ReactNode }[];
-    emptyContent?: React.ReactNode;
-    onSearch?: (q: string) => void;
-    [key: string]: unknown;
-  }) => (
-    <div data-testid="data-table">
-      {isLoading && <div role="status" aria-busy="true" aria-label="Loading" data-testid="table-loading" />}
-      {!isLoading && data.length === 0 && emptyContent}
-      {!isLoading && data.length > 0 && (
-        <table role="grid">
-          <thead>
-            <tr>
-              {columns.map(c => <th key={c.key}>{c.label}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {(data as Record<string, unknown>[]).map((item) => (
-              <tr key={String(item.id)} data-testid={`row-${item.id}`}>
-                {columns.map(c => (
-                  <td key={c.key} data-testid={`cell-${c.key}-${item.id}`}>
-                    {c.render ? c.render(item) : String(item[c.key] ?? '')}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      {onSearch && (
-        <input
-          data-testid="search-input"
-          placeholder="Search"
-          onChange={(e) => onSearch(e.target.value)}
-        />
-      )}
-    </div>
-  ),
-  ConfirmModal: ({ isOpen, onConfirm, onClose, title }: { isOpen: boolean; onConfirm: () => void; onClose: () => void; title: string; message?: string; confirmLabel?: string; confirmColor?: string; isLoading?: boolean }) =>
-    isOpen ? (
-      <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
-        <p>{title}</p>
-        <button onClick={onClose}>Cancel</button>
-        <button onClick={onConfirm} data-testid="confirm-btn">Confirm</button>
-      </div>
-    ) : null,
-  EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
-  BulkActionToolbar: ({ selectedCount }: { selectedCount: number }) =>
-    selectedCount > 0 ? <div data-testid="bulk-toolbar">Bulk: {selectedCount}</div> : null,
-}));
-
 // ─── Stub HeroUI Modal family ─────────────────────────────────────────────────
 vi.mock('@/components/ui', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
-    Modal: ({ isOpen, children, onClose }: { isOpen: boolean; children: React.ReactNode; onClose?: () => void; size?: string }) =>
+    Modal: ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode; onClose?: () => void; size?: string }) =>
       isOpen ? <div role="dialog" aria-label="Dialog" data-testid="reject-modal">{children}</div> : null,
     ModalContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalHeader: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className} data-testid="modal-header">{children}</div>,
@@ -161,12 +93,10 @@ vi.mock('@/components/ui', async (importOriginal) => {
     Chip: ({ children, color }: { children: React.ReactNode; color?: string; size?: string; variant?: string; className?: string }) => (
       <span data-color={color}>{children}</span>
     ),
-    Tabs: ({ children, onSelectionChange }: { children: React.ReactNode; onSelectionChange?: (key: string | number) => void; selectedKey?: string; [key: string]: unknown }) => (
+    Tabs: ({ children }: { children: React.ReactNode; onSelectionChange?: (key: string | number) => void; selectedKey?: string; [key: string]: unknown }) => (
       <div role="tablist">{children}</div>
     ),
-    Tab: ({ title, key: tabKey }: { title: React.ReactNode; key?: string }) => (
-      <button role="tab" data-key={tabKey}>{title}</button>
-    ),
+    Tab: ({ title }: { title: React.ReactNode }) => <button role="tab">{title}</button>,
     Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     Avatar: ({ name }: { name?: string; src?: string; size?: string; radius?: string; className?: string }) => (
       <div data-testid="avatar" aria-label={name}>{name?.[0]}</div>
@@ -183,7 +113,7 @@ const { makeListing } = vi.hoisted(() => ({
     id: 1,
     title: 'Handmade Candle',
     price: 15.00,
-    price_currency: '€',
+    price_currency: 'EUR',
     price_type: 'fixed',
     status: 'active',
     moderation_status: 'pending',
@@ -216,17 +146,18 @@ describe('MarketplaceModerationPage', () => {
     mockApi.get.mockImplementation(() => new Promise(() => {}));
     const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
     render(<MarketplaceModerationPage />);
-    await waitFor(() => {
-      expect(screen.getByTestId('table-loading')).toBeInTheDocument();
-    });
+    expect(await screen.findByRole('status', { name: 'Loading' })).toHaveAttribute(
+      'aria-busy',
+      'true'
+    );
   });
 
   it('renders empty state when no listings returned', async () => {
     const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
     render(<MarketplaceModerationPage />);
-    await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('heading', { name: 'No listings found' })
+    ).toBeInTheDocument();
   });
 
   it('renders listing rows when data returned', async () => {
@@ -261,9 +192,8 @@ describe('MarketplaceModerationPage', () => {
     const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
     render(<MarketplaceModerationPage />);
     await waitFor(() => {
-      const approveBtn = screen.queryByLabelText(/approve/i);
-      const rejectBtn = screen.queryByLabelText(/reject/i);
-      expect(approveBtn || rejectBtn).toBeTruthy();
+      expect(screen.getByRole('button', { name: /approve listing/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /reject listing/i })).toBeInTheDocument();
     });
   });
 
@@ -274,13 +204,10 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const approveBtn = screen.queryByLabelText(/approve/i);
-    if (approveBtn) {
-      fireEvent.click(approveBtn);
-      await waitFor(() => {
-        expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/marketplace/listings/7/approve');
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: /approve listing/i }));
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/admin/marketplace/listings/7/approve');
+    });
   });
 
   it('opens reject modal when reject button clicked', async () => {
@@ -289,13 +216,8 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const rejectBtn = screen.queryByLabelText(/reject listing/i);
-    if (rejectBtn) {
-      fireEvent.click(rejectBtn);
-      await waitFor(() => {
-        expect(screen.getByTestId('reject-modal')).toBeInTheDocument();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: /reject listing/i }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
   it('shows reject modal with notes textarea when reject clicked', async () => {
@@ -305,20 +227,11 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const rejectBtn = screen.queryByLabelText(/reject listing/i);
-    if (rejectBtn) {
-      fireEvent.click(rejectBtn);
-      // Reject modal should appear (driven by rejectTarget state)
-      await waitFor(() => {
-        expect(screen.getByTestId('reject-modal')).toBeInTheDocument();
-      });
-      // Textarea for rejection notes should be inside modal
-      const rejectModal = screen.getByTestId('reject-modal');
-      expect(rejectModal.querySelector('textarea')).toBeTruthy();
-    } else {
-      // If the reject button doesn't appear (e.g. column not rendered), skip
-      expect(true).toBe(true);
-    }
+    fireEvent.click(screen.getByRole('button', { name: /reject listing/i }));
+    const rejectModal = await screen.findByRole('dialog');
+    expect(
+      within(rejectModal).getByRole('textbox', { name: /moderation notes/i })
+    ).toBeInTheDocument();
   });
 
   it('shows delete confirm modal when delete button clicked', async () => {
@@ -327,13 +240,11 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const deleteBtn = screen.queryByLabelText(/delete listing/i);
-    if (deleteBtn) {
-      fireEvent.click(deleteBtn);
-      await waitFor(() => {
-        expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }));
+    const confirmModal = await screen.findByRole('dialog');
+    expect(
+      within(confirmModal).getByText('Delete Listing')
+    ).toBeInTheDocument();
   });
 
   it('calls DELETE endpoint when delete confirmed', async () => {
@@ -343,16 +254,12 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const deleteBtn = screen.queryByLabelText(/delete listing/i);
-    if (deleteBtn) {
-      fireEvent.click(deleteBtn);
-      await waitFor(() => screen.getByTestId('confirm-modal'));
-      const confirmBtn = screen.getByTestId('confirm-btn');
-      fireEvent.click(confirmBtn);
-      await waitFor(() => {
-        expect(mockApi.delete).toHaveBeenCalledWith('/v2/admin/marketplace/listings/11');
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }));
+    const confirmModal = await screen.findByRole('dialog');
+    fireEvent.click(within(confirmModal).getByRole('button', { name: /delete/i }));
+    await waitFor(() => {
+      expect(mockApi.delete).toHaveBeenCalledWith('/v2/admin/marketplace/listings/11');
+    });
   });
 
   it('shows success toast when listing approved', async () => {
@@ -362,13 +269,10 @@ describe('MarketplaceModerationPage', () => {
     render(<MarketplaceModerationPage />);
     await waitFor(() => screen.getByText('Handmade Candle'));
 
-    const approveBtn = screen.queryByLabelText(/approve listing/i);
-    if (approveBtn) {
-      fireEvent.click(approveBtn);
-      await waitFor(() => {
-        expect(mockToast.success).toHaveBeenCalled();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: /approve listing/i }));
+    await waitFor(() => {
+      expect(mockToast.success).toHaveBeenCalled();
+    });
   });
 
   it('shows error toast when API fails on load', async () => {
@@ -383,9 +287,12 @@ describe('MarketplaceModerationPage', () => {
   it('renders page header', async () => {
     const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
     render(<MarketplaceModerationPage />);
-    await waitFor(() => {
-      expect(screen.getByTestId('page-header')).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Moderation Queue' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Review and moderate marketplace listings pending approval')
+    ).toBeInTheDocument();
   });
 
   it('renders moderation filter tabs', async () => {
@@ -407,11 +314,20 @@ describe('MarketplaceModerationPage', () => {
   });
 
   it('renders listing price with currency', async () => {
-    mockApi.get.mockResolvedValue(makeApiResponse([makeListing({ price: 25, price_currency: '€' })]));
+    mockApi.get.mockResolvedValue(makeApiResponse([makeListing({ price: 25, price_currency: 'EUR' })]));
     const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
     render(<MarketplaceModerationPage />);
     await waitFor(() => {
       expect(screen.getByText(/€25\.00/)).toBeInTheDocument();
     });
+  });
+
+  it('does not invent decimal places for zero-decimal listing currencies', async () => {
+    mockApi.get.mockResolvedValue(makeApiResponse([makeListing({ price: 2500, price_currency: 'JPY' })]));
+    const { MarketplaceModerationPage } = await import('./MarketplaceModerationPage');
+    render(<MarketplaceModerationPage />);
+
+    const price = await screen.findByText((content) => /2[,.]500/.test(content));
+    expect(price.textContent).not.toMatch(/[,.]00(?:\D|$)/);
   });
 });

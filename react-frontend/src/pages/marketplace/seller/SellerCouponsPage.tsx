@@ -27,6 +27,7 @@ import { useTenant, useToast } from '@/contexts';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 
 interface Coupon {
   id: number;
@@ -43,7 +44,7 @@ export default function SellerCouponsPage() {
   const { t } = useTranslation(['common', 'marketplace']);
   const confirm = useConfirm();
   const toast = useToast();
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
   usePageTitle(t('coupon.seller.page_title'));
 
   const [items, setItems] = useState<Coupon[]>([]);
@@ -53,7 +54,9 @@ export default function SellerCouponsPage() {
     setLoading(true);
     try {
       const res = await api.get<{ items: Coupon[] }>('/v2/marketplace/seller/coupons');
-      setItems(res.data?.items ?? []);
+      if (res.success) {
+        setItems(res.data?.items ?? []);
+      }
     } catch (err) {
       logError('SellerCouponsPage.load', err);
     } finally {
@@ -73,17 +76,24 @@ export default function SellerCouponsPage() {
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/marketplace/seller/coupons/${id}`);
+      const response = await api.delete(`/v2/marketplace/seller/coupons/${id}`);
+      if (!response.success) {
+        toast.error(response.error || t('error_title'));
+        return;
+      }
       toast.success(t('coupon.seller.deleted'));
       load();
     } catch (err) {
       logError('SellerCouponsPage.delete', err);
+      toast.error(t('error_title'));
     }
   };
 
   const formatDiscount = (c: Coupon): string => {
     if (c.discount_type === 'percent') return `${c.discount_value}%`;
-    if (c.discount_type === 'fixed') return `€${(c.discount_value / 100).toFixed(2)}`;
+    if (c.discount_type === 'fixed') {
+      return formatMarketplaceCurrency(c.discount_value / 100, tenant?.currency || '');
+    }
     return t('coupon.type_bogo');
   };
 

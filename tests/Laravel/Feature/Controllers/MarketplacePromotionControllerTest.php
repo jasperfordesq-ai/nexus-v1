@@ -68,6 +68,7 @@ class MarketplacePromotionControllerTest extends TestCase
     {
         $user = $this->authenticatedUser();
         $this->enableMarketplacePromotions();
+        MarketplaceConfigurationService::set(MarketplaceConfigurationService::CONFIG_BUMP_PRICE, 0.0);
 
         $listingId = DB::table('marketplace_listings')->insertGetId([
             'tenant_id' => $this->testTenantId,
@@ -99,7 +100,49 @@ class MarketplacePromotionControllerTest extends TestCase
             'user_id' => $user->id,
             'promotion_type' => 'bump',
             'is_active' => 1,
+            'amount_paid' => 0,
         ]);
+    }
+
+    public function test_priced_promotion_is_not_activated_without_payment(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->enableMarketplacePromotions();
+        MarketplaceConfigurationService::set(MarketplaceConfigurationService::CONFIG_BUMP_PRICE, 5.0);
+
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Paid promotion test listing',
+            'description' => 'Must not be promoted without payment.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'condition' => 'good',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $products = $this->apiGet('/v2/marketplace/promotions/products');
+        $products->assertOk();
+        $this->assertSame([], $products->json('data'));
+
+        $response = $this->apiPost("/v2/marketplace/listings/{$listingId}/promote", [
+            'promotion_type' => 'bump',
+        ]);
+
+        $response->assertStatus(503);
+        $response->assertJsonPath('errors.0.code', 'PAYMENT_UNAVAILABLE');
+        $this->assertDatabaseMissing('marketplace_promotions', [
+            'marketplace_listing_id' => $listingId,
+            'promotion_type' => 'bump',
+        ]);
+        $this->assertNull(DB::table('marketplace_listings')->where('id', $listingId)->value('promoted_until'));
     }
 
     private function enableMarketplacePromotions(): void

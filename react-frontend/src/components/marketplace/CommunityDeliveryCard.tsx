@@ -98,6 +98,10 @@ export function CommunityDeliveryCard({
     setLoading(true);
     try {
       const response = await api.get<DeliveryOffersResponse | DeliveryOffer[]>(`/v2/marketplace/orders/${orderId}/delivery-offers`);
+      if (!response.success) {
+        setOffers([]);
+        return;
+      }
       const raw = response.data;
       const list = raw && !Array.isArray(raw) && 'data' in raw ? raw.data : raw;
       setOffers(Array.isArray(list) ? list : []);
@@ -118,11 +122,15 @@ export function CommunityDeliveryCard({
     if (!orderId) return;
     setSubmitting(true);
     try {
-      await api.post(`/v2/marketplace/orders/${orderId}/delivery-offers`, {
+      const response = await api.post(`/v2/marketplace/orders/${orderId}/delivery-offers`, {
         time_credits: parseFloat(timeCredits),
         estimated_minutes: estimatedMinutes ? parseInt(estimatedMinutes, 10) : undefined,
         notes: notes || undefined,
       });
+      if (!response.success) {
+        toast.error(response.error || t('community_delivery.offer_failed'));
+        return;
+      }
       toast.success(t('community_delivery.offer_sent'));
       onClose();
       setTimeCredits('1');
@@ -140,7 +148,11 @@ export function CommunityDeliveryCard({
   const handleAcceptOffer = async (delivererId: number) => {
     if (!orderId) return;
     try {
-      await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/accept`);
+      const response = await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/accept`);
+      if (!response.success) {
+        toast.error(response.error || t('community_delivery.accept_failed'));
+        return;
+      }
       toast.success(t('community_delivery.offer_accepted'));
       loadOffers();
     } catch (err) {
@@ -152,7 +164,11 @@ export function CommunityDeliveryCard({
   const handleConfirmDelivery = async (delivererId: number) => {
     if (!orderId) return;
     try {
-      await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/confirm`);
+      const response = await api.put(`/v2/marketplace/orders/${orderId}/delivery-offers/${delivererId}/confirm`);
+      if (!response.success) {
+        toast.error(response.error || t('community_delivery.confirm_failed'));
+        return;
+      }
       toast.success(t('community_delivery.delivery_confirmed'));
       loadOffers();
     } catch (err) {

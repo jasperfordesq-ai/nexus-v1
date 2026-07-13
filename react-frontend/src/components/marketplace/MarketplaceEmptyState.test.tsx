@@ -5,31 +5,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
-import { createMockContexts } from '@/test/mock-contexts';
-import React from 'react';
 
 // ─── Contexts ────────────────────────────────────────────────────────────────
-vi.mock('@/contexts', () =>
-  createMockContexts({
-    useTenant: () => ({
-      tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-      tenantPath: (p: string) => `/test${p}`,
-      hasFeature: vi.fn(() => true),
-      hasModule: vi.fn(() => true),
-    }),
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
   }),
-);
-
-// ─── Stub Button to avoid HeroUI jsdom quirks ────────────────────────────────
-vi.mock('@/components/ui', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/components/ui')>();
-  return {
-    ...orig,
-    Button: ({ children, ...rest }: { children: React.ReactNode; [key: string]: unknown }) => (
-      <button data-testid="cta-button" {...(rest as object)}>{children}</button>
-    ),
-  };
-});
+}));
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('MarketplaceEmptyState', () => {
@@ -60,13 +45,13 @@ describe('MarketplaceEmptyState', () => {
   it('does NOT render the CTA button by default (showCta=false)', async () => {
     const { MarketplaceEmptyState } = await import('./MarketplaceEmptyState');
     render(<MarketplaceEmptyState />);
-    expect(screen.queryByTestId('cta-button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Start Selling' })).not.toBeInTheDocument();
   });
 
   it('renders the CTA button when showCta=true', async () => {
     const { MarketplaceEmptyState } = await import('./MarketplaceEmptyState');
     render(<MarketplaceEmptyState showCta />);
-    expect(screen.getByTestId('cta-button')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Start Selling' })).toBeInTheDocument();
   });
 
   it('CTA button shows translated "Start Selling" text', async () => {
@@ -78,9 +63,8 @@ describe('MarketplaceEmptyState', () => {
   it('CTA link points to tenantPath(/marketplace/sell)', async () => {
     const { MarketplaceEmptyState } = await import('./MarketplaceEmptyState');
     render(<MarketplaceEmptyState showCta />);
-    const btn = screen.getByTestId('cta-button');
-    // The Button is rendered as-a Link; `to` prop becomes an attribute in our stub
-    expect(btn.getAttribute('to')).toBe('/test/marketplace/sell');
+    const link = screen.getByRole('link', { name: 'Start Selling' });
+    expect(link).toHaveAttribute('href', '/test/marketplace/sell');
   });
 
   it('renders the shopping bag icon (aria-hidden)', async () => {
@@ -112,6 +96,6 @@ describe('MarketplaceEmptyState', () => {
     const { MarketplaceEmptyState } = await import('./MarketplaceEmptyState');
     render(<MarketplaceEmptyState showCta message="Try selling something!" />);
     expect(screen.getByText('Try selling something!')).toBeInTheDocument();
-    expect(screen.getByTestId('cta-button')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Start Selling' })).toBeInTheDocument();
   });
 });

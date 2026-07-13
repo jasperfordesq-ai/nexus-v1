@@ -42,6 +42,7 @@ class MarketplaceSellerProfile extends Model
         'community_trust_score',
         'is_community_endorsed',
         'is_suspended',
+        'marketplace_suspension_report_id',
         'joined_marketplace_at',
         'marketplace_partner_badge_at',
     ];
@@ -56,6 +57,7 @@ class MarketplaceSellerProfile extends Model
         'business_verified' => 'boolean',
         'stripe_onboarding_complete' => 'boolean',
         'is_community_endorsed' => 'boolean',
+        'is_suspended' => 'boolean',
         'joined_marketplace_at' => 'datetime',
         'marketplace_partner_badge_at' => 'datetime',
         'avg_rating' => 'float',

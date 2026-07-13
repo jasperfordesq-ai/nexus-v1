@@ -100,7 +100,9 @@
         "seller_verified": "Venditore verificato.",
         "seller_suspended": "Venditore sospeso e tutti gli annunci disattivati.",
         "report_acknowledged": "Segnalazione presa in carico.",
-        "report_resolved": "Segnalazione risolta."
+        "report_resolved": "Segnalazione risolta.",
+        "report_appeal_resolved": "Ricorso della segnalazione risolto.",
+        "dispute_resolved": "Controversia risolta."
     },
     "admin_newsletter": {
         "newsletter_queued": "Newsletter messa in coda per :count destinatario/i",

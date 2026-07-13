@@ -23,6 +23,12 @@ class ImageUploadService
     private const MAX_IMAGE_PIXELS = 24000000; // 24 MP cap prevents memory-heavy uploads.
     private const MAX_IMAGE_EDGE = 6000;
     private const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    private const MIME_EXTENSIONS = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp',
+    ];
     private const THUMBNAIL_WIDTH = 640;
     private const THUMBNAIL_HEIGHT = 480;
     private const THUMBNAIL_QUALITY = 78;
@@ -81,8 +87,12 @@ class ImageUploadService
         $tenantId = \App\Core\TenantContext::getId();
         $tenantDir = $tenantId ? "tenant_{$tenantId}/{$directory}" : $directory;
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        // The client-controlled original extension must never influence a file
+        // written to the public disk. A valid image can otherwise be uploaded
+        // with an executable extension (for example, image.php).
+        $filename = Str::uuid() . '.' . self::MIME_EXTENSIONS[$mime];
         $path = $file->storeAs($tenantDir, $filename, 'public');
+        $this->stripEmbeddedMetadata($path, $mime);
         $thumbnail = $this->createThumbnail($path, $filename);
         $variants = $this->createVariants($path, $filename);
 
@@ -442,5 +452,52 @@ class ImageUploadService
             'image/gif' => function_exists('imagecreatefromgif') ? @imagecreatefromgif($path) : null,
             default => null,
         };
+    }
+
+    /** Re-encode public originals so EXIF/GPS and ancillary metadata are removed. */
+    private function stripEmbeddedMetadata(string $storagePath, string $mime): void
+    {
+        if ($mime === 'image/gif') {
+            // Re-encoding GIF would silently destroy animation. GIF has no EXIF
+            // GPS container; derivative generation still decodes it defensively.
+            return;
+        }
+
+        $absolutePath = Storage::disk('public')->path($storagePath);
+        $image = $this->createImageResource($absolutePath, $mime);
+        if (! $image) {
+            Storage::disk('public')->delete($storagePath);
+            throw new \InvalidArgumentException(__('api.image_metadata_strip_failed'));
+        }
+
+        if ($mime === 'image/jpeg' && function_exists('exif_read_data')) {
+            $exif = @exif_read_data($absolutePath);
+            $orientation = is_array($exif) ? (int) ($exif['Orientation'] ?? 1) : 1;
+            $rotated = match ($orientation) {
+                3 => imagerotate($image, 180, 0),
+                6 => imagerotate($image, -90, 0),
+                8 => imagerotate($image, 90, 0),
+                default => false,
+            };
+            if ($rotated !== false) {
+                imagedestroy($image);
+                $image = $rotated;
+            }
+        }
+
+        $temporaryPath = $absolutePath . '.metadata-clean';
+        $written = match ($mime) {
+            'image/jpeg' => imagejpeg($image, $temporaryPath, 88),
+            'image/png' => imagepng($image, $temporaryPath, 6),
+            'image/webp' => function_exists('imagewebp') && imagewebp($image, $temporaryPath, 88),
+            default => false,
+        };
+        imagedestroy($image);
+
+        if (! $written || ! @rename($temporaryPath, $absolutePath)) {
+            @unlink($temporaryPath);
+            Storage::disk('public')->delete($storagePath);
+            throw new \InvalidArgumentException(__('api.image_metadata_strip_failed'));
+        }
     }
 }

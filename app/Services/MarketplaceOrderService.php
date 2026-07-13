@@ -10,14 +10,21 @@ use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
+use App\Models\MarketplaceEscrow;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
+use App\Models\MarketplacePayment;
+use App\Models\MarketplaceSellerProfile;
+use App\Models\MarketplaceShippingOption;
 use App\Models\Notification;
+use App\Support\StripeCurrency;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * MarketplaceOrderService — Order lifecycle management for the marketplace module.
@@ -26,6 +33,7 @@ use Illuminate\Support\Carbon;
  */
 class MarketplaceOrderService
 {
+    private const MAX_ORDER_QUANTITY = 100;
     private const DELIVERY_CHANNEL_EMAIL = 'email';
     private const DELIVERY_CHANNEL_BELL = 'bell';
     private const DELIVERY_STATUS_CLAIMED = 'claimed';
@@ -40,48 +48,238 @@ class MarketplaceOrderService
     /**
      * Create an order from an accepted offer.
      */
-    public static function createFromOffer(MarketplaceOffer $offer): MarketplaceOrder
+    public static function createFromOffer(MarketplaceOffer $offer, array $data): MarketplaceOrder
     {
-        if ($offer->status !== 'accepted') {
-            throw new \InvalidArgumentException('Offer must be accepted before creating an order.');
-        }
+        self::assertAcceptedOfferCheckoutable($offer);
 
         $tenantId = (int) ($offer->tenant_id ?: TenantContext::getId());
-        $listing  = MarketplaceListing::withoutGlobalScopes()
-            ->where('tenant_id', $tenantId)
-            ->findOrFail($offer->marketplace_listing_id);
+        $quantity = (int) ($data['quantity'] ?? 1);
+        if ($quantity !== 1
+            || (int) ($data['listing_id'] ?? 0) !== (int) $offer->marketplace_listing_id) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+        $rawCheckoutKey = trim((string) ($data['idempotency_key'] ?? ''));
+        if ($rawCheckoutKey === '') {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+        $checkoutKey = hash('sha256', $rawCheckoutKey);
+        $checkoutFingerprint = self::checkoutFingerprint(
+            (int) $offer->marketplace_listing_id,
+            $quantity,
+            $data,
+        );
 
-        return TenantContext::runForTenant($tenantId, function () use ($offer, $listing, $tenantId): MarketplaceOrder {
-            $order = DB::transaction(function () use ($offer, $listing, $tenantId) {
-            self::assertOrderContactAllowed(
-                (int) $offer->buyer_id,
-                (int) $offer->seller_id,
-                $tenantId,
-            );
-            $order = new MarketplaceOrder();
-            $order->tenant_id = $tenantId;
-            $order->order_number = self::generateOrderNumber($tenantId);
-            $order->buyer_id = $offer->buyer_id;
-            $order->seller_id = $offer->seller_id;
-            $order->marketplace_listing_id = $listing->id;
-            $order->marketplace_offer_id = $offer->id;
-            $order->quantity = 1;
-            $order->unit_price = $offer->amount;
-            $order->total_price = $offer->amount;
-            $order->currency = $offer->currency;
-            $order->status = 'pending_payment';
-            $order->save();
+        return TenantContext::runForTenant($tenantId, function () use (
+            $offer,
+            $tenantId,
+            $data,
+            $checkoutKey,
+            $checkoutFingerprint,
+        ): MarketplaceOrder {
+            $created = false;
 
-            MarketplaceListing::where('id', $listing->id)->update(['status' => 'sold']);
-
-            return $order;
-            });
-
-            // Order confirmation emails (outside transaction)
             try {
-                self::sendOrderConfirmationEmails($order, $listing->title);
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] createFromOffer email failed: ' . $e->getMessage());
+                $order = DB::transaction(function () use (
+                    $offer,
+                    $tenantId,
+                    $data,
+                    $checkoutKey,
+                    $checkoutFingerprint,
+                    &$created,
+                ): MarketplaceOrder {
+                    $lockedOffer = MarketplaceOffer::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($offer->id)
+                        ->lockForUpdate()
+                        ->first();
+                    if (! $lockedOffer) {
+                        throw new \InvalidArgumentException(__('api.marketplace_order_offer_not_accepted'));
+                    }
+                    self::assertAcceptedOfferCheckoutable($lockedOffer);
+
+                    $existing = MarketplaceOrder::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->where('marketplace_offer_id', $lockedOffer->id)
+                        ->lockForUpdate()
+                        ->first();
+                    if ($existing) {
+                        if ((string) $existing->status !== 'cancelled') {
+                            self::assertCheckoutReplayMatches($existing, $checkoutFingerprint);
+                            return $existing;
+                        }
+
+                        // A terminal unpaid attempt must not permanently consume
+                        // the offer's one-live-order constraint. Preserve the old
+                        // order and all of its ledgers, but release the nullable
+                        // unique claims before creating a fresh checkout attempt.
+                        $existing->marketplace_offer_id = null;
+                        $existing->checkout_key = null;
+                        $existing->save();
+                    }
+
+                    $listing = MarketplaceListing::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($lockedOffer->marketplace_listing_id)
+                        ->lockForUpdate()
+                        ->firstOrFail();
+                    self::assertListingPurchasable($listing, true);
+
+                    if ((int) $listing->user_id !== (int) $lockedOffer->seller_id) {
+                        throw new \InvalidArgumentException(__('api.marketplace_order_offer_seller_mismatch'));
+                    }
+
+                    self::assertOrderContactAllowed(
+                        (int) $lockedOffer->buyer_id,
+                        (int) $lockedOffer->seller_id,
+                        $tenantId,
+                    );
+
+                    [$shippingOptionId, $shippingMethod, $shippingCost] = self::resolveShipping(
+                        $listing,
+                        $data,
+                        $tenantId,
+                    );
+                    $paymentMethod = strtolower(trim((string) ($data['payment_method'] ?? 'cash')));
+                    // Marketplace offers are monetary negotiations. A buyer
+                    // cannot replace the accepted amount with another tender
+                    // after the seller accepts it.
+                    if ($paymentMethod !== 'cash') {
+                        throw new \InvalidArgumentException(__('api.validation_failed'));
+                    }
+
+                    $currency = StripeCurrency::normalize((string) $lockedOffer->currency);
+                    $subtotalMinor = StripeCurrency::toMinor(
+                        (float) $lockedOffer->amount + $shippingCost,
+                        $currency,
+                    );
+                    if ($subtotalMinor <= 0) {
+                        throw new \InvalidArgumentException(__('api.marketplace_listing_cash_price_invalid'));
+                    }
+                    $subtotal = StripeCurrency::fromMinor($subtotalMinor, $currency);
+                    $unitPriceMinor = StripeCurrency::toMinor((float) $lockedOffer->amount, $currency);
+                    $coupon = null;
+                    $couponDiscount = 0.0;
+                    $couponDiscountMinor = 0;
+                    $couponCode = trim((string) ($data['coupon_code'] ?? ''));
+                    $loyaltyRedemptionId = isset($data['loyalty_redemption_id'])
+                        ? (int) $data['loyalty_redemption_id']
+                        : null;
+                    if ($loyaltyRedemptionId !== null && $couponCode !== '') {
+                        throw new \InvalidArgumentException(__('api.marketplace_coupon_loyalty_exclusive'));
+                    }
+                    if ($couponCode !== '') {
+                        $coupon = MerchantCouponService::validateCoupon(
+                            $couponCode,
+                            (int) $lockedOffer->buyer_id,
+                            $subtotalMinor,
+                            (int) $listing->id,
+                            $listing->category_id !== null ? (int) $listing->category_id : null,
+                            $currency,
+                        );
+                        $couponDiscountMinor = MerchantCouponService::calculateOrderDiscountMinor(
+                            $coupon,
+                            $subtotalMinor,
+                            $unitPriceMinor,
+                            1,
+                        );
+                        $couponDiscount = StripeCurrency::fromMinor(
+                            $couponDiscountMinor,
+                            $currency,
+                        );
+                    }
+
+                    $order = new MarketplaceOrder();
+                    $order->tenant_id = $tenantId;
+                    $order->order_number = self::generateOrderNumber($tenantId);
+                    $order->buyer_id = $lockedOffer->buyer_id;
+                    $order->seller_id = $lockedOffer->seller_id;
+                    $order->marketplace_listing_id = $listing->id;
+                    $order->marketplace_offer_id = $lockedOffer->id;
+                    $order->checkout_key = $checkoutKey;
+                    $order->checkout_fingerprint = $checkoutFingerprint;
+                    $order->quantity = 1;
+                    $order->unit_price = $lockedOffer->amount;
+                    $order->total_price = max(
+                        0.0,
+                        StripeCurrency::roundMajor($subtotal - $couponDiscount, $currency),
+                    );
+                    $order->currency = $currency;
+                    $order->shipping_method = $shippingMethod;
+                    $order->shipping_option_id = $shippingOptionId;
+                    $order->shipping_cost = $shippingCost;
+                    $order->delivery_address = $data['delivery_address'] ?? null;
+                    $order->delivery_notes = $data['delivery_notes'] ?? null;
+                    $order->status = 'pending_payment';
+                    $order->payment_expires_at = now()->addMinutes(30);
+                    $order->save();
+
+                    if ($loyaltyRedemptionId !== null) {
+                        app(CaringLoyaltyService::class)->applyPendingToOrder(
+                            $loyaltyRedemptionId,
+                            $order,
+                        );
+                        $order->refresh();
+                    }
+                    self::finalizeCashCheckoutState($order);
+                    self::assertSellerReadyForCardPayment($order);
+
+                    if ($listing->inventory_count === null) {
+                        // NULL means unlimited inventory, not a single implicit
+                        // unit. Release the offer reservation for future sales.
+                        if ($listing->status === 'reserved') {
+                            $listing->status = 'active';
+                            $listing->save();
+                        }
+                    } else {
+                        MarketplaceInventoryService::decrementForOrder((int) $listing->id, 1);
+                        $listing->refresh();
+                        if ((int) $listing->inventory_count > 0 && $listing->status === 'reserved') {
+                            $listing->status = 'active';
+                            $listing->save();
+                        }
+                    }
+
+                    if ($coupon) {
+                        MerchantCouponService::redeemForOrder(
+                            (int) $coupon->id,
+                            (int) $order->id,
+                            (int) $lockedOffer->buyer_id,
+                            'online',
+                            $couponDiscountMinor,
+                        );
+                    }
+
+                    self::reservePickupSlotIfRequested(
+                        $order,
+                        $data,
+                        (int) $lockedOffer->buyer_id,
+                    );
+
+                    $created = true;
+                    return $order;
+                });
+            } catch (QueryException $exception) {
+                $existing = MarketplaceOrder::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->where('marketplace_offer_id', $offer->id)
+                    ->first();
+                if (! $existing) {
+                    throw $exception;
+                }
+                self::assertCheckoutReplayMatches($existing, $checkoutFingerprint);
+                $order = $existing;
+            }
+
+            if ($created) {
+                try {
+                    $title = MarketplaceListing::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($order->marketplace_listing_id)
+                        ->value('title') ?? '';
+                    self::sendOrderConfirmationEmails($order, (string) $title);
+                } catch (\Throwable $e) {
+                    Log::warning('[MarketplaceOrderService] createFromOffer email failed: ' . $e->getMessage());
+                }
             }
 
             return $order;
@@ -94,121 +292,642 @@ class MarketplaceOrderService
     public static function createDirectPurchase(int $buyerId, int $listingId, array $data): MarketplaceOrder
     {
         $listing = MarketplaceListing::findOrFail($listingId);
-
-        if ($listing->user_id === $buyerId) {
-            throw new \InvalidArgumentException('Cannot purchase your own listing.');
-        }
-
-        if (!in_array($listing->status, ['active'], true)) {
-            throw new \InvalidArgumentException('This listing is not available for purchase.');
-        }
-
         $tenantId = (int) ($listing->tenant_id ?: TenantContext::getId());
-        $quantity = max(1, (int) ($data['quantity'] ?? 1));
-        $unitPrice = (float) $listing->price;
-        $shippingCost = isset($data['shipping_cost']) ? (float) $data['shipping_cost'] : null;
-        $subtotal = ($unitPrice * $quantity) + ($shippingCost ?? 0);
-
-        // AG63 — apply merchant coupon if supplied (validation only; redemption inside txn).
-        $couponCode = isset($data['coupon_code']) ? trim((string) $data['coupon_code']) : '';
-        $couponDiscount = 0.0;
-        $coupon = null;
-        if ($couponCode !== '') {
-            try {
-                $coupon = \App\Services\MerchantCouponService::validateCoupon(
-                    $couponCode,
-                    $buyerId,
-                    (int) round($subtotal * 100),
-                    (int) $listing->id,
-                    isset($listing->category_id) ? (int) $listing->category_id : null
-                );
-                $discountCents = \App\Services\MerchantCouponService::calculateDiscountCents(
-                    $coupon,
-                    (int) round($subtotal * 100)
-                );
-                $couponDiscount = $discountCents / 100.0;
-            } catch (\InvalidArgumentException $e) {
-                throw $e;
-            }
+        $quantity = (int) ($data['quantity'] ?? 1);
+        if ($quantity < 1 || $quantity > self::MAX_ORDER_QUANTITY) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
         }
-        $totalPrice = max(0.0, $subtotal - $couponDiscount);
+        $rawCheckoutKey = trim((string) ($data['idempotency_key'] ?? ''));
+        if ($rawCheckoutKey === '') {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+        $checkoutKey = hash('sha256', $rawCheckoutKey);
+        $checkoutFingerprint = self::checkoutFingerprint($listingId, $quantity, $data);
 
         return TenantContext::runForTenant($tenantId, function () use (
-            $buyerId, $listing, $tenantId, $quantity,
-            $unitPrice, $totalPrice, $shippingCost, $data, $coupon
+            $buyerId, $listingId, $tenantId, $quantity, $checkoutKey, $checkoutFingerprint, $data
         ): MarketplaceOrder {
-            $order = DB::transaction(function () use (
-                $buyerId, $listing, $tenantId, $quantity,
-                $unitPrice, $totalPrice, $shippingCost, $data, $coupon
-            ) {
-            // Lock listing row to prevent race condition on simultaneous purchases
-            $lockedListing = MarketplaceListing::where('id', $listing->id)
-                ->lockForUpdate()
+            $existing = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('buyer_id', $buyerId)
+                ->where('checkout_key', $checkoutKey)
                 ->first();
-
-            if (!$lockedListing || $lockedListing->status !== 'active') {
-                throw new \InvalidArgumentException('This listing is no longer available for purchase.');
+            if ($existing) {
+                self::assertCheckoutReplayMatches($existing, $checkoutFingerprint);
+                if ($existing->status === 'pending_payment'
+                    && (float) ($existing->time_credits_used ?? 0) > 0) {
+                    return self::settleTimeCreditOrder($existing);
+                }
+                return $existing;
             }
 
-            self::assertOrderContactAllowed(
-                $buyerId,
-                (int) $lockedListing->user_id,
-                $tenantId,
-            );
-
-            $order = new MarketplaceOrder();
-            $order->tenant_id = $tenantId;
-            $order->order_number = self::generateOrderNumber($tenantId);
-            $order->buyer_id = $buyerId;
-            $order->seller_id = $lockedListing->user_id;
-            $order->marketplace_listing_id = $lockedListing->id;
-            $order->marketplace_offer_id = null;
-            $order->quantity = $quantity;
-            $order->unit_price = $unitPrice;
-            $order->total_price = $totalPrice;
-            $order->currency = $lockedListing->price_currency ?? 'EUR';
-            $order->time_credits_used = $data['time_credits_used'] ?? null;
-            $order->shipping_method = $data['shipping_method'] ?? null;
-            $order->shipping_cost = $shippingCost;
-            $order->delivery_address = $data['delivery_address'] ?? null;
-            $order->delivery_notes = $data['delivery_notes'] ?? null;
-            $order->status = 'pending_payment';
-            $order->save();
-
-            // AG46 — atomic inventory decrement (under same DB transaction).
-            // If inventory_count is NULL the listing is unlimited and we mark
-            // it sold like before; otherwise let inventory drive status.
-            if ($lockedListing->inventory_count === null) {
-                $lockedListing->update(['status' => 'sold']);
-            } else {
-                \App\Services\MarketplaceInventoryService::decrementForOrder(
-                    (int) $lockedListing->id,
-                    (int) $quantity
-                );
-            }
-
-            // AG63 — atomically redeem coupon (locks coupon row, increments usage_count).
-            if ($coupon) {
-                \App\Services\MerchantCouponService::redeemForOrder(
-                    (int) $coupon->id,
-                    (int) $order->id,
-                    (int) $buyerId,
-                    'online'
-                );
-            }
-
-            return $order;
-            });
-
-            // Order confirmation emails (outside transaction)
+            $created = false;
             try {
-                self::sendOrderConfirmationEmails($order, $listing->title);
-            } catch (\Throwable $e) {
-                Log::warning('[MarketplaceOrderService] createDirectPurchase email failed: ' . $e->getMessage());
+                $order = DB::transaction(function () use (
+                    $buyerId,
+                    $listingId,
+                    $tenantId,
+                    $quantity,
+                    $checkoutKey,
+                    $checkoutFingerprint,
+                    $data,
+                    &$created,
+                ): MarketplaceOrder {
+                    $lockedListing = MarketplaceListing::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($listingId)
+                        ->lockForUpdate()
+                        ->first();
+                    if (! $lockedListing) {
+                        throw new \InvalidArgumentException(__('api.marketplace_listing_unavailable_for_purchase'));
+                    }
+                    self::assertListingPurchasable($lockedListing, false);
+
+                    if ((int) $lockedListing->user_id === $buyerId) {
+                        throw new \InvalidArgumentException(__('api.marketplace_purchase_own_listing'));
+                    }
+                    self::assertOrderContactAllowed($buyerId, (int) $lockedListing->user_id, $tenantId);
+
+                    [$shippingOptionId, $shippingMethod, $shippingCost] = self::resolveShipping(
+                        $lockedListing,
+                        $data,
+                        $tenantId,
+                    );
+
+                    $priceType = (string) ($lockedListing->price_type ?? 'fixed');
+                    $requestedPaymentMethod = (string) ($data['payment_method'] ?? 'cash');
+                    if ($priceType === 'free') {
+                        $requestedPaymentMethod = 'free';
+                    } elseif ($requestedPaymentMethod === 'cash'
+                        && (float) ($lockedListing->price ?? 0) <= 0
+                        && (float) ($lockedListing->time_credit_price ?? 0) > 0) {
+                        // A time-credit-only listing has no ambiguous method to
+                        // choose, so older clients may safely omit this hint.
+                        $requestedPaymentMethod = 'time_credits';
+                    }
+                    if (! in_array($priceType, ['fixed', 'free'], true)) {
+                        throw new \InvalidArgumentException(__('api.marketplace_listing_offer_purchase_required'));
+                    }
+                    if ($requestedPaymentMethod === 'free' && $priceType !== 'free') {
+                        throw new \InvalidArgumentException(__('api.marketplace_free_checkout_not_available'));
+                    }
+
+                    $unitPrice = $requestedPaymentMethod === 'cash'
+                        ? (float) ($lockedListing->price ?? 0)
+                        : 0.0;
+                    $timeCredits = $requestedPaymentMethod === 'time_credits'
+                        ? (float) ($lockedListing->time_credit_price ?? 0) * $quantity
+                        : 0.0;
+                    if ($requestedPaymentMethod === 'cash' && $priceType !== 'free' && $unitPrice <= 0) {
+                        throw new \InvalidArgumentException(__('api.marketplace_listing_cash_price_invalid'));
+                    }
+                    if ($requestedPaymentMethod === 'time_credits' && $timeCredits <= 0) {
+                        throw new \InvalidArgumentException(__('api.marketplace_listing_time_credits_unavailable'));
+                    }
+                    if ($requestedPaymentMethod !== 'cash' && $shippingCost > 0) {
+                        throw new \InvalidArgumentException(
+                            __('api.marketplace_paid_shipping_cash_only'),
+                        );
+                    }
+
+                    $currency = (string) ($lockedListing->price_currency ?: TenantContext::getCurrency());
+                    $subtotalMinor = null;
+                    if ($requestedPaymentMethod === 'cash') {
+                        $subtotalMinor = StripeCurrency::toMinor(
+                            ($unitPrice * $quantity) + $shippingCost,
+                            $currency,
+                        );
+                        if ($subtotalMinor <= 0) {
+                            throw new \InvalidArgumentException(__('api.marketplace_listing_cash_price_invalid'));
+                        }
+                        $subtotal = StripeCurrency::fromMinor($subtotalMinor, $currency);
+                    } else {
+                        $subtotal = round(($unitPrice * $quantity) + $shippingCost, 2);
+                    }
+                    $coupon = null;
+                    $couponDiscount = 0.0;
+                    $couponDiscountMinor = 0;
+                    $couponCode = trim((string) ($data['coupon_code'] ?? ''));
+                    $loyaltyRedemptionId = isset($data['loyalty_redemption_id'])
+                        ? (int) $data['loyalty_redemption_id']
+                        : null;
+                    if ($loyaltyRedemptionId !== null && $couponCode !== '') {
+                        throw new \InvalidArgumentException(
+                            __('api.marketplace_coupon_loyalty_exclusive'),
+                        );
+                    }
+                    if ($loyaltyRedemptionId !== null && $requestedPaymentMethod !== 'cash') {
+                        throw new \InvalidArgumentException(
+                            __('api.marketplace_loyalty_cash_only'),
+                        );
+                    }
+                    if ($couponCode !== '') {
+                        if ($requestedPaymentMethod !== 'cash') {
+                            throw new \InvalidArgumentException(__('api.marketplace_coupon_cash_only'));
+                        }
+                        $subtotalMinor ??= StripeCurrency::toMinor($subtotal, $currency);
+                        $unitPriceMinor = StripeCurrency::toMinor($unitPrice, $currency);
+                        $coupon = MerchantCouponService::validateCoupon(
+                            $couponCode,
+                            $buyerId,
+                            $subtotalMinor,
+                            (int) $lockedListing->id,
+                            $lockedListing->category_id !== null ? (int) $lockedListing->category_id : null,
+                            $currency,
+                        );
+                        $couponDiscountMinor = MerchantCouponService::calculateOrderDiscountMinor(
+                            $coupon,
+                            $subtotalMinor,
+                            $unitPriceMinor,
+                            $quantity,
+                        );
+                        $couponDiscount = StripeCurrency::fromMinor(
+                            $couponDiscountMinor,
+                            $currency,
+                        );
+                    }
+
+                    $order = new MarketplaceOrder();
+                    $order->tenant_id = $tenantId;
+                    $order->order_number = self::generateOrderNumber($tenantId);
+                    $order->buyer_id = $buyerId;
+                    $order->seller_id = $lockedListing->user_id;
+                    $order->marketplace_listing_id = $lockedListing->id;
+                    $order->marketplace_offer_id = null;
+                    $order->checkout_key = $checkoutKey;
+                    $order->checkout_fingerprint = $checkoutFingerprint;
+                    $order->quantity = $quantity;
+                    $order->unit_price = $unitPrice;
+                    $order->total_price = max(
+                        0.0,
+                        $requestedPaymentMethod === 'cash'
+                            ? StripeCurrency::roundMajor($subtotal - $couponDiscount, $currency)
+                            : round($subtotal - $couponDiscount, 2),
+                    );
+                    $order->currency = $currency;
+                    $order->time_credits_used = $timeCredits > 0 ? $timeCredits : null;
+                    $order->shipping_method = $shippingMethod;
+                    $order->shipping_option_id = $shippingOptionId;
+                    $order->shipping_cost = $shippingCost;
+                    $order->delivery_address = $data['delivery_address'] ?? null;
+                    $order->delivery_notes = $data['delivery_notes'] ?? null;
+                    $order->status = $requestedPaymentMethod === 'free' ? 'paid' : 'pending_payment';
+                    // Time-credit settlement happens immediately after this
+                    // transaction. Keep the same checkout expiry backstop as
+                    // cash until settlement clears it, so a worker/process
+                    // interruption cannot reserve inventory indefinitely.
+                    $order->payment_expires_at = $requestedPaymentMethod === 'free'
+                        ? null
+                        : now()->addMinutes(30);
+                    $order->save();
+
+                    if ($loyaltyRedemptionId !== null) {
+                        app(CaringLoyaltyService::class)->applyPendingToOrder(
+                            $loyaltyRedemptionId,
+                            $order,
+                        );
+                        $order->refresh();
+                    }
+                    if ($requestedPaymentMethod === 'cash') {
+                        self::finalizeCashCheckoutState($order);
+                        self::assertSellerReadyForCardPayment($order);
+                    }
+
+                    // NULL inventory is unlimited and remains active.
+                    if ($lockedListing->inventory_count !== null) {
+                        MarketplaceInventoryService::decrementForOrder((int) $lockedListing->id, $quantity);
+                    }
+
+                    if ($coupon) {
+                        MerchantCouponService::redeemForOrder(
+                            (int) $coupon->id,
+                            (int) $order->id,
+                            $buyerId,
+                            'online',
+                            $couponDiscountMinor,
+                        );
+                    }
+
+                    self::reservePickupSlotIfRequested($order, $data, $buyerId);
+
+                    $created = true;
+                    return $order;
+                });
+            } catch (QueryException $exception) {
+                $existing = MarketplaceOrder::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->where('buyer_id', $buyerId)
+                    ->where('checkout_key', $checkoutKey)
+                    ->first();
+                if (! $existing) {
+                    throw $exception;
+                }
+                self::assertCheckoutReplayMatches($existing, $checkoutFingerprint);
+                $order = $existing;
+            }
+
+            if ($created && (float) ($order->time_credits_used ?? 0) > 0) {
+                try {
+                    $order = self::settleTimeCreditOrder($order);
+                } catch (\Throwable $exception) {
+                    self::cancel($order, 'time_credit_payment_failed');
+                    throw $exception;
+                }
+            }
+
+            if ($created) {
+                try {
+                    $title = MarketplaceListing::withoutGlobalScopes()
+                        ->where('tenant_id', $tenantId)
+                        ->whereKey($listingId)
+                        ->value('title') ?? '';
+                    self::sendOrderConfirmationEmails($order, (string) $title);
+                } catch (\Throwable $e) {
+                    Log::warning('[MarketplaceOrderService] createDirectPurchase email failed: ' . $e->getMessage());
+                }
             }
 
             return $order;
         });
+    }
+
+    /**
+     * Hash the canonical fields that define one checkout attempt. Client price
+     * hints are intentionally absent because all money is resolved server-side.
+     */
+    private static function checkoutFingerprint(int $listingId, int $quantity, array $data): string
+    {
+        $shippingOptionId = isset($data['shipping_option_id'])
+            ? max(1, (int) $data['shipping_option_id'])
+            : null;
+        $shippingSelection = $shippingOptionId !== null
+            ? ['option_id' => $shippingOptionId, 'method' => null]
+            : [
+                'option_id' => null,
+                'method' => strtolower(trim((string) ($data['shipping_method'] ?? 'default'))),
+            ];
+        $paymentMethod = strtolower(trim((string) ($data['payment_method'] ?? 'default')));
+        if (! in_array($paymentMethod, ['default', 'cash', 'time_credits', 'free'], true)) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+
+        $canonical = [
+            'offer_id' => isset($data['offer_id']) ? max(1, (int) $data['offer_id']) : null,
+            'listing_id' => $listingId,
+            'quantity' => $quantity,
+            'shipping' => $shippingSelection,
+            'pickup_slot_id' => isset($data['pickup_slot_id'])
+                ? max(1, (int) $data['pickup_slot_id'])
+                : null,
+            'delivery_address' => self::canonicalizeCheckoutValue($data['delivery_address'] ?? null),
+            'delivery_notes' => trim((string) ($data['delivery_notes'] ?? '')),
+            'coupon_code' => strtoupper(trim((string) ($data['coupon_code'] ?? ''))),
+            'loyalty_redemption_id' => isset($data['loyalty_redemption_id'])
+                ? max(1, (int) $data['loyalty_redemption_id'])
+                : null,
+            'payment_method' => $paymentMethod,
+        ];
+
+        return hash('sha256', json_encode($canonical, JSON_THROW_ON_ERROR));
+    }
+
+    private static function canonicalizeCheckoutValue(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if (! array_is_list($value)) {
+            ksort($value);
+        }
+
+        return array_map(
+            static fn (mixed $item): mixed => self::canonicalizeCheckoutValue($item),
+            $value,
+        );
+    }
+
+    private static function assertCheckoutReplayMatches(
+        MarketplaceOrder $existing,
+        string $checkoutFingerprint,
+    ): void {
+        if (empty($existing->checkout_fingerprint)
+            || ! hash_equals((string) $existing->checkout_fingerprint, $checkoutFingerprint)) {
+            throw new \InvalidArgumentException(__('api.marketplace_checkout_idempotency_conflict'));
+        }
+    }
+
+    /** Accepted offers remain checkoutable only until their accepted deadline. */
+    private static function assertAcceptedOfferCheckoutable(MarketplaceOffer $offer): void
+    {
+        if ((string) $offer->status !== 'accepted') {
+            throw new \InvalidArgumentException(__('api.marketplace_order_offer_not_accepted'));
+        }
+        if ($offer->expires_at !== null && $offer->expires_at->isPast()) {
+            throw new \InvalidArgumentException(__('api.marketplace_offer_expired'));
+        }
+    }
+
+    /** Reserve checkout pickup while the order transaction is still open. */
+    private static function reservePickupSlotIfRequested(
+        MarketplaceOrder $order,
+        array $data,
+        int $buyerId,
+    ): void {
+        $hasSlotSelection = isset($data['pickup_slot_id']);
+        if ((string) $order->shipping_method !== 'pickup') {
+            if ($hasSlotSelection) {
+                throw new \InvalidArgumentException(__('api.marketplace_pickup_reservation_failed'));
+            }
+            return;
+        }
+
+        $sellerProfileId = MarketplaceSellerProfile::withoutGlobalScopes()
+            ->where('tenant_id', $order->tenant_id)
+            ->where('user_id', $order->seller_id)
+            ->value('id');
+        $hasScheduledSlots = $sellerProfileId !== null
+            && DB::table('marketplace_pickup_slots')
+                ->where('tenant_id', $order->tenant_id)
+                ->where('seller_id', $sellerProfileId)
+                ->where('is_active', true)
+                ->where('slot_start', '>=', now())
+                ->exists();
+        if ($hasScheduledSlots && ! $hasSlotSelection) {
+            throw new \InvalidArgumentException(__('api.marketplace_pickup_reservation_failed'));
+        }
+        if (! $hasSlotSelection) {
+            return;
+        }
+
+        try {
+            MarketplacePickupSlotService::reserve(
+                (int) $data['pickup_slot_id'],
+                (int) $order->id,
+                $buyerId,
+            );
+        } catch (\DomainException $exception) {
+            throw new \InvalidArgumentException(
+                __('api.marketplace_pickup_reservation_failed'),
+                previous: $exception,
+            );
+        }
+    }
+
+    /** Validate the final cash total and settle seller-funded zero-total orders locally. */
+    private static function finalizeCashCheckoutState(MarketplaceOrder $order): void
+    {
+        $minor = StripeCurrency::toMinor((float) $order->total_price, (string) $order->currency);
+        if ($minor === 0 && $order->status === 'pending_payment') {
+            $order->status = 'paid';
+            $order->payment_expires_at = null;
+            $order->save();
+        }
+    }
+
+    /** Positive cash orders must be payable before reserving stock or coupons. */
+    private static function assertSellerReadyForCardPayment(MarketplaceOrder $order): void
+    {
+        if ($order->status !== 'pending_payment'
+            || StripeCurrency::toMinor(
+                (float) $order->total_price,
+                (string) $order->currency,
+            ) <= 0) {
+            return;
+        }
+
+        if (! (bool) MarketplaceConfigurationService::get(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            false,
+        )) {
+            throw new \InvalidArgumentException(__('api.marketplace_stripe_disabled'));
+        }
+
+        $profile = MarketplaceSellerProfile::withoutGlobalScopes()
+            ->where('tenant_id', $order->tenant_id)
+            ->where('user_id', $order->seller_id)
+            ->lockForUpdate()
+            ->first();
+        if (! $profile || empty($profile->stripe_account_id)) {
+            throw new \InvalidArgumentException(__('api.marketplace_seller_onboarding_required'));
+        }
+        if (! $profile->stripe_onboarding_complete) {
+            throw new \InvalidArgumentException(__('api.marketplace_seller_onboarding_incomplete'));
+        }
+    }
+
+    /** Enforce the complete server-side availability boundary. */
+    private static function assertListingPurchasable(
+        MarketplaceListing $listing,
+        bool $fromAcceptedOffer,
+    ): void {
+        $allowedStatuses = $fromAcceptedOffer ? ['active', 'reserved'] : ['active'];
+        if (! in_array((string) $listing->status, $allowedStatuses, true)) {
+            throw new \InvalidArgumentException(__('api.marketplace_listing_unavailable_for_purchase'));
+        }
+        if ((string) $listing->moderation_status !== 'approved') {
+            throw new \InvalidArgumentException(__('api.marketplace_listing_not_approved'));
+        }
+        if ($listing->expires_at !== null && $listing->expires_at->isPast()) {
+            throw new \InvalidArgumentException(__('api.marketplace_listing_expired'));
+        }
+
+        self::assertCheckoutPolicy($listing);
+
+        $tenantId = (int) ($listing->tenant_id ?: TenantContext::getId());
+        $sellerProfile = MarketplaceSellerProfile::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $listing->user_id)
+            ->first();
+        if ($sellerProfile && (bool) $sellerProfile->is_suspended) {
+            throw new \InvalidArgumentException(__('api.marketplace_seller_suspended'));
+        }
+
+        $sellerStatus = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $listing->user_id)
+            ->value('status');
+        if ($sellerStatus === null || in_array((string) $sellerStatus, [
+            'banned', 'suspended', 'inactive', 'deactivated',
+        ], true)) {
+            throw new \InvalidArgumentException(__('api.marketplace_seller_transactions_unavailable'));
+        }
+    }
+
+    /**
+     * Re-check tenant policy against the locked listing at checkout time.
+     *
+     * A listing can outlive the configuration under which it was published.
+     * Both direct and accepted-offer checkout must therefore fail closed when
+     * an administrator subsequently disables a governed commerce capability.
+     */
+    private static function assertCheckoutPolicy(MarketplaceListing $listing): void
+    {
+        if ((string) $listing->price_type === 'free'
+            && ! MarketplaceConfigurationService::allowFreeItems()) {
+            throw new \InvalidArgumentException(__('api.marketplace_free_items_disabled'));
+        }
+
+        $deliveryMethod = (string) ($listing->delivery_method ?? 'pickup');
+        if (((bool) $listing->shipping_available
+                || in_array($deliveryMethod, ['shipping', 'both'], true))
+            && ! MarketplaceConfigurationService::allowShipping()) {
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_disabled'));
+        }
+        if ($deliveryMethod === 'community_delivery'
+            && ! MarketplaceConfigurationService::allowCommunityDelivery()) {
+            throw new \InvalidArgumentException(__('api.marketplace_community_delivery_disabled'));
+        }
+
+        if ((float) ($listing->price ?? 0) > 0
+            && (float) ($listing->time_credit_price ?? 0) > 0
+            && ! MarketplaceConfigurationService::allowHybridPricing()) {
+            throw new \InvalidArgumentException(__('api.marketplace_hybrid_pricing_disabled'));
+        }
+    }
+
+    /**
+     * Resolve a delivery selection from seller-owned, tenant-scoped data.
+     *
+     * @return array{0:int|null,1:string|null,2:float}
+     */
+    private static function resolveShipping(
+        MarketplaceListing $listing,
+        array $data,
+        int $tenantId,
+    ): array {
+        $shippingOptionId = isset($data['shipping_option_id'])
+            ? (int) $data['shipping_option_id']
+            : null;
+        $requestedMethod = (string) ($data['shipping_method'] ?? '');
+
+        if ($shippingOptionId !== null) {
+            if (! (bool) $listing->shipping_available) {
+                throw new \InvalidArgumentException(__('api.marketplace_shipping_unavailable'));
+            }
+
+            $sellerProfileId = MarketplaceSellerProfile::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $listing->user_id)
+                ->value('id');
+            $option = $sellerProfileId === null ? null : MarketplaceShippingOption::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('seller_id', $sellerProfileId)
+                ->whereKey($shippingOptionId)
+                ->where('is_active', true)
+                ->lockForUpdate()
+                ->first();
+            if (! $option) {
+                throw new \InvalidArgumentException(__('api.marketplace_shipping_option_unavailable'));
+            }
+
+            $listingCurrency = strtoupper((string) ($listing->price_currency ?: TenantContext::getCurrency()));
+            if (strtoupper((string) $option->currency) !== $listingCurrency) {
+                throw new \InvalidArgumentException(__('api.marketplace_shipping_currency_mismatch'));
+            }
+
+            return [
+                (int) $option->id,
+                (string) ($option->courier_code ?: $option->courier_name),
+                round((float) $option->price, 2),
+            ];
+        }
+
+        if ($requestedMethod === 'community_delivery') {
+            if ((string) $listing->delivery_method !== 'community_delivery') {
+                throw new \InvalidArgumentException(__('api.marketplace_community_delivery_unavailable'));
+            }
+            return [null, 'community_delivery', 0.0];
+        }
+
+        if ($requestedMethod === 'pickup' || (bool) $listing->local_pickup) {
+            if (! (bool) $listing->local_pickup) {
+                throw new \InvalidArgumentException(__('api.marketplace_local_pickup_unavailable'));
+            }
+            return [null, 'pickup', 0.0];
+        }
+
+        if ((bool) $listing->shipping_available) {
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_option_required'));
+        }
+
+        return [null, null, 0.0];
+    }
+
+    /** Settle a time-credit purchase atomically against the wallet ledger. */
+    private static function settleTimeCreditOrder(MarketplaceOrder $order): MarketplaceOrder
+    {
+        return app(MarketplaceTimeCreditSettlementService::class)->settle($order);
+    }
+
+    /** Release a reserved pickup slot when an unpaid order is cancelled. */
+    private static function cancelPickupReservation(int $orderId, int $tenantId): void
+    {
+        if (! Schema::hasTable('marketplace_pickup_reservations')) {
+            return;
+        }
+        $reservation = DB::table('marketplace_pickup_reservations')
+            ->where('tenant_id', $tenantId)
+            ->where('order_id', $orderId)
+            ->where('status', 'reserved')
+            ->lockForUpdate()
+            ->first();
+        if (! $reservation) {
+            return;
+        }
+
+        $slot = DB::table('marketplace_pickup_slots')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reservation->slot_id)
+            ->lockForUpdate()
+            ->first();
+        if ($slot) {
+            DB::table('marketplace_pickup_slots')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $slot->id)
+                ->update([
+                    'booked_count' => max(0, (int) $slot->booked_count - 1),
+                    'updated_at' => now(),
+                ]);
+        }
+        DB::table('marketplace_pickup_reservations')
+            ->where('id', $reservation->id)
+            ->update([
+                'status' => 'cancelled',
+                'updated_at' => now(),
+            ]);
+    }
+
+    /** Restore fulfilment reservations after a full, durable refund. */
+    public static function restoreInventoryForRefund(MarketplaceOrder $order): void
+    {
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
+        $listing = MarketplaceListing::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($order->marketplace_listing_id)
+            ->lockForUpdate()
+            ->first();
+
+        if ($listing) {
+            if ($listing->inventory_count === null) {
+                if ((string) $listing->moderation_status === 'approved') {
+                    $listing->status = 'active';
+                    $listing->save();
+                }
+            } else {
+                MarketplaceInventoryService::incrementForCancellation(
+                    (int) $listing->id,
+                    (int) ($order->quantity ?? 1),
+                );
+            }
+        }
+
+        self::cancelPickupReservation((int) $order->id, $tenantId);
+        MerchantCouponService::releaseForOrder((int) $order->id, 'payment_refunded');
+        app(CaringLoyaltyService::class)->reverseForOrder(
+            (int) $order->id,
+            'payment_refunded',
+        );
     }
 
     /**
@@ -231,18 +950,32 @@ class MarketplaceOrderService
      */
     public static function markShipped(MarketplaceOrder $order, array $data): MarketplaceOrder
     {
-        if (!in_array($order->status, ['paid', 'shipped'], true)) {
-            throw new \InvalidArgumentException('Order must be paid before marking as shipped.');
-        }
+        $order = self::withOrderTenant($order, function () use ($order, $data): MarketplaceOrder {
+            return DB::transaction(function () use ($order, $data): MarketplaceOrder {
+                $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                    ->where('tenant_id', $order->tenant_id)
+                    ->whereKey($order->id)
+                    ->lockForUpdate()
+                    ->first();
+                if (! $lockedOrder
+                    || ! in_array((string) $lockedOrder->status, ['paid', 'shipped'], true)) {
+                    throw new \InvalidArgumentException(__('api.marketplace_order_paid_before_shipping'));
+                }
 
-        if ($order->status === 'paid') {
-            $order->status = 'shipped';
-            $order->seller_confirmed_at = now();
-            $order->shipping_method = $data['shipping_method'] ?? $order->shipping_method;
-            $order->tracking_number = $data['tracking_number'] ?? null;
-            $order->tracking_url = $data['tracking_url'] ?? null;
-            $order->save();
-        }
+                if ((string) $lockedOrder->status === 'paid') {
+                    $lockedOrder->status = 'shipped';
+                    $lockedOrder->seller_confirmed_at = now();
+                    // Fulfilment was selected and priced at checkout. A seller
+                    // may attach tracking evidence, but cannot rewrite that
+                    // authoritative method after the buyer has paid.
+                    $lockedOrder->tracking_number = $data['tracking_number'] ?? null;
+                    $lockedOrder->tracking_url = $data['tracking_url'] ?? null;
+                    $lockedOrder->save();
+                }
+
+                return $lockedOrder;
+            });
+        });
 
         self::withOrderTenant($order, function () use ($order): void {
             // Notify buyer their order has shipped
@@ -271,7 +1004,8 @@ class MarketplaceOrderService
             // In-app bell to buyer
             self::deliverOrderBell($order, 'shipped', (int) $order->buyer_id, [
                 'user_id'    => $order->buyer_id,
-                'message'    => __('api_controllers_3.marketplace_order.shipped', ['order_number' => $order->order_number]),
+                'message_key' => 'api_controllers_3.marketplace_order.shipped',
+                'message_params' => ['order_number' => $order->order_number],
                 'link'       => '/marketplace/orders/' . $order->id,
                 'type'       => 'marketplace_order',
                 'created_at' => now(),
@@ -282,20 +1016,37 @@ class MarketplaceOrderService
     }
 
     /**
-     * Buyer confirms receipt of the order. Sets auto-complete countdown (14 days).
+     * Buyer confirms receipt of the order and starts the 14-day dispute window.
+     *
+     * Confirmation deliberately does not release escrow immediately: the
+     * delivered notification promises both parties that completion happens
+     * after 14 days unless a dispute is raised. The escrow auto-release path
+     * therefore requires this auto_complete_at deadline to have elapsed.
      */
     public static function confirmDelivery(MarketplaceOrder $order): MarketplaceOrder
     {
-        if (!in_array($order->status, ['shipped', 'paid', 'delivered'], true)) {
-            throw new \InvalidArgumentException('Order must be shipped or paid to confirm delivery.');
-        }
+        $order = self::withOrderTenant($order, function () use ($order): MarketplaceOrder {
+            return DB::transaction(function () use ($order): MarketplaceOrder {
+                $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                    ->where('tenant_id', $order->tenant_id)
+                    ->whereKey($order->id)
+                    ->lockForUpdate()
+                    ->first();
+                if (! $lockedOrder
+                    || ! in_array((string) $lockedOrder->status, ['shipped', 'paid', 'delivered'], true)) {
+                    throw new \InvalidArgumentException(__('api.marketplace_order_delivery_state_invalid'));
+                }
 
-        if ($order->status !== 'delivered') {
-            $order->status = 'delivered';
-            $order->buyer_confirmed_at = now();
-            $order->auto_complete_at = now()->addDays(14);
-            $order->save();
-        }
+                if ((string) $lockedOrder->status !== 'delivered') {
+                    $lockedOrder->status = 'delivered';
+                    $lockedOrder->buyer_confirmed_at = now();
+                    $lockedOrder->auto_complete_at = now()->addDays(14);
+                    $lockedOrder->save();
+                }
+
+                return $lockedOrder;
+            });
+        });
 
         self::withOrderTenant($order, function () use ($order): void {
             // Notify seller delivery was confirmed
@@ -314,7 +1065,8 @@ class MarketplaceOrderService
             // In-app bell to seller
             self::deliverOrderBell($order, 'delivered', (int) $order->seller_id, [
                 'user_id'    => $order->seller_id,
-                'message'    => __('api_controllers_3.marketplace_order.delivered', ['order_number' => $order->order_number]),
+                'message_key' => 'api_controllers_3.marketplace_order.delivered',
+                'message_params' => ['order_number' => $order->order_number],
                 'link'       => '/marketplace/orders/' . $order->id,
                 'type'       => 'marketplace_order',
                 'created_at' => now(),
@@ -329,38 +1081,79 @@ class MarketplaceOrderService
      */
     public static function cancel(MarketplaceOrder $order, string $reason): MarketplaceOrder
     {
-        // A paid order must be REFUNDED, not cancelled. cancel() moves no money,
-        // so silently voiding a paid order would leave the buyer charged with no
-        // goods and no refund. Only a pre-payment order can be cancelled here;
-        // refunding a captured payment goes through MarketplacePaymentService::processRefund.
-        if (in_array($order->status, ['paid', 'shipped', 'delivered', 'completed', 'refunded'], true)) {
-            throw new \InvalidArgumentException('Only an unpaid order can be cancelled; a paid order must be refunded.');
-        }
+        $cancelledNow = false;
+        $order = self::withOrderTenant($order, function () use (
+            $order,
+            $reason,
+            &$cancelledNow,
+        ): MarketplaceOrder {
+            return DB::transaction(function () use ($order, $reason, &$cancelledNow): MarketplaceOrder {
+                $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                    ->where('tenant_id', $order->tenant_id)
+                    ->whereKey($order->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        $order = self::withOrderTenant($order, function () use ($order, $reason): MarketplaceOrder {
-            return DB::transaction(function () use ($order, $reason) {
-            $order->status = 'cancelled';
-            $order->cancelled_at = now();
-            $order->cancellation_reason = $reason;
-            $order->save();
-
-            // AG46 — restore inventory on cancellation.
-            $listing = MarketplaceListing::where('id', $order->marketplace_listing_id)->lockForUpdate()->first();
-            if ($listing) {
-                if ($listing->inventory_count === null) {
-                    $listing->status = 'active';
-                    $listing->save();
-                } else {
-                    \App\Services\MarketplaceInventoryService::incrementForCancellation(
-                        (int) $listing->id,
-                        (int) ($order->quantity ?? 1)
+                if ($lockedOrder->status === 'cancelled') {
+                    return $lockedOrder;
+                }
+                $hasSuccessfulPayment = MarketplacePayment::withoutGlobalScopes()
+                    ->where('tenant_id', $lockedOrder->tenant_id)
+                    ->where('order_id', $lockedOrder->id)
+                    ->whereIn('status', ['succeeded', 'partially_refunded', 'refunded'])
+                    ->exists();
+                $isCancellableLocalPaid = $lockedOrder->status === 'paid'
+                    && StripeCurrency::toMinor(
+                        (float) $lockedOrder->total_price,
+                        (string) $lockedOrder->currency,
+                    ) === 0
+                    && $lockedOrder->wallet_transaction_id === null
+                    && ! $hasSuccessfulPayment;
+                if (! $isCancellableLocalPaid && in_array($lockedOrder->status, [
+                    'paid', 'shipped', 'delivered', 'completed', 'refunded', 'disputed',
+                ], true)) {
+                    throw new \InvalidArgumentException(
+                        __('api.marketplace_order_cancel_paid_refund_required'),
                     );
                 }
-            }
 
-            return $order;
+                $lockedOrder->status = 'cancelled';
+                $lockedOrder->cancelled_at = now();
+                $lockedOrder->cancellation_reason = $reason;
+                $lockedOrder->payment_expires_at = null;
+                $lockedOrder->save();
+
+                $listing = MarketplaceListing::withoutGlobalScopes()
+                    ->where('tenant_id', $lockedOrder->tenant_id)
+                    ->whereKey($lockedOrder->marketplace_listing_id)
+                    ->lockForUpdate()
+                    ->first();
+                if ($listing) {
+                    if ($listing->inventory_count === null) {
+                        $listing->status = 'active';
+                        $listing->save();
+                    } else {
+                        MarketplaceInventoryService::incrementForCancellation(
+                            (int) $listing->id,
+                            (int) ($lockedOrder->quantity ?? 1),
+                        );
+                    }
+                }
+
+                MerchantCouponService::releaseForOrder((int) $lockedOrder->id, $reason);
+                app(CaringLoyaltyService::class)->reverseForOrder(
+                    (int) $lockedOrder->id,
+                    $reason,
+                );
+                self::cancelPickupReservation((int) $lockedOrder->id, (int) $lockedOrder->tenant_id);
+                $cancelledNow = true;
+                return $lockedOrder;
             });
         });
+
+        if (! $cancelledNow) {
+            return $order;
+        }
 
         self::withOrderTenant($order, function () use ($order, $reason): void {
             // Notify both parties of the cancellation
@@ -384,9 +1177,9 @@ class MarketplaceOrderService
 
             // In-app bells to both parties
             $cancelLink = '/marketplace/orders/' . $order->id;
-            $cancelBell = __('api_controllers_3.marketplace_order.cancelled', ['order_number' => $order->order_number]);
-            self::deliverOrderBell($order, 'cancelled', (int) $order->buyer_id, ['user_id' => $order->buyer_id,  'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
-            self::deliverOrderBell($order, 'cancelled', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message' => $cancelBell, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            $cancelParams = ['order_number' => $order->order_number];
+            self::deliverOrderBell($order, 'cancelled', (int) $order->buyer_id, ['user_id' => $order->buyer_id, 'message_key' => 'api_controllers_3.marketplace_order.cancelled', 'message_params' => $cancelParams, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'cancelled', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message_key' => 'api_controllers_3.marketplace_order.cancelled', 'message_params' => $cancelParams, 'link' => $cancelLink, 'type' => 'marketplace_order', 'created_at' => now()]);
         });
 
         return $order;
@@ -404,20 +1197,37 @@ class MarketplaceOrderService
         }
 
         if (!in_array($order->status, ['delivered', 'paid', 'shipped'], true)) {
-            throw new \InvalidArgumentException('Order must be delivered before it can be completed.');
+            throw new \InvalidArgumentException(__('api.marketplace_order_delivery_before_completion'));
         }
 
         $claimed = false;
         $order = self::withOrderTenant($order, function () use ($order, &$claimed): MarketplaceOrder {
             return DB::transaction(function () use ($order, &$claimed) {
+            // A completed order must never imply that held escrow was paid out.
+            // The escrow release path marks the hold released before calling
+            // complete(); non-escrow payment methods have no escrow row.
+            $escrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $order->tenant_id)
+                ->where('order_id', $order->id)
+                ->lockForUpdate()
+                ->first();
+            if ($escrow !== null && $escrow->status !== 'released') {
+                $order->refresh();
+                return $order;
+            }
+
             // Atomic claim — the in-memory status check above can race
             // (buyer confirm vs auto-release cron, or a double-click): both
             // would pass and double-increment seller stats. The status
             // predicate makes exactly one caller win.
+            $updates = ['status' => 'completed'];
+            if ($escrow !== null) {
+                $updates['escrow_released_at'] = $escrow->released_at ?? now();
+            }
             $claimedRows = MarketplaceOrder::query()
                 ->whereKey($order->id)
                 ->whereIn('status', ['delivered', 'paid', 'shipped'])
-                ->update(['status' => 'completed', 'escrow_released_at' => now()]);
+                ->update($updates);
 
             $claimed = $claimedRows > 0;
             $order->refresh();
@@ -431,7 +1241,8 @@ class MarketplaceOrderService
                 ->first();
             if ($sellerProfile) {
                 $sellerProfile->increment('total_sales');
-                $sellerProfile->increment('total_revenue', (float) $order->total_price);
+                // Revenue is queried from orders grouped by currency. The
+                // legacy scalar cache cannot represent multi-currency sales.
             }
 
             return $order;
@@ -477,9 +1288,9 @@ class MarketplaceOrderService
 
             // In-app bells to both parties
             $completeLink = '/marketplace/orders/' . $order->id;
-            $completeBell = __('api_controllers_3.marketplace_order.completed', ['order_number' => $order->order_number]);
-            self::deliverOrderBell($order, 'completed', (int) $order->buyer_id, ['user_id' => $order->buyer_id,  'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
-            self::deliverOrderBell($order, 'completed', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message' => $completeBell, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            $completeParams = ['order_number' => $order->order_number];
+            self::deliverOrderBell($order, 'completed', (int) $order->buyer_id, ['user_id' => $order->buyer_id, 'message_key' => 'api_controllers_3.marketplace_order.completed', 'message_params' => $completeParams, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
+            self::deliverOrderBell($order, 'completed', (int) $order->seller_id, ['user_id' => $order->seller_id, 'message_key' => 'api_controllers_3.marketplace_order.completed', 'message_params' => $completeParams, 'link' => $completeLink, 'type' => 'marketplace_order', 'created_at' => now()]);
         });
     }
 
@@ -489,8 +1300,10 @@ class MarketplaceOrderService
             $listing = MarketplaceListing::find($order->marketplace_listing_id);
             $title = htmlspecialchars($listing->title ?? '', ENT_QUOTES, 'UTF-8');
             $link = '/marketplace/orders/' . $order->id;
-            $currency = strtoupper($payment->currency ?? $order->currency ?? TenantContext::getCurrency() ?? 'EUR');
-            $amount = number_format((float) $payment->amount, 2) . ' ' . $currency;
+            $currency = StripeCurrency::normalize(
+                (string) ($payment->currency ?: $order->currency ?: TenantContext::getCurrency()),
+            );
+            $amount = StripeCurrency::formatMajor((float) $payment->amount, $currency) . ' ' . $currency;
 
             self::deliverOrderEmail($order, 'paid', (int) $order->buyer_id, function () use ($order, $title, $amount, $link): string {
                 return self::sendOrderEmail(
@@ -517,14 +1330,16 @@ class MarketplaceOrderService
 
             self::deliverOrderBell($order, 'paid', (int) $order->buyer_id, [
                 'user_id' => $order->buyer_id,
-                'message' => __('api_controllers_3.marketplace_order.paid_buyer', ['order_number' => $order->order_number, 'amount' => $amount]),
+                'message_key' => 'api_controllers_3.marketplace_order.paid_buyer',
+                'message_params' => ['order_number' => $order->order_number, 'amount' => $amount],
                 'link' => $link,
                 'type' => 'marketplace_order',
                 'created_at' => now(),
             ]);
             self::deliverOrderBell($order, 'paid', (int) $order->seller_id, [
                 'user_id' => $order->seller_id,
-                'message' => __('api_controllers_3.marketplace_order.paid_seller', ['order_number' => $order->order_number, 'amount' => $amount]),
+                'message_key' => 'api_controllers_3.marketplace_order.paid_seller',
+                'message_params' => ['order_number' => $order->order_number, 'amount' => $amount],
                 'link' => $link,
                 'type' => 'marketplace_order',
                 'created_at' => now(),
@@ -709,14 +1524,16 @@ class MarketplaceOrderService
         // In-app bells
         self::deliverOrderBell($order, 'confirmed', (int) $order->buyer_id, [
             'user_id'    => $order->buyer_id,
-            'message'    => __('api_controllers_3.marketplace_order.confirmed_buyer', ['order_number' => $order->order_number, 'title' => $title]),
+            'message_key' => 'api_controllers_3.marketplace_order.confirmed_buyer',
+            'message_params' => ['order_number' => $order->order_number, 'title' => $title],
             'link'       => $link,
             'type'       => 'marketplace_order',
             'created_at' => now(),
         ]);
         self::deliverOrderBell($order, 'confirmed', (int) $order->seller_id, [
             'user_id'    => $order->seller_id,
-            'message'    => __('api_controllers_3.marketplace_order.confirmed_seller', ['order_number' => $order->order_number, 'title' => $title]),
+            'message_key' => 'api_controllers_3.marketplace_order.confirmed_seller',
+            'message_params' => ['order_number' => $order->order_number, 'title' => $title],
             'link'       => $link,
             'type'       => 'marketplace_order',
             'created_at' => now(),
@@ -891,7 +1708,8 @@ class MarketplaceOrderService
      */
     private static function createOrderBell(array $attributes): ?int
     {
-        if ((int) ($attributes['user_id'] ?? 0) <= 0) {
+        $userId = (int) ($attributes['user_id'] ?? 0);
+        if ($userId <= 0) {
             Log::warning('[MarketplaceOrderService] skipped marketplace bell without recipient', [
                 'type' => $attributes['type'] ?? null,
                 'link' => $attributes['link'] ?? null,
@@ -899,26 +1717,35 @@ class MarketplaceOrderService
             return null;
         }
 
-        return (int) Notification::create($attributes)->id;
-    }
+        $messageKey = (string) ($attributes['message_key'] ?? '');
+        $messageParams = is_array($attributes['message_params'] ?? null)
+            ? $attributes['message_params']
+            : [];
+        unset($attributes['message_key'], $attributes['message_params']);
 
-    /**
-     * Generate a unique order number: MKT-000001, MKT-000002, etc.
-     */
-    public static function generateOrderNumber(int $tenantId): string
-    {
-        $lastOrder = MarketplaceOrder::withoutGlobalScopes()
-            ->where('tenant_id', $tenantId)
-            ->orderBy('id', 'desc')
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select(['id', 'preferred_language'])
             ->first();
-
-        if ($lastOrder && preg_match('/MKT-(\d+)/', $lastOrder->order_number, $matches)) {
-            $nextNumber = (int) $matches[1] + 1;
-        } else {
-            $nextNumber = 1;
+        if (! $recipient) {
+            return null;
         }
 
-        return 'MKT-' . str_pad((string) $nextNumber, 6, '0', STR_PAD_LEFT);
+        return (int) LocaleContext::withLocale($recipient, function () use ($attributes, $messageKey, $messageParams): int {
+            $localized = $attributes;
+            if ($messageKey !== '') {
+                $localized['message'] = __($messageKey, $messageParams);
+            }
+
+            return (int) Notification::create($localized)->id;
+        });
+    }
+
+    /** Generate a concurrency-safe, non-enumerable marketplace order number. */
+    public static function generateOrderNumber(int $tenantId): string
+    {
+        return 'MKT-' . strtoupper((string) Str::ulid());
     }
 
     /**
@@ -936,12 +1763,27 @@ class MarketplaceOrderService
             'order_number' => $order->order_number,
             'status' => $order->status,
             'quantity' => $order->quantity,
-            'unit_price' => $order->unit_price,
-            'total_price' => $order->total_price,
+            'unit_price' => (float) $order->unit_price,
+            'total_price' => (float) $order->total_price,
             'currency' => $order->currency,
-            'time_credits_used' => $order->time_credits_used,
+            'time_credits_used' => $order->time_credits_used !== null
+                ? (float) $order->time_credits_used
+                : null,
+            'wallet_transaction_id' => $order->wallet_transaction_id,
+            'wallet_refund_transaction_id' => $order->wallet_refund_transaction_id,
+            'loyalty_redemption_id' => $order->loyalty_redemption_id,
+            'payment_method' => $order->wallet_transaction_id !== null
+                ? 'time_credits'
+                : ((float) $order->total_price <= 0 ? 'free' : 'cash'),
+            'requires_payment' => $order->status === 'pending_payment'
+                && $order->wallet_transaction_id === null
+                && (float) $order->total_price > 0,
+            'payment_expires_at' => $order->payment_expires_at?->toISOString(),
             'shipping_method' => $order->shipping_method,
-            'shipping_cost' => $order->shipping_cost,
+            'shipping_option_id' => $order->shipping_option_id,
+            'shipping_cost' => $order->shipping_cost !== null
+                ? (float) $order->shipping_cost
+                : null,
             'tracking_number' => $order->tracking_number,
             'tracking_url' => $order->tracking_url,
             'delivery_address' => $order->delivery_address,
@@ -957,7 +1799,7 @@ class MarketplaceOrderService
             'listing' => $listing ? [
                 'id' => $listing->id,
                 'title' => $listing->title,
-                'price' => $listing->price,
+                'price' => $listing->price !== null ? (float) $listing->price : null,
                 'price_currency' => $listing->price_currency,
                 'status' => $listing->status,
                 'delivery_method' => $listing->delivery_method,

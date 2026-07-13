@@ -19,7 +19,9 @@
       "invalid_listing": "出品はこの業者のものではありません。",
       "listing_unavailable": "このリストはロイヤリティの引き換えには利用できません。",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "このロイヤルティ交換は利用できなくなりました。",
+      "redemption_mismatch": "このロイヤルティ交換は選択したマーケットプレイス注文と一致しません。"
     }
   },
   "survey": {

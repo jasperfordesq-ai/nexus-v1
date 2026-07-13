@@ -88,6 +88,7 @@ class MarketplaceCommunityDeliveryControllerTest extends TestCase
             'unit_price' => 10,
             'total_price' => 10,
             'currency' => 'EUR',
+            'shipping_method' => 'community_delivery',
             'status' => 'paid',
             'created_at' => now(),
             'updated_at' => now(),
@@ -194,6 +195,83 @@ class MarketplaceCommunityDeliveryControllerTest extends TestCase
             'deliverer_id' => $deliverer->id,
             'status' => 'accepted',
         ]);
+    }
+
+    public function test_seller_cannot_accept_an_offer_that_debits_the_buyer(): void
+    {
+        $this->requireCommunityDeliveryTables();
+        $this->setMarketplaceFeature(true);
+
+        $buyer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 10]);
+        $seller = $this->authenticatedUser();
+        $deliverer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $orderId = $this->createCommunityDeliveryOrder($buyer, $seller);
+        DB::table('marketplace_delivery_offers')->insert([
+            'tenant_id' => $this->testTenantId,
+            'order_id' => $orderId,
+            'deliverer_id' => $deliverer->id,
+            'time_credits' => 2,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPut("/v2/marketplace/orders/{$orderId}/delivery-offers/{$deliverer->id}/accept", []);
+
+        $response->assertStatus(403)->assertJsonPath('errors.0.code', 'FORBIDDEN');
+        $this->assertDatabaseHas('marketplace_delivery_offers', [
+            'order_id' => $orderId,
+            'deliverer_id' => $deliverer->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_buyer_confirmation_is_idempotent_and_moves_credits_once(): void
+    {
+        $this->requireCommunityDeliveryTables();
+        $this->setMarketplaceFeature(true);
+
+        $buyer = $this->authenticatedUser();
+        $buyer->forceFill(['balance' => 10])->save();
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $deliverer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $orderId = $this->createCommunityDeliveryOrder($buyer, $seller);
+        DB::table('marketplace_delivery_offers')->insert([
+            'tenant_id' => $this->testTenantId,
+            'order_id' => $orderId,
+            'deliverer_id' => $deliverer->id,
+            'time_credits' => 2,
+            'status' => 'accepted',
+            'accepted_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $policy = Mockery::mock(SafeguardingInteractionPolicy::class);
+        $policy->shouldReceive('assertManyLocalContactsAllowed')->once();
+        $policy->shouldReceive('assertLocalContactAllowed')->twice();
+        $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
+
+        $first = $this->apiPut("/v2/marketplace/orders/{$orderId}/delivery-offers/{$deliverer->id}/confirm", []);
+        $second = $this->apiPut("/v2/marketplace/orders/{$orderId}/delivery-offers/{$deliverer->id}/confirm", []);
+
+        $first->assertOk();
+        $second->assertOk();
+        $offer = DB::table('marketplace_delivery_offers')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('order_id', $orderId)
+            ->where('deliverer_id', $deliverer->id)
+            ->first();
+        $this->assertSame('completed', $offer->status);
+        $this->assertNotNull($offer->wallet_transaction_id);
+        $this->assertSame(8.0, (float) $buyer->fresh()->balance);
+        $this->assertSame(2.0, (float) $deliverer->fresh()->balance);
+        $this->assertSame(1, DB::table('transactions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('transaction_type', 'community_delivery')
+            ->where('sender_id', $buyer->id)
+            ->where('receiver_id', $deliverer->id)
+            ->count());
     }
 
     public function test_delivery_offer_denial_writes_no_offer_or_notes(): void

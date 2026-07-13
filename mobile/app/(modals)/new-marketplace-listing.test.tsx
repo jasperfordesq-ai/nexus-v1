@@ -8,6 +8,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 let mockParams: Record<string, string> = {};
+let mockTenantCurrency = 'EUR';
 
 // Stable references so screens that put `show` in a useCallback/useEffect
 // dependency array don't re-run their effects on every render.
@@ -113,6 +114,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ tenant: { currency: mockTenantCurrency } }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -171,6 +173,7 @@ describe('NewMarketplaceListingRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockParams = {};
+    mockTenantCurrency = 'EUR';
   });
 
   it('renders optional coordinate fields for nearby search parity', async () => {
@@ -218,6 +221,25 @@ describe('NewMarketplaceListingRoute', () => {
       expect(createMarketplaceListing).toHaveBeenCalledWith(expect.objectContaining({
         price: 12.5,
         price_currency: 'USD',
+      }));
+    });
+  });
+
+  it('uses the tenant payment currency for a new listing by default', async () => {
+    mockTenantCurrency = 'JPY';
+    jest.mocked(createMarketplaceListing).mockResolvedValue({ data: { id: 89 } } as never);
+
+    const { getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Vintage lamp');
+    fireEvent.changeText(getByPlaceholderText('Details'), 'Working lamp in good condition.');
+    fireEvent.changeText(getByPlaceholderText('0.00'), '2500');
+    fireEvent.press(getByText('Publish'));
+
+    await waitFor(() => {
+      expect(createMarketplaceListing).toHaveBeenCalledWith(expect.objectContaining({
+        price: 2500,
+        price_currency: 'JPY',
       }));
     });
   });

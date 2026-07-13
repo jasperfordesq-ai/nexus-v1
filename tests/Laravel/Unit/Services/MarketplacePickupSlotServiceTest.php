@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Unit\Services;
 
 use App\Core\TenantContext;
+use App\Models\MarketplacePickupSlot;
 use App\Services\MarketplacePickupSlotService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,8 @@ class MarketplacePickupSlotServiceTest extends TestCase
             'price'       => '5.00',
             'price_type'  => 'fixed',
             'status'      => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addWeek(),
             'delivery_method' => 'pickup',
             'seller_type' => 'private',
             'created_at'  => now(),
@@ -104,6 +107,7 @@ class MarketplacePickupSlotServiceTest extends TestCase
             'quantity'               => 1,
             'unit_price'             => '5.00',
             'total_price'            => '5.00',
+            'shipping_method'        => 'pickup',
             'status'                 => 'paid',
             'created_at'             => now(),
             'updated_at'             => now(),
@@ -140,6 +144,45 @@ class MarketplacePickupSlotServiceTest extends TestCase
         ]);
 
         $this->assertSame(1, (int) $slot->capacity, 'Capacity 0 must be clamped to 1');
+    }
+
+    public function test_create_rejects_an_end_before_the_start(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('SLOT_END_BEFORE_START');
+
+        MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addHours(2)->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 1,
+        ]);
+    }
+
+    public function test_create_rejects_a_seller_profile_from_another_tenant(): void
+    {
+        $userId = (int) DB::table('users')->insertGetId([
+            'tenant_id' => 999,
+            'name' => 'Other tenant seller',
+            'email' => 'other-tenant-slot-' . uniqid() . '@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $profileId = (int) DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => 999,
+            'user_id' => $userId,
+            'seller_type' => 'private',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('SELLER_PROFILE_NOT_FOUND');
+        MarketplacePickupSlotService::create($profileId, [
+            'slot_start' => now()->addHour()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addHours(2)->format('Y-m-d H:i:s'),
+            'capacity' => 1,
+        ]);
     }
 
     // ── listForSeller ─────────────────────────────────────────────────────────
@@ -223,6 +266,82 @@ class MarketplacePickupSlotServiceTest extends TestCase
         $this->assertSame([], $result);
     }
 
+    public function test_list_available_for_listing_enforces_public_listing_and_active_seller_boundary(): void
+    {
+        MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+
+        foreach ([
+            ['moderation_status' => 'pending'],
+            ['status' => 'draft'],
+            ['status' => 'active', 'moderation_status' => 'approved', 'expires_at' => now()->subMinute()],
+            ['status' => 'active', 'moderation_status' => 'approved', 'expires_at' => now()->addDay(), 'delivery_method' => 'shipping'],
+        ] as $listingState) {
+            DB::table('marketplace_listings')->where('id', $this->listingId)->update($listingState);
+            $this->assertSame([], MarketplacePickupSlotService::listAvailableForListing($this->listingId));
+        }
+
+        DB::table('marketplace_listings')->where('id', $this->listingId)->update([
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'delivery_method' => 'pickup',
+        ]);
+        DB::table('marketplace_seller_profiles')->where('id', $this->sellerProfileId)->update([
+            'is_suspended' => true,
+        ]);
+        $this->assertSame([], MarketplacePickupSlotService::listAvailableForListing($this->listingId));
+
+        DB::table('marketplace_seller_profiles')->where('id', $this->sellerProfileId)->update([
+            'is_suspended' => false,
+        ]);
+        DB::table('users')->where('id', self::SELLER_UID)->update(['status' => 'inactive']);
+        $this->assertSame([], MarketplacePickupSlotService::listAvailableForListing($this->listingId));
+    }
+
+    public function test_update_reloads_and_locks_current_booking_count_before_lowering_capacity(): void
+    {
+        $slot = MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+        $staleSlot = MarketplacePickupSlot::withoutGlobalScopes()->findOrFail($slot->id);
+        MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+
+        try {
+            MarketplacePickupSlotService::update($staleSlot, ['capacity' => 0]);
+            $this->fail('A stale slot model must not overwrite the current booking count.');
+        } catch (\DomainException $exception) {
+            $this->assertSame('CAPACITY_BELOW_BOOKINGS', $exception->getMessage());
+        }
+
+        $this->assertSame(2, (int) $slot->fresh()->capacity);
+        $this->assertSame(1, (int) $slot->fresh()->booked_count);
+    }
+
+    public function test_delete_rechecks_active_reservations_under_the_slot_lock(): void
+    {
+        $slot = MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+        $staleSlot = MarketplacePickupSlot::withoutGlobalScopes()->findOrFail($slot->id);
+        MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('SLOT_HAS_RESERVATIONS');
+        try {
+            MarketplacePickupSlotService::delete($staleSlot);
+        } finally {
+            $this->assertDatabaseHas('marketplace_pickup_slots', ['id' => $slot->id]);
+        }
+    }
+
     // ── reserve ───────────────────────────────────────────────────────────────
 
     public function test_reserve_creates_reservation_and_increments_booked_count(): void
@@ -269,6 +388,7 @@ class MarketplacePickupSlotServiceTest extends TestCase
             'quantity'               => 1,
             'unit_price'             => '5.00',
             'total_price'            => '5.00',
+            'shipping_method'        => 'pickup',
             'status'                 => 'paid',
             'created_at'             => now(),
             'updated_at'             => now(),
@@ -332,7 +452,67 @@ class MarketplacePickupSlotServiceTest extends TestCase
         MarketplacePickupSlotService::reserve($slotId, $this->orderId, self::BUYER_UID);
     }
 
+    public function test_reserve_rejects_a_slot_owned_by_another_seller(): void
+    {
+        $otherSeller = (int) DB::table('users')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'name' => 'Other pickup seller',
+            'email' => 'other-pickup-' . uniqid() . '@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $otherProfile = (int) DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $otherSeller,
+            'seller_type' => 'private',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $slot = MarketplacePickupSlotService::create($otherProfile, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+
+        try {
+            MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+            $this->fail('A buyer must not reserve another seller\'s pickup slot.');
+        } catch (\DomainException $e) {
+            $this->assertSame('SLOT_SELLER_MISMATCH', $e->getMessage());
+        }
+
+        $this->assertSame(0, (int) $slot->fresh()->booked_count);
+        $this->assertDatabaseMissing('marketplace_pickup_reservations', [
+            'order_id' => $this->orderId,
+        ]);
+    }
+
     // ── scanQr ───────────────────────────────────────────────────────────────
+
+    public function test_reserve_rejects_an_order_not_configured_for_pickup(): void
+    {
+        DB::table('marketplace_orders')->where('id', $this->orderId)->update([
+            'shipping_method' => 'shipping',
+        ]);
+        $slot = MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+
+        try {
+            MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+            $this->fail('A shipping order must not reserve a pickup slot.');
+        } catch (\DomainException $e) {
+            $this->assertSame('ORDER_NOT_PICKUP_ELIGIBLE', $e->getMessage());
+        }
+
+        $this->assertSame(0, (int) $slot->fresh()->booked_count);
+        $this->assertDatabaseMissing('marketplace_pickup_reservations', [
+            'order_id' => $this->orderId,
+        ]);
+    }
 
     public function test_scan_qr_marks_reservation_picked_up(): void
     {
@@ -420,6 +600,39 @@ class MarketplacePickupSlotServiceTest extends TestCase
 
         $this->assertSame(10, (int) $updated->capacity);
         $this->assertFalse((bool) $updated->is_active);
+    }
+
+    public function test_update_rejects_capacity_below_active_bookings(): void
+    {
+        $slot = MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+        MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('CAPACITY_BELOW_BOOKINGS');
+        MarketplacePickupSlotService::update($slot->fresh(), ['capacity' => 0]);
+    }
+
+    public function test_delete_rejects_slot_with_active_reservation(): void
+    {
+        $slot = MarketplacePickupSlotService::create($this->sellerProfileId, [
+            'slot_start' => now()->addDay()->format('Y-m-d H:i:s'),
+            'slot_end' => now()->addDay()->addHour()->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+        MarketplacePickupSlotService::reserve($slot->id, $this->orderId, self::BUYER_UID);
+
+        try {
+            MarketplacePickupSlotService::delete($slot);
+            $this->fail('A slot with an active reservation must not be deleted.');
+        } catch (\DomainException $e) {
+            $this->assertSame('SLOT_HAS_RESERVATIONS', $e->getMessage());
+        }
+
+        $this->assertDatabaseHas('marketplace_pickup_slots', ['id' => $slot->id]);
     }
 
     public function test_delete_removes_slot_from_db(): void

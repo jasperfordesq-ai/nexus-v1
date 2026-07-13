@@ -19,6 +19,7 @@ use App\Services\MarketplaceSellerService;
 use App\Services\PrerenderContentInvalidator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 /**
  * MarketplaceListingController — Standalone marketplace listing endpoints.
@@ -210,6 +211,16 @@ class MarketplaceListingController extends BaseApiController
         $this->rateLimit('marketplace_show', 60, 60);
 
         $listing = MarketplaceListingService::getById($id, $userId);
+        if (! $listing) {
+            $offerId = $this->queryInt('offer_id', 0, 0);
+            if ($offerId > 0) {
+                $listing = MarketplaceListingService::getByIdForAcceptedOfferBuyer(
+                    $id,
+                    $userId,
+                    $offerId,
+                );
+            }
+        }
 
         if (!$listing) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.marketplace_listing.not_found'), null, 404);
@@ -245,7 +256,7 @@ class MarketplaceListingController extends BaseApiController
             'price_currency'     => 'nullable|string|max:3',
             'price_type'         => 'nullable|string|in:fixed,negotiable,free,auction,contact',
             'time_credit_price'  => 'nullable|numeric|min:0',
-            'category_id'        => 'nullable|integer|exists:marketplace_categories,id',
+            'category_id'        => ['nullable', 'integer', $this->availableCategoryRule()],
             'condition'          => 'nullable|string|in:new,like_new,good,fair,poor',
             'quantity'           => 'nullable|integer|min:1',
             'inventory_count'    => 'nullable|integer|min:0',
@@ -273,6 +284,8 @@ class MarketplaceListingController extends BaseApiController
                 return $this->respondWithError('SELLER_SUSPENDED', __('api_controllers_2.marketplace_listing.seller_suspended'), null, 403);
             }
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.create_failed'), null, 500);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Marketplace listing creation failed', [
                 'user_id' => $userId,
@@ -313,7 +326,7 @@ class MarketplaceListingController extends BaseApiController
             'price_currency'     => 'nullable|string|max:3',
             'price_type'         => 'nullable|string|in:fixed,negotiable,free,auction,contact',
             'time_credit_price'  => 'nullable|numeric|min:0',
-            'category_id'        => 'nullable|integer|exists:marketplace_categories,id',
+            'category_id'        => ['nullable', 'integer', $this->availableCategoryRule()],
             'condition'          => 'nullable|string|in:new,like_new,good,fair,poor',
             'quantity'           => 'nullable|integer|min:1',
             'inventory_count'    => 'nullable|integer|min:0',
@@ -332,6 +345,13 @@ class MarketplaceListingController extends BaseApiController
 
         try {
             MarketplaceListingService::update($listing, $data);
+        } catch (\DomainException $e) {
+            if ($e->getMessage() === 'SELLER_SUSPENDED') {
+                return $this->respondWithError('SELLER_SUSPENDED', __('api_controllers_2.marketplace_listing.seller_suspended'), null, 403);
+            }
+            throw $e;
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Marketplace listing update failed', [
                 'listing_id' => $id,
@@ -372,8 +392,8 @@ class MarketplaceListingController extends BaseApiController
     /**
      * POST /v2/marketplace/listings/{id}/images — Upload images to a listing.
      *
-     * Accepts multipart/form-data with images[] files. Maximum 20 images
-     * per listing. Uses ImageUploadService for upload handling.
+     * Accepts multipart/form-data with images[] files. The per-listing limit is
+     * tenant-configured. Uses ImageUploadService for upload handling.
      */
     public function uploadImages(int $id): JsonResponse
     {
@@ -427,7 +447,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         // Cap at remaining slots
-        $remainingSlots = 20 - $existingCount;
+        $remainingSlots = max(0, $maxImages - $existingCount);
         if (count($files) > $remainingSlots) {
             $files = array_slice($files, 0, $remainingSlots);
         }
@@ -456,7 +476,7 @@ class MarketplaceListingController extends BaseApiController
                 ]);
                 continue;
             }
-            if (isset($extMimeMap[$ext]) && $extMimeMap[$ext] !== $detectedMime) {
+            if (!isset($extMimeMap[$ext]) || $extMimeMap[$ext] !== $detectedMime) {
                 \Illuminate\Support\Facades\Log::warning('Marketplace image upload rejected (ext/MIME mismatch)', [
                     'listing_id' => $id,
                     'mime'       => $detectedMime,
@@ -505,6 +525,25 @@ class MarketplaceListingController extends BaseApiController
     }
 
     /**
+     * Restrict category references to active system categories or categories
+     * owned by the current tenant. The plain exists rule accepts another
+     * tenant's category because the foreign key is not tenant-composite.
+     */
+    private function availableCategoryRule(): \Illuminate\Validation\Rules\Exists
+    {
+        $tenantId = TenantContext::getId();
+
+        return Rule::exists('marketplace_categories', 'id')
+            ->where(static function ($query) use ($tenantId): void {
+                $query->where('is_active', true)
+                    ->where(static function ($tenantQuery) use ($tenantId): void {
+                        $tenantQuery->where('tenant_id', $tenantId)
+                            ->orWhereNull('tenant_id');
+                    });
+            });
+    }
+
+    /**
      * PUT /v2/marketplace/listings/{id}/images/reorder — Reorder listing images.
      *
      * Body: { "image_ids": [3, 1, 2] }
@@ -523,7 +562,11 @@ class MarketplaceListingController extends BaseApiController
             'image_ids.*' => 'integer',
         ]);
 
-        MarketplaceListingService::reorderImages($listing, $data['image_ids']);
+        try {
+            MarketplaceListingService::reorderImages($listing, $data['image_ids']);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'image_ids', 422);
+        }
         $this->refreshListingSnapshots($listing);
 
         return $this->respondWithData(['reordered' => true]);
@@ -612,6 +655,7 @@ class MarketplaceListingController extends BaseApiController
         $url = '/storage/' . $path;
 
         $listing->update(['video_url' => $url]);
+        MarketplaceListingService::markPendingForModeration($listing);
 
         return $this->respondWithData(['video_url' => $url], null, 201);
     }
@@ -635,6 +679,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         $listing->update(['video_url' => null]);
+        MarketplaceListingService::markPendingForModeration($listing);
 
         return $this->noContent();
     }
@@ -659,7 +704,16 @@ class MarketplaceListingController extends BaseApiController
 
         $days = $this->inputInt('duration_days', 30, 1, 90);
 
-        $updated = MarketplaceListingService::renew($listing, $days);
+        try {
+            $updated = MarketplaceListingService::renew($listing, $days);
+        } catch (\DomainException $e) {
+            if ($e->getMessage() === 'SELLER_SUSPENDED') {
+                return $this->respondWithError('SELLER_SUSPENDED', __('api_controllers_2.marketplace_listing.seller_suspended'), null, 403);
+            }
+            throw $e;
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
         $detail = MarketplaceListingService::getByIdForOwner($updated->id, $userId);
 
         return $this->respondWithData($detail);
@@ -767,7 +821,10 @@ class MarketplaceListingController extends BaseApiController
 
         $limit = $this->queryInt('limit', 20, 1, 100);
 
-        $items = MarketplaceListingService::getNearby($lat, $lng, $radius, $limit);
+        $items = MarketplaceListingService::getNearby($lat, $lng, $radius, $limit, [
+            'search' => trim((string) ($this->query('q') ?? '')),
+            'category_id' => $this->query('category_id'),
+        ]);
 
         return $this->respondWithData($this->augmentPublicMarketplaceListings($items));
     }
@@ -872,12 +929,7 @@ class MarketplaceListingController extends BaseApiController
      */
     private function augmentPublicMarketplaceListings(array $items): array
     {
-        return array_map(
-            static fn (mixed $item): mixed => is_array($item)
-                ? PublicMarketplaceListingResource::augment($item)
-                : $item,
-            $items
-        );
+        return PublicMarketplaceListingResource::augmentCollection($items);
     }
 
     // =====================================================================
@@ -1011,6 +1063,19 @@ class MarketplaceListingController extends BaseApiController
         $listingIds = $validated['listing_ids'];
         $action = $validated['action'];
 
+        if (in_array($action, ['activate', 'renew'], true)) {
+            try {
+                MarketplaceListingService::assertSellerCanPublish($userId);
+            } catch (\DomainException $e) {
+                return $this->respondWithError(
+                    'SELLER_SUSPENDED',
+                    __('api_controllers_2.marketplace_listing.seller_suspended'),
+                    null,
+                    403,
+                );
+            }
+        }
+
         // Verify all listings belong to this user
         $listings = MarketplaceListing::whereIn('id', $listingIds)
             ->where('user_id', $userId)
@@ -1019,7 +1084,7 @@ class MarketplaceListingController extends BaseApiController
         if ($listings->count() !== count($listingIds)) {
             return $this->respondWithError(
                 'FORBIDDEN',
-                'One or more listings do not exist or do not belong to you.',
+                    __('api.marketplace_bulk_listing_owner_required'),
                 null,
                 403
             );
@@ -1031,8 +1096,7 @@ class MarketplaceListingController extends BaseApiController
             switch ($action) {
                 case 'activate':
                     if ($listing->status === 'draft') {
-                        $listing->status = 'active';
-                        $listing->save();
+                        MarketplaceListingService::activate($listing);
                         $processed++;
                     }
                     break;
@@ -1048,9 +1112,11 @@ class MarketplaceListingController extends BaseApiController
                     break;
 
                 case 'renew':
-                    $durationDays = MarketplaceConfigurationService::listingDurationDays();
-                    MarketplaceListingService::renew($listing, $durationDays);
-                    $processed++;
+                    if (in_array((string) $listing->status, ['active', 'draft', 'expired'], true)) {
+                        $durationDays = MarketplaceConfigurationService::listingDurationDays();
+                        MarketplaceListingService::renew($listing, $durationDays);
+                        $processed++;
+                    }
                     break;
 
                 case 'remove':
@@ -1202,13 +1268,13 @@ class MarketplaceListingController extends BaseApiController
 
         foreach ($lines as $lineNum => $line) {
             if ($created >= $maxImport) {
-                $errors[] = "Reached maximum import limit of {$maxImport} listings.";
+                $errors[] = __('api.marketplace_listing_csv_import_limit', ['max' => $maxImport]);
                 break;
             }
 
             $row = str_getcsv($line);
             if (count($row) !== count($headers)) {
-                $errors[] = "Row " . ($lineNum + 2) . ": column count mismatch.";
+                $errors[] = __('api.marketplace_listing_csv_column_mismatch', ['row' => $lineNum + 2]);
                 continue;
             }
 
@@ -1219,12 +1285,12 @@ class MarketplaceListingController extends BaseApiController
             $description = trim($data['description'] ?? '');
 
             if (empty($title) || empty($description)) {
-                $errors[] = "Row " . ($lineNum + 2) . ": title and description are required.";
+                $errors[] = __('api.marketplace_listing_csv_required_fields', ['row' => $lineNum + 2]);
                 continue;
             }
 
             if (strlen($title) > 200 || strlen($description) > 10000) {
-                $errors[] = "Row " . ($lineNum + 2) . ": title or description exceeds length limit.";
+                $errors[] = __('api.marketplace_listing_csv_length_limit', ['row' => $lineNum + 2]);
                 continue;
             }
 
@@ -1271,7 +1337,10 @@ class MarketplaceListingController extends BaseApiController
                     'row' => $lineNum + 2,
                     'error' => $e->getMessage(),
                 ]);
-                $errors[] = "Row " . ($lineNum + 2) . ": " . $e->getMessage();
+                $errors[] = __('api.marketplace_csv_row_error', [
+                    'row' => $lineNum + 2,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

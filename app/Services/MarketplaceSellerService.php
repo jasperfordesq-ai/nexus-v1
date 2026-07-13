@@ -228,15 +228,26 @@ class MarketplaceSellerService
             ->where('status', 'expired')
             ->count();
 
-        $totalRevenue = 0.0;
-        $revenueCurrency = 'EUR';
+        $revenueByCurrency = [];
         if (DB::getSchemaBuilder()->hasTable('marketplace_orders')) {
-            $totalRevenue = (float) DB::table('marketplace_orders')
+            $revenueByCurrency = DB::table('marketplace_orders')
                 ->where('seller_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'completed')
-                ->sum('total_price');
+                ->where('total_price', '>', 0)
+                ->groupByRaw('UPPER(currency)')
+                ->orderByRaw('UPPER(currency)')
+                ->selectRaw('UPPER(currency) AS currency, SUM(total_price) AS total')
+                ->get()
+                ->map(static fn (object $row): array => [
+                    'currency' => (string) $row->currency,
+                    'total' => (float) $row->total,
+                ])
+                ->all();
         }
+
+        $hasSingleRevenueCurrency = count($revenueByCurrency) <= 1;
+        $singleRevenue = $revenueByCurrency[0] ?? ['currency' => null, 'total' => 0.0];
 
         return [
             'active_listings' => $activeListings,
@@ -247,8 +258,12 @@ class MarketplaceSellerService
             'total_views' => (int) $totalViews,
             'total_saves' => (int) $totalSaves,
             'pending_offers' => $pendingOffers,
-            'total_revenue' => $totalRevenue,
-            'revenue_currency' => $revenueCurrency,
+            // Legacy scalar fields remain available only when they are
+            // financially meaningful. Consumers can always render the grouped
+            // currency ledger without pretending unlike currencies are equal.
+            'total_revenue' => $hasSingleRevenueCurrency ? $singleRevenue['total'] : null,
+            'revenue_currency' => $hasSingleRevenueCurrency ? $singleRevenue['currency'] : null,
+            'revenue_by_currency' => $revenueByCurrency,
         ];
     }
 

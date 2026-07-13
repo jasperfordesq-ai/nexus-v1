@@ -101,12 +101,12 @@
     "opportunity_cancelled": "Volunteer opportunity \"{{title}}\" has been cancelled"
   },
   "marketplace_offer": {
-    "received": "{{buyer}} made an offer of {{amount}} on your listing \"{{title}}\"",
-    "accepted": "Your offer on \"{{title}}\" has been accepted!",
-    "declined": "Your offer on \"{{title}}\" was declined.",
-    "countered": "The seller countered your offer on \"{{title}}\" with {{amount}}",
-    "counter_accepted": "Your counter-offer on \"{{title}}\" was accepted!",
-    "withdrawn": "{{buyer}} withdrew their offer on your listing \"{{title}}\""
+    "received": "{{buyer}} a proposé {{amount}} pour votre annonce « {{title}} ».",
+    "accepted": "Votre offre pour « {{title}} » a été acceptée !",
+    "declined": "Votre offre pour « {{title}} » a été refusée.",
+    "countered": "Le vendeur a répondu à votre offre pour « {{title}} » avec {{amount}}.",
+    "counter_accepted": "Votre contre-offre pour « {{title}} » a été acceptée !",
+    "withdrawn": "{{buyer}} a retiré son offre pour votre annonce « {{title}} »."
   },
   "marketplace_order": {
     "confirmed_buyer": "Order #{{order_number}} confirmed — \"{{title}}\"",

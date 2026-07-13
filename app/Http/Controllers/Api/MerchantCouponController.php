@@ -23,10 +23,10 @@ class MerchantCouponController extends BaseApiController
     private function ensureFeature(): void
     {
         if (!TenantContext::hasFeature('marketplace')) {
-            abort(403, 'Marketplace feature is not enabled for this tenant.');
+            abort(403, __('api.marketplace_feature_disabled'));
         }
         if (!TenantContext::hasFeature('merchant_coupons')) {
-            abort(403, 'Merchant coupons are not enabled for this tenant.');
+            abort(403, __('api.marketplace_merchant_coupons_disabled'));
         }
     }
 
@@ -119,23 +119,30 @@ class MerchantCouponController extends BaseApiController
 
         $data = request()->validate([
             'code' => 'required|string|max:64',
-            'order_total_cents' => 'required|integer|min:0',
-            'listing_id' => 'nullable|integer',
-            'category_id' => 'nullable|integer',
+            // Retained as an ignored compatibility field. Price authority comes
+            // from the listing and seller-owned shipping option below.
+            'order_total_cents' => 'nullable|integer|min:0',
+            'listing_id' => 'required|integer|min:1',
+            'shipping_option_id' => 'nullable|integer|min:1',
+            'quantity' => 'nullable|integer|min:1|max:100',
         ]);
 
         try {
-            $coupon = MerchantCouponService::validateCoupon(
+            $quote = MerchantCouponService::quoteForListing(
                 $data['code'],
                 $userId,
-                (int) $data['order_total_cents'],
-                $data['listing_id'] ?? null,
-                $data['category_id'] ?? null
+                (int) $data['listing_id'],
+                isset($data['shipping_option_id']) ? (int) $data['shipping_option_id'] : null,
+                (int) ($data['quantity'] ?? 1),
             );
-            $discount = MerchantCouponService::calculateDiscountCents($coupon, (int) $data['order_total_cents']);
             return $this->respondWithData([
-                'coupon' => MerchantCouponService::format($coupon),
-                'discount_cents' => $discount,
+                'coupon' => MerchantCouponService::format($quote['coupon']),
+                // Compatibility key: this is the currency's minor unit, not
+                // necessarily a hundredth for zero-decimal currencies.
+                'discount_cents' => $quote['discount_minor'],
+                'discount_amount' => $quote['discount_amount'],
+                'currency' => $quote['currency'],
+                'order_total_amount' => $quote['order_total_amount'],
             ]);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);

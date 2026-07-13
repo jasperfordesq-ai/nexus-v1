@@ -100,7 +100,9 @@
         "seller_verified": "Verkäufer verifiziert.",
         "seller_suspended": "Verkäufer gesperrt und alle Inserate deaktiviert.",
         "report_acknowledged": "Meldung bestätigt.",
-        "report_resolved": "Meldung behoben."
+        "report_resolved": "Meldung behoben.",
+        "report_appeal_resolved": "Einspruch gegen Meldung beigelegt.",
+        "dispute_resolved": "Streitfall beigelegt."
     },
     "admin_newsletter": {
         "newsletter_queued": "Newsletter für :count Empfänger in die Warteschlange gestellt",

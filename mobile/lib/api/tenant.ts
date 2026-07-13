@@ -16,6 +16,8 @@ export interface TenantBranding {
 export interface TenantConfig {
   name: string;
   slug: string;
+  /** Uppercase ISO 4217 payment currency resolved by the tenant bootstrap. */
+  currency?: string;
   tagline: string | null;
   branding: TenantBranding;
   features: Record<string, boolean>;

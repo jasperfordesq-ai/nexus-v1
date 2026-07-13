@@ -121,7 +121,7 @@
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="price_currency">{{ __('govuk_alpha_commerce.listing_form.currency_label') }}</label>
-                        <input class="govuk-input govuk-input--width-5" id="price_currency" name="price_currency" type="text" maxlength="3" value="{{ $oldVal('price_currency', 'EUR') }}">
+                        <input class="govuk-input govuk-input--width-5" id="price_currency" name="price_currency" type="text" maxlength="3" value="{{ $oldVal('price_currency', $defaultCurrency ?? 'EUR') }}">
                     </div>
                 </div>
             </div>

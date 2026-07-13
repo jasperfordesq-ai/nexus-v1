@@ -100,7 +100,9 @@
         "seller_verified": "Díoltóir fíoraithe.",
         "seller_suspended": "Díoltóir ar fionraí agus gach liostú dígníomhachtaithe.",
         "report_acknowledged": "Tuarascáil aitheanta.",
-        "report_resolved": "Tuarascáil réitithe."
+        "report_resolved": "Tuarascáil réitithe.",
+        "report_appeal_resolved": "Achomharc tuairisce réitithe.",
+        "dispute_resolved": "Díospóid réitithe."
     },
     "admin_newsletter": {
         "newsletter_queued": "Nuachtlitir curtha sa scuaine do :count faighteoir(í)",

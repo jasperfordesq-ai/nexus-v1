@@ -94,6 +94,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ tenant: { currency: 'EUR' } }),
 }));
 
 jest.mock('@/lib/hooks/useAuth', () => ({

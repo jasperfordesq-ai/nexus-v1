@@ -52,6 +52,10 @@ import { logError } from '@/lib/logger';
 import { usePageTitle, useDraftPersistence } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
+import {
+  normalizeSupportedMarketplaceCurrency,
+  SUPPORTED_MARKETPLACE_CURRENCIES,
+} from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -119,7 +123,7 @@ export function CreateMarketplaceListingPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('create.page_title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -134,7 +138,9 @@ export function CreateMarketplaceListingPage() {
   const condition = draft.condition;
   const priceType = draft.priceType;
   const price = draft.price;
-  const [currency, setCurrency] = useState('EUR');
+  // An unsupported or missing bootstrap value stays empty so the backend can
+  // apply its authoritative tenant-currency default instead of sending EUR.
+  const [currency, setCurrency] = useState(() => normalizeSupportedMarketplaceCurrency(tenant?.currency));
 
   const setTitle = (v: string) => setDraft((prev) => ({ ...prev, title: v }));
   const setDescription = useCallback((v: string) => setDraft((prev) => ({ ...prev, description: v })), [setDraft]);
@@ -382,14 +388,24 @@ export function CreateMarketplaceListingPage() {
         images.forEach((img, idx) => {
           formData.append(`images[${idx}]`, img.file);
         });
-        await api.upload(`/v2/marketplace/listings/${listingId}/images`, formData);
+        const imageResponse = await api.upload(`/v2/marketplace/listings/${listingId}/images`, formData);
+        if (!imageResponse.success) {
+          toast.error(imageResponse.error || t('create.created_error_retry'));
+          navigate(tenantPath(`/marketplace/${listingId}/edit`));
+          return;
+        }
       }
 
       // Upload video if one was selected
       if (videoFile) {
         const videoFormData = new FormData();
         videoFormData.append('video', videoFile);
-        await api.upload(`/v2/marketplace/listings/${listingId}/video`, videoFormData);
+        const videoResponse = await api.upload(`/v2/marketplace/listings/${listingId}/video`, videoFormData);
+        if (!videoResponse.success) {
+          toast.error(videoResponse.error || t('create.created_error_retry'));
+          navigate(tenantPath(`/marketplace/${listingId}/edit`));
+          return;
+        }
       }
 
       toast.success(t('create.created_success'));
@@ -761,18 +777,9 @@ export function CreateMarketplaceListingPage() {
                 }}
                 className="w-full sm:w-32"
               >
-                <AutocompleteItem id="EUR">EUR</AutocompleteItem>
-                <AutocompleteItem id="GBP">GBP</AutocompleteItem>
-                <AutocompleteItem id="USD">USD</AutocompleteItem>
-                <AutocompleteItem id="CAD">CAD</AutocompleteItem>
-                <AutocompleteItem id="AUD">AUD</AutocompleteItem>
-                <AutocompleteItem id="NZD">NZD</AutocompleteItem>
-                <AutocompleteItem id="CHF">CHF</AutocompleteItem>
-                <AutocompleteItem id="SEK">SEK</AutocompleteItem>
-                <AutocompleteItem id="NOK">NOK</AutocompleteItem>
-                <AutocompleteItem id="DKK">DKK</AutocompleteItem>
-                <AutocompleteItem id="PLN">PLN</AutocompleteItem>
-                <AutocompleteItem id="JPY">JPY</AutocompleteItem>
+                {SUPPORTED_MARKETPLACE_CURRENCIES.map((option) => (
+                  <AutocompleteItem key={option} id={option}>{option}</AutocompleteItem>
+                ))}
               </Autocomplete>
             </div>
           )}

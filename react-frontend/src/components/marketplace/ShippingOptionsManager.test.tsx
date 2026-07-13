@@ -3,30 +3,28 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ── Hoisted stable refs ───────────────────────────────────────────────────────
-const { mockToast, mockConfirm } = vi.hoisted(() => ({
+const { mockToast, mockConfirm, mockTenantState } = vi.hoisted(() => ({
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockConfirm: vi.fn(),
+  mockTenantState: { currency: 'EUR' },
 }));
 
 vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
+    useTenant: () => ({ tenant: { currency: mockTenantState.currency } }),
   }),
 );
 
 // useConfirm comes from @/components/ui — mock the whole module, spread actual + override
-vi.mock('@/components/ui', async () => {
-  const actual = await vi.importActual<typeof import('@/components/ui')>('@/components/ui');
-  return {
-    ...actual,
-    useConfirm: () => mockConfirm,
-  };
-});
+vi.mock('@/components/ui/ConfirmDialog', () => ({
+  useConfirm: () => mockConfirm,
+}));
 
 vi.mock('@/lib/api', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
@@ -62,6 +60,10 @@ const makeOption = (overrides: Partial<MarketplaceShippingOption> = {}): Marketp
 
 const OPTION_1 = makeOption({ id: 1, courier_name: 'DHL Express' });
 const OPTION_2 = makeOption({ id: 2, courier_name: 'An Post', price: 3.5, is_default: true });
+
+afterEach(() => {
+  mockTenantState.currency = 'EUR';
+});
 
 describe('ShippingOptionsManager — loading state', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -103,6 +105,19 @@ describe('ShippingOptionsManager — populated state', () => {
       expect(screen.getByText('DHL Express')).toBeInTheDocument();
       expect(screen.getByText('An Post')).toBeInTheDocument();
     });
+  });
+
+  it('uses currency metadata when formatting zero-decimal shipping prices', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: [makeOption({ courier_name: 'Japan Post', price: 500, currency: 'JPY' })],
+    });
+
+    render(<ShippingOptionsManager sellerId={1} />);
+
+    await waitFor(() => expect(screen.getByText('Japan Post')).toBeInTheDocument());
+    expect(document.body.textContent).toContain('500');
+    expect(document.body.textContent).not.toContain('500.00');
   });
 
   it('shows edit and delete buttons per option', async () => {
@@ -195,6 +210,35 @@ describe('ShippingOptionsManager — add flow', () => {
     }
     // If button is disabled (due to empty price after re-render), skip PUT assertion
     // The route is covered by the test structure; price field is type=number.
+  });
+
+  it('uses the tenant currency when creating a shipping option', async () => {
+    mockTenantState.currency = 'JPY';
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
+    vi.mocked(api.post).mockResolvedValueOnce({
+      success: true,
+      data: makeOption({ id: 11, courier_name: 'Japan Post', price: 500, currency: 'JPY' }),
+    });
+
+    render(<ShippingOptionsManager sellerId={1} />);
+    await waitFor(() => expect(noBusySpinner()).toBe(true));
+
+    const addButton = screen.getAllByRole('button').find((button) =>
+      button.textContent?.toLowerCase().includes('add'),
+    );
+    fireEvent.click(addButton!);
+    fireEvent.change(screen.getAllByRole('textbox')[0], { target: { value: 'Japan Post' } });
+    fireEvent.change(document.querySelector('input[type="number"]')!, { target: { value: '500' } });
+
+    const submitButton = screen.getAllByRole('button').find((button) =>
+      !button.hasAttribute('disabled') && button.textContent?.toLowerCase().includes('add'),
+    );
+    fireEvent.click(submitButton!);
+
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith(
+      '/v2/marketplace/seller/shipping-options',
+      expect.objectContaining({ currency: 'JPY' }),
+    ));
   });
 
   it('shows success toast after successful add', async () => {
@@ -336,6 +380,20 @@ describe('ShippingOptionsManager — delete flow', () => {
     });
     // An Post should still be visible
     expect(screen.getByText('An Post')).toBeInTheDocument();
+  });
+
+  it('keeps the option when delete resolves with success false', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [OPTION_1] });
+    mockConfirm.mockResolvedValueOnce(true);
+    vi.mocked(api.delete).mockResolvedValueOnce({ success: false, error: 'Still in use' });
+
+    render(<ShippingOptionsManager sellerId={1} />);
+    await waitFor(() => screen.getByText('DHL Express'));
+    fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Still in use'));
+    expect(screen.getByText('DHL Express')).toBeInTheDocument();
+    expect(mockToast.success).not.toHaveBeenCalled();
   });
 });
 

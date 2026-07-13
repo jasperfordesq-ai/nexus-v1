@@ -27,7 +27,7 @@ class MarketplaceInventoryController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_feature_disabled'), null, 403)
             );
         }
     }
@@ -44,10 +44,10 @@ class MarketplaceInventoryController extends BaseApiController
             ->first();
 
         if (!$listing) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_listing_not_found'), null, 404);
         }
         if ((int) $listing->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You can only update your own listing inventory.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.marketplace_inventory_owner_required'), null, 403);
         }
 
         $data = request()->validate([

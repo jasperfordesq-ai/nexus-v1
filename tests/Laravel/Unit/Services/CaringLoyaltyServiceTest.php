@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Models\MarketplaceOrder;
 use App\Services\CaringLoyaltyService;
 use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -77,18 +78,46 @@ class CaringLoyaltyServiceTest extends TestCase
         );
     }
 
-    private function insertListing(int $sellerId, string $status = 'active', string $modStatus = 'approved'): int
+    private function insertListing(
+        int $sellerId,
+        string $status = 'active',
+        string $modStatus = 'approved',
+        float $price = 100.0,
+    ): int
     {
         return (int) DB::table('marketplace_listings')->insertGetId([
             'tenant_id'         => self::TENANT_ID,
             'user_id'           => $sellerId,
             'title'             => 'Test Listing ' . uniqid(),
             'description'       => 'Test description',
+            'price'             => $price,
+            'price_currency'    => 'CHF',
+            'price_type'        => 'fixed',
             'status'            => $status,
             'moderation_status' => $modStatus,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
+    }
+
+    private function insertOrder(int $memberId, int $sellerId, int $listingId): MarketplaceOrder
+    {
+        $id = (int) DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'order_number' => 'LOYALTY-' . strtoupper(uniqid('', true)),
+            'buyer_id' => $memberId,
+            'seller_id' => $sellerId,
+            'marketplace_listing_id' => $listingId,
+            'quantity' => 1,
+            'unit_price' => 100.0,
+            'total_price' => 100.0,
+            'currency' => 'CHF',
+            'status' => 'pending_payment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return MarketplaceOrder::withoutGlobalScopes()->findOrFail($id);
     }
 
     // ── calculateAvailableDiscount ────────────────────────────────────────────
@@ -106,7 +135,7 @@ class CaringLoyaltyServiceTest extends TestCase
         $this->assertArrayHasKey('reason', $result);
     }
 
-    public function test_calculateAvailableDiscount_returns_invalid_order_total_for_zero_total(): void
+    public function test_calculateAvailableDiscount_requires_an_authoritative_listing(): void
     {
         $memberId = $this->insertUser(50.0, 'member');
         $sellerId = $this->insertUser(0.0, 'seller');
@@ -114,7 +143,7 @@ class CaringLoyaltyServiceTest extends TestCase
         $result = $this->svc->calculateAvailableDiscount($memberId, $sellerId, 0.0, null);
 
         $this->assertFalse($result['accepts']);
-        $this->assertSame('invalid_order_total', $result['reason']);
+        $this->assertSame('invalid_listing', $result['reason']);
     }
 
     public function test_calculateAvailableDiscount_happy_path_computes_correct_max_credits(): void
@@ -167,7 +196,7 @@ class CaringLoyaltyServiceTest extends TestCase
 
     // ── redeem ─────────────────────────────────────────────────────────────────
 
-    public function test_redeem_debits_member_wallet_and_inserts_redemption_row(): void
+    public function test_redeem_reserves_without_debiting_until_order_is_created(): void
     {
         $memberId  = $this->insertUser(10.0, 'member');
         $sellerId  = $this->insertUser(0.0, 'seller');
@@ -179,12 +208,12 @@ class CaringLoyaltyServiceTest extends TestCase
 
         // Return shape
         $this->assertSame(20.0, $result['discount_chf']);
-        $this->assertSame(8.0, $result['new_wallet_balance']);
+        $this->assertSame(10.0, $result['new_wallet_balance']);
         $this->assertIsInt($result['redemption_id']);
 
-        // Wallet debited in DB
+        // Reserving is deliberately non-destructive until checkout applies it.
         $newBal = (float) DB::table('users')->where('id', $memberId)->value('balance');
-        $this->assertSame(8.0, $newBal);
+        $this->assertSame(10.0, $newBal);
 
         // Redemption row inserted
         $row = DB::table('caring_loyalty_redemptions')->where('id', $result['redemption_id'])->first();
@@ -194,7 +223,41 @@ class CaringLoyaltyServiceTest extends TestCase
         $this->assertSame($sellerId, (int) $row->merchant_user_id);
         $this->assertSame(2.0, round((float) $row->credits_used, 2));
         $this->assertSame(20.0, round((float) $row->discount_chf, 2));
-        $this->assertSame('applied', (string) $row->status);
+        $this->assertSame('pending', (string) $row->status);
+        $this->assertNull($row->marketplace_order_id);
+        $this->assertNotNull($row->expires_at);
+    }
+
+    public function test_applyPendingToOrder_debits_once_and_links_the_checkout(): void
+    {
+        $memberId = $this->insertUser(10.0, 'member');
+        $sellerId = $this->insertUser(0.0, 'seller');
+        $listingId = $this->insertListing($sellerId);
+        $this->insertSellerSettings($sellerId, true, 10.0, 50);
+        $redemption = $this->svc->redeem($memberId, $sellerId, $listingId, 2.0, 9999.0);
+        $order = $this->insertOrder($memberId, $sellerId, $listingId);
+
+        $discount = $this->svc->applyPendingToOrder($redemption['redemption_id'], $order);
+
+        $this->assertSame(20.0, $discount);
+        $this->assertSame(8.0, (float) DB::table('users')->where('id', $memberId)->value('balance'));
+        $this->assertDatabaseHas('caring_loyalty_redemptions', [
+            'id' => $redemption['redemption_id'],
+            'marketplace_order_id' => $order->id,
+            'status' => 'applied',
+        ]);
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $order->id,
+            'loyalty_redemption_id' => $redemption['redemption_id'],
+            'total_price' => 80.0,
+        ]);
+
+        try {
+            $this->svc->applyPendingToOrder($redemption['redemption_id'], $order->fresh());
+            $this->fail('An applied redemption must not be reusable.');
+        } catch (RuntimeException) {
+            $this->assertSame(8.0, (float) DB::table('users')->where('id', $memberId)->value('balance'));
+        }
     }
 
     public function test_redeem_throws_when_credits_to_use_is_zero(): void
@@ -247,6 +310,8 @@ class CaringLoyaltyServiceTest extends TestCase
         // Create a redemption first
         $redeemResult = $this->svc->redeem($memberId, $sellerId, $listingId, 2.0, 100.0);
         $redemptionId = $redeemResult['redemption_id'];
+        $order = $this->insertOrder($memberId, $sellerId, $listingId);
+        $this->svc->applyPendingToOrder($redemptionId, $order);
 
         // Balance after redeem = 8
         $balAfterRedeem = (float) DB::table('users')->where('id', $memberId)->value('balance');
@@ -351,9 +416,17 @@ class CaringLoyaltyServiceTest extends TestCase
         $this->insertSellerSettings($sellerId, true, 10.0, 80);
         $adminId   = $this->insertUser(0.0, 'admin');
 
-        // Insert 2 applied redemptions via redeem()
-        $this->svc->redeem($memberId, $sellerId, $listingId, 1.0, 100.0);
-        $this->svc->redeem($memberId, $sellerId, $listingId, 2.0, 200.0);
+        // Reserve and apply two redemptions to two distinct orders.
+        $first = $this->svc->redeem($memberId, $sellerId, $listingId, 1.0, 100.0);
+        $this->svc->applyPendingToOrder(
+            $first['redemption_id'],
+            $this->insertOrder($memberId, $sellerId, $listingId),
+        );
+        $second = $this->svc->redeem($memberId, $sellerId, $listingId, 2.0, 200.0);
+        $this->svc->applyPendingToOrder(
+            $second['redemption_id'],
+            $this->insertOrder($memberId, $sellerId, $listingId),
+        );
 
         // Insert a reversed redemption directly (should NOT count in stats)
         $reversedId = (int) DB::table('caring_loyalty_redemptions')->insertGetId([

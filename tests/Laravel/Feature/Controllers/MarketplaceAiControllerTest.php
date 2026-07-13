@@ -10,9 +10,11 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\MarketplaceListing;
 use App\Models\User;
+use App\Services\MarketplaceAiService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -51,6 +53,18 @@ class MarketplaceAiControllerTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    private function enableMarketplaceFeature(): void
+    {
+        $features = json_decode((string) DB::table('tenants')->where('id', $this->testTenantId)->value('features'), true) ?: [];
+        $features['marketplace'] = true;
+
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+
+        \App\Core\TenantContext::setById($this->testTenantId);
     }
 
     public function test_auto_reply_requires_auth(): void
@@ -107,5 +121,30 @@ class MarketplaceAiControllerTest extends TestCase
         $response = $this->apiPost("/v2/marketplace/listings/{$listingId}/auto-reply", []);
 
         $this->assertContains($response->getStatusCode(), [403, 422]);
+    }
+
+    public function test_auto_reply_does_not_expose_provider_exception_text(): void
+    {
+        $this->enableMarketplaceFeature();
+        $user = $this->authenticatedUser();
+        $listingId = $this->createListing($user->id, $this->testTenantId);
+        $providerError = 'Provider secret: request-id=req_sensitive_123';
+
+        $service = Mockery::mock(MarketplaceAiService::class);
+        $service->shouldReceive('generateAutoReply')
+            ->once()
+            ->with($listingId, 'Is this item still available?')
+            ->andThrow(new \RuntimeException($providerError));
+        $this->app->instance(MarketplaceAiService::class, $service);
+
+        $response = $this->apiPost("/v2/marketplace/listings/{$listingId}/auto-reply", [
+            'message' => 'Is this item still available?',
+        ]);
+
+        $response
+            ->assertStatus(500)
+            ->assertJsonPath('errors.0.code', 'AI_ERROR')
+            ->assertJsonPath('errors.0.message', __('api_controllers_2.marketplace_ai.generation_failed'));
+        $this->assertStringNotContainsString($providerError, $response->getContent());
     }
 }

@@ -10,32 +10,24 @@ import { useTranslation } from 'react-i18next';
 
 import type { MarketplaceListingItem } from '@/lib/api/marketplace';
 import Avatar from '@/components/ui/Avatar';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
-import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatMarketplaceCurrency } from '@/lib/utils/marketplaceCurrency';
 
 export function formatMarketplacePrice(
   price: number | null | undefined,
   priceType: string | undefined,
   currency: string | undefined,
   freeLabel: string,
+  fallbackCurrency?: string,
 ): string {
   if (priceType === 'free' || price === null || price === undefined || Number(price) === 0) {
     return freeLabel;
   }
 
-  try {
-    return new Intl.NumberFormat(dateLocale(), {
-      style: 'currency',
-      currency: currency || 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(Number(price));
-  } catch {
-    return `${currency || 'EUR'} ${price}`;
-  }
+  return formatMarketplaceCurrency(Number(price), currency || fallbackCurrency);
 }
 
 export default function MarketplaceListingCard({
@@ -48,6 +40,7 @@ export default function MarketplaceListingCard({
   onSavePress?: () => void;
 }) {
   const { t } = useTranslation('marketplace');
+  const { tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const accent =
@@ -57,7 +50,13 @@ export default function MarketplaceListingCard({
         ? theme.warning
         : primary;
   const imageUrl = resolveImageUrl(item.image?.thumbnail_url ?? item.image?.url ?? item.images?.[0]?.thumbnail_url ?? item.images?.[0]?.url);
-  const price = formatMarketplacePrice(item.price, item.price_type, item.price_currency, t('common.free'));
+  const price = formatMarketplacePrice(
+    item.price,
+    item.price_type,
+    item.price_currency,
+    t('common.free'),
+    tenant?.currency,
+  );
   const inventory = inventoryChip(item);
 
   return (

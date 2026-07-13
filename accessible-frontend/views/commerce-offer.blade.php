@@ -9,7 +9,12 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $iTitle = trim((string) ($item['title'] ?? '')) ?: __('govuk_alpha.marketplace.title');
         $money = (float) ($item['price'] ?? 0);
-        $askingPrice = $money > 0 ? trim(trim((string) ($item['price_currency'] ?? '')) . ' ' . number_format($money, 2)) : '';
+        $askingPrice = $money > 0
+            ? \App\Support\MarketplaceMoneyFormatter::format(
+                $money,
+                (string) ($item['price_currency'] ?? ''),
+            )
+            : '';
         $offerErrors = session('commerceOfferErrors', []);
     @endphp
 

@@ -19,7 +19,9 @@
       "invalid_listing": "Der Eintrag gehört nicht diesem Händler.",
       "listing_unavailable": "Dieses Angebot ist nicht für die Einlösung von Treueprogrammen verfügbar.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Diese Einlösung im Treueprogramm ist nicht mehr verfügbar.",
+      "redemption_mismatch": "Diese Einlösung im Treueprogramm stimmt nicht mit der ausgewählten Marketplace-Bestellung überein."
     }
   },
   "survey": {

@@ -100,7 +100,9 @@
         "seller_verified": "تم التحقق من البائع.",
         "seller_suspended": "تم تعليق البائع وتعطيل جميع الإعلانات.",
         "report_acknowledged": "تم الإقرار بالتقرير.",
-        "report_resolved": "تم حل التقرير."
+        "report_resolved": "تم حل التقرير.",
+        "report_appeal_resolved": "تم حل استئناف التقرير.",
+        "dispute_resolved": "تم حل النزاع."
     },
     "admin_newsletter": {
         "newsletter_queued": "تمت إضافة النشرة الإخبارية إلى قائمة الانتظار لـ :count مستلم/مستلمين",

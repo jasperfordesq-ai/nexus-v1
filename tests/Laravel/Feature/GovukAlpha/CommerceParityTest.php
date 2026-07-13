@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\GovukAlpha;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\MarketplaceConfigurationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -43,6 +44,17 @@ class CommerceParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
 
         \Illuminate\Support\Facades\Cache::flush();
+    }
+
+    public function post($uri, array $data = [], array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (is_string($uri) && str_contains($uri, '/accessible')) {
+            $token = (string) ($data['_token'] ?? 'govuk-alpha-commerce-test-token');
+            $data['_token'] = $token;
+            $this->withSession(['_token' => $token]);
+        }
+
+        return parent::post($uri, $data, $headers);
     }
 
     // ==================================================================
@@ -309,17 +321,381 @@ class CommerceParityTest extends TestCase
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.buy.title'));
         $res->assertSee('Fixed Price Kettle');
+        $res->assertSee('name="idempotency_key"', false);
     }
 
-    public function test_commerce_buy_form_404_for_free_listing(): void
+    public function test_commerce_listing_default_and_buy_display_follow_tenant_jpy_currency(): void
+    {
+        $seller = $this->authenticatedUser(['name' => 'JPY Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+        DB::table('tenant_settings')->updateOrInsert(
+            [
+                'tenant_id' => $this->testTenantId,
+                'setting_key' => 'general.default_currency',
+            ],
+            [
+                'setting_value' => 'jpy',
+                'setting_type' => 'string',
+                'category' => 'general',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+        \Illuminate\Support\Facades\Cache::forget('tenant_settings:' . $this->testTenantId);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/create")
+            ->assertOk()
+            ->assertSee('name="price_currency"', false)
+            ->assertSee('value="JPY"', false);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/create", [
+            'title' => 'JPY priced item',
+            'description' => 'A marketplace item priced in the tenant currency.',
+            'price_type' => 'fixed',
+            'price' => '1200',
+            'delivery_method' => 'pickup',
+        ])->assertRedirect();
+        $listingId = (int) DB::table('marketplace_listings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $seller->id)
+            ->where('title', 'JPY priced item')
+            ->value('id');
+        $this->assertGreaterThan(0, $listingId);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'price_currency' => 'JPY',
+        ]);
+        DB::table('marketplace_listings')->where('id', $listingId)->update([
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($buyer, ['*']);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace")
+            ->assertOk()
+            ->assertSee('JPY 1,200')
+            ->assertDontSee('JPY 1,200.00');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}")
+            ->assertOk()
+            ->assertSee('JPY 1,200')
+            ->assertDontSee('JPY 1,200.00');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/search")
+            ->assertOk()
+            ->assertSee('JPY 1,200')
+            ->assertDontSee('JPY 1,200.00');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy")
+            ->assertOk()
+            ->assertSee('JPY 1,200')
+            ->assertDontSee('JPY 1,200.00');
+    }
+
+    public function test_commerce_marketplace_detail_links_to_buy_for_all_supported_checkout_types(): void
     {
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
-        $this->authenticatedUser(['name' => 'Free Buyer']);
+        $this->authenticatedUser(['name' => 'Detail Buyer']);
         $this->enableAlphaFeatures(['marketplace']);
-        $id = $this->seedListing($owner->id, ['price_type' => 'free']);
 
-        // Free listings are not purchasable via buy-now.
-        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy")->assertStatus(404);
+        $cashId = $this->seedListing($owner->id, ['price_type' => 'fixed', 'price' => 15.00]);
+        $freeId = $this->seedListing($owner->id, ['price_type' => 'free', 'price' => null]);
+        $creditId = $this->seedListing($owner->id, [
+            'price_type' => 'fixed',
+            'price' => null,
+            'time_credit_price' => 2.00,
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$cashId}")
+            ->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.nav.detail_buy'));
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$freeId}")
+            ->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.nav.detail_buy'));
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$creditId}")
+            ->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.nav.detail_buy'));
+    }
+
+    public function test_commerce_shipping_checkout_requires_and_resolves_seller_option(): void
+    {
+        $seller = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $buyer = $this->authenticatedUser(['name' => 'Shipping Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_ALLOW_SHIPPING,
+            true,
+        );
+        $sellerProfileId = $this->seedCardReadySellerProfile($seller->id);
+        $shippingOptionId = $this->seedShippingOption($sellerProfileId);
+        $listingId = $this->seedListing($seller->id, [
+            'price_type' => 'fixed',
+            'price' => 15.00,
+            'price_currency' => 'EUR',
+            'delivery_method' => 'shipping',
+            'shipping_available' => 1,
+            'local_pickup' => 0,
+        ]);
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy");
+        $form->assertOk()
+            ->assertSee('Tracked courier')
+            ->assertSee('name="delivery_choice"', false)
+            ->assertSee('name="idempotency_key"', false);
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $form->getContent(), $matches);
+        $idempotencyKey = $matches[1] ?? '';
+        preg_match('/name="_token" value="([^"]+)"/', $form->getContent(), $csrfMatches);
+        $csrfToken = $csrfMatches[1] ?? '';
+        $this->assertGreaterThanOrEqual(16, strlen($idempotencyKey));
+        $this->assertNotSame('', $csrfToken);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", [
+            '_token' => $csrfToken,
+            'quantity' => 1,
+            'idempotency_key' => $idempotencyKey,
+        ])->assertRedirect()->assertSessionHas('commerceBuyError');
+        $this->assertSame(
+            $idempotencyKey,
+            session('govuk_alpha.marketplace.buy.idempotency.' . $listingId),
+        );
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $listingId,
+        ]);
+
+        $placed = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", [
+            '_token' => $csrfToken,
+            'quantity' => 1,
+            'idempotency_key' => $idempotencyKey,
+            'delivery_choice' => 'shipping:' . $shippingOptionId,
+        ]);
+        $this->assertNull(session('commerceBuyError'), (string) session('commerceBuyError'));
+        $placed->assertRedirectContains('/accessible/marketplace/orders');
+
+        $this->assertDatabaseHas('marketplace_orders', [
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $listingId,
+            'shipping_option_id' => $shippingOptionId,
+            'shipping_cost' => 6.50,
+        ]);
+
+        // A browser retry with the same hidden key resolves to the existing
+        // order rather than reserving inventory and charging shipping twice.
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", [
+            '_token' => $csrfToken,
+            'quantity' => 1,
+            'idempotency_key' => $idempotencyKey,
+            'delivery_choice' => 'shipping:' . $shippingOptionId,
+        ])->assertRedirectContains('/accessible/marketplace/orders');
+        $this->assertSame(1, DB::table('marketplace_orders')
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $listingId)
+            ->count());
+    }
+
+    public function test_commerce_direct_pickup_checkout_requires_and_reserves_available_slot(): void
+    {
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $buyer = $this->authenticatedUser(['name' => 'Pickup Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $sellerProfileId = $this->seedCardReadySellerProfile($seller->id);
+        $pickupSlotId = $this->seedPickupSlot($sellerProfileId);
+        $listingId = $this->seedListing($seller->id, [
+            'price_type' => 'fixed',
+            'price' => 15.00,
+            'price_currency' => 'EUR',
+            'delivery_method' => 'pickup',
+            'local_pickup' => 1,
+            'shipping_available' => 0,
+            'inventory_count' => 2,
+        ]);
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy");
+        $form->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.buy.pickup_slot_label'))
+            ->assertSee('name="pickup_slot_id"', false);
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $form->getContent(), $keyMatches);
+        preg_match('/name="_token" value="([^"]+)"/', $form->getContent(), $csrfMatches);
+        $payload = [
+            '_token' => $csrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $keyMatches[1] ?? '',
+        ];
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", $payload)
+            ->assertRedirectContains("/accessible/marketplace/{$listingId}/buy")
+            ->assertSessionHas('commerceBuyError', __('govuk_alpha_commerce.buy.pickup_slot_required'));
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $listingId,
+        ]);
+
+        // If the chosen slot becomes unavailable between rendering and POST,
+        // reject checkout instead of silently creating an unscheduled pickup.
+        DB::table('marketplace_pickup_slots')->where('id', $pickupSlotId)->update(['is_active' => 0]);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", array_merge($payload, [
+            'pickup_slot_id' => $pickupSlotId,
+        ]))->assertRedirectContains("/accessible/marketplace/{$listingId}/buy")
+            ->assertSessionHas('commerceBuyError', __('govuk_alpha_commerce.buy.pickup_slot_required'));
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $listingId,
+        ]);
+        DB::table('marketplace_pickup_slots')->where('id', $pickupSlotId)->update(['is_active' => 1]);
+
+        $placed = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", array_merge($payload, [
+            'pickup_slot_id' => $pickupSlotId,
+        ]));
+        $this->assertNull(session('commerceBuyError'), (string) session('commerceBuyError'));
+        $placed->assertRedirectContains('/accessible/marketplace/orders');
+
+        $orderId = (int) DB::table('marketplace_orders')
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $listingId)
+            ->value('id');
+        $this->assertGreaterThan(0, $orderId);
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $orderId,
+            'shipping_method' => 'pickup',
+        ]);
+        $this->assertDatabaseHas('marketplace_pickup_reservations', [
+            'order_id' => $orderId,
+            'slot_id' => $pickupSlotId,
+            'buyer_user_id' => $buyer->id,
+            'status' => 'reserved',
+        ]);
+        $this->assertDatabaseHas('marketplace_pickup_slots', [
+            'id' => $pickupSlotId,
+            'booked_count' => 1,
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$listingId}/buy", array_merge($payload, [
+            'pickup_slot_id' => $pickupSlotId,
+        ]))->assertRedirectContains('/accessible/marketplace/orders');
+        $this->assertSame(1, DB::table('marketplace_orders')
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $listingId)
+            ->count());
+        $this->assertSame(1, (int) DB::table('marketplace_pickup_slots')
+            ->where('id', $pickupSlotId)
+            ->value('booked_count'));
+    }
+
+    public function test_commerce_accepted_offer_checkout_is_buyer_only_idempotent_and_reserves_slot(): void
+    {
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $buyer = $this->authenticatedUser(['name' => 'Accepted Offer Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $sellerProfileId = $this->seedCardReadySellerProfile($seller->id);
+        $pickupSlotId = $this->seedPickupSlot($sellerProfileId);
+        $listingId = $this->seedListing($seller->id, [
+            'title' => 'Reserved offer item',
+            'price_type' => 'negotiable',
+            'price' => 40.00,
+            'price_currency' => 'EUR',
+            'status' => 'reserved',
+            'delivery_method' => 'pickup',
+            'local_pickup' => 1,
+            'shipping_available' => 0,
+            'inventory_count' => 1,
+        ]);
+        $offerId = (int) DB::table('marketplace_offers')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'amount' => 31.50,
+            'currency' => 'EUR',
+            'status' => 'accepted',
+            'accepted_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $offers = $this->get("/{$this->testTenantSlug}/accessible/marketplace/offers?tab=sent");
+        $offers->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.offers.complete_purchase'))
+            ->assertSee("/marketplace/offers/{$offerId}/buy", false);
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/offers/{$offerId}/buy");
+        $form->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.buy.accepted_offer_title'))
+            ->assertSee('EUR 31.50')
+            ->assertSee('name="pickup_slot_id"', false);
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $form->getContent(), $keyMatches);
+        preg_match('/name="_token" value="([^"]+)"/', $form->getContent(), $csrfMatches);
+        $payload = [
+            '_token' => $csrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $keyMatches[1] ?? '',
+            'pickup_slot_id' => $pickupSlotId,
+        ];
+
+        $placed = $this->post("/{$this->testTenantSlug}/accessible/marketplace/offers/{$offerId}/buy", $payload);
+        $this->assertNull(session('commerceBuyError'), (string) session('commerceBuyError'));
+        $placed->assertRedirectContains('/accessible/marketplace/orders');
+        $order = DB::table('marketplace_orders')
+            ->where('marketplace_offer_id', $offerId)
+            ->first();
+        $this->assertNotNull($order);
+        $this->assertSame($buyer->id, (int) $order->buyer_id);
+        $this->assertSame(31.5, (float) $order->unit_price);
+        $this->assertSame('pickup', $order->shipping_method);
+        $this->assertDatabaseHas('marketplace_pickup_reservations', [
+            'order_id' => $order->id,
+            'slot_id' => $pickupSlotId,
+            'status' => 'reserved',
+        ]);
+
+        // The same browser retry re-enters the service fingerprint check and
+        // resolves to the existing order without booking the slot twice.
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/offers/{$offerId}/buy", $payload)
+            ->assertRedirectContains('/accessible/marketplace/orders');
+        $this->assertSame(1, DB::table('marketplace_orders')->where('marketplace_offer_id', $offerId)->count());
+        $this->assertSame(1, (int) DB::table('marketplace_pickup_slots')->where('id', $pickupSlotId)->value('booked_count'));
+
+        $stranger = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($stranger, ['*']);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/offers/{$offerId}/buy")
+            ->assertForbidden();
+    }
+
+    public function test_commerce_buy_form_and_order_support_free_listing(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $buyer = $this->authenticatedUser(['name' => 'Free Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $id = $this->seedListing($owner->id, ['price_type' => 'free', 'price' => null]);
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy");
+        $form->assertOk()->assertSee(__('govuk_alpha.marketplace.free'));
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $form->getContent(), $matches);
+        preg_match('/name="_token" value="([^"]+)"/', $form->getContent(), $csrfMatches);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy", [
+            '_token' => $csrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $matches[1] ?? '',
+        ])->assertRedirectContains('/accessible/marketplace/orders');
+
+        $this->assertDatabaseHas('marketplace_orders', [
+            'tenant_id' => $this->testTenantId,
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $id,
+            'status' => 'paid',
+            'total_price' => 0,
+        ]);
     }
 
     public function test_commerce_report_form_and_submission(): void
@@ -1623,6 +1999,132 @@ class CommerceParityTest extends TestCase
         ]);
     }
 
+    public function test_commerce_buy_form_and_order_support_time_credit_listing(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'balance' => 0,
+        ]);
+        $buyer = $this->authenticatedUser(['name' => 'Time Credit Buyer', 'balance' => 5]);
+        $this->enableAlphaFeatures(['marketplace']);
+        $id = $this->seedListing($owner->id, [
+            'price_type' => 'fixed',
+            'price' => null,
+            'time_credit_price' => 2,
+        ]);
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy");
+        $form->assertOk()->assertSee(__('govuk_alpha.marketplace.credits_label'));
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $form->getContent(), $matches);
+        preg_match('/name="_token" value="([^"]+)"/', $form->getContent(), $csrfMatches);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy", [
+            '_token' => $csrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $matches[1] ?? '',
+        ])->assertRedirectContains('/accessible/marketplace/orders');
+
+        $order = DB::table('marketplace_orders')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $id)
+            ->first();
+        $this->assertNotNull($order);
+        $this->assertSame('paid', $order->status);
+        $this->assertNotNull($order->wallet_transaction_id);
+        $this->assertSame(3.0, (float) $buyer->fresh()->balance);
+        $this->assertSame(2.0, (float) $owner->fresh()->balance);
+    }
+
+    public function test_commerce_hybrid_buy_requires_and_honours_the_selected_payment_method(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'balance' => 0,
+        ]);
+        $buyer = $this->authenticatedUser(['name' => 'Hybrid Buyer', 'balance' => 5]);
+        $this->enableAlphaFeatures(['marketplace']);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_ALLOW_HYBRID_PRICING,
+            true,
+        );
+        $this->seedCardReadySellerProfile($owner->id);
+
+        $cashListingId = $this->seedListing($owner->id, [
+            'price_type' => 'fixed',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'time_credit_price' => 2,
+        ]);
+        $cashForm = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$cashListingId}/buy");
+        $cashForm->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.buy.payment_method_label'))
+            ->assertSee('name="payment_method"', false)
+            ->assertSee('value="cash"', false)
+            ->assertSee('value="time_credits"', false);
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $cashForm->getContent(), $cashKeyMatches);
+        preg_match('/name="_token" value="([^"]+)"/', $cashForm->getContent(), $cashCsrfMatches);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$cashListingId}/buy", [
+            '_token' => $cashCsrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $cashKeyMatches[1] ?? '',
+        ])->assertRedirectContains("/accessible/marketplace/{$cashListingId}/buy")
+            ->assertSessionHas('commerceBuyError', __('govuk_alpha_commerce.buy.payment_method_required'));
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'tenant_id' => $this->testTenantId,
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $cashListingId,
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$cashListingId}/buy", [
+            '_token' => $cashCsrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $cashKeyMatches[1] ?? '',
+            'payment_method' => 'cash',
+        ])->assertRedirectContains('/accessible/marketplace/orders');
+
+        $cashOrder = DB::table('marketplace_orders')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $cashListingId)
+            ->first();
+        $this->assertNotNull($cashOrder);
+        $this->assertSame('pending_payment', $cashOrder->status);
+        $this->assertNull($cashOrder->time_credits_used);
+        $this->assertSame(5.0, (float) $buyer->fresh()->balance);
+        $this->assertSame(0.0, (float) $owner->fresh()->balance);
+
+        $creditListingId = $this->seedListing($owner->id, [
+            'price_type' => 'fixed',
+            'price' => 12,
+            'price_currency' => 'EUR',
+            'time_credit_price' => 3,
+        ]);
+        $creditForm = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$creditListingId}/buy");
+        preg_match('/name="idempotency_key" value="([^"]+)"/', $creditForm->getContent(), $creditKeyMatches);
+        preg_match('/name="_token" value="([^"]+)"/', $creditForm->getContent(), $creditCsrfMatches);
+
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$creditListingId}/buy", [
+            '_token' => $creditCsrfMatches[1] ?? '',
+            'quantity' => 1,
+            'idempotency_key' => $creditKeyMatches[1] ?? '',
+            'payment_method' => 'time_credits',
+        ])->assertRedirectContains('/accessible/marketplace/orders');
+
+        $creditOrder = DB::table('marketplace_orders')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('buyer_id', $buyer->id)
+            ->where('marketplace_listing_id', $creditListingId)
+            ->first();
+        $this->assertNotNull($creditOrder);
+        $this->assertSame('paid', $creditOrder->status);
+        $this->assertSame(3.0, (float) $creditOrder->time_credits_used);
+        $this->assertSame(2.0, (float) $buyer->fresh()->balance);
+        $this->assertSame(3.0, (float) $owner->fresh()->balance);
+    }
+
     public function test_commerce_disabled_creation_does_not_strand_existing_podcast_authors(): void
     {
         $owner = $this->authenticatedUser(['name' => 'Existing Podcast Owner']);
@@ -1776,6 +2278,42 @@ class CommerceParityTest extends TestCase
             'booked_count' => 0,
             'is_recurring' => 0,
             'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedShippingOption(int $sellerProfileId): int
+    {
+        return (int) DB::table('marketplace_shipping_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $sellerProfileId,
+            'courier_name' => 'Tracked courier',
+            'courier_code' => 'tracked',
+            'price' => 6.50,
+            'currency' => 'EUR',
+            'estimated_days' => 3,
+            'is_default' => 1,
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedCardReadySellerProfile(int $userId): int
+    {
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            true,
+        );
+
+        return (int) DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'seller_type' => 'business',
+            'stripe_account_id' => 'acct_accessible_test_' . $userId,
+            'stripe_onboarding_complete' => 1,
+            'joined_marketplace_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

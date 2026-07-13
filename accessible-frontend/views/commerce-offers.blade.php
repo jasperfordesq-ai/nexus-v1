@@ -61,7 +61,10 @@
             @foreach ($offers as $offer)
                 @php
                     $oTitle = trim((string) ($offer['listing']['title'] ?? '')) ?: __('govuk_alpha.marketplace.title');
-                    $amount = trim(trim((string) ($offer['currency'] ?? '')) . ' ' . number_format((float) ($offer['amount'] ?? 0), 2));
+                    $amount = \App\Support\MarketplaceMoneyFormatter::format(
+                        (float) ($offer['amount'] ?? 0),
+                        (string) ($offer['currency'] ?? ''),
+                    );
                     $oStatus = (string) ($offer['status'] ?? 'pending');
                     $counterparty = $activeTab === 'sent' ? ($offer['seller']['name'] ?? '') : ($offer['buyer']['name'] ?? '');
                     $listingId = (int) ($offer['listing']['id'] ?? 0);
@@ -103,6 +106,8 @@
                                 </form>
                             @endif
                         </div>
+                    @elseif ($activeTab === 'sent' && $oStatus === 'accepted')
+                        <a class="govuk-button govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.marketplace.offers.buy', ['tenantSlug' => $tenantSlug, 'id' => $offer['id']]) }}">{{ __('govuk_alpha_commerce.offers.complete_purchase') }}</a>
                     @endif
                 </article>
             @endforeach

@@ -225,6 +225,7 @@ const CoursesAdmin = lazy(() => import('./modules/courses/CoursesAdmin'));
 const PodcastsAdmin = lazy(() => import('./modules/podcasts/PodcastsAdmin'));
 const MarketplaceModerationPage = lazy(() => import('./modules/marketplace/MarketplaceModerationPage'));
 const MarketplaceSellerAdmin = lazy(() => import('./modules/marketplace/MarketplaceSellerAdmin'));
+const MarketplaceCasesPage = lazy(() => import('./modules/marketplace/MarketplaceCasesPage'));
 const AdminCouponsPage = lazy(() => import('./modules/marketplace/AdminCouponsPage'));
 
 // Ideation / Challenges module
@@ -688,6 +689,7 @@ export function AdminRoutes() {
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />
       <Route path="marketplace/moderation" element={<Lazy><MarketplaceModerationPage /></Lazy>} />
       <Route path="marketplace/sellers" element={<Lazy><MarketplaceSellerAdmin /></Lazy>} />
+      <Route path="marketplace/cases" element={<Lazy><MarketplaceCasesPage /></Lazy>} />
       <Route path="marketplace/coupons" element={<Lazy><AdminCouponsPage /></Lazy>} />
 
       {/* ─── IDEATION / CHALLENGES ─── */}

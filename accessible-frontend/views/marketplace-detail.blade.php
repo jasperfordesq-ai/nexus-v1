@@ -10,11 +10,23 @@
         $iTitle = trim((string) ($item['title'] ?? '')) ?: __('govuk_alpha.marketplace.title');
         $tc = (float) ($item['time_credit_price'] ?? 0);
         $money = (float) ($item['price'] ?? 0);
-        if ($tc > 0) {
+        if ($tc > 0 && $money > 0) {
+            $priceLabel = __('govuk_alpha_commerce.buy.hybrid_price', [
+                'money' => \App\Support\MarketplaceMoneyFormatter::format(
+                    $money,
+                    (string) ($item['price_currency'] ?? ''),
+                ),
+                'credits' => rtrim(rtrim(number_format($tc, 2), '0'), '.'),
+            ]);
+            $priceTagClass = 'govuk-tag--purple';
+        } elseif ($tc > 0) {
             $priceLabel = rtrim(rtrim(number_format($tc, 2), '0'), '.') . ' ' . __('govuk_alpha.marketplace.credits_label');
             $priceTagClass = 'govuk-tag--blue';
         } elseif ($money > 0) {
-            $priceLabel = trim(trim((string) ($item['price_currency'] ?? '')) . ' ' . number_format($money, 2));
+            $priceLabel = \App\Support\MarketplaceMoneyFormatter::format(
+                $money,
+                (string) ($item['price_currency'] ?? ''),
+            );
             $priceTagClass = 'govuk-tag--grey';
         } else {
             $priceLabel = __('govuk_alpha.marketplace.free');
@@ -35,6 +47,9 @@
         $loc = trim((string) ($item['location'] ?? ''));
         $condition = trim((string) ($item['condition'] ?? ''));
         $delivery = trim((string) ($item['delivery_method'] ?? ''));
+        $priceType = (string) ($item['price_type'] ?? '');
+        $canBuy = (string) ($item['status'] ?? '') === 'active'
+            && (($priceType === 'fixed' && $money > 0) || $priceType === 'free' || $tc > 0);
     @endphp
 
     <a href="{{ route('govuk-alpha.marketplace.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.marketplace.back') }}</a>
@@ -98,7 +113,9 @@
 
     @if ($currentUserId && $itemId > 0 && !$isOwnItem)
         <div class="govuk-button-group govuk-!-margin-top-4">
-            <a class="govuk-button" href="{{ route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_buy') }}</a>
+            @if ($canBuy)
+                <a class="govuk-button" href="{{ route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_buy') }}</a>
+            @endif
             <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.marketplace.offer', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_offer') }}</a>
             <form method="post" action="{{ route('govuk-alpha.marketplace.save', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
                 @csrf

@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Unit\Services\AI\Tools;
 
 use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\AI\Tools\SearchMarketplaceTool;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -18,7 +19,7 @@ use Tests\Laravel\TestCase;
  * SearchMarketplaceToolTest
  *
  * Tests the SearchMarketplaceTool which queries `marketplace_listings`
- * (status=active, moderation_status IN [NULL, 'approved']) scoped to the
+ * (status=active, moderation_status='approved', not expired) scoped to the
  * current tenant, matching on title / tagline / description.
  *
  * Note on isAvailable(): marketplace feature defaults to FALSE in
@@ -172,6 +173,44 @@ class SearchMarketplaceToolTest extends TestCase
         $token = 'SOLDITEM' . uniqid();
         $this->insertListing(['title' => $token, 'status' => 'sold']);
         $this->insertListing(['title' => $token, 'status' => 'expired']);
+
+        $result = $this->tool->execute(['query' => $token], 1);
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame([], $result['results']);
+    }
+
+    public function test_execute_excludes_expired_active_listings(): void
+    {
+        $token = 'EXPIREDITEM' . uniqid();
+        $this->insertListing([
+            'title' => $token,
+            'expires_at' => now()->subMinute()->toDateTimeString(),
+        ]);
+
+        $result = $this->tool->execute(['query' => $token], 1);
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame([], $result['results']);
+    }
+
+    public function test_execute_excludes_marketplace_suspended_sellers(): void
+    {
+        $token = 'SUSPENDEDSELLER' . uniqid();
+        $seller = User::factory()->forTenant(self::TENANT_ID)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        DB::table('marketplace_seller_profiles')->insert([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $seller->id,
+            'display_name' => 'Suspended AI marketplace seller',
+            'seller_type' => 'private',
+            'is_suspended' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->insertListing(['title' => $token, 'user_id' => $seller->id]);
 
         $result = $this->tool->execute(['query' => $token], 1);
 

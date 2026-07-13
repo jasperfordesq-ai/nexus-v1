@@ -37,7 +37,7 @@ class MarketplaceRatingService
     public static function rateOrder(int $orderId, int $raterId, string $role, array $data, ?int $expectedTenantId = null): MarketplaceSellerRating
     {
         if (!in_array($role, ['buyer', 'seller'], true)) {
-            throw new \InvalidArgumentException('Role must be buyer or seller.');
+            throw new \InvalidArgumentException(__('api.marketplace_rating_role_invalid'));
         }
 
         $order = self::findOrderForTenant($orderId, $expectedTenantId);
@@ -45,15 +45,15 @@ class MarketplaceRatingService
 
         return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $raterId, $role, $data, $tenantId): MarketplaceSellerRating {
             if ($order->status !== 'completed') {
-                throw new \InvalidArgumentException('Can only rate completed orders.');
+                throw new \InvalidArgumentException(__('api.marketplace_rating_completed_order_required'));
             }
 
             // Verify the rater participated in this order with the claimed role
             if ($role === 'buyer' && $order->buyer_id !== $raterId) {
-                throw new \InvalidArgumentException('You are not the buyer of this order.');
+                throw new \InvalidArgumentException(__('api.marketplace_rating_buyer_required'));
             }
             if ($role === 'seller' && $order->seller_id !== $raterId) {
-                throw new \InvalidArgumentException('You are not the seller of this order.');
+                throw new \InvalidArgumentException(__('api.marketplace_rating_seller_required'));
             }
 
             // Determine the ratee
@@ -72,12 +72,12 @@ class MarketplaceRatingService
                 ->first();
 
             if ($existingRating) {
-                throw new \InvalidArgumentException('You have already rated this order.');
+                throw new \InvalidArgumentException(__('api.marketplace_rating_duplicate'));
             }
 
             $rating = (int) ($data['rating'] ?? 0);
             if ($rating < 1 || $rating > 5) {
-                throw new \InvalidArgumentException('Rating must be between 1 and 5.');
+                throw new \InvalidArgumentException(__('api.marketplace_rating_range'));
             }
 
             $sellerRating = new MarketplaceSellerRating();
@@ -200,27 +200,31 @@ class MarketplaceRatingService
 
         return TenantContext::runForTenant($tenantId, function () use ($order, $orderId, $userId, $data, $tenantId): MarketplaceDispute {
             // Only buyer or seller can open a dispute
-            if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
-                throw new \InvalidArgumentException('You are not a participant in this order.');
+            if ((int) $order->buyer_id !== $userId && (int) $order->seller_id !== $userId) {
+                throw new \InvalidArgumentException(__('api.marketplace_order_participant_required'));
             }
 
-            // Cannot dispute cancelled/refunded orders
-            if (in_array($order->status, ['cancelled', 'refunded'], true)) {
-                throw new \InvalidArgumentException('Cannot dispute a cancelled or refunded order.');
+            // Payment must have settled before either party can open a claim.
+            if (! in_array((string) $order->status, ['paid', 'shipped', 'delivered', 'completed'], true)) {
+                throw new \InvalidArgumentException(__('api.marketplace_dispute_order_not_eligible'));
             }
 
             $validReasons = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
             $reason = $data['reason'] ?? '';
             if (!in_array($reason, $validReasons, true)) {
-                throw new \InvalidArgumentException('Invalid dispute reason.');
+                throw new \InvalidArgumentException(__('api.marketplace_dispute_invalid_reason'));
             }
 
-            $dispute = DB::transaction(function () use ($order, $orderId, $userId, $data, $reason, $tenantId) {
-                MarketplaceOrder::withoutGlobalScopes()
+            $dispute = DB::transaction(function () use ($orderId, $userId, $data, $reason, $tenantId) {
+                $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
                     ->whereKey($orderId)
                     ->where('tenant_id', $tenantId)
                     ->lockForUpdate()
                     ->firstOrFail();
+
+                if (! in_array((string) $lockedOrder->status, ['paid', 'shipped', 'delivered', 'completed'], true)) {
+                    throw new \InvalidArgumentException(__('api.marketplace_dispute_order_not_eligible'));
+                }
 
                 $existingDispute = MarketplaceDispute::where('order_id', $orderId)
                     ->where('tenant_id', $tenantId)
@@ -229,7 +233,7 @@ class MarketplaceRatingService
                     ->first();
 
                 if ($existingDispute) {
-                    throw new \InvalidArgumentException('A dispute already exists for this order.');
+                    throw new \InvalidArgumentException(__('api.marketplace_dispute_duplicate'));
                 }
 
                 $dispute = new MarketplaceDispute();
@@ -240,11 +244,12 @@ class MarketplaceRatingService
                 $dispute->description = $data['description'];
                 $dispute->evidence_urls = $data['evidence_urls'] ?? null;
                 $dispute->status = 'open';
+                $dispute->prior_order_status = $lockedOrder->status;
                 $dispute->save();
 
                 // Move order to disputed status
-                $order->status = 'disputed';
-                $order->save();
+                $lockedOrder->status = 'disputed';
+                $lockedOrder->save();
 
                 return $dispute;
             });

@@ -14,7 +14,10 @@
                 return rtrim(rtrim(number_format($tc, 2), '0'), '.') . ' ' . __('govuk_alpha.marketplace.credits_label');
             }
             if ($money > 0) {
-                return trim(trim((string) ($i['price_currency'] ?? '')) . ' ' . number_format($money, 2));
+                return \App\Support\MarketplaceMoneyFormatter::format(
+                    $money,
+                    (string) ($i['price_currency'] ?? ''),
+                );
             }
             return __('govuk_alpha.marketplace.free');
         };

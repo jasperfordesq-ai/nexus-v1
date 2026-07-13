@@ -1429,16 +1429,19 @@ CREATE TABLE `caring_loyalty_redemptions` (
   `order_total_chf` decimal(10,2) NOT NULL,
   `status` enum('pending','applied','reversed') NOT NULL DEFAULT 'applied',
   `redeemed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `expires_at` timestamp NULL DEFAULT NULL,
   `reversed_at` timestamp NULL DEFAULT NULL,
   `reversed_by` bigint(20) unsigned DEFAULT NULL,
   `reversal_reason` varchar(500) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `clr_order_once_unique` (`marketplace_order_id`),
   KEY `clr_tenant_member_idx` (`tenant_id`,`member_user_id`),
   KEY `clr_tenant_merchant_idx` (`tenant_id`,`merchant_user_id`),
   KEY `clr_tenant_redeemed_idx` (`tenant_id`,`redeemed_at`),
-  KEY `clr_tenant_listing_idx` (`tenant_id`,`marketplace_listing_id`)
+  KEY `clr_tenant_listing_idx` (`tenant_id`,`marketplace_listing_id`),
+  KEY `clr_pending_expiry_idx` (`tenant_id`,`status`,`expires_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `caring_municipality_feedback`;
@@ -12448,7 +12451,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=385 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=390 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -12925,7 +12928,7 @@ DROP TABLE IF EXISTS `marketplace_delivery_offers`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `marketplace_delivery_offers` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `tenant_id` int(10) unsigned NOT NULL DEFAULT 1,
+  `tenant_id` bigint(20) unsigned NOT NULL DEFAULT 1,
   `order_id` bigint(20) unsigned NOT NULL,
   `deliverer_id` int(10) unsigned NOT NULL,
   `time_credits` decimal(8,2) NOT NULL COMMENT 'Time credits offered for delivery',
@@ -12934,9 +12937,11 @@ CREATE TABLE `marketplace_delivery_offers` (
   `status` enum('pending','accepted','declined','completed','cancelled') NOT NULL DEFAULT 'pending',
   `accepted_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
+  `wallet_transaction_id` int(10) unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `mdo_wallet_tx_once_unique` (`wallet_transaction_id`),
   KEY `idx_mdo_order_status` (`order_id`,`status`),
   KEY `idx_mdo_deliverer_status` (`deliverer_id`,`status`),
   KEY `idx_mdo_tenant` (`tenant_id`)
@@ -12954,6 +12959,7 @@ CREATE TABLE `marketplace_disputes` (
   `description` text NOT NULL,
   `evidence_urls` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`evidence_urls`)),
   `status` enum('open','under_review','resolved_buyer','resolved_seller','escalated','closed') NOT NULL DEFAULT 'open',
+  `prior_order_status` varchar(32) DEFAULT NULL,
   `resolution_notes` text DEFAULT NULL,
   `resolved_by` bigint(20) unsigned DEFAULT NULL,
   `resolved_at` timestamp NULL DEFAULT NULL,
@@ -13062,6 +13068,7 @@ CREATE TABLE `marketplace_listings` (
   `video_url` varchar(500) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `marketplace_enforcement_report_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `mpl_tenant_status_idx` (`tenant_id`,`status`),
   KEY `mpl_tenant_category_idx` (`tenant_id`,`category_id`),
@@ -13076,6 +13083,9 @@ CREATE TABLE `marketplace_listings` (
   KEY `idx_mpl_public_price` (`tenant_id`,`status`,`moderation_status`,`price`,`id`),
   KEY `idx_mpl_public_popular` (`tenant_id`,`status`,`moderation_status`,`views_count`,`id`),
   KEY `idx_mpl_public_promoted` (`tenant_id`,`status`,`moderation_status`,`promoted_until`,`id`),
+  KEY `mpl_browse_price_idx` (`tenant_id`,`status`,`moderation_status`,`price`,`id`),
+  KEY `mpl_browse_promotion_idx` (`tenant_id`,`status`,`moderation_status`,`promoted_until`,`id`),
+  KEY `marketplace_listings_marketplace_enforcement_report_id_index` (`marketplace_enforcement_report_id`),
   FULLTEXT KEY `mpl_title_description_ft` (`title`,`description`),
   CONSTRAINT `marketplace_listings_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `marketplace_categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -13145,15 +13155,24 @@ CREATE TABLE `marketplace_orders` (
   `seller_id` bigint(20) unsigned NOT NULL,
   `marketplace_listing_id` bigint(20) unsigned DEFAULT NULL,
   `marketplace_offer_id` bigint(20) unsigned DEFAULT NULL,
+  `checkout_key` varchar(64) DEFAULT NULL,
+  `checkout_fingerprint` varchar(64) DEFAULT NULL,
   `quantity` int(11) NOT NULL DEFAULT 1,
   `unit_price` decimal(10,2) NOT NULL,
   `total_price` decimal(10,2) NOT NULL,
   `currency` varchar(3) NOT NULL DEFAULT 'EUR',
   `time_credits_used` decimal(8,2) DEFAULT NULL,
+  `wallet_transaction_id` bigint(20) unsigned DEFAULT NULL,
+  `wallet_refund_transaction_id` bigint(20) unsigned DEFAULT NULL,
+  `loyalty_redemption_id` bigint(20) unsigned DEFAULT NULL,
   `status` enum('pending_payment','paid','shipped','delivered','completed','disputed','refunded','cancelled') NOT NULL DEFAULT 'pending_payment',
+  `stripe_checkout_mode` varchar(24) DEFAULT NULL,
   `payment_intent_id` varchar(255) DEFAULT NULL,
+  `checkout_session_id` varchar(255) DEFAULT NULL,
+  `payment_expires_at` timestamp NULL DEFAULT NULL,
   `escrow_released_at` timestamp NULL DEFAULT NULL,
   `shipping_method` varchar(100) DEFAULT NULL,
+  `shipping_option_id` bigint(20) unsigned DEFAULT NULL,
   `shipping_cost` decimal(8,2) DEFAULT NULL,
   `tracking_number` varchar(255) DEFAULT NULL,
   `tracking_url` varchar(500) DEFAULT NULL,
@@ -13168,6 +13187,11 @@ CREATE TABLE `marketplace_orders` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mo_tenant_order_number_unique` (`tenant_id`,`order_number`),
+  UNIQUE KEY `mo_offer_once_unique` (`marketplace_offer_id`),
+  UNIQUE KEY `mo_tenant_buyer_checkout_unique` (`tenant_id`,`buyer_id`,`checkout_key`),
+  UNIQUE KEY `mo_loyalty_redemption_unique` (`loyalty_redemption_id`),
+  UNIQUE KEY `mo_wallet_refund_once_unique` (`wallet_refund_transaction_id`),
+  UNIQUE KEY `mo_checkout_session_unique` (`checkout_session_id`),
   KEY `mo_tenant_buyer_idx` (`tenant_id`,`buyer_id`),
   KEY `mo_tenant_seller_idx` (`tenant_id`,`seller_id`),
   KEY `mo_tenant_status_idx` (`tenant_id`,`status`),
@@ -13176,9 +13200,33 @@ CREATE TABLE `marketplace_orders` (
   KEY `mo_seller_id_idx` (`seller_id`),
   KEY `marketplace_orders_tenant_id_index` (`tenant_id`),
   KEY `marketplace_orders_marketplace_listing_id_foreign` (`marketplace_listing_id`),
+  KEY `mo_pending_expiry_idx` (`tenant_id`,`status`,`payment_expires_at`),
+  KEY `mo_shipping_option_idx` (`shipping_option_id`),
   CONSTRAINT `marketplace_orders_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE SET NULL,
   CONSTRAINT `marketplace_orders_marketplace_offer_id_foreign` FOREIGN KEY (`marketplace_offer_id`) REFERENCES `marketplace_offers` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `marketplace_payment_refunds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `marketplace_payment_refunds` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `payment_id` bigint(20) unsigned NOT NULL,
+  `stripe_refund_id` varchar(255) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `platform_fee_reversal` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `seller_payout_reversal` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `reason` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `marketplace_payment_refunds_stripe_refund_id_unique` (`stripe_refund_id`),
+  KEY `marketplace_payment_refunds_tenant_id_index` (`tenant_id`),
+  KEY `marketplace_payment_refunds_payment_id_foreign` (`payment_id`),
+  KEY `mpr_tenant_payment_idx` (`tenant_id`,`payment_id`),
+  CONSTRAINT `marketplace_payment_refunds_payment_id_foreign` FOREIGN KEY (`payment_id`) REFERENCES `marketplace_payments` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_payments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -13189,6 +13237,7 @@ CREATE TABLE `marketplace_payments` (
   `order_id` bigint(20) unsigned NOT NULL,
   `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
   `stripe_charge_id` varchar(255) DEFAULT NULL,
+  `funds_flow` varchar(32) NOT NULL DEFAULT 'destination_charge',
   `amount` decimal(10,2) NOT NULL,
   `currency` varchar(3) NOT NULL DEFAULT 'EUR',
   `platform_fee` decimal(10,2) NOT NULL DEFAULT 0.00,
@@ -13203,6 +13252,9 @@ CREATE TABLE `marketplace_payments` (
   `paid_out_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `stripe_dispute_id` varchar(255) DEFAULT NULL,
+  `stripe_dispute_status` varchar(50) DEFAULT NULL,
+  `dispute_previous_order_status` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `marketplace_payments_pi_unique` (`stripe_payment_intent_id`),
   KEY `marketplace_payments_order_id_foreign` (`order_id`),
@@ -13210,6 +13262,7 @@ CREATE TABLE `marketplace_payments` (
   KEY `marketplace_payments_tenant_id_status_index` (`tenant_id`,`status`),
   KEY `marketplace_payments_tenant_id_index` (`tenant_id`),
   KEY `marketplace_payments_stripe_payment_intent_id_index` (`stripe_payment_intent_id`),
+  KEY `marketplace_payments_stripe_dispute_id_index` (`stripe_dispute_id`),
   CONSTRAINT `marketplace_payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `marketplace_orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -13336,7 +13389,9 @@ CREATE TABLE `marketplace_reports` (
   `resolved_at` timestamp NULL DEFAULT NULL,
   `resolution_reason` text DEFAULT NULL,
   `action_taken` enum('none','warning','listing_removed','seller_suspended') DEFAULT NULL,
+  `enforcement_snapshot` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`enforcement_snapshot`)),
   `appeal_text` text DEFAULT NULL,
+  `appealed_by` bigint(20) unsigned DEFAULT NULL,
   `appeal_resolved_at` timestamp NULL DEFAULT NULL,
   `handled_by` bigint(20) unsigned DEFAULT NULL,
   `transparency_report_included` tinyint(1) NOT NULL DEFAULT 0,
@@ -13346,6 +13401,7 @@ CREATE TABLE `marketplace_reports` (
   KEY `marketplace_reports_marketplace_listing_id_foreign` (`marketplace_listing_id`),
   KEY `mr_reporter_id_idx` (`reporter_id`),
   KEY `mr_handled_by_idx` (`handled_by`),
+  KEY `mr_appealed_by_idx` (`appealed_by`),
   KEY `marketplace_reports_tenant_id_status_index` (`tenant_id`,`status`),
   KEY `marketplace_reports_tenant_id_marketplace_listing_id_index` (`tenant_id`,`marketplace_listing_id`),
   KEY `marketplace_reports_tenant_id_index` (`tenant_id`),
@@ -13441,9 +13497,11 @@ CREATE TABLE `marketplace_seller_profiles` (
   `marketplace_partner_badge_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `marketplace_suspension_report_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `mpsp_tenant_user_unique` (`tenant_id`,`user_id`),
-  KEY `marketplace_seller_profiles_tenant_id_index` (`tenant_id`)
+  KEY `marketplace_seller_profiles_tenant_id_index` (`tenant_id`),
+  KEY `msp_enforcement_report_idx` (`marketplace_suspension_report_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_seller_ratings`;
@@ -14107,6 +14165,8 @@ CREATE TABLE `merchant_coupon_redemptions` (
   `order_id` bigint(20) unsigned DEFAULT NULL,
   `discount_applied_cents` int(10) unsigned NOT NULL DEFAULT 0,
   `redeemed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `reversed_at` timestamp NULL DEFAULT NULL,
+  `reversal_reason` varchar(100) DEFAULT NULL,
   `redemption_method` enum('online','qr_scan') NOT NULL DEFAULT 'online',
   `qr_token` varchar(64) DEFAULT NULL,
   `qr_expires_at` timestamp NULL DEFAULT NULL,
@@ -14114,6 +14174,7 @@ CREATE TABLE `merchant_coupon_redemptions` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `merchant_coupon_redemptions_qr_token_unique` (`qr_token`),
+  UNIQUE KEY `mcr_order_once_unique` (`order_id`),
   KEY `merchant_coupon_redemptions_tenant_id_coupon_id_index` (`tenant_id`,`coupon_id`),
   KEY `merchant_coupon_redemptions_tenant_id_user_id_index` (`tenant_id`,`user_id`),
   KEY `merchant_coupon_redemptions_tenant_id_order_id_index` (`tenant_id`,`order_id`),
@@ -20423,7 +20484,12 @@ INSERT INTO `laravel_migrations` VALUES
 (381,'2026_07_12_000069_add_event_recurrence_materialization_state',111),
 (382,'2026_07_12_000070_add_event_recurrence_revision_ledger',111),
 (383,'2026_07_12_000071_add_event_recurrence_definition_blueprints',111),
-(384,'2026_07_12_000075_create_podcast_media_cleanup_tasks',112);
+(384,'2026_07_12_000075_create_podcast_media_cleanup_tasks',112),
+(385,'2026_07_12_000072_harden_marketplace_checkout_state',113),
+(386,'2026_07_12_000073_optimize_marketplace_browse_queries',114),
+(387,'2026_07_12_000074_complete_marketplace_dispute_appeal_workflows',115),
+(388,'2026_07_13_000076_bind_marketplace_checkout_sessions',116),
+(389,'2026_07_13_000077_bind_marketplace_stripe_checkout_mode',117);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

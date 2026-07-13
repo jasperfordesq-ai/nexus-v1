@@ -139,6 +139,11 @@ export interface MarketplaceOrder {
   tracking_number?: string | null;
   tracking_url?: string | null;
   shipping_method?: string | null;
+  payment_method?: 'cash' | 'time_credits' | 'free';
+  requires_payment?: boolean;
+  time_credits_used?: number;
+  wallet_transaction_id?: number | null;
+  wallet_refund_transaction_id?: number | null;
   ratings?: MarketplaceOrderRating[];
   created_at: string;
 }
@@ -591,8 +596,14 @@ export function getMarketplaceCategoryTemplate(id: number): Promise<MarketplaceD
   return api.get<MarketplaceDataResponse<MarketplaceCategoryTemplate>>(`${API_V2}/marketplace/categories/${id}/template`);
 }
 
-export function getMarketplaceListing(id: number): Promise<MarketplaceDataResponse<MarketplaceListingDetail>> {
-  return api.get<MarketplaceDataResponse<MarketplaceListingDetail>>(`${API_V2}/marketplace/listings/${id}`);
+export function getMarketplaceListing(
+  id: number,
+  acceptedOfferId?: number | null,
+): Promise<MarketplaceDataResponse<MarketplaceListingDetail>> {
+  const endpoint = `${API_V2}/marketplace/listings/${id}`;
+  return acceptedOfferId
+    ? api.get<MarketplaceDataResponse<MarketplaceListingDetail>>(endpoint, { offer_id: String(acceptedOfferId) })
+    : api.get<MarketplaceDataResponse<MarketplaceListingDetail>>(endpoint);
 }
 
 export function createMarketplaceListing(
@@ -781,8 +792,12 @@ export function createMarketplaceOrder(payload: {
   listing_id: number;
   offer_id?: number;
   quantity?: number;
-  shipping_method?: string | null;
+  idempotency_key: string;
+  shipping_option_id?: number | null;
+  shipping_method?: 'pickup' | 'community_delivery';
+  pickup_slot_id?: number;
   coupon_code?: string;
+  payment_method?: 'cash' | 'time_credits' | 'free';
 }): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
   return api.post<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders`, payload);
 }
@@ -811,8 +826,14 @@ export function confirmMarketplacePayment(paymentIntentId: string): Promise<Mark
   });
 }
 
-export function getMarketplaceListingPickupSlots(listingId: number): Promise<MarketplaceDataResponse<MarketplacePickupSlotOption[]>> {
-  return api.get<MarketplaceDataResponse<MarketplacePickupSlotOption[]>>(`${API_V2}/marketplace/listings/${listingId}/pickup-slots`);
+export function getMarketplaceListingPickupSlots(
+  listingId: number,
+  acceptedOfferId?: number | null,
+): Promise<MarketplaceDataResponse<MarketplacePickupSlotOption[]>> {
+  const endpoint = `${API_V2}/marketplace/listings/${listingId}/pickup-slots`;
+  return acceptedOfferId
+    ? api.get<MarketplaceDataResponse<MarketplacePickupSlotOption[]>>(endpoint, { offer_id: String(acceptedOfferId) })
+    : api.get<MarketplaceDataResponse<MarketplacePickupSlotOption[]>>(endpoint);
 }
 
 export function reserveMarketplacePickup(orderId: number, slotId: number): Promise<MarketplaceDataResponse<MarketplacePickupReservation>> {
@@ -823,10 +844,19 @@ export function reserveMarketplacePickup(orderId: number, slotId: number): Promi
 
 export function validateMarketplaceCoupon(payload: {
   code: string;
-  order_total_cents: number;
   listing_id: number;
-}): Promise<MarketplaceDataResponse<{ discount_cents: number }>> {
-  return api.post<MarketplaceDataResponse<{ discount_cents: number }>>(`${API_V2}/coupons/validate`, payload);
+  shipping_option_id?: number;
+  order_total_cents?: number;
+}): Promise<MarketplaceDataResponse<{
+  discount_amount: number;
+  discount_cents: number;
+  currency: string;
+}>> {
+  return api.post<MarketplaceDataResponse<{
+    discount_amount: number;
+    discount_cents: number;
+    currency: string;
+  }>>(`${API_V2}/coupons/validate`, payload);
 }
 
 export function getMerchantOnboardingStatus(): Promise<MarketplaceDataResponse<MerchantOnboardingStatus>> {
@@ -1004,6 +1034,14 @@ export function getMarketplacePickupSlots(): Promise<MarketplaceDataResponse<Mar
 
 export function getMarketplaceShippingOptions(): Promise<MarketplaceDataResponse<MarketplaceShippingOption[]>> {
   return api.get<MarketplaceDataResponse<MarketplaceShippingOption[]>>(`${API_V2}/marketplace/seller/shipping-options`);
+}
+
+export function getMarketplaceSellerShippingOptions(
+  sellerUserId: number,
+): Promise<MarketplaceDataResponse<MarketplaceShippingOption[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceShippingOption[]>>(
+    `${API_V2}/marketplace/sellers/${sellerUserId}/shipping-options`,
+  );
 }
 
 export function createMarketplaceShippingOption(payload: {

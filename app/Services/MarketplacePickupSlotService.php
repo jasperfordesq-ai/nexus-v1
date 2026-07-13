@@ -10,10 +10,12 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
+use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePickupReservation;
 use App\Models\MarketplacePickupSlot;
 use App\Models\MarketplaceSellerProfile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -56,6 +58,18 @@ class MarketplacePickupSlotService
     public static function create(int $sellerProfileId, array $data): MarketplacePickupSlot
     {
         $tenantId = TenantContext::getId();
+        $ownsProfile = MarketplaceSellerProfile::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($sellerProfileId)
+            ->exists();
+        if (! $ownsProfile) {
+            throw new \DomainException('SELLER_PROFILE_NOT_FOUND');
+        }
+        $slotStart = Carbon::parse((string) $data['slot_start']);
+        $slotEnd = Carbon::parse((string) $data['slot_end']);
+        if (! $slotEnd->greaterThan($slotStart)) {
+            throw new \DomainException('SLOT_END_BEFORE_START');
+        }
 
         $slot = new MarketplacePickupSlot();
         $slot->tenant_id = $tenantId;
@@ -74,18 +88,65 @@ class MarketplacePickupSlotService
 
     public static function update(MarketplacePickupSlot $slot, array $data): MarketplacePickupSlot
     {
-        foreach (['slot_start', 'slot_end', 'capacity', 'is_recurring', 'recurring_pattern', 'is_active'] as $f) {
-            if (array_key_exists($f, $data)) {
-                $slot->{$f} = $data[$f];
+        $tenantId = TenantContext::getId();
+
+        return DB::transaction(function () use ($slot, $data, $tenantId): MarketplacePickupSlot {
+            $lockedSlot = MarketplacePickupSlot::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('seller_id', $slot->seller_id)
+                ->whereKey($slot->id)
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedSlot) {
+                throw new \DomainException('SLOT_NOT_FOUND');
             }
-        }
-        $slot->save();
-        return $slot;
+
+            $slotStart = Carbon::parse((string) ($data['slot_start'] ?? $lockedSlot->slot_start));
+            $slotEnd = Carbon::parse((string) ($data['slot_end'] ?? $lockedSlot->slot_end));
+            if (! $slotEnd->greaterThan($slotStart)) {
+                throw new \DomainException('SLOT_END_BEFORE_START');
+            }
+            if (isset($data['capacity']) && (int) $data['capacity'] < (int) $lockedSlot->booked_count) {
+                throw new \DomainException('CAPACITY_BELOW_BOOKINGS');
+            }
+
+            foreach (['slot_start', 'slot_end', 'capacity', 'is_recurring', 'recurring_pattern', 'is_active'] as $field) {
+                if (array_key_exists($field, $data)) {
+                    $lockedSlot->{$field} = $data[$field];
+                }
+            }
+            $lockedSlot->save();
+
+            return $lockedSlot;
+        }, 3);
     }
 
     public static function delete(MarketplacePickupSlot $slot): void
     {
-        $slot->delete();
+        $tenantId = TenantContext::getId();
+
+        DB::transaction(function () use ($slot, $tenantId): void {
+            $lockedSlot = MarketplacePickupSlot::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('seller_id', $slot->seller_id)
+                ->whereKey($slot->id)
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedSlot) {
+                throw new \DomainException('SLOT_NOT_FOUND');
+            }
+
+            $hasReservations = MarketplacePickupReservation::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('slot_id', $lockedSlot->id)
+                ->whereIn('status', ['reserved', 'picked_up'])
+                ->exists();
+            if ($hasReservations) {
+                throw new \DomainException('SLOT_HAS_RESERVATIONS');
+            }
+
+            $lockedSlot->delete();
+        }, 3);
     }
 
     // -----------------------------------------------------------------
@@ -97,15 +158,43 @@ class MarketplacePickupSlotService
      *
      * @return array<int,array<string,mixed>>
      */
-    public static function listAvailableForListing(int $listingId, int $limit = 50): array
+    public static function listAvailableForListing(
+        int $listingId,
+        int $limit = 50,
+        ?int $viewerUserId = null,
+        ?int $offerId = null,
+    ): array
     {
         $tenantId = TenantContext::getId();
         $listing = MarketplaceListing::query()
             ->where('tenant_id', $tenantId)
             ->where('id', $listingId)
+            ->whereIn('status', ['active', 'reserved'])
+            ->where('moderation_status', 'approved')
+            ->whereIn('delivery_method', ['pickup', 'both'])
+            ->where(static function ($query): void {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
             ->first();
         if (!$listing) {
             return [];
+        }
+
+        if ((string) $listing->status === 'reserved') {
+            if ($viewerUserId === null || $offerId === null) {
+                return [];
+            }
+            $isAcceptedOfferBuyer = MarketplaceOffer::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($offerId)
+                ->where('marketplace_listing_id', $listingId)
+                ->where('buyer_id', $viewerUserId)
+                ->where('status', 'accepted')
+                ->exists();
+            if (! $isAcceptedOfferBuyer) {
+                return [];
+            }
         }
 
         $sellerProfile = MarketplaceSellerProfile::query()
@@ -113,6 +202,18 @@ class MarketplacePickupSlotService
             ->where('user_id', $listing->user_id)
             ->first();
         if (!$sellerProfile) {
+            return [];
+        }
+        if ((bool) $sellerProfile->is_suspended) {
+            return [];
+        }
+
+        $sellerIsActive = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $listing->user_id)
+            ->where('status', 'active')
+            ->exists();
+        if (! $sellerIsActive) {
             return [];
         }
 
@@ -139,6 +240,22 @@ class MarketplacePickupSlotService
         $tenantId = TenantContext::getId();
 
         return DB::transaction(function () use ($slotId, $orderId, $buyerUserId, $tenantId) {
+            // Lock order before slot. Cancellation uses the same order→slot
+            // ordering, preventing a reserve/cancel deadlock.
+            $order = MarketplaceOrder::query()
+                ->where('id', $orderId)
+                ->where('tenant_id', $tenantId)
+                ->where('buyer_id', $buyerUserId)
+                ->lockForUpdate()
+                ->first();
+            if (!$order) {
+                throw new \DomainException('ORDER_NOT_FOUND');
+            }
+            if (! in_array($order->status, ['pending_payment', 'paid'], true)
+                || $order->shipping_method !== 'pickup') {
+                throw new \DomainException('ORDER_NOT_PICKUP_ELIGIBLE');
+            }
+
             $slot = MarketplacePickupSlot::query()
                 ->where('id', $slotId)
                 ->where('tenant_id', $tenantId)
@@ -158,13 +275,12 @@ class MarketplacePickupSlotService
                 throw new \DomainException('SLOT_FULL');
             }
 
-            $order = MarketplaceOrder::query()
-                ->where('id', $orderId)
+            $sellerProfile = MarketplaceSellerProfile::query()
                 ->where('tenant_id', $tenantId)
-                ->where('buyer_id', $buyerUserId)
+                ->where('user_id', $order->seller_id)
                 ->first();
-            if (!$order) {
-                throw new \DomainException('ORDER_NOT_FOUND');
+            if (! $sellerProfile || (int) $slot->seller_id !== (int) $sellerProfile->id) {
+                throw new \DomainException('SLOT_SELLER_MISMATCH');
             }
 
             $existing = MarketplacePickupReservation::query()
@@ -220,6 +336,9 @@ class MarketplacePickupSlotService
                 ->first();
             if (!$order || (int) $order->seller_id !== $sellerUserId) {
                 throw new \DomainException('NOT_FOR_SELLER');
+            }
+            if (! in_array($order->status, ['paid', 'shipped', 'delivered'], true)) {
+                throw new \DomainException('ORDER_NOT_PAID');
             }
 
             if ($reservation->status === 'picked_up') {

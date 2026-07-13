@@ -19,7 +19,9 @@
       "invalid_listing": "L'annonce n'appartient pas à ce marchand.",
       "listing_unavailable": "Cette annonce n'est pas disponible pour l'échange de fidélité.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Cet échange du programme de fidélité n’est plus disponible.",
+      "redemption_mismatch": "Cet échange du programme de fidélité ne correspond pas à la commande sélectionnée sur la place de marché."
     }
   },
   "survey": {

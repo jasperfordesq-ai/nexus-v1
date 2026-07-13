@@ -115,7 +115,7 @@
       "deleted": "クーポンが削除されました",
       "failed_delete": "削除に失敗しました",
       "discount_percent": "{{value}}%",
-      "discount_fixed": "€{{value}}",
+      "discount_fixed": "{{value}}",
       "discount_bogo": "BOGO",
       "no_expiry": "-",
       "suspend": "つるす",

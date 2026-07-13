@@ -13,6 +13,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MarketplaceReport;
 use App\Models\MarketplaceSellerProfile;
 use App\Models\Notification;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -45,37 +46,44 @@ class MarketplaceReportService
     public static function createReport(int $reporterId, int $listingId, array $data): MarketplaceReport
     {
         $tenantId = TenantContext::getId();
-        $listing = MarketplaceListing::where('tenant_id', $tenantId)
-            ->where('id', $listingId)
-            ->first();
-        if (!$listing) {
-            throw new \InvalidArgumentException(__('api.marketplace_listing_not_found'));
-        }
+        // Serialize reports for the same listing. Without the listing lock,
+        // two concurrent requests can both pass the duplicate check and insert
+        // active reports before either transaction becomes visible.
+        $report = DB::transaction(function () use ($tenantId, $reporterId, $listingId, $data): MarketplaceReport {
+            $listing = MarketplaceListing::where('tenant_id', $tenantId)
+                ->where('id', $listingId)
+                ->lockForUpdate()
+                ->first();
+            if (!$listing) {
+                throw new \InvalidArgumentException(__('api.marketplace_listing_not_found'));
+            }
 
-        if ((int) $listing->user_id === $reporterId) {
-            throw new \InvalidArgumentException(__('api.marketplace_report_own_listing'));
-        }
+            if ((int) $listing->user_id === $reporterId) {
+                throw new \InvalidArgumentException(__('api.marketplace_report_own_listing'));
+            }
 
-        // Prevent duplicate active reports from the same user
-        $existingReport = MarketplaceReport::where('reporter_id', $reporterId)
-            ->where('tenant_id', $tenantId)
-            ->where('marketplace_listing_id', $listingId)
-            ->whereNotIn('status', ['no_action', 'appeal_resolved'])
-            ->first();
+            $existingReport = MarketplaceReport::where('reporter_id', $reporterId)
+                ->where('tenant_id', $tenantId)
+                ->where('marketplace_listing_id', $listingId)
+                ->whereNotIn('status', ['no_action', 'appeal_resolved'])
+                ->first();
 
-        if ($existingReport) {
-            throw new \InvalidArgumentException(__('api.marketplace_report_duplicate_active'));
-        }
+            if ($existingReport) {
+                throw new \InvalidArgumentException(__('api.marketplace_report_duplicate_active'));
+            }
 
-        $report = new MarketplaceReport();
-        $report->tenant_id = $tenantId;
-        $report->marketplace_listing_id = $listingId;
-        $report->reporter_id = $reporterId;
-        $report->reason = $data['reason'];
-        $report->description = $data['description'];
-        $report->evidence_urls = $data['evidence_urls'] ?? null;
-        $report->status = 'received';
-        $report->save();
+            $report = new MarketplaceReport();
+            $report->tenant_id = $tenantId;
+            $report->marketplace_listing_id = $listingId;
+            $report->reporter_id = $reporterId;
+            $report->reason = $data['reason'];
+            $report->description = $data['description'];
+            $report->evidence_urls = $data['evidence_urls'] ?? null;
+            $report->status = 'received';
+            $report->save();
+
+            return $report;
+        });
 
         // Send receipt confirmation to reporter (DSA requirement)
         self::queueReportNotification(
@@ -128,7 +136,7 @@ class MarketplaceReportService
         $report = MarketplaceReport::findOrFail($reportId);
 
         if (!in_array($report->status, ['received', 'acknowledged'])) {
-            throw new \InvalidArgumentException('Report cannot be acknowledged in its current state.');
+            throw new \InvalidArgumentException(__('api.marketplace_report_acknowledge_invalid_state'));
         }
 
         $report->acknowledged_at = now();
@@ -179,28 +187,39 @@ class MarketplaceReportService
      */
     public static function resolveReport(int $reportId, int $adminId, array $data): MarketplaceReport
     {
-        $report = MarketplaceReport::findOrFail($reportId);
-
-        if (!in_array($report->status, ['received', 'acknowledged', 'under_review'])) {
-            throw new \InvalidArgumentException('Report cannot be resolved in its current state.');
-        }
-
         $actionTaken = $data['action_taken'] ?? 'none';
+        $report = DB::transaction(function () use ($reportId, $adminId, $data, $actionTaken): MarketplaceReport {
+            $lockedReport = MarketplaceReport::query()
+                ->whereKey($reportId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $report->status = $actionTaken === 'none' ? 'no_action' : 'action_taken';
-        $report->action_taken = $actionTaken;
-        $report->resolution_reason = $data['resolution_reason'] ?? null;
-        $report->resolved_at = now();
-        $report->handled_by = $adminId;
-        $report->transparency_report_included = true;
-        $report->save();
+            if (! in_array($lockedReport->status, ['received', 'acknowledged', 'under_review'], true)) {
+                throw new \InvalidArgumentException(__('api.marketplace_report_resolve_invalid_state'));
+            }
 
-        // Execute the enforcement action
-        if ($actionTaken === 'listing_removed') {
-            self::removeListing($report->marketplace_listing_id);
-        } elseif ($actionTaken === 'seller_suspended') {
-            self::suspendSeller($report->marketplace_listing_id);
-        }
+            $lockedReport->status = $actionTaken === 'none' ? 'no_action' : 'action_taken';
+            $lockedReport->action_taken = $actionTaken;
+            if (in_array($actionTaken, ['listing_removed', 'seller_suspended'], true)) {
+                $lockedReport->enforcement_snapshot = self::captureEnforcementSnapshot(
+                    (int) $lockedReport->marketplace_listing_id,
+                );
+            }
+            $lockedReport->resolution_reason = $data['resolution_reason'] ?? null;
+            $lockedReport->resolved_at = now();
+            $lockedReport->handled_by = $adminId;
+            $lockedReport->transparency_report_included = true;
+            $lockedReport->save();
+
+            if ($actionTaken === 'listing_removed') {
+                self::removeListing($lockedReport->marketplace_listing_id, (int) $lockedReport->id);
+            } elseif ($actionTaken === 'seller_suspended') {
+                self::suspendSeller($lockedReport->marketplace_listing_id, (int) $lockedReport->id);
+            }
+
+            return $lockedReport;
+        });
+        $report->loadMissing('listing');
 
         // Notify reporter of the decision (DSA requirement — action taken or no action)
         try {
@@ -251,27 +270,30 @@ class MarketplaceReportService
     // -----------------------------------------------------------------
 
     /**
-     * File an appeal against a resolved report (reporter only).
+     * File an appeal against a resolved report.
      *
      * @param int    $reportId  The report to appeal
-     * @param int    $reporterId The user filing the appeal (must be original reporter)
+     * @param int    $userId The original reporter or affected seller
      * @param string $appealText The appeal justification
      * @return MarketplaceReport
      */
-    public static function appealReport(int $reportId, int $reporterId, string $appealText): MarketplaceReport
+    public static function appealReport(int $reportId, int $userId, string $appealText): MarketplaceReport
     {
-        $report = MarketplaceReport::findOrFail($reportId);
-
-        if ((int) $report->reporter_id !== $reporterId) {
-            throw new \InvalidArgumentException('Only the original reporter can appeal.');
+        $report = MarketplaceReport::with('listing:id,user_id,title,status')->findOrFail($reportId);
+        $isReporter = (int) $report->reporter_id === $userId;
+        $isAffectedSeller = (int) ($report->listing?->user_id ?? 0) === $userId;
+        $eligible = ($isReporter && $report->status === 'no_action')
+            || ($isAffectedSeller && $report->status === 'action_taken');
+        if (! $isReporter && ! $isAffectedSeller) {
+            throw new AuthorizationException(__('api.marketplace_report_access_denied'));
         }
-
-        if (!in_array($report->status, ['action_taken', 'no_action'])) {
-            throw new \InvalidArgumentException('Report cannot be appealed in its current state.');
+        if (! $eligible) {
+            throw new \InvalidArgumentException(__('api.marketplace_report_appeal_invalid_state'));
         }
 
         $report->status = 'appealed';
         $report->appeal_text = $appealText;
+        $report->appealed_by = $userId;
         $report->save();
 
         // Confirm appeal receipt to reporter
@@ -286,7 +308,8 @@ class MarketplaceReportService
                 ['report_id' => $report->id],
                 null, [],
                 '/marketplace/reports/' . $report->id,
-                'emails_misc.marketplace_report.received_cta'
+                'emails_misc.marketplace_report.received_cta',
+                $userId,
             );
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceReportService] appealReport email failed: ' . $e->getMessage());
@@ -305,27 +328,38 @@ class MarketplaceReportService
      */
     public static function resolveAppeal(int $reportId, int $adminId, array $data): MarketplaceReport
     {
-        $report = MarketplaceReport::findOrFail($reportId);
-
-        if ($report->status !== 'appealed') {
-            throw new \InvalidArgumentException('Report is not in appealed state.');
-        }
-
         $actionTaken = $data['action_taken'] ?? 'none';
+        $report = DB::transaction(function () use ($reportId, $adminId, $data, $actionTaken): MarketplaceReport {
+            $lockedReport = MarketplaceReport::query()
+                ->whereKey($reportId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $report->status = 'appeal_resolved';
-        $report->action_taken = $actionTaken;
-        $report->resolution_reason = $data['resolution_reason'] ?? null;
-        $report->appeal_resolved_at = now();
-        $report->handled_by = $adminId;
-        $report->save();
+            if ($lockedReport->status !== 'appealed') {
+                throw new \InvalidArgumentException(__('api.marketplace_report_not_appealed'));
+            }
 
-        // Execute the enforcement action if changed
-        if ($actionTaken === 'listing_removed') {
-            self::removeListing($report->marketplace_listing_id);
-        } elseif ($actionTaken === 'seller_suspended') {
-            self::suspendSeller($report->marketplace_listing_id);
-        }
+            $previousAction = (string) ($lockedReport->action_taken ?? 'none');
+            if ($previousAction !== $actionTaken) {
+                self::restoreEnforcementSnapshot($lockedReport);
+            }
+
+            $lockedReport->status = 'appeal_resolved';
+            $lockedReport->action_taken = $actionTaken;
+            $lockedReport->resolution_reason = $data['resolution_reason'] ?? null;
+            $lockedReport->appeal_resolved_at = now();
+            $lockedReport->handled_by = $adminId;
+            $lockedReport->save();
+
+            if ($actionTaken === 'listing_removed') {
+                self::removeListing($lockedReport->marketplace_listing_id, (int) $lockedReport->id);
+            } elseif ($actionTaken === 'seller_suspended') {
+                self::suspendSeller($lockedReport->marketplace_listing_id, (int) $lockedReport->id);
+            }
+
+            return $lockedReport;
+        });
+        $report->loadMissing('listing');
 
         // Send final decision email to reporter (DSA — end of appeals process)
         try {
@@ -339,7 +373,8 @@ class MarketplaceReportService
                 ['report_id' => $report->id],
                 null, [],
                 '/marketplace/reports/' . $report->id,
-                'emails_misc.marketplace_report.appeal_resolved_cta'
+                'emails_misc.marketplace_report.appeal_resolved_cta',
+                (int) ($report->appealed_by ?: $report->reporter_id),
             );
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceReportService] resolveAppeal email failed: ' . $e->getMessage());
@@ -367,6 +402,76 @@ class MarketplaceReportService
     // -----------------------------------------------------------------
     //  Queries
     // -----------------------------------------------------------------
+
+    /**
+     * Return a privacy-safe report view to its reporter or affected seller.
+     * The seller never receives the reporter's identity, evidence URLs, or
+     * free-text notice description.
+     *
+     * @return array<string,mixed>
+     */
+    public static function getReportForUser(int $reportId, int $userId): array
+    {
+        $report = MarketplaceReport::with('listing:id,user_id,title,status')
+            ->findOrFail($reportId);
+        $isReporter = (int) $report->reporter_id === $userId;
+        $isSeller = (int) ($report->listing?->user_id ?? 0) === $userId;
+        if (! $isReporter && ! $isSeller) {
+            throw new AuthorizationException(__('api.marketplace_report_access_denied'));
+        }
+
+        return self::formatReportForViewer($report, $userId, $isReporter);
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    public static function getReportsForUser(int $userId): array
+    {
+        return MarketplaceReport::query()
+            ->with('listing:id,user_id,title,status')
+            ->where(function ($query) use ($userId): void {
+                $query->where('reporter_id', $userId)
+                    ->orWhereHas('listing', fn ($listing) => $listing->where('user_id', $userId));
+            })
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get()
+            ->map(fn (MarketplaceReport $report): array => self::formatReportForViewer(
+                $report,
+                $userId,
+                (int) $report->reporter_id === $userId,
+            ))
+            ->all();
+    }
+
+    /** @return array<string,mixed> */
+    private static function formatReportForViewer(MarketplaceReport $report, int $userId, bool $isReporter): array
+    {
+        $isSeller = ! $isReporter && (int) ($report->listing?->user_id ?? 0) === $userId;
+        $canAppeal = ($isReporter && $report->status === 'no_action')
+            || ($isSeller && $report->status === 'action_taken');
+
+        return [
+            'id' => (int) $report->id,
+            'marketplace_listing_id' => (int) $report->marketplace_listing_id,
+            'reason' => $report->reason,
+            'description' => $isReporter ? $report->description : null,
+            'evidence_urls' => $isReporter ? $report->evidence_urls : null,
+            'status' => $report->status,
+            'acknowledged_at' => $report->acknowledged_at?->toISOString(),
+            'resolved_at' => $report->resolved_at?->toISOString(),
+            'resolution_reason' => $report->resolution_reason,
+            'action_taken' => $report->action_taken,
+            'appeal_text' => (int) $report->appealed_by === $userId ? $report->appeal_text : null,
+            'appeal_resolved_at' => $report->appeal_resolved_at?->toISOString(),
+            'can_appeal' => $canAppeal,
+            'viewer_role' => $isReporter ? 'reporter' : 'seller',
+            'listing' => $report->listing ? [
+                'id' => (int) $report->listing->id,
+                'title' => $report->listing->title,
+                'status' => $report->listing->status,
+            ] : null,
+        ];
+    }
 
     /**
      * Get pending reports for admin review (offset-paginated).
@@ -672,11 +777,12 @@ class MarketplaceReportService
         ?string $noteKey,
         array $noteParams,
         string $link,
-        string $ctaKey
+        string $ctaKey,
+        ?int $recipientOverride = null,
     ): void {
         $tenantId = (int) ($report->tenant_id ?: TenantContext::getId());
         $reportId = (int) $report->id;
-        $recipientUserId = (int) $report->reporter_id;
+        $recipientUserId = $recipientOverride ?? (int) $report->reporter_id;
 
         if ($tenantId <= 0 || $reportId <= 0 || $recipientUserId <= 0) {
             Log::warning('[MarketplaceReportService] skipped report notification with missing identifiers', [
@@ -706,7 +812,7 @@ class MarketplaceReportService
         ];
 
         foreach (['bell', 'email'] as $channel) {
-            $dedupeKey = "marketplace_report:{$reportId}:{$eventType}";
+            $dedupeKey = "marketplace_report:{$reportId}:{$eventType}:{$recipientUserId}";
 
             DB::table('marketplace_report_notifications')->insertOrIgnore([
                 'tenant_id' => $tenantId,
@@ -840,27 +946,40 @@ class MarketplaceReportService
         $bodyKey = (string) ($payload['body_key'] ?? '');
         $bodyParams = is_array($payload['body_params'] ?? null) ? $payload['body_params'] : [];
         $link = (string) ($payload['link'] ?? '');
+        $tenantId = (int) TenantContext::getId();
 
-        if ($bodyKey === '') {
+        if ($bodyKey === '' || $tenantId <= 0) {
             return false;
         }
 
-        $message = trim(strip_tags(__($bodyKey, $bodyParams)));
-        if ($message === '') {
+        $recipient = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'preferred_language'])
+            ->first();
+
+        if (!$recipient) {
             return false;
         }
 
-        Notification::createNotification(
-            $userId,
-            $message,
-            $link,
-            'marketplace_report_' . $eventType,
-            true,
-            TenantContext::getId()
-        );
-        \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'marketplace_report_' . $eventType, $message, $link);
+        return (bool) LocaleContext::withLocale($recipient, function () use ($userId, $eventType, $bodyKey, $bodyParams, $link, $tenantId): bool {
+            $message = trim(strip_tags(__($bodyKey, $bodyParams)));
+            if ($message === '') {
+                return false;
+            }
 
-        return true;
+            Notification::createNotification(
+                $userId,
+                $message,
+                $link,
+                'marketplace_report_' . $eventType,
+                true,
+                $tenantId
+            );
+            \App\Services\NotificationDispatcher::fanOutPush($userId, 'marketplace_report_' . $eventType, $message, $link);
+
+            return true;
+        });
     }
 
     /**
@@ -941,6 +1060,7 @@ class MarketplaceReportService
             'resolution_reason' => $report->resolution_reason,
             'action_taken' => $report->action_taken,
             'appeal_text' => $report->appeal_text,
+            'appealed_by' => $report->appealed_by,
             'appeal_resolved_at' => $report->appeal_resolved_at?->toISOString(),
             'transparency_report_included' => $report->transparency_report_included,
             'listing' => $report->listing ? [
@@ -966,15 +1086,82 @@ class MarketplaceReportService
     //  Enforcement helpers
     // -----------------------------------------------------------------
 
+    /** @return array<string,mixed> */
+    private static function captureEnforcementSnapshot(int $listingId): array
+    {
+        $listing = MarketplaceListing::query()->whereKey($listingId)->first();
+        if (! $listing) {
+            return [];
+        }
+
+        $profile = MarketplaceSellerProfile::query()
+            ->where('user_id', $listing->user_id)
+            ->first();
+
+        return [
+            'listing_id' => (int) $listing->id,
+            'seller_id' => (int) $listing->user_id,
+            'listings' => MarketplaceListing::query()
+                ->where('user_id', $listing->user_id)
+                ->get(['id', 'status', 'moderation_status'])
+                ->map(fn (MarketplaceListing $item): array => [
+                    'id' => (int) $item->id,
+                    'status' => (string) $item->status,
+                    'moderation_status' => (string) $item->moderation_status,
+                ])
+                ->all(),
+            'seller_profile' => $profile ? [
+                'is_suspended' => (bool) $profile->is_suspended,
+                'is_community_endorsed' => (bool) $profile->is_community_endorsed,
+            ] : null,
+        ];
+    }
+
+    /** Restore the exact pre-enforcement listing and seller state. */
+    private static function restoreEnforcementSnapshot(MarketplaceReport $report): void
+    {
+        $snapshot = $report->enforcement_snapshot;
+        if (! is_array($snapshot)) {
+            return;
+        }
+
+        foreach (($snapshot['listings'] ?? []) as $listingState) {
+            if (! is_array($listingState) || ! isset($listingState['id'])) {
+                continue;
+            }
+            MarketplaceListing::query()
+                ->whereKey((int) $listingState['id'])
+                ->where('marketplace_enforcement_report_id', $report->id)
+                ->update([
+                    'status' => (string) ($listingState['status'] ?? 'inactive'),
+                    'moderation_status' => (string) ($listingState['moderation_status'] ?? 'pending'),
+                    'marketplace_enforcement_report_id' => null,
+                ]);
+        }
+
+        $profileState = $snapshot['seller_profile'] ?? null;
+        if (is_array($profileState) && isset($snapshot['seller_id'])) {
+            MarketplaceSellerProfile::query()
+                ->where('user_id', (int) $snapshot['seller_id'])
+                ->where('marketplace_suspension_report_id', $report->id)
+                ->update([
+                    'is_suspended' => (bool) ($profileState['is_suspended'] ?? false),
+                    'is_community_endorsed' => (bool) ($profileState['is_community_endorsed'] ?? false),
+                    'marketplace_suspension_report_id' => null,
+                ]);
+        }
+    }
+
     /**
      * Remove a listing by setting its status to 'removed'.
      */
-    private static function removeListing(int $listingId): void
+    private static function removeListing(int $listingId, int $reportId): void
     {
         MarketplaceListing::where('id', $listingId)
             ->update([
                 'status' => 'removed',
                 'moderation_status' => 'rejected',
+                'marketplace_enforcement_report_id' => $reportId,
             ]);
     }
 
@@ -983,7 +1170,7 @@ class MarketplaceReportService
      * Deactivates all their active listings and sets is_suspended = true to
      * prevent them from creating new listings.
      */
-    private static function suspendSeller(int $listingId): void
+    private static function suspendSeller(int $listingId, int $reportId): void
     {
         $listing = MarketplaceListing::find($listingId);
         if (!$listing) {
@@ -995,12 +1182,14 @@ class MarketplaceReportService
             ->update([
                 'status' => 'removed',
                 'moderation_status' => 'rejected',
+                'marketplace_enforcement_report_id' => $reportId,
             ]);
 
         MarketplaceSellerProfile::where('user_id', $listing->user_id)
             ->update([
                 'is_community_endorsed' => false,
                 'is_suspended'          => true,
+                'marketplace_suspension_report_id' => $reportId,
             ]);
     }
 }

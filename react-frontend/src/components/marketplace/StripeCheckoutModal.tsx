@@ -21,6 +21,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 import { logError } from '@/lib/logger';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stripe imports — packages are installed via @stripe/react-stripe-js
@@ -57,12 +58,7 @@ interface StripeCheckoutModalProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function formatAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: currency || 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  return formatMarketplaceCurrency(amount, currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

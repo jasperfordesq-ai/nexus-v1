@@ -10,6 +10,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,10 @@ class MarketplacePaymentControllerTest extends TestCase
         ]);
 
         TenantContext::setById($tenantId);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            true,
+        );
     }
 
     public function test_create_intent_requires_auth(): void
@@ -67,6 +72,24 @@ class MarketplacePaymentControllerTest extends TestCase
         ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_create_intent_returns_403_when_card_payments_disabled(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            false,
+        );
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->apiPost('/v2/marketplace/payments/create-intent', [
+            'order_id' => 1,
+        ]);
+
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.message', __('api.marketplace_stripe_disabled'));
     }
 
     public function test_create_intent_validates_order_id(): void
@@ -146,6 +169,47 @@ class MarketplacePaymentControllerTest extends TestCase
         $response = $this->apiGet('/v2/marketplace/payments/9999999/status');
 
         $response->assertStatus(404);
+    }
+
+    public function test_status_serializes_all_money_fields_as_json_numbers(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $seller = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $listingId = $this->createListing($this->testTenantId, (int) $seller->id);
+        $orderId = $this->createOrder(
+            $this->testTenantId,
+            (int) $buyer->id,
+            (int) $seller->id,
+            $listingId,
+            'pi_numeric_contract'
+        );
+        $paymentId = (int) DB::table('marketplace_payments')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'order_id' => $orderId,
+            'stripe_payment_intent_id' => 'pi_numeric_contract',
+            'amount' => 25.50,
+            'currency' => 'EUR',
+            'platform_fee' => 2.55,
+            'seller_payout' => 22.95,
+            'status' => 'partially_refunded',
+            'refund_amount' => 5.25,
+            'payout_status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Sanctum::actingAs($buyer);
+
+        $response = $this->apiGet("/v2/marketplace/payments/{$paymentId}/status");
+
+        $response->assertOk()
+            ->assertJsonPath('data.amount', 25.5)
+            ->assertJsonPath('data.platform_fee', 2.55)
+            ->assertJsonPath('data.seller_payout', 22.95)
+            ->assertJsonPath('data.refund_amount', 5.25);
+        foreach (['amount', 'platform_fee', 'seller_payout', 'refund_amount'] as $field) {
+            $this->assertIsFloat($response->json("data.{$field}"));
+        }
     }
 
     public function test_balance_requires_auth(): void

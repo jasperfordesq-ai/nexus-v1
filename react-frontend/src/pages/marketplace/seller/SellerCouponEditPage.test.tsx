@@ -13,6 +13,10 @@ const mockNavigate = vi.fn();
 
 vi.mock('@/contexts', () =>
   createMockContexts({
+    useAuth: () => ({
+      user: { id: 1, name: 'Coupon Seller' },
+      isAuthenticated: true,
+    }),
     useToast: () => mockToast,
     useTenant: () => ({
       tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
@@ -73,6 +77,7 @@ const mockCoupon = {
   valid_until: null,
   status: 'draft',
   applies_to: 'all_listings',
+  applies_to_ids: null,
 };
 
 describe('SellerCouponEditPage — create mode', () => {
@@ -202,6 +207,53 @@ describe('SellerCouponEditPage — edit mode', () => {
         expect.objectContaining({ title: 'Save 10%' })
       );
       expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('loads and preserves specific listing targets in the coupon payload', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url === '/v2/marketplace/seller/coupons') {
+        return {
+          success: true,
+          data: {
+            items: [{
+              ...mockCoupon,
+              applies_to: 'listing_ids',
+              applies_to_ids: [101],
+            }],
+          },
+        };
+      }
+
+      if (url.includes('/v2/marketplace/listings?user_id=')) {
+        return {
+          success: true,
+          data: [{ id: 101, title: 'Target listing' }],
+        };
+      }
+
+      return { success: false, error: 'Unexpected endpoint' };
+    });
+    vi.mocked(api.put).mockResolvedValue({ success: true, data: {} });
+
+    render(<SellerCouponEditPage />);
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(
+        expect.stringContaining('/v2/marketplace/listings?user_id=1'),
+      );
+    });
+    expect(screen.getAllByText('Target listing')).not.toHaveLength(0);
+    fireEvent.submit(document.querySelector('form')!);
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith(
+        '/v2/marketplace/seller/coupons/5',
+        expect.objectContaining({
+          applies_to: 'listing_ids',
+          applies_to_ids: [101],
+        }),
+      );
     });
   });
 

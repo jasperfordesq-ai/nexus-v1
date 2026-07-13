@@ -120,6 +120,17 @@ describe('BuyerOrdersPage', () => {
     expect(screen.getByText(/Bob Seller/)).toBeInTheDocument();
   });
 
+  it('renders historical orders whose listing has been removed', async () => {
+    mockApi.get.mockResolvedValue(makeResponse([makeOrder({ listing: null })]));
+    const { BuyerOrdersPage } = await import('./BuyerOrdersPage');
+    render(<BuyerOrdersPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/listing.*not.found/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/Bob Seller/)).toBeInTheDocument();
+    });
+  });
+
   it('shows the order status badge', async () => {
     mockApi.get.mockResolvedValue(makeResponse([makeOrder({ status: 'shipped' })]));
     const { BuyerOrdersPage } = await import('./BuyerOrdersPage');

@@ -51,12 +51,14 @@ vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
 }));
 
+vi.mock('@/components/seo/PageMeta', () => ({
+  PageMeta: () => null,
+}));
+
 // Mock useConfirm so delete flows work without a real dialog
 const mockConfirm = vi.fn(async () => true);
-vi.mock('@/components/ui', async (importOriginal) => {
-  const original = await importOriginal<typeof import('@/components/ui')>();
+vi.mock('@/components/ui/ConfirmDialog', () => {
   return {
-    ...original,
     useConfirm: () => mockConfirm,
   };
 });
@@ -162,7 +164,14 @@ describe('SellerPickupSlotsPage', () => {
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {
+      expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+        title: expect.any(String),
+        status: 'danger',
+        confirmLabel: expect.any(String),
+      }));
       expect(api.delete).toHaveBeenCalledWith('/v2/marketplace/seller/pickup-slots/1');
+      expect(screen.queryByText(/2\/5/)).not.toBeInTheDocument();
+      expect(mockToast.success).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -180,8 +189,12 @@ describe('SellerPickupSlotsPage', () => {
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {
-      expect(api.delete).not.toHaveBeenCalled();
+      expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
+        status: 'danger',
+      }));
     });
+    expect(api.delete).not.toHaveBeenCalled();
+    expect(screen.getByText(/2\/5/)).toBeInTheDocument();
   });
 
   it('calls api.get on /v2/marketplace/seller/pickup-slots', async () => {

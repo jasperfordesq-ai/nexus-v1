@@ -200,7 +200,9 @@ describe('MarketplaceMapSearchPage', () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getAllByText('Map search failed. Please try again.').length).toBeGreaterThan(0);
     });
+    expect(screen.queryByText('No Nearby Listings')).not.toBeInTheDocument();
   });
 
   it('shows listing title in the sidebar list when listings are loaded', async () => {
@@ -275,8 +277,10 @@ describe('MarketplaceMapSearchPage', () => {
       expect(nearbyCalled).toBe(true);
       const nearbyCall = mockApi.get.mock.calls.find((c: string[]) => c[0].includes('/nearby'));
       expect(nearbyCall).toBeDefined();
-      expect(nearbyCall![0]).toContain('lat=');
-      expect(nearbyCall![0]).toContain('lng=');
+      expect(nearbyCall![0]).toContain('latitude=53.3');
+      expect(nearbyCall![0]).toContain('longitude=-6.3');
+      expect(nearbyCall![0]).toContain('radius=25');
+      expect(nearbyCall![0]).not.toContain('radius_km=');
     });
   });
 });

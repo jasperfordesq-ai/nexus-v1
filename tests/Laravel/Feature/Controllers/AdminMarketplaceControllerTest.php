@@ -215,4 +215,48 @@ class AdminMarketplaceControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_suspend_seller_persists_account_flag_and_removes_active_listings(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $this->adminUser();
+        $seller = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $profileId = (int) DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'display_name' => 'Suspension fixture',
+            'seller_type' => 'private',
+            'is_suspended' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Active seller listing',
+            'description' => 'Must be removed when the seller is suspended.',
+            'price_currency' => 'EUR',
+            'price_type' => 'free',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/admin/marketplace/sellers/{$profileId}/suspend");
+
+        $response->assertOk();
+        $this->assertDatabaseHas('marketplace_seller_profiles', [
+            'id' => $profileId,
+            'is_suspended' => 1,
+        ]);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'removed',
+            'moderation_status' => 'rejected',
+        ]);
+    }
 }

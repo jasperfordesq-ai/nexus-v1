@@ -163,7 +163,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.coupons.redemptionMember': `Member #${String(opts?.member ?? '')}`,
     'tools.coupons.redemptionMethod': `Method: ${String(opts?.method ?? '')}`,
     'tools.coupons.dateUnknown': 'Date unavailable',
-    'publicCoupons.fixedValue': `EUR ${String(opts?.value ?? '')} off`,
+    'publicCoupons.fixedValue': `${String(opts?.value ?? '')} off`,
     'publicCoupons.bogo': 'BOGO',
     'tools.coupons.discountTypes.percent': 'Percent',
     'tools.coupons.discountTypes.fixed': 'Fixed',
@@ -227,7 +227,7 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
-  useTenant: () => ({ hasFeature: mockHasFeature }),
+  useTenant: () => ({ tenant: { currency: 'GBP' }, hasFeature: mockHasFeature }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -447,6 +447,22 @@ describe('MarketplaceToolsRoute', () => {
       }));
       expect(getMyMarketplacePromotions).toHaveBeenCalledTimes(2);
     });
+  });
+
+  it('does not force decimals for zero-decimal promotion currencies', async () => {
+    mockParams = { tab: 'promotions' };
+    jest.mocked(getMyMarketplaceListings).mockResolvedValue({
+      data: [{ id: 42, title: 'Promotable lamp', price: 2500, price_currency: 'JPY', price_type: 'fixed', image: null }],
+      meta: { cursor: null, has_more: false },
+    } as never);
+    jest.mocked(getMarketplacePromotionProducts).mockResolvedValue({
+      data: [{ type: 'featured', label: 'Featured', description: 'Highlight this listing', price: 500, currency: 'JPY', duration_hours: 168 }],
+    } as never);
+
+    const { findByText, queryByText } = render(<MarketplaceToolsRoute />);
+
+    expect(await findByText(/JPY\s*500/)).toBeTruthy();
+    expect(queryByText(/500\.00/)).toBeNull();
   });
 
   it('creates pickup slots with selected capacity and recurrence', async () => {

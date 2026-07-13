@@ -1518,6 +1518,7 @@
       "all_listings": "All my listings",
       "specific_listings": "Specific listings",
       "specific_categories": "Specific categories",
+      "target_required": "Choose at least one listing or category",
       "save": "Save",
       "delete_confirm": "Delete this coupon? This cannot be undone.",
       "no_coupons": "You have not created any coupons yet.",

@@ -76,7 +76,10 @@
                 $oNumber = (string) ($order['order_number'] ?? $order['id'] ?? '');
                 $oStatus = (string) ($order['status'] ?? '');
                 $oTitle = trim((string) ($order['listing']['title'] ?? '')) ?: __('govuk_alpha.marketplace.title');
-                $total = trim(trim((string) ($order['currency'] ?? '')) . ' ' . number_format((float) ($order['total_price'] ?? 0), 2));
+                $total = \App\Support\MarketplaceMoneyFormatter::format(
+                    (float) ($order['total_price'] ?? 0),
+                    (string) ($order['currency'] ?? ''),
+                );
                 $counterparty = $isSeller ? ($order['buyer']['name'] ?? '') : ($order['seller']['name'] ?? '');
                 $tracking = trim((string) ($order['tracking_number'] ?? ''));
                 $orderId = (int) ($order['id'] ?? 0);

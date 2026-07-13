@@ -41,6 +41,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { formatMarketplaceCurrency, normalizeMarketplaceListing } from '@/lib/marketplaceNumbers';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { MAPS_ENABLED } from '@/lib/map-config';
@@ -85,7 +86,7 @@ export function MarketplaceMapSearchPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('map.page_title'));
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenant, tenantPath, hasFeature } = useTenant();
   const toast = useToast();
 
   // Maps kill switch: this is a map-first page, so when maps are off for the
@@ -106,12 +107,20 @@ export function MarketplaceMapSearchPage() {
   // Data
   const [listings, setListings] = useState<(MarketplaceListingItem & { latitude?: number; longitude?: number; distance_km?: number })[]>([]);
   const [categories, setCategories] = useState<ApiCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const urlLatitude = Number(searchParams.get('lat'));
+  const urlLongitude = Number(searchParams.get('lng'));
+  const hasUrlCenter = searchParams.has('lat')
+    && searchParams.has('lng')
+    && Number.isFinite(urlLatitude)
+    && Number.isFinite(urlLongitude);
 
   // Map center — prefer URL params, fall back to user profile location
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(() => {
-    if (searchParams.get('lat') && searchParams.get('lng')) {
-      return { lat: parseFloat(searchParams.get('lat')!), lng: parseFloat(searchParams.get('lng')!) };
+    if (hasUrlCenter) {
+      return { lat: urlLatitude, lng: urlLongitude };
     }
     if (user?.latitude != null && user?.longitude != null) {
       return { lat: user.latitude, lng: user.longitude };
@@ -120,6 +129,8 @@ export function MarketplaceMapSearchPage() {
   });
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listingRequestRef = useRef(0);
+  const persistCoordinatesRef = useRef(hasUrlCenter);
 
   // Debounce search input
   useEffect(() => {
@@ -151,14 +162,19 @@ export function MarketplaceMapSearchPage() {
 
   // Load nearby listings
   const loadListings = useCallback(async () => {
-    if (!mapCenter || !canUseMaps) return;
+    if (!mapCenter || !canUseMaps) {
+      setIsLoading(false);
+      return;
+    }
 
+    const requestId = ++listingRequestRef.current;
     setIsLoading(true);
+    setLoadError(null);
     try {
       const params = new URLSearchParams();
-      params.set('lat', String(mapCenter.lat));
-      params.set('lng', String(mapCenter.lng));
-      params.set('radius_km', radiusKm);
+      params.set('latitude', String(mapCenter.lat));
+      params.set('longitude', String(mapCenter.lng));
+      params.set('radius', radiusKm);
       if (debouncedQuery) params.set('q', debouncedQuery);
       if (categoryId) params.set('category_id', categoryId);
       params.set('limit', '100');
@@ -166,8 +182,10 @@ export function MarketplaceMapSearchPage() {
       const response = await api.get<NearbyListing[]>(
         `/v2/marketplace/listings/nearby?${params}`
       );
+      if (requestId !== listingRequestRef.current) return;
       if (response.success && response.data) {
-        const mapped = response.data.map((item) => ({
+        setLoadError(null);
+        const mapped = response.data.map((item) => normalizeMarketplaceListing({
           ...(item as unknown as MarketplaceListingItem),
           latitude: item.latitude,
           longitude: item.longitude,
@@ -175,13 +193,18 @@ export function MarketplaceMapSearchPage() {
         }));
         setListings(mapped);
       } else {
-        setListings([]);
+        const message = t('map.search_failed');
+        setLoadError(message);
+        toast.error(message);
       }
     } catch (err) {
+      if (requestId !== listingRequestRef.current) return;
       logError('Failed to load nearby listings', err);
-      toast.error(t('map.search_failed'));
+      const message = t('map.search_failed');
+      setLoadError(message);
+      toast.error(message);
     } finally {
-      setIsLoading(false);
+      if (requestId === listingRequestRef.current) setIsLoading(false);
     }
   }, [mapCenter, radiusKm, debouncedQuery, categoryId, canUseMaps, toast, t]);
 
@@ -196,7 +219,7 @@ export function MarketplaceMapSearchPage() {
     if (debouncedQuery) params.set('q', debouncedQuery);
     if (categoryId) params.set('category_id', categoryId);
     if (radiusKm !== String(DEFAULT_RADIUS_KM)) params.set('radius', radiusKm);
-    if (mapCenter) {
+    if (mapCenter && persistCoordinatesRef.current) {
       params.set('lat', String(mapCenter.lat));
       params.set('lng', String(mapCenter.lng));
     }
@@ -206,6 +229,7 @@ export function MarketplaceMapSearchPage() {
   // "Use my location" handler — centres map on the user's profile location
   const handleUseMyLocation = useCallback(() => {
     if (user?.latitude != null && user?.longitude != null) {
+      persistCoordinatesRef.current = false;
       setMapCenter({ lat: user.latitude, lng: user.longitude });
     } else {
       toast.error(t('map.location_required'));
@@ -387,7 +411,7 @@ export function MarketplaceMapSearchPage() {
         )}
 
         {/* Results info */}
-        {!isLoading && listings.length > 0 && (
+        {!isLoading && !loadError && listings.length > 0 && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted">
               {t('map.results_count', { count: listings.length })}
@@ -413,6 +437,12 @@ export function MarketplaceMapSearchPage() {
                 <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-12">
                   <Spinner size="lg" color="accent" />
                 </div>
+              ) : loadError ? (
+                <EmptyState
+                  icon={<Search className="w-6 h-6" />}
+                  title={loadError}
+                  action={{ label: t('common.try_again'), onClick: loadListings }}
+                />
               ) : listings.length === 0 ? (
                 <EmptyState
                   icon={<Search className="w-6 h-6" />}
@@ -453,12 +483,10 @@ export function MarketplaceMapSearchPage() {
                             <p className="text-sm font-bold text-accent mt-0.5">
                               {listing.price_type === 'free' || listing.price === null || listing.price === 0
                                 ? t('price.free')
-                                : new Intl.NumberFormat(undefined, {
-                                    style: 'currency',
-                                    currency: listing.price_currency || 'EUR',
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 2,
-                                  }).format(listing.price)}
+                                : formatMarketplaceCurrency(
+                                  listing.price,
+                                  listing.price_currency || tenant?.currency || '',
+                                )}
                             </p>
                             {listing.distance_km != null && (
                               <p className="text-xs text-muted mt-0.5">
@@ -481,15 +509,26 @@ export function MarketplaceMapSearchPage() {
           <div className="flex-1 min-w-0">
             {/* Desktop: always show map. Mobile: depends on viewMode */}
             <div className={viewMode === 'list' ? 'hidden lg:block' : ''}>
-              <MapSearchView
-                listings={listings}
-                center={mapCenter}
-                zoom={12}
-                height="calc(100vh - 280px)"
-                isLoading={isLoading && !listings.length}
-                onRequestLocation={handleUseMyLocation}
-                locationLoading={false}
-              />
+              {loadError && (
+                <div className="lg:hidden">
+                  <EmptyState
+                    icon={<Search className="w-6 h-6" />}
+                    title={loadError}
+                    action={{ label: t('common.try_again'), onClick: loadListings }}
+                  />
+                </div>
+              )}
+              <div className={loadError ? 'hidden lg:block' : ''}>
+                <MapSearchView
+                  listings={listings}
+                  center={mapCenter}
+                  zoom={12}
+                  height="calc(100vh - 280px)"
+                  isLoading={isLoading && !listings.length}
+                  onRequestLocation={handleUseMyLocation}
+                  locationLoading={false}
+                />
+              </div>
             </div>
 
             {/* Mobile list view */}
@@ -498,6 +537,12 @@ export function MarketplaceMapSearchPage() {
                 <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-12">
                   <Spinner size="lg" color="accent" />
                 </div>
+              ) : loadError ? (
+                <EmptyState
+                  icon={<Search className="w-6 h-6" />}
+                  title={loadError}
+                  action={{ label: t('common.try_again'), onClick: loadListings }}
+                />
               ) : listings.length === 0 ? (
                 <EmptyState
                   icon={<Search className="w-6 h-6" />}

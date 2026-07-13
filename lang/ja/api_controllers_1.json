@@ -100,7 +100,9 @@
         "seller_verified": "販売者を認証しました。",
         "seller_suspended": "販売者を停止し、すべての出品を無効化しました。",
         "report_acknowledged": "レポートを確認しました。",
-        "report_resolved": "レポートを解決しました。"
+        "report_resolved": "レポートを解決しました。",
+        "report_appeal_resolved": "報告への異議申し立てを解決しました。",
+        "dispute_resolved": "紛争を解決しました。"
     },
     "admin_newsletter": {
         "newsletter_queued": ":count 名の受信者向けにニュースレターをキューに追加しました",

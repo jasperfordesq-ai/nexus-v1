@@ -10,10 +10,12 @@ import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
 
 // ─── Hoist mock data ─────────────────────────────────────────────────────────
-const { mockApi, mockToast, mockNavigate } = vi.hoisted(() => ({
+const { mockApi, mockToast, mockNavigate, mockClearDraft, mockTenantState } = vi.hoisted(() => ({
   mockApi: { get: vi.fn(), post: vi.fn(), upload: vi.fn() },
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockNavigate: vi.fn(),
+  mockClearDraft: vi.fn(),
+  mockTenantState: { currency: 'EUR' },
 }));
 
 // ─── Module mocks ────────────────────────────────────────────────────────────
@@ -39,7 +41,7 @@ vi.mock('@/contexts', () =>
       updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle' as const, error: null,
     }),
     useTenant: () => ({
-      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenant: { id: 2, name: 'Test', slug: 'test', currency: mockTenantState.currency },
       tenantPath: (p: string) => `/test${p}`,
       hasFeature: vi.fn(() => true),
       hasModule: vi.fn(() => true),
@@ -54,7 +56,7 @@ vi.mock('@/hooks', () => ({
     initial: T
   ): [T, (updater: (prev: T) => T) => void, () => void] => {
     const [state, setState] = React.useState<T>(initial);
-    return [state, (updater) => setState(updater), vi.fn()];
+    return [state, (updater) => setState(updater), mockClearDraft];
   },
 }));
 
@@ -148,6 +150,7 @@ const makeCategories = () => [
 describe('CreateMarketplaceListingPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockTenantState.currency = 'EUR';
     mockApi.get.mockImplementation((url: string) => {
       if (url === '/v2/marketplace/categories') {
         return Promise.resolve({ success: true, data: makeCategories() });
@@ -335,6 +338,47 @@ describe('CreateMarketplaceListingPage', () => {
         expect.stringContaining('77')
       ));
     }
+  });
+
+  it('initializes a new listing with the tenant payment currency', async () => {
+    mockTenantState.currency = 'jpy';
+    const { CreateMarketplaceListingPage } = await import('./CreateMarketplaceListingPage');
+
+    render(<CreateMarketplaceListingPage />);
+
+    expect(screen.getByDisplayValue('JPY')).toBeInTheDocument();
+  });
+
+  it('routes to edit without reporting success when image upload resolves with success false', async () => {
+    mockApi.upload.mockResolvedValueOnce({ success: false, error: 'Image rejected' });
+    const { CreateMarketplaceListingPage } = await import('./CreateMarketplaceListingPage');
+    render(<CreateMarketplaceListingPage />);
+    await waitFor(() => mockApi.get.mock.calls.length > 0);
+
+    const textboxes = screen.getAllByRole('textbox');
+    await userEvent.type(textboxes[0], 'Listing with image');
+    const description = textboxes.find((element) => element.tagName === 'TEXTAREA');
+    if (description) await userEvent.type(description, 'Description for image failure test');
+    const freeRadio = screen.queryAllByRole('radio').find(
+      (element) => (element as HTMLInputElement).value === 'free',
+    );
+    if (freeRadio) await userEvent.click(freeRadio);
+
+    const imageInput = document.querySelector('input[type="file"][accept="image/*"]') as HTMLInputElement;
+    fireEvent.change(imageInput, {
+      target: { files: [new File(['image'], 'photo.jpg', { type: 'image/jpeg' })] },
+    });
+
+    const publishButton = screen.getAllByRole('button').find(
+      (button) => button.getAttribute('data-disabled') !== 'true'
+        && /publish|submit/i.test(button.textContent ?? ''),
+    );
+    if (publishButton) await userEvent.click(publishButton);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Image rejected'));
+    expect(mockToast.success).not.toHaveBeenCalled();
+    expect(mockClearDraft).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('/test/marketplace/77/edit');
   });
 
   it('shows error toast when API POST fails', async () => {

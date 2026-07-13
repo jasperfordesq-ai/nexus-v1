@@ -854,6 +854,9 @@
     "start_error": "Échec du démarrage de l'intégration"
   },
   "checkout": {
+    "payment_method_label": "Choisissez votre mode de paiement",
+    "pay_with_money": "Payer {{amount}}",
+    "pay_with_time_credits": "Payer avec {{count}} crédits-temps",
     "title": "Paiement sécurisé",
     "order_summary": "Récapitulatif de la commande",
     "shipping": "Livraison",

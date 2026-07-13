@@ -11,6 +11,7 @@ use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MarketplaceOffer;
 use App\Models\User;
 use App\Services\MarketplaceOfferService;
+use App\Services\MarketplaceOrderService;
 use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -101,6 +102,50 @@ class MarketplaceOfferServiceTest extends TestCase
             ->value('contacts_count'));
     }
 
+    public function test_create_rejects_fractional_offer_for_zero_decimal_currency(): void
+    {
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'JPY offer precision',
+            'description' => 'Offer amount precision regression.',
+            'price' => 1000,
+            'price_currency' => 'JPY',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'contacts_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        try {
+            MarketplaceOfferService::create((int) $buyer->id, $listingId, [
+                'amount' => 0.01,
+                'currency' => 'JPY',
+            ]);
+            $this->fail('Expected zero-decimal precision rejection');
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertSame(
+                __('api.marketplace_payment_currency_precision_invalid'),
+                $exception->getMessage(),
+            );
+        }
+
+        $this->assertDatabaseMissing('marketplace_offers', [
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+        ]);
+        $this->assertSame(0, (int) DB::table('marketplace_listings')
+            ->where('id', $listingId)
+            ->value('contacts_count'));
+    }
+
     public function test_counter_denial_leaves_offer_unchanged(): void
     {
         $offer = Mockery::mock(MarketplaceOffer::class)->makePartial();
@@ -177,5 +222,114 @@ class MarketplaceOfferServiceTest extends TestCase
         $this->expectExceptionMessage('has not been countered');
 
         MarketplaceOfferService::acceptCounter($offer, 5);
+    }
+
+    public function test_expireStaleOffers_expires_unconverted_accepted_offer_and_releases_listing(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Expired accepted reservation',
+            'description' => 'The listing should become available again.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'inventory_count' => 1,
+            'quantity' => 1,
+            'status' => 'reserved',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offerId = (int) DB::table('marketplace_offers')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'amount' => 9,
+            'currency' => 'EUR',
+            'status' => 'accepted',
+            'accepted_at' => now()->subDays(3),
+            'expires_at' => now()->subMinute(),
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDays(3),
+        ]);
+
+        MarketplaceOfferService::expireStaleOffers();
+
+        $this->assertDatabaseHas('marketplace_offers', [
+            'id' => $offerId,
+            'status' => 'expired',
+        ]);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_expireStaleOffers_keeps_accepted_offer_with_live_order(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $seller = User::factory()->forTenant($this->testTenantId)->create();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Converted accepted reservation',
+            'description' => 'A live order protects the accepted offer record.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'inventory_count' => 1,
+            'quantity' => 1,
+            'status' => 'reserved',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offerId = (int) DB::table('marketplace_offers')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'amount' => 9,
+            'currency' => 'EUR',
+            'status' => 'accepted',
+            'accepted_at' => now()->subDays(3),
+            'expires_at' => now()->subMinute(),
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDays(3),
+        ]);
+        DB::table('marketplace_orders')->insert([
+            'tenant_id' => $this->testTenantId,
+            'order_number' => MarketplaceOrderService::generateOrderNumber($this->testTenantId),
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'marketplace_listing_id' => $listingId,
+            'marketplace_offer_id' => $offerId,
+            'quantity' => 1,
+            'unit_price' => 9,
+            'total_price' => 9,
+            'currency' => 'EUR',
+            'status' => 'pending_payment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        MarketplaceOfferService::expireStaleOffers();
+
+        $this->assertDatabaseHas('marketplace_offers', [
+            'id' => $offerId,
+            'status' => 'accepted',
+        ]);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'reserved',
+        ]);
     }
 }

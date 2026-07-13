@@ -1,4 +1,8 @@
-import { getFormattingLocale } from '@/lib/helpers';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,15 +17,14 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Shield from 'lucide-react/icons/shield';
 import Users from 'lucide-react/icons/users';
+import Gavel from 'lucide-react/icons/gavel';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { getFormattingLocale } from '@/lib/helpers';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Admin Marketplace Dashboard
@@ -40,7 +43,9 @@ interface DashboardStats {
   total_sellers: number;
   pending_moderation: number;
   total_orders: number;
-  revenue: number;
+  revenue: number | null;
+  currency: string | null;
+  revenue_by_currency: Array<{ currency: string; total: number }>;
 }
 
 interface RecentListing {
@@ -85,9 +90,11 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 
 export function MarketplaceAdmin() {
   const { t } = useTranslation('admin_marketplace');
+  const { t: tc } = useTranslation('marketplace_cases');
+  const { t: tm } = useTranslation('marketplace');
   usePageTitle(t('marketplace.page_title'));
   const toast = useToast();
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentListings, setRecentListings] = useState<RecentListing[]>([]);
@@ -144,7 +151,7 @@ export function MarketplaceAdmin() {
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
           label={t('marketplace.stat_total_listings')}
           value={stats?.total_listings ?? 0}
@@ -180,10 +187,23 @@ export function MarketplaceAdmin() {
           color="default"
           loading={loading}
         />
+        <StatCard
+          label={tm('my_listings.stat_revenue')}
+          value={(stats?.revenue_by_currency?.length
+            ? stats.revenue_by_currency
+            : stats?.revenue != null && stats.currency
+              ? [{ total: stats.revenue, currency: stats.currency }]
+              : [])
+            .map((entry) => formatMarketplaceCurrency(entry.total, entry.currency))
+            .join(' · ') || '0'}
+          icon={DollarSign}
+          color="success"
+          loading={loading}
+        />
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Link to={tenantPath('/admin/marketplace/moderation')}>
           <Card isPressable className="w-full border border-divider/70 bg-surface transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
@@ -211,6 +231,20 @@ export function MarketplaceAdmin() {
                 <p className="text-sm text-muted">
                   {t('marketplace.seller_management_desc')}
                 </p>
+              </div>
+              <ChevronRight size={20} className="text-muted" />
+            </CardBody>
+          </Card>
+        </Link>
+        <Link to={tenantPath('/admin/marketplace/cases')}>
+          <Card isPressable className="w-full border border-divider/70 bg-surface transition-transform hover:-translate-y-0.5">
+            <CardBody className="flex flex-row items-center gap-4 p-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-danger/10 text-danger">
+                <Gavel size={24} aria-hidden="true" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-foreground">{tc('admin.title')}</p>
+                <p className="text-sm text-muted">{tc('admin.dashboard_description')}</p>
               </div>
               <ChevronRight size={20} className="text-muted" />
             </CardBody>
@@ -254,7 +288,12 @@ export function MarketplaceAdmin() {
                     </TableCell>
                     <TableCell className="text-muted">{listing.user?.name ?? '--'}</TableCell>
                     <TableCell className="text-muted">
-                      {listing.price_currency ?? ''}{(parseFloat(String(listing.price)) || 0).toFixed(2)}
+                      {listing.price_type === 'free'
+                        ? tm('price.free')
+                        : formatMarketplaceCurrency(
+                          parseFloat(String(listing.price)) || 0,
+                          listing.price_currency || tenant?.currency || '',
+                        )}
                     </TableCell>
                     <TableCell>
                       <Chip

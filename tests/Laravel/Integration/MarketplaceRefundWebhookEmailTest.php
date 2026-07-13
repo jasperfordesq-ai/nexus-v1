@@ -18,6 +18,12 @@ class MarketplaceRefundWebhookEmailTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['services.stripe.secret' => 'sk_test_marketplace_refund_webhook']);
+    }
+
     public function test_charge_refunded_webhook_notifies_buyer_and_seller_once(): void
     {
         $tenantId = $this->testTenantId;

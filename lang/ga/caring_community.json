@@ -19,7 +19,9 @@
       "invalid_listing": "Ní leis an díoltóir seo an liostú.",
       "listing_unavailable": "Níl an liostú seo ar fáil le haghaidh fuascailte dílseachta.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Níl an fhuascailt dílseachta seo ar fáil a thuilleadh.",
+      "redemption_mismatch": "Ní mheaitseálann an fhuascailt dílseachta seo an t-ordú margaidh roghnaithe."
     }
   },
   "survey": {

@@ -15,7 +15,10 @@
         $cardPrice = rtrim(rtrim(number_format($cardTc, 2), '0'), '.') . ' ' . __('govuk_alpha_commerce.common.credits_label');
         $cardTag = 'govuk-tag--blue';
     } elseif ($cardMoney > 0) {
-        $cardPrice = trim(trim((string) ($card['price_currency'] ?? '')) . ' ' . number_format($cardMoney, 2));
+        $cardPrice = \App\Support\MarketplaceMoneyFormatter::format(
+            $cardMoney,
+            (string) ($card['price_currency'] ?? ''),
+        );
         $cardTag = 'govuk-tag--grey';
     } else {
         $cardPrice = __('govuk_alpha_commerce.common.free');

@@ -835,6 +835,9 @@
     "start_error": "Starten van onboarding is mislukt"
   },
   "checkout": {
+    "payment_method_label": "Kies hoe u wilt betalen",
+    "pay_with_money": "Betaal {{amount}}",
+    "pay_with_time_credits": "Betaal met {{count}} tijdtegoeden",
     "title": "Veilig afrekenen",
     "order_summary": "Besteloverzicht",
     "shipping": "Verzending",

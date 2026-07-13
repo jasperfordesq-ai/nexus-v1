@@ -31,6 +31,7 @@ vi.mock('@/lib/api', () => {
 });
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');

@@ -38,12 +38,13 @@ import {
 } from '@/lib/api/marketplace';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 import { contrastText, withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatMarketplaceCurrency } from '@/lib/utils/marketplaceCurrency';
 
 type OrderMode = 'purchases' | 'sales';
 type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
@@ -61,12 +62,7 @@ const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
 };
 
 function formatOrderTotal(value: number, currency: string): string {
-  return new Intl.NumberFormat(dateLocale(), {
-    style: 'currency',
-    currency: currency || 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value);
+  return formatMarketplaceCurrency(value, currency);
 }
 
 function translatedOrderStatus(status: string, t: (key: string) => string): string {
@@ -647,9 +643,10 @@ function OrderCard({
   onDeliveryOffers: () => void;
 }) {
   const { t } = useTranslation('marketplace');
+  const { tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const total = formatOrderTotal(Number(item.total_price), item.currency || 'EUR');
+  const total = formatOrderTotal(Number(item.total_price), item.currency || tenant?.currency || '');
   const imageUrl = resolveImageUrl(item.listing?.image?.url);
   const counterparty = mode === 'purchases' ? item.seller : item.buyer;
   const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');

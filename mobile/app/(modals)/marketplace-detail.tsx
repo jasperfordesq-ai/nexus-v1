@@ -3,12 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { Image, Linking, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { ResizeMode, Video } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
+import { randomUUID } from 'expo-crypto';
 import { Button as HeroButton, CloseButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
@@ -28,12 +29,12 @@ import {
   createMarketplaceOrder,
   createMarketplacePaymentIntent,
   getMarketplaceListingPickupSlots,
+  getMarketplaceSellerShippingOptions,
   getMarketplaceSellerListings,
   getMarketplaceCollections,
   getMarketplaceListing,
   makeMarketplaceOffer,
   reportMarketplaceListing,
-  reserveMarketplacePickup,
   saveMarketplaceListing,
   unsaveMarketplaceListing,
   validateMarketplaceCoupon,
@@ -41,6 +42,7 @@ import {
   type MarketplaceListingDetail,
   type MarketplaceListingItem,
   type MarketplacePickupSlotOption,
+  type MarketplaceShippingOption,
 } from '@/lib/api/marketplace';
 import { APP_URL } from '@/lib/constants';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
@@ -60,17 +62,24 @@ export default function MarketplaceDetailRoute() {
 
 type ReportReason = 'counterfeit' | 'illegal' | 'unsafe' | 'misleading' | 'discrimination' | 'ip_violation' | 'other';
 const REPORT_REASONS: ReportReason[] = ['counterfeit', 'illegal', 'unsafe', 'misleading', 'discrimination', 'ip_violation', 'other'];
+type FulfilmentChoice = 'pickup' | `shipping:${number}`;
 
 function MarketplaceDetailScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const params = useLocalSearchParams<{ id?: string }>();
+  const params = useLocalSearchParams<{ id?: string; offer_id?: string; offer_amount?: string }>();
   const primary = usePrimaryColor();
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenant } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
   const { show: showToast } = useAppToast();
   const listingId = Number(params.id);
   const safeId = Number.isFinite(listingId) && listingId > 0 ? listingId : 0;
+  const parsedOfferId = Number(params.offer_id);
+  const acceptedOfferId = Number.isInteger(parsedOfferId) && parsedOfferId > 0 ? parsedOfferId : null;
+  const parsedOfferAmount = Number(params.offer_amount);
+  const acceptedOfferAmount = Number.isFinite(parsedOfferAmount) && parsedOfferAmount >= 0
+    ? parsedOfferAmount
+    : null;
   const [listing, setListing] = useState<MarketplaceListingDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -81,24 +90,32 @@ function MarketplaceDetailScreen() {
   const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const [pickupSlots, setPickupSlots] = useState<MarketplacePickupSlotOption[]>([]);
+  const [shippingOptions, setShippingOptions] = useState<MarketplaceShippingOption[]>([]);
+  const [isShippingLoading, setIsShippingLoading] = useState(false);
+  const [shippingLoadFailed, setShippingLoadFailed] = useState(false);
   const [sellerListings, setSellerListings] = useState<MarketplaceListingItem[]>([]);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+  const [fulfilmentChoice, setFulfilmentChoice] = useState<FulfilmentChoice | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState<'cash' | 'time_credits'>('cash');
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
   const [reportReason, setReportReason] = useState<ReportReason>('misleading');
   const [reportDescription, setReportDescription] = useState('');
+  const checkoutIdempotencyKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
+    checkoutIdempotencyKeyRef.current = null;
+    setCheckoutPaymentMethod('cash');
     void loadListing();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeId]);
+  }, [safeId, acceptedOfferId]);
 
   useEffect(() => {
     if (!listing || listing.is_own || (user?.id && listing.user?.id === user.id)) return;
     let mounted = true;
-    getMarketplaceListingPickupSlots(listing.id)
+    getMarketplaceListingPickupSlots(listing.id, acceptedOfferId)
       .then((response) => {
         if (mounted) setPickupSlots(response.data);
       })
@@ -108,7 +125,56 @@ function MarketplaceDetailScreen() {
     return () => {
       mounted = false;
     };
-  }, [listing, user?.id]);
+  }, [listing, user?.id, acceptedOfferId]);
+
+  useEffect(() => {
+    const deliveryMethod = listing?.delivery_method;
+    const supportsShipping = deliveryMethod === 'shipping' || deliveryMethod === 'both';
+    const supportsPickup = Boolean(listing?.local_pickup || deliveryMethod === 'pickup' || deliveryMethod === 'both');
+    const sellerUserId = listing?.user?.id;
+
+    if (!listing || !supportsShipping || !sellerUserId) {
+      setShippingOptions([]);
+      setShippingLoadFailed(false);
+      setIsShippingLoading(false);
+      setFulfilmentChoice(supportsPickup ? 'pickup' : null);
+      return undefined;
+    }
+
+    let mounted = true;
+    setIsShippingLoading(true);
+    setShippingLoadFailed(false);
+    setFulfilmentChoice(supportsPickup ? 'pickup' : null);
+
+    getMarketplaceSellerShippingOptions(sellerUserId)
+      .then((response) => {
+        if (!mounted) return;
+        const hasCashCheckout = listing.price_type === 'fixed' && Number(listing.price ?? 0) > 0;
+        const hasTimeCreditCheckout = Number(listing.time_credit_price ?? 0) > 0;
+        const requiresFreeShipping = listing.price_type === 'free'
+          || (hasTimeCreditCheckout && (!hasCashCheckout || checkoutPaymentMethod === 'time_credits'));
+        const activeOptions = response.data.filter((option) => option.is_active !== false
+          && (!requiresFreeShipping || Number(option.price ?? 0) <= 0));
+        setShippingOptions(activeOptions);
+        if (!supportsPickup) {
+          const defaultOption = activeOptions.find((option) => option.is_default) ?? activeOptions[0];
+          setFulfilmentChoice(defaultOption ? `shipping:${defaultOption.id}` : null);
+        }
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setShippingOptions([]);
+        setShippingLoadFailed(true);
+        if (!supportsPickup) setFulfilmentChoice(null);
+      })
+      .finally(() => {
+        if (mounted) setIsShippingLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [checkoutPaymentMethod, listing?.delivery_method, listing?.id, listing?.local_pickup, listing?.price, listing?.price_type, listing?.time_credit_price, listing?.user?.id]);
 
   useEffect(() => {
     const sellerId = listing?.user?.id;
@@ -137,7 +203,7 @@ function MarketplaceDetailScreen() {
     }
     setIsLoading(true);
     try {
-      const response = await getMarketplaceListing(safeId);
+      const response = await getMarketplaceListing(safeId, acceptedOfferId);
       setListing(response.data);
     } catch {
       setListing(null);
@@ -185,10 +251,47 @@ function MarketplaceDetailScreen() {
   const activeImageUrl = resolveImageUrl(images[activeImage]?.url ?? images[activeImage]?.thumbnail_url);
   const videoUrl = resolveImageUrl(listing.video_url);
   const accent = listing.price_type === 'free' ? theme.success : listing.is_promoted ? theme.warning : primary;
-  const priceLabel = formatMarketplacePrice(listing.price, listing.price_type, listing.price_currency, t('common.free'));
+  const isAcceptedOfferCheckout = acceptedOfferId !== null && acceptedOfferAmount !== null;
+  const checkoutMoneyPrice = isAcceptedOfferCheckout ? acceptedOfferAmount : Number(listing.price ?? 0);
+  const priceLabel = formatMarketplacePrice(
+    checkoutMoneyPrice,
+    isAcceptedOfferCheckout ? 'fixed' : listing.price_type,
+    listing.price_currency,
+    t('common.free'),
+    tenant?.currency,
+  );
   const isOwner = Boolean(listing.is_own || (user?.id && listing.user?.id === user.id));
-  const canBuy = !isOwner && listing.status === 'active' && listing.price_type !== 'contact' && listing.price_type !== 'auction';
-  const couponsEnabled = hasFeature('merchant_coupons');
+  const isActiveNonOwner = !isOwner && (
+    listing.status === 'active'
+    || (isAcceptedOfferCheckout && listing.status === 'reserved')
+  );
+  const isTimeCreditListing = !isAcceptedOfferCheckout && Number(listing.time_credit_price ?? 0) > 0;
+  const isCashCheckoutEligible = isAcceptedOfferCheckout
+    ? checkoutMoneyPrice > 0
+    : listing.price_type === 'fixed' && Number(listing.price ?? 0) > 0;
+  const isFreeCheckoutEligible = !isAcceptedOfferCheckout && listing.price_type === 'free';
+  const isHybridCheckout = isCashCheckoutEligible && isTimeCreditListing;
+  const effectivePaymentMethod: 'cash' | 'time_credits' | 'free' = isAcceptedOfferCheckout
+    ? 'cash'
+    : isFreeCheckoutEligible
+    ? 'free'
+    : isTimeCreditListing && !isCashCheckoutEligible
+      ? 'time_credits'
+      : checkoutPaymentMethod;
+  const canBuy = isActiveNonOwner
+    && (isCashCheckoutEligible || isFreeCheckoutEligible || isTimeCreditListing);
+  const supportsShipping = listing.delivery_method === 'shipping' || listing.delivery_method === 'both';
+  const supportsPickup = Boolean(listing.local_pickup || listing.delivery_method === 'pickup' || listing.delivery_method === 'both');
+  const selectedShippingOptionId = fulfilmentChoice?.startsWith('shipping:')
+    ? Number(fulfilmentChoice.slice('shipping:'.length))
+    : null;
+  const fulfilmentReady = !supportsShipping
+    || fulfilmentChoice === 'pickup'
+    || (selectedShippingOptionId !== null && shippingOptions.some((option) => option.id === selectedShippingOptionId));
+  const pickupSlotReady = fulfilmentChoice !== 'pickup'
+    || pickupSlots.length === 0
+    || selectedSlotId !== null;
+  const couponsEnabled = !isAcceptedOfferCheckout && hasFeature('merchant_coupons');
   const templateEntries = getListingTemplateEntries(listing.template_data);
 
   async function handleToggleSave() {
@@ -206,33 +309,66 @@ function MarketplaceDetailScreen() {
   }
 
   async function handleBuyNow() {
-    if (!listing || isActionLoading) return;
+    if (!listing || isActionLoading || !canBuy) return;
+    if (!fulfilmentReady || !pickupSlotReady) {
+      showToast({ title: t('common:errors.alertTitle'), description: t('checkout.deliveryRequired'), variant: 'warning' });
+      return;
+    }
     setIsActionLoading(true);
     try {
+      const idempotencyKey = checkoutIdempotencyKeyRef.current ?? `mobile-marketplace-${randomUUID()}`;
+      checkoutIdempotencyKeyRef.current = idempotencyKey;
       const response = await createMarketplaceOrder({
         listing_id: listing.id,
+        ...(acceptedOfferId ? { offer_id: acceptedOfferId } : {}),
         quantity: 1,
-        coupon_code: couponApplied && couponCode.trim() ? couponCode.trim().toUpperCase() : undefined,
+        idempotency_key: idempotencyKey,
+        ...(selectedShippingOptionId !== null ? { shipping_option_id: selectedShippingOptionId } : {}),
+        ...(fulfilmentChoice === 'pickup'
+          ? {
+              shipping_method: 'pickup' as const,
+              ...(selectedSlotId ? { pickup_slot_id: selectedSlotId } : {}),
+            }
+          : listing.delivery_method === 'community_delivery'
+            ? { shipping_method: 'community_delivery' as const }
+            : {}),
+        ...(!isAcceptedOfferCheckout && effectivePaymentMethod === 'cash' && couponApplied && couponCode.trim()
+          ? { coupon_code: couponCode.trim().toUpperCase() }
+          : {}),
+        payment_method: effectivePaymentMethod,
       });
-      const orderId = response.data.id;
-      const orderNumber = response.data.order_number;
-      if (selectedSlotId) {
-        try {
-          await reserveMarketplacePickup(orderId, selectedSlotId);
-        } catch {
-          setSelectedSlotId(null);
-        }
+      const orderId = Number(response.data?.id);
+      const orderNumber = response.data?.order_number;
+      if (!Number.isInteger(orderId) || orderId <= 0 || !orderNumber) {
+        showToast({ title: t('common:errors.alertTitle'), description: t('detail.orderFailed'), variant: 'danger' });
+        return;
+      }
+      if (response.data.requires_payment === false || response.data.status === 'paid') {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showToast({
+          title: t('detail.orderCreated'),
+          description: t('detail.orderCreatedHint', { order: orderNumber }),
+          variant: 'success',
+        });
+        router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
+        return;
       }
       let payment;
       try {
         payment = await createMarketplacePaymentIntent(orderId);
       } catch {
         showToast({ title: t('checkout.paymentRecoveryTitle'), description: t('checkout.paymentRecoveryHint', { order: orderNumber }), variant: 'danger' });
+        router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
         return;
       }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (payment.data.checkout_url) {
-        await Linking.openURL(payment.data.checkout_url);
+        try {
+          await Linking.openURL(payment.data.checkout_url);
+        } catch {
+          showToast({ title: t('checkout.paymentRecoveryTitle'), description: t('checkout.paymentRecoveryHint', { order: orderNumber }), variant: 'danger' });
+          router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
+        }
         return;
       }
       if (payment.data.client_secret) {
@@ -253,7 +389,8 @@ function MarketplaceDetailScreen() {
         showToast({ title: t('checkout.openedTitle'), description: t('checkout.clientSecretHint'), variant: 'default' });
         return;
       }
-      showToast({ title: t('detail.orderCreated'), description: t('detail.orderCreatedHint', { order: response.data.order_number }), variant: 'success' });
+      showToast({ title: t('checkout.paymentRecoveryTitle'), description: t('checkout.paymentRecoveryHint', { order: orderNumber }), variant: 'danger' });
+      router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
     } catch (err) {
       showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('detail.orderFailed'), variant: 'danger' });
     } finally {
@@ -267,8 +404,8 @@ function MarketplaceDetailScreen() {
     try {
       await validateMarketplaceCoupon({
         code: couponCode.trim().toUpperCase(),
-        order_total_cents: Math.round(Number(listing.price ?? 0) * 100),
         listing_id: listing.id,
+        ...(selectedShippingOptionId !== null ? { shipping_option_id: selectedShippingOptionId } : {}),
       });
       setCouponApplied(true);
       showToast({ title: t('checkout.couponAppliedTitle'), description: t('checkout.couponAppliedHint'), variant: 'success' });
@@ -281,7 +418,13 @@ function MarketplaceDetailScreen() {
   }
 
   function togglePickupSlot(slotId: number) {
+    setFulfilmentChoice('pickup');
     setSelectedSlotId((current) => current === slotId ? null : slotId);
+  }
+
+  function chooseFulfilment(choice: FulfilmentChoice) {
+    setFulfilmentChoice(choice);
+    if (choice !== 'pickup') setSelectedSlotId(null);
   }
 
   async function handleSubmitOffer() {
@@ -552,7 +695,81 @@ function MarketplaceDetailScreen() {
           <HeroCard className="mb-3 rounded-panel p-0">
             <HeroCard.Body className="gap-3 p-4">
               <Text className="text-base font-bold" style={{ color: theme.text }}>{t('checkout.title')}</Text>
-              {pickupSlots.length > 0 ? (
+              {isHybridCheckout ? (
+                <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={t('checkout.paymentMethodLabel')}>
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('checkout.paymentMethodLabel')}</Text>
+                  <View className="flex-row gap-2">
+                    <HeroButton
+                      className="flex-1"
+                      variant={checkoutPaymentMethod === 'cash' ? 'primary' : 'secondary'}
+                      onPress={() => setCheckoutPaymentMethod('cash')}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: checkoutPaymentMethod === 'cash' }}
+                      testID="marketplace-payment-cash"
+                      style={checkoutPaymentMethod === 'cash' ? { backgroundColor: primary } : undefined}
+                    >
+                      <HeroButton.Label>{t('checkout.payWithMoney', { amount: priceLabel })}</HeroButton.Label>
+                    </HeroButton>
+                    <HeroButton
+                      className="flex-1"
+                      variant={checkoutPaymentMethod === 'time_credits' ? 'primary' : 'secondary'}
+                      onPress={() => {
+                        setCheckoutPaymentMethod('time_credits');
+                        setCouponApplied(false);
+                      }}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: checkoutPaymentMethod === 'time_credits' }}
+                      testID="marketplace-payment-time-credits"
+                      style={checkoutPaymentMethod === 'time_credits' ? { backgroundColor: primary } : undefined}
+                    >
+                      <HeroButton.Label>{t('checkout.payWithTimeCredits', { count: Number(listing.time_credit_price ?? 0) })}</HeroButton.Label>
+                    </HeroButton>
+                  </View>
+                </View>
+              ) : null}
+              {supportsShipping ? (
+                <View className="gap-2">
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('checkout.deliveryTitle')}</Text>
+                  {supportsPickup ? (
+                    <HeroButton
+                      variant={fulfilmentChoice === 'pickup' ? 'primary' : 'secondary'}
+                      onPress={() => chooseFulfilment('pickup')}
+                      accessibilityState={{ selected: fulfilmentChoice === 'pickup' }}
+                      testID="marketplace-fulfilment-pickup"
+                      style={fulfilmentChoice === 'pickup' ? { backgroundColor: primary } : undefined}
+                    >
+                      <Ionicons name="location-outline" size={16} color={fulfilmentChoice === 'pickup' ? '#fff' : primary} />
+                      <HeroButton.Label>{t('checkout.localPickup')}</HeroButton.Label>
+                    </HeroButton>
+                  ) : null}
+                  {isShippingLoading ? (
+                    <Text style={{ color: theme.textSecondary }}>{t('checkout.shippingLoading')}</Text>
+                  ) : shippingLoadFailed ? (
+                    <Text style={{ color: theme.error }}>{t('checkout.shippingLoadFailed')}</Text>
+                  ) : shippingOptions.length === 0 ? (
+                    <Text style={{ color: theme.textSecondary }}>{t('checkout.shippingUnavailable')}</Text>
+                  ) : (
+                    shippingOptions.map((option) => {
+                      const choice = `shipping:${option.id}` as FulfilmentChoice;
+                      const selected = fulfilmentChoice === choice;
+                      return (
+                        <HeroButton
+                          key={option.id}
+                          variant={selected ? 'primary' : 'secondary'}
+                          onPress={() => chooseFulfilment(choice)}
+                          accessibilityState={{ selected }}
+                          testID={`marketplace-shipping-option-${option.id}`}
+                          style={selected ? { backgroundColor: primary } : undefined}
+                        >
+                          <Ionicons name="cube-outline" size={16} color={selected ? '#fff' : primary} />
+                          <HeroButton.Label>{formatShippingOption(option)}</HeroButton.Label>
+                        </HeroButton>
+                      );
+                    })
+                  )}
+                </View>
+              ) : null}
+              {pickupSlots.length > 0 && fulfilmentChoice === 'pickup' ? (
                 <View className="gap-2">
                   <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('pickup.chooseSlot')}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
@@ -573,7 +790,7 @@ function MarketplaceDetailScreen() {
                   </ScrollView>
                 </View>
               ) : null}
-              {couponsEnabled ? (
+              {couponsEnabled && effectivePaymentMethod === 'cash' ? (
                 <View className="flex-row gap-2">
                   <View className="min-w-0 flex-1">
                     <FormInput label={t('checkout.coupon')} value={couponCode} onChangeText={(value) => { setCouponCode(value); setCouponApplied(false); }} placeholder={t('checkout.couponPlaceholder')} />
@@ -586,6 +803,7 @@ function MarketplaceDetailScreen() {
             </HeroCard.Body>
           </HeroCard>
         ) : null}
+
       </ScrollView>
 
       {!isOwner ? (
@@ -602,12 +820,14 @@ function MarketplaceDetailScreen() {
               </HeroButton>
             </View>
             <View className="flex-row gap-2">
-              <HeroButton className="flex-1" variant="secondary" onPress={() => setOfferOpen(true)}>
-                <Ionicons name="hand-left-outline" size={17} color={primary} />
-                <HeroButton.Label>{t('detail.makeOffer')}</HeroButton.Label>
-              </HeroButton>
+              {!isAcceptedOfferCheckout ? (
+                <HeroButton className="flex-1" variant="secondary" onPress={() => setOfferOpen(true)}>
+                  <Ionicons name="hand-left-outline" size={17} color={primary} />
+                  <HeroButton.Label>{t('detail.makeOffer')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
               {canBuy ? (
-                <HeroButton className="flex-1" variant="primary" onPress={handleBuyNow} isDisabled={isActionLoading} style={{ backgroundColor: primary }}>
+                <HeroButton className="flex-1" variant="primary" onPress={handleBuyNow} isDisabled={isActionLoading || !fulfilmentReady || !pickupSlotReady} style={{ backgroundColor: primary }}>
                   <Ionicons name="card-outline" size={17} color="#fff" />
                   <HeroButton.Label>{t('detail.buyNow')}</HeroButton.Label>
                 </HeroButton>
@@ -797,6 +1017,23 @@ function formatPickupSlot(slot: MarketplacePickupSlotOption, fallback: string) {
     return `${new Date(slot.slot_start).toLocaleString()}${remaining}`;
   } catch {
     return fallback;
+  }
+}
+
+function formatShippingOption(option: MarketplaceShippingOption): string {
+  const amount = Number(option.price);
+  if (!Number.isFinite(amount)) {
+    return `${option.courier_name} · ${option.currency} ${String(option.price)}`;
+  }
+  try {
+    const formattedAmount = new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: option.currency,
+      currencyDisplay: 'code',
+    }).format(amount).replace(/\s+/g, ' ');
+    return `${option.courier_name} · ${formattedAmount}`;
+  } catch {
+    return `${option.courier_name} · ${option.currency} ${amount}`;
   }
 }
 

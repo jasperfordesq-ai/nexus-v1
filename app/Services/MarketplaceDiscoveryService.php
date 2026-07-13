@@ -11,6 +11,7 @@ use App\Models\MarketplaceCollection;
 use App\Models\MarketplaceCollectionItem;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceSavedSearch;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -30,7 +31,7 @@ class MarketplaceDiscoveryService
      */
     public static function createSavedSearch(int $userId, array $data): MarketplaceSavedSearch
     {
-        return MarketplaceSavedSearch::create([
+        $attributes = [
             'user_id' => $userId,
             'name' => $data['name'],
             'search_query' => $data['search_query'] ?? null,
@@ -38,7 +39,27 @@ class MarketplaceDiscoveryService
             'alert_frequency' => $data['alert_frequency'] ?? 'daily',
             'alert_channel' => $data['alert_channel'] ?? 'email',
             'is_active' => $data['is_active'] ?? true,
-        ]);
+        ];
+
+        return DB::transaction(function () use ($userId, $attributes): MarketplaceSavedSearch {
+            // Serialize discovery creation per user so a client retry cannot
+            // create two identical records even when requests overlap.
+            DB::table('users')->where('id', $userId)->lockForUpdate()->value('id');
+
+            $filters = self::normalizeComparablePayload($attributes['filters']);
+            $existing = MarketplaceSavedSearch::where('user_id', $userId)
+                ->where('name', $attributes['name'])
+                ->where('search_query', $attributes['search_query'])
+                ->where('alert_frequency', $attributes['alert_frequency'])
+                ->where('alert_channel', $attributes['alert_channel'])
+                ->where('is_active', $attributes['is_active'])
+                ->get()
+                ->first(static fn (MarketplaceSavedSearch $search): bool =>
+                    self::normalizeComparablePayload($search->filters) === $filters
+                );
+
+            return $existing ?? MarketplaceSavedSearch::create($attributes);
+        });
     }
 
     /**
@@ -96,12 +117,18 @@ class MarketplaceDiscoveryService
      */
     public static function createCollection(int $userId, array $data): MarketplaceCollection
     {
-        return MarketplaceCollection::create([
+        $attributes = [
             'user_id' => $userId,
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'is_public' => $data['is_public'] ?? false,
-        ]);
+        ];
+
+        return DB::transaction(function () use ($userId, $attributes): MarketplaceCollection {
+            DB::table('users')->where('id', $userId)->lockForUpdate()->value('id');
+
+            return MarketplaceCollection::firstOrCreate($attributes);
+        });
     }
 
     /**
@@ -155,21 +182,37 @@ class MarketplaceDiscoveryService
      */
     public static function addToCollection(int $collectionId, int $listingId, ?string $note = null): void
     {
-        $exists = MarketplaceCollectionItem::where('collection_id', $collectionId)
-            ->where('marketplace_listing_id', $listingId)
-            ->exists();
+        DB::transaction(static function () use ($collectionId, $listingId, $note): void {
+            // Both models are tenant-scoped. Resolving both before insertion is
+            // a defence-in-depth check against cross-tenant foreign keys.
+            $collection = MarketplaceCollection::query()->lockForUpdate()->find($collectionId);
+            $listing = MarketplaceListing::query()->find($listingId);
+            if (!$collection || !$listing || (int) $collection->tenant_id !== (int) $listing->tenant_id) {
+                throw new \DomainException('COLLECTION_LISTING_TENANT_MISMATCH');
+            }
 
-        if ($exists) {
-            return;
-        }
+            $isOwnedListing = (int) $listing->user_id === (int) $collection->user_id;
+            $isPubliclyVisible = (string) $listing->status === 'active'
+                && (string) $listing->moderation_status === 'approved'
+                && ($listing->expires_at === null || $listing->expires_at->isFuture());
+            if (! $isOwnedListing && ! $isPubliclyVisible) {
+                // A collection must not become an existence/item-count oracle
+                // for another seller's unpublished listing.
+                throw new \DomainException('COLLECTION_LISTING_NOT_VISIBLE');
+            }
 
-        MarketplaceCollectionItem::create([
-            'collection_id' => $collectionId,
-            'marketplace_listing_id' => $listingId,
-            'note' => $note,
-        ]);
+            $item = MarketplaceCollectionItem::firstOrCreate(
+                [
+                    'collection_id' => $collectionId,
+                    'marketplace_listing_id' => $listingId,
+                ],
+                ['note' => $note]
+            );
 
-        MarketplaceCollection::where('id', $collectionId)->increment('item_count');
+            if ($item->wasRecentlyCreated) {
+                $collection->increment('item_count');
+            }
+        });
     }
 
     /**
@@ -191,15 +234,50 @@ class MarketplaceDiscoveryService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getCollectionItems(int $collectionId, int $limit = 20, ?string $cursor = null): array
+    public static function getCollectionItems(
+        int $collectionId,
+        int $limit = 20,
+        ?string $cursor = null,
+        bool $publicOnly = false,
+        ?int $viewerUserId = null
+    ): array
     {
-        $query = MarketplaceCollectionItem::where('collection_id', $collectionId)
-            ->with([
-                'listing' => fn ($q) => $q->with([
+        $limit = max(1, min($limit, 100));
+        $publicVisibility = static function ($query): void {
+            // Eager-load constraints receive a BelongsTo relation, while
+            // whereHas receives an Eloquent builder.
+            $builder = $query instanceof Builder ? $query : $query->getQuery();
+            MarketplaceListingService::applyPublicVisibility($builder);
+        };
+        $listingConstraint = static function ($query) use ($publicOnly, $viewerUserId, $publicVisibility): void {
+            if ($publicOnly) {
+                $publicVisibility($query);
+                return;
+            }
+
+            // A private collection grants access to the collection metadata,
+            // not to another seller's draft/pending/expired listing.
+            $query->where(static function ($visibilityQuery) use ($viewerUserId, $publicVisibility): void {
+                $visibilityQuery->where($publicVisibility);
+                if ($viewerUserId !== null) {
+                    $visibilityQuery->orWhere('user_id', $viewerUserId);
+                }
+            });
+        };
+
+        $query = MarketplaceCollectionItem::where('collection_id', $collectionId);
+
+        $query->whereHas('listing', $listingConstraint);
+
+        $query->with([
+                'listing' => static function ($q) use ($listingConstraint): void {
+                    $listingConstraint($q);
+                    $q->with([
                     'user:id,first_name,last_name,avatar_url',
                     'category:id,name,slug,icon',
                     'images' => fn ($iq) => $iq->where('is_primary', true)->limit(1),
-                ]),
+                    ]);
+                },
             ])
             ->orderBy('id', 'desc');
 
@@ -231,7 +309,7 @@ class MarketplaceDiscoveryService
                 'listing' => [
                     'id' => $listing->id,
                     'title' => $listing->title,
-                    'price' => $listing->price,
+                    'price' => $listing->price !== null ? (float) $listing->price : null,
                     'price_currency' => $listing->price_currency,
                     'price_type' => $listing->price_type,
                     'condition' => $listing->condition,
@@ -267,5 +345,24 @@ class MarketplaceDiscoveryService
             'cursor' => $nextCursor,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Canonicalize nested filter objects before comparing retry payloads.
+     */
+    private static function normalizeComparablePayload(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if (! array_is_list($value)) {
+            ksort($value);
+        }
+
+        return array_map(
+            static fn (mixed $item): mixed => self::normalizeComparablePayload($item),
+            $value
+        );
     }
 }

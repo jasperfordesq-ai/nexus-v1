@@ -115,7 +115,7 @@
       "deleted": "Coupon eliminato",
       "failed_delete": "Impossibile eliminare",
       "discount_percent": "{{value}}%",
-      "discount_fixed": "€{{value}}",
+      "discount_fixed": "{{value}}",
       "discount_bogo": "BOGO",
       "no_expiry": "-",
       "suspend": "Sospendere",

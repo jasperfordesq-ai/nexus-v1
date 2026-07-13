@@ -97,6 +97,9 @@ export interface MarketplaceOffer {
     price: number;
     price_currency: string;
     status: string;
+    shipping_available?: boolean;
+    local_pickup?: boolean;
+    delivery_method?: string;
     image?: { url: string; thumbnail_url?: string } | null;
   };
   buyer?: { id: number; name: string; avatar_url?: string };
@@ -304,7 +307,7 @@ export interface MarketplaceOrderItem {
   order_number: string;
   buyer: { id: number; name: string; avatar_url?: string };
   seller: { id: number; name: string; avatar_url?: string };
-  listing: { id: number; title: string; image?: { url: string; thumbnail_url?: string } };
+  listing: { id: number; title: string; image?: { url: string; thumbnail_url?: string } } | null;
   quantity: number;
   unit_price: number;
   total_price: number;

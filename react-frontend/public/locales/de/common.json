@@ -1518,6 +1518,7 @@
       "all_listings": "Alle meine Inserate",
       "specific_listings": "Bestimmte Inserate",
       "specific_categories": "Bestimmte Kategorien",
+      "target_required": "Wählen Sie mindestens ein Inserat oder eine Kategorie aus",
       "save": "Speichern",
       "delete_confirm": "Diesen Gutschein löschen? Das kann nicht rückgängig gemacht werden.",
       "no_coupons": "Sie haben noch keine Gutscheine erstellt.",

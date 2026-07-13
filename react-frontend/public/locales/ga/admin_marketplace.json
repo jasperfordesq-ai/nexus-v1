@@ -115,7 +115,7 @@
       "deleted": "Scriosadh an cúpón",
       "failed_delete": "Theip ar scriosadh",
       "discount_percent": "{{value}}%",
-      "discount_fixed": "€{{value}}",
+      "discount_fixed": "{{value}}",
       "discount_bogo": "BOGO",
       "no_expiry": "-",
       "suspend": "Fionraí",

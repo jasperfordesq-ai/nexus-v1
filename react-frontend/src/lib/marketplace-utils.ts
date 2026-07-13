@@ -43,14 +43,17 @@ export interface ApiMarketplaceListing {
  * Converts a raw API marketplace listing to the shared MarketplaceListingItem
  * type expected by MarketplaceListingCard / MarketplaceListingGrid.
  */
-export function mapApiToListingItem(raw: ApiMarketplaceListing): MarketplaceListingItem {
+export function mapApiToListingItem(
+  raw: ApiMarketplaceListing,
+  fallbackCurrency = '',
+): MarketplaceListingItem {
   const primaryImage = raw.images?.[0] ?? null;
 
   return {
     id: raw.id,
     title: raw.title,
     price: raw.price,
-    price_currency: raw.currency || 'EUR',
+    price_currency: raw.currency || fallbackCurrency,
     price_type: raw.price_type,
     condition: (raw.condition as MarketplaceListingItem['condition']) || null,
     location: raw.location ?? undefined,

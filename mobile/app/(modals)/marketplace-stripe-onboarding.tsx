@@ -28,6 +28,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatMarketplaceCurrency } from '@/lib/utils/marketplaceCurrency';
 
 export default function MarketplaceStripeOnboardingRoute() {
   return (
@@ -39,7 +40,7 @@ export default function MarketplaceStripeOnboardingRoute() {
 
 function MarketplaceStripeOnboardingScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenant } = useTenant();
   const params = useLocalSearchParams<{ return?: string; complete?: string; refresh?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -210,9 +211,9 @@ function MarketplaceStripeOnboardingScreen() {
               <Ionicons name="wallet-outline" size={22} color={primary} />
             </View>
             <View className="flex-row flex-wrap gap-2">
-              <BalanceTile label={t('stripeOnboarding.pending')} value={formatMoney(balance?.pending, balance?.currency)} tone={theme.warning} />
-              <BalanceTile label={t('stripeOnboarding.available')} value={formatMoney(balance?.available, balance?.currency)} tone={theme.success} />
-              <BalanceTile label={t('stripeOnboarding.totalEarned')} value={formatMoney(balance?.total_earned, balance?.currency)} tone={primary} />
+              <BalanceTile label={t('stripeOnboarding.pending')} value={formatMoney(balance?.pending, balance?.currency || tenant?.currency)} tone={theme.warning} />
+              <BalanceTile label={t('stripeOnboarding.available')} value={formatMoney(balance?.available, balance?.currency || tenant?.currency)} tone={theme.success} />
+              <BalanceTile label={t('stripeOnboarding.totalEarned')} value={formatMoney(balance?.total_earned, balance?.currency || tenant?.currency)} tone={primary} />
             </View>
           </HeroCard.Body>
         </HeroCard>
@@ -276,8 +277,7 @@ function ReadinessRow({ label, ready }: { label: string; ready: boolean }) {
 }
 
 function formatMoney(value?: number | null, currency?: string | null) {
-  const amount = Number(value ?? 0);
-  return `${(currency || 'EUR').toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return formatMarketplaceCurrency(Number(value ?? 0), currency);
 }
 
 function StatusChip({ label, enabled }: { label: string; enabled: boolean }) {

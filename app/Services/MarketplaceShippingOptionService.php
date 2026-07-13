@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceShippingOption;
+use App\Support\StripeCurrency;
 
 /**
  * MarketplaceShippingOptionService — Seller shipping option management (MKT31).
@@ -25,6 +26,10 @@ class MarketplaceShippingOptionService
      */
     public static function getSellerOptions(int $sellerId): array
     {
+        if (! MarketplaceConfigurationService::allowShipping()) {
+            return [];
+        }
+
         $options = MarketplaceShippingOption::where('seller_id', $sellerId)
             ->where('is_active', true)
             ->orderByDesc('is_default')
@@ -43,13 +48,19 @@ class MarketplaceShippingOptionService
      */
     public static function createOption(int $sellerId, array $data): MarketplaceShippingOption
     {
+        self::assertShippingEnabled();
+        [$price, $currency] = self::normalizeMoney(
+            $data['price'],
+            $data['currency'] ?? TenantContext::getCurrency(),
+        );
+
         $option = new MarketplaceShippingOption();
         $option->tenant_id = TenantContext::getId();
         $option->seller_id = $sellerId;
         $option->courier_name = $data['courier_name'];
         $option->courier_code = $data['courier_code'] ?? null;
-        $option->price = $data['price'];
-        $option->currency = $data['currency'] ?? 'EUR';
+        $option->price = $price;
+        $option->currency = $currency;
         $option->estimated_days = $data['estimated_days'] ?? null;
         $option->is_default = $data['is_default'] ?? false;
         $option->is_active = true;
@@ -72,6 +83,14 @@ class MarketplaceShippingOptionService
      */
     public static function updateOption(MarketplaceShippingOption $option, array $data): MarketplaceShippingOption
     {
+        self::assertShippingEnabled();
+        if (array_key_exists('price', $data) || array_key_exists('currency', $data)) {
+            [$data['price'], $data['currency']] = self::normalizeMoney(
+                $data['price'] ?? $option->price,
+                $data['currency'] ?? $option->currency,
+            );
+        }
+
         $fillable = ['courier_name', 'courier_code', 'price', 'currency', 'estimated_days', 'is_default', 'is_active'];
 
         foreach ($fillable as $field) {
@@ -106,7 +125,7 @@ class MarketplaceShippingOptionService
             ->first();
 
         if (!$option) {
-            throw new \InvalidArgumentException('Shipping option not found.');
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_option_not_found'));
         }
 
         $option->is_active = false;
@@ -124,12 +143,13 @@ class MarketplaceShippingOptionService
      */
     public static function setDefault(int $optionId, int $sellerId): void
     {
+        self::assertShippingEnabled();
         $option = MarketplaceShippingOption::where('id', $optionId)
             ->where('seller_id', $sellerId)
             ->first();
 
         if (!$option) {
-            throw new \InvalidArgumentException('Shipping option not found.');
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_option_not_found'));
         }
 
         // Unset all other defaults for this seller
@@ -152,13 +172,36 @@ class MarketplaceShippingOptionService
             'id' => $option->id,
             'courier_name' => $option->courier_name,
             'courier_code' => $option->courier_code,
-            'price' => $option->price,
+            'price' => (float) $option->price,
             'currency' => $option->currency,
             'estimated_days' => $option->estimated_days,
             'is_default' => $option->is_default,
             'is_active' => $option->is_active,
             'created_at' => $option->created_at?->toISOString(),
             'updated_at' => $option->updated_at?->toISOString(),
+        ];
+    }
+
+    private static function assertShippingEnabled(): void
+    {
+        if (! MarketplaceConfigurationService::allowShipping()) {
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_disabled'));
+        }
+    }
+
+    /** @return array{0:float,1:string} */
+    private static function normalizeMoney(mixed $price, mixed $currency): array
+    {
+        $normalizedCurrency = StripeCurrency::normalize((string) $currency);
+        $numericPrice = (float) $price;
+        if (! is_finite($numericPrice) || $numericPrice < 0) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+        $minor = StripeCurrency::toMinor($numericPrice, $normalizedCurrency);
+
+        return [
+            StripeCurrency::fromMinor($minor, $normalizedCurrency),
+            $normalizedCurrency,
         ];
     }
 

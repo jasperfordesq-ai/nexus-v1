@@ -64,7 +64,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
-  useTenant: () => ({ hasFeature: () => true }),
+  useTenant: () => ({ tenant: { currency: 'JPY' }, hasFeature: () => true }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -170,5 +170,17 @@ describe('MarketplaceStripeOnboardingRoute', () => {
     });
 
     unmount();
+  });
+
+  it('does not invent decimals for zero-decimal seller balances', async () => {
+    (getMarketplaceSellerBalance as jest.Mock).mockResolvedValueOnce({
+      data: { pending: 2500, available: 0, total_earned: 2500, currency: 'JPY' },
+    });
+
+    const { findAllByText } = render(<MarketplaceStripeOnboardingRoute />);
+    const balances = await findAllByText(/2[,.]500/);
+
+    expect(balances.length).toBeGreaterThan(0);
+    balances.forEach((balance) => expect(String(balance.props.children)).not.toMatch(/[,.]00(?:\D|$)/));
   });
 });

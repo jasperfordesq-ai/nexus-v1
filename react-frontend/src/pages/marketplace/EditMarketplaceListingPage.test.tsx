@@ -9,7 +9,7 @@ import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
 // ─── Mock api ────────────────────────────────────────────────────────────────
-const { mockApi, stableTenantPath, stableT } = vi.hoisted(() => ({
+const { mockApi, mockTenantState, stableTenantPath, stableT } = vi.hoisted(() => ({
   mockApi: {
     get: vi.fn(),
     post: vi.fn(),
@@ -19,6 +19,7 @@ const { mockApi, stableTenantPath, stableT } = vi.hoisted(() => ({
     download: vi.fn(),
     upload: vi.fn(),
   },
+  mockTenantState: { currency: 'EUR' },
   // Stable function references — prevents effect re-runs from identity changes
   stableTenantPath: (p: string) => `/test${p}`,
   stableT: (key: string) => key,
@@ -72,7 +73,7 @@ vi.mock('@/contexts', () =>
     }),
     useToast: () => mockToast,
     useTenant: () => ({
-      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenant: { id: 2, name: 'Test', slug: 'test', currency: mockTenantState.currency },
       tenantPath: stableTenantPath,
       hasFeature: vi.fn(() => true),
       hasModule: vi.fn(() => true),
@@ -94,6 +95,16 @@ vi.mock('@/components/feedback', () => ({
 
 // Stub heavy location/map components
 vi.mock('@/components/location', () => ({
+  PlaceAutocompleteInput: ({ label, value, onChange }: { label?: string; value?: string; onChange?: (v: string) => void }) => (
+    <input
+      aria-label={label ?? 'location'}
+      value={value ?? ''}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  ),
+}));
+
+vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
   PlaceAutocompleteInput: ({ label, value, onChange }: { label?: string; value?: string; onChange?: (v: string) => void }) => (
     <input
       aria-label={label ?? 'location'}
@@ -202,6 +213,7 @@ function setupMocks(listingOverrides = {}) {
 describe('EditMarketplaceListingPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockTenantState.currency = 'EUR';
     setupMocks();
   });
 
@@ -312,6 +324,73 @@ describe('EditMarketplaceListingPage', () => {
         );
       });
     }
+  });
+
+  it('uses the tenant currency when a legacy listing omitted its currency', async () => {
+    mockTenantState.currency = 'JPY';
+    setupMocks({ price_currency: null });
+    mockApi.put.mockResolvedValue({ success: true });
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => screen.getByDisplayValue('Vintage Lamp'));
+    const saveBtn = screen.getAllByRole('button').find(
+      (button) => button.textContent?.toLowerCase().includes('save'),
+    );
+    if (saveBtn) fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockApi.put).toHaveBeenCalledWith(
+        '/v2/marketplace/listings/77',
+        expect.objectContaining({ price_currency: 'JPY' }),
+      );
+    });
+  });
+
+  it('does not overwrite inventory when the API omitted inventory fields', async () => {
+    mockApi.put.mockResolvedValue({ success: true });
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+    await waitFor(() => screen.getByDisplayValue('Vintage Lamp'));
+
+    const saveBtn = screen.getAllByRole('button').find(
+      (button) => button.textContent?.toLowerCase().includes('save'),
+    );
+    if (saveBtn) fireEvent.click(saveBtn);
+
+    await waitFor(() => expect(mockApi.put).toHaveBeenCalled());
+    const payload = mockApi.put.mock.calls[0][1];
+    expect(payload).not.toHaveProperty('inventory_count');
+    expect(payload).not.toHaveProperty('low_stock_threshold');
+    expect(payload).not.toHaveProperty('is_oversold_protected');
+  });
+
+  it('round-trips finite inventory fields supplied by the API', async () => {
+    setupMocks({
+      inventory_count: 8,
+      low_stock_threshold: 2,
+      is_oversold_protected: true,
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+    await waitFor(() => screen.getByDisplayValue('Vintage Lamp'));
+
+    const saveBtn = screen.getAllByRole('button').find(
+      (button) => button.textContent?.toLowerCase().includes('save'),
+    );
+    if (saveBtn) fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockApi.put).toHaveBeenCalledWith(
+        '/v2/marketplace/listings/77',
+        expect.objectContaining({
+          inventory_count: 8,
+          low_stock_threshold: 2,
+          is_oversold_protected: true,
+        }),
+      );
+    });
   });
 
   it('shows error toast when save fails', async () => {

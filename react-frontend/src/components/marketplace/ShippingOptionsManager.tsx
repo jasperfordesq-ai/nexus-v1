@@ -30,9 +30,10 @@ import X from 'lucide-react/icons/x';
 import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { normalizeMarketplaceShippingOption } from '@/lib/marketplaceNumbers';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,14 +52,6 @@ interface ShippingFormData {
   is_default: boolean;
 }
 
-const EMPTY_FORM: ShippingFormData = {
-  courier_name: '',
-  price: '',
-  currency: 'EUR',
-  estimated_days: '',
-  is_default: false,
-};
-
 const CURRENCY_OPTIONS = [
   { value: 'EUR', label: 'EUR' },
   { value: 'GBP', label: 'GBP' },
@@ -73,6 +66,32 @@ const CURRENCY_OPTIONS = [
   { value: 'PLN', label: 'PLN' },
   { value: 'JPY', label: 'JPY' },
 ];
+
+function normalizeSupportedCurrency(value?: string | null): string {
+  const candidate = value?.trim().toUpperCase() ?? '';
+  return CURRENCY_OPTIONS.some((option) => option.value === candidate) ? candidate : '';
+}
+
+function createEmptyForm(currency: string): ShippingFormData {
+  return {
+    courier_name: '',
+    price: '',
+    currency,
+    estimated_days: '',
+    is_default: false,
+  };
+}
+
+function formatCurrencyAmount(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+    }).format(amount);
+  } catch {
+    return `${currency} ${amount}`;
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Inline Form — shared between Add and Edit
@@ -89,6 +108,9 @@ interface ShippingFormProps {
 
 function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submitLabel }: ShippingFormProps) {
   const { t } = useTranslation('marketplace');
+  const currencyOptions = form.currency && !CURRENCY_OPTIONS.some((option) => option.value === form.currency)
+    ? [{ value: form.currency, label: form.currency }, ...CURRENCY_OPTIONS]
+    : CURRENCY_OPTIONS;
 
   return (
     <GlassCard className="space-y-4 border border-accent/20 bg-accent/5 p-4 shadow-sm">
@@ -127,7 +149,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
             variant="secondary"
             className="w-28"
           >
-            {CURRENCY_OPTIONS.map((opt) => (
+            {currencyOptions.map((opt) => (
               <SelectItem key={opt.value} id={opt.value}>{opt.label}</SelectItem>
             ))}
           </Select>
@@ -187,8 +209,10 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
 
 export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsManagerProps) {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { tenant } = useTenant();
   const toast = useToast();
   const confirm = useConfirm();
+  const defaultCurrency = normalizeSupportedCurrency(tenant?.currency);
 
   const [options, setOptions] = useState<MarketplaceShippingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -196,11 +220,11 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
 
   // Add mode
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addForm, setAddForm] = useState<ShippingFormData>(EMPTY_FORM);
+  const [addForm, setAddForm] = useState<ShippingFormData>(() => createEmptyForm(defaultCurrency));
 
   // Edit mode
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<ShippingFormData>(EMPTY_FORM);
+  const [editForm, setEditForm] = useState<ShippingFormData>(() => createEmptyForm(defaultCurrency));
 
   // ─── Load ──────────────────────────────────────────────────────────────────
   const loadOptions = useCallback(async () => {
@@ -210,7 +234,9 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         '/v2/marketplace/seller/shipping-options'
       );
       if (response.success && response.data) {
-        setOptions(response.data);
+        setOptions(response.data.map(normalizeMarketplaceShippingOption));
+      } else {
+        toast.error(response.error || t('shipping.load_error'));
       }
     } catch (err) {
       logError('Failed to load shipping options', err);
@@ -234,22 +260,25 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         {
           courier_name: addForm.courier_name.trim(),
           price: parseFloat(addForm.price),
-          currency: addForm.currency,
+          ...(addForm.currency ? { currency: addForm.currency } : {}),
           estimated_days: addForm.estimated_days ? parseInt(addForm.estimated_days, 10) : null,
           is_default: addForm.is_default,
         }
       );
       if (response.success && response.data) {
+        const savedOption = normalizeMarketplaceShippingOption(response.data);
         setOptions((prev) => {
           // If new option is default, unset others
-          if (response.data!.is_default) {
-            return [...prev.map((o) => ({ ...o, is_default: false })), response.data!];
+          if (savedOption.is_default) {
+            return [...prev.map((o) => ({ ...o, is_default: false })), savedOption];
           }
-          return [...prev, response.data!];
+          return [...prev, savedOption];
         });
-        setAddForm(EMPTY_FORM);
+        setAddForm(createEmptyForm(defaultCurrency));
         setShowAddForm(false);
         toast.success(t('shipping.added_success'));
+      } else {
+        toast.error(response.error || t('shipping.add_error'));
       }
     } catch (err) {
       logError('Failed to add shipping option', err);
@@ -257,7 +286,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
     } finally {
       setIsSubmitting(false);
     }
-  }, [addForm, toast, t]);
+  }, [addForm, defaultCurrency, toast, t]);
 
   // ─── Edit ──────────────────────────────────────────────────────────────────
   const startEdit = useCallback((option: MarketplaceShippingOption) => {
@@ -288,19 +317,22 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         }
       );
       if (response.success && response.data) {
+        const savedOption = normalizeMarketplaceShippingOption(response.data);
         setOptions((prev) =>
           prev.map((o) => {
-            if (o.id === editingId) return response.data!;
+            if (o.id === editingId) return savedOption;
             // If updated option became default, unset others
-            if (response.data!.is_default && o.is_default) {
+            if (savedOption.is_default && o.is_default) {
               return { ...o, is_default: false };
             }
             return o;
           })
         );
         setEditingId(null);
-        setEditForm(EMPTY_FORM);
+        setEditForm(createEmptyForm(defaultCurrency));
         toast.success(t('shipping.updated_success'));
+      } else {
+        toast.error(response.error || t('shipping.update_error'));
       }
     } catch (err) {
       logError('Failed to update shipping option', err);
@@ -308,7 +340,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
     } finally {
       setIsSubmitting(false);
     }
-  }, [editingId, editForm, toast, t]);
+  }, [editingId, editForm, defaultCurrency, toast, t]);
 
   // ─── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async (id: number) => {
@@ -319,7 +351,11 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/marketplace/seller/shipping-options/${id}`);
+      const response = await api.delete(`/v2/marketplace/seller/shipping-options/${id}`);
+      if (!response.success) {
+        toast.error(response.error || t('shipping.delete_error'));
+        return;
+      }
       setOptions((prev) => prev.filter((o) => o.id !== id));
       toast.success(t('shipping.deleted_success'));
     } catch (err) {
@@ -361,7 +397,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
             size="sm"
             className="w-full sm:w-auto"
             startContent={<Plus className="w-4 h-4" />}
-            onPress={() => { setShowAddForm(true); setAddForm(EMPTY_FORM); }}
+            onPress={() => { setShowAddForm(true); setAddForm(createEmptyForm(defaultCurrency)); }}
           >
             {t('shipping.add_option')}
           </Button>
@@ -374,7 +410,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
           form={addForm}
           onChange={updateAddForm}
           onSubmit={handleAdd}
-          onCancel={() => { setShowAddForm(false); setAddForm(EMPTY_FORM); }}
+          onCancel={() => { setShowAddForm(false); setAddForm(createEmptyForm(defaultCurrency)); }}
           isSubmitting={isSubmitting}
           submitLabel={t('shipping.add_option')}
         />
@@ -400,7 +436,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                 form={editForm}
                 onChange={updateEditForm}
                 onSubmit={handleUpdate}
-                onCancel={() => { setEditingId(null); setEditForm(EMPTY_FORM); }}
+                onCancel={() => { setEditingId(null); setEditForm(createEmptyForm(defaultCurrency)); }}
                 isSubmitting={isSubmitting}
                 submitLabel={t('shipping.save_changes')}
               />
@@ -422,12 +458,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                       </div>
                       <div className="flex items-center gap-3 text-sm text-muted mt-0.5">
                         <span className="font-semibold text-foreground">
-                          {new Intl.NumberFormat(undefined, {
-                            style: 'currency',
-                            currency: option.currency || 'EUR',
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 2,
-                          }).format(option.price)}
+                          {formatCurrencyAmount(option.price, option.currency)}
                         </span>
                         {option.estimated_days != null && (
                           <span>

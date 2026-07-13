@@ -100,7 +100,9 @@
         "seller_verified": "Verkoper geverifieerd.",
         "seller_suspended": "Verkoper gesuspendeerd en alle advertenties gedeactiveerd.",
         "report_acknowledged": "Rapport erkend.",
-        "report_resolved": "Rapport opgelost."
+        "report_resolved": "Rapport opgelost.",
+        "report_appeal_resolved": "Beroep tegen rapport opgelost.",
+        "dispute_resolved": "Geschil opgelost."
     },
     "admin_newsletter": {
         "newsletter_queued": "Nieuwsbrief in de wachtrij gezet voor :count ontvangers",

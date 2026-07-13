@@ -125,15 +125,14 @@ describe('MarketplaceListingCard', () => {
     expect(onUnsave).toHaveBeenCalledWith(42);
   });
 
-  it('toggles saved state optimistically on button click', () => {
+  it('waits for the authoritative listing prop before showing saved state', () => {
     const onSave = vi.fn();
     render(<MarketplaceListingCard listing={BASE_LISTING} onSave={onSave} />);
     const btn = screen.getByRole('button');
     const labelBefore = btn.getAttribute('aria-label');
     fireEvent.click(btn);
     const labelAfter = btn.getAttribute('aria-label');
-    // aria-label must change to reflect the new saved state
-    expect(labelAfter).not.toBe(labelBefore);
+    expect(labelAfter).toBe(labelBefore);
   });
 
   it('renders promoted badge when is_promoted is true', () => {

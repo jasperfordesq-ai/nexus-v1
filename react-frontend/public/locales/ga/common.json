@@ -1548,6 +1548,7 @@
       "all_listings": "Mo liostuithe ar fad",
       "specific_listings": "Liostuithe faoi leith",
       "specific_categories": "Catagóirí faoi leith",
+      "target_required": "Roghnaigh liostú nó catagóir amháin ar a laghad",
       "save": "Sábháil",
       "delete_confirm": "An cúpón seo a scriosadh? Ní féidir é seo a chur ar ais.",
       "no_coupons": "Níor chruthaigh tú aon chúpóin fós.",

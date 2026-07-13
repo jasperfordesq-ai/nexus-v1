@@ -43,6 +43,7 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveThumbnailUrl, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -76,12 +77,8 @@ const SHIPPING_METHODS = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 function formatPrice(price: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: currency || 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(price);
+  const numericPrice = Number(price);
+  return formatMarketplaceCurrency(Number.isFinite(numericPrice) ? numericPrice : 0, currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,7 +93,7 @@ function SellerOrderCard({
   onMarkShipped: (orderId: number) => void;
 }) {
   const { t } = useTranslation('marketplace');
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
 
   const hasRating = order.ratings && order.ratings.some((r) => r.rater_role === 'buyer');
 
@@ -104,7 +101,7 @@ function SellerOrderCard({
     <GlassCard className="p-4">
       <div className="flex gap-4">
         {/* Listing image */}
-        <Link
+        {order.listing ? <Link
           to={tenantPath(`/marketplace/${order.listing.id}`)}
           className="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-surface-secondary"
         >
@@ -121,18 +118,29 @@ function SellerOrderCard({
               <Package className="w-8 h-8 text-muted" />
             </div>
           )}
-        </Link>
+        </Link> : (
+          <div
+            className="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-surface-secondary flex items-center justify-center"
+            aria-label={t('listing.not_found_title')}
+          >
+            <Package className="w-8 h-8 text-muted" />
+          </div>
+        )}
 
         {/* Order details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <Link
+              {order.listing ? <Link
                 to={tenantPath(`/marketplace/${order.listing.id}`)}
                 className="font-semibold text-foreground hover:text-accent transition-colors line-clamp-1"
               >
                 {order.listing.title}
-              </Link>
+              </Link> : (
+                <span className="font-semibold text-muted line-clamp-1">
+                  {t('listing.not_found_title')}
+                </span>
+              )}
               <div className="flex items-center gap-2 mt-1">
                 <Avatar
                   src={resolveAvatarUrl(order.buyer.avatar_url) || undefined}
@@ -151,7 +159,7 @@ function SellerOrderCard({
           <div className="flex items-center justify-between mt-2">
             <div>
               <span className="text-lg font-bold text-foreground">
-                {formatPrice(order.total_price, order.currency)}
+                {formatPrice(order.total_price, order.currency || tenant?.currency || '')}
               </span>
               {order.quantity > 1 && (
                 <span className="text-xs text-muted ml-1">

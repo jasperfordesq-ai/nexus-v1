@@ -63,6 +63,10 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import {
+  formatLegacyCouponMinorAmount,
+  formatMarketplaceMinorAmount,
+} from '@/lib/utils/marketplaceCurrency';
 
 type ToolTab = 'collections' | 'savedSearches' | 'promotions' | 'pickups' | 'coupons';
 type CouponDiscountType = 'percent' | 'fixed' | 'bogo';
@@ -534,7 +538,7 @@ function PromotionProductRow({
   const primary = usePrimaryColor();
   const theme = useTheme();
   const price = product.price > 0
-    ? `${product.currency} ${Number(product.price).toFixed(2)}`
+    ? formatCurrencyAmount(Number(product.price), product.currency)
     : t('tools.promotions.free');
   return (
     <HeroButton
@@ -553,6 +557,18 @@ function PromotionProductRow({
       </View>
     </HeroButton>
   );
+}
+
+function formatCurrencyAmount(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'code',
+    }).format(amount);
+  } catch {
+    return `${currency} ${amount}`;
+  }
 }
 
 function formatPromotionDuration(hours: number, t: (key: string, options?: Record<string, unknown>) => string): string {
@@ -799,6 +815,7 @@ function PickupSlotToolCard({
 
 function CouponsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { tenant } = useTenant();
   const { show: showToast } = useAppToast();
   const { confirm, confirmDialog } = useConfirm();
   const primary = usePrimaryColor();
@@ -1079,6 +1096,7 @@ function CouponsPanel() {
           <CouponToolCard
             key={item.id}
             item={item}
+            currency={tenant?.currency}
             onEdit={() => openEdit(item)}
             onRedemptions={() => void openRedemptions(item)}
             onDelete={() => void remove(item)}
@@ -1109,7 +1127,7 @@ function CouponsPanel() {
             ) : (
               <ScrollView contentContainerStyle={{ gap: 10 }}>
                 {redemptions.map((redemption) => (
-                  <RedemptionRow key={redemption.id} redemption={redemption} />
+                  <RedemptionRow key={redemption.id} redemption={redemption} currency={tenant?.currency} />
                 ))}
               </ScrollView>
             )}
@@ -1120,7 +1138,13 @@ function CouponsPanel() {
   );
 }
 
-function RedemptionRow({ redemption }: { redemption: MerchantCouponRedemption }) {
+function RedemptionRow({
+  redemption,
+  currency,
+}: {
+  redemption: MerchantCouponRedemption;
+  currency?: string;
+}) {
   const { t } = useTranslation('marketplace');
   const theme = useTheme();
   const primary = usePrimaryColor();
@@ -1138,7 +1162,7 @@ function RedemptionRow({ redemption }: { redemption: MerchantCouponRedemption })
           </Text>
           <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
             {t('tools.coupons.redemptionValue', {
-              value: (redemption.discount_applied_cents / 100).toFixed(2),
+              value: formatMarketplaceMinorAmount(redemption.discount_applied_cents, currency),
               date: redeemedAt,
             })}
           </Text>
@@ -1160,11 +1184,13 @@ function RedemptionRow({ redemption }: { redemption: MerchantCouponRedemption })
 
 function CouponToolCard({
   item,
+  currency,
   onEdit,
   onRedemptions,
   onDelete,
 }: {
   item: MerchantCoupon;
+  currency?: string;
   onEdit: () => void;
   onRedemptions: () => void;
   onDelete: () => void;
@@ -1186,7 +1212,7 @@ function CouponToolCard({
           <View className="flex-row flex-wrap items-center gap-2">
             <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{item.title}</Text>
             <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
-              <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, t)}</Chip.Label>
+              <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, currency, t)}</Chip.Label>
             </Chip>
           </View>
           <Text className="font-mono text-xs font-semibold" style={{ color: primary }}>{item.code}</Text>
@@ -1239,12 +1265,18 @@ function couponPayload(form: CouponFormState) {
   };
 }
 
-function couponDiscountLabel(coupon: MerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string {
+function couponDiscountLabel(
+  coupon: MerchantCoupon,
+  currency: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
   if (coupon.discount_type === 'percent') {
     return t('tools.coupons.percentValue', { value: coupon.discount_value ?? 0 });
   }
   if (coupon.discount_type === 'fixed') {
-    return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
+    return t('publicCoupons.fixedValue', {
+      value: formatLegacyCouponMinorAmount(coupon.discount_value ?? 0, currency),
+    });
   }
   return t('publicCoupons.bogo');
 }

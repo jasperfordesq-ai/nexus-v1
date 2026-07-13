@@ -43,6 +43,12 @@ const mockPausedCoupon = vi.hoisted(() => ({
 vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test Tenant', slug: 'test', currency: 'GBP' },
+      tenantPath: (path: string) => `/test${path}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
   })
 );
 
@@ -164,6 +170,13 @@ describe('AdminCouponsPage', () => {
       return element?.tagName === 'TD' && content.includes('25') && !content.includes('Summer Sale');
     });
     expect(discountCell).toBeInTheDocument();
+  });
+
+  it('formats fixed discounts in the tenant currency', async () => {
+    mockSuccessfulLoad([{ ...mockCoupon, discount_type: 'fixed', discount_value: 500 }]);
+    render(<AdminCouponsPage />);
+
+    expect(await screen.findByText('£5.00')).toBeInTheDocument();
   });
 
   it('calls POST /suspend endpoint when Suspend is confirmed', async () => {

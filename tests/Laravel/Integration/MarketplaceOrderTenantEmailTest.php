@@ -8,11 +8,13 @@ namespace Tests\Laravel\Integration;
 
 use App\Core\TenantContext;
 use App\Exceptions\SafeguardingPolicyException;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplaceOrderService;
 use App\Services\SafeguardingInteractionPolicy;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -39,6 +41,20 @@ class MarketplaceOrderTenantEmailTest extends TestCase
             'email' => 'marketplace-buyer-' . uniqid('', true) . '@example.test',
             'preferred_language' => 'en',
         ]);
+        DB::table('marketplace_seller_profiles')->insert([
+            'tenant_id' => $marketplaceTenantId,
+            'user_id' => $seller->id,
+            'seller_type' => 'private',
+            'stripe_account_id' => 'acct_tenant_order_email_' . $seller->id,
+            'stripe_onboarding_complete' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        TenantContext::setById($marketplaceTenantId);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            true,
+        );
 
         $listingId = $this->createListing($marketplaceTenantId, (int) $seller->id);
         $offerId = $this->createAcceptedOffer($marketplaceTenantId, $listingId, (int) $buyer->id, (int) $seller->id);
@@ -57,12 +73,19 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         app()->instance(EmailDispatchService::class, $mailer);
 
         TenantContext::setById(2);
-
-        $order = MarketplaceOrderService::createFromOffer($offer);
+        $order = MarketplaceOrderService::createFromOffer($offer, [
+            'listing_id' => $listingId,
+            'offer_id' => $offerId,
+            'idempotency_key' => 'tenant-offer-checkout-' . $offerId,
+            'payment_method' => 'cash',
+            'shipping_method' => 'pickup',
+        ]);
 
         $this->assertSame($marketplaceTenantId, (int) $order->tenant_id);
         $this->assertSame($marketplaceTenantId, (int) DB::table('marketplace_orders')->where('id', $order->id)->value('tenant_id'));
-        $this->assertSame('sold', DB::table('marketplace_listings')->where('id', $listingId)->value('status'));
+        // NULL inventory is intentionally untracked/unlimited, so one accepted
+        // offer order must not silently turn the listing into a one-off item.
+        $this->assertSame('active', DB::table('marketplace_listings')->where('id', $listingId)->value('status'));
         $this->assertCount(2, $mailer->calls);
         $this->assertSame($marketplaceTenantId, $mailer->calls[0]['options']['tenant_id']);
         $this->assertSame($marketplaceTenantId, $mailer->calls[1]['options']['tenant_id']);
@@ -93,7 +116,13 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         $this->app->instance(SafeguardingInteractionPolicy::class, $policy);
 
         try {
-            MarketplaceOrderService::createFromOffer($offer);
+            MarketplaceOrderService::createFromOffer($offer, [
+                'listing_id' => $listingId,
+                'offer_id' => $offerId,
+                'idempotency_key' => 'safeguarding-offer-checkout-' . $offerId,
+                'payment_method' => 'cash',
+                'shipping_method' => 'pickup',
+            ]);
             $this->fail('Expected safeguarding denial');
         } catch (SafeguardingPolicyException $e) {
             $this->assertSame('VETTING_REQUIRED', $e->reasonCode);
@@ -113,7 +142,7 @@ class MarketplaceOrderTenantEmailTest extends TestCase
             'status' => 'active',
             'is_approved' => true,
             'email' => 'paid-seller-' . uniqid('', true) . '@example.test',
-            'preferred_language' => 'en',
+            'preferred_language' => 'de',
         ]);
         $buyer = User::factory()->forTenant($marketplaceTenantId)->create([
             'status' => 'active',
@@ -166,6 +195,7 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         app()->instance(EmailDispatchService::class, $mailer);
 
         TenantContext::setById(2);
+        app()->setLocale('en');
 
         MarketplaceOrderService::sendPaidNotifications(
             MarketplaceOrder::withoutGlobalScopes()->findOrFail($orderId),
@@ -178,6 +208,19 @@ class MarketplaceOrderTenantEmailTest extends TestCase
         $this->assertSame('marketplace_order', $mailer->calls[0]['options']['category']);
         $this->assertSame('marketplace_order', $mailer->calls[1]['options']['category']);
         $this->assertSame(2, DB::table('notifications')->where('tenant_id', $marketplaceTenantId)->where('type', 'marketplace_order')->count());
+        $sellerBell = (string) DB::table('notifications')
+            ->where('tenant_id', $marketplaceTenantId)
+            ->where('user_id', $seller->id)
+            ->where('type', 'marketplace_order')
+            ->value('message');
+        $this->assertSame(
+            LocaleContext::withLocale('de', fn (): string => __('api_controllers_3.marketplace_order.paid_seller', [
+                'order_number' => DB::table('marketplace_orders')->where('id', $orderId)->value('order_number'),
+                'amount' => '10.00 EUR',
+            ])),
+            $sellerBell,
+        );
+        $this->assertSame('en', app()->getLocale(), 'Recipient locale must be restored after bell rendering.');
         $this->assertSame(2, TenantContext::getId());
     }
 

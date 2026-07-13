@@ -1508,6 +1508,7 @@
       "all_listings": "自分のすべての掲載",
       "specific_listings": "特定の掲載",
       "specific_categories": "特定のカテゴリー",
+      "target_required": "掲載またはカテゴリーを1つ以上選択してください",
       "save": "保存",
       "delete_confirm": "このクーポンを削除しますか？元に戻せません。",
       "no_coupons": "まだクーポンを作成していません。",

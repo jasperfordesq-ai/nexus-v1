@@ -8,12 +8,15 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
+use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceImage;
 use App\Models\MarketplaceSellerProfile;
 use App\Models\MarketplaceSavedListing;
+use App\Support\StripeCurrency;
 use App\Services\MarketplaceConfigurationService;
 use App\Services\SearchService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -53,7 +56,7 @@ class MarketplaceListingService
      */
     public static function getAll(array $filters = []): array
     {
-        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $limit = max(1, min((int) ($filters['limit'] ?? 20), 100));
         $cursor = $filters['cursor'] ?? null;
         $currentUserId = !empty($filters['current_user_id'])
             ? (int) $filters['current_user_id']
@@ -147,9 +150,8 @@ class MarketplaceListingService
                         'images' => fn ($qq) => $qq->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
                     ])
                     ->withCount('images')
-                    ->whereIn('id', $ids)
-                    ->where('status', 'active')
-                    ->where('moderation_status', 'approved');
+                    ->whereIn('id', $ids);
+                self::applyPublicVisibility($q);
 
                 $listingsById = $q->get()->keyBy('id');
 
@@ -210,8 +212,7 @@ class MarketplaceListingService
                 $query->where('status', $filters['status']);
             }
         } else {
-            $query->where('status', 'active')
-                  ->where('moderation_status', 'approved');
+            self::applyPublicVisibility($query);
         }
 
         // Category filter
@@ -277,21 +278,27 @@ class MarketplaceListingService
 
         // Featured first (must be BEFORE the main sort so it takes priority)
         if (!empty($filters['featured_first'])) {
-            $query->orderByRaw('promoted_until > NOW() DESC');
+            // Expired promotion markers are cleared by the hourly marketplace
+            // maintenance job. Ordering the indexed timestamp directly avoids
+            // the per-request boolean-expression filesort.
+            $query->orderByDesc('promoted_until');
         }
 
         // Sorting
         $sort = $filters['sort'] ?? 'newest';
         match ($sort) {
-            'price_asc' => $query->orderByRaw('COALESCE(price, -1) ASC')->orderBy('id', 'asc'),
-            'price_desc' => $query->orderByRaw('COALESCE(price, -1) DESC')->orderBy('id', 'desc'),
+            // MySQL/MariaDB's native NULL ordering matches the former
+            // COALESCE(price, -1) semantics because marketplace prices cannot
+            // be negative, while allowing a composite index to satisfy order.
+            'price_asc' => $query->orderBy('price', 'asc')->orderBy('id', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc')->orderBy('id', 'desc'),
             'popular' => $query->orderBy('views_count', 'desc')->orderBy('id', 'desc'),
             default => $query->orderBy('id', 'desc'), // newest
         };
 
         // Cursor pagination
         if ($cursor) {
-            self::applySqlCursor($query, $sort, $cursor);
+            self::applySqlCursor($query, $sort, $cursor, ! empty($filters['featured_first']));
         }
 
         $listings = $query->limit($limit + 1)->get();
@@ -315,7 +322,7 @@ class MarketplaceListingService
         $items = $listings->map(fn ($l) => self::formatListingItem($l, $savedIds, $currentUserId))->values()->all();
 
         $nextCursor = $hasMore && $listings->isNotEmpty()
-            ? self::encodeSqlCursor($listings->last(), $sort)
+            ? self::encodeSqlCursor($listings->last(), $sort, ! empty($filters['featured_first']))
             : null;
 
         return [
@@ -325,7 +332,12 @@ class MarketplaceListingService
         ];
     }
 
-    private static function applySqlCursor(Builder $query, string $sort, string $cursor): void
+    private static function applySqlCursor(
+        Builder $query,
+        string $sort,
+        string $cursor,
+        bool $featuredFirst = false
+    ): void
     {
         $decoded = base64_decode($cursor, true);
         if ($decoded === false || $decoded === '') {
@@ -346,15 +358,77 @@ class MarketplaceListingService
             return;
         }
 
-        if ($sort === 'price_asc' || $sort === 'price_desc') {
-            $price = (float) ($payload['value'] ?? -1);
-            $operator = $sort === 'price_asc' ? '>' : '<';
-            $query->where(function (Builder $q) use ($price, $id, $operator) {
-                $q->whereRaw('COALESCE(price, -1) ' . $operator . ' ?', [$price])
-                    ->orWhere(function (Builder $tie) use ($price, $id, $operator) {
-                        $tie->whereRaw('COALESCE(price, -1) = ?', [$price])
-                            ->where('id', $operator, $id);
+        if ($featuredFirst && array_key_exists('promoted_until', $payload)) {
+            $promotedUntil = is_string($payload['promoted_until'])
+                && $payload['promoted_until'] !== ''
+                    ? $payload['promoted_until']
+                    : null;
+
+            $query->where(function (Builder $promotionCursor) use ($promotedUntil, $sort, $payload, $id): void {
+                if ($promotedUntil === null) {
+                    $promotionCursor->whereNull('promoted_until')
+                        ->where(function (Builder $tie) use ($sort, $payload, $id): void {
+                            self::applySortCursorPayload($tie, $sort, $payload, $id);
+                        });
+                    return;
+                }
+
+                $promotionCursor->where('promoted_until', '<', $promotedUntil)
+                    ->orWhereNull('promoted_until')
+                    ->orWhere(function (Builder $tie) use ($promotedUntil, $sort, $payload, $id): void {
+                        $tie->where('promoted_until', $promotedUntil)
+                            ->where(function (Builder $secondaryTie) use ($sort, $payload, $id): void {
+                                self::applySortCursorPayload($secondaryTie, $sort, $payload, $id);
+                            });
                     });
+            });
+            return;
+        }
+
+        self::applySortCursorPayload($query, $sort, $payload, $id);
+    }
+
+    /** @param array<string,mixed> $payload */
+    private static function applySortCursorPayload(
+        Builder $query,
+        string $sort,
+        array $payload,
+        int $id
+    ): void {
+
+        if ($sort === 'price_asc' || $sort === 'price_desc') {
+            $price = is_numeric($payload['value'] ?? null)
+                ? (float) $payload['value']
+                : null;
+
+            if ($sort === 'price_asc') {
+                $query->where(function (Builder $q) use ($price, $id): void {
+                    if ($price === null) {
+                        $q->where(static function (Builder $nullTie) use ($id): void {
+                            $nullTie->whereNull('price')->where('id', '>', $id);
+                        })->orWhereNotNull('price');
+                        return;
+                    }
+
+                    $q->where('price', '>', $price)
+                        ->orWhere(static function (Builder $tie) use ($price, $id): void {
+                            $tie->where('price', $price)->where('id', '>', $id);
+                        });
+                });
+                return;
+            }
+
+            $query->where(function (Builder $q) use ($price, $id): void {
+                if ($price === null) {
+                    $q->whereNull('price')->where('id', '<', $id);
+                    return;
+                }
+
+                $q->where('price', '<', $price)
+                    ->orWhere(static function (Builder $tie) use ($price, $id): void {
+                        $tie->where('price', $price)->where('id', '<', $id);
+                    })
+                    ->orWhereNull('price');
             });
             return;
         }
@@ -374,19 +448,28 @@ class MarketplaceListingService
         $query->where('id', '<', $id);
     }
 
-    private static function encodeSqlCursor(MarketplaceListing $listing, string $sort): string
+    private static function encodeSqlCursor(
+        MarketplaceListing $listing,
+        string $sort,
+        bool $featuredFirst = false
+    ): string
     {
         $value = match ($sort) {
-            'price_asc', 'price_desc' => (float) ($listing->price ?? -1),
+            'price_asc', 'price_desc' => $listing->price !== null ? (float) $listing->price : null,
             'popular' => (int) ($listing->views_count ?? 0),
             default => (int) $listing->id,
         };
 
-        return base64_encode(json_encode([
+        $payload = [
             'sort' => $sort,
             'value' => $value,
             'id' => (int) $listing->id,
-        ], JSON_THROW_ON_ERROR));
+        ];
+        if ($featuredFirst) {
+            $payload['promoted_until'] = $listing->promoted_until?->format('Y-m-d H:i:s.u');
+        }
+
+        return base64_encode(json_encode($payload, JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -394,10 +477,9 @@ class MarketplaceListingService
      */
     public static function getById(int $id, ?int $currentUserId = null): ?array
     {
-        $listing = self::listingDetailQuery()
-            ->where('status', 'active')
-            ->where('moderation_status', 'approved')
-            ->find($id);
+        $query = self::listingDetailQuery();
+        self::applyPublicVisibility($query);
+        $listing = $query->find($id);
 
         return self::formatLoadedListingDetail($listing, $id, $currentUserId);
     }
@@ -414,6 +496,35 @@ class MarketplaceListingService
             ->find($id);
 
         return self::formatLoadedListingDetail($listing, $id, $ownerId);
+    }
+
+    /**
+     * Permit only the buyer named on an accepted offer to inspect its reserved
+     * listing during checkout. This deliberately does not broaden ordinary
+     * public visibility for reserved or otherwise unpublished listings.
+     */
+    public static function getByIdForAcceptedOfferBuyer(int $id, int $buyerId, int $offerId): ?array
+    {
+        $tenantId = (int) TenantContext::getId();
+        $authorized = MarketplaceOffer::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($offerId)
+            ->where('marketplace_listing_id', $id)
+            ->where('buyer_id', $buyerId)
+            ->where('status', 'accepted')
+            ->exists();
+        if (! $authorized) {
+            return null;
+        }
+
+        $listing = self::listingDetailQuery()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($id)
+            ->where('status', 'reserved')
+            ->where('moderation_status', 'approved')
+            ->first();
+
+        return self::formatLoadedListingDetail($listing, $id, $buyerId);
     }
 
     private static function listingDetailQuery(): Builder
@@ -447,35 +558,60 @@ class MarketplaceListingService
 
     /**
      * Get nearby marketplace listings using haversine distance.
+     *
+     * @param array{search?: string, category_id?: mixed} $filters
      */
-    public static function getNearby(float $lat, float $lng, float $radiusKm = 25, int $limit = 20): array
+    public static function getNearby(
+        float $lat,
+        float $lng,
+        float $radiusKm = 25,
+        int $limit = 20,
+        array $filters = []
+    ): array
     {
-        $listings = MarketplaceListing::query()
+        $query = MarketplaceListing::query()
             ->with([
                 'user:id,first_name,last_name,avatar_url',
                 'category:id,name,slug,icon',
                 'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
             ])
             ->withCount('images')
-            ->where('status', 'active')
-            ->where('moderation_status', 'approved')
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->selectRaw('*, (
-                6371 * acos(
+            ->withinRadiusBoundingBox($lat, $lng, $radiusKm)
+            ->select('marketplace_listings.*')
+            ->selectRaw('(
+                6371 * acos(LEAST(1, GREATEST(-1,
                     cos(radians(?)) * cos(radians(latitude)) *
                     cos(radians(longitude) - radians(?)) +
                     sin(radians(?)) * sin(radians(latitude))
-                )
+                )))
             ) AS distance_km', [$lat, $lng, $lat])
             ->having('distance_km', '<=', $radiusKm)
             ->orderBy('distance_km')
-            ->limit($limit)
-            ->get();
+            ->limit($limit);
+
+        if (($search = trim((string) ($filters['search'] ?? ''))) !== '') {
+            $query->where(static function (Builder $searchQuery) use ($search): void {
+                $searchQuery->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+        if (($categoryId = filter_var($filters['category_id'] ?? null, FILTER_VALIDATE_INT)) !== false
+            && $categoryId > 0) {
+            $query->where('category_id', $categoryId);
+        }
+
+        self::applyPublicVisibility($query);
+        $listings = $query->get();
 
         return $listings->map(fn ($l) => array_merge(
             self::formatListingItem($l, [], null),
-            ['distance_km' => round($l->distance_km, 1)]
+            [
+                // Nearby results are public. Map pins need coordinates, but
+                // exact seller/profile coordinates must never leave the API.
+                'latitude' => round((float) $l->latitude, 2),
+                'longitude' => round((float) $l->longitude, 2),
+                'distance_km' => round((float) $l->distance_km, 1),
+            ]
         ))->all();
     }
 
@@ -488,75 +624,79 @@ class MarketplaceListingService
      */
     public static function create(int $userId, array $data): MarketplaceListing
     {
-        // Block suspended sellers
-        $profile = MarketplaceSellerProfile::where('user_id', $userId)
-            ->where('tenant_id', TenantContext::getId())
-            ->first();
-        if ($profile && $profile->is_suspended) {
-            throw new \DomainException('SELLER_SUSPENDED');
-        }
+        $data = self::normalizePricingInput($data);
+        self::assertListingPolicy($data);
+        self::ensureCategoryAvailable($data['category_id'] ?? null);
 
-        // Enforce max active listings per seller
-        $maxListings = MarketplaceConfigurationService::maxActiveListings();
-        if ($maxListings > 0) {
-            $activeCount = MarketplaceListing::where('user_id', $userId)
-                ->where('status', 'active')
-                ->count();
-            if ($activeCount >= $maxListings) {
-                throw new \InvalidArgumentException("Maximum of {$maxListings} active listings reached.");
-            }
-        }
+        self::assertSellerCanPublish($userId);
 
-        $listing = new MarketplaceListing();
-        $listing->tenant_id = TenantContext::getId();
-        $listing->user_id = $userId;
-        $listing->title = $data['title'];
-        $listing->description = $data['description'];
-        $listing->tagline = $data['tagline'] ?? null;
-        $listing->price = $data['price'] ?? null;
-        $listing->price_currency = $data['price_currency'] ?? 'EUR';
-        $listing->price_type = $data['price_type'] ?? 'fixed';
-        $listing->time_credit_price = $data['time_credit_price'] ?? null;
-        $listing->category_id = $data['category_id'] ?? null;
-        $listing->condition = $data['condition'] ?? null;
-        $listing->quantity = $data['quantity'] ?? 1;
-        // AG46 — inventory tracking columns
-        if (array_key_exists('inventory_count', $data)) {
-            $listing->inventory_count = $data['inventory_count'];
-        }
-        if (array_key_exists('low_stock_threshold', $data)) {
-            $listing->low_stock_threshold = $data['low_stock_threshold'];
-        }
-        if (array_key_exists('is_oversold_protected', $data)) {
-            $listing->is_oversold_protected = (bool) $data['is_oversold_protected'];
-        }
-        $listing->location = $data['location'] ?? null;
-        $listing->latitude = $data['latitude'] ?? null;
-        $listing->longitude = $data['longitude'] ?? null;
-        $listing->shipping_available = $data['shipping_available'] ?? false;
-        $listing->local_pickup = $data['local_pickup'] ?? true;
-        $listing->delivery_method = $data['delivery_method'] ?? 'pickup';
-        $listing->seller_type = $data['seller_type'] ?? 'private';
-        $listing->status = $data['status'] ?? 'active';
-        // Only require moderation if explicitly enabled for this tenant
-        try {
-            $moderationEnabled = MarketplaceConfigurationService::moderationEnabled();
-        } catch (\Throwable $e) {
-            $moderationEnabled = false; // Default to no moderation if config unavailable
-        }
-        $listing->moderation_status = $moderationEnabled ? 'pending' : 'approved';
-        $listing->template_data = $data['template_data'] ?? null;
-        $durationDays = (int) ($data['duration_days'] ?? MarketplaceConfigurationService::listingDurationDays());
-        $listing->expires_at = now()->addDays($durationDays);
-        $listing->save();
+        // Serialize quota check + insert per seller. A plain count-then-save
+        // allows two concurrent requests to exceed the tenant limit.
+        $tenantId = (int) TenantContext::getId();
+        $listing = Cache::lock("marketplace-listing-quota:{$tenantId}:{$userId}", 15)
+            ->block(10, static function () use ($userId, $tenantId, $data): MarketplaceListing {
+                $maxListings = MarketplaceConfigurationService::maxActiveListings();
+                if ($maxListings > 0) {
+                    $activeCount = MarketplaceListing::where('user_id', $userId)
+                        ->where('status', 'active')
+                        ->count();
+                    if ($activeCount >= $maxListings) {
+                        throw new \InvalidArgumentException(__('api.marketplace_active_listing_limit', ['max' => $maxListings]));
+                    }
+                }
+
+                $listing = new MarketplaceListing();
+                $listing->tenant_id = $tenantId;
+                $listing->user_id = $userId;
+                $listing->title = $data['title'];
+                $listing->description = $data['description'];
+                $listing->tagline = $data['tagline'] ?? null;
+                $listing->price = $data['price'] ?? null;
+                $listing->price_currency = $data['price_currency'] ?? strtoupper(TenantContext::getCurrency());
+                $listing->price_type = $data['price_type'] ?? 'fixed';
+                $listing->time_credit_price = $data['time_credit_price'] ?? null;
+                $listing->category_id = $data['category_id'] ?? null;
+                $listing->condition = $data['condition'] ?? null;
+                $listing->quantity = $data['quantity'] ?? 1;
+                if (array_key_exists('inventory_count', $data)) {
+                    $listing->inventory_count = $data['inventory_count'];
+                }
+                if (array_key_exists('low_stock_threshold', $data)) {
+                    $listing->low_stock_threshold = $data['low_stock_threshold'];
+                }
+                if (array_key_exists('is_oversold_protected', $data)) {
+                    $listing->is_oversold_protected = (bool) $data['is_oversold_protected'];
+                }
+                $listing->location = $data['location'] ?? null;
+                $listing->latitude = $data['latitude'] ?? null;
+                $listing->longitude = $data['longitude'] ?? null;
+                $listing->shipping_available = $data['shipping_available'] ?? false;
+                $listing->local_pickup = $data['local_pickup'] ?? true;
+                $listing->delivery_method = $data['delivery_method'] ?? 'pickup';
+                $listing->seller_type = $data['seller_type'] ?? 'private';
+                $listing->status = $data['status'] ?? 'active';
+                $listing->moderation_status = MarketplaceConfigurationService::moderationEnabled()
+                    ? 'pending'
+                    : 'approved';
+                $listing->template_data = $data['template_data'] ?? null;
+                $durationDays = (int) ($data['duration_days'] ?? MarketplaceConfigurationService::listingDurationDays());
+                $listing->expires_at = now()->addDays($durationDays);
+                $listing->save();
+
+                return $listing;
+            });
 
         // Geocode if location provided but no coordinates
         if ($listing->location && !$listing->latitude) {
             self::geocodeListing($listing);
         }
 
-        // Sync to Meilisearch index (non-blocking, best-effort)
-        SearchService::indexMarketplaceListing($listing);
+        // Pending or draft content must never enter the public search index.
+        if ($listing->status === 'active' && $listing->moderation_status === 'approved') {
+            SearchService::indexMarketplaceListing($listing);
+        } else {
+            SearchService::removeMarketplaceListing($listing->id);
+        }
 
         return $listing;
     }
@@ -566,6 +706,20 @@ class MarketplaceListingService
      */
     public static function update(MarketplaceListing $listing, array $data): MarketplaceListing
     {
+        $data = self::normalizePricingInput($data, $listing);
+        self::assertListingPolicy($data, $listing);
+        if (array_key_exists('status', $data)) {
+            if (! in_array((string) $listing->status, ['active', 'draft'], true)) {
+                throw new \InvalidArgumentException(__('api.validation_failed'));
+            }
+            if ((string) $data['status'] === 'active') {
+                self::assertSellerCanPublish((int) $listing->user_id);
+            }
+        }
+        if (array_key_exists('category_id', $data)) {
+            self::ensureCategoryAvailable($data['category_id']);
+        }
+
         $fillable = [
             'title', 'description', 'tagline', 'price', 'price_currency',
             'price_type', 'time_credit_price', 'category_id', 'condition',
@@ -581,6 +735,29 @@ class MarketplaceListingService
             }
         }
 
+        $moderatedFields = [
+            'title',
+            'description',
+            'tagline',
+            'price',
+            'price_currency',
+            'price_type',
+            'time_credit_price',
+            'category_id',
+            'condition',
+            'quantity',
+            'template_data',
+        ];
+        $requiresRemoderation = $listing->moderation_status === 'approved'
+            && MarketplaceConfigurationService::moderationEnabled()
+            && $listing->isDirty($moderatedFields);
+        if ($requiresRemoderation) {
+            $listing->moderation_status = 'pending';
+            $listing->moderation_notes = null;
+            $listing->moderated_by = null;
+            $listing->moderated_at = null;
+        }
+
         $listing->save();
 
         // Re-geocode if location changed
@@ -588,8 +765,13 @@ class MarketplaceListingService
             self::geocodeListing($listing);
         }
 
-        // Sync updated listing to Meilisearch index (non-blocking, best-effort)
-        SearchService::indexMarketplaceListing($listing);
+        // Pending content must leave public search until an administrator
+        // approves the material changes.
+        if ($listing->status === 'active' && $listing->moderation_status === 'approved') {
+            SearchService::indexMarketplaceListing($listing);
+        } else {
+            SearchService::removeMarketplaceListing($listing->id);
+        }
 
         return $listing;
     }
@@ -611,14 +793,45 @@ class MarketplaceListingService
      */
     public static function renew(MarketplaceListing $listing, int $durationDays = 30): MarketplaceListing
     {
+        self::assertSellerCanPublish((int) $listing->user_id);
+        if (! in_array((string) $listing->status, ['active', 'draft', 'expired'], true)) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
         $listing->status = 'active';
         $listing->expires_at = now()->addDays($durationDays);
         $listing->renewed_at = now();
         $listing->renewal_count = ($listing->renewal_count ?? 0) + 1;
         $listing->save();
 
-        // Re-index renewed listing in Meilisearch
-        SearchService::indexMarketplaceListing($listing);
+        // Renewal does not bypass moderation.
+        if ($listing->moderation_status === 'approved') {
+            SearchService::indexMarketplaceListing($listing);
+        } else {
+            SearchService::removeMarketplaceListing($listing->id);
+        }
+
+        return $listing;
+    }
+
+    /** Publish a seller draft without altering renewal accounting. */
+    public static function activate(MarketplaceListing $listing): MarketplaceListing
+    {
+        self::assertSellerCanPublish((int) $listing->user_id);
+        if ((string) $listing->status !== 'draft') {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
+        }
+
+        $listing->status = 'active';
+        if ($listing->expires_at === null || $listing->expires_at->isPast()) {
+            $listing->expires_at = now()->addDays(MarketplaceConfigurationService::listingDurationDays());
+        }
+        $listing->save();
+
+        if ($listing->moderation_status === 'approved') {
+            SearchService::indexMarketplaceListing($listing);
+        } else {
+            SearchService::removeMarketplaceListing($listing->id);
+        }
 
         return $listing;
     }
@@ -648,6 +861,8 @@ class MarketplaceListingService
                 'is_primary' => $maxSort < 0 && $i === 0,
             ]);
         }
+
+        self::markPendingForModeration($listing);
     }
 
     /**
@@ -658,14 +873,35 @@ class MarketplaceListingService
      */
     public static function reorderImages(MarketplaceListing $listing, array $imageIds): void
     {
-        foreach ($imageIds as $order => $imageId) {
-            MarketplaceImage::where('id', $imageId)
-                ->where('marketplace_listing_id', $listing->id)
-                ->update([
-                    'sort_order' => $order,
-                    'is_primary' => $order === 0,
-                ]);
+        $requestedIds = array_values(array_map('intval', $imageIds));
+        $currentIds = MarketplaceImage::query()
+            ->where('marketplace_listing_id', $listing->id)
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $requestedSet = $requestedIds;
+        $currentSet = $currentIds;
+        sort($requestedSet);
+        sort($currentSet);
+        if (count($requestedIds) !== count(array_unique($requestedIds))
+            || $requestedSet !== $currentSet) {
+            throw new \InvalidArgumentException(__('api.validation_failed'));
         }
+
+        DB::transaction(static function () use ($listing, $requestedIds): void {
+            MarketplaceImage::query()
+                ->where('marketplace_listing_id', $listing->id)
+                ->update(['is_primary' => false]);
+            foreach ($requestedIds as $order => $imageId) {
+                MarketplaceImage::query()
+                    ->whereKey($imageId)
+                    ->where('marketplace_listing_id', $listing->id)
+                    ->update([
+                        'sort_order' => $order,
+                        'is_primary' => $order === 0,
+                    ]);
+            }
+        });
     }
 
     /**
@@ -673,9 +909,59 @@ class MarketplaceListingService
      */
     public static function deleteImage(MarketplaceListing $listing, int $imageId): bool
     {
-        return MarketplaceImage::where('id', $imageId)
-            ->where('marketplace_listing_id', $listing->id)
-            ->delete() > 0;
+        $deleted = DB::transaction(static function () use ($listing, $imageId): bool {
+            $image = MarketplaceImage::query()
+                ->whereKey($imageId)
+                ->where('marketplace_listing_id', $listing->id)
+                ->lockForUpdate()
+                ->first();
+            if ($image === null) {
+                return false;
+            }
+
+            $wasPrimary = (bool) $image->is_primary;
+            $image->delete();
+            if ($wasPrimary) {
+                $replacement = MarketplaceImage::query()
+                    ->where('marketplace_listing_id', $listing->id)
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->first();
+                if ($replacement !== null) {
+                    $replacement->is_primary = true;
+                    $replacement->save();
+                }
+            }
+
+            return true;
+        });
+
+        if ($deleted) {
+            self::markPendingForModeration($listing);
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Return an approved listing to moderation after its public media changes.
+     */
+    public static function markPendingForModeration(MarketplaceListing $listing): bool
+    {
+        if ($listing->moderation_status !== 'approved'
+            || !MarketplaceConfigurationService::moderationEnabled()) {
+            return false;
+        }
+
+        $listing->moderation_status = 'pending';
+        $listing->moderation_notes = null;
+        $listing->moderated_by = null;
+        $listing->moderated_at = null;
+        $listing->save();
+        SearchService::removeMarketplaceListing($listing->id);
+
+        return true;
     }
 
     // -----------------------------------------------------------------
@@ -692,13 +978,15 @@ class MarketplaceListingService
             return;
         }
 
-        MarketplaceSavedListing::firstOrCreate([
+        $saved = MarketplaceSavedListing::firstOrCreate([
             'tenant_id' => TenantContext::getId(),
             'user_id' => $userId,
             'marketplace_listing_id' => $listingId,
         ]);
 
-        MarketplaceListing::where('id', $listingId)->increment('saves_count');
+        if ($saved->wasRecentlyCreated) {
+            MarketplaceListing::where('id', $listingId)->increment('saves_count');
+        }
     }
 
     /**
@@ -711,7 +999,9 @@ class MarketplaceListingService
             ->delete();
 
         if ($deleted) {
-            MarketplaceListing::where('id', $listingId)->decrement('saves_count');
+            MarketplaceListing::where('id', $listingId)->update([
+                'saves_count' => DB::raw('GREATEST(saves_count - 1, 0)'),
+            ]);
         }
     }
 
@@ -735,15 +1025,16 @@ class MarketplaceListingService
         }
 
         $listingIds = $saved->pluck('marketplace_listing_id');
-        $listings = MarketplaceListing::query()
+        $listingsQuery = MarketplaceListing::query()
             ->with([
                 'user:id,first_name,last_name,avatar_url',
                 'category:id,name,slug,icon',
                 'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
             ])
             ->withCount('images')
-            ->whereIn('id', $listingIds)
-            ->get()
+            ->whereIn('id', $listingIds);
+        self::applyPublicVisibility($listingsQuery);
+        $listings = $listingsQuery->get()
             ->keyBy('id');
 
         $items = $saved->map(function ($s) use ($listings) {
@@ -818,6 +1109,10 @@ class MarketplaceListingService
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->where('moderation_status', 'approved')
+            ->where(static function ($query): void {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
             ->groupBy('category_id')
             ->selectRaw('category_id, COUNT(*) as count')
             ->pluck('count', 'category_id');
@@ -847,10 +1142,12 @@ class MarketplaceListingService
             'id' => $listing->id,
             'title' => $listing->title,
             'tagline' => $listing->tagline,
-            'price' => $listing->price,
+            'price' => $listing->price !== null ? (float) $listing->price : null,
             'price_currency' => $listing->price_currency,
             'price_type' => $listing->price_type,
-            'time_credit_price' => $listing->time_credit_price,
+            'time_credit_price' => $listing->time_credit_price !== null
+                ? (float) $listing->time_credit_price
+                : null,
             'condition' => $listing->condition,
             'location' => $listing->location,
             'delivery_method' => $listing->delivery_method,
@@ -884,6 +1181,13 @@ class MarketplaceListingService
 
     private static function formatListingDetail(MarketplaceListing $listing, bool $isSaved, ?int $currentUserId): array
     {
+        $isOwner = $currentUserId !== null && (int) $listing->user_id === $currentUserId;
+        $latitude = $listing->latitude !== null
+            ? ($isOwner ? (float) $listing->latitude : round((float) $listing->latitude, 2))
+            : null;
+        $longitude = $listing->longitude !== null
+            ? ($isOwner ? (float) $listing->longitude : round((float) $listing->longitude, 2))
+            : null;
         $images = $listing->relationLoaded('images')
             ? $listing->images->map(fn ($img) => [
                 'id' => $img->id,
@@ -894,15 +1198,17 @@ class MarketplaceListingService
             ])->all()
             : [];
 
-        return [
+        $detail = [
             'id' => $listing->id,
             'title' => $listing->title,
             'description' => $listing->description,
             'tagline' => $listing->tagline,
-            'price' => $listing->price,
+            'price' => $listing->price !== null ? (float) $listing->price : null,
             'price_currency' => $listing->price_currency,
             'price_type' => $listing->price_type,
-            'time_credit_price' => $listing->time_credit_price,
+            'time_credit_price' => $listing->time_credit_price !== null
+                ? (float) $listing->time_credit_price
+                : null,
             'category' => $listing->category ? [
                 'id' => $listing->category->id,
                 'name' => $listing->category->name,
@@ -912,8 +1218,8 @@ class MarketplaceListingService
             'condition' => $listing->condition,
             'quantity' => $listing->quantity,
             'location' => $listing->location,
-            'latitude' => $listing->latitude,
-            'longitude' => $listing->longitude,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'shipping_available' => $listing->shipping_available,
             'local_pickup' => $listing->local_pickup,
             'delivery_method' => $listing->delivery_method,
@@ -930,7 +1236,7 @@ class MarketplaceListingService
                 'member_since' => $listing->user->created_at?->toISOString(),
             ] : null,
             'is_saved' => $isSaved,
-            'is_own' => $currentUserId && $listing->user_id === $currentUserId,
+            'is_own' => $isOwner,
             'is_promoted' => $listing->promoted_until && $listing->promoted_until > now(),
             'views_count' => $listing->views_count,
             'saves_count' => $listing->saves_count,
@@ -938,11 +1244,199 @@ class MarketplaceListingService
             'created_at' => $listing->created_at?->toISOString(),
             'updated_at' => $listing->updated_at?->toISOString(),
         ];
+
+        // Inventory is commercially sensitive and only needed by the seller's
+        // edit workflow. Preserve the fields for owners without exposing exact
+        // stock levels to public listing viewers.
+        if ($isOwner) {
+            $detail['inventory_count'] = $listing->inventory_count !== null
+                ? (int) $listing->inventory_count
+                : null;
+            $detail['low_stock_threshold'] = $listing->low_stock_threshold !== null
+                ? (int) $listing->low_stock_threshold
+                : null;
+            $detail['is_oversold_protected'] = (bool) $listing->is_oversold_protected;
+        }
+
+        return $detail;
     }
 
     // -----------------------------------------------------------------
     //  Helpers
     // -----------------------------------------------------------------
+
+    /**
+     * Apply the canonical public-listing visibility contract.
+     */
+    public static function applyPublicVisibility(Builder $query): Builder
+    {
+        $query->where('status', 'active')
+            ->where('moderation_status', 'approved')
+            ->where(static function (Builder $expiryQuery): void {
+                $expiryQuery->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->whereNotExists(static function ($inactiveSeller): void {
+                $inactiveSeller->selectRaw('1')
+                    ->from('users as marketplace_public_seller')
+                    ->whereColumn('marketplace_public_seller.id', 'marketplace_listings.user_id')
+                    ->whereColumn('marketplace_public_seller.tenant_id', 'marketplace_listings.tenant_id')
+                    ->where(static function ($inactive): void {
+                        $inactive->where('marketplace_public_seller.status', '!=', 'active')
+                            ->orWhere('marketplace_public_seller.is_approved', false);
+                    });
+            })
+            ->whereNotExists(static function ($suspendedSeller): void {
+                $suspendedSeller->selectRaw('1')
+                    ->from('marketplace_seller_profiles as marketplace_public_profile')
+                    ->whereColumn('marketplace_public_profile.user_id', 'marketplace_listings.user_id')
+                    ->whereColumn('marketplace_public_profile.tenant_id', 'marketplace_listings.tenant_id')
+                    ->where('marketplace_public_profile.is_suspended', true);
+            });
+
+        if (! MarketplaceConfigurationService::allowFreeItems()) {
+            $query->where('price_type', '!=', 'free');
+        }
+
+        return $query;
+    }
+
+    /** Block every publication path for an administratively suspended seller. */
+    public static function assertSellerCanPublish(int $userId): void
+    {
+        $isSuspended = MarketplaceSellerProfile::query()
+            ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->where('is_suspended', true)
+            ->exists();
+
+        if ($isSuspended) {
+            throw new \DomainException('SELLER_SUSPENDED');
+        }
+    }
+
+    /**
+     * Canonicalize monetary input at the service boundary so CSV imports and
+     * other non-HTTP callers cannot create prices Stripe cannot represent.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function normalizePricingInput(
+        array $data,
+        ?MarketplaceListing $existing = null,
+    ): array {
+        $rawCurrency = array_key_exists('price_currency', $data)
+            ? (string) $data['price_currency']
+            : (string) ($existing?->price_currency ?? TenantContext::getCurrency());
+        $currency = StripeCurrency::normalize($rawCurrency);
+
+        if ($existing === null || array_key_exists('price_currency', $data)) {
+            $data['price_currency'] = $currency;
+        }
+
+        $price = array_key_exists('price', $data) ? $data['price'] : $existing?->price;
+        if ($price !== null && $price !== '') {
+            $numericPrice = (float) $price;
+            if (! is_finite($numericPrice) || $numericPrice < 0) {
+                throw new \InvalidArgumentException(__('api.validation_failed'));
+            }
+            StripeCurrency::toMinor($numericPrice, $currency);
+            if (array_key_exists('price', $data)) {
+                $data['price'] = StripeCurrency::roundMajor($numericPrice, $currency);
+            }
+        }
+
+        if (array_key_exists('time_credit_price', $data)
+            && $data['time_credit_price'] !== null
+            && $data['time_credit_price'] !== '') {
+            $timeCreditPrice = (float) $data['time_credit_price'];
+            if (! is_finite($timeCreditPrice) || $timeCreditPrice < 0) {
+                throw new \InvalidArgumentException(__('api.validation_failed'));
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Enforce tenant marketplace policy at the service boundary so imports and
+     * future non-HTTP callers cannot bypass the maintained controller UI.
+     *
+     * Existing legacy listings remain editable unless a governed field is
+     * changed; checkout independently re-checks the current policy.
+     *
+     * @param array<string,mixed> $data
+     */
+    private static function assertListingPolicy(
+        array $data,
+        ?MarketplaceListing $existing = null,
+    ): void {
+        $isCreate = $existing === null;
+        $priceType = (string) ($data['price_type'] ?? $existing?->price_type ?? 'fixed');
+        if (($isCreate || array_key_exists('price_type', $data))
+            && $priceType === 'free'
+            && ! MarketplaceConfigurationService::allowFreeItems()) {
+            throw new \InvalidArgumentException(__('api.marketplace_free_items_disabled'));
+        }
+
+        $sellerType = (string) ($data['seller_type'] ?? $existing?->seller_type ?? 'private');
+        if (($isCreate || array_key_exists('seller_type', $data))
+            && $sellerType === 'business'
+            && ! MarketplaceConfigurationService::allowBusinessSellers()) {
+            throw new \InvalidArgumentException(__('api.marketplace_business_sellers_disabled'));
+        }
+
+        $deliveryMethod = (string) ($data['delivery_method'] ?? $existing?->delivery_method ?? 'pickup');
+        $shippingAvailable = (bool) ($data['shipping_available'] ?? $existing?->shipping_available ?? false);
+        if (($isCreate
+                || array_key_exists('delivery_method', $data)
+                || array_key_exists('shipping_available', $data))
+            && ($shippingAvailable || in_array($deliveryMethod, ['shipping', 'both'], true))
+            && ! MarketplaceConfigurationService::allowShipping()) {
+            throw new \InvalidArgumentException(__('api.marketplace_shipping_disabled'));
+        }
+        if (($isCreate || array_key_exists('delivery_method', $data))
+            && $deliveryMethod === 'community_delivery'
+            && ! MarketplaceConfigurationService::allowCommunityDelivery()) {
+            throw new \InvalidArgumentException(__('api.marketplace_community_delivery_disabled'));
+        }
+
+        $cashPrice = (float) ($data['price'] ?? $existing?->price ?? 0);
+        $creditPrice = (float) ($data['time_credit_price'] ?? $existing?->time_credit_price ?? 0);
+        if (($isCreate
+                || array_key_exists('price', $data)
+                || array_key_exists('time_credit_price', $data))
+            && $cashPrice > 0
+            && $creditPrice > 0
+            && ! MarketplaceConfigurationService::allowHybridPricing()) {
+            throw new \InvalidArgumentException(__('api.marketplace_hybrid_pricing_disabled'));
+        }
+    }
+
+    /**
+     * Allow current-tenant and system categories only.
+     */
+    private static function ensureCategoryAvailable(mixed $categoryId): void
+    {
+        if ($categoryId === null || $categoryId === '') {
+            return;
+        }
+
+        $tenantId = TenantContext::getId();
+        $available = DB::table('marketplace_categories')
+            ->where('id', (int) $categoryId)
+            ->where('is_active', true)
+            ->where(static function ($query) use ($tenantId): void {
+                $query->where('tenant_id', $tenantId)
+                    ->orWhereNull('tenant_id');
+            })
+            ->exists();
+
+        if (!$available) {
+            throw new \DomainException('MARKETPLACE_CATEGORY_UNAVAILABLE');
+        }
+    }
 
     /**
      * Geocode a listing's location to lat/lng coordinates.

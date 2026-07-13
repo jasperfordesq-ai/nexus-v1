@@ -7,6 +7,11 @@ RewriteBase /
 # before Apache can serve a file (including generated WebP derivatives).
 RewriteRule ^uploads/(?:tenants/[^/]+/)?vetting/documents(?:/|$) - [F,L,NC]
 
+# Public storage contains user-controlled uploads. Never allow a script-like
+# extension beneath the storage symlink to reach an Apache/PHP handler, even if
+# an application-level upload validation regression is introduced later.
+RewriteRule ^storage/.*\.(?:php[0-9]?|phtml|pht|phar)(?:/|$) - [F,L,NC]
+
 # APK MIME Type - Force Download
 <FilesMatch "\.apk$">
     ForceType application/vnd.android.package-archive

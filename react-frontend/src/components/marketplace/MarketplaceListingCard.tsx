@@ -9,7 +9,7 @@
  * Shows an image with overlaid price and condition badges, listing title, * location, seller info, and a toggleable save/heart button.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import Heart from 'lucide-react/icons/heart';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -36,17 +36,27 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
   const { t } = useTranslation('marketplace');
   const { tenantPath } = useTenant();
   const [isSaved, setIsSaved] = useState(listing.is_saved);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setIsSaved(listing.is_saved);
+  }, [listing.is_saved]);
 
   const handleToggleSave = useCallback(
-    () => {
-      if (isSaved) {
-        onUnsave?.(listing.id);
-      } else {
-        onSave?.(listing.id);
+    async () => {
+      const action = isSaved ? onUnsave : onSave;
+      if (!action || isSaving) return;
+
+      setIsSaving(true);
+      try {
+        await action(listing.id);
+      } finally {
+        // The parent owns the authoritative API-backed state. The effect above
+        // updates the heart only after that state actually changes.
+        setIsSaving(false);
       }
-      setIsSaved((prev) => !prev);
     },
-    [isSaved, listing.id, onSave, onUnsave],
+    [isSaved, isSaving, listing.id, onSave, onUnsave],
   );
 
   const sourceImageUrl = listing.image?.thumbnail_url || listing.image?.url;
@@ -144,6 +154,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
         variant="secondary"
         size="sm"
         onPress={handleToggleSave}
+        isDisabled={isSaving}
         className="absolute top-2 right-2 z-20 bg-background/90 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md transition-colors hover:bg-background"
         aria-label={
           isSaved

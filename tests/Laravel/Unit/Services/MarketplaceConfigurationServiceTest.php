@@ -18,7 +18,7 @@ class MarketplaceConfigurationServiceTest extends TestCase
     public function test_has_public_methods(): void
     {
         $ref = new \ReflectionClass(\App\Services\MarketplaceConfigurationService::class);
-        foreach (['get', 'set', 'getAll', 'maxImages', 'maxActiveListings', 'listingDurationDays', 'moderationEnabled', 'allowShipping', 'allowFreeItems', 'allowBusinessSellers', 'allowHybridPricing', 'allowCommunityDelivery'] as $m) {
+        foreach (['get', 'set', 'getAll', 'maxImages', 'maxActiveListings', 'listingDurationDays', 'moderationEnabled', 'allowShipping', 'allowFreeItems', 'allowBusinessSellers', 'allowHybridPricing', 'allowCommunityDelivery', 'stripeEnabled', 'promotionsEnabled'] as $m) {
             $this->assertTrue($ref->hasMethod($m), "Missing method: {$m}");
             $this->assertTrue($ref->getMethod($m)->isPublic(), "Not public: {$m}");
         }

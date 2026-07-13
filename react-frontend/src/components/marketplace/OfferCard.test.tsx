@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@/test/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 import type { MarketplaceOffer } from '@/types/marketplace';
 
 vi.mock('@/lib/api', () => ({
@@ -25,13 +25,17 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
-vi.mock('@/lib/helpers', () => ({
-  resolveAvatarUrl: (url: string | null | undefined) => url || '',
-}));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: (url: string | null | undefined) => url || '',
+  };
+});
 
 vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }),
-  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useAuth: () => ({ user: { id: 2, name: 'Alice' }, isAuthenticated: true, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test' }, tenantPath: (p: string) => `/test${p}`, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
   useTheme: () => ({ resolvedTheme: 'light', theme: 'system', toggleTheme: vi.fn(), setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -47,6 +51,7 @@ vi.mock('@/contexts', () => ({
 }));
 
 import { OfferCard } from './OfferCard';
+import { api } from '@/lib/api';
 
 const BASE_OFFER: MarketplaceOffer = {
   id: 1,
@@ -95,6 +100,36 @@ describe('OfferCard', () => {
   it('shows a payment action for accepted buyer offers', () => {
     render(<OfferCard offer={{ ...BASE_OFFER, status: 'accepted' }} perspective="buyer" />);
     expect(screen.getByRole('button', { name: /pay accepted offer/i })).toBeInTheDocument();
+  });
+
+  it('requires an explicit shipping selection for an accepted offer', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => ({
+      success: true,
+      data: url.includes('/shipping-options')
+        ? [{ id: 8, courier_name: 'Tracked post', price: 4, currency: 'EUR', is_default: true, is_active: true }]
+        : [],
+    }));
+
+    render(
+      <OfferCard
+        offer={{
+          ...BASE_OFFER,
+          status: 'accepted',
+          listing: {
+            ...BASE_OFFER.listing!,
+            shipping_available: true,
+            local_pickup: false,
+            delivery_method: 'shipping',
+          },
+        }}
+        perspective="buyer"
+      />,
+    );
+
+    const payButton = screen.getByRole('button', { name: /pay accepted offer/i });
+    expect(payButton).toBeDisabled();
+    fireEvent.click(await screen.findByText('Tracked post'));
+    await waitFor(() => expect(payButton).not.toBeDisabled());
   });
 
   it('renders declined status chip', () => {

@@ -46,6 +46,17 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
     }
 
+    public function post($uri, array $data = [], array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (is_string($uri) && str_contains($uri, '/accessible')) {
+            $token = (string) ($data['_token'] ?? 'govuk-alpha-card-checkout-test-token');
+            $data['_token'] = $token;
+            $this->withSession(['_token' => $token]);
+        }
+
+        return parent::post($uri, $data, $headers);
+    }
+
     private function user(array $o = []): User
     {
         $u = User::factory()->forTenant($this->testTenantId)->create(array_merge(['status' => 'active', 'is_approved' => true], $o));
@@ -107,6 +118,40 @@ class MarketplaceCardCheckoutParityTest extends TestCase
 
         $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/pay")
             ->assertRedirectContains('status=pay-not-required');
+    }
+
+    public function test_pending_order_cancel_does_not_release_order_when_payment_cannot_be_reconciled(): void
+    {
+        $buyer = $this->user();
+        $seller = $this->user();
+        $orderId = $this->seedOrder($buyer->id, $seller->id, [
+            'payment_intent_id' => 'pi_requires_reconciliation',
+        ]);
+        Sanctum::actingAs($buyer, ['*']);
+
+        $oldSecret = getenv('STRIPE_SECRET_KEY');
+        config(['services.stripe.secret' => null]);
+        putenv('STRIPE_SECRET_KEY=');
+        unset($_ENV['STRIPE_SECRET_KEY'], $_SERVER['STRIPE_SECRET_KEY']);
+        try {
+            $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/cancel", [
+                'reason' => 'Changed my mind',
+            ])->assertRedirectContains('status=cancel-failed');
+        } finally {
+            if ($oldSecret === false) {
+                putenv('STRIPE_SECRET_KEY');
+            } else {
+                putenv('STRIPE_SECRET_KEY=' . $oldSecret);
+            }
+        }
+
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $orderId,
+            'status' => 'pending_payment',
+        ]);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/orders?status=cancel-failed")
+            ->assertOk()
+            ->assertSee(__('govuk_alpha_commerce.orders.status_cancel_failed'));
     }
 
     public function test_card_pay_unavailable_when_seller_not_onboarded(): void

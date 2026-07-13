@@ -29,26 +29,26 @@ class MarketplacePromotionService
      */
     private const PROMOTION_TYPES = [
         'bump' => [
-            'label' => 'Bump to Top',
-            'description' => 'Move your listing to the top of search results for 24 hours.',
+            'label_key' => 'api.marketplace_promotion_bump_label',
+            'description_key' => 'api.marketplace_promotion_bump_description',
             'duration_hours' => 24,
             'config_key' => MarketplaceConfigurationService::CONFIG_BUMP_PRICE,
         ],
         'featured' => [
-            'label' => 'Featured Listing',
-            'description' => 'Highlighted badge and priority placement for 7 days.',
+            'label_key' => 'api.marketplace_promotion_featured_label',
+            'description_key' => 'api.marketplace_promotion_featured_description',
             'duration_hours' => 168, // 7 days
             'config_key' => MarketplaceConfigurationService::CONFIG_FEATURED_PRICE,
         ],
         'top_of_category' => [
-            'label' => 'Top of Category',
-            'description' => 'Pin your listing at the top of its category for 3 days.',
+            'label_key' => 'api.marketplace_promotion_category_label',
+            'description_key' => 'api.marketplace_promotion_category_description',
             'duration_hours' => 72, // 3 days
             'config_key' => null, // uses featured price * 1.5
         ],
         'homepage_carousel' => [
-            'label' => 'Homepage Carousel',
-            'description' => 'Displayed in the marketplace homepage carousel for 7 days.',
+            'label_key' => 'api.marketplace_promotion_homepage_label',
+            'description_key' => 'api.marketplace_promotion_homepage_description',
             'duration_hours' => 168, // 7 days
             'config_key' => null, // uses featured price * 2
         ],
@@ -61,6 +61,10 @@ class MarketplacePromotionService
      */
     public static function getProducts(): array
     {
+        if (! MarketplaceConfigurationService::promotionsEnabled()) {
+            return [];
+        }
+
         $bumpPrice = (float) MarketplaceConfigurationService::get(
             MarketplaceConfigurationService::CONFIG_BUMP_PRICE,
             5.00
@@ -81,8 +85,8 @@ class MarketplacePromotionService
 
             $products[$type] = [
                 'type' => $type,
-                'label' => $info['label'],
-                'description' => $info['description'],
+                'label' => __($info['label_key']),
+                'description' => __($info['description_key']),
                 'price' => $price,
                 'currency' => strtoupper(TenantContext::getCurrency()),
                 'duration_hours' => $info['duration_hours'],
@@ -101,43 +105,62 @@ class MarketplacePromotionService
      */
     public static function createPromotion(int $userId, int $listingId, string $type): MarketplacePromotion
     {
+        if (! MarketplaceConfigurationService::promotionsEnabled()) {
+            throw new \DomainException('PROMOTIONS_DISABLED');
+        }
+
         $products = self::getProducts();
 
         if (!isset($products[$type])) {
-            throw new \InvalidArgumentException("Unknown promotion type: {$type}");
+            throw new \InvalidArgumentException(__('api.marketplace_promotion_type_unknown', ['type' => $type]));
         }
 
         $product = $products[$type];
         $durationHours = $product['duration_hours'];
         $price = $product['price'];
 
-        // Deactivate any existing active promotion of the same type on this listing
-        MarketplacePromotion::where('marketplace_listing_id', $listingId)
-            ->where('promotion_type', $type)
-            ->where('is_active', true)
-            ->update(['is_active' => false]);
-
-        $promotion = MarketplacePromotion::create([
-            'marketplace_listing_id' => $listingId,
-            'user_id' => $userId,
-            'promotion_type' => $type,
-            'amount_paid' => $price,
-            'currency' => $product['currency'],
-            'started_at' => now(),
-            'expires_at' => now()->addHours($durationHours),
-            'is_active' => true,
-        ]);
-
-        // Update promoted_until on the listing for backward-compatible queries
-        $maxExpiry = MarketplacePromotion::where('marketplace_listing_id', $listingId)
-            ->where('is_active', true)
-            ->max('expires_at');
-
-        if ($maxExpiry) {
-            MarketplaceListing::where('id', $listingId)->update(['promoted_until' => $maxExpiry]);
+        // This endpoint has no payment-authorisation input and therefore must
+        // never activate a priced product or record a fictitious amount paid.
+        // A tenant may still deliberately configure a zero-price promotion.
+        if ($price > 0) {
+            throw new \DomainException('PROMOTION_PAYMENT_REQUIRED');
         }
 
-        return $promotion;
+        return DB::transaction(static function () use (
+            $userId,
+            $listingId,
+            $type,
+            $product,
+            $durationHours
+        ): MarketplacePromotion {
+            // Deactivate any existing active promotion of the same type on this listing.
+            MarketplacePromotion::where('marketplace_listing_id', $listingId)
+                ->where('promotion_type', $type)
+                ->where('is_active', true)
+                ->update(['is_active' => false]);
+
+            $promotion = MarketplacePromotion::create([
+                'marketplace_listing_id' => $listingId,
+                'user_id' => $userId,
+                'promotion_type' => $type,
+                'amount_paid' => 0,
+                'currency' => $product['currency'],
+                'started_at' => now(),
+                'expires_at' => now()->addHours($durationHours),
+                'is_active' => true,
+            ]);
+
+            // Update promoted_until on the listing for backward-compatible queries.
+            $maxExpiry = MarketplacePromotion::where('marketplace_listing_id', $listingId)
+                ->where('is_active', true)
+                ->max('expires_at');
+
+            if ($maxExpiry) {
+                MarketplaceListing::where('id', $listingId)->update(['promoted_until' => $maxExpiry]);
+            }
+
+            return $promotion;
+        });
     }
 
     /**

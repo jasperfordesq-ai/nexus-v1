@@ -30,7 +30,7 @@ class MarketplacePromotionController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_feature_disabled'), null, 403)
             );
         }
     }
@@ -44,7 +44,26 @@ class MarketplacePromotionController extends BaseApiController
 
         if (!$enabled) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'Promotions are not enabled for this marketplace.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_promotions_disabled'), null, 403)
+            );
+        }
+    }
+
+    /**
+     * Priced promotions must stay hidden until a payment-authorisation and
+     * webhook lifecycle exists. Zero-price tenant promotions remain usable.
+     */
+    private function ensurePromotionCheckoutAvailable(string $type): void
+    {
+        $product = MarketplacePromotionService::getProducts()[$type] ?? null;
+        if ($product !== null && (float) $product['price'] > 0) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError(
+                    'PAYMENT_UNAVAILABLE',
+                    __('api.marketplace_promotions_payment_unavailable'),
+                    null,
+                    503,
+                ),
             );
         }
     }
@@ -63,7 +82,12 @@ class MarketplacePromotionController extends BaseApiController
         $this->ensureFeature();
         $this->ensurePromotionsEnabled();
 
-        return $this->respondWithData(array_values(MarketplacePromotionService::getProducts()));
+        $availableProducts = array_filter(
+            MarketplacePromotionService::getProducts(),
+            static fn (array $product): bool => (float) $product['price'] <= 0,
+        );
+
+        return $this->respondWithData(array_values($availableProducts));
     }
 
     /**
@@ -80,22 +104,24 @@ class MarketplacePromotionController extends BaseApiController
 
         $listing = MarketplaceListing::find($id);
         if (!$listing) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Listing not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.marketplace_listing_not_found'), null, 404);
         }
 
         if ((int) $listing->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You can only promote your own listings.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.marketplace_promotion_owner_required'), null, 403);
         }
 
         $request->validate([
             'promotion_type' => 'required|string|in:bump,featured,top_of_category,homepage_carousel',
         ]);
+        $promotionType = (string) $request->input('promotion_type');
+        $this->ensurePromotionCheckoutAvailable($promotionType);
 
         try {
             $promotion = MarketplacePromotionService::createPromotion(
                 $userId,
                 $id,
-                $request->input('promotion_type')
+                $promotionType
             );
 
             return $this->respondWithData([
@@ -107,6 +133,17 @@ class MarketplacePromotionController extends BaseApiController
                 'expires_at' => $promotion->expires_at?->toISOString(),
                 'is_active' => $promotion->is_active,
             ], null, 201);
+        } catch (\DomainException $e) {
+            if ($e->getMessage() === 'PROMOTION_PAYMENT_REQUIRED') {
+                return $this->respondWithError(
+                    'PAYMENT_REQUIRED',
+                    __('api.marketplace_promotions_payment_unavailable'),
+                    null,
+                    503
+                );
+            }
+
+            throw $e;
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('INVALID_INPUT', $e->getMessage(), null, 422);
         }

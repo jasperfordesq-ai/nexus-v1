@@ -1558,6 +1558,7 @@
       "all_listings": "كل إعلاناتي",
       "specific_listings": "إعلانات محددة",
       "specific_categories": "فئات محددة",
+      "target_required": "اختر إعلانًا أو فئة واحدة على الأقل",
       "save": "حفظ",
       "delete_confirm": "حذف هذه القسيمة؟ لا يمكن التراجع عن ذلك.",
       "no_coupons": "لم تنشئ أي قسائم بعد.",

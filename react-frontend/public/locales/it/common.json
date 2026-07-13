@@ -1528,6 +1528,7 @@
       "all_listings": "Tutti i miei annunci",
       "specific_listings": "Annunci specifici",
       "specific_categories": "Categorie specifiche",
+      "target_required": "Seleziona almeno un annuncio o una categoria",
       "save": "Salva",
       "delete_confirm": "Eliminare questo buono? L'operazione non è reversibile.",
       "no_coupons": "Non hai ancora creato alcun buono.",

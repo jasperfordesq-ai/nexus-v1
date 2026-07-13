@@ -50,10 +50,10 @@ jest.mock('react-i18next', () => ({
         'publicCoupons.unavailableSubtitle': 'Coupon features are not enabled.',
         'publicCoupons.details': 'Details',
         'publicCoupons.percentSuffix': '% off',
-        'publicCoupons.fixedValue': `EUR ${String(opts?.value ?? '')} off`,
+        'publicCoupons.fixedValue': `${String(opts?.value ?? '')} off`,
         'publicCoupons.bogo': 'Buy one, get one',
         'publicCoupons.validUntil': `Valid until ${String(opts?.date ?? '')}`,
-        'publicCoupons.minOrder': `Min EUR ${String(opts?.value ?? '')}`,
+        'publicCoupons.minOrder': `Min ${String(opts?.value ?? '')}`,
         'publicCoupons.usage': `${String(opts?.used ?? 0)} of ${String(opts?.max ?? 0)} used`,
         'publicCoupons.perMember': `${String(opts?.count ?? 0)} per member`,
         'publicCoupons.notFound': 'Coupon not found',
@@ -119,7 +119,10 @@ jest.mock('@/components/marketplace/MarketplaceListingCard', () => {
 });
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
-  useTenant: () => ({ hasFeature: (feature: string) => mockFeatures.has(feature) }),
+  useTenant: () => ({
+    tenant: { currency: 'GBP' },
+    hasFeature: (feature: string) => mockFeatures.has(feature),
+  }),
 }));
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
@@ -233,6 +236,24 @@ describe('public marketplace routes', () => {
       pathname: '/(modals)/marketplace-coupon-detail',
       params: { id: '8' },
     });
+  });
+
+  it('formats fixed coupons and minimum spend in the tenant currency', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          items: [{ ...coupon, discount_type: 'fixed', discount_value: 500 }],
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<MarketplaceCouponsRoute />);
+
+    expect(getByText('£5.00 off')).toBeTruthy();
+    expect(getByText('Min £5.00')).toBeTruthy();
   });
 
   it('renders coupon detail and can open the QR sheet', async () => {

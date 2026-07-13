@@ -19,7 +19,9 @@
       "invalid_listing": "A listagem não pertence a este comerciante.",
       "listing_unavailable": "Esta listagem não está disponível para resgate de fidelidade.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Este resgate do programa de fidelização já não está disponível.",
+      "redemption_mismatch": "Este resgate do programa de fidelização não corresponde à encomenda do marketplace selecionada."
     }
   },
   "survey": {

@@ -26,6 +26,7 @@ import Heart from 'lucide-react/icons/heart';
 import Package from 'lucide-react/icons/package';
 import HandCoins from 'lucide-react/icons/hand-coins';
 import Truck from 'lucide-react/icons/truck';
+import FileWarning from 'lucide-react/icons/file-warning';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -41,6 +42,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { normalizeMarketplaceListing } from '@/lib/marketplaceNumbers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -85,6 +87,7 @@ function toSharedCategory(cat: ApiCategory): MarketplaceCategory {
 
 export function MarketplacePage() {
   const { t } = useTranslation('marketplace');
+  const { t: tc } = useTranslation('marketplace_cases');
   usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
@@ -106,6 +109,7 @@ export function MarketplacePage() {
     searchParams.get('category') ? Number(searchParams.get('category')) : undefined,
   );
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listingRequestRef = useRef(0);
   const featureEnabled = hasFeature('marketplace');
 
   // Debounce search
@@ -145,7 +149,7 @@ export function MarketplacePage() {
       try {
         const response = await api.get<MarketplaceListingItem[]>('/v2/marketplace/listings/featured');
         if (!cancelled && response.success && response.data) {
-          setFeaturedListings(response.data as MarketplaceListingItem[]);
+          setFeaturedListings(response.data.map(normalizeMarketplaceListing));
         }
       } catch (err) {
         logError('Failed to load featured listings', err);
@@ -157,6 +161,7 @@ export function MarketplacePage() {
 
   // Load listings
   const loadListings = useCallback(async (append = false) => {
+    const requestId = ++listingRequestRef.current;
     try {
       if (!append) {
         setIsLoading(true);
@@ -174,8 +179,9 @@ export function MarketplacePage() {
       }
 
       const response = await api.get<MarketplaceListingItem[]>(`/v2/marketplace/listings?${params}`);
+      if (requestId !== listingRequestRef.current) return;
       if (response.success && response.data) {
-        const mapped = response.data as MarketplaceListingItem[];
+        const mapped = response.data.map(normalizeMarketplaceListing);
         if (append) {
           setListings((prev) => [...prev, ...mapped]);
         } else {
@@ -187,6 +193,7 @@ export function MarketplacePage() {
         setError(t('hub.unable_to_load'));
       }
     } catch (err) {
+      if (requestId !== listingRequestRef.current) return;
       logError('Failed to load marketplace listings', err);
       if (!append) {
         setError(t('hub.unable_to_load'));
@@ -194,8 +201,10 @@ export function MarketplacePage() {
         toast.error(t('hub.load_more_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (requestId === listingRequestRef.current) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
   }, [debouncedQuery, selectedCategoryId, toast, t])
 
@@ -463,6 +472,13 @@ export function MarketplacePage() {
                     >
                       <ShoppingBag className="w-4 h-4" aria-hidden="true" />
                       {t('hub.my_orders')}
+                    </Link>
+                    <Link
+                      to={tenantPath('/marketplace/reports')}
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+                    >
+                      <FileWarning className="w-4 h-4" aria-hidden="true" />
+                      {tc('report.index_title')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/seller/shipping-options')}

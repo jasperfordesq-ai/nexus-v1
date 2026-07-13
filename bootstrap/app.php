@@ -375,6 +375,24 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping(10)
             ->name('marketplace-retry-report-notifications');
 
+        $schedule->command('marketplace:expire-pending-orders')
+            ->everyFiveMinutes()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('marketplace-expire-pending-orders');
+
+        $schedule->command('marketplace:expire-listings')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('marketplace-expire-listings');
+
+        $schedule->command('marketplace:complete-orders')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('marketplace-complete-orders');
+
         // Jobs: send interview reminders (24h and 1h before)
         $schedule->call(function () {
             \App\Services\JobInterviewService::sendReminders();

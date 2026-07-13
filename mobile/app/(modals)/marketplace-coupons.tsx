@@ -20,6 +20,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatLegacyCouponMinorAmount } from '@/lib/utils/marketplaceCurrency';
 
 export default function MarketplaceCouponsRoute() {
   return (
@@ -31,7 +32,7 @@ export default function MarketplaceCouponsRoute() {
 
 function MarketplaceCouponsScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const coupons = useApi(() => getPublicMerchantCoupons(), [], { enabled: hasFeature('merchant_coupons') });
@@ -73,7 +74,7 @@ function MarketplaceCouponsScreen() {
             </View>
           </Surface>
         }
-        renderItem={({ item }) => <CouponCard item={item} />}
+        renderItem={({ item }) => <CouponCard item={item} currency={tenant?.currency} />}
         ListEmptyComponent={
           coupons.isLoading ? (
             <View className="py-16">
@@ -94,11 +95,11 @@ function MarketplaceCouponsScreen() {
   );
 }
 
-function CouponCard({ item }: { item: PublicMerchantCoupon }) {
+function CouponCard({ item, currency }: { item: PublicMerchantCoupon; currency?: string }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const terms = couponTerms(item, t);
+  const terms = couponTerms(item, currency, t);
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -108,7 +109,7 @@ function CouponCard({ item }: { item: PublicMerchantCoupon }) {
             {item.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{item.description}</Text> : null}
           </View>
           <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
-            <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, t)}</Chip.Label>
+            <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, currency, t)}</Chip.Label>
           </Chip>
         </View>
         <Surface variant="secondary" className="rounded-2xl px-3 py-2">
@@ -136,16 +137,30 @@ function CouponCard({ item }: { item: PublicMerchantCoupon }) {
   );
 }
 
-function couponDiscountLabel(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string {
+function couponDiscountLabel(
+  coupon: PublicMerchantCoupon,
+  currency: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
   if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}${t('publicCoupons.percentSuffix')}`;
-  if (coupon.discount_type === 'fixed') return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
+  if (coupon.discount_type === 'fixed') {
+    return t('publicCoupons.fixedValue', {
+      value: formatLegacyCouponMinorAmount(coupon.discount_value ?? 0, currency),
+    });
+  }
   return t('publicCoupons.bogo');
 }
 
-function couponTerms(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string[] {
+function couponTerms(
+  coupon: PublicMerchantCoupon,
+  currency: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string[] {
   const terms: string[] = [];
   if (coupon.min_order_cents && coupon.min_order_cents > 0) {
-    terms.push(t('publicCoupons.minOrder', { value: (coupon.min_order_cents / 100).toFixed(2) }));
+    terms.push(t('publicCoupons.minOrder', {
+      value: formatLegacyCouponMinorAmount(coupon.min_order_cents, currency),
+    }));
   }
   if (coupon.max_uses) {
     terms.push(t('publicCoupons.usage', { used: coupon.usage_count ?? coupon.used_count ?? 0, max: coupon.max_uses }));

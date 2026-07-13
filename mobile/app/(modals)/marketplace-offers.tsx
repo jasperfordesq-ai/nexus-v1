@@ -36,6 +36,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatMarketplaceCurrency } from '@/lib/utils/marketplaceCurrency';
 
 type OfferMode = 'sent' | 'received';
 
@@ -205,16 +206,7 @@ function normalizeOfferMode(value?: string): OfferMode {
 }
 
 function formatOfferAmount(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat(dateLocale(), {
-      style: 'currency',
-      currency: currency || 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return `${currency || 'EUR'} ${Number(amount).toLocaleString()}`;
-  }
+  return formatMarketplaceCurrency(amount, currency);
 }
 
 function formatOfferDate(value?: string | null): string | null {
@@ -238,6 +230,7 @@ function OfferCard({
   onCounter: (offer: MarketplaceOffer, amount: number, message?: string | null) => void;
 }) {
   const { t } = useTranslation('marketplace');
+  const { tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { show: showToast } = useAppToast();
@@ -245,8 +238,9 @@ function OfferCard({
   const [counterAmount, setCounterAmount] = useState('');
   const [counterMessage, setCounterMessage] = useState('');
   const listingId = offer.listing?.id;
-  const amount = formatOfferAmount(Number(offer.amount), offer.currency || 'EUR');
-  const counterAmountLabel = offer.counter_amount ? formatOfferAmount(Number(offer.counter_amount), offer.currency || 'EUR') : null;
+  const currency = offer.currency || tenant?.currency || '';
+  const amount = formatOfferAmount(Number(offer.amount), currency);
+  const counterAmountLabel = offer.counter_amount ? formatOfferAmount(Number(offer.counter_amount), currency) : null;
   const counterparty = mode === 'sent' ? offer.seller : offer.buyer;
   const counterpartyLabel = mode === 'sent' ? t('offers.sellerLabel') : t('offers.buyerLabel');
   const offerDate = formatOfferDate(offer.created_at);
@@ -347,7 +341,21 @@ function OfferCard({
         ) : null}
         <View className="flex-row flex-wrap gap-2">
           {listingId ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(listingId) } } as unknown as Href)} style={{ minWidth: '46%' }}>
+            <HeroButton
+              className="flex-1"
+              size="sm"
+              variant="secondary"
+              onPress={() => router.push({
+                pathname: '/(modals)/marketplace-detail',
+                params: {
+                  id: String(listingId),
+                  ...(mode === 'sent' && offer.status === 'accepted'
+                    ? { offer_id: String(offer.id), offer_amount: String(offer.amount) }
+                    : {}),
+                },
+              } as unknown as Href)}
+              style={{ minWidth: '46%' }}
+            >
               <Ionicons name="open-outline" size={14} color={primary} />
               <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
             </HeroButton>

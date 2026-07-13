@@ -19,7 +19,9 @@
       "invalid_listing": "Ogłoszenie nie należy do tego sprzedawcy.",
       "listing_unavailable": "Ta aukcja nie jest dostępna w ramach programu lojalnościowego.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Ta realizacja programu lojalnościowego nie jest już dostępna.",
+      "redemption_mismatch": "Ta realizacja programu lojalnościowego nie odpowiada wybranemu zamówieniu marketplace."
     }
   },
   "survey": {

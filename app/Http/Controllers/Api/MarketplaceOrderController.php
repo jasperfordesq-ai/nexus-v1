@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Models\MarketplaceOrder;
 use App\Services\MarketplaceOrderService;
+use App\Services\MarketplacePaymentService;
 use App\Services\MarketplaceRatingService;
 use Illuminate\Http\JsonResponse;
 
@@ -23,7 +24,7 @@ class MarketplaceOrderController extends BaseApiController
     private function ensureFeature(): void
     {
         if (!TenantContext::hasFeature('marketplace')) {
-            abort(403, 'Marketplace feature is not enabled for this tenant.');
+        abort(403, __('api.marketplace_feature_disabled'));
         }
     }
 
@@ -43,21 +44,28 @@ class MarketplaceOrderController extends BaseApiController
         $data = request()->validate([
             'listing_id' => 'required|integer|exists:marketplace_listings,id',
             'offer_id' => 'nullable|integer|exists:marketplace_offers,id',
-            'quantity' => 'nullable|integer|min:1',
-            'shipping_method' => 'nullable|string|max:100',
-            'shipping_cost' => 'nullable|numeric|min:0|max:999999',
+            'quantity' => 'nullable|integer|min:1|max:100',
+            // Shipping prices are resolved from a tenant-scoped seller option
+            // inside MarketplaceOrderService. Never accept a client supplied
+            // price: it would let a buyer choose the amount charged.
+            'shipping_option_id' => 'nullable|integer|min:1',
+            'shipping_method' => 'nullable|string|in:pickup,community_delivery',
+            'pickup_slot_id' => 'nullable|integer|min:1',
             'delivery_address' => 'nullable|array',
             'delivery_notes' => 'nullable|string|max:500',
             'coupon_code' => 'nullable|string|max:64',
+            'idempotency_key' => 'required|string|min:16|max:100',
+            'loyalty_redemption_id' => 'nullable|integer|min:1',
+            'payment_method' => 'nullable|string|in:cash,time_credits,free',
         ]);
 
         try {
             if (!empty($data['offer_id'])) {
                 $offer = \App\Models\MarketplaceOffer::findOrFail($data['offer_id']);
                 if ($offer->buyer_id !== $userId) {
-                    return $this->respondWithError('FORBIDDEN', 'You can only create orders from your own accepted offers.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_offer_buyer_required'), null, 403);
                 }
-                $order = MarketplaceOrderService::createFromOffer($offer);
+                $order = MarketplaceOrderService::createFromOffer($offer, $data);
             } else {
                 $order = MarketplaceOrderService::createDirectPurchase($userId, $data['listing_id'], $data);
             }
@@ -81,11 +89,11 @@ class MarketplaceOrderController extends BaseApiController
 
         $order = MarketplaceOrderService::getById($id);
         if (!$order) {
-            return $this->respondWithError('NOT_FOUND', 'Order not found.', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.marketplace_order_not_found'), null, 404);
         }
 
         if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have access to this order.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_participant_required'), null, 403);
         }
 
         return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
@@ -150,13 +158,12 @@ class MarketplaceOrderController extends BaseApiController
 
         $order = MarketplaceOrder::findOrFail($id);
         if ($order->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the seller can mark an order as shipped.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_seller_ship_required'), null, 403);
         }
 
         $data = request()->validate([
             'tracking_number' => 'nullable|string|max:255',
             'tracking_url' => 'nullable|string|max:500|url',
-            'shipping_method' => 'nullable|string|max:100',
         ]);
 
         try {
@@ -178,7 +185,7 @@ class MarketplaceOrderController extends BaseApiController
 
         $order = MarketplaceOrder::findOrFail($id);
         if ($order->buyer_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the buyer can confirm delivery.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_buyer_delivery_required'), null, 403);
         }
 
         try {
@@ -200,7 +207,7 @@ class MarketplaceOrderController extends BaseApiController
 
         $order = MarketplaceOrder::findOrFail($id);
         if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have access to this order.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_participant_required'), null, 403);
         }
 
         $data = request()->validate([
@@ -208,6 +215,16 @@ class MarketplaceOrderController extends BaseApiController
         ]);
 
         try {
+            if ((string) $order->status === 'pending_payment'
+                && ! MarketplacePaymentService::prepareOrderForExpiry($order)) {
+                return $this->respondWithError(
+                    'PAYMENT_RECONCILIATION_REQUIRED',
+                    __('api.marketplace_order_cancel_payment_pending'),
+                    null,
+                    409,
+                );
+            }
+            $order->refresh();
             $order = MarketplaceOrderService::cancel($order, $data['reason']);
             return $this->respondWithData(MarketplaceOrderService::formatOrder($order));
         } catch (\InvalidArgumentException $e) {
@@ -287,7 +304,7 @@ class MarketplaceOrderController extends BaseApiController
             'reason' => 'required|string|in:not_received,not_as_described,damaged,wrong_item,other',
             'description' => 'required|string|max:2000',
             'evidence_urls' => 'nullable|array|max:10',
-            'evidence_urls.*' => 'string|max:500',
+            'evidence_urls.*' => ['string', 'max:500', 'url:http,https'],
         ]);
 
         try {

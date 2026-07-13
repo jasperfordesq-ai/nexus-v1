@@ -15,9 +15,14 @@ use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
 use App\Models\MarketplaceSellerProfile;
 use App\Models\Notification;
+use App\Support\StripeCurrency;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
+use Stripe\PaymentIntent;
+use Stripe\StripeClient;
 
 /**
  * MarketplacePaymentService — Stripe Connect integration for the marketplace.
@@ -45,12 +50,36 @@ class MarketplacePaymentService
      */
     public static function createConnectAccount(int $userId): array
     {
+        self::assertStripeEnabled();
         $tenantId = TenantContext::getId();
 
-        $sellerProfile = MarketplaceSellerProfile::where('user_id', $userId)->first();
+        try {
+            return Cache::lock("marketplace-connect-onboarding:{$tenantId}:{$userId}", 180)
+                ->block(10, static fn (): array => self::createConnectAccountLocked($tenantId, $userId));
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $exception) {
+            throw new \RuntimeException(
+                __('api.marketplace_connect_account_create_failed'),
+                previous: $exception,
+            );
+        }
+    }
+
+    /** Create/reuse the provider account while holding the seller onboarding claim. */
+    private static function createConnectAccountLocked(int $tenantId, int $userId): array
+    {
+        // Re-read under a row lock after acquiring the cross-process claim. A
+        // retry waiting behind another worker must observe and reuse the account
+        // that worker persisted rather than issuing another provider request.
+        $sellerProfile = DB::transaction(static fn (): ?MarketplaceSellerProfile =>
+            MarketplaceSellerProfile::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->lockForUpdate()
+                ->first()
+        );
 
         if (!$sellerProfile) {
-            throw new \RuntimeException('Seller profile not found. Create a seller profile first.');
+            throw new \RuntimeException(__('api.marketplace_payment_seller_profile_required'));
         }
 
         // If they already have a Connect account, return onboarding link instead
@@ -68,49 +97,73 @@ class MarketplacePaymentService
             ->first(['id', 'first_name', 'last_name', 'email']);
 
         if (!$user) {
-            throw new \RuntimeException('User not found.');
+            throw new \RuntimeException(__('api.marketplace_payment_user_not_found'));
         }
 
         $client = StripeService::client();
 
         try {
-            $account = $client->accounts->create([
-                'type' => 'express',
-                'email' => $user->email,
-                'metadata' => [
-                    'nexus_user_id' => (string) $userId,
-                    'nexus_tenant_id' => (string) $tenantId,
+            $account = $client->accounts->create(
+                [
+                    'type' => 'express',
+                    'email' => $user->email,
+                    'metadata' => [
+                        'nexus_user_id' => (string) $userId,
+                        'nexus_tenant_id' => (string) $tenantId,
+                    ],
+                    'capabilities' => [
+                        'card_payments' => ['requested' => true],
+                        'transfers' => ['requested' => true],
+                    ],
                 ],
-                'capabilities' => [
-                    'card_payments' => ['requested' => true],
-                    'transfers' => ['requested' => true],
-                ],
-            ]);
+                // Stable across process crashes and retries. If Stripe created
+                // the account but our DB write did not commit, the next attempt
+                // receives that same account instead of orphaning another one.
+                ['idempotency_key' => "marketplace-connect-account-{$tenantId}-{$userId}"],
+            );
         } catch (\Exception $e) {
             Log::error('MarketplacePayment: failed to create Connect account', [
                 'user_id' => $userId,
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to create Stripe Connect account: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_connect_account_create_failed'));
         }
 
-        // Store the account ID on the seller profile
-        $sellerProfile->stripe_account_id = $account->id;
-        $sellerProfile->stripe_onboarding_complete = false;
-        $sellerProfile->save();
+        // Serialize the local binding too. A worker that somehow outlives the
+        // cache lease may not overwrite a provider account already persisted by
+        // another worker; the stable Stripe key means both normally have the
+        // same ID, but this is the final last-save-wins backstop.
+        $accountId = DB::transaction(static function () use ($tenantId, $userId, $account): string {
+            $lockedProfile = MarketplaceSellerProfile::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if (! empty($lockedProfile->stripe_account_id)) {
+                return (string) $lockedProfile->stripe_account_id;
+            }
 
-        // Generate onboarding link
-        $onboardingUrl = self::generateOnboardingLink($account->id);
+            $lockedProfile->stripe_account_id = (string) $account->id;
+            $lockedProfile->stripe_onboarding_complete = false;
+            $lockedProfile->save();
+
+            return (string) $account->id;
+        });
+
+        // Re-read the winning local binding. This also preserves the existing
+        // null-link behavior if an already-complete profile won the fallback
+        // row-lock race while Stripe was responding.
+        $onboardingUrl = self::getOnboardingLink($userId);
 
         Log::info('MarketplacePayment: Connect account created', [
             'user_id' => $userId,
             'tenant_id' => $tenantId,
-            'account_id' => $account->id,
+            'account_id' => $accountId,
         ]);
 
         return [
-            'account_id' => $account->id,
+            'account_id' => $accountId,
             'onboarding_url' => $onboardingUrl,
         ];
     }
@@ -228,7 +281,13 @@ class MarketplacePaymentService
     public static function createPaymentIntent(MarketplaceOrder $order): array
     {
         if ($order->status !== 'pending_payment') {
-            throw new \InvalidArgumentException('Order must be in pending_payment status to create a payment intent.');
+            throw new \InvalidArgumentException(__('api.marketplace_payment_intent_order_state_required'));
+        }
+        if ((float) $order->total_price <= 0 || (float) ($order->time_credits_used ?? 0) > 0) {
+            throw new \InvalidArgumentException(__('api.marketplace_card_payment_not_required'));
+        }
+        if ($order->payment_expires_at !== null && $order->payment_expires_at->isPast()) {
+            throw new \InvalidArgumentException(__('api.marketplace_checkout_expired'));
         }
 
         $tenantId = TenantContext::getId();
@@ -237,12 +296,13 @@ class MarketplacePaymentService
         $sellerProfile = MarketplaceSellerProfile::where('user_id', $order->seller_id)->first();
 
         if (!$sellerProfile || empty($sellerProfile->stripe_account_id)) {
-            throw new \RuntimeException('Seller has not completed Stripe onboarding.');
+            throw new \RuntimeException(__('api.marketplace_seller_onboarding_required'));
         }
 
         if (!$sellerProfile->stripe_onboarding_complete) {
-            throw new \RuntimeException('Seller Stripe account onboarding is not complete.');
+            throw new \RuntimeException(__('api.marketplace_seller_onboarding_incomplete'));
         }
+        self::assertStripeEnabled();
 
         // Calculate fees from config
         $feePercent = (float) MarketplaceConfigurationService::get(
@@ -250,16 +310,67 @@ class MarketplacePaymentService
             5
         );
 
-        $totalAmount = (float) $order->total_price;
-        $platformFee = round($totalAmount * ($feePercent / 100), 2);
-        $sellerPayout = round($totalAmount - $platformFee, 2);
+        $currency = StripeCurrency::normalize((string) ($order->currency ?? TenantContext::getCurrency()));
+        $amountCents = StripeCurrency::toMinor((float) $order->total_price, $currency);
+        $totalAmount = StripeCurrency::fromMinor($amountCents, $currency);
+        $feeCents = StripeCurrency::toMinor(
+            StripeCurrency::roundMajor($totalAmount * ($feePercent / 100), $currency),
+            $currency,
+        );
+        $payoutCents = $amountCents - $feeCents;
+        $platformFee = StripeCurrency::fromMinor($feeCents, $currency);
+        $sellerPayout = StripeCurrency::fromMinor($payoutCents, $currency);
 
-        $amountCents = (int) round($totalAmount * 100);
-        $feeCents = (int) round($platformFee * 100);
+        $currency = strtolower($currency);
+        $delayedPayout = (bool) MarketplaceConfigurationService::get(
+            MarketplaceConfigurationService::CONFIG_ESCROW_ENABLED,
+            false,
+        );
+        $fundsFlow = $delayedPayout ? 'separate_charge_transfer' : 'destination_charge';
 
-        $currency = strtolower($order->currency ?? TenantContext::getCurrency());
+        // Claim the mechanism only after every deterministic local precondition
+        // passes, but before the first Stripe network call.
+        $order = self::claimStripeCheckoutMode($order, 'payment_intent');
 
         $client = StripeService::client();
+
+        if (! empty($order->payment_intent_id)) {
+            try {
+                $existingIntent = $client->paymentIntents->retrieve(
+                    (string) $order->payment_intent_id,
+                );
+                self::providerBoundEconomics($existingIntent, $order, $tenantId);
+                if (empty($existingIntent->client_secret)) {
+                    throw new \RuntimeException(__('api.marketplace_payment_intent_order_mismatch'));
+                }
+
+                try {
+                    self::bindPaymentIntentToPayableOrder(
+                        $order,
+                        (string) $existingIntent->id,
+                        $tenantId,
+                    );
+                } catch (\Throwable $stateException) {
+                    self::cancelUnboundPaymentIntent($client, $existingIntent, $order, $tenantId);
+                    throw $stateException;
+                }
+
+                return [
+                    'client_secret' => (string) $existingIntent->client_secret,
+                    'payment_intent_id' => (string) $existingIntent->id,
+                ];
+            } catch (\InvalidArgumentException $exception) {
+                throw $exception;
+            } catch (\Throwable $exception) {
+                Log::error('MarketplacePayment: failed to resume PaymentIntent', [
+                    'order_id' => $order->id,
+                    'tenant_id' => $tenantId,
+                    'payment_intent_id' => $order->payment_intent_id,
+                    'error' => $exception->getMessage(),
+                ]);
+                throw new \RuntimeException(__('api.marketplace_payment_create_failed'));
+            }
+        }
 
         try {
             // Idempotency key binds a network retry of this create() to the same
@@ -267,22 +378,39 @@ class MarketplacePaymentService
             // charging the buyer twice. Scoped to order id + tenant to avoid
             // collisions across tenants that share a Stripe account.
             $idempotencyKey = "market-order-{$tenantId}-{$order->id}";
-            $paymentIntent = $client->paymentIntents->create([
+            $params = [
                 'amount' => $amountCents,
                 'currency' => $currency,
-                'application_fee_amount' => $feeCents,
-                'transfer_data' => [
-                    'destination' => $sellerProfile->stripe_account_id,
-                ],
                 'metadata' => [
                     'nexus_tenant_id' => (string) $tenantId,
                     'nexus_order_id' => (string) $order->id,
                     'nexus_buyer_id' => (string) $order->buyer_id,
                     'nexus_seller_id' => (string) $order->seller_id,
                     'nexus_type' => 'marketplace',
+                    'nexus_funds_flow' => $fundsFlow,
+                    'nexus_currency' => strtoupper($currency),
+                    'nexus_amount_minor' => (string) $amountCents,
+                    'nexus_platform_fee_minor' => (string) $feeCents,
+                    'nexus_seller_payout_minor' => (string) $payoutCents,
                 ],
-                'description' => "Marketplace order {$order->order_number}",
-            ], ['idempotency_key' => $idempotencyKey]);
+                'description' => __('api.marketplace_stripe_order_description', [
+                    'order' => $order->order_number,
+                ]),
+            ];
+            if ($delayedPayout) {
+                // Separate charge now; MarketplaceEscrowService creates the
+                // seller transfer only after the release condition is met.
+                $params['transfer_group'] = 'marketplace_order_' . $order->id;
+            } else {
+                $params['application_fee_amount'] = $feeCents;
+                $params['transfer_data'] = [
+                    'destination' => $sellerProfile->stripe_account_id,
+                ];
+            }
+            $paymentIntent = $client->paymentIntents->create(
+                $params,
+                ['idempotency_key' => $idempotencyKey],
+            );
         } catch (\Exception $e) {
             Log::error('MarketplacePayment: failed to create PaymentIntent', [
                 'order_id' => $order->id,
@@ -290,12 +418,21 @@ class MarketplacePaymentService
                 'amount' => $totalAmount,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to create payment intent: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_payment_create_failed'));
         }
 
-        // Store the payment intent ID on the order for reference
-        $order->payment_intent_id = $paymentIntent->id;
-        $order->save();
+        // Re-check the payable state after the network call. Cancellation or
+        // expiry may have won while Stripe was creating the remote object.
+        try {
+            self::bindPaymentIntentToPayableOrder(
+                $order,
+                (string) $paymentIntent->id,
+                $tenantId,
+            );
+        } catch (\Throwable $stateException) {
+            self::cancelUnboundPaymentIntent($client, $paymentIntent, $order, $tenantId);
+            throw $stateException;
+        }
 
         Log::info('MarketplacePayment: PaymentIntent created', [
             'order_id' => $order->id,
@@ -327,28 +464,85 @@ class MarketplacePaymentService
     public static function createCheckoutSession(MarketplaceOrder $order, string $successUrl, string $cancelUrl): string
     {
         if ($order->status !== 'pending_payment') {
-            throw new \InvalidArgumentException('Order must be in pending_payment status to start checkout.');
+            throw new \InvalidArgumentException(__('api.marketplace_checkout_order_state_required'));
+        }
+        if ((float) $order->total_price <= 0 || (float) ($order->time_credits_used ?? 0) > 0) {
+            throw new \InvalidArgumentException(__('api.marketplace_card_payment_not_required'));
+        }
+        if ($order->payment_expires_at !== null && $order->payment_expires_at->isPast()) {
+            throw new \InvalidArgumentException(__('api.marketplace_checkout_expired'));
         }
 
         $tenantId = TenantContext::getId();
 
         $sellerProfile = MarketplaceSellerProfile::where('user_id', $order->seller_id)->first();
         if (!$sellerProfile || empty($sellerProfile->stripe_account_id)) {
-            throw new \RuntimeException('Seller has not completed Stripe onboarding.');
+            throw new \RuntimeException(__('api.marketplace_seller_onboarding_required'));
         }
         if (!$sellerProfile->stripe_onboarding_complete) {
-            throw new \RuntimeException('Seller Stripe account onboarding is not complete.');
+            throw new \RuntimeException(__('api.marketplace_seller_onboarding_incomplete'));
         }
+        self::assertStripeEnabled();
 
         $feePercent = (float) MarketplaceConfigurationService::get(
             MarketplaceConfigurationService::CONFIG_PLATFORM_FEE_PERCENT,
             5
         );
-        $totalAmount = (float) $order->total_price;
-        $platformFee = round($totalAmount * ($feePercent / 100), 2);
-        $amountCents = (int) round($totalAmount * 100);
-        $feeCents = (int) round($platformFee * 100);
-        $currency = strtolower($order->currency ?? TenantContext::getCurrency());
+        $currency = StripeCurrency::normalize((string) ($order->currency ?? TenantContext::getCurrency()));
+        $amountCents = StripeCurrency::toMinor((float) $order->total_price, $currency);
+        $totalAmount = StripeCurrency::fromMinor($amountCents, $currency);
+        $feeCents = StripeCurrency::toMinor(
+            StripeCurrency::roundMajor($totalAmount * ($feePercent / 100), $currency),
+            $currency,
+        );
+        $payoutCents = $amountCents - $feeCents;
+        $platformFee = StripeCurrency::fromMinor($feeCents, $currency);
+        $sellerPayout = StripeCurrency::fromMinor($payoutCents, $currency);
+        $currency = strtolower($currency);
+        $delayedPayout = (bool) MarketplaceConfigurationService::get(
+            MarketplaceConfigurationService::CONFIG_ESCROW_ENABLED,
+            false,
+        );
+        $fundsFlow = $delayedPayout ? 'separate_charge_transfer' : 'destination_charge';
+
+        // Bind the remote session lifetime only after deterministic seller,
+        // amount, currency and configuration validation succeeds. Stripe
+        // requires a session expiry at least 30 minutes in the future.
+        $order = DB::transaction(function () use ($order, $tenantId): MarketplaceOrder {
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if ($lockedOrder->status !== 'pending_payment') {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_order_state_required'));
+            }
+            if ($lockedOrder->payment_expires_at !== null && $lockedOrder->payment_expires_at->isPast()) {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_expired'));
+            }
+            $boundMode = (string) ($lockedOrder->stripe_checkout_mode ?? '');
+            if ($boundMode === '' && ! empty($lockedOrder->payment_intent_id)) {
+                $boundMode = 'payment_intent';
+            }
+            if ($boundMode !== '' && $boundMode !== 'checkout_session') {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_mode_conflict'));
+            }
+            if ($boundMode === '') {
+                $lockedOrder->stripe_checkout_mode = 'checkout_session';
+            }
+            if (empty($lockedOrder->checkout_session_id)) {
+                $minimumRemoteExpiry = now()->addMinutes(31)->startOfSecond();
+                if ($lockedOrder->payment_expires_at === null
+                    || $lockedOrder->payment_expires_at->lt($minimumRemoteExpiry)) {
+                    $lockedOrder->payment_expires_at = $minimumRemoteExpiry;
+                }
+            }
+            if ($lockedOrder->isDirty()) {
+                $lockedOrder->save();
+            }
+
+            return $lockedOrder;
+        });
 
         $metadata = [
             'nexus_tenant_id' => (string) $tenantId,
@@ -356,41 +550,107 @@ class MarketplacePaymentService
             'nexus_buyer_id' => (string) $order->buyer_id,
             'nexus_seller_id' => (string) $order->seller_id,
             'nexus_type' => 'marketplace',
+            'nexus_funds_flow' => $fundsFlow,
+            'nexus_currency' => strtoupper($currency),
+            'nexus_amount_minor' => (string) $amountCents,
+            'nexus_platform_fee_minor' => (string) $feeCents,
+            'nexus_seller_payout_minor' => (string) $payoutCents,
         ];
 
         $client = StripeService::client();
 
+        if (! empty($order->checkout_session_id)) {
+            try {
+                $existingSession = $client->checkout->sessions->retrieve(
+                    (string) $order->checkout_session_id,
+                    [],
+                );
+                $sessionOrderId = (int) ($existingSession->metadata->nexus_order_id
+                    ?? $existingSession->client_reference_id
+                    ?? 0);
+                $boundAmount = self::strictMetadataMinorAmount(
+                    $existingSession->metadata->nexus_amount_minor ?? null,
+                );
+                $boundFee = self::strictMetadataMinorAmount(
+                    $existingSession->metadata->nexus_platform_fee_minor ?? null,
+                );
+                $boundPayout = self::strictMetadataMinorAmount(
+                    $existingSession->metadata->nexus_seller_payout_minor ?? null,
+                );
+                if ($sessionOrderId !== (int) $order->id
+                    || (int) ($existingSession->metadata->nexus_tenant_id ?? 0) !== $tenantId
+                    || (int) ($existingSession->metadata->nexus_buyer_id ?? 0) !== (int) $order->buyer_id
+                    || (int) ($existingSession->metadata->nexus_seller_id ?? 0) !== (int) $order->seller_id
+                    || (string) ($existingSession->metadata->nexus_currency ?? '') !== strtoupper($currency)
+                    || $boundAmount !== $amountCents
+                    || $boundFee === null
+                    || $boundPayout === null
+                    || $boundFee > $boundAmount
+                    || $boundPayout !== $boundAmount - $boundFee
+                    || ! in_array(
+                        (string) ($existingSession->metadata->nexus_funds_flow ?? ''),
+                        ['destination_charge', 'separate_charge_transfer'],
+                        true,
+                    )
+                    || (string) ($existingSession->status ?? '') !== 'open'
+                    || empty($existingSession->url)) {
+                    throw new \RuntimeException(__('api.marketplace_checkout_start_failed'));
+                }
+
+                return (string) $existingSession->url;
+            } catch (\Throwable $exception) {
+                Log::error('MarketplacePayment: failed to resume Checkout Session', [
+                    'order_id' => $order->id,
+                    'tenant_id' => $tenantId,
+                    'checkout_session_id' => $order->checkout_session_id,
+                    'error' => $exception->getMessage(),
+                ]);
+                throw new \RuntimeException(__('api.marketplace_checkout_start_failed'));
+            }
+        }
+
         try {
             // Idempotency: a network retry of this create() returns the same
             // session rather than charging twice. Scoped to order + tenant + the
-            // exact amount/fee — orders snapshot their price at creation so this
-            // is normally constant, but binding the amount guarantees a stale
-            // cached session can never be reused for a different total.
-            $idempotencyKey = "market-checkout-{$tenantId}-{$order->id}-{$amountCents}-{$feeCents}";
+            // order identity. If a supposedly immutable amount, fee, or funds
+            // flow changes, Stripe rejects reuse with different parameters
+            // instead of creating a second payable session.
+            $idempotencyKey = "market-checkout-{$tenantId}-{$order->id}";
+            $paymentIntentData = [
+                'metadata' => $metadata,
+                'description' => __('api.marketplace_stripe_order_description', [
+                    'order' => $order->order_number,
+                ]),
+            ];
+            if ($delayedPayout) {
+                $paymentIntentData['transfer_group'] = 'marketplace_order_' . $order->id;
+            } else {
+                $paymentIntentData['application_fee_amount'] = $feeCents;
+                $paymentIntentData['transfer_data'] = [
+                    'destination' => $sellerProfile->stripe_account_id,
+                ];
+            }
+
             $session = $client->checkout->sessions->create([
                 'mode' => 'payment',
                 'line_items' => [[
                     'price_data' => [
                         'currency' => $currency,
                         'product_data' => [
-                            'name' => "Marketplace order {$order->order_number}",
+                            'name' => __('api.marketplace_stripe_order_description', [
+                                'order' => $order->order_number,
+                            ]),
                         ],
                         'unit_amount' => $amountCents,
                     ],
                     'quantity' => 1,
                 ]],
-                'payment_intent_data' => [
-                    'application_fee_amount' => $feeCents,
-                    'transfer_data' => [
-                        'destination' => $sellerProfile->stripe_account_id,
-                    ],
-                    'metadata' => $metadata,
-                    'description' => "Marketplace order {$order->order_number}",
-                ],
+                'payment_intent_data' => $paymentIntentData,
                 // Session-level metadata too, so the webhook can read nexus_type
                 // / nexus_order_id straight off the checkout.session object.
                 'metadata' => $metadata,
                 'client_reference_id' => (string) $order->id,
+                'expires_at' => $order->payment_expires_at?->getTimestamp(),
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
             ], ['idempotency_key' => $idempotencyKey]);
@@ -401,7 +661,44 @@ class MarketplacePaymentService
                 'amount' => $totalAmount,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to start checkout: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_checkout_start_failed'));
+        }
+
+        $sessionBound = DB::transaction(function () use ($order, $session, $tenantId): bool {
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedOrder || $lockedOrder->status !== 'pending_payment') {
+                return false;
+            }
+            if (! empty($lockedOrder->checkout_session_id)
+                && (string) $lockedOrder->checkout_session_id !== (string) $session->id) {
+                return false;
+            }
+
+            $lockedOrder->checkout_session_id = (string) $session->id;
+            if (! empty($session->expires_at)) {
+                $lockedOrder->payment_expires_at = Carbon::createFromTimestamp((int) $session->expires_at);
+            }
+            $lockedOrder->save();
+            return true;
+        });
+        if (! $sessionBound) {
+            try {
+                if ((string) ($session->status ?? 'open') === 'open') {
+                    $client->checkout->sessions->expire((string) $session->id, []);
+                }
+            } catch (\Throwable $exception) {
+                Log::critical('MarketplacePayment: unbound Checkout Session could not be expired', [
+                    'order_id' => $order->id,
+                    'tenant_id' => $tenantId,
+                    'checkout_session_id' => $session->id ?? null,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+            throw new \RuntimeException(__('api.marketplace_checkout_expired'));
         }
 
         Log::info('MarketplacePayment: Checkout Session created', [
@@ -409,6 +706,7 @@ class MarketplacePaymentService
             'session_id' => $session->id,
             'amount' => $totalAmount,
             'platform_fee' => $platformFee,
+            'seller_payout' => $sellerPayout,
         ]);
 
         return (string) $session->url;
@@ -439,11 +737,11 @@ class MarketplacePaymentService
                 'payment_intent_id' => $paymentIntentId,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to verify payment status: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_payment_verify_failed'));
         }
 
         if ($paymentIntent->status !== 'succeeded') {
-            throw new \RuntimeException("Payment has not succeeded. Current status: {$paymentIntent->status}");
+            throw new \RuntimeException(__('api.marketplace_payment_not_succeeded', ['status' => $paymentIntent->status]));
         }
 
         $order = MarketplaceOrder::where('payment_intent_id', $paymentIntentId)
@@ -451,36 +749,35 @@ class MarketplacePaymentService
             ->first();
 
         if (!$order) {
-            throw new \RuntimeException('Order not found for this payment intent.');
+            throw new \RuntimeException(__('api.marketplace_payment_intent_order_not_found'));
         }
 
-        $metadataOrderId = (int) ($paymentIntent->metadata->nexus_order_id ?? 0);
-        if ($metadataOrderId > 0 && $metadataOrderId !== (int) $order->id) {
-            Log::warning('MarketplacePayment: Stripe metadata order mismatch', [
-                'payment_intent_id' => $paymentIntentId,
-                'local_order_id' => $order->id,
-                'metadata_order_id' => $metadataOrderId,
-                'tenant_id' => $tenantId,
-            ]);
-            throw new \RuntimeException('Payment intent does not match the local order.');
+        $economics = self::providerBoundEconomics($paymentIntent, $order, $tenantId);
+        $currency = $economics['currency'];
+        $expectedAmountCents = $economics['amount_minor'];
+        $receivedAmountCents = (int) ($paymentIntent->amount_received ?? $paymentIntent->amount ?? 0);
+        if ($receivedAmountCents !== $expectedAmountCents) {
+            throw new \RuntimeException(__('api.marketplace_payment_amount_mismatch'));
         }
+        $fundsFlow = $economics['funds_flow'];
 
         // Idempotency: check if payment already recorded (scoped by tenant)
         $existingPayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)
             ->where('tenant_id', $tenantId)
             ->first();
         if ($existingPayment) {
+            if ($existingPayment->funds_flow === 'separate_charge_transfer') {
+                MarketplaceEscrowService::holdFunds($order, $existingPayment);
+            }
             return $existingPayment;
         }
 
-        // Calculate fees
-        $feePercent = (float) MarketplaceConfigurationService::get(
-            MarketplaceConfigurationService::CONFIG_PLATFORM_FEE_PERCENT,
-            5
-        );
-        $totalAmount = (float) ($paymentIntent->amount / 100);
-        $platformFee = round($totalAmount * ($feePercent / 100), 2);
-        $sellerPayout = round($totalAmount - $platformFee, 2);
+        // These economics were bound into the provider object at checkout
+        // creation. Never recalculate from mutable tenant configuration here:
+        // the fee may legitimately change while the buyer is completing Stripe.
+        $totalAmount = StripeCurrency::fromMinor($economics['amount_minor'], $currency);
+        $platformFee = StripeCurrency::fromMinor($economics['platform_fee_minor'], $currency);
+        $sellerPayout = StripeCurrency::fromMinor($economics['seller_payout_minor'], $currency);
 
         // Get charge ID if available
         $chargeId = null;
@@ -494,7 +791,7 @@ class MarketplacePaymentService
         try {
             $payment = DB::transaction(function () use (
                 $order, $paymentIntentId, $chargeId, $totalAmount,
-                $platformFee, $sellerPayout, $paymentIntent, $tenantId, &$createdPayment
+                $platformFee, $sellerPayout, $paymentIntent, $tenantId, $fundsFlow, &$createdPayment
             ) {
             $lockedOrder = MarketplaceOrder::where('id', $order->id)
                 ->where('tenant_id', $tenantId)
@@ -502,7 +799,7 @@ class MarketplacePaymentService
                 ->first();
 
             if (!$lockedOrder) {
-                throw new \RuntimeException('Order not found for this payment intent.');
+                throw new \RuntimeException(__('api.marketplace_payment_intent_order_not_found'));
             }
 
             $existingPayment = MarketplacePayment::where('stripe_payment_intent_id', $paymentIntentId)
@@ -510,7 +807,13 @@ class MarketplacePaymentService
                 ->lockForUpdate()
                 ->first();
             if ($existingPayment) {
+                if ($existingPayment->funds_flow === 'separate_charge_transfer') {
+                    MarketplaceEscrowService::holdFunds($lockedOrder, $existingPayment);
+                }
                 return $existingPayment;
+            }
+            if ($lockedOrder->status !== 'pending_payment') {
+                throw new \RuntimeException(__('api.marketplace_order_not_awaiting_payment'));
             }
 
             $payment = new MarketplacePayment();
@@ -518,18 +821,28 @@ class MarketplacePaymentService
             $payment->order_id = $lockedOrder->id;
             $payment->stripe_payment_intent_id = $paymentIntentId;
             $payment->stripe_charge_id = $chargeId;
+            $payment->funds_flow = $fundsFlow;
             $payment->amount = $totalAmount;
             $payment->currency = strtoupper($paymentIntent->currency ?? TenantContext::getCurrency());
             $payment->platform_fee = $platformFee;
             $payment->seller_payout = $sellerPayout;
             $payment->payment_method = $paymentIntent->payment_method_types[0] ?? 'card';
             $payment->status = 'succeeded';
-            $payment->payout_status = 'pending';
+            $payment->payout_status = $fundsFlow === 'destination_charge' ? 'paid' : 'pending';
+            $payment->paid_out_at = $fundsFlow === 'destination_charge' ? now() : null;
             $payment->save();
 
             // Transition order to 'paid'
             $lockedOrder->status = 'paid';
+            $lockedOrder->payment_expires_at = null;
             $lockedOrder->save();
+
+            // The paid transition and escrow hold are one durable commit. If
+            // the hold write fails, the local payment/order changes roll back
+            // and Stripe's webhook can safely retry and heal the capture.
+            if ($payment->funds_flow === 'separate_charge_transfer') {
+                MarketplaceEscrowService::holdFunds($lockedOrder, $payment);
+            }
 
             $createdPayment = true;
             return $payment;
@@ -539,6 +852,12 @@ class MarketplacePaymentService
                 ->where('tenant_id', $tenantId)
                 ->first();
             if ($duplicatePayment) {
+                if ($duplicatePayment->funds_flow === 'separate_charge_transfer') {
+                    MarketplaceEscrowService::holdFunds(
+                        $order->fresh() ?? $order,
+                        $duplicatePayment,
+                    );
+                }
                 return $duplicatePayment;
             }
 
@@ -550,25 +869,6 @@ class MarketplacePaymentService
         }
 
         $order = $order->fresh() ?? $order;
-
-        // Create escrow hold if escrow is enabled
-        $escrowEnabled = (bool) MarketplaceConfigurationService::get(
-            MarketplaceConfigurationService::CONFIG_ESCROW_ENABLED,
-            false
-        );
-
-        if ($escrowEnabled) {
-            try {
-                MarketplaceEscrowService::holdFunds($order, $payment);
-            } catch (\Exception $e) {
-                Log::error('MarketplacePayment: failed to create escrow hold', [
-                    'order_id' => $order->id,
-                    'payment_id' => $payment->id,
-                    'error' => $e->getMessage(),
-                ]);
-                // Payment still succeeded — escrow is supplementary
-            }
-        }
 
         try {
             MarketplaceOrderService::sendPaidNotifications($order, $payment);
@@ -590,6 +890,221 @@ class MarketplacePaymentService
         return $payment;
     }
 
+    /**
+     * Read and verify the immutable checkout economics stamped on a Stripe
+     * PaymentIntent when it was created.
+     *
+     * @return array{currency:string,amount_minor:int,platform_fee_minor:int,seller_payout_minor:int,funds_flow:string}
+     */
+    private static function providerBoundEconomics(
+        object $paymentIntent,
+        MarketplaceOrder $order,
+        int $tenantId,
+    ): array {
+        $metadata = $paymentIntent->metadata ?? null;
+        $metadataOrderId = (int) ($metadata->nexus_order_id ?? 0);
+        if (($metadata->nexus_type ?? null) !== 'marketplace'
+            || $metadataOrderId !== (int) $order->id) {
+            Log::warning('MarketplacePayment: Stripe metadata order mismatch', [
+                'payment_intent_id' => $paymentIntent->id ?? null,
+                'local_order_id' => $order->id,
+                'metadata_order_id' => $metadataOrderId,
+                'tenant_id' => $tenantId,
+            ]);
+            throw new \RuntimeException(__('api.marketplace_payment_intent_order_mismatch'));
+        }
+        if ((int) ($metadata->nexus_tenant_id ?? 0) !== $tenantId) {
+            throw new \RuntimeException(__('api.marketplace_payment_intent_tenant_mismatch'));
+        }
+        if ((int) ($metadata->nexus_buyer_id ?? 0) !== (int) $order->buyer_id
+            || (int) ($metadata->nexus_seller_id ?? 0) !== (int) $order->seller_id) {
+            throw new \RuntimeException(__('api.marketplace_payment_intent_order_mismatch'));
+        }
+
+        try {
+            $currency = StripeCurrency::normalize((string) $order->currency);
+            $providerCurrency = StripeCurrency::normalize((string) ($paymentIntent->currency ?? ''));
+            $metadataCurrency = StripeCurrency::normalize((string) ($metadata->nexus_currency ?? ''));
+        } catch (\InvalidArgumentException) {
+            throw new \RuntimeException(__('api.marketplace_payment_currency_mismatch'));
+        }
+        if ($providerCurrency !== $currency || $metadataCurrency !== $currency) {
+            throw new \RuntimeException(__('api.marketplace_payment_currency_mismatch'));
+        }
+
+        $amountMinor = self::strictMetadataMinorAmount($metadata->nexus_amount_minor ?? null);
+        $feeMinor = self::strictMetadataMinorAmount($metadata->nexus_platform_fee_minor ?? null);
+        $payoutMinor = self::strictMetadataMinorAmount($metadata->nexus_seller_payout_minor ?? null);
+        $expectedAmountMinor = StripeCurrency::toMinor((float) $order->total_price, $currency);
+        $providerAmountMinor = (int) ($paymentIntent->amount ?? 0);
+        if ($amountMinor === null
+            || $feeMinor === null
+            || $payoutMinor === null
+            || $amountMinor <= 0
+            || $providerAmountMinor !== $amountMinor
+            || $expectedAmountMinor !== $amountMinor
+            || $feeMinor > $amountMinor
+            || $payoutMinor !== $amountMinor - $feeMinor) {
+            throw new \RuntimeException(__('api.marketplace_payment_amount_mismatch'));
+        }
+
+        $fundsFlow = (string) ($metadata->nexus_funds_flow ?? '');
+        if (! in_array($fundsFlow, ['destination_charge', 'separate_charge_transfer'], true)) {
+            throw new \RuntimeException(__('api.marketplace_payment_funds_flow_unsupported'));
+        }
+        $providerFeeMinor = $paymentIntent->application_fee_amount ?? null;
+        if ($providerFeeMinor !== null
+            && (($fundsFlow === 'destination_charge' && (int) $providerFeeMinor !== $feeMinor)
+                || ($fundsFlow === 'separate_charge_transfer' && (int) $providerFeeMinor !== 0))) {
+            throw new \RuntimeException(__('api.marketplace_payment_amount_mismatch'));
+        }
+
+        return [
+            'currency' => $currency,
+            'amount_minor' => $amountMinor,
+            'platform_fee_minor' => $feeMinor,
+            'seller_payout_minor' => $payoutMinor,
+            'funds_flow' => $fundsFlow,
+        ];
+    }
+
+    private static function strictMetadataMinorAmount(mixed $value): ?int
+    {
+        if (! is_string($value) || $value === '' || ! ctype_digit($value)) {
+            return null;
+        }
+        if (strlen($value) > 12) {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * Reconcile and cancel an unpaid Stripe intent before inventory is released.
+     * Returns true only when it is safe for the caller to cancel the order.
+     */
+    public static function prepareOrderForExpiry(MarketplaceOrder $order): bool
+    {
+        if (! empty($order->checkout_session_id)) {
+            $client = StripeService::client();
+            try {
+                $session = $client->checkout->sessions->retrieve(
+                    (string) $order->checkout_session_id,
+                    [],
+                );
+                $sessionOrderId = (int) ($session->metadata->nexus_order_id
+                    ?? $session->client_reference_id
+                    ?? 0);
+                if ($sessionOrderId !== (int) $order->id) {
+                    Log::critical('MarketplacePayment: Checkout Session order binding mismatch', [
+                        'order_id' => $order->id,
+                        'tenant_id' => $order->tenant_id,
+                        'checkout_session_id' => $order->checkout_session_id,
+                        'session_order_id' => $sessionOrderId,
+                    ]);
+                    return false;
+                }
+
+                $paymentIntentId = $session->payment_intent ?? null;
+                $paymentIntentId = is_string($paymentIntentId)
+                    ? $paymentIntentId
+                    : ($paymentIntentId->id ?? null);
+                if ((string) ($session->payment_status ?? '') === 'paid') {
+                    if (! $paymentIntentId) {
+                        return false;
+                    }
+                    DB::transaction(function () use ($order, $paymentIntentId): void {
+                        $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                            ->where('tenant_id', $order->tenant_id)
+                            ->whereKey($order->id)
+                            ->lockForUpdate()
+                            ->first();
+                        if ($lockedOrder) {
+                            $boundMode = (string) ($lockedOrder->stripe_checkout_mode ?? '');
+                            if ($boundMode !== '' && $boundMode !== 'checkout_session') {
+                                throw new \RuntimeException(__('api.marketplace_checkout_mode_conflict'));
+                            }
+                            $lockedOrder->stripe_checkout_mode = 'checkout_session';
+                            if (empty($lockedOrder->payment_intent_id)) {
+                                $lockedOrder->payment_intent_id = $paymentIntentId;
+                            }
+                            if ($lockedOrder->isDirty()) {
+                                $lockedOrder->save();
+                            }
+                        }
+                    });
+                    self::confirmPayment($paymentIntentId);
+                    return false;
+                }
+
+                $sessionStatus = (string) ($session->status ?? '');
+                if ($sessionStatus === 'expired') {
+                    return true;
+                }
+                if ($sessionStatus !== 'open') {
+                    $order->payment_expires_at = now()->addMinutes(15);
+                    $order->save();
+                    return false;
+                }
+
+                // Stripe guarantees a successfully-expired open session can no
+                // longer be completed. If completion wins this race, expire()
+                // fails and we defer rather than release inventory under a
+                // potentially successful payment.
+                $expired = $client->checkout->sessions->expire(
+                    (string) $order->checkout_session_id,
+                    [],
+                );
+                return (string) ($expired->status ?? '') === 'expired';
+            } catch (\Throwable $exception) {
+                Log::error('MarketplacePayment: Checkout Session expiry reconciliation failed', [
+                    'order_id' => $order->id,
+                    'tenant_id' => $order->tenant_id,
+                    'checkout_session_id' => $order->checkout_session_id,
+                    'error' => $exception->getMessage(),
+                ]);
+                return false;
+            }
+        }
+
+        if (empty($order->payment_intent_id)) {
+            return true;
+        }
+
+        $client = StripeService::client();
+        try {
+            $intent = $client->paymentIntents->retrieve($order->payment_intent_id);
+            if ($intent->status === 'succeeded') {
+                self::confirmPayment((string) $intent->id);
+                return false;
+            }
+            if (in_array($intent->status, ['processing', 'requires_capture'], true)) {
+                $order->payment_expires_at = now()->addMinutes(15);
+                $order->save();
+                return false;
+            }
+            if ($intent->status !== 'canceled') {
+                $client->paymentIntents->cancel((string) $intent->id, [], [
+                    'idempotency_key' => sprintf(
+                        'marketplace-expire-intent-%d-%d',
+                        (int) $order->tenant_id,
+                        (int) $order->id,
+                    ),
+                ]);
+            }
+            return true;
+        } catch (\Throwable $exception) {
+            Log::error('MarketplacePayment: expiry reconciliation failed', [
+                'order_id' => $order->id,
+                'tenant_id' => $order->tenant_id,
+                'payment_intent_id' => $order->payment_intent_id,
+                'error' => $exception->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
     // -----------------------------------------------------------------
     //  Refunds
     // -----------------------------------------------------------------
@@ -607,32 +1122,113 @@ class MarketplacePaymentService
     public static function processRefund(MarketplaceOrder $order, ?float $amount, string $reason): MarketplacePayment
     {
         $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
-
-        $payment = MarketplacePayment::withoutGlobalScopes()
+        $paymentId = MarketplacePayment::withoutGlobalScopes()
             ->where('tenant_id', $tenantId)
             ->where('order_id', $order->id)
-            ->where('status', 'succeeded')
-            ->first();
+            ->whereIn('status', ['succeeded', 'partially_refunded', 'refunded'])
+            ->value('id');
+        if ($paymentId === null) {
+            throw new \RuntimeException(__('api.marketplace_successful_payment_not_found'));
+        }
+
+        try {
+            return Cache::lock("marketplace-money-movement:{$tenantId}:{$paymentId}", 180)
+                ->block(10, static fn (): MarketplacePayment => self::processRefundLocked(
+                    $order,
+                    $amount,
+                    $reason,
+                ));
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $exception) {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'), previous: $exception);
+        }
+    }
+
+    /** Process a refund while holding the cross-process payout/refund claim. */
+    private static function processRefundLocked(
+        MarketplaceOrder $order,
+        ?float $amount,
+        string $reason,
+    ): MarketplacePayment
+    {
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
+
+        $payment = DB::transaction(function () use ($tenantId, $order): ?MarketplacePayment {
+            $lockedPayment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('order_id', $order->id)
+                ->whereIn('status', ['succeeded', 'partially_refunded', 'refunded'])
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedPayment) {
+                return null;
+            }
+
+            $escrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('payment_id', $lockedPayment->id)
+                ->lockForUpdate()
+                ->first();
+            if ($lockedPayment->funds_flow === 'separate_charge_transfer'
+                && ($lockedPayment->payout_status === 'scheduled'
+                    || ($escrow !== null
+                        && $escrow->status === 'released'
+                        && ($lockedPayment->payout_status !== 'paid'
+                            || empty($lockedPayment->payout_id))))) {
+                throw new \RuntimeException(__('api.marketplace_payout_processing'));
+            }
+
+            return $lockedPayment;
+        });
 
         if (!$payment) {
-            throw new \RuntimeException('No successful payment found for this order.');
+            throw new \RuntimeException(__('api.marketplace_successful_payment_not_found'));
         }
 
+        $currency = StripeCurrency::normalize((string) $payment->currency);
+        $originalChargeAmount = (float) $payment->amount;
+        $alreadyRefunded = (float) ($payment->refund_amount ?? 0);
+        if ($payment->status === 'refunded') {
+            if ($amount === null || abs($amount - $originalChargeAmount) <= 0.005) {
+                return $payment;
+            }
+            throw new \InvalidArgumentException(__('api.marketplace_refund_amount_invalid'));
+        }
         if (empty($payment->stripe_payment_intent_id)) {
-            throw new \RuntimeException('Payment has no associated Stripe payment intent.');
+            throw new \RuntimeException(__('api.marketplace_payment_intent_missing'));
         }
 
-        $refundAmount = $amount ?? (float) $payment->amount;
+        $remainingRefundable = max(0.0, StripeCurrency::roundMajor(
+            $originalChargeAmount - $alreadyRefunded,
+            $currency,
+        ));
+        $refundAmount = $amount ?? $remainingRefundable;
 
-        if ($refundAmount <= 0 || $refundAmount > (float) $payment->amount) {
-            throw new \InvalidArgumentException('Invalid refund amount.');
+        if ($refundAmount <= 0 || $refundAmount > $remainingRefundable) {
+            throw new \InvalidArgumentException(__('api.marketplace_refund_amount_invalid'));
+        }
+        if ($payment->funds_flow === 'separate_charge_transfer'
+            && $payment->payout_status === 'scheduled') {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'));
         }
 
         $client = StripeService::client();
 
+        $currentPlatformFee = (float) $payment->platform_fee;
+        $currentSellerPayout = (float) $payment->seller_payout;
+        $feeReversal = $remainingRefundable > 0
+            ? StripeCurrency::roundMajor(
+                $currentPlatformFee * ($refundAmount / $remainingRefundable),
+                $currency,
+            )
+            : 0.0;
+        $payoutReversal = min(
+            $currentSellerPayout,
+            max(0.0, StripeCurrency::roundMajor($refundAmount - $feeReversal, $currency)),
+        );
+
         $refundParams = [
             'payment_intent' => $payment->stripe_payment_intent_id,
-            'amount' => (int) round($refundAmount * 100),
+            'amount' => StripeCurrency::toMinor($refundAmount, $currency),
             'reason' => 'requested_by_customer',
             'metadata' => [
                 'nexus_order_id' => (string) $order->id,
@@ -641,12 +1237,23 @@ class MarketplacePaymentService
             ],
         ];
 
-        // For Connect refunds, reverse the application fee proportionally
-        $refundParams['refund_application_fee'] = true;
-        $refundParams['reverse_transfer'] = true;
+        // Destination charges moved funds at capture, so Stripe must reverse
+        // the transfer and application fee. Separate-charge payouts are
+        // reversed explicitly above.
+        if ($payment->funds_flow !== 'separate_charge_transfer') {
+            $refundParams['refund_application_fee'] = true;
+            $refundParams['reverse_transfer'] = true;
+        }
 
         try {
-            $refund = $client->refunds->create($refundParams);
+            $refund = $client->refunds->create($refundParams, [
+                'idempotency_key' => sprintf(
+                    'marketplace-refund-%d-%d-%d',
+                    $tenantId,
+                    $payment->id,
+                    StripeCurrency::toMinor($alreadyRefunded + $refundAmount, $currency),
+                ),
+            ]);
         } catch (\Exception $e) {
             Log::error('MarketplacePayment: failed to create refund', [
                 'order_id' => $order->id,
@@ -654,54 +1261,129 @@ class MarketplacePaymentService
                 'amount' => $refundAmount,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to process refund: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_refund_failed'));
         }
 
-        $isFullRefund = abs($refundAmount - (float) $payment->amount) < 0.01;
+        // Refund the buyer first. If transfer reversal then fails, Stripe's
+        // charge.refunded webhook uses the refund ID as a durable recovery key
+        // and completes the seller-side reconciliation idempotently.
+        if ($payment->funds_flow === 'separate_charge_transfer'
+            && $payment->payout_status === 'paid'
+            && ! empty($payment->payout_id)
+            && $payoutReversal > 0) {
+            try {
+                $client->transfers->createReversal(
+                    $payment->payout_id,
+                    ['amount' => StripeCurrency::toMinor($payoutReversal, $currency)],
+                    ['idempotency_key' => 'marketplace-external-transfer-reversal-' . hash('sha256', (string) $refund->id)],
+                );
+            } catch (\Throwable $exception) {
+                Log::critical('MarketplacePayment: buyer refunded but seller transfer reversal is pending webhook recovery', [
+                    'order_id' => $order->id,
+                    'payment_id' => $payment->id,
+                    'payout_id' => $payment->payout_id,
+                    'stripe_refund_id' => $refund->id,
+                    'amount' => $payoutReversal,
+                    'error' => $exception->getMessage(),
+                ]);
+                throw new \RuntimeException(__('api.marketplace_refund_failed'));
+            }
+        }
 
-        // Compensating ledger reversal: compute the proportional platform fee
-        // being reversed on this refund. Stripe reverses the application_fee via
-        // refund_application_fee=true above — we mirror that on our local books
-        // so reports/payouts don't double-count the fee as revenue.
-        $originalAmount = (float) $payment->amount;
-        $originalPlatformFee = (float) $payment->platform_fee;
-        $originalSellerPayout = (float) $payment->seller_payout;
-        $feeReversal = $originalAmount > 0
-            ? round($originalPlatformFee * ($refundAmount / $originalAmount), 2)
-            : 0.0;
-        $payoutReversal = round($refundAmount - $feeReversal, 2);
-
+        $isFullRefund = false;
         DB::transaction(function () use (
-            $payment, $order, $refundAmount, $reason, $isFullRefund,
-            $originalPlatformFee, $originalSellerPayout, $feeReversal, $payoutReversal
-        ) {
-            $payment->refund_amount = ($payment->refund_amount ?? 0) + $refundAmount;
-            $payment->refund_reason = $reason;
-            $payment->refunded_at = now();
-            $payment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
-            // Reverse platform fee + seller payout proportionally on the local
-            // books so accounting reflects the refund (Stripe side is handled
-            // via refund_application_fee=true / reverse_transfer=true).
-            $payment->platform_fee = $isFullRefund
+            $payment,
+            $order,
+            $refund,
+            $refundAmount,
+            $reason,
+            $feeReversal,
+            $payoutReversal,
+            $tenantId,
+            $currency,
+            &$isFullRefund,
+        ): void {
+            $lockedPayment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $recorded = DB::table('marketplace_payment_refunds')
+                ->where('tenant_id', $tenantId)
+                ->where('stripe_refund_id', (string) $refund->id)
+                ->exists();
+            if ($recorded) {
+                $isFullRefund = $lockedPayment->status === 'refunded';
+                return;
+            }
+
+            DB::table('marketplace_payment_refunds')->insert([
+                'tenant_id' => $tenantId,
+                'payment_id' => $lockedPayment->id,
+                'stripe_refund_id' => (string) $refund->id,
+                'amount' => $refundAmount,
+                'platform_fee_reversal' => $feeReversal,
+                'seller_payout_reversal' => $payoutReversal,
+                'reason' => mb_substr($reason, 0, 500),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $newRefundTotal = min(
+                (float) $lockedPayment->amount,
+                StripeCurrency::roundMajor(
+                    (float) ($lockedPayment->refund_amount ?? 0) + $refundAmount,
+                    $currency,
+                ),
+            );
+            $isFullRefund = $newRefundTotal >= (float) $lockedPayment->amount - 0.005;
+            $lockedPayment->refund_amount = $newRefundTotal;
+            $lockedPayment->refund_reason = $reason;
+            $lockedPayment->refunded_at = now();
+            $lockedPayment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
+            $lockedPayment->platform_fee = $isFullRefund
                 ? 0
-                : max(0, round($originalPlatformFee - $feeReversal, 2));
-            $payment->seller_payout = $isFullRefund
+                : max(0, StripeCurrency::roundMajor(
+                    (float) $lockedPayment->platform_fee - $feeReversal,
+                    $currency,
+                ));
+            $lockedPayment->seller_payout = $isFullRefund
                 ? 0
-                : max(0, round($originalSellerPayout - $payoutReversal, 2));
-            $payment->save();
+                : max(0, StripeCurrency::roundMajor(
+                    (float) $lockedPayment->seller_payout - $payoutReversal,
+                    $currency,
+                ));
+            if ($isFullRefund && $lockedPayment->funds_flow === 'separate_charge_transfer') {
+                $lockedPayment->payout_status = 'failed';
+            }
+            $lockedPayment->save();
 
-            if ($isFullRefund) {
-                $order->status = 'refunded';
-                $order->save();
-
-                // Refund escrow if held
-                $escrow = MarketplaceEscrow::where('order_id', $order->id)
-                    ->where('status', 'held')
-                    ->first();
-
-                if ($escrow) {
-                    MarketplaceEscrowService::refundEscrow($escrow);
+            $escrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->where('order_id', $lockedOrder->id)
+                ->lockForUpdate()
+                ->first();
+            if ($escrow) {
+                $escrow->amount = (float) $lockedPayment->seller_payout;
+                if ($isFullRefund) {
+                    $escrow->status = 'refunded';
+                    $escrow->released_at = now();
+                    $escrow->release_trigger = null;
                 }
+                $escrow->save();
+            }
+
+            if ($isFullRefund && $lockedOrder->status !== 'refunded') {
+                $lockedOrder->status = 'refunded';
+                $lockedOrder->save();
+
+                MarketplaceOrderService::restoreInventoryForRefund($lockedOrder);
             }
         });
 
@@ -753,9 +1435,54 @@ class MarketplacePaymentService
             'checkout.session.completed' => self::handleCheckoutSessionCompleted($eventData),
             'payment_intent.succeeded' => self::handlePaymentIntentSucceeded($eventData),
             'charge.refunded' => self::handleChargeRefunded($eventData),
+            'charge.dispute.created', 'charge.dispute.updated', 'charge.dispute.closed'
+                => self::handleChargeDispute($eventType, $eventData),
             'account.updated' => self::handleAccountUpdated($eventData),
             default => null,
         };
+    }
+
+    /**
+     * Serialize every Stripe-originated refund/chargeback with manual refunds
+     * and escrow release for the same payment. The lock deliberately spans the
+     * remote reversal and its local ledger commit.
+     */
+    private static function withMoneyMovementLock(
+        int $tenantId,
+        int $paymentId,
+        callable $callback,
+    ): mixed {
+        try {
+            return Cache::lock("marketplace-money-movement:{$tenantId}:{$paymentId}", 180)
+                ->block(10, $callback);
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $exception) {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'), previous: $exception);
+        }
+    }
+
+    /**
+     * A scheduled payout is between its local claim and durable transfer
+     * persistence. It is never safe for a webhook to commit a refund/dispute
+     * against that ambiguous state; fail the event so Stripe retries it.
+     */
+    private static function paymentReadyForWebhookMovement(
+        int $tenantId,
+        int $paymentId,
+    ): MarketplacePayment {
+        $payment = MarketplacePayment::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($paymentId)
+            ->firstOrFail();
+        if ($payment->payout_status === 'scheduled') {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'));
+        }
+        if ($payment->funds_flow === 'separate_charge_transfer'
+            && $payment->payout_status === 'paid'
+            && empty($payment->payout_id)) {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'));
+        }
+
+        return $payment;
     }
 
     /**
@@ -800,7 +1527,7 @@ class MarketplacePaymentService
                 'order_id' => $orderId,
                 'session_id' => $session->id ?? null,
             ]);
-            throw new \RuntimeException('PaymentIntent not yet linked to checkout session');
+            throw new \RuntimeException(__('api.marketplace_payment_intent_checkout_unlinked'));
         }
 
         // Trust ONLY our own DB for the order + its tenant. Stripe signature
@@ -829,13 +1556,25 @@ class MarketplacePaymentService
             // Row-locked so a concurrent payment_intent.succeeded webhook for the
             // same purchase can't race the association (confirmPayment is itself
             // idempotent, but this keeps the write single-writer).
-            DB::transaction(function () use ($orderId, $tenantId, $piId) {
+            DB::transaction(function () use ($orderId, $tenantId, $piId, $session) {
                 $order = MarketplaceOrder::where('id', $orderId)
                     ->where('tenant_id', $tenantId)
                     ->lockForUpdate()
                     ->first();
-                if ($order && empty($order->payment_intent_id)) {
-                    $order->payment_intent_id = $piId;
+                if ($order) {
+                    $boundMode = (string) ($order->stripe_checkout_mode ?? '');
+                    if ($boundMode !== '' && $boundMode !== 'checkout_session') {
+                        throw new \RuntimeException(__('api.marketplace_checkout_mode_conflict'));
+                    }
+                    if (! empty($order->checkout_session_id)
+                        && (string) $order->checkout_session_id !== (string) ($session->id ?? '')) {
+                        throw new \RuntimeException(__('api.marketplace_payment_intent_order_mismatch'));
+                    }
+                    $order->stripe_checkout_mode = 'checkout_session';
+                    $order->checkout_session_id = (string) ($session->id ?? '');
+                    if (empty($order->payment_intent_id)) {
+                        $order->payment_intent_id = $piId;
+                    }
                     $order->save();
                 }
             });
@@ -870,18 +1609,6 @@ class MarketplacePaymentService
 
         $piId = $paymentIntent->id ?? null;
         if (!$piId) {
-            return;
-        }
-
-        // Check if already recorded (idempotency)
-        $existing = MarketplacePayment::withoutGlobalScopes()
-            ->where('stripe_payment_intent_id', $piId)
-            ->first();
-
-        if ($existing && $existing->status === 'succeeded') {
-            Log::info('MarketplacePayment webhook: payment already confirmed', [
-                'payment_intent_id' => $piId,
-            ]);
             return;
         }
 
@@ -929,6 +1656,7 @@ class MarketplacePaymentService
                 'order_id' => $orderId,
                 'error' => $e->getMessage(),
             ]);
+            throw $e;
         } finally {
             if ($previousTenantId !== null) {
                 TenantContext::setById($previousTenantId);
@@ -956,43 +1684,81 @@ class MarketplacePaymentService
             return; // Not a marketplace payment
         }
 
-        $refundedAmountCents = $charge->amount_refunded ?? 0;
-        $refundedAmount = $refundedAmountCents / 100;
-        $isFullRefund = $refundedAmountCents >= ($charge->amount ?? 0);
         $order = MarketplaceOrder::withoutGlobalScopes()->find($payment->order_id);
-
-        if (
-            in_array($payment->status, ['refunded'], true)
-            || ((float) ($payment->refund_amount ?? 0) >= $refundedAmount && $refundedAmount > 0)
-        ) {
-            // Email failure must NOT fail the webhook: the refund is already
-            // recorded, and throwing makes Stripe retry the event for days
-            // (a suppressed/bounced recipient fails permanently).
-            if ($order && !self::marketplaceRefundNotificationsHaveEvidence($payment, $order)) {
-                $sent = self::sendMarketplaceRefundNotifications($payment, $order, $refundedAmount, $isFullRefund);
-                if (!$sent) {
-                    Log::warning('MarketplacePayment webhook: refund notification email not sent (will not fail webhook)', [
-                        'payment_id' => $payment->id,
-                    ]);
-                }
-            }
-            return; // Already processed
+        if (! $order) {
+            Log::error('MarketplacePayment webhook: refund has no local order', [
+                'payment_id' => $payment->id,
+                'payment_intent_id' => $piId,
+            ]);
+            return;
+        }
+        $tenantId = (int) $payment->tenant_id;
+        if ($tenantId <= 0 || (int) $order->tenant_id !== $tenantId) {
+            Log::error('MarketplacePayment webhook: refund tenant mismatch', [
+                'payment_id' => $payment->id,
+                'order_id' => $order->id,
+            ]);
+            return;
         }
 
-        $payment->refund_amount = $refundedAmount;
-        $payment->refunded_at = now();
-        $payment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
-        $payment->save();
+        TenantContext::runForTenant($tenantId, static function () use ($charge, $payment, $order, $piId, $tenantId): void {
+        self::withMoneyMovementLock($tenantId, (int) $payment->id, static function () use (
+            $charge,
+            $payment,
+            $order,
+            $piId,
+            $tenantId,
+        ): void {
+        $payment = self::paymentReadyForWebhookMovement($tenantId, (int) $payment->id);
+        $order = MarketplaceOrder::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($order->id)
+            ->firstOrFail();
+        $currency = StripeCurrency::normalize((string) $payment->currency);
 
-        if ($isFullRefund) {
-            if ($order && !in_array($order->status, ['refunded', 'cancelled'], true)) {
-                $order->status = 'refunded';
-                $order->save();
+        $refunds = is_iterable($charge->refunds->data ?? null)
+            ? $charge->refunds->data
+            : [];
+        foreach ($refunds as $refund) {
+            $refundId = (string) ($refund->id ?? '');
+            $refundAmount = StripeCurrency::fromMinor((int) ($refund->amount ?? 0), $currency);
+            if ($refundId === '' || $refundAmount <= 0) {
+                continue;
             }
+            self::reconcileExternalRefund($payment, $order, $charge, $refund, $refundId, $refundAmount);
         }
 
-        if ($order) {
-            $sent = self::sendMarketplaceRefundNotifications($payment, $order, $refundedAmount, $isFullRefund);
+        // Some Stripe API versions omit the expanded refunds collection. Use a
+        // deterministic cumulative key for only the unrecorded difference.
+        $payment->refresh();
+        $refundedAmount = StripeCurrency::fromMinor((int) ($charge->amount_refunded ?? 0), $currency);
+        $unrecorded = StripeCurrency::roundMajor(
+            $refundedAmount - (float) ($payment->refund_amount ?? 0),
+            $currency,
+        );
+        if ($unrecorded > 0) {
+            $fallbackId = sprintf(
+                'charge:%s:%d',
+                (string) ($charge->id ?? $piId),
+                StripeCurrency::toMinor($refundedAmount, $currency),
+            );
+            $fallbackRefund = (object) [
+                'id' => $fallbackId,
+                'amount' => StripeCurrency::toMinor($unrecorded, $currency),
+            ];
+            self::reconcileExternalRefund($payment, $order, $charge, $fallbackRefund, $fallbackId, $unrecorded);
+        }
+
+        $payment->refresh();
+        $order->refresh();
+        $isFullRefund = (string) $payment->status === 'refunded';
+        if (! self::marketplaceRefundNotificationsHaveEvidence($payment, $order)) {
+            $sent = self::sendMarketplaceRefundNotifications(
+                $payment,
+                $order,
+                (float) ($payment->refund_amount ?? 0),
+                $isFullRefund,
+            );
             if (!$sent) {
                 Log::warning('MarketplacePayment webhook: refund notification email not sent (will not fail webhook)', [
                     'payment_id' => $payment->id,
@@ -1003,8 +1769,541 @@ class MarketplacePaymentService
         Log::info('MarketplacePayment webhook: charge refunded', [
             'payment_id' => $payment->id,
             'payment_intent_id' => $piId,
-            'refunded_amount' => $refundedAmount,
+            'refunded_amount' => (float) ($payment->refund_amount ?? 0),
         ]);
+        });
+        });
+    }
+
+    /**
+     * Apply one externally-created Stripe refund to transfer, fee, escrow and
+     * inventory ledgers. The Stripe refund ID is the idempotency boundary.
+     */
+    private static function reconcileExternalRefund(
+        MarketplacePayment $payment,
+        MarketplaceOrder $order,
+        object $charge,
+        object $refund,
+        string $refundId,
+        float $refundAmount,
+    ): void {
+        if (DB::table('marketplace_payment_refunds')->where('stripe_refund_id', $refundId)->exists()) {
+            return;
+        }
+
+        $currency = StripeCurrency::normalize((string) $payment->currency);
+        $remainingRefundable = max(0.0, StripeCurrency::roundMajor(
+            (float) $payment->amount - (float) ($payment->refund_amount ?? 0),
+            $currency,
+        ));
+        $refundAmount = min($remainingRefundable, StripeCurrency::roundMajor($refundAmount, $currency));
+        if ($refundAmount <= 0) {
+            return;
+        }
+
+        $feeReversal = $remainingRefundable > 0
+            ? StripeCurrency::roundMajor(
+                (float) $payment->platform_fee * ($refundAmount / $remainingRefundable),
+                $currency,
+            )
+            : 0.0;
+        $payoutReversal = min(
+            (float) $payment->seller_payout,
+            max(0.0, StripeCurrency::roundMajor($refundAmount - $feeReversal, $currency)),
+        );
+        $client = StripeService::client();
+
+        $transferId = $payment->funds_flow === 'separate_charge_transfer'
+            ? (string) ($payment->payout_id ?? '')
+            : (is_string($charge->transfer ?? null)
+                ? $charge->transfer
+                : (string) ($charge->transfer->id ?? ''));
+        $alreadyReversed = ! empty($refund->transfer_reversal ?? null)
+            || ! empty($refund->source_transfer_reversal ?? null);
+        if ($payoutReversal > 0 && $transferId !== '' && ! $alreadyReversed) {
+            $client->transfers->createReversal(
+                $transferId,
+                ['amount' => StripeCurrency::toMinor($payoutReversal, $currency)],
+                ['idempotency_key' => 'marketplace-external-transfer-reversal-' . hash('sha256', $refundId)],
+            );
+        }
+
+        $applicationFeeId = is_string($charge->application_fee ?? null)
+            ? $charge->application_fee
+            : (string) ($charge->application_fee->id ?? '');
+        if ($payment->funds_flow !== 'separate_charge_transfer'
+            && $feeReversal > 0
+            && $applicationFeeId !== ''
+            && empty($refund->application_fee_refund ?? null)) {
+            $client->applicationFees->createRefund(
+                $applicationFeeId,
+                ['amount' => StripeCurrency::toMinor($feeReversal, $currency)],
+                ['idempotency_key' => 'marketplace-external-fee-refund-' . hash('sha256', $refundId)],
+            );
+        }
+
+        DB::transaction(function () use (
+            $payment,
+            $order,
+            $refundId,
+            $refundAmount,
+            $feeReversal,
+            $payoutReversal,
+            $currency,
+        ): void {
+            $lockedPayment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if (DB::table('marketplace_payment_refunds')->where('stripe_refund_id', $refundId)->exists()) {
+                return;
+            }
+
+            DB::table('marketplace_payment_refunds')->insert([
+                'tenant_id' => $payment->tenant_id,
+                'payment_id' => $lockedPayment->id,
+                'stripe_refund_id' => $refundId,
+                'amount' => $refundAmount,
+                'platform_fee_reversal' => $feeReversal,
+                'seller_payout_reversal' => $payoutReversal,
+                'reason' => 'external_stripe_refund',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $newRefundTotal = min(
+                (float) $lockedPayment->amount,
+                StripeCurrency::roundMajor(
+                    (float) ($lockedPayment->refund_amount ?? 0) + $refundAmount,
+                    $currency,
+                ),
+            );
+            $isFullRefund = $newRefundTotal >= (float) $lockedPayment->amount - 0.005;
+            $lockedPayment->refund_amount = $newRefundTotal;
+            $lockedPayment->refund_reason = 'external_stripe_refund';
+            $lockedPayment->refunded_at = now();
+            $lockedPayment->status = $isFullRefund ? 'refunded' : 'partially_refunded';
+            $lockedPayment->platform_fee = $isFullRefund
+                ? 0
+                : max(0, StripeCurrency::roundMajor(
+                    (float) $lockedPayment->platform_fee - $feeReversal,
+                    $currency,
+                ));
+            $lockedPayment->seller_payout = $isFullRefund
+                ? 0
+                : max(0, StripeCurrency::roundMajor(
+                    (float) $lockedPayment->seller_payout - $payoutReversal,
+                    $currency,
+                ));
+            if ($isFullRefund) {
+                $lockedPayment->payout_status = 'failed';
+            }
+            $lockedPayment->save();
+
+            $escrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->where('order_id', $lockedOrder->id)
+                ->lockForUpdate()
+                ->first();
+            if ($escrow) {
+                $escrow->amount = (float) $lockedPayment->seller_payout;
+                if ($isFullRefund) {
+                    $escrow->status = 'refunded';
+                    $escrow->released_at = now();
+                    $escrow->release_trigger = null;
+                }
+                $escrow->save();
+            }
+
+            if ($isFullRefund && $lockedOrder->status !== 'refunded') {
+                $lockedOrder->status = 'refunded';
+                $lockedOrder->save();
+                MarketplaceOrderService::restoreInventoryForRefund($lockedOrder);
+            }
+        });
+    }
+
+    /** Reconcile Stripe chargeback lifecycle with marketplace payout state. */
+    private static function handleChargeDispute(string $eventType, object $dispute): void
+    {
+        $chargeId = is_string($dispute->charge ?? null)
+            ? $dispute->charge
+            : (string) ($dispute->charge->id ?? '');
+        $disputeId = (string) ($dispute->id ?? '');
+        if ($chargeId === '' || $disputeId === '') {
+            return;
+        }
+
+        $payment = MarketplacePayment::withoutGlobalScopes()
+            ->where('stripe_charge_id', $chargeId)
+            ->first();
+        if (! $payment) {
+            return;
+        }
+        $order = MarketplaceOrder::withoutGlobalScopes()->find($payment->order_id);
+        if (! $order) {
+            return;
+        }
+
+        $tenantId = (int) $payment->tenant_id;
+        if ($tenantId <= 0 || (int) $order->tenant_id !== $tenantId) {
+            Log::error('MarketplacePayment webhook: dispute tenant mismatch', [
+                'payment_id' => $payment->id,
+                'order_id' => $order->id,
+                'dispute_id' => $disputeId,
+            ]);
+            return;
+        }
+
+        TenantContext::runForTenant($tenantId, static function () use (
+            $eventType,
+            $dispute,
+            $disputeId,
+            $chargeId,
+            $payment,
+            $order,
+            $tenantId,
+        ): void {
+        self::withMoneyMovementLock($tenantId, (int) $payment->id, static function () use (
+            $eventType,
+            $dispute,
+            $disputeId,
+            $chargeId,
+            $payment,
+            $order,
+            $tenantId,
+        ): void {
+        $payment = self::paymentReadyForWebhookMovement($tenantId, (int) $payment->id);
+        $order = MarketplaceOrder::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->whereKey($order->id)
+            ->firstOrFail();
+        $status = (string) ($dispute->status ?? 'needs_response');
+        $currency = StripeCurrency::normalize((string) $payment->currency);
+        $isWon = $status === 'won';
+        $isLost = $status === 'lost';
+        $remainingExposure = max(
+            0.0,
+            StripeCurrency::roundMajor(
+                (float) $payment->amount - (float) ($payment->refund_amount ?? 0),
+                $currency,
+            ),
+        );
+        $disputeAmount = min(
+            $remainingExposure,
+            max(0.0, StripeCurrency::fromMinor((int) ($dispute->amount ?? 0), $currency)),
+        );
+        $sellerShare = $remainingExposure > 0
+            ? min(
+                (float) $payment->seller_payout,
+                StripeCurrency::roundMajor(
+                    (float) $payment->seller_payout * ($disputeAmount / $remainingExposure),
+                    $currency,
+                ),
+            )
+            : 0.0;
+        $feeShare = $remainingExposure > 0
+            ? min(
+                (float) $payment->platform_fee,
+                StripeCurrency::roundMajor(
+                    (float) $payment->platform_fee * ($disputeAmount / $remainingExposure),
+                    $currency,
+                ),
+            )
+            : 0.0;
+        $ledgerId = 'dispute:' . $disputeId;
+        $existingLedger = DB::table('marketplace_payment_refunds')
+            ->where('stripe_refund_id', $ledgerId)
+            ->first();
+        $transferWasReversed = false;
+
+        // A won dispute returns the funds to the platform, but Stripe does not
+        // recreate a separate Connect transfer that we explicitly reversed.
+        // Reimburse only that recorded seller share, using a durable
+        // idempotency key so webhook retries cannot duplicate the transfer.
+        if ($isWon
+            && ($existingLedger->reason ?? null) === 'stripe_dispute_hold'
+            && (float) ($existingLedger->seller_payout_reversal ?? 0) > 0) {
+            $sellerProfile = MarketplaceSellerProfile::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->where('user_id', $order->seller_id)
+                ->first();
+            if (! $sellerProfile || empty($sellerProfile->stripe_account_id)) {
+                throw new \RuntimeException(__('api.marketplace_dispute_reimbursement_unavailable'));
+            }
+            StripeService::client()->transfers->create([
+                'amount' => StripeCurrency::toMinor(
+                    (float) $existingLedger->seller_payout_reversal,
+                    $currency,
+                ),
+                'currency' => strtolower((string) $payment->currency),
+                'destination' => $sellerProfile->stripe_account_id,
+                'source_transaction' => $payment->stripe_charge_id,
+                'transfer_group' => 'marketplace_order_' . $order->id,
+                'metadata' => [
+                    'nexus_tenant_id' => (string) $payment->tenant_id,
+                    'nexus_order_id' => (string) $order->id,
+                    'nexus_payment_id' => (string) $payment->id,
+                    'nexus_type' => 'marketplace_dispute_reimbursement',
+                ],
+            ], [
+                'idempotency_key' => 'marketplace-dispute-transfer-reimbursement-' . hash('sha256', $disputeId),
+            ]);
+        }
+
+        // An early dispute event can arrive while escrow is still held and
+        // therefore record a zero-reversal hold. If a payout is subsequently
+        // persisted before the lost event, that zero entry must not suppress
+        // the now-required transfer reversal.
+        $ledgerHasSellerReversal = (float) ($existingLedger->seller_payout_reversal ?? 0) > 0;
+        $shouldReverseTransfer = ! $isWon
+            && ! $ledgerHasSellerReversal
+            && (
+                ($payment->funds_flow === 'separate_charge_transfer' && $payment->payout_status === 'paid')
+                || ($isLost && $payment->funds_flow === 'destination_charge')
+            );
+        if ($shouldReverseTransfer && $sellerShare > 0) {
+            $client = StripeService::client();
+            $transferId = (string) ($payment->payout_id ?? '');
+            if ($transferId === '') {
+                $charge = $client->charges->retrieve($chargeId);
+                $transferId = is_string($charge->transfer ?? null)
+                    ? $charge->transfer
+                    : (string) ($charge->transfer->id ?? '');
+            }
+            if ($transferId !== '') {
+                $client->transfers->createReversal(
+                    $transferId,
+                    ['amount' => StripeCurrency::toMinor($sellerShare, $currency)],
+                    ['idempotency_key' => 'marketplace-dispute-transfer-reversal-' . hash('sha256', $disputeId)],
+                );
+                $transferWasReversed = true;
+            } else {
+                throw new \RuntimeException(__('api.marketplace_dispute_transfer_not_found'));
+            }
+        }
+
+        DB::transaction(function () use (
+            $payment,
+            $order,
+            $disputeId,
+            $status,
+            $isWon,
+            $isLost,
+            $disputeAmount,
+            $sellerShare,
+            $feeShare,
+            $ledgerId,
+            $transferWasReversed,
+            $currency,
+        ): void {
+            $lockedPayment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $escrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $payment->tenant_id)
+                ->where('order_id', $lockedOrder->id)
+                ->lockForUpdate()
+                ->first();
+
+            $lockedPayment->stripe_dispute_id = $disputeId;
+            $lockedPayment->stripe_dispute_status = $status;
+            if ($lockedPayment->dispute_previous_order_status === null
+                && $lockedOrder->status !== 'disputed') {
+                $lockedPayment->dispute_previous_order_status = $lockedOrder->status;
+            }
+
+            $ledger = DB::table('marketplace_payment_refunds')
+                ->where('stripe_refund_id', $ledgerId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($isWon) {
+                if (($ledger->reason ?? null) === 'stripe_dispute_hold') {
+                    $reinstatedPayout = (float) ($ledger->seller_payout_reversal ?? 0);
+                    $lockedPayment->seller_payout = round(
+                        (float) $lockedPayment->seller_payout + $reinstatedPayout,
+                        2,
+                    );
+                    DB::table('marketplace_payment_refunds')
+                        ->where('id', $ledger->id)
+                        ->update([
+                            'reason' => 'stripe_dispute_won',
+                            'updated_at' => now(),
+                        ]);
+                }
+                if ($lockedOrder->status === 'disputed') {
+                    $lockedOrder->status = $lockedPayment->dispute_previous_order_status ?: 'paid';
+                    $lockedOrder->save();
+                }
+                if ($escrow && $escrow->status === 'disputed') {
+                    $escrow->status = 'held';
+                    $escrow->release_after = now();
+                    $escrow->amount = (float) $lockedPayment->seller_payout;
+                    $escrow->save();
+                }
+                if ($lockedPayment->paid_out_at !== null) {
+                    $lockedPayment->payout_status = 'paid';
+                }
+            } elseif ($isLost) {
+                if (($ledger->reason ?? null) !== 'stripe_dispute_lost') {
+                    $reversalAlreadyApplied = ($ledger->reason ?? null) === 'stripe_dispute_hold'
+                        && (float) ($ledger->seller_payout_reversal ?? 0) > 0;
+                    $recordedSellerReversal = $reversalAlreadyApplied
+                        ? (float) ($ledger->seller_payout_reversal ?? 0)
+                        : $sellerShare;
+                    if ($ledger === null) {
+                        DB::table('marketplace_payment_refunds')->insert([
+                            'tenant_id' => $payment->tenant_id,
+                            'payment_id' => $lockedPayment->id,
+                            'stripe_refund_id' => $ledgerId,
+                            'amount' => $disputeAmount,
+                            'platform_fee_reversal' => $feeShare,
+                            'seller_payout_reversal' => $recordedSellerReversal,
+                            'reason' => 'stripe_dispute_lost',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        DB::table('marketplace_payment_refunds')
+                            ->where('id', $ledger->id)
+                            ->update([
+                                'amount' => $disputeAmount,
+                                'platform_fee_reversal' => $feeShare,
+                                'seller_payout_reversal' => $recordedSellerReversal,
+                                'reason' => 'stripe_dispute_lost',
+                                'updated_at' => now(),
+                            ]);
+                    }
+
+                    $newRefundTotal = min(
+                        (float) $lockedPayment->amount,
+                        StripeCurrency::roundMajor(
+                            (float) ($lockedPayment->refund_amount ?? 0) + $disputeAmount,
+                            $currency,
+                        ),
+                    );
+                    $fullDispute = $newRefundTotal >= (float) $lockedPayment->amount - 0.005;
+                    $lockedPayment->refund_amount = $newRefundTotal;
+                    $lockedPayment->platform_fee = max(
+                        0,
+                        StripeCurrency::roundMajor(
+                            (float) $lockedPayment->platform_fee - $feeShare,
+                            $currency,
+                        ),
+                    );
+                    if (! $reversalAlreadyApplied) {
+                        $lockedPayment->seller_payout = max(
+                            0,
+                            StripeCurrency::roundMajor(
+                                (float) $lockedPayment->seller_payout - $sellerShare,
+                                $currency,
+                            ),
+                        );
+                    }
+                    $lockedPayment->refund_reason = 'stripe_dispute_lost';
+                    $lockedPayment->refunded_at = now();
+                    $lockedPayment->status = $fullDispute ? 'refunded' : 'partially_refunded';
+                    $lockedPayment->payout_status = $fullDispute
+                        ? 'failed'
+                        : ($lockedPayment->paid_out_at !== null ? 'paid' : 'pending');
+                    if ($escrow) {
+                        $escrow->amount = (float) $lockedPayment->seller_payout;
+                        if ($fullDispute) {
+                            $escrow->status = 'refunded';
+                            $escrow->released_at = now();
+                            $escrow->release_trigger = null;
+                        } elseif ($escrow->status === 'disputed') {
+                            $escrow->status = $lockedPayment->paid_out_at !== null ? 'released' : 'held';
+                            $escrow->release_after = $lockedPayment->paid_out_at === null ? now() : $escrow->release_after;
+                        }
+                        $escrow->save();
+                    }
+                    if ($fullDispute && $lockedOrder->status !== 'refunded') {
+                        $lockedOrder->status = 'refunded';
+                        $lockedOrder->save();
+                        MarketplaceOrderService::restoreInventoryForRefund($lockedOrder);
+                    } elseif (! $fullDispute && $lockedOrder->status === 'disputed') {
+                        $lockedOrder->status = $lockedPayment->dispute_previous_order_status ?: 'paid';
+                        $lockedOrder->save();
+                    }
+                }
+            } else {
+                if ($ledger === null) {
+                    DB::table('marketplace_payment_refunds')->insert([
+                        'tenant_id' => $payment->tenant_id,
+                        'payment_id' => $lockedPayment->id,
+                        'stripe_refund_id' => $ledgerId,
+                        'amount' => 0,
+                        'platform_fee_reversal' => 0,
+                        'seller_payout_reversal' => $transferWasReversed ? $sellerShare : 0,
+                        'reason' => 'stripe_dispute_hold',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    if ($transferWasReversed) {
+                        $lockedPayment->seller_payout = max(
+                            0,
+                            StripeCurrency::roundMajor(
+                                (float) $lockedPayment->seller_payout - $sellerShare,
+                                $currency,
+                            ),
+                        );
+                    }
+                } elseif ($transferWasReversed
+                    && (float) ($ledger->seller_payout_reversal ?? 0) <= 0) {
+                    DB::table('marketplace_payment_refunds')
+                        ->where('id', $ledger->id)
+                        ->update([
+                            'seller_payout_reversal' => $sellerShare,
+                            'updated_at' => now(),
+                        ]);
+                    $lockedPayment->seller_payout = max(
+                        0,
+                        StripeCurrency::roundMajor(
+                            (float) $lockedPayment->seller_payout - $sellerShare,
+                            $currency,
+                        ),
+                    );
+                }
+                if (! in_array($lockedOrder->status, ['cancelled', 'refunded'], true)) {
+                    $lockedOrder->status = 'disputed';
+                    $lockedOrder->save();
+                }
+                if ($escrow && $escrow->status === 'held') {
+                    $escrow->status = 'disputed';
+                    $escrow->save();
+                }
+                if ($transferWasReversed) {
+                    $lockedPayment->payout_status = (float) $lockedPayment->seller_payout > 0 ? 'paid' : 'failed';
+                }
+            }
+
+            $lockedPayment->save();
+        });
+
+        Log::warning('Marketplace Stripe dispute reconciled', [
+            'event_type' => $eventType,
+            'dispute_id' => $disputeId,
+            'status' => $status,
+            'payment_id' => $payment->id,
+            'order_id' => $order->id,
+        ]);
+        });
+        });
     }
 
     private static function marketplaceRefundNotificationsHaveEvidence(MarketplacePayment $payment, MarketplaceOrder $order): bool
@@ -1012,24 +2311,24 @@ class MarketplacePaymentService
         $users = DB::table('users')
             ->where('tenant_id', $payment->tenant_id)
             ->whereIn('id', [(int) $order->buyer_id, (int) $order->seller_id])
-            ->select(['id', 'email'])
+            ->select(['id', 'email', 'preferred_language'])
             ->get();
 
-        $currency = strtoupper($payment->currency ?? 'EUR');
-        $amount = number_format((float) ($payment->refund_amount ?? 0), 2);
+        $currency = StripeCurrency::normalize((string) $payment->currency);
+        $amount = StripeCurrency::formatMajor((float) ($payment->refund_amount ?? 0), $currency);
         $isFullRefund = (string) $payment->status === 'refunded'
             || (float) ($payment->refund_amount ?? 0) >= (float) ($payment->amount ?? 0);
         $messageKey = $isFullRefund
             ? 'api_controllers_3.marketplace_order.refunded'
             : 'api_controllers_3.marketplace_order.partially_refunded';
-        $message = __($messageKey, [
-            'amount' => $amount,
-            'currency' => $currency,
-            'order_number' => $order->order_number,
-        ]);
         $link = '/marketplace/orders/' . $order->id;
 
         foreach ($users as $user) {
+            $message = (string) LocaleContext::withLocale($user, fn (): string => __($messageKey, [
+                'amount' => $amount,
+                'currency' => $currency,
+                'order_number' => $order->order_number,
+            ]));
             $hasBellEvidence = DB::table('notifications')
                 ->where('tenant_id', (int) $payment->tenant_id)
                 ->where('user_id', (int) $user->id)
@@ -1067,8 +2366,8 @@ class MarketplacePaymentService
         try {
             TenantContext::setById((int) $payment->tenant_id);
 
-            $currency = strtoupper($payment->currency ?? 'EUR');
-            $amountFormatted = number_format($refundedAmount, 2);
+            $currency = StripeCurrency::normalize((string) $payment->currency);
+            $amountFormatted = StripeCurrency::formatMajor($refundedAmount, $currency);
             $amountWithCurrency = $amountFormatted . ' ' . $currency;
             $buyerAmount = $isFullRefund ? $amountWithCurrency : $amountFormatted;
             $orderNumber = (string) $order->order_number;
@@ -1077,38 +2376,39 @@ class MarketplacePaymentService
             $listingTitle = DB::table('marketplace_listings')
                 ->where('id', $order->marketplace_listing_id)
                 ->where('tenant_id', $payment->tenant_id)
-                ->value('title') ?? __('emails_misc.marketplace_order.item_fallback');
-            $safeTitle = htmlspecialchars((string) $listingTitle, ENT_QUOTES, 'UTF-8');
-            $reason = __('emails_misc.marketplace_order.refund_reason_stripe_webhook');
+                ->value('title');
 
             $bellKey = $isFullRefund ? 'api_controllers_3.marketplace_order.refunded' : 'api_controllers_3.marketplace_order.partially_refunded';
-            $bellMessage = __($bellKey, ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber]);
+            $bellParams = ['amount' => $amountFormatted, 'currency' => $currency, 'order_number' => $orderNumber];
 
             $allSent = true;
             $allSent = self::sendMarketplaceRefundNotificationToUser(
                 (int) $payment->tenant_id,
                 (int) $order->buyer_id,
-                $bellMessage,
+                $bellKey,
+                $bellParams,
                 $link,
                 $fullUrl,
                 $orderNumber,
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_buyer_subject' : 'emails_misc.marketplace_order.partially_refunded_subject',
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_buyer_title' : 'emails_misc.marketplace_order.partially_refunded_title',
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_buyer_body' : 'emails_misc.marketplace_order.partially_refunded_body',
-                ['amount' => $buyerAmount, 'currency' => $currency, 'order_number' => $orderNumber, 'title' => $safeTitle]
+                ['amount' => $buyerAmount, 'currency' => $currency, 'order_number' => $orderNumber, 'title' => (string) ($listingTitle ?? '')]
             ) && $allSent;
 
             $allSent = self::sendMarketplaceRefundNotificationToUser(
                 (int) $payment->tenant_id,
                 (int) $order->seller_id,
-                $bellMessage,
+                $bellKey,
+                $bellParams,
                 $link,
                 $fullUrl,
                 $orderNumber,
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_seller_subject' : 'emails_misc.marketplace_order.partially_refunded_seller_subject',
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_seller_title' : 'emails_misc.marketplace_order.partially_refunded_seller_title',
                 $isFullRefund ? 'emails_misc.marketplace_order.refunded_seller_body' : 'emails_misc.marketplace_order.partially_refunded_seller_body',
-                ['amount' => $amountWithCurrency, 'currency' => $currency, 'order_number' => $orderNumber, 'title' => $safeTitle, 'reason' => $reason]
+                ['amount' => $amountWithCurrency, 'currency' => $currency, 'order_number' => $orderNumber, 'title' => (string) ($listingTitle ?? '')],
+                'emails_misc.marketplace_order.refund_reason_stripe_webhook'
             ) && $allSent;
 
             return $allSent;
@@ -1129,19 +2429,22 @@ class MarketplacePaymentService
     }
 
     /**
+     * @param array<string,string> $bellParams
      * @param array<string,string> $bodyParams
      */
     private static function sendMarketplaceRefundNotificationToUser(
         int $tenantId,
         int $userId,
-        string $bellMessage,
+        string $bellKey,
+        array $bellParams,
         string $link,
         string $fullUrl,
         string $orderNumber,
         string $subjectKey,
         string $titleKey,
         string $bodyKey,
-        array $bodyParams
+        array $bodyParams,
+        ?string $reasonKey = null
     ): bool {
         $user = DB::table('users')
             ->where('id', $userId)
@@ -1153,65 +2456,74 @@ class MarketplacePaymentService
             return true;
         }
 
-        $bellExists = DB::table('notifications')
-            ->where('tenant_id', $tenantId)
-            ->where('user_id', $userId)
-            ->where('type', 'marketplace_order')
-            ->where('link', $link)
-            ->where('message', $bellMessage)
-            ->exists();
+        return (bool) LocaleContext::withLocale($user, function () use ($user, $userId, $tenantId, $bellKey, $bellParams, $link, $orderNumber, $subjectKey, $titleKey, $bodyKey, $bodyParams, $reasonKey, $fullUrl): bool {
+            $bellMessage = __($bellKey, $bellParams);
+            $bellExists = DB::table('notifications')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('type', 'marketplace_order')
+                ->where('link', $link)
+                ->where('message', $bellMessage)
+                ->exists();
 
-        if (!$bellExists) {
-            Notification::create([
-                'tenant_id' => $tenantId,
-                'user_id' => $userId,
-                'message' => $bellMessage,
-                'link' => $link,
-                'type' => 'marketplace_order',
-                'created_at' => now(),
-            ]);
-        }
+            if (!$bellExists) {
+                Notification::create([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'message' => $bellMessage,
+                    'link' => $link,
+                    'type' => 'marketplace_order',
+                    'created_at' => now(),
+                ]);
+            }
 
-        if (empty($user->email)) {
-            return true;
-        }
+            if (empty($user->email)) {
+                return true;
+            }
 
-        $subject = __($subjectKey, ['order_number' => $orderNumber]);
-        $hasEmailEvidence = DB::table('email_log')
-            ->where('tenant_id', $tenantId)
-            ->where('recipient_email', $user->email)
-            ->where('category', 'marketplace_refund')
-            ->whereIn('status', ['sent', 'delivered'])
-            ->where(function ($query) use ($subject, $orderNumber): void {
-                $query->where('subject', $subject)
-                    ->orWhere('subject', 'like', '%' . $orderNumber . '%');
-            })
-            ->exists();
+            $subject = __($subjectKey, ['order_number' => $orderNumber]);
+            $hasEmailEvidence = DB::table('email_log')
+                ->where('tenant_id', $tenantId)
+                ->where('recipient_email', $user->email)
+                ->where('category', 'marketplace_refund')
+                ->whereIn('status', ['sent', 'delivered'])
+                ->where(function ($query) use ($subject, $orderNumber): void {
+                    $query->where('subject', $subject)
+                        ->orWhere('subject', 'like', '%' . $orderNumber . '%');
+                })
+                ->exists();
 
-        if ($hasEmailEvidence) {
-            return true;
-        }
+            if ($hasEmailEvidence) {
+                return true;
+            }
 
-        $sent = false;
-        LocaleContext::withLocale($user, function () use (&$sent, $user, $titleKey, $bodyKey, $subject, $bodyParams, $fullUrl, $tenantId): void {
+            $localizedBodyParams = $bodyParams;
+            $title = trim((string) ($localizedBodyParams['title'] ?? ''));
+            if ($title === '') {
+                $title = __('emails_misc.marketplace_order.item_fallback');
+            }
+            $localizedBodyParams['title'] = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+            if ($reasonKey !== null) {
+                $localizedBodyParams['reason'] = __($reasonKey);
+            }
+
             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
             $html = EmailTemplateBuilder::make()
                 ->title(__($titleKey))
                 ->greeting($firstName)
-                ->paragraph(__($bodyKey, $bodyParams))
+                ->paragraph(__($bodyKey, $localizedBodyParams))
                 ->button(__('emails_misc.marketplace_order.order_cta'), $fullUrl)
                 ->render();
 
             $sent = \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'marketplace_refund', ['tenant_id' => $tenantId]);
+            if (!$sent) {
+                Log::warning('MarketplacePayment webhook: refund email returned false', [
+                    'user_id' => $userId,
+                ]);
+            }
+
+            return $sent;
         });
-
-        if (!$sent) {
-            Log::warning('MarketplacePayment webhook: refund email returned false', [
-                'user_id' => $userId,
-            ]);
-        }
-
-        return $sent;
     }
 
     /**
@@ -1236,9 +2548,18 @@ class MarketplacePaymentService
             && ($account->charges_enabled ?? false)
             && ($account->payouts_enabled ?? false);
 
-        if ($isOnboarded && !$sellerProfile->stripe_onboarding_complete) {
-            $sellerProfile->stripe_onboarding_complete = true;
+        $wasOnboarded = (bool) $sellerProfile->stripe_onboarding_complete;
+        if ($isOnboarded !== $wasOnboarded) {
+            $sellerProfile->stripe_onboarding_complete = $isOnboarded;
             $sellerProfile->save();
+
+            if (! $isOnboarded) {
+                Log::warning('MarketplacePayment webhook: seller payout capability disabled', [
+                    'user_id' => $sellerProfile->user_id,
+                    'account_id' => $accountId,
+                ]);
+                return;
+            }
 
             Log::info('MarketplacePayment webhook: seller onboarding complete via webhook', [
                 'user_id' => $sellerProfile->user_id,
@@ -1315,7 +2636,7 @@ class MarketplacePaymentService
     {
         $query = MarketplacePayment::whereHas('order', function ($q) use ($userId) {
             $q->where('seller_id', $userId);
-        })->where('status', 'succeeded');
+        })->whereIn('status', ['succeeded', 'partially_refunded']);
 
         $total = $query->count();
 
@@ -1327,9 +2648,9 @@ class MarketplacePaymentService
                 return [
                     'id' => $p->id,
                     'order_id' => $p->order_id,
-                    'amount' => $p->amount,
-                    'platform_fee' => $p->platform_fee,
-                    'seller_payout' => $p->seller_payout,
+                    'amount' => (float) $p->amount,
+                    'platform_fee' => (float) $p->platform_fee,
+                    'seller_payout' => (float) $p->seller_payout,
                     'currency' => $p->currency,
                     'status' => $p->status,
                     'payout_status' => $p->payout_status,
@@ -1347,40 +2668,149 @@ class MarketplacePaymentService
      * Get the seller's pending balance (total of payments not yet paid out).
      *
      * @param int $userId Seller's user ID
-     * @return array{pending: float, available: float, currency: string, total_earned: float}
+     * @return array{pending: float|null, available: float|null, currency: string|null, total_earned: float|null, balances_by_currency: array<int,array{currency:string,pending:float,available:float,total_earned:float}>}
      */
     public static function getSellerBalance(int $userId): array
     {
         $baseQuery = MarketplacePayment::whereHas('order', function ($q) use ($userId) {
             $q->where('seller_id', $userId);
-        })->where('status', 'succeeded');
+        })->whereIn('status', ['succeeded', 'partially_refunded']);
 
-        $pending = (clone $baseQuery)
-            ->where('payout_status', 'pending')
-            ->sum('seller_payout');
-
-        $available = (clone $baseQuery)
-            ->whereIn('payout_status', ['scheduled', 'paid'])
-            ->sum('seller_payout');
-
-        $totalEarned = (clone $baseQuery)->sum('seller_payout');
-
-        // Derive currency from the seller's most recent payment record; fall back to tenant default.
-        $currency = strtoupper(
-            (clone $baseQuery)->latest()->value('currency') ?? TenantContext::getCurrency() ?? 'EUR'
-        );
+        $balances = (clone $baseQuery)
+            ->selectRaw("UPPER(currency) as currency,
+                SUM(CASE WHEN payout_status = 'pending' THEN seller_payout ELSE 0 END) as pending,
+                SUM(CASE WHEN payout_status IN ('scheduled', 'paid') THEN seller_payout ELSE 0 END) as available,
+                SUM(seller_payout) as total_earned")
+            ->groupByRaw('UPPER(currency)')
+            ->orderBy('currency')
+            ->get()
+            ->map(static function ($row): array {
+                $currency = StripeCurrency::normalize((string) $row->currency);
+                return [
+                    'currency' => $currency,
+                    'pending' => StripeCurrency::roundMajor((float) $row->pending, $currency),
+                    'available' => StripeCurrency::roundMajor((float) $row->available, $currency),
+                    'total_earned' => StripeCurrency::roundMajor((float) $row->total_earned, $currency),
+                ];
+            })
+            ->all();
+        $single = count($balances) <= 1 ? ($balances[0] ?? null) : null;
 
         return [
-            'pending' => round((float) $pending, 2),
-            'available' => round((float) $available, 2),
-            'currency' => $currency,
-            'total_earned' => round((float) $totalEarned, 2),
+            'pending' => $single['pending'] ?? null,
+            'available' => $single['available'] ?? null,
+            'currency' => $single['currency'] ?? null,
+            'total_earned' => $single['total_earned'] ?? null,
+            'balances_by_currency' => $balances,
         ];
     }
 
     // -----------------------------------------------------------------
     //  Internal helpers
     // -----------------------------------------------------------------
+
+    /** Bind a PaymentIntent only while the locked local order remains payable. */
+    private static function bindPaymentIntentToPayableOrder(
+        MarketplaceOrder $order,
+        string $paymentIntentId,
+        int $tenantId,
+    ): void {
+        DB::transaction(function () use ($order, $paymentIntentId, $tenantId): void {
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if ($lockedOrder->status !== 'pending_payment') {
+                throw new \InvalidArgumentException(
+                    __('api.marketplace_payment_intent_order_state_required'),
+                );
+            }
+            if ($lockedOrder->payment_expires_at !== null
+                && $lockedOrder->payment_expires_at->isPast()) {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_expired'));
+            }
+            if (! empty($lockedOrder->payment_intent_id)
+                && (string) $lockedOrder->payment_intent_id !== $paymentIntentId) {
+                throw new \RuntimeException(__('api.marketplace_checkout_mode_conflict'));
+            }
+
+            $lockedOrder->payment_intent_id = $paymentIntentId;
+            $lockedOrder->save();
+        });
+    }
+
+    /** Best-effort fail-closed cleanup for a remote intent that lost the local race. */
+    private static function cancelUnboundPaymentIntent(
+        StripeClient $client,
+        PaymentIntent $paymentIntent,
+        MarketplaceOrder $order,
+        int $tenantId,
+    ): void {
+        try {
+            if (! in_array((string) ($paymentIntent->status ?? ''), ['canceled', 'succeeded'], true)) {
+                $client->paymentIntents->cancel(
+                    (string) $paymentIntent->id,
+                    [],
+                    ['idempotency_key' => "marketplace-unbound-intent-{$tenantId}-{$order->id}"],
+                );
+            }
+        } catch (\Throwable $cleanupException) {
+            Log::critical('MarketplacePayment: unbound PaymentIntent could not be cancelled', [
+                'order_id' => $order->id,
+                'tenant_id' => $tenantId,
+                'payment_intent_id' => $paymentIntent->id ?? null,
+                'error' => $cleanupException->getMessage(),
+            ]);
+        }
+    }
+
+    /** Atomically bind one order to exactly one Stripe checkout mechanism. */
+    private static function claimStripeCheckoutMode(
+        MarketplaceOrder $order,
+        string $requestedMode,
+    ): MarketplaceOrder {
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
+
+        return DB::transaction(function () use ($order, $tenantId, $requestedMode): MarketplaceOrder {
+            $lockedOrder = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if ($lockedOrder->status !== 'pending_payment') {
+                throw new \InvalidArgumentException(
+                    __('api.marketplace_payment_intent_order_state_required'),
+                );
+            }
+            if ($lockedOrder->payment_expires_at !== null
+                && $lockedOrder->payment_expires_at->isPast()) {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_expired'));
+            }
+            $boundMode = (string) ($lockedOrder->stripe_checkout_mode ?? '');
+            if ($boundMode === '') {
+                $boundMode = ! empty($lockedOrder->checkout_session_id)
+                    ? 'checkout_session'
+                    : (! empty($lockedOrder->payment_intent_id) ? 'payment_intent' : '');
+            }
+            if ($boundMode !== '' && $boundMode !== $requestedMode) {
+                throw new \InvalidArgumentException(__('api.marketplace_checkout_mode_conflict'));
+            }
+            if ($boundMode === '') {
+                $lockedOrder->stripe_checkout_mode = $requestedMode;
+                $lockedOrder->save();
+            }
+
+            return $lockedOrder;
+        });
+    }
+
+    private static function assertStripeEnabled(): void
+    {
+        if (! MarketplaceConfigurationService::stripeEnabled()) {
+            throw new \RuntimeException(__('api.marketplace_stripe_disabled'));
+        }
+    }
 
     /**
      * Generate a Stripe Account Link for onboarding.
@@ -1405,7 +2835,7 @@ class MarketplacePaymentService
                 'account_id' => $accountId,
                 'error' => $e->getMessage(),
             ]);
-            throw new \RuntimeException('Failed to generate onboarding link: ' . $e->getMessage());
+            throw new \RuntimeException(__('api.marketplace_onboarding_link_failed'));
         }
     }
 }

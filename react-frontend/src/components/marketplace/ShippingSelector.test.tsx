@@ -181,6 +181,46 @@ describe('ShippingSelector', () => {
     });
   });
 
+  it('does not silently select fulfilment when autoSelect is disabled', async () => {
+    const onSelect = vi.fn();
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [SHIPPING_OPTION] });
+
+    render(
+      <ShippingSelector
+        sellerId={10}
+        onSelect={onSelect}
+        localPickup={false}
+        autoSelect={false}
+      />,
+    );
+
+    await screen.findByText('Standard Post');
+    expect(onSelect).not.toHaveBeenCalledWith(SHIPPING_OPTION);
+    fireEvent.click(screen.getByText('Standard Post'));
+    await waitFor(() => expect(onSelect).toHaveBeenCalledWith(SHIPPING_OPTION));
+  });
+
+  it('only shows zero-cost options for free or time-credit checkout', async () => {
+    const freeOption: MarketplaceShippingOption = {
+      ...SHIPPING_OPTION,
+      id: 9,
+      courier_name: 'Community courier',
+      price: 0,
+      is_default: false,
+    };
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [SHIPPING_OPTION, freeOption],
+    });
+
+    render(<ShippingSelector sellerId={10} onSelect={vi.fn()} localPickup={false} freeOnly />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Community courier')).toBeInTheDocument();
+      expect(screen.queryByText('Standard Post')).not.toBeInTheDocument();
+    });
+  });
+
   it('calls the correct API URL with the given sellerId', async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
 

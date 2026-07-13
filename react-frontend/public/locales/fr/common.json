@@ -1528,6 +1528,7 @@
       "all_listings": "Toutes mes annonces",
       "specific_listings": "Annonces spécifiques",
       "specific_categories": "Catégories spécifiques",
+      "target_required": "Choisissez au moins une annonce ou une catégorie",
       "save": "Enregistrer",
       "delete_confirm": "Supprimer ce bon ? Cette action est irréversible.",
       "no_coupons": "Vous n'avez encore créé aucun bon.",

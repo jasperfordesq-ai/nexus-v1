@@ -25,6 +25,8 @@ class MerchantCouponRedemption extends Model
         'order_id',
         'discount_applied_cents',
         'redeemed_at',
+        'reversed_at',
+        'reversal_reason',
         'redemption_method',
         'qr_token',
         'qr_expires_at',
@@ -32,6 +34,7 @@ class MerchantCouponRedemption extends Model
 
     protected $casts = [
         'redeemed_at' => 'datetime',
+        'reversed_at' => 'datetime',
         'qr_expires_at' => 'datetime',
         'discount_applied_cents' => 'integer',
     ];

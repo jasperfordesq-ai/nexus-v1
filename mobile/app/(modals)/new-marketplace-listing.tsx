@@ -39,7 +39,7 @@ import {
   type MarketplacePriceType,
   type MarketplaceVideoUpload,
 } from '@/lib/api/marketplace';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { contrastText, withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -51,7 +51,6 @@ const DELIVERY: MarketplaceDeliveryMethod[] = ['pickup', 'shipping', 'both', 'co
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 const MAX_IMAGES = 20;
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
-type MarketplaceCurrency = typeof CURRENCIES[number];
 
 function toNumber(value: string): number | null {
   const parsed = Number(value.replace(/[,\s]/g, ''));
@@ -63,9 +62,14 @@ function basenameFromUri(uri: string): string {
   return cleanUri.split('/').pop() || 'marketplace-video.mp4';
 }
 
-function normalizeCurrency(value?: string | null): MarketplaceCurrency {
-  const candidate = (value ?? '').toUpperCase() as MarketplaceCurrency;
-  return CURRENCIES.includes(candidate) ? candidate : 'EUR';
+function normalizeSupportedCurrency(value?: string | null): string {
+  const candidate = (value ?? '').trim().toUpperCase();
+  return CURRENCIES.includes(candidate as (typeof CURRENCIES)[number]) ? candidate : '';
+}
+
+function normalizeExistingCurrency(value?: string | null): string {
+  const candidate = (value ?? '').trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(candidate) ? candidate : '';
 }
 
 export default function NewMarketplaceListingRoute() {
@@ -79,6 +83,7 @@ export default function NewMarketplaceListingRoute() {
 export function MarketplaceListingForm() {
   const { t } = useTranslation(['marketplace', 'common']);
   const params = useLocalSearchParams<{ id?: string; price_type?: MarketplacePriceType }>();
+  const { tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { show: showToast } = useAppToast();
@@ -92,7 +97,9 @@ export function MarketplaceListingForm() {
   const [timeCredits, setTimeCredits] = useState('');
   const initialPriceType = PRICE_TYPES.includes(params.price_type as MarketplacePriceType) ? params.price_type as MarketplacePriceType : 'fixed';
   const [priceType, setPriceType] = useState<MarketplacePriceType>(initialPriceType);
-  const [currency, setCurrency] = useState<MarketplaceCurrency>('EUR');
+  // Leave unsupported/missing bootstrap values empty so create falls back to
+  // the backend's authoritative tenant currency.
+  const [currency, setCurrency] = useState(() => normalizeSupportedCurrency(tenant?.currency));
   const [condition, setCondition] = useState<MarketplaceCondition>('good');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [categoryTemplate, setCategoryTemplate] = useState<MarketplaceCategoryTemplateField[]>([]);
@@ -143,7 +150,10 @@ export function MarketplaceListingForm() {
         setTagline(listing.tagline ?? '');
         setDescription(listing.description ?? '');
         setPrice(listing.price !== null && listing.price !== undefined ? String(listing.price) : '');
-        setCurrency(normalizeCurrency(listing.price_currency));
+        setCurrency(
+          normalizeExistingCurrency(listing.price_currency)
+          || normalizeSupportedCurrency(tenant?.currency),
+        );
         setTimeCredits(listing.time_credit_price !== null && listing.time_credit_price !== undefined ? String(listing.time_credit_price) : '');
         setPriceType(listing.price_type ?? 'fixed');
         setCondition(listing.condition ?? 'good');
@@ -184,7 +194,7 @@ export function MarketplaceListingForm() {
     return () => {
       mounted = false;
     };
-  }, [hydrated, isEditing, listingId, showToast, t]);
+  }, [hydrated, isEditing, listingId, showToast, t, tenant?.currency]);
 
   useEffect(() => {
     if (!categoryId) {
@@ -256,7 +266,7 @@ export function MarketplaceListingForm() {
         tagline: tagline.trim() || null,
         description: description.trim(),
         price: priceType === 'contact' ? null : priceValue,
-        price_currency: currency,
+        ...(currency ? { price_currency: currency } : {}),
         price_type: priceType,
         time_credit_price: toNumber(timeCredits),
         category_id: categoryId,
@@ -444,7 +454,16 @@ export function MarketplaceListingForm() {
             {priceType !== 'free' && priceType !== 'contact' ? (
               <>
                 <FormField label={t('forms.price')} value={price} onChangeText={setPrice} placeholder={t('forms.pricePlaceholder')} keyboardType="decimal-pad" />
-                <ButtonGroup label={t('forms.currency')} values={CURRENCIES} selected={currency} onSelect={setCurrency} labelFor={(value) => value} primary={primary} />
+                <ButtonGroup
+                  label={t('forms.currency')}
+                  values={currency && !CURRENCIES.includes(currency as (typeof CURRENCIES)[number])
+                    ? [currency, ...CURRENCIES]
+                    : CURRENCIES}
+                  selected={currency}
+                  onSelect={setCurrency}
+                  labelFor={(value) => value}
+                  primary={primary}
+                />
               </>
             ) : null}
             <FormField label={t('forms.timeCredits')} value={timeCredits} onChangeText={setTimeCredits} placeholder={t('forms.timeCreditsPlaceholder')} keyboardType="decimal-pad" />

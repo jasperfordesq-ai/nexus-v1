@@ -1538,6 +1538,7 @@
       "all_listings": "Wszystkie moje ogłoszenia",
       "specific_listings": "Określone ogłoszenia",
       "specific_categories": "Określone kategorie",
+      "target_required": "Wybierz co najmniej jedno ogłoszenie lub kategorię",
       "save": "Zapisz",
       "delete_confirm": "Usunąć ten kupon? Tej operacji nie można cofnąć.",
       "no_coupons": "Nie utworzyłeś/aś jeszcze żadnych kuponów.",

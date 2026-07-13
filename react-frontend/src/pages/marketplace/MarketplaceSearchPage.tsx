@@ -38,6 +38,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { normalizeMarketplaceListing } from '@/lib/marketplaceNumbers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -120,9 +121,11 @@ export function MarketplaceSearchPage() {
   const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const cursorRef = useRef<string | null>(null);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listingRequestRef = useRef(0);
 
   // Debounce search
   useEffect(() => {
@@ -154,9 +157,11 @@ export function MarketplaceSearchPage() {
 
   // Load listings
   const loadListings = useCallback(async (append = false) => {
+    const requestId = ++listingRequestRef.current;
     try {
       if (!append) {
         setIsLoading(true);
+        setLoadError(null);
       } else {
         setIsLoadingMore(true);
       }
@@ -177,8 +182,10 @@ export function MarketplaceSearchPage() {
       }
 
       const response = await api.get<MarketplaceListingItem[]>(`/v2/marketplace/listings?${params}`);
+      if (requestId !== listingRequestRef.current) return;
       if (response.success && response.data) {
-        const mapped = response.data as MarketplaceListingItem[];
+        if (!append) setLoadError(null);
+        const mapped = response.data.map(normalizeMarketplaceListing);
         if (append) {
           setListings((prev) => [...prev, ...mapped]);
         } else {
@@ -187,17 +194,23 @@ export function MarketplaceSearchPage() {
         cursorRef.current = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
       } else if (!append) {
-        setListings([]);
-        setHasMore(false);
+        const message = t('search.search_failed');
+        setLoadError(message);
+        toast.error(message);
       }
     } catch (err) {
+      if (requestId !== listingRequestRef.current) return;
       logError('Failed to search marketplace', err);
       if (!append) {
-        toast.error(t('search.search_failed'));
+        const message = t('search.search_failed');
+        setLoadError(message);
+        toast.error(message);
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (requestId === listingRequestRef.current) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
   }, [debouncedQuery, categoryId, priceMin, priceMax, selectedConditions, sellerType, deliveryMethod, sortBy, postedWithin, toast, t])
 
@@ -586,6 +599,12 @@ export function MarketplaceSearchPage() {
           <div className="flex-1 min-w-0">
             {isLoading ? (
               <MarketplaceListingGridSkeleton />
+            ) : loadError ? (
+              <EmptyState
+                icon={<Search className="w-8 h-8" />}
+                title={loadError}
+                action={{ label: t('common.try_again'), onClick: () => loadListings(false) }}
+              />
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={<Search className="w-8 h-8" />}

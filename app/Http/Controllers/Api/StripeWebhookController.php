@@ -308,6 +308,10 @@ class StripeWebhookController extends BaseApiController
     private function handleDisputeUpdated(object $dispute): void
     {
         DonationOperationsService::recordStripeDispute($dispute);
+        MarketplacePaymentService::handleWebhookEvent(
+            'charge.dispute.' . (($dispute->status ?? null) === 'won' || ($dispute->status ?? null) === 'lost' ? 'closed' : 'updated'),
+            $dispute,
+        );
     }
 
     private function handleAccountUpdated(object $account): void

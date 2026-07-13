@@ -19,7 +19,9 @@
       "invalid_listing": "القائمة لا تنتمي إلى هذا التاجر.",
       "listing_unavailable": "هذه القائمة غير متاحة لاسترداد الولاء.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "لم يعد استرداد برنامج الولاء هذا متاحًا.",
+      "redemption_mismatch": "لا يتطابق استرداد برنامج الولاء هذا مع طلب السوق المحدد."
     }
   },
   "survey": {

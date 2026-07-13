@@ -11,6 +11,7 @@ use App\Models\MarketplaceCollection;
 use App\Services\MarketplaceDiscoveryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 /**
  * MarketplaceDiscoveryController — Saved searches and collections endpoints.
@@ -29,7 +30,7 @@ class MarketplaceDiscoveryController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_feature_disabled'), null, 403)
             );
         }
     }
@@ -75,7 +76,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             'name' => 'required|string|max:100',
             'search_query' => 'nullable|string|max:255',
             'filters' => 'nullable|array',
-            'filters.category_id' => 'nullable|integer',
+            'filters.category_id' => ['nullable', 'integer', $this->availableCategoryRule()],
             'filters.price_min' => 'nullable|numeric|min:0',
             'filters.price_max' => 'nullable|numeric|min:0',
             'filters.condition' => 'nullable|string',
@@ -96,7 +97,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             'alert_channel' => $search->alert_channel,
             'is_active' => $search->is_active,
             'created_at' => $search->created_at?->toISOString(),
-        ], 201);
+        ], null, 201);
     }
 
     /**
@@ -162,7 +163,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             'is_public' => $collection->is_public,
             'item_count' => 0,
             'created_at' => $collection->created_at?->toISOString(),
-        ], 201);
+        ], null, 201);
     }
 
     /**
@@ -178,7 +179,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             ->first();
 
         if (!$collection) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Collection not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.marketplace_collection_not_found'), null, 404);
         }
 
         $validated = $request->validate([
@@ -226,11 +227,29 @@ class MarketplaceDiscoveryController extends BaseApiController
             ->first();
 
         if (!$collection) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Collection not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.marketplace_collection_not_found'), null, 404);
         }
 
         $request->validate([
-            'listing_id' => 'required|integer|exists:marketplace_listings,id',
+            'listing_id' => [
+                'required',
+                'integer',
+                Rule::exists('marketplace_listings', 'id')
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where(static function ($query) use ($userId): void {
+                        $query->where(static function ($visibilityQuery) use ($userId): void {
+                            $visibilityQuery->where('user_id', $userId)
+                                ->orWhere(static function ($publicQuery): void {
+                                    $publicQuery->where('status', 'active')
+                                        ->where('moderation_status', 'approved')
+                                        ->where(static function ($expiryQuery): void {
+                                            $expiryQuery->whereNull('expires_at')
+                                                ->orWhere('expires_at', '>', now());
+                                        });
+                                });
+                        });
+                    }),
+            ],
             'note' => 'nullable|string|max:500',
         ]);
 
@@ -240,7 +259,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             $request->input('note')
         );
 
-        return $this->respondWithData(['added' => true], 201);
+        return $this->respondWithData(['added' => true], null, 201);
     }
 
     /**
@@ -257,7 +276,7 @@ class MarketplaceDiscoveryController extends BaseApiController
             ->first();
 
         if (!$collection) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Collection not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.marketplace_collection_not_found'), null, 404);
         }
 
         MarketplaceDiscoveryService::removeFromCollection($id, $listingId);
@@ -282,17 +301,41 @@ class MarketplaceDiscoveryController extends BaseApiController
             ->first();
 
         if (!$collection) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Collection not found.', null, 404);
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.marketplace_collection_not_found'), null, 404);
         }
 
-        $limit = min((int) $request->query('limit', 20), 100);
+        $limit = max(1, min((int) $request->query('limit', 20), 100));
         $cursor = $request->query('cursor');
 
-        $result = MarketplaceDiscoveryService::getCollectionItems($id, $limit, $cursor);
+        $result = MarketplaceDiscoveryService::getCollectionItems(
+            $id,
+            $limit,
+            $cursor,
+            (int) $collection->user_id !== $userId,
+            $userId
+        );
 
-        return $this->respondWithData($result['items'], 200, [
+        return $this->respondWithData($result['items'], [
             'cursor' => $result['cursor'],
             'has_more' => $result['has_more'],
-        ]);
+        ], 200);
+    }
+
+    /**
+     * Saved-search category filters may reference a tenant category or a
+     * globally seeded system category, but never another tenant's category.
+     */
+    private function availableCategoryRule(): \Illuminate\Validation\Rules\Exists
+    {
+        $tenantId = TenantContext::getId();
+
+        return Rule::exists('marketplace_categories', 'id')
+            ->where(static function ($query) use ($tenantId): void {
+                $query->where('is_active', true)
+                    ->where(static function ($tenantQuery) use ($tenantId): void {
+                        $tenantQuery->where('tenant_id', $tenantId)
+                            ->orWhereNull('tenant_id');
+                    });
+            });
     }
 }

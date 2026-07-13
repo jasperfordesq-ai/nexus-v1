@@ -47,6 +47,18 @@ const TYPE_COLORS: Record<string, 'primary' | 'warning' | 'secondary' | 'success
   homepage_carousel: 'success',
 };
 
+function formatPromotionPrice(price: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'code',
+    }).format(price);
+  } catch {
+    return `${currency} ${price}`;
+  }
+}
+
 export function PromotionSelector({
   isOpen,
   onClose,
@@ -114,7 +126,7 @@ export function PromotionSelector({
   const selectedProduct = products.find((p) => p.type === selectedType);
   const selectedPrice = selectedProduct
     ? selectedProduct.price > 0
-      ? `${selectedProduct.currency} ${Number(selectedProduct.price).toFixed(2)}`
+      ? formatPromotionPrice(Number(selectedProduct.price), selectedProduct.currency)
       : t('promotions.free_label')
     : '';
 
@@ -170,7 +182,7 @@ export function PromotionSelector({
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-foreground">
                                 {product.price > 0
-                                  ? `${product.currency} ${Number(product.price).toFixed(2)}`
+                                  ? formatPromotionPrice(Number(product.price), product.currency)
                                   : t('promotions.free_label')}
                               </span>
                               {isSelected && <Check aria-hidden="true" className="w-5 h-5 text-accent" />}

@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceShippingOption;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplacePaymentService;
 use App\Services\MarketplaceSellerService;
 use App\Services\MarketplaceShippingOptionService;
@@ -34,7 +35,7 @@ class MarketplaceSellerController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_feature_disabled'), null, 403)
             );
         }
     }
@@ -60,7 +61,7 @@ class MarketplaceSellerController extends BaseApiController
         $profile = MarketplaceSellerService::getMemberProfile($profileId);
 
         if ($profile === null) {
-            return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_seller_profile_not_found'), null, 404);
         }
 
         return $this->respondWithData($profile);
@@ -84,7 +85,7 @@ class MarketplaceSellerController extends BaseApiController
         $profile = MarketplaceSellerService::getByUserId((int) $id)
             ?? MarketplaceSellerService::getById($id);
         if (!$profile) {
-            return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_seller_profile_not_found'), null, 404);
         }
 
         $limit = $this->queryInt('per_page', 20, 1, 100);
@@ -115,7 +116,7 @@ class MarketplaceSellerController extends BaseApiController
             ?? MarketplaceSellerService::getById($id);
 
         if (!$profile) {
-            return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_seller_profile_not_found'), null, 404);
         }
 
         $options = MarketplaceShippingOptionService::getSellerOptions($profile->id);
@@ -224,6 +225,14 @@ class MarketplaceSellerController extends BaseApiController
     public function createShippingOption(): JsonResponse
     {
         $this->ensureFeature();
+        if (! MarketplaceConfigurationService::allowShipping()) {
+            return $this->respondWithError(
+                'FEATURE_DISABLED',
+                __('api.marketplace_shipping_disabled'),
+                null,
+                403,
+            );
+        }
         $this->rateLimit('marketplace_seller_shipping', 30, 60);
 
         $userId = $this->requireAuth();
@@ -238,13 +247,17 @@ class MarketplaceSellerController extends BaseApiController
             'is_default' => 'nullable|boolean',
         ]);
 
-        $option = MarketplaceShippingOptionService::createOption($profile->id, $validated);
+        try {
+            $option = MarketplaceShippingOptionService::createOption($profile->id, $validated);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
 
         return $this->respondWithData([
             'id' => $option->id,
             'courier_name' => $option->courier_name,
             'courier_code' => $option->courier_code,
-            'price' => $option->price,
+            'price' => (float) $option->price,
             'currency' => $option->currency,
             'estimated_days' => $option->estimated_days,
             'is_default' => $option->is_default,
@@ -258,6 +271,14 @@ class MarketplaceSellerController extends BaseApiController
     public function updateShippingOption(int $id): JsonResponse
     {
         $this->ensureFeature();
+        if (! MarketplaceConfigurationService::allowShipping()) {
+            return $this->respondWithError(
+                'FEATURE_DISABLED',
+                __('api.marketplace_shipping_disabled'),
+                null,
+                403,
+            );
+        }
         $this->rateLimit('marketplace_seller_shipping', 30, 60);
 
         $userId = $this->requireAuth();
@@ -268,7 +289,7 @@ class MarketplaceSellerController extends BaseApiController
             ->first();
 
         if (!$option) {
-            return $this->respondWithError('NOT_FOUND', 'Shipping option not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_shipping_option_not_found'), null, 404);
         }
 
         $validated = request()->validate([
@@ -281,13 +302,17 @@ class MarketplaceSellerController extends BaseApiController
             'is_active' => 'nullable|boolean',
         ]);
 
-        $updated = MarketplaceShippingOptionService::updateOption($option, $validated);
+        try {
+            $updated = MarketplaceShippingOptionService::updateOption($option, $validated);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
 
         return $this->respondWithData([
             'id' => $updated->id,
             'courier_name' => $updated->courier_name,
             'courier_code' => $updated->courier_code,
-            'price' => $updated->price,
+            'price' => (float) $updated->price,
             'currency' => $updated->currency,
             'estimated_days' => $updated->estimated_days,
             'is_default' => $updated->is_default,

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockAuthState: {
   isAuthenticated: boolean;
@@ -15,6 +15,7 @@ let mockAuthState: {
 };
 
 const mockHasFeature = jest.fn(() => true);
+let mockTenantCurrency = 'EUR';
 
 const mockT = (key: string) => {
   const map: Record<string, string> = {
@@ -81,7 +82,10 @@ jest.mock('@/components/ui/EmptyState', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
-  useTenant: () => ({ hasFeature: mockHasFeature }),
+  useTenant: () => ({
+    hasFeature: mockHasFeature,
+    tenant: { currency: mockTenantCurrency },
+  }),
 }));
 
 jest.mock('@/lib/hooks/useAuth', () => ({
@@ -129,11 +133,12 @@ jest.mock('@/components/ui/useConfirm', () => ({
 }));
 
 import MarketplaceShippingOptionsRoute from './marketplace-shipping-options';
-import { getMarketplaceShippingOptions } from '@/lib/api/marketplace';
+import { createMarketplaceShippingOption, getMarketplaceShippingOptions } from '@/lib/api/marketplace';
 
 describe('MarketplaceShippingOptionsRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockTenantCurrency = 'EUR';
     mockHasFeature.mockReturnValue(true);
     mockAuthState = {
       isAuthenticated: true,
@@ -159,5 +164,41 @@ describe('MarketplaceShippingOptionsRoute', () => {
     });
     expect(getByPlaceholderText('6.50')).toBeTruthy();
     expect(getByPlaceholderText('3')).toBeTruthy();
+  });
+
+  it('uses the tenant currency when creating a shipping option', async () => {
+    mockTenantCurrency = 'JPY';
+    jest.mocked(createMarketplaceShippingOption).mockResolvedValue({ data: { id: 7 } } as never);
+
+    const { getByPlaceholderText, getByText } = render(<MarketplaceShippingOptionsRoute />);
+
+    await waitFor(() => expect(getByPlaceholderText('Postal service or local courier')).toBeTruthy());
+    fireEvent.changeText(getByPlaceholderText('Postal service or local courier'), 'Japan Post');
+    fireEvent.changeText(getByPlaceholderText('6.50'), '500');
+    fireEvent.press(getByText('Create option'));
+
+    await waitFor(() => expect(createMarketplaceShippingOption).toHaveBeenCalledWith(
+      expect.objectContaining({ currency: 'JPY' }),
+    ));
+  });
+
+  it('formats zero-decimal shipping prices without forced decimals', async () => {
+    jest.mocked(getMarketplaceShippingOptions).mockResolvedValue({
+      data: [{
+        id: 4,
+        courier_name: 'Japan Post',
+        price: 500,
+        currency: 'JPY',
+        estimated_days: 2,
+        is_default: false,
+        is_active: true,
+      }],
+    } as never);
+
+    const { findByText, queryByText } = render(<MarketplaceShippingOptionsRoute />);
+
+    expect(await findByText('Japan Post')).toBeTruthy();
+    expect(await findByText(/500/)).toBeTruthy();
+    expect(queryByText(/500\.00/)).toBeNull();
   });
 });

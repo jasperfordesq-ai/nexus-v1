@@ -659,6 +659,7 @@
     "distance_km": "{{km}} km 先",
     "distance_meters": "{{m}} m 先",
     "view_toggle": "ビューモード",
+    "results_count_one": "近隣で {{count}} 件のリスティングが見つかりました",
     "results_count_other": "近隣で {{count}} 件のリスティングが見つかりました"
   },
   "shipping": {
@@ -822,6 +823,9 @@
     "start_error": "オンボーディングの開始に失敗しました"
   },
   "checkout": {
+    "payment_method_label": "支払い方法を選択",
+    "pay_with_money": "{{amount}}を支払う",
+    "pay_with_time_credits": "{{count}}時間クレジットで支払う",
     "title": "安全なチェックアウト",
     "order_summary": "注文概要",
     "shipping": "配送",

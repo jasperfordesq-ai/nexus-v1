@@ -19,7 +19,9 @@
       "invalid_listing": "L'inserzione non appartiene a questo commerciante.",
       "listing_unavailable": "Questo elenco non è disponibile per il riscatto fedeltà.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Questo riscatto fedeltà non è più disponibile.",
+      "redemption_mismatch": "Questo riscatto fedeltà non corrisponde all’ordine del marketplace selezionato."
     }
   },
   "survey": {

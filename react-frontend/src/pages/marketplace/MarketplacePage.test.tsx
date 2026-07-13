@@ -43,6 +43,29 @@ vi.mock('@/contexts', () =>
   })
 );
 
+vi.mock('@/contexts/AuthContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/AuthContext')>();
+  return { ...actual, useAuth: () => ({ user: { id: 1, name: 'Alice' }, isAuthenticated: true }) };
+});
+vi.mock('@/contexts/ToastContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/ToastContext')>();
+  return { ...actual, useToast: () => mockToast };
+});
+vi.mock('@/contexts/TenantContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/TenantContext')>();
+  return {
+    ...actual,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenantPath: (path: string) => `/test${path}`,
+      hasFeature: mockHasFeature,
+      hasModule: vi.fn(() => true),
+    }),
+  };
+});
+
+vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ─── Stub heavy marketplace sub-components ────────────────────────────────────
@@ -66,7 +89,34 @@ vi.mock('@/components/marketplace', () => ({
   ),
 }));
 
+vi.mock('@/components/marketplace/MarketplaceListingGrid', () => ({
+  MarketplaceListingGrid: ({ listings }: { listings: object[] }) => (
+    <div data-testid="listing-grid">
+      {(listings as Array<{ id: number; title: string }>).map((listing) => (
+        <div key={listing.id} data-testid="listing-card">{listing.title}</div>
+      ))}
+    </div>
+  ),
+}));
+vi.mock('@/components/marketplace/MarketplaceListingGridSkeleton', () => ({
+  MarketplaceListingGridSkeleton: () => (
+    <div data-testid="listing-skeleton" role="status" aria-busy="true" aria-label="loading" />
+  ),
+}));
+vi.mock('@/components/marketplace/CategoryChips', () => ({
+  CategoryChips: ({ categories }: { categories: object[] }) => (
+    <div data-testid="category-chips">
+      {(categories as Array<{ id: number; name: string }>).map((category) => (
+        <button key={category.id}>{category.name}</button>
+      ))}
+    </div>
+  ),
+}));
+
 vi.mock('@/components/feedback', () => ({
+  EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
+}));
+vi.mock('@/components/feedback/EmptyState', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }));
 

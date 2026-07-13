@@ -16,6 +16,7 @@ import {
   acceptMarketplaceCounterOffer,
   acceptMarketplaceDeliveryOffer,
   createMarketplaceListing,
+  createMarketplaceOrder,
   createMarketplaceCollection,
   createMarketplaceDeliveryOffer,
   createMarketplacePaymentIntent,
@@ -47,6 +48,7 @@ import {
   getMarketplaceShippingOptions,
   getMarketplaceSavedSearches,
   getMarketplaceSellerBalance,
+  getMarketplaceSellerShippingOptions,
   getMarketplaceSellerPayouts,
   getMarketplaceStripeOnboardingStatus,
   getMerchantCouponRedemptions,
@@ -178,6 +180,9 @@ describe('marketplace api', () => {
 
     await getMarketplaceListing(9);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9');
+
+    await getMarketplaceListing(9, 31);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9', { offer_id: '31' });
 
     await getMarketplaceCategoryTemplate(3);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/categories/3/template');
@@ -383,6 +388,27 @@ describe('marketplace api', () => {
     await getMarketplaceListingPickupSlots(9);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9/pickup-slots');
 
+    await getMarketplaceListingPickupSlots(9, 31);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9/pickup-slots', { offer_id: '31' });
+
+    await getMarketplaceSellerShippingOptions(22);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/sellers/22/shipping-options');
+
+    await createMarketplaceOrder({
+      listing_id: 9,
+      quantity: 1,
+      idempotency_key: 'mobile-marketplace-checkout-9',
+      shipping_method: 'pickup',
+      pickup_slot_id: 3,
+    });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders', {
+      listing_id: 9,
+      quantity: 1,
+      idempotency_key: 'mobile-marketplace-checkout-9',
+      shipping_method: 'pickup',
+      pickup_slot_id: 3,
+    });
+
     await reserveMarketplacePickup(14, 3);
     expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/pickup-reservation', {
       slot_id: 3,
@@ -398,11 +424,11 @@ describe('marketplace api', () => {
       payment_intent_id: 'pi_14',
     });
 
-    await validateMarketplaceCoupon({ code: 'SAVE10', order_total_cents: 2500, listing_id: 9 });
+    await validateMarketplaceCoupon({ code: 'SAVE10', listing_id: 9, shipping_option_id: 3 });
     expect(api.post).toHaveBeenCalledWith('/api/v2/coupons/validate', {
       code: 'SAVE10',
-      order_total_cents: 2500,
       listing_id: 9,
+      shipping_option_id: 3,
     });
   });
 

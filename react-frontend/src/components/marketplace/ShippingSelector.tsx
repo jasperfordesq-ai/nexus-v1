@@ -20,6 +20,8 @@ import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { formatMarketplaceCurrency, normalizeMarketplaceShippingOption } from '@/lib/marketplaceNumbers';
+import { useTenant } from '@/contexts';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
 import { Chip } from '@/components/ui/Chip';
 import { RadioGroup, Radio } from '@/components/ui/Radio';
@@ -34,6 +36,10 @@ export interface ShippingSelectorProps {
   onSelect: (option: MarketplaceShippingOption | null | undefined) => void;
   /** Whether local pickup is available for this listing. */
   localPickup: boolean;
+  /** Free/time-credit orders may only use zero-cost shipping options. */
+  freeOnly?: boolean;
+  /** Require an explicit buyer choice instead of selecting a default. */
+  autoSelect?: boolean;
 }
 
 // The special "local pickup" pseudo-option ID
@@ -43,8 +49,15 @@ const LOCAL_PICKUP_ID = 'local_pickup';
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSelectorProps) {
+export function ShippingSelector({
+  sellerId,
+  onSelect,
+  localPickup,
+  freeOnly = false,
+  autoSelect = true,
+}: ShippingSelectorProps) {
   const { t } = useTranslation('marketplace');
+  const { tenant } = useTenant();
 
   const [options, setOptions] = useState<MarketplaceShippingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,25 +71,35 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
     const load = async () => {
       setIsLoading(true);
       setError(null);
+      setSelectedValue('');
       try {
         const response = await api.get<MarketplaceShippingOption[]>(
           `/v2/marketplace/sellers/${sellerId}/shipping-options`
         );
         if (cancelled) return;
         if (response.success && response.data) {
-          const activeOptions = response.data.filter((o) => o.is_active);
+          const activeOptions = response.data
+            .map(normalizeMarketplaceShippingOption)
+            .filter((o) => o.is_active && (!freeOnly || o.price <= 0));
           setOptions(activeOptions);
 
-          // Auto-select: local pickup first if available, else default option, else first option
-          if (localPickup) {
+          // Listing checkout retains its historical convenience default. An
+          // accepted offer disables this so fulfilment is an explicit choice.
+          if (!autoSelect) {
+            setSelectedValue('');
+          } else if (localPickup) {
             setSelectedValue(LOCAL_PICKUP_ID);
             // onSelect(null) means local pickup — parent interprets this
           } else {
             const defaultOpt = activeOptions.find((o) => o.is_default) || activeOptions[0];
             if (defaultOpt) {
               setSelectedValue(String(defaultOpt.id));
+            } else {
+              setSelectedValue('');
             }
           }
+        } else {
+          setError(response.error || t('shipping.load_error'));
         }
       } catch (err) {
         if (!cancelled) {
@@ -90,7 +113,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
 
     load();
     return () => { cancelled = true; };
-  }, [sellerId, localPickup, t]);
+  }, [sellerId, localPickup, freeOnly, autoSelect, t]);
 
   // When selectedValue changes, fire onSelect
   useEffect(() => {
@@ -103,7 +126,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
       return;
     }
     const opt = options.find((o) => String(o.id) === selectedValue);
-    onSelect(opt || null);
+    onSelect(opt);
   }, [selectedValue, options]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectionChange = useCallback((value: string) => {
@@ -208,12 +231,10 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                 )}
               </div>
               <span className="text-sm font-semibold text-foreground shrink-0">
-                {new Intl.NumberFormat(undefined, {
-                  style: 'currency',
-                  currency: option.currency || 'EUR',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2,
-                }).format(option.price)}
+                {formatMarketplaceCurrency(
+                  option.price,
+                  option.currency || tenant?.currency || '',
+                )}
               </span>
             </div>
           </Radio>

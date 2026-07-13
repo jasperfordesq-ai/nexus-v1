@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Services\MarketplaceAiService;
@@ -69,8 +70,19 @@ class MarketplaceAiController extends BaseApiController
         try {
             $reply = $this->aiService->generateAutoReply($id, $data['message']);
             return $this->respondWithData(['reply' => $reply]);
-        } catch (\RuntimeException $e) {
-            return $this->respondWithError('AI_ERROR', $e->getMessage(), null, 500);
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceAiController] auto-reply generation failed', [
+                'listing_id' => $id,
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->respondWithError(
+                'AI_ERROR',
+                __('api_controllers_2.marketplace_ai.generation_failed'),
+                null,
+                500
+            );
         }
     }
 }

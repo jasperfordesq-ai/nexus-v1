@@ -892,6 +892,9 @@
     "start_error": "Theip ar thús an ionduchtaithe"
   },
   "checkout": {
+    "payment_method_label": "Roghnaigh conas íoc",
+    "pay_with_money": "Íoc {{amount}}",
+    "pay_with_time_credits": "Íoc le {{count}} creidmheas ama",
     "title": "Seiceáil Slán",
     "order_summary": "Achoimre Ordaithe",
     "shipping": "Postáil",

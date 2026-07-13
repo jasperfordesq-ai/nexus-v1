@@ -1360,6 +1360,9 @@ Route::post('/v2/marketplace/listings/{id}/auto-reply', [\App\Http\Controllers\A
 
 // Marketplace DSA Reports — User reporting (MKT6)
 Route::post('/v2/marketplace/listings/{id}/report', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'store']);
+Route::get('/v2/marketplace/reports', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'mine']);
+Route::get('/v2/marketplace/reports/{id}', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'show']);
+Route::post('/v2/marketplace/reports/{id}/appeal', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'appeal']);
 
 // AG63 — Merchant Coupons (member-facing)
 Route::get('/v2/coupons', [\App\Http\Controllers\Api\MerchantCouponController::class, 'index']);
@@ -2642,6 +2645,9 @@ Route::post('/v2/admin/marketplace/sellers/{id}/suspend', [\App\Http\Controllers
 Route::get('/v2/admin/marketplace/reports', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'reports']);
 Route::post('/v2/admin/marketplace/reports/{id}/acknowledge', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'acknowledgeReport']);
 Route::put('/v2/admin/marketplace/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'resolveReport']);
+Route::put('/v2/admin/marketplace/reports/{id}/resolve-appeal', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'resolveReportAppeal']);
+Route::get('/v2/admin/marketplace/disputes', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'disputes']);
+Route::put('/v2/admin/marketplace/disputes/{id}/resolve', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'resolveDispute']);
 Route::get('/v2/admin/marketplace/transparency', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'transparencyStats']);
 // Marketplace Admin — DSA Reports for a specific listing
 Route::get('/v2/admin/marketplace/listings/{id}/reports', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'index']);

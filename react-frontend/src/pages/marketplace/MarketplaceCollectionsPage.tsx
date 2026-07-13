@@ -44,6 +44,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveThumbnailUrl } from '@/lib/helpers';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -51,7 +52,7 @@ export function MarketplaceCollectionsPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('collections.page_title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenant, tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const [searchParams] = useSearchParams();
   const featureEnabled = hasFeature('marketplace');
@@ -86,6 +87,8 @@ export function MarketplaceCollectionsPage() {
       const res = await api.get<MarketplaceCollection[]>('/v2/marketplace/collections');
       if (res.success && res.data) {
         setCollections(res.data);
+      } else {
+        toast.error(res.error || t('collections.load_error'));
       }
     } catch (err) {
       logError('Failed to load collections', err);
@@ -102,13 +105,15 @@ export function MarketplaceCollectionsPage() {
       const res = await api.get<MarketplaceSavedSearch[]>('/v2/marketplace/saved-searches');
       if (res.success && res.data) {
         setSavedSearches(res.data);
+      } else {
+        toast.error(res.error || t('collections.load_error'));
       }
     } catch (err) {
       logError('Failed to load saved searches', err);
     } finally {
       setIsLoadingSearches(false);
     }
-  }, []);
+  }, [t, toast]);
 
   useEffect(() => {
     if (!featureEnabled || !isAuthenticated) return;
@@ -133,6 +138,8 @@ export function MarketplaceCollectionsPage() {
         setNewDescription('');
         setNewIsPublic(false);
         toast.success(t('collections.created'));
+      } else {
+        toast.error(res.error || t('collections.create_error'));
       }
     } catch (err) {
       logError('Failed to create collection', err);
@@ -152,6 +159,8 @@ export function MarketplaceCollectionsPage() {
       );
       if (res.success && res.data) {
         setCollectionItems(res.data);
+      } else {
+        toast.error(res.error || t('collections.items_load_error'));
       }
     } catch (err) {
       logError('Failed to load collection items', err);
@@ -165,9 +174,13 @@ export function MarketplaceCollectionsPage() {
   const handleRemoveItem = async (listingId: number) => {
     if (!selectedCollection) return;
     try {
-      await api.delete(
+      const res = await api.delete(
         `/v2/marketplace/collections/${selectedCollection.id}/items/${listingId}`,
       );
+      if (!res.success) {
+        toast.error(res.error || t('collections.remove_item_error'));
+        return;
+      }
       setCollectionItems((prev) =>
         prev.filter((item) => item.listing.id !== listingId),
       );
@@ -191,7 +204,11 @@ export function MarketplaceCollectionsPage() {
   // ─── Saved search actions ──────────────────────────────────────────
   const handleDeleteSearch = async (id: number) => {
     try {
-      await api.delete(`/v2/marketplace/saved-searches/${id}`);
+      const res = await api.delete(`/v2/marketplace/saved-searches/${id}`);
+      if (!res.success) {
+        toast.error(res.error || t('saved_searches.delete_error'));
+        return;
+      }
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));
       toast.success(t('saved_searches.deleted'));
     } catch (err) {
@@ -318,7 +335,10 @@ export function MarketplaceCollectionsPage() {
                       {item.listing.price_type === 'free'
                         ? t('common.free')
                         : item.listing.price != null
-                          ? `${item.listing.price_currency} ${Number(item.listing.price).toFixed(2)}`
+                          ? formatMarketplaceCurrency(
+                            Number(item.listing.price),
+                            item.listing.price_currency || tenant?.currency || '',
+                          )
                           : ''}
                     </p>
                     {item.note && (

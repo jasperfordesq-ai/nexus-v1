@@ -100,6 +100,23 @@ class MarketplaceReportControllerTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_store_rejects_executable_evidence_url_schemes(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create());
+
+        $response = $this->apiPost('/v2/marketplace/listings/1/report', [
+            'reason' => 'unsafe',
+            'description' => 'The evidence URL must be safe for an administrator to open.',
+            'evidence_urls' => ['javascript:alert(1)'],
+        ]);
+
+        $response->assertStatus(422);
+        $details = $response->json('errors.0.details');
+        $this->assertIsArray($details);
+        $this->assertArrayHasKey('evidence_urls.0', $details);
+    }
+
     public function test_index_requires_admin(): void
     {
         $this->enableMarketplaceFeature($this->testTenantId);

@@ -335,6 +335,7 @@ class TenantBootstrapController extends BaseApiController
             'id' => (int) $tenant['id'],
             'name' => $tenant['name'] ?? '',
             'slug' => $tenant['slug'] ?? '',
+            'currency' => strtoupper(TenantContext::getCurrency()),
         ];
 
         if (!empty($tenant['domain'])) {

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use App\Services\MarketplaceConfigurationService;
 
 /**
  * Smoke tests for MarketplaceSellerController.
@@ -154,10 +155,17 @@ class MarketplaceSellerControllerTest extends TestCase
             ],
         ]);
 
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_ALLOW_SHIPPING,
+            true,
+        );
+
         $response = $this->apiGet("/v2/marketplace/sellers/{$seller->id}/shipping-options");
 
         $response->assertSuccessful();
         $response->assertJsonCount(1, 'data');
         $response->assertJsonPath('data.0.courier_name', 'Standard Post');
+        $response->assertJsonPath('data.0.price', 4.99);
+        $this->assertIsFloat($response->json('data.0.price'));
     }
 }

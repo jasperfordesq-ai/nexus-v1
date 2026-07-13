@@ -28,6 +28,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { dateLocale } from '@/lib/utils/dateLocale';
+import { formatLegacyCouponMinorAmount } from '@/lib/utils/marketplaceCurrency';
 
 export default function MarketplaceCouponDetailRoute() {
   return (
@@ -40,7 +41,7 @@ export default function MarketplaceCouponDetailRoute() {
 function MarketplaceCouponDetailScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { show: showToast } = useAppToast();
@@ -100,7 +101,13 @@ function MarketplaceCouponDetailScreen() {
         </View>
       ) : (
         <View className="flex-1 gap-3 px-4 pt-2" style={{ flex: 1 }}>
-          <CouponDetailCard item={item} onShare={shareCode} onQr={openQr} isQrLoading={isQrLoading} />
+          <CouponDetailCard
+            item={item}
+            currency={tenant?.currency}
+            onShare={shareCode}
+            onQr={openQr}
+            isQrLoading={isQrLoading}
+          />
         </View>
       )}
 
@@ -133,11 +140,13 @@ function MarketplaceCouponDetailScreen() {
 
 function CouponDetailCard({
   item,
+  currency,
   onShare,
   onQr,
   isQrLoading,
 }: {
   item: PublicMerchantCoupon;
+  currency?: string;
   onShare: () => void;
   onQr: () => void;
   isQrLoading: boolean;
@@ -145,7 +154,7 @@ function CouponDetailCard({
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const terms = couponTerms(item, t);
+  const terms = couponTerms(item, currency, t);
   return (
     <HeroCard className="overflow-hidden rounded-panel p-0">
       <View className="h-1.5" style={{ backgroundColor: primary }} />
@@ -155,7 +164,7 @@ function CouponDetailCard({
             <Ionicons name="ticket-outline" size={25} color={primary} />
           </View>
           <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
-            <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, t)}</Chip.Label>
+            <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, currency, t)}</Chip.Label>
           </Chip>
         </View>
         <View className="gap-2">
@@ -195,16 +204,30 @@ function CouponDetailCard({
   );
 }
 
-function couponDiscountLabel(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string {
+function couponDiscountLabel(
+  coupon: PublicMerchantCoupon,
+  currency: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
   if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}${t('publicCoupons.percentSuffix')}`;
-  if (coupon.discount_type === 'fixed') return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
+  if (coupon.discount_type === 'fixed') {
+    return t('publicCoupons.fixedValue', {
+      value: formatLegacyCouponMinorAmount(coupon.discount_value ?? 0, currency),
+    });
+  }
   return t('publicCoupons.bogo');
 }
 
-function couponTerms(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string[] {
+function couponTerms(
+  coupon: PublicMerchantCoupon,
+  currency: string | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string[] {
   const terms: string[] = [t(`publicCoupons.status.${coupon.status}`)];
   if (coupon.min_order_cents && coupon.min_order_cents > 0) {
-    terms.push(t('publicCoupons.minOrder', { value: (coupon.min_order_cents / 100).toFixed(2) }));
+    terms.push(t('publicCoupons.minOrder', {
+      value: formatLegacyCouponMinorAmount(coupon.min_order_cents, currency),
+    }));
   }
   if (coupon.max_uses) {
     terms.push(t('publicCoupons.usage', { used: coupon.usage_count ?? coupon.used_count ?? 0, max: coupon.max_uses }));

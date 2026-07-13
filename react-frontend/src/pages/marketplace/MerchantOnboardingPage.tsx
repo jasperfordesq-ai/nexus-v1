@@ -466,7 +466,7 @@ export function MerchantOnboardingPage() {
         <Button
           size="lg"
           endContent={<ArrowRight size={16} />}
-          onPress={() => navigate(tenantPath('/marketplace/listings/new'))}
+          onPress={() => navigate(tenantPath('/marketplace/sell'))}
         >
           {t('success_cta')}
         </Button>
@@ -824,7 +824,7 @@ export function MerchantOnboardingPage() {
             <Button
               size="lg"
               endContent={<ArrowRight size={16} />}
-              onPress={() => navigate(tenantPath('/marketplace/listings/new'))}
+              onPress={() => navigate(tenantPath('/marketplace/sell'))}
             >
               {t('success_cta')}
             </Button>

@@ -15,14 +15,16 @@ import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Undo2 from 'lucide-react/icons/undo-2';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
-import type { MarketplaceOffer } from '@/types/marketplace';
+import type { MarketplaceOffer, MarketplaceShippingOption } from '@/types/marketplace';
 import { BuyNowButton } from './BuyNowButton';
+import { ShippingSelector } from './ShippingSelector';
 
 interface OfferCardProps {
   offer: MarketplaceOffer;
@@ -84,6 +86,10 @@ export function OfferCard({
   const { t } = useTranslation('marketplace');
   const statusConfig = STATUS_CONFIG[offer.status] ?? { color: 'default' as const, labelKey: 'offer.status.unknown' };
   const counterparty = perspective === 'buyer' ? offer.seller : offer.buyer;
+  const [acceptedShippingOption, setAcceptedShippingOption] = useState<MarketplaceShippingOption | null | undefined>(undefined);
+  const acceptedFulfilmentRequired = Boolean(
+    offer.listing?.shipping_available || offer.listing?.local_pickup,
+  );
 
   return (
     <GlassCard className="p-4">
@@ -239,7 +245,15 @@ export function OfferCard({
           )}
 
           {offer.status === 'accepted' && perspective === 'buyer' && offer.listing && offer.seller && (
-            <div className="mt-3">
+            <div className="mt-3 space-y-3">
+              {acceptedFulfilmentRequired && (
+                <ShippingSelector
+                  sellerId={offer.seller.id}
+                  localPickup={Boolean(offer.listing.local_pickup)}
+                  autoSelect={false}
+                  onSelect={setAcceptedShippingOption}
+                />
+              )}
               <BuyNowButton
                 listingId={offer.listing.id}
                 offerId={offer.id}
@@ -247,6 +261,11 @@ export function OfferCard({
                 price={offer.amount}
                 currency={offer.currency}
                 sellerId={offer.seller.id}
+                selectedShippingOption={acceptedShippingOption}
+                shippingRequired={acceptedFulfilmentRequired}
+                shippingMethod={offer.listing.delivery_method === 'community_delivery'
+                  ? 'community_delivery'
+                  : 'pickup'}
                 allowCoupons={false}
                 buttonLabelKey="offer.pay_accepted"
                 onSuccess={() => onCheckoutSuccess?.(offer.id)}

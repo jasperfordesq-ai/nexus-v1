@@ -58,9 +58,10 @@ interface SellerDashboardStats {
   sold_listings: number;
   expired_listings: number;
   total_views: number;
-  total_revenue: number;
-  revenue_currency: string;
-  [key: string]: number | string;
+  total_revenue: number | null;
+  revenue_currency: string | null;
+  revenue_by_currency?: Array<{ currency: string; total: number }>;
+  [key: string]: number | string | null | Array<{ currency: string; total: number }> | undefined;
 }
 
 interface OnboardingStatus {
@@ -369,9 +370,13 @@ export function MyListingsPage() {
             <GlassCard className="p-4 text-center">
               <BarChart3 className="w-5 h-5 text-warning mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">
-                {stats.total_revenue > 0
-                  ? formatCurrency(stats.total_revenue, stats.revenue_currency || 'EUR')
-                  : '0'}
+                {(stats.revenue_by_currency?.length
+                  ? stats.revenue_by_currency
+                  : stats.total_revenue != null && stats.revenue_currency
+                    ? [{ total: stats.total_revenue, currency: stats.revenue_currency }]
+                    : [])
+                  .map((entry) => formatCurrency(entry.total, entry.currency))
+                  .join(' · ') || '0'}
               </p>
               <p className="text-xs text-muted">{t('my_listings.stat_revenue')}</p>
             </GlassCard>
@@ -396,7 +401,7 @@ export function MyListingsPage() {
                   <span>{t(tab.tKey)}</span>
                   {stats && (
                     <span className="text-xs text-muted">
-                      ({stats[`${tab.key}_listings`] ?? 0})
+                      ({Number(stats[`${tab.key}_listings`] ?? 0)})
                     </span>
                   )}
                 </div>

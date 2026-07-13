@@ -29,7 +29,9 @@ class MarketplaceReport extends Model
         'resolved_at',
         'resolution_reason',
         'action_taken',
+        'enforcement_snapshot',
         'appeal_text',
+        'appealed_by',
         'appeal_resolved_at',
         'handled_by',
         'transparency_report_included',
@@ -42,6 +44,7 @@ class MarketplaceReport extends Model
 
     protected $casts = [
         'evidence_urls' => 'array',
+        'enforcement_snapshot' => 'array',
         'acknowledged_at' => 'datetime',
         'resolved_at' => 'datetime',
         'appeal_resolved_at' => 'datetime',
@@ -49,6 +52,7 @@ class MarketplaceReport extends Model
         'handled_by' => 'integer',
         'marketplace_listing_id' => 'integer',
         'reporter_id' => 'integer',
+        'appealed_by' => 'integer',
     ];
 
     // ---------------------------------------------------------------

@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\MarketplaceOrder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -67,12 +69,8 @@ class CaringLoyaltyService
             return $base + ['reason' => 'feature_unavailable'];
         }
 
-        if ($orderTotalChf <= 0) {
-            return $base + ['reason' => 'invalid_order_total'];
-        }
-
         try {
-            $this->assertListingBelongsToSeller($tenantId, $sellerId, $listingId);
+            $orderTotalChf = $this->authoritativeListingTotalChf($tenantId, $sellerId, $listingId);
         } catch (RuntimeException) {
             return $base + ['reason' => 'invalid_listing'];
         }
@@ -121,14 +119,14 @@ class CaringLoyaltyService
     }
 
     /**
-     * Apply a redemption.
+     * Reserve a redemption for atomic application during order creation.
      *
      * Atomically:
      *   1. Validates merchant accepts credits
      *   2. Validates member has the requested credits
      *   3. Validates the discount fits within merchant's max-discount-pct cap
-     *   4. Debits the member's wallet
-     *   5. Inserts a caring_loyalty_redemption row
+     *   4. Verifies the current wallet can cover it without debiting yet
+     *   5. Inserts a short-lived pending redemption token
      *
      * @return array{discount_chf: float, redemption_id: int, new_wallet_balance: float}
      *
@@ -147,9 +145,7 @@ class CaringLoyaltyService
         if ($creditsToUse <= 0) {
             throw new InvalidArgumentException(__('caring_community.loyalty.errors.credits_must_be_positive'));
         }
-        if ($orderTotalChf <= 0) {
-            throw new InvalidArgumentException(__('caring_community.loyalty.errors.invalid_order_total'));
-        }
+        $orderTotalChf = $this->authoritativeListingTotalChf($tenantId, $sellerId, $listingId);
         if (abs(round($creditsToUse, 2) - $creditsToUse) > 0.0001) {
             throw new InvalidArgumentException(__('caring_community.loyalty.errors.credits_decimal_precision'));
         }
@@ -166,8 +162,6 @@ class CaringLoyaltyService
         if (!Schema::hasTable('caring_loyalty_redemptions')) {
             throw new RuntimeException(__('caring_community.loyalty.errors.programme_unavailable'));
         }
-        $this->assertListingBelongsToSeller($tenantId, $sellerId, $listingId);
-
         // Lock seller settings row first (deterministic order: settings then user)
         $result = DB::transaction(function () use ($tenantId, $memberId, $sellerId, $listingId, $creditsToUse, $orderTotalChf) {
             $settings = DB::table('marketplace_seller_loyalty_settings')
@@ -213,16 +207,6 @@ class CaringLoyaltyService
                 throw new RuntimeException(__('caring_community.loyalty.errors.insufficient_credits'));
             }
 
-            // Debit wallet
-            $newBalance = round($currentBalance - $creditsToUse, 2);
-            DB::table('users')
-                ->where('id', $memberId)
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'balance'    => $newBalance,
-                    'updated_at' => now(),
-                ]);
-
             $redemptionId = DB::table('caring_loyalty_redemptions')->insertGetId([
                 'tenant_id'              => $tenantId,
                 'member_user_id'         => $memberId,
@@ -233,8 +217,9 @@ class CaringLoyaltyService
                 'exchange_rate_chf'      => $rate,
                 'discount_chf'           => $discountChf,
                 'order_total_chf'        => $orderTotalChf,
-                'status'                 => 'applied',
+                'status'                 => 'pending',
                 'redeemed_at'            => now(),
+                'expires_at'             => now()->addMinutes(30),
                 'created_at'             => now(),
                 'updated_at'             => now(),
             ]);
@@ -242,7 +227,7 @@ class CaringLoyaltyService
             return [
                 'discount_chf'       => $discountChf,
                 'redemption_id'      => (int) $redemptionId,
-                'new_wallet_balance' => $newBalance,
+                'new_wallet_balance' => $currentBalance,
             ];
         });
 
@@ -259,7 +244,122 @@ class CaringLoyaltyService
         return $result;
     }
 
-    private function assertListingBelongsToSeller(int $tenantId, int $sellerId, ?int $listingId): void
+    /**
+     * Atomically apply a pending redemption to a newly-created cash order.
+     * The wallet debit and order discount commit or roll back together.
+     */
+    public function applyPendingToOrder(int $redemptionId, MarketplaceOrder $order): float
+    {
+        $tenantId = (int) ($order->tenant_id ?: TenantContext::getId());
+
+        return DB::transaction(function () use ($tenantId, $redemptionId, $order): float {
+            $redemption = DB::table('caring_loyalty_redemptions')
+                ->where('id', $redemptionId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (! $redemption
+                || $redemption->status !== 'pending'
+                || $redemption->marketplace_order_id !== null
+                || ($redemption->expires_at !== null && now()->greaterThan(Carbon::parse($redemption->expires_at)))) {
+                throw new RuntimeException(__('caring_community.loyalty.errors.redemption_unavailable'));
+            }
+            if ((int) $redemption->member_user_id !== (int) $order->buyer_id
+                || (int) $redemption->merchant_user_id !== (int) $order->seller_id
+                || (int) $redemption->marketplace_listing_id !== (int) $order->marketplace_listing_id
+                || (int) $order->quantity !== 1
+                || strtoupper((string) $order->currency) !== 'CHF') {
+                throw new RuntimeException(__('caring_community.loyalty.errors.redemption_mismatch'));
+            }
+
+            $itemTotal = round((float) $order->unit_price * (int) $order->quantity, 2);
+            if (abs($itemTotal - (float) $redemption->order_total_chf) > 0.005) {
+                throw new RuntimeException(__('caring_community.loyalty.errors.redemption_mismatch'));
+            }
+
+            $member = DB::table('users')
+                ->where('id', $order->buyer_id)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            $credits = round((float) $redemption->credits_used, 2);
+            if (! $member || (float) $member->balance < $credits) {
+                throw new RuntimeException(__('caring_community.loyalty.errors.insufficient_credits'));
+            }
+
+            DB::table('users')
+                ->where('id', $order->buyer_id)
+                ->where('tenant_id', $tenantId)
+                ->decrement('balance', $credits);
+            DB::table('caring_loyalty_redemptions')
+                ->where('id', $redemptionId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->update([
+                    'marketplace_order_id' => $order->id,
+                    'status' => 'applied',
+                    'expires_at' => null,
+                    'updated_at' => now(),
+                ]);
+
+            $discount = round((float) $redemption->discount_chf, 2);
+            $baseTotal = round($itemTotal + (float) ($order->shipping_cost ?? 0), 2);
+            $order->loyalty_redemption_id = $redemptionId;
+            $order->total_price = max(0.0, round($baseTotal - $discount, 2));
+            $order->save();
+
+            return $discount;
+        });
+    }
+
+    /** Restore an applied loyalty redemption when its unpaid/refunded order unwinds. */
+    public function reverseForOrder(int $orderId, string $reason): void
+    {
+        if (! Schema::hasTable('caring_loyalty_redemptions')) {
+            return;
+        }
+        $tenantId = TenantContext::getId();
+        DB::transaction(function () use ($tenantId, $orderId, $reason): void {
+            $redemption = DB::table('caring_loyalty_redemptions')
+                ->where('tenant_id', $tenantId)
+                ->where('marketplace_order_id', $orderId)
+                ->lockForUpdate()
+                ->first();
+            if (! $redemption || $redemption->status === 'reversed') {
+                return;
+            }
+            if ($redemption->status !== 'applied') {
+                DB::table('caring_loyalty_redemptions')
+                    ->where('id', $redemption->id)
+                    ->update(['status' => 'reversed', 'updated_at' => now()]);
+                return;
+            }
+
+            DB::table('users')
+                ->where('id', $redemption->member_user_id)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            DB::table('users')
+                ->where('id', $redemption->member_user_id)
+                ->where('tenant_id', $tenantId)
+                ->increment('balance', (float) $redemption->credits_used);
+            DB::table('caring_loyalty_redemptions')
+                ->where('id', $redemption->id)
+                ->update([
+                    'status' => 'reversed',
+                    'reversed_at' => now(),
+                    'reversal_reason' => mb_substr($reason, 0, 500),
+                    'updated_at' => now(),
+                ]);
+        });
+    }
+
+    private function authoritativeListingTotalChf(
+        int $tenantId,
+        int $sellerId,
+        ?int $listingId,
+    ): float
     {
         if ($listingId === null || $listingId <= 0) {
             throw new RuntimeException(__('caring_community.loyalty.errors.invalid_listing'));
@@ -271,7 +371,15 @@ class CaringLoyaltyService
         $listing = DB::table('marketplace_listings')
             ->where('id', $listingId)
             ->where('tenant_id', $tenantId)
-            ->first(['user_id', 'status', 'moderation_status']);
+            ->first([
+                'user_id',
+                'status',
+                'moderation_status',
+                'price',
+                'price_currency',
+                'price_type',
+                'expires_at',
+            ]);
 
         if (!$listing || (int) $listing->user_id !== $sellerId) {
             throw new RuntimeException(__('caring_community.loyalty.errors.invalid_listing'));
@@ -279,6 +387,16 @@ class CaringLoyaltyService
         if ((string) $listing->status !== 'active' || (string) $listing->moderation_status !== 'approved') {
             throw new RuntimeException(__('caring_community.loyalty.errors.listing_unavailable'));
         }
+        if ($listing->expires_at !== null && now()->greaterThan(Carbon::parse($listing->expires_at))) {
+            throw new RuntimeException(__('caring_community.loyalty.errors.listing_unavailable'));
+        }
+        if ((string) $listing->price_type !== 'fixed'
+            || strtoupper((string) $listing->price_currency) !== 'CHF'
+            || (float) $listing->price <= 0) {
+            throw new RuntimeException(__('caring_community.loyalty.errors.invalid_order_total'));
+        }
+
+        return round((float) $listing->price, 2);
     }
 
     /**

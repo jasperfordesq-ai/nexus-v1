@@ -911,6 +911,9 @@
     "start_error": "فشل في بدء عملية الانضمام"
   },
   "checkout": {
+    "payment_method_label": "اختر طريقة الدفع",
+    "pay_with_money": "ادفع {{amount}}",
+    "pay_with_time_credits": "ادفع باستخدام {{count}} من الأرصدة الزمنية",
     "title": "الدفع الآمن",
     "order_summary": "ملخص الطلب",
     "shipping": "الشحن",

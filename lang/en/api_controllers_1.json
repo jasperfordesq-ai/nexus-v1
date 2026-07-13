@@ -100,7 +100,9 @@
         "seller_verified": "Seller verified.",
         "seller_suspended": "Seller suspended and all listings deactivated.",
         "report_acknowledged": "Report acknowledged.",
-        "report_resolved": "Report resolved."
+        "report_resolved": "Report resolved.",
+        "report_appeal_resolved": "Report appeal resolved.",
+        "dispute_resolved": "Dispute resolved."
     },
     "admin_newsletter": {
         "newsletter_queued": "Newsletter queued for :count recipients",

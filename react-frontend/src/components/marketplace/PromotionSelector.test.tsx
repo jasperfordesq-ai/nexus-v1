@@ -137,6 +137,18 @@ describe('PromotionSelector', () => {
     });
   });
 
+  it('does not force decimal places for zero-decimal promotion currencies', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: [{ ...MOCK_PRODUCTS[1], currency: 'JPY', price: 500 }],
+    });
+
+    render(<PromotionSelector {...DEFAULT_PROPS} />);
+
+    await waitFor(() => expect(screen.getByText(/JPY\s*500/)).toBeInTheDocument());
+    expect(document.body.textContent).not.toContain('500.00');
+  });
+
   it('renders duration for each product (in days when >= 24h)', async () => {
     render(<PromotionSelector {...DEFAULT_PROPS} />);
     await waitFor(() => {
@@ -212,7 +224,7 @@ describe('PromotionSelector', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /promote for EUR 4\.99/i })
+        screen.getByRole('button', { name: /promote for EUR\s*4\.99/i })
       ).toBeInTheDocument();
     });
   });

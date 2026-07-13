@@ -25,6 +25,7 @@ class MarketplaceDispute extends Model
         'description',
         'evidence_urls',
         'status',
+        'prior_order_status',
         'resolution_notes',
         'resolved_by',
         'resolved_at',

@@ -854,6 +854,9 @@
     "start_error": "Impossibile avviare l'onboarding"
   },
   "checkout": {
+    "payment_method_label": "Scegli come pagare",
+    "pay_with_money": "Paga {{amount}}",
+    "pay_with_time_credits": "Paga con {{count}} crediti di tempo",
     "title": "Pagamento sicuro",
     "order_summary": "Riepilogo ordine",
     "shipping": "Spedizione",

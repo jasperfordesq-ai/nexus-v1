@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -42,7 +43,7 @@ class MarketplaceGroupService
     public static function getGroupListings(int $groupId, array $filters = []): array
     {
         $tenantId = TenantContext::getId();
-        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $limit = max(1, min((int) ($filters['limit'] ?? 20), 100));
         $cursor = $filters['cursor'] ?? null;
         $currentUserId = !empty($filters['current_user_id']) ? (int) $filters['current_user_id'] : null;
 
@@ -64,9 +65,8 @@ class MarketplaceGroupService
                 'category:id,name,slug,icon',
                 'images' => fn ($q) => $q->orderBy('sort_order')->limit(5),
             ])
-            ->where('status', 'active')
-            ->where('moderation_status', 'approved')
             ->whereIn('user_id', $memberUserIds);
+        MarketplaceListingService::applyPublicVisibility($query);
 
         // Category filter
         if (!empty($filters['category_id'])) {
@@ -75,7 +75,7 @@ class MarketplaceGroupService
 
         // Search
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
+            $search = addcslashes((string) $filters['search'], '%_\\');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'LIKE', "%{$search}%")
                   ->orWhere('description', 'LIKE', "%{$search}%");
@@ -101,9 +101,9 @@ class MarketplaceGroupService
         // Sorting
         $sort = $filters['sort'] ?? 'newest';
         match ($sort) {
-            'price_asc' => $query->orderBy('price', 'asc'),
-            'price_desc' => $query->orderBy('price', 'desc'),
-            'popular' => $query->orderBy('views_count', 'desc'),
+            'price_asc' => $query->orderBy('price', 'asc')->orderBy('id', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc')->orderBy('id', 'desc'),
+            'popular' => $query->orderBy('views_count', 'desc')->orderBy('id', 'desc'),
             default => $query->orderBy('id', 'desc'),
         };
 
@@ -112,10 +112,7 @@ class MarketplaceGroupService
 
         // Cursor pagination
         if ($cursor) {
-            $decodedCursor = (int) base64_decode($cursor, true);
-            if ($decodedCursor > 0) {
-                $query->where('id', '<', $decodedCursor);
-            }
+            self::applyCursor($query, $sort, $cursor);
         }
 
         $listings = $query->limit($limit + 1)->get();
@@ -139,7 +136,7 @@ class MarketplaceGroupService
         $items = $listings->map(fn ($l) => self::formatGroupListingItem($l, $savedIds, $currentUserId))->values()->all();
 
         $nextCursor = $hasMore && $listings->isNotEmpty()
-            ? base64_encode((string) $listings->last()->id)
+            ? self::encodeCursor($listings->last(), $sort)
             : null;
 
         return [
@@ -198,11 +195,9 @@ class MarketplaceGroupService
         }
 
         // Active listings count
-        $activeListings = MarketplaceListing::query()
-            ->where('status', 'active')
-            ->where('moderation_status', 'approved')
-            ->whereIn('user_id', $memberUserIds)
-            ->count();
+        $activeQuery = MarketplaceListing::query()->whereIn('user_id', $memberUserIds);
+        MarketplaceListingService::applyPublicVisibility($activeQuery);
+        $activeListings = $activeQuery->count();
 
         // Total ever listed
         $totalListed = MarketplaceListing::query()
@@ -216,11 +211,37 @@ class MarketplaceGroupService
             ->count('user_id');
 
         // Category breakdown for active listings
-        $categories = DB::table('marketplace_listings as ml')
+        $categoryQuery = DB::table('marketplace_listings as ml')
             ->join('marketplace_categories as mc', 'mc.id', '=', 'ml.category_id')
             ->where('ml.status', 'active')
             ->where('ml.moderation_status', 'approved')
+            ->where('ml.tenant_id', $tenantId)
+            ->where(static function ($expiry): void {
+                $expiry->whereNull('ml.expires_at')->orWhere('ml.expires_at', '>', now());
+            })
             ->whereIn('ml.user_id', $memberUserIds)
+            ->whereNotExists(static function ($inactiveSeller): void {
+                $inactiveSeller->selectRaw('1')
+                    ->from('users as group_marketplace_seller')
+                    ->whereColumn('group_marketplace_seller.id', 'ml.user_id')
+                    ->whereColumn('group_marketplace_seller.tenant_id', 'ml.tenant_id')
+                    ->where(static function ($inactive): void {
+                        $inactive->where('group_marketplace_seller.status', '!=', 'active')
+                            ->orWhere('group_marketplace_seller.is_approved', false);
+                    });
+            })
+            ->whereNotExists(static function ($suspendedSeller): void {
+                $suspendedSeller->selectRaw('1')
+                    ->from('marketplace_seller_profiles as group_marketplace_profile')
+                    ->whereColumn('group_marketplace_profile.user_id', 'ml.user_id')
+                    ->whereColumn('group_marketplace_profile.tenant_id', 'ml.tenant_id')
+                    ->where('group_marketplace_profile.is_suspended', true);
+            });
+        if (! MarketplaceConfigurationService::allowFreeItems()) {
+            $categoryQuery->where('ml.price_type', '!=', 'free');
+        }
+
+        $categories = $categoryQuery
             ->groupBy('mc.id', 'mc.name', 'mc.slug', 'mc.icon')
             ->selectRaw('mc.id, mc.name, mc.slug, mc.icon, COUNT(*) as listing_count')
             ->orderByDesc('listing_count')
@@ -247,6 +268,80 @@ class MarketplaceGroupService
     //  Formatting helpers
     // -----------------------------------------------------------------
 
+    private static function applyCursor(Builder $query, string $sort, string $cursor): void
+    {
+        $decoded = base64_decode($cursor, true);
+        if ($decoded === false || $decoded === '') {
+            return;
+        }
+        $payload = json_decode($decoded, true);
+        if (! is_array($payload) || ($payload['sort'] ?? null) !== $sort || ! isset($payload['id'])) {
+            $legacyId = (int) $decoded;
+            if ($legacyId > 0) {
+                $query->where('id', $sort === 'price_asc' ? '>' : '<', $legacyId);
+            }
+            return;
+        }
+
+        $id = (int) $payload['id'];
+        if ($id <= 0) {
+            return;
+        }
+        if ($sort === 'price_asc' || $sort === 'price_desc') {
+            $price = is_numeric($payload['value'] ?? null) ? (float) $payload['value'] : null;
+            $query->where(function (Builder $cursorQuery) use ($sort, $price, $id): void {
+                if ($sort === 'price_asc') {
+                    if ($price === null) {
+                        $cursorQuery->where(static function (Builder $nullTie) use ($id): void {
+                            $nullTie->whereNull('price')->where('id', '>', $id);
+                        })->orWhereNotNull('price');
+                        return;
+                    }
+                    $cursorQuery->where('price', '>', $price)
+                        ->orWhere(static function (Builder $tie) use ($price, $id): void {
+                            $tie->where('price', $price)->where('id', '>', $id);
+                        });
+                    return;
+                }
+                if ($price === null) {
+                    $cursorQuery->whereNull('price')->where('id', '<', $id);
+                    return;
+                }
+                $cursorQuery->where('price', '<', $price)
+                    ->orWhere(static function (Builder $tie) use ($price, $id): void {
+                        $tie->where('price', $price)->where('id', '<', $id);
+                    })
+                    ->orWhereNull('price');
+            });
+            return;
+        }
+        if ($sort === 'popular') {
+            $views = (int) ($payload['value'] ?? 0);
+            $query->where(static function (Builder $cursorQuery) use ($views, $id): void {
+                $cursorQuery->where('views_count', '<', $views)
+                    ->orWhere(static function (Builder $tie) use ($views, $id): void {
+                        $tie->where('views_count', $views)->where('id', '<', $id);
+                    });
+            });
+            return;
+        }
+
+        $query->where('id', '<', $id);
+    }
+
+    private static function encodeCursor(MarketplaceListing $listing, string $sort): string
+    {
+        return base64_encode((string) json_encode([
+            'sort' => $sort,
+            'value' => match ($sort) {
+                'price_asc', 'price_desc' => $listing->price !== null ? (float) $listing->price : null,
+                'popular' => (int) ($listing->views_count ?? 0),
+                default => (int) $listing->id,
+            },
+            'id' => (int) $listing->id,
+        ], JSON_THROW_ON_ERROR));
+    }
+
     private static function formatGroupListingItem(MarketplaceListing $listing, array $savedIds, ?int $currentUserId): array
     {
         $primaryImage = $listing->relationLoaded('images')
@@ -257,10 +352,12 @@ class MarketplaceGroupService
             'id' => $listing->id,
             'title' => $listing->title,
             'tagline' => $listing->tagline,
-            'price' => $listing->price,
+            'price' => $listing->price !== null ? (float) $listing->price : null,
             'price_currency' => $listing->price_currency,
             'price_type' => $listing->price_type,
-            'time_credit_price' => $listing->time_credit_price,
+            'time_credit_price' => $listing->time_credit_price !== null
+                ? (float) $listing->time_credit_price
+                : null,
             'condition' => $listing->condition,
             'location' => $listing->location,
             'delivery_method' => $listing->delivery_method,

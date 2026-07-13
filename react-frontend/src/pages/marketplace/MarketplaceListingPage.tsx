@@ -48,7 +48,10 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 import { EmptyState } from '@/components/feedback';
 import { BuyNowButton } from '@/components/marketplace/BuyNowButton';
-import { LoyaltyRedemptionCard } from '@/components/marketplace/LoyaltyRedemptionCard';
+import {
+  LoyaltyRedemptionCard,
+  type LoyaltyRedemptionSelection,
+} from '@/components/marketplace/LoyaltyRedemptionCard';
 import { MarketplaceListingDetailSkeleton } from '@/components/marketplace/MarketplaceListingDetailSkeleton';
 import { ShippingSelector } from '@/components/marketplace/ShippingSelector';
 import { useAuth } from '@/contexts/AuthContext';
@@ -61,6 +64,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
+import { formatMarketplaceCurrency, normalizeMarketplaceListing } from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -133,12 +137,7 @@ const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'dang
 
 function formatPrice(price: number | null, priceType: string, currency: string, freeLabel: string): string {
   if (priceType === 'free' || price === null || price === 0) return freeLabel;
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: currency || 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(price);
+  return formatMarketplaceCurrency(price, currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -181,7 +180,7 @@ function buildProductSchema(
     'offers': {
       '@type': 'Offer',
       'url': canonicalUrl,
-      'priceCurrency': listing.price_currency || 'EUR',
+      'priceCurrency': listing.price_currency,
       'price': listing.price_type === 'free' ? '0' : String(listing.price ?? 0),
       'availability': AVAILABILITY_MAP[listing.status] ?? 'https://schema.org/InStock',
       'itemCondition': listing.condition
@@ -199,7 +198,7 @@ function buildProductSchema(
     schema['image'] = listing.images.map((img) => img.url);
   }
 
-  return JSON.stringify(schema);
+  return JSON.stringify(schema).replace(/</g, '\\u003c');
 }
 
 function getDeliveryMethodKey(method: string): string {
@@ -349,7 +348,7 @@ export function MarketplaceListingPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('page_title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, branding } = useTenant();
+  const { tenant, tenantPath, branding } = useTenant();
   const toast = useToast();
   const offerModal = useDisclosure();
   const freeLabel = t('price.free');
@@ -365,6 +364,8 @@ export function MarketplaceListingPage() {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [selectedShippingOption, setSelectedShippingOption] = useState<MarketplaceShippingOption | null | undefined>(undefined);
+  const [loyaltyRedemption, setLoyaltyRedemption] = useState<LoyaltyRedemptionSelection | null>(null);
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState<'cash' | 'time_credits'>('cash');
   const sellerId = listing?.user?.id;
 
   // Load listing
@@ -379,7 +380,7 @@ export function MarketplaceListingPage() {
         const response = await api.get<ListingDetail>(`/v2/marketplace/listings/${id}`);
         if (cancelled) return;
         if (response.success && response.data) {
-          setListing(response.data);
+          setListing(normalizeMarketplaceListing(response.data));
         } else {
           setError(response.error || t('listing.not_found_title'));
         }
@@ -421,6 +422,8 @@ export function MarketplaceListingPage() {
 
   useEffect(() => {
     setSelectedShippingOption(undefined);
+    setLoyaltyRedemption(null);
+    setCheckoutPaymentMethod('cash');
   }, [listing?.id]);
 
   // Toggle save
@@ -464,9 +467,12 @@ export function MarketplaceListingPage() {
   const handleSubmitReport = useCallback(async () => {
     if (!listing || !reportReason.trim()) return;
     try {
-      const response = await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
+      const response = await api.post<{ id: number }>(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
       if (response.success) {
         toast.success(t('listing.report_submitted'));
+        if (response.data?.id) {
+          navigate(tenantPath(`/marketplace/reports/${response.data.id}`));
+        }
       } else {
         toast.error(response.error || t('listing.report_error'));
       }
@@ -476,7 +482,7 @@ export function MarketplaceListingPage() {
       setReportModalOpen(false);
       setReportReason('');
     }
-  }, [listing, reportReason, toast, t])
+  }, [listing, navigate, reportReason, tenantPath, toast, t])
 
   // Make offer
   const handleMakeOffer = useCallback(async () => {
@@ -535,8 +541,20 @@ export function MarketplaceListingPage() {
     );
   }
 
-  const priceDisplay = formatPrice(listing.price, listing.price_type, listing.price_currency, freeLabel);
+  const listingCurrency = listing.price_currency || tenant?.currency || '';
+  const priceDisplay = formatPrice(listing.price, listing.price_type, listingCurrency, freeLabel);
   const shippingRequired = Boolean(listing.shipping_available || listing.local_pickup);
+  const isOwnListing = listing.is_own;
+  const hasCashCheckout = listing.price_type === 'fixed'
+    && listing.price != null
+    && listing.price > 0;
+  const hasTimeCreditCheckout = Number(listing.time_credit_price ?? 0) > 0;
+  const isHybridCheckout = hasCashCheckout && hasTimeCreditCheckout;
+  const effectivePaymentMethod: 'cash' | 'time_credits' | 'free' = listing.price_type === 'free'
+    ? 'free'
+    : hasTimeCreditCheckout && !hasCashCheckout
+      ? 'time_credits'
+      : checkoutPaymentMethod;
   const metaDescription = (listing.tagline || listing.description || t('listing.meta_description_fallback'))
     .replace(/\s+/g, ' ')
     .trim()
@@ -554,7 +572,7 @@ export function MarketplaceListingPage() {
       />
       <Helmet>
         <script type="application/ld+json">
-          {buildProductSchema(listing, tenantPath, branding.name)}
+          {buildProductSchema({ ...listing, price_currency: listingCurrency }, tenantPath, branding.name)}
         </script>
       </Helmet>
 
@@ -672,30 +690,67 @@ export function MarketplaceListingPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex flex-col gap-2 pt-2">
-                {listing.price_type === 'fixed' && listing.price != null && listing.price > 0 && (
+              {!isOwnListing && <div className="flex flex-col gap-2 pt-2">
+                {((listing.price_type === 'fixed' && listing.price != null && listing.price > 0)
+                  || listing.price_type === 'free'
+                  || Number(listing.time_credit_price ?? 0) > 0) && (
                   <>
-                    <LoyaltyRedemptionCard
-                      sellerId={listing.user?.id ?? 0}
-                      listingId={listing.id}
-                      orderTotalChf={listing.price}
-                      currency={listing.price_currency || 'CHF'}
-                    />
+                    {isHybridCheckout && (
+                      <div className="space-y-2" role="group" aria-label={t('checkout.payment_method_label')}>
+                        <p className="text-sm font-medium text-theme-primary">
+                          {t('checkout.payment_method_label')}
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <Button
+                            variant={checkoutPaymentMethod === 'cash' ? 'primary' : 'secondary'}
+                            aria-pressed={checkoutPaymentMethod === 'cash'}
+                            onPress={() => setCheckoutPaymentMethod('cash')}
+                          >
+                            {t('checkout.pay_with_money', { amount: priceDisplay })}
+                          </Button>
+                          <Button
+                            variant={checkoutPaymentMethod === 'time_credits' ? 'primary' : 'secondary'}
+                            aria-pressed={checkoutPaymentMethod === 'time_credits'}
+                            onPress={() => {
+                              setCheckoutPaymentMethod('time_credits');
+                              setLoyaltyRedemption(null);
+                            }}
+                          >
+                            {t('checkout.pay_with_time_credits', { count: Number(listing.time_credit_price ?? 0) })}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {hasCashCheckout && effectivePaymentMethod === 'cash' && (
+                      <LoyaltyRedemptionCard
+                        sellerId={listing.user?.id ?? 0}
+                        listingId={listing.id}
+                        orderTotalChf={listing.price ?? 0}
+                        currency={listing.price_currency || 'CHF'}
+                        onRedemptionChange={setLoyaltyRedemption}
+                      />
+                    )}
                     {(listing.shipping_available || listing.local_pickup) && (
                       <ShippingSelector
                         sellerId={listing.user?.id ?? 0}
                         localPickup={listing.local_pickup}
+                        freeOnly={effectivePaymentMethod !== 'cash'}
                         onSelect={setSelectedShippingOption}
                       />
                     )}
                     <BuyNowButton
                       listingId={listing.id}
                       listingTitle={listing.title}
-                      price={listing.price}
+                      price={listing.price ?? 0}
                       currency={listing.price_currency}
                       sellerId={listing.user?.id ?? 0}
                       selectedShippingOption={selectedShippingOption}
                       shippingRequired={shippingRequired}
+                      loyaltyRedemptionId={loyaltyRedemption?.redemptionId}
+                      loyaltyDiscount={loyaltyRedemption?.discountChf}
+                      paymentMethod={effectivePaymentMethod}
+                      timeCredits={Number(listing.time_credit_price ?? 0)}
+                      shippingMethod={listing.delivery_method === 'community_delivery' ? 'community_delivery' : 'pickup'}
                       onSuccess={() => {
                         toast.success(t('listing.order_created'));
                       }}
@@ -724,9 +779,9 @@ export function MarketplaceListingPage() {
                     {t('listing.message_seller')}
                   </Button>
                 </div>
-              </div>
+              </div>}
 
-              {!isAuthenticated && (
+              {!isOwnListing && !isAuthenticated && (
                 <p className="text-xs text-muted text-center">
                   <Link to={tenantPath('/login')} className="text-accent hover:underline">
                     {t('listing.sign_in')}
@@ -873,7 +928,12 @@ export function MarketplaceListingPage() {
                         {item.title}
                       </p>
                       <p className="text-sm font-semibold text-accent mt-0.5">
-                        {formatPrice(item.price, item.price_type, item.price_currency, freeLabel)}
+                        {formatPrice(
+                          item.price,
+                          item.price_type,
+                          item.price_currency || tenant?.currency || '',
+                          freeLabel,
+                        )}
                       </p>
                     </div>
                   </GlassCard>
@@ -956,7 +1016,7 @@ export function MarketplaceListingPage() {
                     onValueChange={setOfferAmount}
                     startContent={
                       <span className="text-muted text-sm">
-                        {listing.price_currency || 'EUR'}
+                        {listingCurrency}
                       </span>
                     }
                     isRequired

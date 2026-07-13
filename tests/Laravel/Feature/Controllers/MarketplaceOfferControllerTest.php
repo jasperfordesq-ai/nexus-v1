@@ -12,7 +12,9 @@ use App\Services\TenantFeatureConfig;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use App\Models\MarketplaceOffer;
 use App\Models\User;
+use App\Services\MarketplaceOfferService;
 
 /**
  * Smoke tests for MarketplaceOfferController.
@@ -122,5 +124,227 @@ class MarketplaceOfferControllerTest extends TestCase
             'buyer_id' => $buyer->id,
         ]);
         $this->assertSame(0, DB::table('notifications')->where('tenant_id', $otherTenantId)->where('user_id', $seller->id)->count());
+    }
+
+    public function test_store_rejects_unapproved_expired_and_inactive_seller_listings(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $buyer = $this->authenticatedUser();
+
+        $scenarios = [
+            'unapproved' => [
+                'seller_status' => 'active',
+                'listing' => ['moderation_status' => 'pending'],
+            ],
+            'expired' => [
+                'seller_status' => 'active',
+                'listing' => ['expires_at' => now()->subMinute()],
+            ],
+            'inactive seller' => [
+                'seller_status' => 'inactive',
+                'listing' => [],
+            ],
+            'suspended seller profile' => [
+                'seller_status' => 'active',
+                'listing' => [],
+                'suspended_profile' => true,
+            ],
+        ];
+
+        foreach ($scenarios as $name => $scenario) {
+            $seller = User::factory()->forTenant($this->testTenantId)->create([
+                'status' => $scenario['seller_status'],
+                'is_approved' => true,
+            ]);
+            $listingId = (int) DB::table('marketplace_listings')->insertGetId(array_merge([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $seller->id,
+                'title' => "Offer boundary: {$name}",
+                'description' => 'Offers must obey the public listing availability boundary.',
+                'price' => 12.00,
+                'price_currency' => 'EUR',
+                'price_type' => 'fixed',
+                'quantity' => 1,
+                'contacts_count' => 0,
+                'shipping_available' => 0,
+                'local_pickup' => 1,
+                'delivery_method' => 'pickup',
+                'seller_type' => 'private',
+                'status' => 'active',
+                'moderation_status' => 'approved',
+                'expires_at' => now()->addDay(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ], $scenario['listing']));
+
+            if ($scenario['suspended_profile'] ?? false) {
+                DB::table('marketplace_seller_profiles')->insert([
+                    'tenant_id' => $this->testTenantId,
+                    'user_id' => $seller->id,
+                    'seller_type' => 'private',
+                    'is_suspended' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $response = $this->apiPost("/v2/marketplace/listings/{$listingId}/offers", [
+                'amount' => 10.00,
+            ]);
+
+            $response->assertStatus(422);
+            $this->assertDatabaseMissing('marketplace_offers', [
+                'marketplace_listing_id' => $listingId,
+                'buyer_id' => $buyer->id,
+            ]);
+            $this->assertSame(0, (int) DB::table('marketplace_listings')
+                ->where('id', $listingId)
+                ->value('contacts_count'));
+        }
+    }
+
+    public function test_accept_rechecks_listing_expiry_before_reserving_it(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $seller = $this->authenticatedUser();
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Expired during negotiation',
+            'description' => 'The offer cannot reactivate an expired listing.',
+            'price' => 12.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'contacts_count' => 0,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->subMinute(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offerId = (int) DB::table('marketplace_offers')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'amount' => 10.00,
+            'currency' => 'EUR',
+            'status' => 'pending',
+            'expires_at' => now()->addHour(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPut("/v2/marketplace/offers/{$offerId}/accept");
+
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('marketplace_offers', ['id' => $offerId, 'status' => 'pending']);
+        $this->assertDatabaseHas('marketplace_listings', ['id' => $listingId, 'status' => 'active']);
+    }
+
+    public function test_duplicate_active_offer_retry_creates_one_row_and_one_contact(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $buyer = $this->authenticatedUser();
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Retry-safe offer listing',
+            'description' => 'Offer creation is serialized on the listing row.',
+            'price' => 12.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'contacts_count' => 0,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $payload = ['amount' => 10.00, 'message' => 'One active offer only'];
+        $this->apiPost("/v2/marketplace/listings/{$listingId}/offers", $payload)->assertCreated();
+        $this->apiPost("/v2/marketplace/listings/{$listingId}/offers", $payload)->assertStatus(422);
+
+        $this->assertSame(1, DB::table('marketplace_offers')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('marketplace_listing_id', $listingId)
+            ->where('buyer_id', $buyer->id)
+            ->count());
+        $this->assertSame(1, (int) DB::table('marketplace_listings')
+            ->where('id', $listingId)
+            ->value('contacts_count'));
+    }
+
+    public function test_stale_concurrent_accept_rechecks_locked_offer_and_cannot_double_accept(): void
+    {
+        $this->enableMarketplaceFeature($this->testTenantId);
+        $seller = $this->authenticatedUser();
+        $buyerA = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $buyerB = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Atomic accept listing',
+            'description' => 'Only one stale offer instance may transition to accepted.',
+            'price' => 15.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offerIds = [];
+        foreach ([$buyerA, $buyerB] as $buyer) {
+            $offerIds[] = (int) DB::table('marketplace_offers')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'marketplace_listing_id' => $listingId,
+                'buyer_id' => $buyer->id,
+                'seller_id' => $seller->id,
+                'amount' => 12.00,
+                'currency' => 'EUR',
+                'status' => 'pending',
+                'expires_at' => now()->addHour(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        $winner = MarketplaceOffer::withoutGlobalScopes()->findOrFail($offerIds[0]);
+        $staleLoser = MarketplaceOffer::withoutGlobalScopes()->findOrFail($offerIds[1]);
+
+        MarketplaceOfferService::accept($winner, (int) $seller->id);
+        try {
+            MarketplaceOfferService::accept($staleLoser, (int) $seller->id);
+            $this->fail('A stale offer must be rechecked after acquiring its row lock.');
+        } catch (\InvalidArgumentException) {
+            // Expected: the locked row was declined by the winning transition.
+        }
+
+        $this->assertDatabaseHas('marketplace_offers', ['id' => $offerIds[0], 'status' => 'accepted']);
+        $this->assertDatabaseHas('marketplace_offers', ['id' => $offerIds[1], 'status' => 'declined']);
+        $this->assertSame(1, DB::table('marketplace_offers')
+            ->where('marketplace_listing_id', $listingId)
+            ->where('status', 'accepted')
+            ->count());
+        $this->assertDatabaseHas('marketplace_listings', ['id' => $listingId, 'status' => 'reserved']);
     }
 }

@@ -7,6 +7,7 @@
 namespace App\Services\AI\Tools;
 
 use App\Core\TenantContext;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Support\Facades\DB;
 
@@ -61,14 +62,36 @@ class SearchMarketplaceTool extends AbstractTool
         $q = DB::table('marketplace_listings')
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
-            ->where(function ($q) {
-                $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
+            ->where('moderation_status', 'approved')
+            ->where(function ($q): void {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->whereNotExists(static function ($inactiveSeller): void {
+                $inactiveSeller->selectRaw('1')
+                    ->from('users as ai_marketplace_seller')
+                    ->whereColumn('ai_marketplace_seller.id', 'marketplace_listings.user_id')
+                    ->whereColumn('ai_marketplace_seller.tenant_id', 'marketplace_listings.tenant_id')
+                    ->where(static function ($inactive): void {
+                        $inactive->where('ai_marketplace_seller.status', '!=', 'active')
+                            ->orWhere('ai_marketplace_seller.is_approved', false);
+                    });
+            })
+            ->whereNotExists(static function ($suspendedSeller): void {
+                $suspendedSeller->selectRaw('1')
+                    ->from('marketplace_seller_profiles as ai_marketplace_profile')
+                    ->whereColumn('ai_marketplace_profile.user_id', 'marketplace_listings.user_id')
+                    ->whereColumn('ai_marketplace_profile.tenant_id', 'marketplace_listings.tenant_id')
+                    ->where('ai_marketplace_profile.is_suspended', true);
             })
             ->where(function ($q) use ($like) {
                 $q->where('title', 'LIKE', $like)
                   ->orWhere('tagline', 'LIKE', $like)
                   ->orWhere('description', 'LIKE', $like);
             });
+
+        if (! MarketplaceConfigurationService::allowFreeItems()) {
+            $q->where('price_type', '!=', 'free');
+        }
 
         if ($location !== '') {
             $locLike = '%' . str_replace(['%', '_'], ['\%', '\_'], $location) . '%';
@@ -90,7 +113,9 @@ class SearchMarketplaceTool extends AbstractTool
             'title' => (string) $r->title,
             'tagline' => $r->tagline,
             'condition' => $r->condition,
-            'price' => $r->price !== null ? ($r->price_currency ?: 'EUR') . ' ' . $r->price : null,
+            'price' => $r->price !== null
+                ? ($r->price_currency ?: strtoupper(TenantContext::getCurrency())) . ' ' . $r->price
+                : null,
             'time_credit_price' => $r->time_credit_price,
             'price_type' => $r->price_type,
             'location' => $r->location,

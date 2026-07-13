@@ -19,7 +19,9 @@
       "invalid_listing": "Listing does not belong to this merchant.",
       "listing_unavailable": "This listing is not available for loyalty redemption.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "This loyalty redemption is no longer available.",
+      "redemption_mismatch": "This loyalty redemption does not match the selected marketplace order."
     }
   },
   "survey": {

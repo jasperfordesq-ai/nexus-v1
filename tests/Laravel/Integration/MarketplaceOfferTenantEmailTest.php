@@ -104,6 +104,32 @@ class MarketplaceOfferTenantEmailTest extends TestCase
         $this->assertSame(2, TenantContext::getId());
     }
 
+    public function test_offer_bell_is_rendered_in_the_recipient_preferred_locale(): void
+    {
+        $tenantId = 999;
+        [$seller, $buyer, $listingId] = $this->createSellerBuyerAndListing($tenantId);
+        DB::table('users')->where('id', $buyer->id)->update(['preferred_language' => 'de']);
+        TenantContext::setById(2);
+
+        $offerId = $this->createOffer($tenantId, $listingId, (int) $buyer->id, (int) $seller->id, 'pending');
+        $offer = MarketplaceOffer::withoutGlobalScopes()->findOrFail($offerId);
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+        app()->setLocale('en');
+
+        MarketplaceOfferService::accept($offer, (int) $seller->id);
+
+        $message = DB::table('notifications')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $buyer->id)
+            ->where('type', 'marketplace_offer')
+            ->value('message');
+
+        $this->assertSame('Dein Angebot für „Tenant-bound offer item“ wurde angenommen!', $message);
+        $this->assertSame('en', app()->getLocale());
+        $this->assertSame(2, TenantContext::getId());
+    }
+
     public function test_marketplace_payment_webhook_resolves_unconfirmed_order_and_restores_tenant_context(): void
     {
         $source = file_get_contents(app_path('Services/MarketplacePaymentService.php'));

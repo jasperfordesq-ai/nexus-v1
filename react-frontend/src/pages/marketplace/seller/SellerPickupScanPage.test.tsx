@@ -55,6 +55,7 @@ vi.mock('@/contexts', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 // usePageTitle hook — stub to avoid document.title side effects
 vi.mock('@/hooks', () => ({

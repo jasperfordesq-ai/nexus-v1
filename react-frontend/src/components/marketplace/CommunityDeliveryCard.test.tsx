@@ -240,6 +240,23 @@ describe('CommunityDeliveryCard — with orderId, non-owner, authenticated', () 
       }
     });
   });
+
+  it('does not report success when submit resolves with success false', async () => {
+    mockApi.post.mockResolvedValue({ success: false, error: 'Offer rejected' });
+    render(<CommunityDeliveryCard orderId={10} />);
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalled());
+    fireEvent.click(screen.queryAllByRole('button').find((button) => /offer/i.test(button.textContent ?? ''))!);
+
+    await waitFor(() => {
+      const sendButton = screen.queryAllByRole('button').find(
+        (button) => /send/i.test(button.textContent ?? ''),
+      );
+      if (sendButton && !sendButton.hasAttribute('disabled')) fireEvent.click(sendButton);
+    });
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Offer rejected'));
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
 });
 
 describe('CommunityDeliveryCard — owner view', () => {

@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -26,6 +28,36 @@ class MarketplaceDiscoveryControllerTest extends TestCase
         ]);
         Sanctum::actingAs($user, ['*']);
         return $user;
+    }
+
+    private function enableMarketplaceFeature(): void
+    {
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode(['marketplace' => true]),
+        ]);
+        TenantContext::setById($this->testTenantId);
+    }
+
+    private function createListing(User $seller, array $overrides = []): int
+    {
+        return (int) DB::table('marketplace_listings')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Collection item',
+            'description' => 'Collection visibility fixture.',
+            'price_currency' => 'EUR',
+            'price_type' => 'free',
+            'quantity' => 1,
+            'shipping_available' => 0,
+            'local_pickup' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
     }
 
     public function test_listSavedSearches_requires_auth(): void
@@ -58,5 +90,259 @@ class MarketplaceDiscoveryControllerTest extends TestCase
         $this->authenticatedUser();
         $response = $this->apiGet('/v2/marketplace/collections');
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_discovery_create_mutations_return_created_instead_of_type_error(): void
+    {
+        $this->enableMarketplaceFeature();
+        $user = $this->authenticatedUser();
+
+        $searchResponse = $this->apiPost('/v2/marketplace/saved-searches', [
+            'name' => 'Tools nearby',
+        ]);
+        $searchResponse->assertCreated();
+
+        $collectionResponse = $this->apiPost('/v2/marketplace/collections', [
+            'name' => 'Repair favourites',
+            'is_public' => true,
+        ]);
+        $collectionResponse->assertCreated();
+
+        $listingId = $this->createListing($user);
+        $collectionId = (int) $collectionResponse->json('data.id');
+        $itemResponse = $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+            'listing_id' => $listingId,
+        ]);
+        $itemResponse->assertCreated();
+
+        $listResponse = $this->apiGet("/v2/marketplace/collections/{$collectionId}/items");
+        $listResponse->assertOk();
+        $listResponse->assertJsonPath('data.0.listing.id', $listingId);
+        $this->assertArrayHasKey('meta', $listResponse->json());
+    }
+
+    public function test_identical_discovery_mutation_retries_are_idempotent(): void
+    {
+        $this->enableMarketplaceFeature();
+        $user = $this->authenticatedUser();
+
+        $savedSearch = [
+            'name' => 'Retry-safe tools',
+            'search_query' => 'drill',
+            'filters' => ['price_max' => 50, 'condition' => 'good'],
+            'alert_frequency' => 'daily',
+            'alert_channel' => 'email',
+        ];
+        $firstSearch = $this->apiPost('/v2/marketplace/saved-searches', $savedSearch);
+        $secondSearch = $this->apiPost('/v2/marketplace/saved-searches', $savedSearch);
+        $firstSearch->assertCreated();
+        $secondSearch->assertCreated();
+        $this->assertSame($firstSearch->json('data.id'), $secondSearch->json('data.id'));
+        $this->assertSame(1, DB::table('marketplace_saved_searches')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('name', 'Retry-safe tools')
+            ->count());
+
+        $collection = [
+            'name' => 'Retry-safe favourites',
+            'description' => 'Created once even if the response is retried.',
+            'is_public' => true,
+        ];
+        $firstCollection = $this->apiPost('/v2/marketplace/collections', $collection);
+        $secondCollection = $this->apiPost('/v2/marketplace/collections', $collection);
+        $firstCollection->assertCreated();
+        $secondCollection->assertCreated();
+        $this->assertSame($firstCollection->json('data.id'), $secondCollection->json('data.id'));
+
+        $listingId = $this->createListing($user);
+        $collectionId = (int) $firstCollection->json('data.id');
+        $firstItem = $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+            'listing_id' => $listingId,
+        ]);
+        $secondItem = $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+            'listing_id' => $listingId,
+        ]);
+        $firstItem->assertCreated();
+        $secondItem->assertCreated();
+
+        $this->assertSame(1, DB::table('marketplace_collection_items')
+            ->where('collection_id', $collectionId)
+            ->where('marketplace_listing_id', $listingId)
+            ->count());
+        $this->assertSame(1, (int) DB::table('marketplace_collections')
+            ->where('id', $collectionId)
+            ->value('item_count'));
+    }
+
+    public function test_collection_rejects_listing_from_another_tenant(): void
+    {
+        $this->enableMarketplaceFeature();
+        $user = $this->authenticatedUser();
+        $collectionId = (int) DB::table('marketplace_collections')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'name' => 'Tenant-safe collection',
+            'is_public' => false,
+            'item_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $foreignListingId = $this->createListing($user, ['tenant_id' => 999]);
+
+        $response = $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+            'listing_id' => $foreignListingId,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('marketplace_collection_items', [
+            'collection_id' => $collectionId,
+            'marketplace_listing_id' => $foreignListingId,
+        ]);
+    }
+
+    public function test_collection_add_rejects_other_sellers_unpublished_listings_but_accepts_owners_private_listing(): void
+    {
+        $this->enableMarketplaceFeature();
+        $owner = $this->authenticatedUser();
+        $otherSeller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $collectionId = (int) DB::table('marketplace_collections')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Private add boundary',
+            'is_public' => false,
+            'item_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $foreignListingIds = [
+            $this->createListing($otherSeller, ['status' => 'draft']),
+            $this->createListing($otherSeller, ['moderation_status' => 'pending']),
+            $this->createListing($otherSeller, ['status' => 'removed']),
+        ];
+
+        foreach ($foreignListingIds as $listingId) {
+            $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+                'listing_id' => $listingId,
+            ])->assertStatus(422);
+        }
+
+        $this->assertSame(0, DB::table('marketplace_collection_items')
+            ->where('collection_id', $collectionId)
+            ->count());
+        $this->assertSame(0, (int) DB::table('marketplace_collections')
+            ->where('id', $collectionId)
+            ->value('item_count'));
+
+        $ownDraftId = $this->createListing($owner, [
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+        ]);
+        $this->apiPost("/v2/marketplace/collections/{$collectionId}/items", [
+            'listing_id' => $ownDraftId,
+        ])->assertCreated();
+
+        $this->assertDatabaseHas('marketplace_collection_items', [
+            'collection_id' => $collectionId,
+            'marketplace_listing_id' => $ownDraftId,
+        ]);
+        $this->assertSame(1, (int) DB::table('marketplace_collections')
+            ->where('id', $collectionId)
+            ->value('item_count'));
+    }
+
+    public function test_public_collection_hides_pending_removed_and_expired_listings(): void
+    {
+        $this->enableMarketplaceFeature();
+        $owner = $this->authenticatedUser();
+        $collectionId = (int) DB::table('marketplace_collections')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Public collection',
+            'is_public' => true,
+            'item_count' => 4,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $visibleId = $this->createListing($owner, ['title' => 'Visible']);
+        $pendingId = $this->createListing($owner, ['title' => 'Pending', 'moderation_status' => 'pending']);
+        $removedId = $this->createListing($owner, ['title' => 'Removed', 'status' => 'removed']);
+        $expiredId = $this->createListing($owner, ['title' => 'Expired', 'expires_at' => now()->subMinute()]);
+        foreach ([$visibleId, $pendingId, $removedId, $expiredId] as $listingId) {
+            DB::table('marketplace_collection_items')->insert([
+                'tenant_id' => $this->testTenantId,
+                'collection_id' => $collectionId,
+                'marketplace_listing_id' => $listingId,
+                'created_at' => now(),
+            ]);
+        }
+
+        $viewer = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet("/v2/marketplace/collections/{$collectionId}/items");
+
+        $response->assertOk();
+        $this->assertSame(
+            [$visibleId],
+            array_map(
+                static fn (array $item): int => (int) $item['listing']['id'],
+                $response->json('data')
+            )
+        );
+    }
+
+    public function test_private_collection_does_not_grant_access_to_another_sellers_unpublished_listing(): void
+    {
+        $this->enableMarketplaceFeature();
+        $owner = $this->authenticatedUser();
+        $otherSeller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $collectionId = (int) DB::table('marketplace_collections')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Private visibility boundary',
+            'is_public' => false,
+            'item_count' => 3,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $ownDraftId = $this->createListing($owner, [
+            'title' => 'Owners own draft',
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+        ]);
+        $otherPendingId = $this->createListing($otherSeller, [
+            'title' => 'Other seller pending',
+            'moderation_status' => 'pending',
+        ]);
+        $otherPublicId = $this->createListing($otherSeller, [
+            'title' => 'Other seller public',
+        ]);
+        foreach ([$ownDraftId, $otherPendingId, $otherPublicId] as $listingId) {
+            DB::table('marketplace_collection_items')->insert([
+                'tenant_id' => $this->testTenantId,
+                'collection_id' => $collectionId,
+                'marketplace_listing_id' => $listingId,
+                'created_at' => now(),
+            ]);
+        }
+
+        $response = $this->apiGet("/v2/marketplace/collections/{$collectionId}/items");
+
+        $response->assertOk();
+        $ids = array_map(
+            static fn (array $item): int => (int) $item['listing']['id'],
+            $response->json('data')
+        );
+        $this->assertContains($ownDraftId, $ids);
+        $this->assertContains($otherPublicId, $ids);
+        $this->assertNotContains($otherPendingId, $ids);
     }
 }

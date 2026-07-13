@@ -1,4 +1,9 @@
 {
+  "checkout": {
+    "paymentMethodLabel": "Scegli come pagare",
+    "payWithMoney": "Paga {{amount}}",
+    "payWithTimeCredits": "Paga con {{count}} crediti di tempo"
+  },
   "map": {
     "searchPanelTitle": "Choose search area",
     "searchPanelSubtitle": "Use coordinates from a map link, then adjust the distance.",

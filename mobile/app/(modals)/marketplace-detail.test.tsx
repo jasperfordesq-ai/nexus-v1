@@ -7,11 +7,14 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockFeatures = new Set(['merchant_coupons']);
+let mockRouteParams: { id?: string; offer_id?: string; offer_amount?: string } = { id: '9' };
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({ id: '9' }),
+  useLocalSearchParams: () => mockRouteParams,
 }));
+
+jest.mock('expo-crypto', () => ({ randomUUID: () => 'checkout-test-uuid' }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -39,6 +42,9 @@ jest.mock('react-i18next', () => ({
         'detail.addToCollection': 'Add to collection',
         'detail.makeOffer': 'Make offer',
         'detail.buyNow': 'Buy now',
+        'detail.orderCreated': 'Order created',
+        'detail.orderCreatedHint': `Order ${String(opts?.order ?? '')} was created. Payment and delivery details can be managed from orders.`,
+        'detail.orderFailed': 'Order could not be created.',
         'detail.reportListing': 'Report listing',
         'detail.moreFromSeller': `More from ${String(opts?.name ?? 'this seller')}`,
         'communityDelivery.eyebrow': 'Community-powered delivery',
@@ -49,6 +55,9 @@ jest.mock('react-i18next', () => ({
         'communityDelivery.step3': 'The buyer or seller accepts an offer, then confirms delivery when the item arrives.',
         'communityDelivery.orderManagedHint': 'Delivery offers are managed from Marketplace orders after checkout.',
         'checkout.title': 'Checkout',
+        'checkout.paymentMethodLabel': 'Choose how to pay',
+        'checkout.payWithMoney': `Pay ${String(opts?.amount ?? '')}`,
+        'checkout.payWithTimeCredits': `Pay with ${String(opts?.count ?? '')} time credits`,
         'checkout.coupon': 'Coupon code',
         'checkout.couponPlaceholder': 'COMMUNITY10',
         'checkout.apply': 'Apply',
@@ -63,6 +72,17 @@ jest.mock('react-i18next', () => ({
         'checkout.paymentSheetFailed': 'The secure payment sheet could not be opened. Continue payment from Orders.',
         'checkout.paymentRecoveryTitle': 'Checkout paused',
         'checkout.paymentRecoveryHint': `Order ${String(opts?.order ?? '')} was created, but payment could not start. Continue payment from Orders.`,
+        'checkout.deliveryTitle': 'Delivery method',
+        'checkout.localPickup': 'Local pickup',
+        'checkout.shippingLoading': 'Loading shipping options…',
+        'checkout.shippingLoadFailed': 'Shipping options could not be loaded. Try again before buying.',
+        'checkout.shippingUnavailable': 'This seller has no active shipping options.',
+        'checkout.deliveryRequired': 'Choose a delivery method before buying.',
+        'checkout.unsupportedTitle': 'Checkout unavailable',
+        'checkout.timeCreditUnsupportedHint': 'Time-credit checkout is not connected in the mobile app yet. No order or wallet debit has been created.',
+        'checkout.freeUnsupportedHint': 'Free-item checkout is not connected in the mobile app yet. No order has been created.',
+        'checkout.pickupRecoveryTitle': 'Pickup not reserved',
+        'checkout.pickupRecoveryHint': `Order ${String(opts?.order ?? '')} was created, but the pickup slot could not be reserved. Review or cancel it from Orders before trying again.`,
       };
       if (key === 'detail.templateFieldLabel') return String(opts?.field ?? '');
       return map[key] ?? key;
@@ -73,7 +93,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
-  useTenant: () => ({ hasFeature: (feature: string) => mockFeatures.has(feature) }),
+  useTenant: () => ({ tenant: { currency: 'EUR' }, hasFeature: (feature: string) => mockFeatures.has(feature) }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -131,12 +151,12 @@ jest.mock('@/lib/api/marketplace', () => ({
   createMarketplaceOrder: jest.fn(),
   createMarketplacePaymentIntent: jest.fn(),
   getMarketplaceListingPickupSlots: jest.fn().mockResolvedValue({ data: [] }),
+  getMarketplaceSellerShippingOptions: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceSellerListings: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceCollections: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceListing: jest.fn(),
   makeMarketplaceOffer: jest.fn(),
   reportMarketplaceListing: jest.fn(),
-  reserveMarketplacePickup: jest.fn(),
   saveMarketplaceListing: jest.fn(),
   unsaveMarketplaceListing: jest.fn(),
   validateMarketplaceCoupon: jest.fn(),
@@ -161,8 +181,8 @@ import {
   createMarketplacePaymentIntent,
   getMarketplaceListing,
   getMarketplaceListingPickupSlots,
+  getMarketplaceSellerShippingOptions,
   getMarketplaceSellerListings,
-  reserveMarketplacePickup,
 } from '@/lib/api/marketplace';
 import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 
@@ -205,9 +225,11 @@ describe('MarketplaceDetailRoute', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRouteParams = { id: '9' };
     mockFeatures = new Set(['merchant_coupons']);
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
     (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValue({ data: [] });
+    (getMarketplaceSellerShippingOptions as jest.Mock).mockResolvedValue({ data: [] });
     (getMarketplaceSellerListings as jest.Mock).mockResolvedValue({ data: [] });
   });
 
@@ -281,10 +303,44 @@ describe('MarketplaceDetailRoute', () => {
         description: 'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
         variant: 'danger',
       });
+      expect(require('expo-router').router.push).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-orders',
+        params: { mode: 'purchases' },
+      });
     });
   });
 
-  it('continues checkout when pickup reservation fails after order creation', async () => {
+  it('checks out an accepted offer as cash with the offer context and no substitutions', async () => {
+    mockRouteParams = { id: '9', offer_id: '31', offer_amount: '37' };
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: { ...mockListing, status: 'reserved', time_credit_price: 4 },
+    });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValueOnce({
+      data: { id: 51, order_number: 'MKT-OFFER-51', status: 'pending_payment' },
+    });
+    (createMarketplacePaymentIntent as jest.Mock).mockRejectedValueOnce(new Error('stop after order'));
+
+    const { getByText, queryByText, queryByPlaceholderText } = render(<MarketplaceDetailRoute />);
+    await waitFor(() => expect(getMarketplaceListing).toHaveBeenCalledWith(9, 31));
+    await waitFor(() => expect(getMarketplaceListingPickupSlots).toHaveBeenCalledWith(9, 31));
+    await waitFor(() => expect(getByText('Checkout')).toBeTruthy());
+    expect(queryByText(/time credits/i)).toBeNull();
+    expect(queryByPlaceholderText('COMMUNITY10')).toBeNull();
+
+    fireEvent.press(getByText('Buy now'));
+    await waitFor(() => {
+      expect(createMarketplaceOrder).toHaveBeenCalledWith(expect.objectContaining({
+        listing_id: 9,
+        offer_id: 31,
+        payment_method: 'cash',
+        shipping_method: 'pickup',
+      }));
+    });
+    const payload = (createMarketplaceOrder as jest.Mock).mock.calls[0][0];
+    expect(payload).not.toHaveProperty('coupon_code');
+  });
+
+  it('submits pickup slot selection atomically with order creation', async () => {
     (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValueOnce({
       data: [
         {
@@ -295,13 +351,7 @@ describe('MarketplaceDetailRoute', () => {
         },
       ],
     });
-    (createMarketplaceOrder as jest.Mock).mockResolvedValue({
-      data: { id: 45, order_number: 'MKT-000045', status: 'pending_payment' },
-    });
-    (reserveMarketplacePickup as jest.Mock).mockRejectedValue(new Error('Slot is full'));
-    (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
-      data: { client_secret: 'pi_secret', payment_intent_id: 'pi_45' },
-    });
+    (createMarketplaceOrder as jest.Mock).mockRejectedValue(new Error('Slot is full'));
 
     const { getByText, findByText, findByTestId } = render(<MarketplaceDetailRoute />);
 
@@ -315,18 +365,164 @@ describe('MarketplaceDetailRoute', () => {
     fireEvent.press(buyNow);
 
     await waitFor(() => {
-      expect(reserveMarketplacePickup).toHaveBeenCalledWith(45, 12);
-      expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(45);
-      expect(presentMarketplacePayment).toHaveBeenCalledWith({
-        clientSecret: 'pi_secret',
-        merchantDisplayName: 'Project NEXUS marketplace',
-      });
+      expect(createMarketplaceOrder).toHaveBeenCalledWith(expect.objectContaining({
+        listing_id: 9,
+        shipping_method: 'pickup',
+        pickup_slot_id: 12,
+      }));
+      expect(createMarketplacePaymentIntent).not.toHaveBeenCalled();
+      expect(presentMarketplacePayment).not.toHaveBeenCalled();
       expect(showToast).toHaveBeenCalledWith({
-        title: 'Checkout started',
-        description: 'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
-        variant: 'default',
+        title: 'Error',
+        description: 'Slot is full',
+        variant: 'danger',
       });
     });
+  });
+
+  it('completes free and time-credit orders without starting Stripe', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: { ...mockListing, price_type: 'free', price: 0 },
+    });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValueOnce({
+      data: { id: 48, order_number: 'MKT-FREE', status: 'paid', requires_payment: false },
+    });
+
+    const freeListing = render(<MarketplaceDetailRoute />);
+    fireEvent.press(await waitFor(() => freeListing.getByText('Buy now')));
+    await waitFor(() => {
+      expect(createMarketplaceOrder).toHaveBeenCalledWith(expect.objectContaining({
+        listing_id: 9,
+        payment_method: 'free',
+      }));
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Order created',
+        description: 'Order MKT-FREE was created. Payment and delivery details can be managed from orders.',
+        variant: 'success',
+      });
+    });
+    expect(createMarketplacePaymentIntent).not.toHaveBeenCalled();
+    freeListing.unmount();
+    jest.clearAllMocks();
+
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: { ...mockListing, price: null, time_credit_price: 2 },
+    });
+    (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValue({ data: [] });
+    (getMarketplaceSellerShippingOptions as jest.Mock).mockResolvedValue({ data: [] });
+    (getMarketplaceSellerListings as jest.Mock).mockResolvedValue({ data: [] });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValueOnce({
+      data: { id: 49, order_number: 'MKT-CREDITS', status: 'paid', requires_payment: false },
+    });
+    const creditListing = render(<MarketplaceDetailRoute />);
+    fireEvent.press(await waitFor(() => creditListing.getByText('Buy now')));
+    await waitFor(() => expect(createMarketplaceOrder).toHaveBeenCalledWith(expect.objectContaining({
+      listing_id: 9,
+      payment_method: 'time_credits',
+    })));
+    expect(createMarketplacePaymentIntent).not.toHaveBeenCalled();
+  });
+
+  it('defaults a hybrid listing to cash and lets the buyer choose time credits', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: { ...mockListing, price: 25, price_type: 'fixed', time_credit_price: 2 },
+    });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValueOnce({
+      data: { id: 50, order_number: 'MKT-HYBRID-CREDITS', status: 'paid', requires_payment: false },
+    });
+
+    const screen = render(<MarketplaceDetailRoute />);
+    const cashButton = await screen.findByTestId('marketplace-payment-cash');
+    const timeCreditButton = await screen.findByTestId('marketplace-payment-time-credits');
+
+    expect(cashButton.props.accessibilityState).toEqual(expect.objectContaining({ checked: true }));
+    expect(timeCreditButton.props.accessibilityState).toEqual(expect.objectContaining({ checked: false }));
+
+    fireEvent.press(timeCreditButton);
+    await waitFor(() => {
+      expect(screen.getByTestId('marketplace-payment-time-credits').props.accessibilityState)
+        .toEqual(expect.objectContaining({ checked: true }));
+    });
+
+    fireEvent.press(screen.getByText('Buy now'));
+    await waitFor(() => expect(createMarketplaceOrder).toHaveBeenCalledWith(expect.objectContaining({
+      listing_id: 9,
+      payment_method: 'time_credits',
+    })));
+    expect(createMarketplacePaymentIntent).not.toHaveBeenCalled();
+  });
+
+  it('submits only the server-owned shipping option id with a stable idempotency key', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: {
+        ...mockListing,
+        delivery_method: 'shipping',
+        shipping_available: true,
+        local_pickup: false,
+      },
+    });
+    (getMarketplaceSellerShippingOptions as jest.Mock).mockResolvedValueOnce({
+      data: [{ id: 7, courier_name: 'An Post', price: 6.5, currency: 'EUR', is_default: true, is_active: true }],
+    });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValue({
+      data: { id: 47, order_number: 'MKT-000047', status: 'pending_payment' },
+    });
+    (createMarketplacePaymentIntent as jest.Mock).mockRejectedValue(new Error('Checkout unavailable'));
+
+    const { getByText } = render(<MarketplaceDetailRoute />);
+    await waitFor(() => {
+      expect(getByText('An Post · EUR 6.50')).toBeTruthy();
+    });
+    fireEvent.press(getByText('Buy now'));
+
+    await waitFor(() => {
+      expect(createMarketplaceOrder).toHaveBeenCalledWith({
+        listing_id: 9,
+        quantity: 1,
+        idempotency_key: 'mobile-marketplace-checkout-test-uuid',
+        shipping_option_id: 7,
+        coupon_code: undefined,
+        payment_method: 'cash',
+      });
+    });
+    const payload = (createMarketplaceOrder as jest.Mock).mock.calls[0][0];
+    expect(payload).not.toHaveProperty('shipping_cost');
+    expect(payload).not.toHaveProperty('shipping_method');
+  });
+
+  it('does not create an order when a shipping-only seller has no active option', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: {
+        ...mockListing,
+        delivery_method: 'shipping',
+        shipping_available: true,
+        local_pickup: false,
+      },
+    });
+    (getMarketplaceSellerShippingOptions as jest.Mock).mockResolvedValueOnce({ data: [] });
+
+    const { getByText } = render(<MarketplaceDetailRoute />);
+    await waitFor(() => {
+      expect(getByText('This seller has no active shipping options.')).toBeTruthy();
+    });
+    fireEvent.press(getByText('Buy now'));
+    expect(createMarketplaceOrder).not.toHaveBeenCalled();
+  });
+
+  it('does not report success or start payment for a malformed order response', async () => {
+    (createMarketplaceOrder as jest.Mock).mockResolvedValue({ data: {} });
+
+    const { getByText } = render(<MarketplaceDetailRoute />);
+    fireEvent.press(await waitFor(() => getByText('Buy now')));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Error',
+        description: 'Order could not be created.',
+        variant: 'danger',
+      });
+    });
+    expect(createMarketplacePaymentIntent).not.toHaveBeenCalled();
   });
 
   it('confirms marketplace payment after the native payment sheet completes', async () => {

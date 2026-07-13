@@ -91,6 +91,53 @@ class MarketplaceGroupControllerTest extends TestCase
         $this->apiGet('/v2/marketplace/groups/' . $foreign->id . '/listings')->assertNotFound();
     }
 
+    public function test_group_price_cursor_preserves_ties_without_duplicates(): void
+    {
+        [$group, $member] = $this->groupAndMember();
+        Sanctum::actingAs($member, ['*']);
+        foreach ([10.0, 20.0, 20.0, 30.0] as $index => $price) {
+            $this->createGroupMarketplaceListing($member, $price, "Cursor {$index}");
+        }
+
+        $first = $this->apiGet("/v2/marketplace/groups/{$group->id}/listings?sort=price_asc&limit=2")
+            ->assertOk()
+            ->assertJsonPath('meta.has_more', true);
+        $cursor = (string) $first->json('meta.cursor');
+        $second = $this->apiGet(
+            "/v2/marketplace/groups/{$group->id}/listings?sort=price_asc&limit=2&cursor=" . urlencode($cursor)
+        )->assertOk();
+
+        $this->assertEquals([10.0, 20.0], array_column($first->json('data'), 'price'));
+        $this->assertEquals([20.0, 30.0], array_column($second->json('data'), 'price'));
+        $this->assertCount(4, array_unique(array_merge(
+            array_column($first->json('data'), 'id'),
+            array_column($second->json('data'), 'id'),
+        )));
+    }
+
+    public function test_group_marketplace_hides_expired_listings_before_the_scheduler_runs(): void
+    {
+        [$group, $member] = $this->groupAndMember();
+        Sanctum::actingAs($member, ['*']);
+        $visibleId = $this->createGroupMarketplaceListing($member, 10, 'Visible group listing');
+        $expiredId = $this->createGroupMarketplaceListing(
+            $member,
+            20,
+            'Expired group listing',
+            now()->subMinute(),
+        );
+
+        $response = $this->apiGet("/v2/marketplace/groups/{$group->id}/listings")
+            ->assertOk();
+        $ids = array_column($response->json('data'), 'id');
+
+        $this->assertContains($visibleId, $ids);
+        $this->assertNotContains($expiredId, $ids);
+        $this->apiGet("/v2/marketplace/groups/{$group->id}/stats")
+            ->assertOk()
+            ->assertJsonPath('data.active_listings', 1);
+    }
+
     /** @return array{Group, User} */
     private function groupAndMember(): array
     {
@@ -112,5 +159,30 @@ class MarketplaceGroupControllerTest extends TestCase
         ]);
 
         return [$group, $member];
+    }
+
+    private function createGroupMarketplaceListing(
+        User $seller,
+        float $price,
+        string $title,
+        mixed $expiresAt = null,
+    ): int {
+        return (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => $title,
+            'description' => 'Group marketplace pagination fixture.',
+            'price' => $price,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => $expiresAt ?? now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

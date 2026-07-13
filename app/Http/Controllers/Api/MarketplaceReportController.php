@@ -53,7 +53,7 @@ class MarketplaceReportController extends BaseApiController
             'reason' => 'required|string|in:counterfeit,illegal,unsafe,misleading,discrimination,ip_violation,other',
             'description' => 'required|string|max:5000',
             'evidence_urls' => 'nullable|array|max:10',
-            'evidence_urls.*' => 'url|max:2000',
+            'evidence_urls.*' => ['string', 'max:2000', 'url:http,https'],
         ]);
 
         try {
@@ -85,5 +85,54 @@ class MarketplaceReportController extends BaseApiController
         $reports = MarketplaceReportService::getReportsForListing($id);
 
         return $this->respondWithData($reports);
+    }
+
+    /** GET /v2/marketplace/reports — reports filed by or affecting the user. */
+    public function mine(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_report_read', 30, 60);
+
+        return $this->respondWithData(MarketplaceReportService::getReportsForUser($userId));
+    }
+
+    /** GET /v2/marketplace/reports/{id} — reporter or affected seller. */
+    public function show(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_report_read', 30, 60);
+
+        try {
+            return $this->respondWithData(MarketplaceReportService::getReportForUser($id, $userId));
+        } catch (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            return $this->respondWithError('FORBIDDEN', $exception->getMessage(), null, 403);
+        }
+    }
+
+    /** POST /v2/marketplace/reports/{id}/appeal — eligible reporter or seller. */
+    public function appeal(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->requireAuth();
+        $this->rateLimit('marketplace_report_appeal', 5, 60);
+        $validated = request()->validate([
+            'appeal_text' => 'required|string|min:20|max:5000',
+        ]);
+
+        try {
+            $report = MarketplaceReportService::appealReport($id, $userId, $validated['appeal_text']);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            return $this->respondWithError('FORBIDDEN', $exception->getMessage(), null, 403);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->respondWithError('VALIDATION_ERROR', $exception->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData([
+            'id' => (int) $report->id,
+            'status' => $report->status,
+            'message' => __('api_controllers_2.marketplace_report.appeal_submitted'),
+        ]);
     }
 }

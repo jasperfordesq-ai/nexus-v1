@@ -1113,10 +1113,11 @@ class CaringCommunityApiController extends BaseApiController
      * GET /api/v2/caring-community/loyalty/quote
      *
      * Compute the maximum discount the authenticated member can apply at a
-     * given seller for a given order total. Used by the checkout UI to render
+     * given seller/listing. The order total is resolved from the listing on the
+     * server. Used by the checkout UI to render
      * the "use my time credits" card live before the buy.
      *
-     * Query: seller_id, order_total_chf, listing_id (optional, for context).
+     * Query: seller_id, listing_id.
      */
     public function loyaltyQuote(): JsonResponse
     {
@@ -1127,7 +1128,6 @@ class CaringCommunityApiController extends BaseApiController
 
         $sellerId = (int) ($this->query('seller_id') ?? 0);
         $listingId = (int) ($this->query('listing_id') ?? 0);
-        $orderTotalChf = (float) ($this->query('order_total_chf') ?? 0);
 
         if ($sellerId <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
@@ -1135,23 +1135,18 @@ class CaringCommunityApiController extends BaseApiController
         if ($listingId <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'listing_id', 422);
         }
-        if ($orderTotalChf <= 0) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'order_total_chf', 422);
-        }
-
         return $this->respondWithData(
-            $this->loyaltyService->calculateAvailableDiscount($userId, $sellerId, $orderTotalChf, $listingId)
+            $this->loyaltyService->calculateAvailableDiscount($userId, $sellerId, 0, $listingId)
         );
     }
 
     /**
      * POST /api/v2/caring-community/loyalty/redeem
      *
-     * Body: { seller_id, listing_id?, credits_to_use, order_total_chf }
+     * Body: { seller_id, listing_id, credits_to_use }
      *
-     * Atomically debits the member's wallet and records a redemption. Returns
-     * the new wallet balance and the discount applied (CHF). The frontend then
-     * proceeds with the actual buy at order_total - discount_chf.
+     * Reserves a short-lived redemption token. The wallet debit and discount
+     * are applied atomically only when the marketplace order is created.
      */
     public function loyaltyRedeem(): JsonResponse
     {
@@ -1164,7 +1159,6 @@ class CaringCommunityApiController extends BaseApiController
         $sellerId      = (int) ($input['seller_id'] ?? 0);
         $listingId     = isset($input['listing_id']) && $input['listing_id'] !== '' ? (int) $input['listing_id'] : null;
         $creditsToUse  = (float) ($input['credits_to_use'] ?? 0);
-        $orderTotalChf = (float) ($input['order_total_chf'] ?? 0);
 
         if ($sellerId <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.field_required'), 'seller_id', 422);
@@ -1176,7 +1170,7 @@ class CaringCommunityApiController extends BaseApiController
                 sellerId:      $sellerId,
                 listingId:     $listingId,
                 creditsToUse:  $creditsToUse,
-                orderTotalChf: $orderTotalChf,
+                orderTotalChf: 0,
             );
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);

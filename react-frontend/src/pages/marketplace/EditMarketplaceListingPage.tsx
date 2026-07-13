@@ -4,10 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@/components/ui/Button';
+import { Autocomplete } from '@/components/ui/Autocomplete';
 import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
 import { RadioGroup, Radio } from '@/components/ui/Radio';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
@@ -52,6 +54,10 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import type { MarketplaceListingDetail } from '@/types/marketplace';
+import {
+  normalizeSupportedMarketplaceCurrency,
+  SUPPORTED_MARKETPLACE_CURRENCIES,
+} from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -112,7 +118,7 @@ export function EditMarketplaceListingPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('edit.page_title'));
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -126,7 +132,7 @@ export function EditMarketplaceListingPage() {
   const [categoryId, setCategoryId] = useState('');
   const [condition, setCondition] = useState('good');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('EUR');
+  const [currency, setCurrency] = useState(() => normalizeSupportedMarketplaceCurrency(tenant?.currency));
   const [priceType, setPriceType] = useState('fixed');
   const [location, setLocation] = useState('');
   const [latitude, setLatitude] = useState<number | undefined>();
@@ -141,6 +147,11 @@ export function EditMarketplaceListingPage() {
   const [inventoryCount, setInventoryCount] = useState('0');
   const [lowStockThreshold, setLowStockThreshold] = useState('5');
   const [oversoldProtected, setOversoldProtected] = useState(true);
+  const [loadedInventoryFields, setLoadedInventoryFields] = useState({
+    inventory: false,
+    threshold: false,
+    oversold: false,
+  });
 
   // Data state
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -189,7 +200,10 @@ export function EditMarketplaceListingPage() {
         setCategoryId(listing.category?.id ? String(listing.category.id) : '');
         setCondition(listing.condition || 'good');
         setPrice(listing.price != null ? String(listing.price) : '');
-        setCurrency(listing.price_currency || 'EUR');
+        setCurrency(
+          listing.price_currency?.trim().toUpperCase()
+            || normalizeSupportedMarketplaceCurrency(tenant?.currency),
+        );
         setPriceType(listing.price_type || 'fixed');
         setLocation(listing.location || '');
         setLatitude(listing.latitude ?? undefined);
@@ -203,17 +217,27 @@ export function EditMarketplaceListingPage() {
           low_stock_threshold?: number | null;
           is_oversold_protected?: boolean;
         });
-        if (inv.inventory_count == null) {
-          setInventoryUnlimited(true);
-          setInventoryCount('0');
-        } else {
-          setInventoryUnlimited(false);
-          setInventoryCount(String(inv.inventory_count));
+        const hasInventory = Object.prototype.hasOwnProperty.call(inv, 'inventory_count');
+        const hasThreshold = Object.prototype.hasOwnProperty.call(inv, 'low_stock_threshold');
+        const hasOversold = Object.prototype.hasOwnProperty.call(inv, 'is_oversold_protected');
+        setLoadedInventoryFields({
+          inventory: hasInventory,
+          threshold: hasThreshold,
+          oversold: hasOversold,
+        });
+        if (hasInventory) {
+          if (inv.inventory_count == null) {
+            setInventoryUnlimited(true);
+            setInventoryCount('0');
+          } else {
+            setInventoryUnlimited(false);
+            setInventoryCount(String(inv.inventory_count));
+          }
         }
-        if (inv.low_stock_threshold != null) {
+        if (hasThreshold && inv.low_stock_threshold != null) {
           setLowStockThreshold(String(inv.low_stock_threshold));
         }
-        if (typeof inv.is_oversold_protected === 'boolean') {
+        if (hasOversold && typeof inv.is_oversold_protected === 'boolean') {
           setOversoldProtected(inv.is_oversold_protected);
         }
 
@@ -249,7 +273,7 @@ export function EditMarketplaceListingPage() {
 
     load();
     return () => { cancelled = true; };
-  }, [id, isAuthenticated, user?.id, navigate, tenantPath, toast, t])
+  }, [id, isAuthenticated, user?.id, navigate, tenant?.currency, tenantPath, toast, t])
 
   // Load categories
   useEffect(() => {
@@ -405,28 +429,6 @@ export function EditMarketplaceListingPage() {
 
     setIsSubmitting(true);
     try {
-      // Delete removed images via individual API calls
-      for (const removedId of removedImageIds) {
-        try {
-          await api.delete(`/v2/marketplace/listings/${id}/images/${removedId}`);
-        } catch (err) {
-          logError('Failed to delete image', err);
-        }
-      }
-
-      // Upload new images
-      const newImageFiles = images.filter((img) => !img.isExisting && img.file);
-      if (newImageFiles.length > 0) {
-        const formData = new FormData();
-        newImageFiles.forEach((img, idx) => {
-          formData.append(`images[${idx}]`, img.file!);
-        });
-        await api.upload(
-          `/v2/marketplace/listings/${id}/images`,
-          formData
-        );
-      }
-
       const body: Record<string, unknown> = {
         title: title.trim(),
         description: description.trim(),
@@ -434,11 +436,20 @@ export function EditMarketplaceListingPage() {
         price_type: priceType,
         delivery_method: deliveryMethod,
         quantity: parseInt(quantity) || 1,
-        // AG46 inventory
-        inventory_count: inventoryUnlimited ? null : Math.max(0, parseInt(inventoryCount) || 0),
-        low_stock_threshold: Math.max(0, parseInt(lowStockThreshold) || 0),
-        is_oversold_protected: oversoldProtected,
       };
+
+      // Only round-trip inventory fields that the API actually supplied, or
+      // that the seller explicitly changed. Older responses omitted these
+      // fields; treating omission as null silently erased finite inventory.
+      if (loadedInventoryFields.inventory) {
+        body.inventory_count = inventoryUnlimited ? null : Math.max(0, parseInt(inventoryCount) || 0);
+      }
+      if (loadedInventoryFields.threshold) {
+        body.low_stock_threshold = Math.max(0, parseInt(lowStockThreshold) || 0);
+      }
+      if (loadedInventoryFields.oversold) {
+        body.is_oversold_protected = oversoldProtected;
+      }
 
       if (categoryId) body.category_id = parseInt(categoryId);
       if (priceType !== 'free' && price) body.price = parseFloat(price);
@@ -457,6 +468,30 @@ export function EditMarketplaceListingPage() {
 
       const response = await api.put(`/v2/marketplace/listings/${id}`, body);
       if (response.success) {
+        for (const removedId of removedImageIds) {
+          const deleteResponse = await api.delete(`/v2/marketplace/listings/${id}/images/${removedId}`);
+          if (!deleteResponse.success) {
+            toast.error(deleteResponse.error || t('edit.updated_error_retry'));
+            return;
+          }
+        }
+
+        const newImageFiles = images.filter((img) => !img.isExisting && img.file);
+        if (newImageFiles.length > 0) {
+          const formData = new FormData();
+          newImageFiles.forEach((img, idx) => {
+            formData.append(`images[${idx}]`, img.file!);
+          });
+          const uploadResponse = await api.upload(
+            `/v2/marketplace/listings/${id}/images`,
+            formData,
+          );
+          if (!uploadResponse.success) {
+            toast.error(uploadResponse.error || t('edit.updated_error_retry'));
+            return;
+          }
+        }
+
         toast.success(t('edit.updated_success'));
         // Cleanup blob URLs
         images.forEach((img) => {
@@ -475,7 +510,7 @@ export function EditMarketplaceListingPage() {
   }, [
     id, title, description, categoryId, condition, price, currency, priceType,
     location, latitude, longitude, deliveryMethod, quantity, images, removedImageIds, templateFields,
-    inventoryUnlimited, inventoryCount, lowStockThreshold, oversoldProtected,
+    inventoryUnlimited, inventoryCount, lowStockThreshold, oversoldProtected, loadedInventoryFields,
     toast, navigate, tenantPath, t,
   ]);
 
@@ -706,7 +741,13 @@ export function EditMarketplaceListingPage() {
                 {t('inventory.section_subtitle')}
               </p>
             </div>
-            <Switch isSelected={inventoryUnlimited} onValueChange={setInventoryUnlimited}>
+            <Switch
+              isSelected={inventoryUnlimited}
+              onValueChange={(value) => {
+                setLoadedInventoryFields((current) => ({ ...current, inventory: true }));
+                setInventoryUnlimited(value);
+              }}
+            >
               {t('inventory.unlimited')}
             </Switch>
             {!inventoryUnlimited && (
@@ -716,7 +757,10 @@ export function EditMarketplaceListingPage() {
                   type="number"
                   min={0}
                   value={inventoryCount}
-                  onValueChange={setInventoryCount}
+                  onValueChange={(value) => {
+                    setLoadedInventoryFields((current) => ({ ...current, inventory: true }));
+                    setInventoryCount(value);
+                  }}
                   className="max-w-[180px]"
                 />
                 <Input
@@ -724,12 +768,21 @@ export function EditMarketplaceListingPage() {
                   type="number"
                   min={0}
                   value={lowStockThreshold}
-                  onValueChange={setLowStockThreshold}
+                  onValueChange={(value) => {
+                    setLoadedInventoryFields((current) => ({ ...current, threshold: true }));
+                    setLowStockThreshold(value);
+                  }}
                   className="max-w-[180px]"
                 />
               </div>
             )}
-            <Switch isSelected={oversoldProtected} onValueChange={setOversoldProtected}>
+            <Switch
+              isSelected={oversoldProtected}
+              onValueChange={(value) => {
+                setLoadedInventoryFields((current) => ({ ...current, oversold: true }));
+                setOversoldProtected(value);
+              }}
+            >
               {t('inventory.oversold_protected')}
             </Switch>
           </div>
@@ -809,10 +862,10 @@ export function EditMarketplaceListingPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Input
                 label={t('create.price_label')}
-                placeholder="0.00"
+                placeholder={currency === 'JPY' ? '0' : '0.00'}
                 type="number"
                 min={0}
-                step={0.01}
+                step={currency === 'JPY' ? 1 : 0.01}
                 value={price}
                 onValueChange={setPrice}
                 isRequired
@@ -821,28 +874,24 @@ export function EditMarketplaceListingPage() {
                   <span className="text-muted text-sm">{currency}</span>
                 }
               />
-              <Select
+              <Autocomplete
                 label={t('create.currency_label')}
-                selectedKeys={[currency]}
-                onSelectionChange={(keys) => {
-                  const selected = Array.from(keys)[0];
-                  if (selected) setCurrency(String(selected));
+                searchPlaceholder={t('create.currency_search')}
+                value={currency}
+                onChange={(key) => {
+                  if (key && !Array.isArray(key)) setCurrency(String(key));
                 }}
                 className="w-full sm:w-32"
               >
-                <SelectItem key="EUR" id="EUR">EUR</SelectItem>
-                <SelectItem key="GBP" id="GBP">GBP</SelectItem>
-                <SelectItem key="USD" id="USD">USD</SelectItem>
-                <SelectItem key="CAD" id="CAD">CAD</SelectItem>
-                <SelectItem key="AUD" id="AUD">AUD</SelectItem>
-                <SelectItem key="NZD" id="NZD">NZD</SelectItem>
-                <SelectItem key="CHF" id="CHF">CHF</SelectItem>
-                <SelectItem key="SEK" id="SEK">SEK</SelectItem>
-                <SelectItem key="NOK" id="NOK">NOK</SelectItem>
-                <SelectItem key="DKK" id="DKK">DKK</SelectItem>
-                <SelectItem key="PLN" id="PLN">PLN</SelectItem>
-                <SelectItem key="JPY" id="JPY">JPY</SelectItem>
-              </Select>
+                {(currency && !SUPPORTED_MARKETPLACE_CURRENCIES.includes(
+                  currency as (typeof SUPPORTED_MARKETPLACE_CURRENCIES)[number],
+                )
+                  ? [currency, ...SUPPORTED_MARKETPLACE_CURRENCIES]
+                  : SUPPORTED_MARKETPLACE_CURRENCIES
+                ).map((option) => (
+                  <AutocompleteItem key={option} id={option}>{option}</AutocompleteItem>
+                ))}
+              </Autocomplete>
             </div>
           )}
         </GlassCard>

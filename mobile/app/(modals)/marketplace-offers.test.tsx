@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockAuthState: {
   isAuthenticated: boolean;
@@ -54,7 +54,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
-  useTenant: () => ({ hasFeature: () => true }),
+  useTenant: () => ({ tenant: { currency: 'EUR' }, hasFeature: () => true }),
 }));
 
 jest.mock('@/lib/hooks/useAuth', () => ({
@@ -154,5 +154,28 @@ describe('MarketplaceOffersRoute', () => {
     expect(getByText('Sign in to view marketplace offers')).toBeTruthy();
     expect(getMarketplaceOffers).not.toHaveBeenCalled();
     unmount();
+  });
+
+  it('opens accepted sent offers with the authoritative offer checkout context', async () => {
+    (getMarketplaceOffers as jest.Mock).mockResolvedValueOnce({
+      data: [{
+        id: 31,
+        amount: 37,
+        currency: 'EUR',
+        status: 'accepted',
+        created_at: '2026-05-15T10:30:00Z',
+        listing: { id: 12, title: 'Cordless drill', status: 'reserved' },
+        seller: { id: 4, name: 'Jordan Seller' },
+      }],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getByText } = render(<MarketplaceOffersRoute />);
+    fireEvent.press(await waitFor(() => getByText('View')));
+
+    expect(require('expo-router').router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/marketplace-detail',
+      params: { id: '12', offer_id: '31', offer_amount: '37' },
+    });
   });
 });

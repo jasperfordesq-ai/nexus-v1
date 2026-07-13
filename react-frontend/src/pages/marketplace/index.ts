@@ -5,6 +5,8 @@
 
 export { MarketplacePage } from './MarketplacePage';
 export { MarketplaceListingPage } from './MarketplaceListingPage';
+export { MarketplaceReportPage } from './MarketplaceReportPage';
+export { MarketplaceReportsPage } from './MarketplaceReportsPage';
 export { CreateMarketplaceListingPage } from './CreateMarketplaceListingPage';
 export { EditMarketplaceListingPage } from './EditMarketplaceListingPage';
 export { MyListingsPage } from './MyListingsPage';

@@ -81,6 +81,26 @@ vi.mock('@/contexts', () =>
   })
 );
 
+vi.mock('@/contexts/AuthContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/AuthContext')>();
+  return { ...actual, useAuth: () => ({
+    user: { id: 10, name: 'Logged User' },
+    isAuthenticated: true,
+  }) };
+});
+vi.mock('@/contexts/ToastContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/ToastContext')>();
+  return { ...actual, useToast: () => mockToast };
+});
+vi.mock('@/contexts/TenantContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/contexts/TenantContext')>();
+  return { ...actual, useTenant: () => ({
+    tenant: { id: 2, name: 'Test', slug: 'test' },
+    tenantPath: stableTenantPath,
+    branding: { name: 'Test Platform' },
+  }) };
+});
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 
@@ -94,11 +114,26 @@ vi.mock('@/components/feedback', () => ({
 
 // Stub marketplace child components
 vi.mock('@/components/marketplace', () => ({
-  BuyNowButton: ({ listingTitle }: { listingTitle?: string }) => (
-    <button data-testid="buy-now-btn">Buy Now: {listingTitle}</button>
+  BuyNowButton: ({ listingTitle, paymentMethod }: { listingTitle?: string; paymentMethod?: string }) => (
+    <button data-testid="buy-now-btn" data-payment-method={paymentMethod}>Buy Now: {listingTitle}</button>
   ),
   LoyaltyRedemptionCard: () => <div data-testid="loyalty-card" />,
   MarketplaceListingDetailSkeleton: () => <div data-testid="listing-skeleton" />,
+}));
+
+vi.mock('@/components/marketplace/BuyNowButton', () => ({
+  BuyNowButton: ({ listingTitle, paymentMethod }: { listingTitle?: string; paymentMethod?: string }) => (
+    <button data-testid="buy-now-btn" data-payment-method={paymentMethod}>Buy Now: {listingTitle}</button>
+  ),
+}));
+vi.mock('@/components/marketplace/LoyaltyRedemptionCard', () => ({
+  LoyaltyRedemptionCard: () => <div data-testid="loyalty-card" />,
+}));
+vi.mock('@/components/marketplace/MarketplaceListingDetailSkeleton', () => ({
+  MarketplaceListingDetailSkeleton: () => <div data-testid="listing-skeleton" />,
+}));
+vi.mock('@/components/marketplace/ShippingSelector', () => ({
+  ShippingSelector: () => <div data-testid="shipping-selector" />,
 }));
 
 // Stub verification badge
@@ -159,6 +194,7 @@ const { makeListing, makeSellerListings } = vi.hoisted(() => ({
     price: number | null;
     price_type: string;
     price_currency: string;
+    time_credit_price: number | null;
     condition: string;
     is_own: boolean;
     is_saved: boolean;
@@ -327,6 +363,51 @@ describe('MarketplaceListingPage', () => {
           (b) => b.textContent?.toLowerCase().includes('message')
         );
       expect(el).toBeDefined();
+    });
+  });
+
+  it('defaults a hybrid listing to cash and lets the buyer choose time credits', async () => {
+    setupMocks({ price: 50, price_type: 'fixed', time_credit_price: 3 });
+    const { MarketplaceListingPage } = await import('./MarketplaceListingPage');
+    render(<MarketplaceListingPage />);
+
+    const buyNow = await screen.findByTestId('buy-now-btn');
+    const cashButton = screen.getByText('checkout.pay_with_money').closest('button');
+    const timeCreditButton = screen.getByText('checkout.pay_with_time_credits').closest('button');
+
+    expect(buyNow).toHaveAttribute('data-payment-method', 'cash');
+    expect(cashButton).toHaveAttribute('aria-pressed', 'true');
+    expect(timeCreditButton).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(timeCreditButton!);
+
+    await waitFor(() => {
+      expect(buyNow).toHaveAttribute('data-payment-method', 'time_credits');
+      expect(timeCreditButton).toHaveAttribute('aria-pressed', 'true');
+    });
+  });
+
+  it('hides buyer actions when the viewer owns the listing', async () => {
+    setupMocks({ is_own: true, user: { id: 10, name: 'Logged User' } });
+    const { MarketplaceListingPage } = await import('./MarketplaceListingPage');
+    render(<MarketplaceListingPage />);
+
+    await waitFor(() => expect(screen.getByText('Cosy Armchair')).toBeInTheDocument());
+    expect(screen.queryByTestId('buy-now-btn')).not.toBeInTheDocument();
+    expect(screen.queryByText('listing.make_offer')).not.toBeInTheDocument();
+    expect(screen.queryByText('listing.message_seller')).not.toBeInTheDocument();
+  });
+
+  it('escapes less-than characters in JSON-LD structured data', async () => {
+    setupMocks({ title: '</script><script>alert(1)</script>' });
+    const { MarketplaceListingPage } = await import('./MarketplaceListingPage');
+    render(<MarketplaceListingPage />);
+
+    await waitFor(() => {
+      const script = document.querySelector('script[type="application/ld+json"]');
+      expect(script).toBeTruthy();
+      expect(script?.textContent).toContain('\\u003c/script>');
+      expect(script?.textContent).not.toContain('</script>');
     });
   });
 

@@ -873,6 +873,9 @@
     "start_error": "Nie udało się rozpocząć wdrożenia"
   },
   "checkout": {
+    "payment_method_label": "Wybierz sposób płatności",
+    "pay_with_money": "Zapłać {{amount}}",
+    "pay_with_time_credits": "Zapłać {{count}} kredytami czasu",
     "title": "Bezpieczna płatność",
     "order_summary": "Podsumowanie zamówienia",
     "shipping": "Dostawa",

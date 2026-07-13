@@ -100,7 +100,9 @@
         "seller_verified": "Sprzedawca zweryfikowany.",
         "seller_suspended": "Sprzedawca zawieszony i wszystkie ogłoszenia dezaktywowane.",
         "report_acknowledged": "Raport przyjęty do wiadomości.",
-        "report_resolved": "Raport rozwiązany."
+        "report_resolved": "Raport rozwiązany.",
+        "report_appeal_resolved": "Odwołanie od zgłoszenia rozstrzygnięte.",
+        "dispute_resolved": "Spór rozstrzygnięty."
     },
     "admin_newsletter": {
         "newsletter_queued": "Biuletyn dodany do kolejki dla :count odbiorców",

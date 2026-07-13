@@ -57,7 +57,7 @@
     "no_history_available": "No se encontró ningún historial disponible",
     "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
     "no_members_found": "No se encontraron miembros encontrados.",
-    "loading": "Loading",
+    "loading": "Cargando",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
     "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
@@ -67,8 +67,8 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
-    "select_row": "Select row {{id}}",
+    "select_all_rows": "Seleccionar todas las filas",
+    "select_row": "Seleccionar fila {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
   },
@@ -115,7 +115,7 @@
       "deleted": "Cupón eliminado",
       "failed_delete": "No se pudo eliminar",
       "discount_percent": "{{value}}%",
-      "discount_fixed": "€{{value}}",
+      "discount_fixed": "{{value}}",
       "discount_bogo": "BOGO",
       "no_expiry": "-",
       "suspend": "Suspender",
@@ -207,8 +207,8 @@
     "verify_seller_message": "Esto marcará al vendedor como verificado. ¿Continuar?",
     "verify_seller_title": "Verificar vendedor",
     "view_all": "Ver todo",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "Filtro de estado de moderación del marketplace",
+    "seller_tabs_aria": "Filtro de estado del vendedor"
   },
   "bulk": {
     "selected_count": "{{count}} seleccionado",

@@ -468,6 +468,9 @@
     }
   },
   "checkout": {
+    "paymentMethodLabel": "Choose how to pay",
+    "payWithMoney": "Pay {{amount}}",
+    "payWithTimeCredits": "Pay with {{count}} time credits",
     "title": "Checkout",
     "coupon": "Coupon code",
     "couponPlaceholder": "COMMUNITY10",
@@ -483,7 +486,18 @@
     "paymentCompleteHint": "Your order is paid. You can track it from Orders.",
     "paymentSheetFailed": "The secure payment sheet could not be opened. Continue payment from Orders.",
     "paymentRecoveryTitle": "Checkout paused",
-    "paymentRecoveryHint": "Order {{order}} was created, but payment could not start. Continue payment from Orders."
+    "paymentRecoveryHint": "Order {{order}} was created, but payment could not start. Continue payment from Orders.",
+    "deliveryTitle": "Delivery method",
+    "localPickup": "Local pickup",
+    "shippingLoading": "Loading shipping options…",
+    "shippingLoadFailed": "Shipping options could not be loaded. Try again before buying.",
+    "shippingUnavailable": "This seller has no active shipping options.",
+    "deliveryRequired": "Choose a delivery method before buying.",
+    "unsupportedTitle": "Checkout unavailable",
+    "timeCreditUnsupportedHint": "Time-credit checkout is not connected in the mobile app yet. No order or wallet debit has been created.",
+    "freeUnsupportedHint": "Free-item checkout is not connected in the mobile app yet. No order has been created.",
+    "pickupRecoveryTitle": "Pickup not reserved",
+    "pickupRecoveryHint": "Order {{order}} was created, but the pickup slot could not be reserved. Review or cancel it from Orders before trying again."
   },
   "communityDelivery": {
     "eyebrow": "Community-powered delivery",
@@ -537,11 +551,11 @@
     "scanAtCheckout": "Ask the seller to scan this QR code at checkout.",
     "qrExpires": "Expires at {{time}}",
     "qrFailed": "Could not generate the coupon QR code. Please try again.",
-    "minOrder": "Minimum spend EUR {{value}}",
+    "minOrder": "Minimum spend {{value}}",
     "usage": "{{used}} of {{max}} used",
     "perMember": "{{count}} per member",
     "percentSuffix": "%",
-    "fixedValue": "EUR {{value}} off",
+    "fixedValue": "{{value}} off",
     "bogo": "BOGO",
     "status": {
       "draft": "Draft",

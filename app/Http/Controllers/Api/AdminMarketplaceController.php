@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceSellerProfile;
 use App\Services\MarketplaceConfigurationService;
+use App\Services\MarketplaceDisputeService;
 use App\Services\MarketplaceReportService;
 use App\Services\TenantSettingsService;
 use Illuminate\Http\JsonResponse;
@@ -56,17 +57,34 @@ class AdminMarketplaceController extends BaseApiController
         $totalSellers = MarketplaceSellerProfile::where('tenant_id', $tenantId)->count();
 
         $totalOrders = 0;
-        $revenue = 0;
+        $revenueByCurrency = [];
         if (DB::getSchemaBuilder()->hasTable('marketplace_orders')) {
             $totalOrders = DB::table('marketplace_orders')
                 ->where('tenant_id', $tenantId)
                 ->whereNotIn('status', ['cancelled', 'refunded'])
                 ->count();
-            $revenue = (float) DB::table('marketplace_orders')
+            $revenueByCurrency = DB::table('marketplace_orders')
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'completed')
-                ->sum('total_price');
+                ->where('total_price', '>', 0)
+                ->groupByRaw('UPPER(currency)')
+                ->orderByRaw('UPPER(currency)')
+                ->selectRaw('UPPER(currency) AS currency, SUM(total_price) AS total')
+                ->get()
+                ->map(static fn (object $row): array => [
+                    'currency' => (string) $row->currency,
+                    'total' => (float) $row->total,
+                ])
+                ->all();
         }
+
+        $hasSingleRevenueCurrency = count($revenueByCurrency) <= 1;
+        $singleRevenue = $revenueByCurrency[0] ?? ['currency' => null, 'total' => 0.0];
+        $defaultCurrency = (string) app(TenantSettingsService::class)->get(
+            $tenantId,
+            'general.default_currency',
+            config('app.default_currency', 'USD')
+        );
 
         return $this->respondWithData([
             'total_listings' => $totalListings,
@@ -74,12 +92,11 @@ class AdminMarketplaceController extends BaseApiController
             'pending_moderation' => $pendingModeration,
             'total_sellers' => $totalSellers,
             'total_orders' => $totalOrders,
-            'revenue' => $revenue,
-            'currency' => (string) app(TenantSettingsService::class)->get(
-                $tenantId,
-                'general.default_currency',
-                config('app.default_currency', 'USD')
-            ),
+            'revenue' => $hasSingleRevenueCurrency ? $singleRevenue['total'] : null,
+            'currency' => $hasSingleRevenueCurrency
+                ? ($singleRevenue['currency'] ?? $defaultCurrency)
+                : null,
+            'revenue_by_currency' => $revenueByCurrency,
         ]);
     }
 
@@ -130,7 +147,7 @@ class AdminMarketplaceController extends BaseApiController
         $items = $listings->map(fn ($l) => [
             'id' => $l->id,
             'title' => $l->title,
-            'price' => $l->price,
+            'price' => $l->price !== null ? (float) $l->price : null,
             'price_currency' => $l->price_currency,
             'price_type' => $l->price_type,
             'status' => $l->status,
@@ -171,6 +188,7 @@ class AdminMarketplaceController extends BaseApiController
         }
 
         $listing->save();
+        \App\Services\SearchService::indexMarketplaceListing($listing);
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_approved')]);
     }
@@ -195,6 +213,7 @@ class AdminMarketplaceController extends BaseApiController
         $listing->moderation_notes = $data['notes'];
         $listing->status = 'removed';
         $listing->save();
+        \App\Services\SearchService::removeMarketplaceListing($listing->id);
 
         // Tell the seller their listing was rejected — previously this admin
         // action was silent (no reason, no path to query). Direct action, so no
@@ -232,6 +251,7 @@ class AdminMarketplaceController extends BaseApiController
         $listing->moderated_by = auth()->id();
         $listing->moderated_at = now();
         $listing->save();
+        \App\Services\SearchService::removeMarketplaceListing($listing->id);
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_removed')]);
     }
@@ -339,11 +359,27 @@ class AdminMarketplaceController extends BaseApiController
 
         $seller = MarketplaceSellerProfile::findOrFail($id);
 
-        // Deactivate all their listings within this tenant
-        MarketplaceListing::where('tenant_id', TenantContext::getId())
-            ->where('user_id', $seller->user_id)
-            ->where('status', 'active')
-            ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
+        $removedListingIds = DB::transaction(static function () use ($seller): array {
+            // Persist the account-level suspension first so the seller cannot
+            // immediately create another listing after this action completes.
+            $seller->is_suspended = true;
+            $seller->save();
+
+            // Deactivate all their listings within this tenant.
+            $activeListings = MarketplaceListing::where('tenant_id', TenantContext::getId())
+                ->where('user_id', $seller->user_id)
+                ->where('status', 'active');
+            $listingIds = (clone $activeListings)->pluck('id')->map(
+                static fn ($listingId): int => (int) $listingId
+            )->all();
+            $activeListings->update(['status' => 'removed', 'moderation_status' => 'rejected']);
+
+            return $listingIds;
+        });
+
+        foreach ($removedListingIds as $listingId) {
+            \App\Services\SearchService::removeMarketplaceListing($listingId);
+        }
 
         app(\App\Services\PrerenderContentInvalidator::class)->refreshRoutes(
             (int) TenantContext::getId(),
@@ -416,7 +452,7 @@ class AdminMarketplaceController extends BaseApiController
             $report = MarketplaceReportService::acknowledgeReport($id, $adminId);
         } catch (\InvalidArgumentException $e) {
             \Illuminate\Support\Facades\Log::warning('AdminMarketplaceController error: ' . $e->getMessage());
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request parameters', 400);
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_acknowledged'), 'status' => $report->status]);
@@ -443,10 +479,84 @@ class AdminMarketplaceController extends BaseApiController
             $report = MarketplaceReportService::resolveReport($id, $adminId, $validated);
         } catch (\InvalidArgumentException $e) {
             \Illuminate\Support\Facades\Log::warning('AdminMarketplaceController error: ' . $e->getMessage());
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid request parameters', 400);
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.report_resolved'), 'status' => $report->status, 'action_taken' => $report->action_taken]);
+    }
+
+    /** PUT /v2/admin/marketplace/reports/{id}/resolve-appeal. */
+    public function resolveReportAppeal(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_reports', 30, 60);
+        $adminId = $this->requireAdmin();
+        $validated = request()->validate([
+            'action_taken' => 'required|string|in:none,warning,listing_removed,seller_suspended',
+            'resolution_reason' => 'required|string|max:5000',
+        ]);
+
+        try {
+            $report = MarketplaceReportService::resolveAppeal($id, $adminId, $validated);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->respondWithError('VALIDATION_ERROR', $exception->getMessage(), null, 422);
+        }
+
+        return $this->respondWithData([
+            'message' => __('api_controllers_1.admin_marketplace.report_appeal_resolved'),
+            'status' => $report->status,
+            'action_taken' => $report->action_taken,
+        ]);
+    }
+
+    /** GET /v2/admin/marketplace/disputes. */
+    public function disputes(MarketplaceDisputeService $service): JsonResponse
+    {
+        $this->requireAdmin();
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_disputes', 30, 60);
+
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 20, 1, 100);
+        $status = $this->query('status');
+        $result = $service->paginate($status, $page, $perPage);
+
+        return $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $result['page'],
+            $result['per_page'],
+        );
+    }
+
+    /** PUT /v2/admin/marketplace/disputes/{id}/resolve. */
+    public function resolveDispute(int $id, MarketplaceDisputeService $service): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('admin_marketplace_disputes', 20, 60);
+        $adminId = $this->requireAdmin();
+        $validated = request()->validate([
+            'resolution' => 'required|string|in:buyer,seller,closed',
+            'resolution_notes' => 'required|string|max:5000',
+            'refund_amount' => 'nullable|numeric|min:0.01',
+        ]);
+
+        try {
+            $dispute = $service->resolve($id, $adminId, $validated);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->respondWithError('VALIDATION_ERROR', $exception->getMessage(), null, 422);
+        } catch (\RuntimeException $exception) {
+            \Illuminate\Support\Facades\Log::error('Marketplace dispute resolution failed', [
+                'dispute_id' => $id,
+                'error' => $exception->getMessage(),
+            ]);
+            return $this->respondWithError('RESOLUTION_FAILED', __('api.marketplace_dispute_resolution_failed'), null, 409);
+        }
+
+        return $this->respondWithData([
+            'message' => __('api_controllers_1.admin_marketplace.dispute_resolved'),
+            'status' => $dispute->status,
+        ]);
     }
 
     /**
@@ -513,6 +623,7 @@ class AdminMarketplaceController extends BaseApiController
                 $listing->moderation_notes = $reason;
                 $listing->status = 'removed';
                 $listing->save();
+                \App\Services\SearchService::removeMarketplaceListing($listing->id);
                 $touchedIds[] = (int) $listing->id;
                 $success++;
 

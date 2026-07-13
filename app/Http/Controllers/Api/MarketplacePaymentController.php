@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
+use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplacePaymentService;
 use Illuminate\Http\JsonResponse;
 
@@ -25,7 +26,7 @@ class MarketplacePaymentController extends BaseApiController
     private function ensureFeature(): void
     {
         if (!TenantContext::hasFeature('marketplace')) {
-            abort(403, 'Marketplace feature is not enabled for this tenant.');
+        abort(403, __('api.marketplace_feature_disabled'));
         }
     }
 
@@ -39,6 +40,14 @@ class MarketplacePaymentController extends BaseApiController
     public function createIntent(): JsonResponse
     {
         $this->ensureFeature();
+        if (! MarketplaceConfigurationService::stripeEnabled()) {
+            return $this->respondWithError(
+                'FEATURE_DISABLED',
+                __('api.marketplace_stripe_disabled'),
+                null,
+                403,
+            );
+        }
         $userId = $this->requireAuth();
         $this->rateLimit('marketplace_payment_create', 10, 60);
 
@@ -50,7 +59,7 @@ class MarketplacePaymentController extends BaseApiController
 
         // Only the buyer can create a payment intent
         if ($order->buyer_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'Only the buyer can initiate payment.', null, 403);
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_payment_buyer_required'), null, 403);
         }
 
         try {
@@ -95,7 +104,7 @@ class MarketplacePaymentController extends BaseApiController
             return $this->respondWithData([
                 'payment_id' => $payment->id,
                 'status' => $payment->status,
-                'amount' => $payment->amount,
+                'amount' => (float) $payment->amount,
                 'currency' => $payment->currency,
                 'order_id' => $payment->order_id,
             ]);
@@ -117,26 +126,29 @@ class MarketplacePaymentController extends BaseApiController
             ->find($id);
 
         if (!$payment) {
-            return $this->respondWithError('NOT_FOUND', 'Payment not found.', null, 404);
+                return $this->respondWithError('NOT_FOUND', __('api.marketplace_payment_not_found'), null, 404);
         }
 
         // Only buyer or seller can view the payment
         $order = $payment->order;
-        if ($order && $order->buyer_id !== $userId && $order->seller_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not have access to this payment.', null, 403);
+        if ($order === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_payment_not_found'), null, 404);
+        }
+        if ($order->buyer_id !== $userId && $order->seller_id !== $userId) {
+                return $this->respondWithError('FORBIDDEN', __('api.marketplace_payment_access_denied'), null, 403);
         }
 
         return $this->respondWithData([
             'id' => $payment->id,
             'order_id' => $payment->order_id,
-            'amount' => $payment->amount,
+            'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
-            'platform_fee' => $payment->platform_fee,
-            'seller_payout' => $payment->seller_payout,
+            'platform_fee' => (float) $payment->platform_fee,
+            'seller_payout' => (float) $payment->seller_payout,
             'payment_method' => $payment->payment_method,
             'status' => $payment->status,
             'payout_status' => $payment->payout_status,
-            'refund_amount' => $payment->refund_amount,
+            'refund_amount' => $payment->refund_amount !== null ? (float) $payment->refund_amount : null,
             'refunded_at' => $payment->refunded_at?->toISOString(),
             'paid_out_at' => $payment->paid_out_at?->toISOString(),
             'created_at' => $payment->created_at?->toISOString(),
@@ -190,6 +202,14 @@ class MarketplacePaymentController extends BaseApiController
     public function onboard(): JsonResponse
     {
         $this->ensureFeature();
+        if (! MarketplaceConfigurationService::stripeEnabled()) {
+            return $this->respondWithError(
+                'FEATURE_DISABLED',
+                __('api.marketplace_stripe_disabled'),
+                null,
+                403,
+            );
+        }
         $userId = $this->requireAuth();
         $this->rateLimit('marketplace_seller_onboard', 5, 60);
 

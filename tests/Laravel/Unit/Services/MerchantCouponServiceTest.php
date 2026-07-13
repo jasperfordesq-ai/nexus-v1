@@ -38,11 +38,11 @@ class MerchantCouponServiceTest extends TestCase
     // ─────────────────────────────────────────────────────────────────────────
 
     /** Insert a bare-minimum user row and return its id. */
-    private function insertUser(): int
+    private function insertUser(int $tenantId = self::TENANT_ID): int
     {
         $uid = uniqid('mct', true);
         return DB::table('users')->insertGetId([
-            'tenant_id'  => self::TENANT_ID,
+            'tenant_id'  => $tenantId,
             'name'       => 'CouponUser ' . $uid,
             'first_name' => 'Coupon',
             'last_name'  => 'User',
@@ -57,15 +57,47 @@ class MerchantCouponServiceTest extends TestCase
     }
 
     /** Insert a minimal seller profile and return its id. */
-    private function insertSellerProfile(int $userId): int
+    private function insertSellerProfile(int $userId, int $tenantId = self::TENANT_ID): int
     {
         return DB::table('marketplace_seller_profiles')->insertGetId([
-            'tenant_id'             => self::TENANT_ID,
+            'tenant_id'             => $tenantId,
             'user_id'               => $userId,
             'seller_type'           => 'business',
             'joined_marketplace_at' => now(),
             'created_at'            => now(),
             'updated_at'            => now(),
+        ]);
+    }
+
+    private function insertListing(int $userId, int $tenantId = self::TENANT_ID): int
+    {
+        return (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'title' => 'Coupon target ' . uniqid(),
+            'description' => 'Listing used to verify coupon target ownership.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'business',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function insertCategory(?int $tenantId = self::TENANT_ID): int
+    {
+        return (int) DB::table('marketplace_categories')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Coupon category ' . uniqid(),
+            'slug' => 'coupon-category-' . uniqid(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 
@@ -123,6 +155,71 @@ class MerchantCouponServiceTest extends TestCase
         $row = DB::table('merchant_coupons')->where('id', $coupon->id)->first();
         $this->assertNotNull($row);
         $this->assertSame('WELCOME20', $row->code);
+    }
+
+    public function test_issue_coupon_persists_only_owned_listing_targets(): void
+    {
+        $userId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($userId);
+        $listingId = $this->insertListing($userId);
+
+        $coupon = MerchantCouponService::issueCoupon($sellerId, [
+            'code' => 'OWNEDTARGET',
+            'title' => 'Owned listing target',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'applies_to' => 'listing_ids',
+            'applies_to_ids' => [$listingId, (string) $listingId],
+        ]);
+
+        $this->assertSame('listing_ids', $coupon->applies_to);
+        $this->assertSame([$listingId], $coupon->applies_to_ids);
+    }
+
+    public function test_issue_coupon_rejects_another_sellers_listing_target(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $otherUserId = $this->insertUser();
+        $foreignListingId = $this->insertListing($otherUserId);
+
+        $this->expectException(\InvalidArgumentException::class);
+        MerchantCouponService::issueCoupon($sellerId, [
+            'code' => 'FOREIGNTARGET',
+            'title' => 'Invalid listing target',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'applies_to' => 'listing_ids',
+            'applies_to_ids' => [$foreignListingId],
+        ]);
+    }
+
+    public function test_issue_coupon_accepts_global_category_but_rejects_foreign_tenant_category(): void
+    {
+        $userId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($userId);
+        $globalCategoryId = $this->insertCategory(null);
+        $foreignCategoryId = $this->insertCategory(1);
+
+        $coupon = MerchantCouponService::issueCoupon($sellerId, [
+            'code' => 'GLOBALCATEGORY',
+            'title' => 'Global category target',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'applies_to' => 'category_ids',
+            'applies_to_ids' => [$globalCategoryId],
+        ]);
+        $this->assertSame([$globalCategoryId], $coupon->applies_to_ids);
+
+        $this->expectException(\InvalidArgumentException::class);
+        MerchantCouponService::issueCoupon($sellerId, [
+            'code' => 'FOREIGNCATEGORY',
+            'title' => 'Foreign category target',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'applies_to' => 'category_ids',
+            'applies_to_ids' => [$foreignCategoryId],
+        ]);
     }
 
     public function test_issue_coupon_throws_on_duplicate_code(): void
@@ -319,9 +416,82 @@ class MerchantCouponServiceTest extends TestCase
         /** @var \App\Models\MerchantCoupon $coupon */
         $coupon = \App\Models\MerchantCoupon::find($couponId);
 
-        $discount = MerchantCouponService::calculateDiscountCents($coupon, 4000);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(__('api.marketplace_coupon_bogo_quantity_required'));
+        MerchantCouponService::calculateDiscountCents($coupon, 4000);
+    }
 
-        $this->assertSame(2000, $discount); // 50% of 4000
+    public function test_bogo_discount_uses_authoritative_unit_price_and_quantity(): void
+    {
+        $userId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($userId);
+        $couponId = $this->insertCoupon($sellerId, [
+            'discount_type' => 'bogo',
+            'discount_value' => '0.00',
+        ]);
+        /** @var \App\Models\MerchantCoupon $coupon */
+        $coupon = \App\Models\MerchantCoupon::find($couponId);
+
+        $discount = MerchantCouponService::calculateOrderDiscountMinor(
+            $coupon,
+            3500,
+            1000,
+            3,
+        );
+
+        $this->assertSame(1000, $discount);
+    }
+
+    public function test_quote_for_jpy_percent_coupon_uses_authoritative_zero_decimal_amount(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $buyerId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $listingId = $this->insertListing($sellerUserId);
+        DB::table('marketplace_listings')->where('id', $listingId)->update([
+            'price' => 1000,
+            'price_currency' => 'JPY',
+        ]);
+        $this->insertCoupon($sellerId, [
+            'code' => 'JPYQUOTE10',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+            'min_order_cents' => null,
+        ]);
+
+        $quote = MerchantCouponService::quoteForListing(
+            'JPYQUOTE10',
+            $buyerId,
+            $listingId,
+        );
+
+        $this->assertSame('JPY', $quote['currency']);
+        $this->assertSame(1000, $quote['order_total_minor']);
+        $this->assertSame(1000.0, $quote['order_total_amount']);
+        $this->assertSame(100, $quote['discount_minor']);
+        $this->assertSame(100.0, $quote['discount_amount']);
+    }
+
+    public function test_quote_rejects_legacy_fixed_coupon_for_zero_decimal_currency(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $buyerId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $listingId = $this->insertListing($sellerUserId);
+        DB::table('marketplace_listings')->where('id', $listingId)->update([
+            'price' => 1000,
+            'price_currency' => 'JPY',
+        ]);
+        $this->insertCoupon($sellerId, [
+            'code' => 'JPYFIXED',
+            'discount_type' => 'fixed',
+            'discount_value' => 500,
+            'min_order_cents' => null,
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(__('api.marketplace_coupon_currency_unsupported'));
+        MerchantCouponService::quoteForListing('JPYFIXED', $buyerId, $listingId);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -352,6 +522,41 @@ class MerchantCouponServiceTest extends TestCase
             ->where('user_id', $buyerId)
             ->first();
         $this->assertNotNull($row);
+    }
+
+    public function test_redeem_for_order_records_discount_from_pre_discount_total(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $buyerId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $couponId = $this->insertCoupon($sellerId, [
+            'code' => 'ACCOUNT10',
+            'discount_type' => 'percent',
+            'discount_value' => 10,
+        ]);
+        $orderId = (int) DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'order_number' => 'MKT-COUPON-ACCOUNT-' . strtoupper(uniqid('', true)),
+            'buyer_id' => $buyerId,
+            'seller_id' => $sellerUserId,
+            'quantity' => 1,
+            'unit_price' => 100.00,
+            'shipping_cost' => 0,
+            'total_price' => 90.00,
+            'currency' => 'EUR',
+            'status' => 'pending_payment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $redemption = MerchantCouponService::redeemForOrder(
+            $couponId,
+            $orderId,
+            $buyerId,
+            'online',
+        );
+
+        $this->assertSame(1000, (int) $redemption->discount_applied_cents);
     }
 
     public function test_redeem_for_order_blocks_second_redemption_by_same_user(): void
@@ -385,6 +590,52 @@ class MerchantCouponServiceTest extends TestCase
         MerchantCouponService::redeemForOrder($couponId, null, $buyerId, 'online');
     }
 
+    public function test_reversed_order_redemption_does_not_consume_member_limit(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $buyerId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $couponId = $this->insertCoupon($sellerId, [
+            'code' => 'REUSEAFTERREVERSE',
+            'max_uses' => 1,
+            'max_uses_per_member' => 1,
+        ]);
+        $orderIds = [];
+        foreach ([1, 2] as $sequence) {
+            $orderIds[] = (int) DB::table('marketplace_orders')->insertGetId([
+                'tenant_id' => self::TENANT_ID,
+                'order_number' => 'MKT-COUPON-REVERSE-' . $sequence . '-' . strtoupper(uniqid('', true)),
+                'buyer_id' => $buyerId,
+                'seller_id' => $sellerUserId,
+                'quantity' => 1,
+                'unit_price' => 10.00,
+                'total_price' => 9.00,
+                'currency' => 'EUR',
+                'status' => 'pending_payment',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        MerchantCouponService::redeemForOrder($couponId, $orderIds[0], $buyerId, 'online');
+        MerchantCouponService::releaseForOrder($orderIds[0], 'payment_expired');
+        $second = MerchantCouponService::redeemForOrder(
+            $couponId,
+            $orderIds[1],
+            $buyerId,
+            'online',
+        );
+
+        $this->assertSame($orderIds[1], (int) $second->order_id);
+        $this->assertSame(1, (int) DB::table('merchant_coupons')
+            ->where('id', $couponId)
+            ->value('usage_count'));
+        $this->assertDatabaseHas('merchant_coupon_redemptions', [
+            'order_id' => $orderIds[0],
+            'reversal_reason' => 'payment_expired',
+        ]);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     //  generateQrToken — token shape + cache miss guard
     // ─────────────────────────────────────────────────────────────────────────
@@ -404,6 +655,36 @@ class MerchantCouponServiceTest extends TestCase
         $this->assertArrayHasKey('coupon_code', $result);
         $this->assertSame('QRCODE1', $result['coupon_code']);
         $this->assertSame(16, strlen($result['token']));
+    }
+
+    public function test_qr_token_is_consumed_before_a_second_scan_can_redeem(): void
+    {
+        $sellerUserId = $this->insertUser();
+        $buyerId = $this->insertUser();
+        $sellerId = $this->insertSellerProfile($sellerUserId);
+        $couponId = $this->insertCoupon($sellerId, [
+            'code' => 'QRONCE',
+            'max_uses' => 10,
+            'max_uses_per_member' => 10,
+        ]);
+        $token = MerchantCouponService::generateQrToken($couponId, $buyerId)['token'];
+
+        $first = MerchantCouponService::redeemQrToken($token, $sellerUserId);
+        $this->assertSame('qr_scan', $first->redemption_method);
+
+        try {
+            MerchantCouponService::redeemQrToken($token, $sellerUserId);
+            $this->fail('Expected the claimed QR token to be unavailable');
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertSame(__('api.marketplace_coupon_qr_invalid'), $exception->getMessage());
+        }
+
+        $this->assertSame(1, DB::table('merchant_coupon_redemptions')
+            ->where('coupon_id', $couponId)
+            ->count());
+        $this->assertSame(1, (int) DB::table('merchant_coupons')
+            ->where('id', $couponId)
+            ->value('usage_count'));
     }
 
     public function test_redeem_qr_token_throws_on_invalid_token(): void

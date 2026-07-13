@@ -854,6 +854,9 @@
     "start_error": "Error al iniciar la incorporación"
   },
   "checkout": {
+    "payment_method_label": "Elige cómo pagar",
+    "pay_with_money": "Pagar {{amount}}",
+    "pay_with_time_credits": "Pagar con {{count}} créditos de tiempo",
     "title": "Pago seguro",
     "order_summary": "Resumen del pedido",
     "shipping": "Envío",

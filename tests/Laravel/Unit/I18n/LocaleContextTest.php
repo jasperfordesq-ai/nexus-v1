@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Unit\I18n;
 
 use App\I18n\LocaleContext;
+use App\I18n\Translator;
 use Illuminate\Support\Facades\App;
 use RuntimeException;
 use Tests\Laravel\TestCase;
@@ -17,6 +18,7 @@ class LocaleContextTest extends TestCase
     {
         parent::setUp();
         App::setLocale('en');
+        Translator::setLocale('en');
     }
 
     public function test_string_locale_switches_active_locale_inside_callback(): void
@@ -50,6 +52,19 @@ class LocaleContextTest extends TestCase
         }
 
         $this->assertSame('en', App::getLocale(), 'Locale must be restored on exception');
+        $this->assertSame('en', Translator::getLocale(), 'JSON locale must be restored on exception');
+    }
+
+    public function test_json_translation_locale_switches_and_restores_with_laravel_locale(): void
+    {
+        $observed = LocaleContext::withLocale('de', fn (): array => [
+            App::getLocale(),
+            Translator::getLocale(),
+        ]);
+
+        $this->assertSame(['de', 'de'], $observed);
+        $this->assertSame('en', App::getLocale());
+        $this->assertSame('en', Translator::getLocale());
     }
 
     public function test_callback_return_value_is_propagated(): void

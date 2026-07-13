@@ -221,6 +221,7 @@ describe('api-schemas', () => {
         id: 2,
         name: 'hOUR Timebank',
         slug: 'hour-timebank',
+        currency: 'JPY',
         tagline: 'Community Time Exchange',
         features: { gamification: true, events: true },
         modules: { feed: true, wallet: true },
@@ -236,6 +237,11 @@ describe('api-schemas', () => {
         },
       };
       expect(tenantBootstrapSchema.safeParse(data).success).toBe(true);
+    });
+
+    it('rejects a lowercase tenant payment currency', () => {
+      const data = { id: 1, name: 'Test', slug: 'test', currency: 'jpy' };
+      expect(tenantBootstrapSchema.safeParse(data).success).toBe(false);
     });
 
     it('validates minimal bootstrap (just id, name, slug)', () => {

@@ -23,7 +23,6 @@ class MarketplaceConfigurationService
     // Config keys
     // =========================================================================
 
-    public const CONFIG_ENABLED = 'marketplace.enabled';
     public const CONFIG_ALLOW_SHIPPING = 'marketplace.allow_shipping';
     public const CONFIG_ALLOW_FREE_ITEMS = 'marketplace.allow_free_items';
     public const CONFIG_ALLOW_BUSINESS_SELLERS = 'marketplace.allow_business_sellers';
@@ -36,8 +35,6 @@ class MarketplaceConfigurationService
     public const CONFIG_ESCROW_AUTO_RELEASE_DAYS = 'marketplace.escrow_auto_release_days';
 
     public const CONFIG_MODERATION_ENABLED = 'marketplace.moderation_enabled';
-    public const CONFIG_DSA_COMPLIANCE = 'marketplace.dsa_compliance';
-    public const CONFIG_AUTO_APPROVE_TRUSTED = 'marketplace.auto_approve_trusted';
 
     public const CONFIG_PROMOTIONS_ENABLED = 'marketplace.promotions_enabled';
     public const CONFIG_BUMP_PRICE = 'marketplace.bump_price';
@@ -52,7 +49,6 @@ class MarketplaceConfigurationService
     // =========================================================================
 
     public const DEFAULTS = [
-        self::CONFIG_ENABLED                   => false,
         self::CONFIG_ALLOW_SHIPPING            => false,
         self::CONFIG_ALLOW_FREE_ITEMS          => true,
         self::CONFIG_ALLOW_BUSINESS_SELLERS    => true,
@@ -64,9 +60,7 @@ class MarketplaceConfigurationService
         self::CONFIG_PLATFORM_FEE_PERCENT      => 5,
         self::CONFIG_ESCROW_AUTO_RELEASE_DAYS  => 14,
 
-        self::CONFIG_MODERATION_ENABLED        => false,
-        self::CONFIG_DSA_COMPLIANCE            => false,
-        self::CONFIG_AUTO_APPROVE_TRUSTED      => false,
+        self::CONFIG_MODERATION_ENABLED        => true,
 
         self::CONFIG_PROMOTIONS_ENABLED        => false,
         self::CONFIG_BUMP_PRICE                => 5.00,
@@ -164,7 +158,7 @@ class MarketplaceConfigurationService
 
     public static function moderationEnabled(): bool
     {
-        return (bool) self::get(self::CONFIG_MODERATION_ENABLED);
+        return (bool) self::get(self::CONFIG_MODERATION_ENABLED, true);
     }
 
     public static function allowShipping(): bool
@@ -192,6 +186,16 @@ class MarketplaceConfigurationService
         return (bool) self::get(self::CONFIG_ALLOW_COMMUNITY_DELIVERY, false);
     }
 
+    public static function stripeEnabled(): bool
+    {
+        return (bool) self::get(self::CONFIG_STRIPE_ENABLED, false);
+    }
+
+    public static function promotionsEnabled(): bool
+    {
+        return (bool) self::get(self::CONFIG_PROMOTIONS_ENABLED, false);
+    }
+
     // =========================================================================
     // Internal helpers
     // =========================================================================
@@ -204,16 +208,23 @@ class MarketplaceConfigurationService
                     ->where('tenant_id', $tenantId)
                     ->where('setting_key', 'LIKE', 'marketplace.%')
                     ->get(['setting_key', 'setting_value', 'setting_type']);
-
-                $result = [];
-                foreach ($rows as $row) {
-                    $result[$row->setting_key] = self::castValue($row->setting_value, $row->setting_type ?? 'string');
-                }
-                return $result;
             } catch (\Throwable $e) {
-                Log::warning('MarketplaceConfigurationService: failed to load config', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
-                return [];
+                // Configuration governs publication, payments, and moderation.
+                // A transient read failure must not be indistinguishable from
+                // permissive defaults (for example, auto-approving a listing).
+                Log::error('MarketplaceConfigurationService: failed to load config', [
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+                throw $e;
             }
+
+            $result = [];
+            foreach ($rows as $row) {
+                $result[$row->setting_key] = self::castValue($row->setting_value, $row->setting_type ?? 'string');
+            }
+
+            return $result;
         });
     }
 

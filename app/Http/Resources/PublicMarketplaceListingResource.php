@@ -28,6 +28,71 @@ final class PublicMarketplaceListingResource
     }
 
     /**
+     * Add the opt-in public contract to a listing collection without issuing
+     * one detail query per item. Browse payloads intentionally omit several
+     * detail fields, so hydrate every missing record in one tenant-scoped read.
+     *
+     * @param array<int, mixed> $listings
+     * @return array<int, mixed>
+     */
+    public static function augmentCollection(array $listings): array
+    {
+        if (!self::shouldIncludePublicContract()) {
+            return $listings;
+        }
+
+        $ids = [];
+        foreach ($listings as $listing) {
+            if (!is_array($listing) || self::hasIndexDetailFields($listing)) {
+                continue;
+            }
+
+            $id = self::nullableInt($listing['id'] ?? null);
+            if ($id !== null) {
+                $ids[] = $id;
+            }
+        }
+
+        $details = $ids === []
+            ? collect()
+            : DB::table('marketplace_listings')
+                ->where('tenant_id', TenantContext::getId())
+                ->whereIn('id', array_values(array_unique($ids)))
+                ->get([
+                    'id',
+                    'description',
+                    'quantity',
+                    'latitude',
+                    'longitude',
+                    'shipping_available',
+                    'local_pickup',
+                    'expires_at',
+                    'updated_at',
+                ])
+                ->keyBy('id');
+
+        return array_map(static function (mixed $listing) use ($details): mixed {
+            if (!is_array($listing)) {
+                return $listing;
+            }
+
+            $id = self::nullableInt($listing['id'] ?? null);
+            $detail = $id === null ? null : $details->get($id);
+            if ($detail !== null) {
+                foreach ((array) $detail as $key => $value) {
+                    if (!array_key_exists($key, $listing) || $listing[$key] === null) {
+                        $listing[$key] = $value;
+                    }
+                }
+            }
+
+            $listing['public_contract'] = self::fromArray($listing);
+
+            return $listing;
+        }, $listings);
+    }
+
+    /**
      * @param array<string, mixed> $listing
      * @return array<string, mixed>
      */
@@ -51,12 +116,17 @@ final class PublicMarketplaceListingResource
             'category' => self::category($listing),
             'location' => [
                 'label' => self::nullableString($listing['location'] ?? null),
-                'latitude' => self::nullableFloat($listing['latitude'] ?? null),
-                'longitude' => self::nullableFloat($listing['longitude'] ?? null),
+                'latitude' => ($latitude = self::nullableFloat($listing['latitude'] ?? null)) !== null
+                    ? round($latitude, 2)
+                    : null,
+                'longitude' => ($longitude = self::nullableFloat($listing['longitude'] ?? null)) !== null
+                    ? round($longitude, 2)
+                    : null,
             ],
             'price' => [
                 'amount' => self::nullableFloat($listing['price'] ?? null),
-                'currency' => self::nullableString($listing['price_currency'] ?? null) ?? 'EUR',
+                'currency' => self::nullableString($listing['price_currency'] ?? null)
+                    ?? strtoupper(TenantContext::getCurrency()),
                 'price_type' => self::nullableString($listing['price_type'] ?? null) ?? 'fixed',
                 'time_credits' => self::nullableFloat($listing['time_credit_price'] ?? null),
             ],

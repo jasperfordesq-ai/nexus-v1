@@ -15,7 +15,7 @@ vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
     useTenant: () => ({
-      tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+      tenant: { id: 2, name: 'Test Tenant', slug: 'test', currency: 'GBP' },
       tenantPath: (p: string) => `/test${p}`,
       hasFeature: vi.fn(() => true),
       hasModule: vi.fn(() => true),
@@ -64,6 +64,8 @@ const mockStats = {
   pending_moderation: 5,
   total_orders: 100,
   revenue: 2500,
+  currency: 'GBP',
+  revenue_by_currency: [{ currency: 'GBP', total: 2500 }],
 };
 
 const mockListings = [
@@ -71,7 +73,7 @@ const mockListings = [
     id: 1,
     title: 'Test Listing',
     price: 9.99,
-    price_currency: '€',
+    price_currency: 'GBP',
     price_type: 'fixed',
     status: 'active',
     moderation_status: 'approved',
@@ -106,7 +108,9 @@ describe('MarketplaceAdmin', () => {
     render(<MarketplaceAdmin />);
 
     await waitFor(() => {
-      expect(screen.getAllByTestId('stat-card').length).toBeGreaterThan(0);
+      expect(screen.getByText('42')).toBeInTheDocument();
+      expect(screen.getByText('30')).toBeInTheDocument();
+      expect(screen.getByText('100')).toBeInTheDocument();
     });
 
     // Loading spinner should be gone after data loaded

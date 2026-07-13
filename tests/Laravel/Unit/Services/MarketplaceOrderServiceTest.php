@@ -7,16 +7,52 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use App\Services\MarketplaceOrderService;
 use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplaceSellerProfile;
+use App\Models\User;
+use App\Services\MarketplaceConfigurationService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
 class MarketplaceOrderServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TenantContext::setById($this->testTenantId);
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            true,
+        );
+    }
+
+    private function makePersistedOrder(string $status, array $attributes = []): MarketplaceOrder
+    {
+        $id = DB::table('marketplace_orders')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'order_number' => MarketplaceOrderService::generateOrderNumber($this->testTenantId),
+            'buyer_id' => 910001,
+            'seller_id' => 910002,
+            'marketplace_listing_id' => null,
+            'quantity' => 1,
+            'unit_price' => 10.00,
+            'total_price' => 10.00,
+            'currency' => 'EUR',
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $attributes));
+
+        return MarketplaceOrder::withoutGlobalScopes()->findOrFail($id);
+    }
+
     // -----------------------------------------------------------------
     //  createFromOffer — guard clause
     // -----------------------------------------------------------------
@@ -29,7 +65,7 @@ class MarketplaceOrderServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Offer must be accepted before creating an order');
 
-        MarketplaceOrderService::createFromOffer($offer);
+        MarketplaceOrderService::createFromOffer($offer, []);
     }
 
     public function test_createFromOffer_throwsWhenOfferIsDeclined(): void
@@ -40,7 +76,214 @@ class MarketplaceOrderServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Offer must be accepted');
 
-        MarketplaceOrderService::createFromOffer($offer);
+        MarketplaceOrderService::createFromOffer($offer, []);
+    }
+
+    public function test_createFromOffer_rejects_expired_accepted_offer(): void
+    {
+        $offer = Mockery::mock(MarketplaceOffer::class)->makePartial();
+        $offer->status = 'accepted';
+        $offer->expires_at = now()->subSecond();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(__('api.marketplace_offer_expired'));
+
+        MarketplaceOrderService::createFromOffer($offer, []);
+    }
+
+    public function test_positive_cash_checkout_rejects_when_tenant_stripe_is_disabled(): void
+    {
+        MarketplaceConfigurationService::set(
+            MarketplaceConfigurationService::CONFIG_STRIPE_ENABLED,
+            false,
+        );
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Stripe-disabled cash item',
+            'description' => 'Positive cash checkout must respect tenant configuration.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'inventory_count' => 1,
+            'quantity' => 1,
+            'local_pickup' => true,
+            'delivery_method' => 'pickup',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        try {
+            MarketplaceOrderService::createDirectPurchase((int) $buyer->id, $listingId, [
+                'listing_id' => $listingId,
+                'idempotency_key' => 'stripe-disabled-checkout',
+                'payment_method' => 'cash',
+                'shipping_method' => 'pickup',
+            ]);
+            $this->fail('Expected Stripe-disabled cash checkout to be rejected.');
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertSame(__('api.marketplace_stripe_disabled'), $exception->getMessage());
+        }
+
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+        ]);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'inventory_count' => 1,
+        ]);
+    }
+
+    public function test_createFromOffer_releases_reservation_for_unlimited_inventory_listing(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        DB::table('marketplace_seller_profiles')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'seller_type' => 'private',
+            'stripe_account_id' => 'acct_order_service_ready',
+            'stripe_onboarding_complete' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Unlimited offer listing',
+            'description' => 'Accepted offers must not sell out NULL inventory.',
+            'price' => 8.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'inventory_count' => null,
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'reserved',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offer = new MarketplaceOffer();
+        $offer->tenant_id = $this->testTenantId;
+        $offer->marketplace_listing_id = $listingId;
+        $offer->buyer_id = $buyer->id;
+        $offer->seller_id = $seller->id;
+        $offer->amount = 8.00;
+        $offer->currency = 'EUR';
+        $offer->status = 'accepted';
+        $offer->accepted_at = now();
+        $offer->expires_at = now()->addHour();
+        $offer->save();
+
+        $order = MarketplaceOrderService::createFromOffer($offer, [
+            'listing_id' => $listingId,
+            'idempotency_key' => 'offer-unlimited-inventory-' . $offer->id,
+            'payment_method' => 'cash',
+            'shipping_method' => 'pickup',
+        ]);
+
+        $this->assertSame($listingId, (int) $order->marketplace_listing_id);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'active',
+            'inventory_count' => null,
+        ]);
+    }
+
+    public function test_createFromOffer_can_retry_after_cancelled_unpaid_attempt(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $buyer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        DB::table('marketplace_seller_profiles')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'seller_type' => 'private',
+            'stripe_account_id' => 'acct_order_retry_ready',
+            'stripe_onboarding_complete' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $listingId = (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Retryable accepted offer',
+            'description' => 'A cancelled checkout must not consume the accepted offer forever.',
+            'price' => 12.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'inventory_count' => null,
+            'quantity' => 1,
+            'local_pickup' => true,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'reserved',
+            'moderation_status' => 'approved',
+            'expires_at' => now()->addDay(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $offer = MarketplaceOffer::create([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'amount' => 12.00,
+            'currency' => 'EUR',
+            'status' => 'accepted',
+            'accepted_at' => now(),
+            'expires_at' => now()->addHour(),
+        ]);
+        $data = [
+            'listing_id' => $listingId,
+            'idempotency_key' => 'accepted-offer-retry-' . $offer->id,
+            'payment_method' => 'cash',
+            'shipping_method' => 'pickup',
+        ];
+
+        $first = MarketplaceOrderService::createFromOffer($offer, $data);
+        MarketplaceOrderService::cancel($first, 'payment_expired');
+        $second = MarketplaceOrderService::createFromOffer($offer->fresh(), $data);
+
+        $this->assertNotSame((int) $first->id, (int) $second->id);
+        $this->assertSame('pending_payment', (string) $second->status);
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $first->id,
+            'status' => 'cancelled',
+            'marketplace_offer_id' => null,
+            'checkout_key' => null,
+        ]);
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $second->id,
+            'marketplace_offer_id' => $offer->id,
+        ]);
     }
 
     // -----------------------------------------------------------------
@@ -49,8 +292,7 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_markShipped_throwsWhenOrderNotPaid(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'pending_payment';
+        $order = $this->makePersistedOrder('pending_payment');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Order must be paid before marking as shipped');
@@ -58,12 +300,9 @@ class MarketplaceOrderServiceTest extends TestCase
         MarketplaceOrderService::markShipped($order, []);
     }
 
-    public function test_markShipped_setsStatusAndTrackingInfo(): void
+    public function test_markShipped_sets_tracking_without_overwriting_checkout_shipping_method(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'paid';
-        $order->shipping_method = null;
-        $order->shouldReceive('save')->once();
+        $order = $this->makePersistedOrder('paid', ['shipping_method' => 'pickup']);
 
         $result = MarketplaceOrderService::markShipped($order, [
             'shipping_method' => 'express',
@@ -74,16 +313,13 @@ class MarketplaceOrderServiceTest extends TestCase
         $this->assertEquals('shipped', $result->status);
         $this->assertEquals('TRACK123', $result->tracking_number);
         $this->assertEquals('https://track.example.com/TRACK123', $result->tracking_url);
-        $this->assertEquals('express', $result->shipping_method);
+        $this->assertEquals('pickup', $result->shipping_method);
         $this->assertNotNull($result->seller_confirmed_at);
     }
 
     public function test_markShipped_keepsExistingShippingMethodWhenNotProvided(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'paid';
-        $order->shipping_method = 'standard';
-        $order->shouldReceive('save')->once();
+        $order = $this->makePersistedOrder('paid', ['shipping_method' => 'standard']);
 
         $result = MarketplaceOrderService::markShipped($order, [
             'tracking_number' => 'TR456',
@@ -94,14 +330,37 @@ class MarketplaceOrderServiceTest extends TestCase
         $this->assertEquals('TR456', $result->tracking_number);
     }
 
+    public function test_markShipped_cannot_overwrite_a_concurrent_refund(): void
+    {
+        $staleOrder = $this->makePersistedOrder('paid');
+        DB::table('marketplace_orders')->where('id', $staleOrder->id)->update([
+            'status' => 'refunded',
+            'updated_at' => now(),
+        ]);
+
+        try {
+            MarketplaceOrderService::markShipped($staleOrder, []);
+            $this->fail('Expected the locked status re-check to reject the transition.');
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertSame(
+                __('api.marketplace_order_paid_before_shipping'),
+                $exception->getMessage(),
+            );
+        }
+
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $staleOrder->id,
+            'status' => 'refunded',
+        ]);
+    }
+
     // -----------------------------------------------------------------
     //  confirmDelivery
     // -----------------------------------------------------------------
 
     public function test_confirmDelivery_throwsWhenOrderInPendingPayment(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'pending_payment';
+        $order = $this->makePersistedOrder('pending_payment');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Order must be shipped or paid');
@@ -111,9 +370,7 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_confirmDelivery_setsDeliveredStatusWithAutoComplete(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'shipped';
-        $order->shouldReceive('save')->once();
+        $order = $this->makePersistedOrder('shipped');
 
         $result = MarketplaceOrderService::confirmDelivery($order);
 
@@ -125,13 +382,35 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_confirmDelivery_worksForPaidStatusToo(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'paid';
-        $order->shouldReceive('save')->once();
+        $order = $this->makePersistedOrder('paid');
 
         $result = MarketplaceOrderService::confirmDelivery($order);
 
         $this->assertEquals('delivered', $result->status);
+    }
+
+    public function test_confirmDelivery_cannot_overwrite_a_concurrent_dispute(): void
+    {
+        $staleOrder = $this->makePersistedOrder('shipped');
+        DB::table('marketplace_orders')->where('id', $staleOrder->id)->update([
+            'status' => 'disputed',
+            'updated_at' => now(),
+        ]);
+
+        try {
+            MarketplaceOrderService::confirmDelivery($staleOrder);
+            $this->fail('Expected the locked status re-check to reject the transition.');
+        } catch (\InvalidArgumentException $exception) {
+            $this->assertSame(
+                __('api.marketplace_order_delivery_state_invalid'),
+                $exception->getMessage(),
+            );
+        }
+
+        $this->assertDatabaseHas('marketplace_orders', [
+            'id' => $staleOrder->id,
+            'status' => 'disputed',
+        ]);
     }
 
     // -----------------------------------------------------------------
@@ -140,8 +419,7 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_cancel_throwsWhenOrderAlreadyShipped(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'shipped';
+        $order = $this->makePersistedOrder('shipped');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Only an unpaid order can be cancelled');
@@ -151,8 +429,7 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_cancel_throwsWhenOrderIsCompleted(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'completed';
+        $order = $this->makePersistedOrder('completed');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Only an unpaid order can be cancelled');
@@ -162,8 +439,7 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_cancel_throwsWhenOrderIsRefunded(): void
     {
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'refunded';
+        $order = $this->makePersistedOrder('refunded');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Only an unpaid order can be cancelled');
@@ -175,8 +451,7 @@ class MarketplaceOrderServiceTest extends TestCase
     {
         // A paid order must be refunded, not cancelled — cancel() moves no money,
         // so voiding it would leave the buyer charged with no goods and no refund.
-        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
-        $order->status = 'paid';
+        $order = $this->makePersistedOrder('paid');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Only an unpaid order can be cancelled');
@@ -254,29 +529,18 @@ class MarketplaceOrderServiceTest extends TestCase
 
     public function test_generateOrderNumber_format(): void
     {
-        // Test the format directly: MKT-XXXXXX (6-digit zero-padded)
-        $format = 'MKT-' . str_pad('1', 6, '0', STR_PAD_LEFT);
-        $this->assertEquals('MKT-000001', $format);
+        $orderNumber = MarketplaceOrderService::generateOrderNumber($this->testTenantId);
 
-        $format42 = 'MKT-' . str_pad('42', 6, '0', STR_PAD_LEFT);
-        $this->assertEquals('MKT-000042', $format42);
-
-        $format999999 = 'MKT-' . str_pad('999999', 6, '0', STR_PAD_LEFT);
-        $this->assertEquals('MKT-999999', $format999999);
+        $this->assertMatchesRegularExpression('/^MKT-[0-9A-HJKMNP-TV-Z]{26}$/', $orderNumber);
     }
 
-    public function test_generateOrderNumber_incrementsFromRegex(): void
+    public function test_generateOrderNumber_isUniqueWithoutReadingPreviousOrders(): void
     {
-        // Verify the regex extraction logic used in generateOrderNumber
-        $orderNumber = 'MKT-000042';
-        preg_match('/MKT-(\d+)/', $orderNumber, $matches);
+        $numbers = [];
+        for ($i = 0; $i < 100; $i++) {
+            $numbers[] = MarketplaceOrderService::generateOrderNumber($this->testTenantId);
+        }
 
-        $this->assertEquals('000042', $matches[1]);
-        $this->assertEquals(42, (int) $matches[1]);
-        $nextNumber = (int) $matches[1] + 1;
-        $this->assertEquals(43, $nextNumber);
-
-        $nextFormatted = 'MKT-' . str_pad((string) $nextNumber, 6, '0', STR_PAD_LEFT);
-        $this->assertEquals('MKT-000043', $nextFormatted);
+        $this->assertCount(100, array_unique($numbers));
     }
 }

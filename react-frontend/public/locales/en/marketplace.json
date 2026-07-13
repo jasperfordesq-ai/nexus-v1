@@ -835,6 +835,9 @@
     "start_error": "Failed to start onboarding"
   },
   "checkout": {
+    "payment_method_label": "Choose how to pay",
+    "pay_with_money": "Pay {{amount}}",
+    "pay_with_time_credits": "Pay with {{count}} time credits",
     "title": "Secure Checkout",
     "order_summary": "Order Summary",
     "shipping": "Shipping",

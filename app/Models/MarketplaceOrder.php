@@ -27,15 +27,20 @@ class MarketplaceOrder extends Model
         'seller_id',
         'marketplace_listing_id',
         'marketplace_offer_id',
+        'checkout_key',
+        'checkout_fingerprint',
         'quantity',
         'unit_price',
         'total_price',
         'currency',
         'time_credits_used',
         'status',
+        'stripe_checkout_mode',
         'payment_intent_id',
+        'checkout_session_id',
         'escrow_released_at',
         'shipping_method',
+        'shipping_option_id',
         'shipping_cost',
         'tracking_number',
         'tracking_url',
@@ -46,6 +51,10 @@ class MarketplaceOrder extends Model
         'auto_complete_at',
         'cancelled_at',
         'cancellation_reason',
+        'payment_expires_at',
+        'wallet_transaction_id',
+        'wallet_refund_transaction_id',
+        'loyalty_redemption_id',
     ];
 
     /**
@@ -64,11 +73,16 @@ class MarketplaceOrder extends Model
         'seller_confirmed_at' => 'datetime',
         'auto_complete_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'payment_expires_at' => 'datetime',
         'quantity' => 'integer',
         'buyer_id' => 'integer',
         'seller_id' => 'integer',
         'marketplace_listing_id' => 'integer',
         'marketplace_offer_id' => 'integer',
+        'shipping_option_id' => 'integer',
+        'wallet_transaction_id' => 'integer',
+        'wallet_refund_transaction_id' => 'integer',
+        'loyalty_redemption_id' => 'integer',
     ];
 
     // ---------------------------------------------------------------

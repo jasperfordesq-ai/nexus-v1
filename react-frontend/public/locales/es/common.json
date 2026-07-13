@@ -1528,6 +1528,7 @@
       "all_listings": "Todos mis anuncios",
       "specific_listings": "Anuncios específicos",
       "specific_categories": "Categorías específicas",
+      "target_required": "Elige al menos un anuncio o una categoría",
       "save": "Guardar",
       "delete_confirm": "¿Eliminar este cupón? Esta acción no se puede deshacer.",
       "no_coupons": "Aún no has creado cupones.",

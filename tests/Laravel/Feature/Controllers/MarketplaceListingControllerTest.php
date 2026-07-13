@@ -20,6 +20,23 @@ class MarketplaceListingControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function test_csv_import_row_errors_are_translated_in_every_locale(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/MarketplaceListingController.php'));
+        foreach ([
+            'marketplace_listing_csv_import_limit',
+            'marketplace_listing_csv_column_mismatch',
+            'marketplace_listing_csv_required_fields',
+            'marketplace_listing_csv_length_limit',
+        ] as $key) {
+            $this->assertStringContainsString("__('api.{$key}'", $source);
+            foreach (glob(base_path('lang/*/api.php')) ?: [] as $translationFile) {
+                $translations = require $translationFile;
+                $this->assertArrayHasKey($key, $translations, $translationFile);
+            }
+        }
+    }
+
     private function authenticatedUser(): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
@@ -99,6 +116,124 @@ class MarketplaceListingControllerTest extends TestCase
     {
         $response = $this->apiPost('/v2/marketplace/listings', []);
         $this->assertContains($response->status(), [401, 403]);
+    }
+
+    public function test_store_rejects_category_owned_by_another_tenant(): void
+    {
+        $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
+        $foreignCategoryId = (int) DB::table('marketplace_categories')->insertGetId([
+            'tenant_id' => 999,
+            'name' => 'Foreign category',
+            'slug' => 'foreign-category-' . uniqid(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/marketplace/listings', [
+            'title' => 'Invalid category listing',
+            'description' => 'Must not retain a category from another tenant.',
+            'price_type' => 'free',
+            'category_id' => $foreignCategoryId,
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertNotEmpty($response->json('errors.0.details.category_id'));
+    }
+
+    public function test_store_accepts_active_global_category(): void
+    {
+        $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
+        $globalCategoryId = (int) DB::table('marketplace_categories')->insertGetId([
+            'tenant_id' => null,
+            'name' => 'Global category',
+            'slug' => 'global-category-' . uniqid(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/marketplace/listings', [
+            'title' => 'Global category listing',
+            'description' => 'System categories remain available to every tenant.',
+            'price_type' => 'free',
+            'category_id' => $globalCategoryId,
+        ]);
+
+        $response->assertCreated();
+        $this->assertDatabaseHas('marketplace_listings', [
+            'tenant_id' => $this->testTenantId,
+            'category_id' => $globalCategoryId,
+        ]);
+    }
+
+    public function test_store_returns_validation_error_for_unsupported_payment_currency(): void
+    {
+        $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/marketplace/listings', [
+            'title' => 'Unsupported currency listing',
+            'description' => 'Cash listings must use a currency the payment provider supports.',
+            'price' => 25,
+            'price_currency' => 'ZZZ',
+            'price_type' => 'fixed',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertSame('VALIDATION_ERROR', $response->json('errors.0.code'));
+    }
+
+    public function test_suspended_seller_cannot_reactivate_a_draft_with_bulk_tools(): void
+    {
+        $this->enableMarketplaceFeature();
+        $seller = $this->authenticatedUser();
+        DB::table('marketplace_seller_profiles')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'display_name' => 'Suspended seller',
+            'seller_type' => 'private',
+            'is_suspended' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $listingId = $this->createMarketplaceListing(
+            $seller,
+            $this->createMarketplaceCategory('Suspended drafts'),
+            ['status' => 'draft']
+        );
+
+        $response = $this->apiPost('/v2/marketplace/listings/bulk-action', [
+            'listing_ids' => [$listingId],
+            'action' => 'activate',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertSame('SELLER_SUSPENDED', $response->json('errors.0.code'));
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_removed_listing_cannot_be_resurrected_by_renewal(): void
+    {
+        $this->enableMarketplaceFeature();
+        $seller = $this->authenticatedUser();
+        $listingId = $this->createMarketplaceListing(
+            $seller,
+            $this->createMarketplaceCategory('Removed listings'),
+            ['status' => 'removed']
+        );
+
+        $this->apiPost("/v2/marketplace/listings/{$listingId}/renew", ['duration_days' => 30])
+            ->assertStatus(422);
+        $this->assertDatabaseHas('marketplace_listings', [
+            'id' => $listingId,
+            'status' => 'removed',
+        ]);
     }
 
     public function test_savedListings_requires_auth(): void
@@ -350,6 +485,40 @@ class MarketplaceListingControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertSame([], $response->json('data'));
         $response->assertJsonPath('meta.has_more', false);
+    }
+
+    public function test_nearby_uses_documented_query_names_and_returns_only_rounded_public_coordinates(): void
+    {
+        $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $categoryId = $this->createMarketplaceCategory('Nearby repairs');
+        $listingId = $this->createMarketplaceListing($seller, $categoryId, [
+            'title' => 'Nearby repair drill',
+            'latitude' => 53.349805,
+            'longitude' => -6.26031,
+        ]);
+
+        $response = $this->apiGet(
+            '/v2/marketplace/listings/nearby'
+            . '?latitude=53.35&longitude=-6.26&radius=5&q=drill'
+            . "&category_id={$categoryId}"
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.id', $listingId);
+        $response->assertJsonPath('data.0.latitude', 53.35);
+        $response->assertJsonPath('data.0.longitude', -6.26);
+        $this->assertNotSame(53.349805, $response->json('data.0.latitude'));
+        $this->assertNotSame(-6.26031, $response->json('data.0.longitude'));
+
+        $legacyNames = $this->apiGet(
+            '/v2/marketplace/listings/nearby?lat=53.35&lng=-6.26&radius_km=5'
+        );
+        $legacyNames->assertStatus(422);
     }
 
     public function test_savedListings_authenticated_smoke(): void

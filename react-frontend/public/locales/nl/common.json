@@ -1518,6 +1518,7 @@
       "all_listings": "Al mijn advertenties",
       "specific_listings": "Specifieke advertenties",
       "specific_categories": "Specifieke categorieën",
+      "target_required": "Kies ten minste één advertentie of categorie",
       "save": "Opslaan",
       "delete_confirm": "Deze kortingsbon verwijderen? Dit kan niet ongedaan worden gemaakt.",
       "no_coupons": "Je hebt nog geen kortingsbonnen aangemaakt.",

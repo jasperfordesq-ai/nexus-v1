@@ -835,6 +835,9 @@
     "start_error": "Onboarding konnte nicht gestartet werden"
   },
   "checkout": {
+    "payment_method_label": "Zahlungsart wählen",
+    "pay_with_money": "{{amount}} bezahlen",
+    "pay_with_time_credits": "Mit {{count}} Zeitguthaben bezahlen",
     "title": "Sicherer Checkout",
     "order_summary": "Bestellübersicht",
     "shipping": "Versand",

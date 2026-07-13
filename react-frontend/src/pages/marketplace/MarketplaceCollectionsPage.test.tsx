@@ -41,6 +41,19 @@ vi.mock('@/components/ui', async (importOriginal) => {
   };
 });
 
+vi.mock('@/components/ui/Modal', () => ({
+  Modal: ({ isOpen, children }: { isOpen?: boolean; children?: React.ReactNode }) =>
+    isOpen ? <div data-testid="modal-root">{children}</div> : null,
+  ModalContent: ({ children }: { children?: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
+    <div role="dialog" aria-label="Dialog" aria-modal="true">
+      {typeof children === 'function' ? children(() => {}) : children}
+    </div>
+  ),
+  ModalHeader: ({ children }: { children?: React.ReactNode }) => <div data-testid="modal-header">{children}</div>,
+  ModalBody: ({ children }: { children?: React.ReactNode }) => <div data-testid="modal-body">{children}</div>,
+  ModalFooter: ({ children }: { children?: React.ReactNode }) => <div data-testid="modal-footer">{children}</div>,
+}));
+
 // ─── Stub heavy marketplace child components ──────────────────────────────────
 vi.mock('@/components/marketplace', () => ({
   CollectionCard: ({
@@ -371,6 +384,32 @@ describe('MarketplaceCollectionsPage', () => {
       const heading = screen.queryByRole('heading');
       expect(heading).toBeDefined();
     });
+  });
+
+  it('formats collection prices using their currency precision', async () => {
+    const jpyItem = makeCollectionItem({
+      listing: {
+        id: 8,
+        title: 'Japanese print',
+        price: 2500,
+        price_type: 'fixed',
+        price_currency: 'JPY',
+        image: null,
+      },
+    });
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/saved-searches')) return Promise.resolve(makeResponse([]));
+      if (url.includes('/items')) return Promise.resolve(makeResponse([jpyItem]));
+      return Promise.resolve(makeResponse([makeCollection()]));
+    });
+
+    const { MarketplaceCollectionsPage } = await import('./MarketplaceCollectionsPage');
+    render(<MarketplaceCollectionsPage />);
+    await waitFor(() => screen.getByTestId('collection-card-1'));
+    fireEvent.click(screen.getByTestId('collection-card-1'));
+
+    const price = await screen.findByText((content) => /2[,.]500/.test(content));
+    expect(price.textContent).not.toMatch(/[,.]00(?:\D|$)/);
   });
 
   it('renders saved searches when present', async () => {

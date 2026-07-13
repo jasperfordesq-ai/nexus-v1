@@ -23,6 +23,7 @@ class MarketplacePayment extends Model
         'order_id',
         'stripe_payment_intent_id',
         'stripe_charge_id',
+        'funds_flow',
         'amount',
         'currency',
         'platform_fee',
@@ -35,6 +36,9 @@ class MarketplacePayment extends Model
         'payout_status',
         'payout_id',
         'paid_out_at',
+        'stripe_dispute_id',
+        'stripe_dispute_status',
+        'dispute_previous_order_status',
     ];
 
     protected $hidden = ['tenant_id'];

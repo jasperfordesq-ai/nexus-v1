@@ -11,8 +11,11 @@ use App\I18n\LocaleContext;
 use App\Models\MarketplaceEscrow;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
+use App\Models\MarketplaceSellerProfile;
 use App\Models\Notification;
+use App\Support\StripeCurrency;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -40,6 +43,15 @@ class MarketplaceEscrowService
      */
     public static function holdFunds(MarketplaceOrder $order, MarketplacePayment $payment): MarketplaceEscrow
     {
+        if ($payment->funds_flow !== 'separate_charge_transfer') {
+            throw new \InvalidArgumentException(
+                __('api.marketplace_escrow_separate_charge_required'),
+            );
+        }
+        if (! in_array($payment->status, ['succeeded', 'partially_refunded'], true)
+            || empty($payment->stripe_charge_id)) {
+            throw new \InvalidArgumentException(__('api.marketplace_escrow_captured_charge_required'));
+        }
         // Idempotency: check if escrow already exists for this order
         $existing = MarketplaceEscrow::where('order_id', $order->id)->first();
         if ($existing) {
@@ -90,50 +102,193 @@ class MarketplaceEscrowService
      */
     public static function releaseFunds(MarketplaceEscrow $escrow, string $trigger): void
     {
+        $tenantId = (int) ($escrow->tenant_id ?: TenantContext::getId());
+        try {
+            Cache::lock("marketplace-money-movement:{$tenantId}:{$escrow->payment_id}", 180)
+                ->block(10, static function () use ($escrow, $trigger): void {
+                    self::releaseFundsLocked($escrow, $trigger);
+                });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $exception) {
+            throw new \RuntimeException(__('api.marketplace_payout_processing'), previous: $exception);
+        }
+    }
+
+    /** Release funds while holding the cross-process payment movement claim. */
+    private static function releaseFundsLocked(MarketplaceEscrow $escrow, string $trigger): void
+    {
+        if ($escrow->status === 'released') {
+            return;
+        }
         if ($escrow->status !== 'held') {
-            throw new \InvalidArgumentException("Escrow is not in 'held' status. Current: {$escrow->status}");
+            throw new \InvalidArgumentException(__('api.marketplace_escrow_not_held', ['status' => $escrow->status]));
         }
 
         $validTriggers = ['buyer_confirmed', 'auto_timeout', 'admin_override', 'dispute_resolved'];
         if (!in_array($trigger, $validTriggers, true)) {
-            throw new \InvalidArgumentException("Invalid release trigger: {$trigger}");
+            throw new \InvalidArgumentException(__('api.marketplace_escrow_invalid_release_trigger', ['trigger' => $trigger]));
         }
 
-        DB::transaction(function () use ($escrow, $trigger) {
-            // Atomic claim — the in-memory 'held' check above can race
-            // (buyer confirm vs auto-release cron). Exactly one caller wins;
-            // the loser throws like the fast-path check (cron catches per-item).
-            $claimed = MarketplaceEscrow::query()
+        $tenantId = (int) ($escrow->tenant_id ?: TenantContext::getId());
+        $context = DB::transaction(function () use ($escrow, $tenantId, $trigger): array {
+            $lockedEscrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
                 ->whereKey($escrow->id)
-                ->where('status', 'held')
-                ->update([
-                    'status' => 'released',
-                    'released_at' => now(),
-                    'release_trigger' => $trigger,
-                ]);
+                ->lockForUpdate()
+                ->firstOrFail();
+            $payment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($lockedEscrow->payment_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $order = MarketplaceOrder::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($lockedEscrow->order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            if ($claimed === 0) {
-                throw new \InvalidArgumentException("Escrow is not in 'held' status. Current: released");
+            if ($lockedEscrow->status === 'released' && $payment->payout_id) {
+                return [$lockedEscrow, $payment, $order, true];
+            }
+            if ($lockedEscrow->status !== 'held') {
+                throw new \InvalidArgumentException(
+                    __('api.marketplace_escrow_not_held', ['status' => $lockedEscrow->status]),
+                );
+            }
+            $hasActiveDispute = DB::table('marketplace_disputes')
+                ->where('tenant_id', $tenantId)
+                ->where('order_id', $lockedEscrow->order_id)
+                ->whereIn('status', ['open', 'under_review', 'escalated'])
+                ->exists();
+            if ($hasActiveDispute) {
+                throw new \InvalidArgumentException(__('api.marketplace_escrow_dispute_active'));
+            }
+            if ($trigger === 'auto_timeout'
+                && ($order->status !== 'delivered'
+                    || $order->auto_complete_at === null
+                    || $order->auto_complete_at->isFuture()
+                    || $lockedEscrow->release_after === null
+                    || $lockedEscrow->release_after->isFuture())) {
+                throw new \InvalidArgumentException(__('api.marketplace_escrow_transfer_ineligible'));
+            }
+            if ($payment->funds_flow !== 'separate_charge_transfer'
+                || ! in_array($payment->status, ['succeeded', 'partially_refunded'], true)
+                || empty($payment->stripe_charge_id)) {
+                throw new \RuntimeException(__('api.marketplace_escrow_transfer_ineligible'));
             }
 
-            $escrow->refresh();
-
-            // Update the payment's payout status
-            $payment = $escrow->payment;
-            if ($payment) {
-                $payment->payout_status = 'paid';
-                $payment->paid_out_at = now();
-                $payment->save();
-            }
-
-            // Complete the order if it's in a completable state.
-            // Delegates to MarketplaceOrderService::complete() which handles
-            // the status transition and seller stats (with double-completion guard).
-            $order = $escrow->order;
-            if ($order && in_array($order->status, ['delivered', 'paid', 'shipped'], true)) {
-                MarketplaceOrderService::complete($order);
-            }
+            $payment->payout_status = 'scheduled';
+            $payment->save();
+            return [$lockedEscrow, $payment, $order, false];
         });
+
+        /** @var MarketplaceEscrow $claimedEscrow */
+        /** @var MarketplacePayment $payment */
+        /** @var MarketplaceOrder $order */
+        [$claimedEscrow, $payment, $order, $alreadyReleased] = $context;
+        if ($alreadyReleased) {
+            return;
+        }
+
+        $sellerProfile = MarketplaceSellerProfile::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $order->seller_id)
+            ->first();
+        if (! $sellerProfile || ! $sellerProfile->stripe_onboarding_complete
+            || empty($sellerProfile->stripe_account_id)) {
+            MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($payment->id)
+                ->where('payout_status', 'scheduled')
+                ->update(['payout_status' => 'failed']);
+            throw new \RuntimeException(__('api.marketplace_escrow_seller_payout_unavailable'));
+        }
+
+        $client = StripeService::client();
+        try {
+            $transfer = $client->transfers->create([
+                'amount' => StripeCurrency::toMinor(
+                    (float) $claimedEscrow->amount,
+                    (string) $claimedEscrow->currency,
+                ),
+                'currency' => strtolower((string) $claimedEscrow->currency),
+                'destination' => $sellerProfile->stripe_account_id,
+                'source_transaction' => $payment->stripe_charge_id,
+                'transfer_group' => 'marketplace_order_' . $order->id,
+                'metadata' => [
+                    'nexus_tenant_id' => (string) $tenantId,
+                    'nexus_order_id' => (string) $order->id,
+                    'nexus_payment_id' => (string) $payment->id,
+                    'nexus_type' => 'marketplace_payout',
+                ],
+            ], [
+                'idempotency_key' => "marketplace-payout-{$tenantId}-{$payment->id}",
+            ]);
+        } catch (\Throwable $exception) {
+            MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($payment->id)
+                ->where('payout_status', 'scheduled')
+                ->update(['payout_status' => 'failed']);
+            Log::error('MarketplaceEscrow: Stripe transfer failed', [
+                'escrow_id' => $escrow->id,
+                'payment_id' => $payment->id,
+                'order_id' => $order->id,
+                'error' => $exception->getMessage(),
+            ]);
+            throw new \RuntimeException(__('api.marketplace_payout_failed'));
+        }
+
+        $stateChangedAfterTransfer = false;
+        DB::transaction(function () use (
+            $claimedEscrow,
+            $payment,
+            $trigger,
+            $transfer,
+            $tenantId,
+            &$stateChangedAfterTransfer,
+        ): void {
+            $lockedEscrow = MarketplaceEscrow::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($claimedEscrow->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            $lockedPayment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+            if ($lockedEscrow->status === 'released'
+                && $lockedPayment->payout_status === 'paid'
+                && (string) $lockedPayment->payout_id === (string) $transfer->id) {
+                return;
+            }
+            // Persist the remote transfer identity before interpreting any
+            // concurrently changed escrow state. This makes compensation and
+            // webhook recovery possible even if another state transition won.
+            $lockedPayment->payout_status = 'paid';
+            $lockedPayment->payout_id = (string) $transfer->id;
+            $lockedPayment->paid_out_at = now();
+            $lockedPayment->save();
+
+            if ($lockedEscrow->status !== 'held') {
+                $stateChangedAfterTransfer = true;
+                return;
+            }
+
+            $lockedEscrow->status = 'released';
+            $lockedEscrow->released_at = now();
+            $lockedEscrow->release_trigger = $trigger;
+            $lockedEscrow->save();
+        });
+        if ($stateChangedAfterTransfer) {
+            throw new \RuntimeException(__('api.marketplace_escrow_state_changed'));
+        }
+
+        $escrow->refresh();
+        $order->refresh();
+        if (in_array($order->status, ['delivered', 'paid', 'shipped'], true)) {
+            MarketplaceOrderService::complete($order);
+        }
 
         Log::info('MarketplaceEscrow: funds released', [
             'escrow_id' => $escrow->id,
@@ -190,10 +345,21 @@ class MarketplaceEscrowService
     public static function refundEscrow(MarketplaceEscrow $escrow): void
     {
         if (!in_array($escrow->status, ['held', 'disputed'], true)) {
-            throw new \InvalidArgumentException("Escrow cannot be refunded from status: {$escrow->status}");
+            throw new \InvalidArgumentException(__('api.marketplace_escrow_refund_status_invalid', ['status' => $escrow->status]));
         }
 
         DB::transaction(function () use ($escrow) {
+            $payment = MarketplacePayment::withoutGlobalScopes()
+                ->where('tenant_id', $escrow->tenant_id)
+                ->whereKey($escrow->payment_id)
+                ->lockForUpdate()
+                ->first();
+            if ($payment && in_array($payment->payout_status, ['scheduled', 'paid'], true)) {
+                throw new \InvalidArgumentException(
+                    __('api.marketplace_escrow_payout_refund_flow_required'),
+                );
+            }
+
             // Atomic claim — the in-memory status check above can race a
             // concurrent releaseFunds() (buyer confirm / auto-release cron).
             // An unconditional save() here would overwrite 'released' with
@@ -210,13 +376,12 @@ class MarketplaceEscrowService
 
             if ($claimed === 0) {
                 $escrow->refresh();
-                throw new \InvalidArgumentException("Escrow cannot be refunded from status: {$escrow->status}");
+                throw new \InvalidArgumentException(__('api.marketplace_escrow_refund_status_invalid', ['status' => $escrow->status]));
             }
 
             $escrow->refresh();
 
             // Update payment payout status
-            $payment = $escrow->payment;
             if ($payment) {
                 $payment->payout_status = 'failed';
                 $payment->save();
@@ -261,22 +426,28 @@ class MarketplaceEscrowService
                 $hasDispute = DB::table('marketplace_disputes')
                     ->where('tenant_id', $escrow->tenant_id)
                     ->where('order_id', $escrow->order_id)
-                    ->where('status', 'open')
+                    ->whereIn('status', ['open', 'under_review', 'escalated'])
                     ->exists();
 
                 if ($hasDispute) {
-                    // Mark escrow as disputed instead of releasing — conditional
-                    // so a concurrent refund/release isn't clobbered back to
-                    // 'disputed' by this unconditional cron write.
-                    MarketplaceEscrow::query()
-                        ->whereKey($escrow->id)
-                        ->where('status', 'held')
-                        ->update(['status' => 'disputed']);
-
                     Log::info('MarketplaceEscrow: auto-release blocked by open dispute', [
                         'escrow_id' => $escrow->id,
                         'order_id' => $escrow->order_id,
                     ]);
+                    continue;
+                }
+
+                // Payment age alone is not delivery evidence. Auto-release is
+                // eligible only after the buyer-confirmed completion window;
+                // admin/dispute release triggers remain available separately.
+                $orderReady = DB::table('marketplace_orders')
+                    ->where('tenant_id', $escrow->tenant_id)
+                    ->where('id', $escrow->order_id)
+                    ->where('status', 'delivered')
+                    ->whereNotNull('auto_complete_at')
+                    ->where('auto_complete_at', '<=', now())
+                    ->exists();
+                if (! $orderReady) {
                     continue;
                 }
 

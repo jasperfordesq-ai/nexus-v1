@@ -19,7 +19,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useTenant, useToast } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
@@ -41,6 +41,12 @@ interface FormState {
   valid_until: string;
   status: Status;
   applies_to: AppliesTo;
+  applies_to_ids: string[];
+}
+
+interface CouponTarget {
+  id: number;
+  label: string;
 }
 
 const initialState: FormState = {
@@ -56,6 +62,7 @@ const initialState: FormState = {
   valid_until: '',
   status: 'draft',
   applies_to: 'all_listings',
+  applies_to_ids: [],
 };
 
 export default function SellerCouponEditPage() {
@@ -64,12 +71,15 @@ export default function SellerCouponEditPage() {
   const { t } = useTranslation('common');
   const toast = useToast();
   const { tenantPath } = useTenant();
+  const { user } = useAuth();
   const isEdit = Boolean(id);
   usePageTitle(isEdit ? t('coupon.seller.edit_title') : t('coupon.seller.create_title'));
 
   const [form, setForm] = useState<FormState>(initialState);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [targets, setTargets] = useState<CouponTarget[]>([]);
+  const [targetsLoading, setTargetsLoading] = useState(false);
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -95,6 +105,9 @@ export default function SellerCouponEditPage() {
           valid_until: c.valid_until ? String(c.valid_until).slice(0, 16) : '',
           status: (c.status as Status) ?? 'draft',
           applies_to: (c.applies_to as AppliesTo) ?? 'all_listings',
+          applies_to_ids: Array.isArray(c.applies_to_ids)
+            ? c.applies_to_ids.map((targetId) => String(targetId))
+            : [],
         });
       } catch (err) {
         logError('SellerCouponEditPage.load', err);
@@ -107,8 +120,56 @@ export default function SellerCouponEditPage() {
     };
   }, [id, isEdit]);
 
+  useEffect(() => {
+    if (form.applies_to === 'all_listings' || !user?.id) {
+      setTargets([]);
+      setTargetsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const loadTargets = async () => {
+      setTargetsLoading(true);
+      try {
+        if (form.applies_to === 'listing_ids') {
+          const response = await api.get<Array<{ id: number; title: string }>>(
+            `/v2/marketplace/listings?user_id=${user.id}&status=active&limit=100`,
+          );
+          if (!cancelled && response.success && response.data) {
+            setTargets(response.data.map((listing) => ({ id: listing.id, label: listing.title })));
+          } else if (!cancelled) {
+            toast.error(response.error || t('errors.unexpected'));
+          }
+        } else {
+          const response = await api.get<Array<{ id: number; name: string }>>('/v2/marketplace/categories');
+          if (!cancelled && response.success && response.data) {
+            setTargets(response.data.map((category) => ({ id: category.id, label: category.name })));
+          } else if (!cancelled) {
+            toast.error(response.error || t('errors.unexpected'));
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          logError('SellerCouponEditPage.targets', err);
+          toast.error(t('errors.unexpected'));
+        }
+      } finally {
+        if (!cancelled) setTargetsLoading(false);
+      }
+    };
+
+    void loadTargets();
+    return () => {
+      cancelled = true;
+    };
+  }, [form.applies_to, t, toast, user?.id]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (form.applies_to !== 'all_listings' && form.applies_to_ids.length === 0) {
+      toast.error(t('coupon.seller.target_required'));
+      return;
+    }
     setSaving(true);
     try {
       const payload: Record<string, unknown> = {
@@ -124,6 +185,9 @@ export default function SellerCouponEditPage() {
         valid_until: form.valid_until || null,
         status: form.status,
         applies_to: form.applies_to,
+        applies_to_ids: form.applies_to === 'all_listings'
+          ? null
+          : form.applies_to_ids.map((targetId) => Number(targetId)),
       };
       const response = isEdit
         ? await api.put(`/v2/marketplace/seller/coupons/${id}`, payload)
@@ -260,7 +324,11 @@ export default function SellerCouponEditPage() {
                 label={t('coupon.seller.applies_to')}
                 selectedKeys={[form.applies_to]}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, applies_to: e.target.value as AppliesTo }))
+                  setForm((f) => ({
+                    ...f,
+                    applies_to: e.target.value as AppliesTo,
+                    applies_to_ids: [],
+                  }))
                 }
               >
                 <SelectItem key="all_listings" id="all_listings">{t('coupon.seller.all_listings')}</SelectItem>
@@ -268,6 +336,30 @@ export default function SellerCouponEditPage() {
                 <SelectItem key="category_ids" id="category_ids">{t('coupon.seller.specific_categories')}</SelectItem>
               </Select>
             </div>
+            {form.applies_to !== 'all_listings' && (
+              <Select
+                label={form.applies_to === 'listing_ids'
+                  ? t('coupon.seller.specific_listings')
+                  : t('coupon.seller.specific_categories')}
+                description={t('coupon.seller.target_required')}
+                selectionMode="multiple"
+                selectedKeys={new Set(form.applies_to_ids)}
+                onSelectionChange={(keys) => {
+                  const selected = keys === 'all'
+                    ? targets.map((target) => String(target.id))
+                    : Array.from(keys).map(String);
+                  setForm((current) => ({ ...current, applies_to_ids: selected }));
+                }}
+                isLoading={targetsLoading}
+                isRequired
+              >
+                {targets.map((target) => (
+                  <SelectItem key={target.id} id={String(target.id)} textValue={target.label}>
+                    {target.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
             <Input
               type="number"
               label={t('coupon.min_order')}

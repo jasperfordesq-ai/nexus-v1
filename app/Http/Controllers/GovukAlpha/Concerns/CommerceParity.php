@@ -21,10 +21,12 @@ use App\Services\CourseService;
 use App\Services\MarketplaceListingService;
 use App\Services\MarketplaceOfferService;
 use App\Services\MarketplaceOrderService;
+use App\Services\MarketplacePaymentService;
 use App\Services\MarketplacePickupSlotService;
 use App\Services\MarketplaceRatingService;
 use App\Services\MarketplaceReportService;
 use App\Services\MarketplaceSellerService;
+use App\Services\MarketplaceShippingOptionService;
 use App\Services\MemberPremiumService;
 use App\Services\MerchantCouponService;
 use App\Services\MerchantOnboardingService;
@@ -32,6 +34,7 @@ use App\Services\PodcastService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 /**
  * Marketplace, courses, podcasts, coupons, premium & clubs — accessible (GOV.UK) frontend parity methods.
@@ -445,7 +448,7 @@ trait CommerceParity
     //  Marketplace — Buy now / Make offer / Report
     // =================================================================
 
-    /** Buy-now confirmation page (for fixed-price money listings). */
+    /** Buy-now confirmation page for supported cash, free, or time-credit listings. */
     public function commerceBuyForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -456,12 +459,28 @@ trait CommerceParity
         }
 
         $item = $this->commercePurchasableOr404($id, $userId);
+        $shippingOptions = $this->commerceShippingOptionsForItem($item);
+        $pickupSlots = MarketplacePickupSlotService::listAvailableForListing(
+            $id,
+            viewerUserId: $userId,
+        );
+        $sessionKey = $this->commerceBuySessionKey($id);
+        $completedSessionKey = $this->commerceBuyCompletedSessionKey($id);
+        $idempotencyKey = self::asStr($request->session()->get($sessionKey));
+        if (strlen($idempotencyKey) < 16 || (bool) $request->session()->get($completedSessionKey, false)) {
+            $idempotencyKey = 'accessible-marketplace-' . Str::uuid()->toString();
+            $request->session()->put($sessionKey, $idempotencyKey);
+            $request->session()->put($completedSessionKey, false);
+        }
 
         return $this->view('accessible-frontend::commerce-buy', [
             'title' => __('govuk_alpha_commerce.buy.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'item' => $item,
+            'shippingOptions' => $shippingOptions,
+            'pickupSlots' => $pickupSlots,
+            'idempotencyKey' => $idempotencyKey,
         ]);
     }
 
@@ -475,31 +494,297 @@ trait CommerceParity
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $this->commercePurchasableOr404($id, $userId);
+        $sessionKey = $this->commerceBuySessionKey($id);
+        $completedSessionKey = $this->commerceBuyCompletedSessionKey($id);
+        $idempotencyKey = trim(self::asStr($request->input('idempotency_key')));
+        $expectedIdempotencyKey = self::asStr($request->session()->get($sessionKey));
+        if (strlen($idempotencyKey) < 16
+            || $expectedIdempotencyKey === ''
+            || !hash_equals($expectedIdempotencyKey, $idempotencyKey)) {
+            return redirect()->route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()
+                ->with('commerceBuyError', __('govuk_alpha_commerce.buy.error_generic'));
+        }
 
         $quantity = max(1, (int) self::asStr($request->input('quantity', '1')));
         $deliveryNotes = trim(self::asStr($request->input('delivery_notes')));
-        $data = ['quantity' => $quantity];
+        $checkoutListing = MarketplaceListing::query()->whereKey($id)->firstOrFail();
+        $hasCashCheckout = (string) ($checkoutListing->price_type ?? '') === 'fixed'
+            && (float) ($checkoutListing->price ?? 0) > 0;
+        $hasTimeCreditCheckout = (float) ($checkoutListing->time_credit_price ?? 0) > 0;
+        $isHybridCheckout = $hasCashCheckout && $hasTimeCreditCheckout;
+        $paymentMethod = $isHybridCheckout
+            ? trim(self::asStr($request->input('payment_method')))
+            : ($hasTimeCreditCheckout
+                ? 'time_credits'
+                : ((string) ($checkoutListing->price_type ?? '') === 'free' ? 'free' : 'cash'));
+        if ($isHybridCheckout && ! in_array($paymentMethod, ['cash', 'time_credits'], true)) {
+            return redirect()->route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()
+                ->with('commerceBuyError', __('govuk_alpha_commerce.buy.payment_method_required'))
+                ->with('commerceBuyErrorTarget', 'payment_method');
+        }
+        $data = [
+            'quantity' => $quantity,
+            'idempotency_key' => $idempotencyKey,
+            'payment_method' => $paymentMethod,
+        ];
         if ($deliveryNotes !== '') {
             $data['delivery_notes'] = $deliveryNotes;
         }
 
-        $error = null;
-        try {
-            MarketplaceOrderService::createDirectPurchase($userId, $id, $data);
-        } catch (\InvalidArgumentException $e) {
-            $error = e($e->getMessage());
-        } catch (\Throwable $e) {
-            report($e);
-            $error = __('govuk_alpha_commerce.buy.error_generic');
+        // Once this session key completed, let the service resolve an immediate
+        // duplicate POST before re-checking availability: the first request may
+        // already have marked the listing sold, but the durable key still maps
+        // the retry to that same order.
+        if ((bool) $request->session()->get($completedSessionKey, false)) {
+            $deliveryMethod = (string) MarketplaceListing::query()
+                ->whereKey($id)
+                ->value('delivery_method');
+            $data = array_merge(
+                $data,
+                $this->commerceRawDeliveryData($request, $deliveryMethod),
+            );
+            try {
+                MarketplaceOrderService::createDirectPurchase($userId, $id, $data);
+                return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'ordered']);
+            } catch (\Throwable $e) {
+                report($e);
+                return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug]);
+            }
+        }
+
+        $item = $this->commercePurchasableOr404($id, $userId);
+
+        [$deliveryData, $error, $errorTarget] = $this->commerceCheckoutDeliveryData(
+            $request,
+            $item,
+            $paymentMethod,
+            MarketplacePickupSlotService::listAvailableForListing(
+                $id,
+                viewerUserId: $userId,
+            ),
+        );
+        $data = array_merge($data, $deliveryData);
+
+        if ($error === null) {
+            try {
+                MarketplaceOrderService::createDirectPurchase($userId, $id, $data);
+            } catch (\InvalidArgumentException $e) {
+                report($e);
+                $error = __('govuk_alpha_commerce.buy.error_generic');
+            } catch (\Throwable $e) {
+                report($e);
+                $error = __('govuk_alpha_commerce.buy.error_generic');
+            }
         }
 
         if ($error !== null) {
             return redirect()->route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $id])
-                ->with('commerceBuyError', $error);
+                ->withInput()
+                ->with('commerceBuyError', $error)
+                ->with('commerceBuyErrorTarget', $errorTarget);
         }
 
+        // Keep the key valid for an immediate browser retry or duplicate POST;
+        // the next GET of the form rotates it for an intentional new order.
+        $request->session()->put($completedSessionKey, true);
         return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'ordered']);
+    }
+
+    /** Show a buyer-only checkout form for an accepted marketplace offer. */
+    public function commerceAcceptedOfferBuyForm(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): Response|RedirectResponse {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $offer = $this->commerceAcceptedOfferForBuyerOr404($id, $userId);
+        $existingOrder = MarketplaceOrder::query()
+            ->where('marketplace_offer_id', $offer->id)
+            ->where('buyer_id', $userId)
+            ->first();
+        if ($existingOrder !== null) {
+            return redirect()->route('govuk-alpha.marketplace.orders.buyer', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'ordered',
+            ]);
+        }
+
+        $listingId = (int) $offer->marketplace_listing_id;
+        $item = MarketplaceListingService::getByIdForAcceptedOfferBuyer(
+            $listingId,
+            $userId,
+            (int) $offer->id,
+        );
+        abort_if($item === null, 404);
+
+        // The accepted offer amount is authoritative for this checkout. The
+        // listing's original asking price is presentation-only here.
+        $item['price_type'] = 'fixed';
+        $item['price'] = (float) $offer->amount;
+        $item['price_currency'] = (string) $offer->currency;
+        $item['time_credit_price'] = 0.0;
+
+        $sessionKey = $this->commerceAcceptedOfferBuySessionKey($id);
+        $completedSessionKey = $this->commerceAcceptedOfferBuyCompletedSessionKey($id);
+        $idempotencyKey = self::asStr($request->session()->get($sessionKey));
+        if (strlen($idempotencyKey) < 16 || (bool) $request->session()->get($completedSessionKey, false)) {
+            $idempotencyKey = 'accessible-marketplace-offer-' . Str::uuid()->toString();
+            $request->session()->put($sessionKey, $idempotencyKey);
+            $request->session()->put($completedSessionKey, false);
+        }
+
+        return $this->view('accessible-frontend::commerce-buy', [
+            'title' => __('govuk_alpha_commerce.buy.accepted_offer_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'item' => $item,
+            'shippingOptions' => $this->commerceShippingOptionsForItem($item),
+            'pickupSlots' => MarketplacePickupSlotService::listAvailableForListing(
+                $listingId,
+                viewerUserId: $userId,
+                offerId: (int) $offer->id,
+            ),
+            'idempotencyKey' => $idempotencyKey,
+            'formAction' => route('govuk-alpha.marketplace.offers.buy.store', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $offer->id,
+            ]),
+            'backUrl' => route('govuk-alpha.marketplace.offers', [
+                'tenantSlug' => $tenantSlug,
+                'tab' => 'sent',
+            ]),
+            'backLabel' => __('govuk_alpha_commerce.common.back_to_offers'),
+            'cancelUrl' => route('govuk-alpha.marketplace.offers', [
+                'tenantSlug' => $tenantSlug,
+                'tab' => 'sent',
+            ]),
+            'isAcceptedOffer' => true,
+        ]);
+    }
+
+    /** Create a pending-payment order from an accepted buyer offer. */
+    public function commerceStoreAcceptedOfferBuy(
+        Request $request,
+        string $tenantSlug,
+        int $id,
+    ): RedirectResponse {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $offer = $this->commerceAcceptedOfferForBuyerOr404($id, $userId);
+        $sessionKey = $this->commerceAcceptedOfferBuySessionKey($id);
+        $completedSessionKey = $this->commerceAcceptedOfferBuyCompletedSessionKey($id);
+        $idempotencyKey = trim(self::asStr($request->input('idempotency_key')));
+        $expectedIdempotencyKey = self::asStr($request->session()->get($sessionKey));
+        if (strlen($idempotencyKey) < 16
+            || $expectedIdempotencyKey === ''
+            || ! hash_equals($expectedIdempotencyKey, $idempotencyKey)) {
+            return redirect()->route('govuk-alpha.marketplace.offers.buy', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+            ])->withInput()
+                ->with('commerceBuyError', __('govuk_alpha_commerce.buy.error_generic'));
+        }
+
+        $listingId = (int) $offer->marketplace_listing_id;
+        $data = [
+            'listing_id' => $listingId,
+            'offer_id' => (int) $offer->id,
+            'quantity' => 1,
+            'idempotency_key' => $idempotencyKey,
+            'payment_method' => 'cash',
+        ];
+        $deliveryNotes = trim(self::asStr($request->input('delivery_notes')));
+        if ($deliveryNotes !== '') {
+            $data['delivery_notes'] = $deliveryNotes;
+        }
+
+        // An immediate browser retry must reach the service with the same
+        // payload so its durable fingerprint check remains authoritative even
+        // after the listing has moved from reserved to sold.
+        if ((bool) $request->session()->get($completedSessionKey, false)) {
+            $deliveryMethod = (string) MarketplaceListing::query()
+                ->whereKey($listingId)
+                ->value('delivery_method');
+            $data = array_merge(
+                $data,
+                $this->commerceRawDeliveryData($request, $deliveryMethod),
+            );
+            try {
+                MarketplaceOrderService::createFromOffer($offer, $data);
+                return redirect()->route('govuk-alpha.marketplace.orders.buyer', [
+                    'tenantSlug' => $tenantSlug,
+                    'status' => 'ordered',
+                ]);
+            } catch (\Throwable $e) {
+                report($e);
+                return redirect()->route('govuk-alpha.marketplace.orders.buyer', [
+                    'tenantSlug' => $tenantSlug,
+                ]);
+            }
+        }
+
+        $item = MarketplaceListingService::getByIdForAcceptedOfferBuyer(
+            $listingId,
+            $userId,
+            (int) $offer->id,
+        );
+        abort_if($item === null, 404);
+        $item['price_type'] = 'fixed';
+        $item['price'] = (float) $offer->amount;
+        $item['price_currency'] = (string) $offer->currency;
+        $item['time_credit_price'] = 0.0;
+
+        [$deliveryData, $error, $errorTarget] = $this->commerceCheckoutDeliveryData(
+            $request,
+            $item,
+            'cash',
+            MarketplacePickupSlotService::listAvailableForListing(
+                $listingId,
+                viewerUserId: $userId,
+                offerId: (int) $offer->id,
+            ),
+        );
+        $data = array_merge($data, $deliveryData);
+
+        if ($error === null) {
+            try {
+                MarketplaceOrderService::createFromOffer($offer, $data);
+            } catch (\InvalidArgumentException $e) {
+                report($e);
+                $error = __('govuk_alpha_commerce.buy.error_generic');
+            } catch (\Throwable $e) {
+                report($e);
+                $error = __('govuk_alpha_commerce.buy.error_generic');
+            }
+        }
+
+        if ($error !== null) {
+            return redirect()->route('govuk-alpha.marketplace.offers.buy', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+            ])->withInput()
+                ->with('commerceBuyError', $error)
+                ->with('commerceBuyErrorTarget', $errorTarget);
+        }
+
+        $request->session()->put($completedSessionKey, true);
+        return redirect()->route('govuk-alpha.marketplace.orders.buyer', [
+            'tenantSlug' => $tenantSlug,
+            'status' => 'ordered',
+        ]);
     }
 
     /**
@@ -915,6 +1200,16 @@ trait CommerceParity
 
         $status = 'cancel-failed';
         try {
+            if ((string) $order->status === 'pending_payment'
+                && ! MarketplacePaymentService::prepareOrderForExpiry($order)) {
+                return redirect()->route(
+                    $isBuyer
+                        ? 'govuk-alpha.marketplace.orders.buyer'
+                        : 'govuk-alpha.marketplace.orders.seller',
+                    ['tenantSlug' => $tenantSlug, 'status' => 'cancel-failed'],
+                );
+            }
+            $order->refresh();
             MarketplaceOrderService::cancel($order, $reason);
             $status = 'cancelled';
         } catch (\InvalidArgumentException $e) {
@@ -3446,7 +3741,7 @@ trait CommerceParity
         return $listing;
     }
 
-    /** Fetch a purchasable (fixed-price money) listing for buying, or abort. */
+    /** Fetch a supported direct-purchase listing for buying, or abort. */
     private function commercePurchasableOr404(int $id, int $userId): array
     {
         $item = null;
@@ -3458,11 +3753,160 @@ trait CommerceParity
         abort_if($item === null, 404);
         // Cannot buy your own listing.
         abort_if((bool) ($item['is_own'] ?? false), 403);
-        // Only money-priced, active, fixed listings are buyable here.
+        // Direct checkout supports fixed cash, free, and time-credit listings.
         abort_unless((string) ($item['status'] ?? '') === 'active', 404);
         $priceType = (string) ($item['price_type'] ?? '');
-        abort_unless(in_array($priceType, ['fixed'], true) && (float) ($item['price'] ?? 0) > 0, 404);
+        $isCash = $priceType === 'fixed' && (float) ($item['price'] ?? 0) > 0;
+        $isFree = $priceType === 'free';
+        $isTimeCredit = (float) ($item['time_credit_price'] ?? 0) > 0;
+        abort_unless($isCash || $isFree || $isTimeCredit, 404);
         return $item;
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    private function commerceShippingOptionsForItem(array $item): array
+    {
+        $deliveryMethod = (string) ($item['delivery_method'] ?? 'pickup');
+        if (!in_array($deliveryMethod, ['shipping', 'both'], true)) {
+            return [];
+        }
+
+        $sellerUserId = (int) ($item['user']['id'] ?? ($item['user_id'] ?? 0));
+        if ($sellerUserId <= 0) {
+            return [];
+        }
+
+        $profile = MarketplaceSellerService::getByUserId($sellerUserId);
+        $options = $profile ? MarketplaceShippingOptionService::getSellerOptions((int) $profile->id) : [];
+        $hasCashCheckout = (string) ($item['price_type'] ?? '') === 'fixed'
+            && (float) ($item['price'] ?? 0) > 0;
+        $requiresFreeShipping = (string) ($item['price_type'] ?? '') === 'free'
+            || ((float) ($item['time_credit_price'] ?? 0) > 0 && ! $hasCashCheckout);
+
+        return $requiresFreeShipping
+            ? array_values(array_filter(
+                $options,
+                static fn (array $option): bool => (float) ($option['price'] ?? 0) <= 0,
+            ))
+            : $options;
+    }
+
+    /**
+     * Validate the buyer's fulfilment choice and return only server-recognised
+     * order fields. Pickup slots are required when the seller advertises any
+     * currently available slots, and are reserved inside order creation.
+     *
+     * @param array<int,array<string,mixed>> $pickupSlots
+     * @return array{0:array<string,mixed>,1:string|null,2:string}
+     */
+    private function commerceCheckoutDeliveryData(
+        Request $request,
+        array $item,
+        string $paymentMethod,
+        array $pickupSlots,
+    ): array {
+        $data = [];
+        $error = null;
+        $errorTarget = 'delivery_choice';
+        $deliveryMethod = (string) ($item['delivery_method'] ?? 'pickup');
+        $isPickup = false;
+
+        if ($deliveryMethod === 'pickup') {
+            $data['shipping_method'] = 'pickup';
+            $isPickup = true;
+        } elseif (in_array($deliveryMethod, ['shipping', 'both'], true)) {
+            $deliveryChoice = trim(self::asStr($request->input('delivery_choice')));
+            if ($deliveryMethod === 'both' && $deliveryChoice === 'pickup') {
+                $data['shipping_method'] = 'pickup';
+                $isPickup = true;
+            } elseif (preg_match('/^shipping:(\d+)$/', $deliveryChoice, $matches) === 1) {
+                $shippingOptionId = (int) $matches[1];
+                $validOption = collect($this->commerceShippingOptionsForItem($item))
+                    ->first(static fn (array $option): bool => (int) ($option['id'] ?? 0) === $shippingOptionId);
+                if ($validOption === null) {
+                    $error = __('govuk_alpha_commerce.buy.delivery_option_required');
+                } elseif ($paymentMethod !== 'cash' && (float) ($validOption['price'] ?? 0) > 0) {
+                    $error = __('govuk_alpha_commerce.buy.delivery_option_cash_only');
+                } else {
+                    $data['shipping_option_id'] = $shippingOptionId;
+                }
+            } else {
+                $error = __('govuk_alpha_commerce.buy.delivery_option_required');
+            }
+        }
+
+        $submittedPickupSlotId = (int) self::asStr($request->input('pickup_slot_id'));
+        if ($error === null
+            && $isPickup
+            && ($pickupSlots !== [] || $submittedPickupSlotId > 0)) {
+            $errorTarget = 'pickup_slot_id';
+            $validSlot = collect($pickupSlots)
+                ->first(static fn (array $slot): bool => (int) ($slot['id'] ?? 0) === $submittedPickupSlotId);
+            if ($submittedPickupSlotId <= 0 || $validSlot === null) {
+                $error = __('govuk_alpha_commerce.buy.pickup_slot_required');
+                $errorTarget = 'pickup_slot_id';
+            } else {
+                $data['pickup_slot_id'] = $submittedPickupSlotId;
+            }
+        }
+
+        return [$data, $error, $errorTarget];
+    }
+
+    /** Build the replay payload before re-entering the service fingerprint check. */
+    private function commerceRawDeliveryData(Request $request, string $deliveryMethod): array
+    {
+        $data = [];
+        $deliveryChoice = trim(self::asStr($request->input('delivery_choice')));
+        $isPickup = false;
+        if ($deliveryMethod === 'pickup'
+            || ($deliveryMethod === 'both' && $deliveryChoice === 'pickup')) {
+            $data['shipping_method'] = 'pickup';
+            $isPickup = true;
+        } elseif (preg_match('/^shipping:(\d+)$/', $deliveryChoice, $matches) === 1) {
+            $data['shipping_option_id'] = (int) $matches[1];
+        }
+        $pickupSlotId = (int) self::asStr($request->input('pickup_slot_id'));
+        if ($isPickup && $pickupSlotId > 0) {
+            $data['pickup_slot_id'] = $pickupSlotId;
+        }
+
+        return $data;
+    }
+
+    private function commerceBuySessionKey(int $listingId): string
+    {
+        return 'govuk_alpha.marketplace.buy.idempotency.' . $listingId;
+    }
+
+    private function commerceBuyCompletedSessionKey(int $listingId): string
+    {
+        return 'govuk_alpha.marketplace.buy.completed.' . $listingId;
+    }
+
+    private function commerceAcceptedOfferBuySessionKey(int $offerId): string
+    {
+        return 'govuk_alpha.marketplace.offer_buy.idempotency.' . $offerId;
+    }
+
+    private function commerceAcceptedOfferBuyCompletedSessionKey(int $offerId): string
+    {
+        return 'govuk_alpha.marketplace.offer_buy.completed.' . $offerId;
+    }
+
+    /** Fetch an accepted offer for its buyer without widening listing visibility. */
+    private function commerceAcceptedOfferForBuyerOr404(int $id, int $userId): MarketplaceOffer
+    {
+        try {
+            $offer = MarketplaceOffer::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
+
+        abort_unless((int) $offer->buyer_id === $userId, 403);
+        abort_unless((string) $offer->status === 'accepted', 404);
+
+        return $offer;
     }
 
     /**
@@ -3638,8 +4082,14 @@ trait CommerceParity
             $data['time_credit_price'] = null;
         } else {
             if ($price !== null && self::asStr($price) !== '' && is_numeric(self::asStr($price))) {
+                $defaultCurrency = strtoupper(TenantContext::getCurrency());
                 $data['price'] = max(0, (float) self::asStr($price));
-                $data['price_currency'] = mb_substr(strtoupper(trim(self::asStr($request->input('price_currency', 'EUR')))) ?: 'EUR', 0, 3);
+                $data['price_currency'] = mb_substr(
+                    strtoupper(trim(self::asStr($request->input('price_currency', $defaultCurrency))))
+                        ?: $defaultCurrency,
+                    0,
+                    3,
+                );
             }
             if ($timeCredit !== null && self::asStr($timeCredit) !== '' && is_numeric(self::asStr($timeCredit))) {
                 $data['time_credit_price'] = max(0, (float) self::asStr($timeCredit));
@@ -3697,6 +4147,7 @@ trait CommerceParity
             'formAction' => $action,
             'categories' => $categories,
             'priceTypes' => self::COMMERCE_PRICE_TYPES,
+            'defaultCurrency' => strtoupper(TenantContext::getCurrency()),
             'conditions' => self::COMMERCE_CONDITIONS,
             'deliveryMethods' => self::COMMERCE_DELIVERY_METHODS,
             'listing' => $listing !== null ? [
@@ -3705,7 +4156,7 @@ trait CommerceParity
                 'description' => (string) $listing->description,
                 'tagline' => (string) ($listing->tagline ?? ''),
                 'price' => $listing->price,
-                'price_currency' => (string) ($listing->price_currency ?? 'EUR'),
+                'price_currency' => (string) ($listing->price_currency ?? strtoupper(TenantContext::getCurrency())),
                 'price_type' => (string) ($listing->price_type ?? 'fixed'),
                 'time_credit_price' => $listing->time_credit_price,
                 'condition' => (string) ($listing->condition ?? ''),

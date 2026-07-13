@@ -19,7 +19,9 @@
       "invalid_listing": "De vermelding is niet van deze verkoper.",
       "listing_unavailable": "Deze aanbieding is niet beschikbaar voor loyaliteitsinwisseling.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Deze loyaliteitsinwisseling is niet langer beschikbaar.",
+      "redemption_mismatch": "Deze loyaliteitsinwisseling komt niet overeen met de geselecteerde marktplaatsbestelling."
     }
   },
   "survey": {

@@ -38,24 +38,23 @@ vi.mock('@/contexts', () =>
 );
 
 // Stub out the HeroUI Slider and GlassCard/Chip so we don't need full HeroUI
-vi.mock('@/components/ui', async (importActual) => {
-  const actual = await importActual<Record<string, unknown>>();
-  return {
-    ...actual,
-    Slider: ({ value, onChange, 'aria-label': ariaLabel }: { value: number; onChange: (v: number) => void; 'aria-label': string }) => (
-      <input
-        type="range"
-        aria-label={ariaLabel}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        data-testid="loyalty-slider"
-      />
-    ),
-    GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-      <div data-testid="glass-card" className={className}>{children}</div>
-    ),
-  };
-});
+vi.mock('@/components/ui/Slider', () => ({
+  Slider: ({ value, onChange, 'aria-label': ariaLabel }: { value: number; onChange: (v: number) => void; 'aria-label': string }) => (
+    <input
+      type="range"
+      aria-label={ariaLabel}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      data-testid="loyalty-slider"
+    />
+  ),
+}));
+
+vi.mock('@/components/ui/GlassCard', () => ({
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="glass-card" className={className}>{children}</div>
+  ),
+}));
 
 import { api } from '@/lib/api';
 import { LoyaltyRedemptionCard } from './LoyaltyRedemptionCard';
@@ -185,6 +184,43 @@ describe('LoyaltyRedemptionCard', () => {
 
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('exposes the pending redemption and server-adjusted total to checkout', async () => {
+    const onRedemptionChange = vi.fn();
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: VALID_QUOTE });
+    vi.mocked(api.post).mockResolvedValueOnce({
+      success: true,
+      data: {
+        discount_chf: 4,
+        adjusted_total_chf: 46,
+        redemption_id: 77,
+      },
+    });
+
+    render(
+      <LoyaltyRedemptionCard
+        sellerId={99}
+        listingId={1}
+        orderTotalChf={50}
+        currency="CHF"
+        onRedemptionChange={onRedemptionChange}
+      />,
+    );
+    await waitFor(() => expect(screen.getByTestId('loyalty-slider')).toBeInTheDocument());
+    fireEvent.change(screen.getByTestId('loyalty-slider'), { target: { value: '2' } });
+    const applyButton = screen.getAllByRole('button').find(
+      (button) => !button.hasAttribute('disabled') && button.getAttribute('aria-disabled') !== 'true',
+    );
+    if (applyButton) fireEvent.click(applyButton);
+
+    await waitFor(() => {
+      expect(onRedemptionChange).toHaveBeenCalledWith({
+        redemptionId: 77,
+        discountChf: 4,
+        adjustedTotalChf: 46,
+      });
     });
   });
 

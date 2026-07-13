@@ -82,7 +82,7 @@ class MarketplaceGroupController extends BaseApiController
             'price_max' => $request->float('price_max') ?: null,
             'condition' => $request->string('condition')->toString() ?: null,
             'sort' => $request->string('sort')->toString() ?: 'newest',
-            'limit' => $request->integer('limit', 20),
+            'limit' => max(1, min($request->integer('limit', 20), 100)),
             'cursor' => $request->string('cursor')->toString() ?: null,
             'current_user_id' => $userId,
         ];

@@ -31,6 +31,8 @@ Route::get('/marketplace/free', [AlphaController::class, 'commerceFreeItems'])->
 
 // ===== Marketplace — offers dashboard =====
 Route::get('/marketplace/offers', [AlphaController::class, 'commerceMyOffers'])->name('marketplace.offers');
+Route::get('/marketplace/offers/{id}/buy', [AlphaController::class, 'commerceAcceptedOfferBuyForm'])->whereNumber('id')->name('marketplace.offers.buy');
+Route::post('/marketplace/offers/{id}/buy', [AlphaController::class, 'commerceStoreAcceptedOfferBuy'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.offers.buy.store');
 Route::post('/marketplace/offers/{id}/accept', [AlphaController::class, 'commerceAcceptOffer'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.offers.accept');
 Route::post('/marketplace/offers/{id}/decline', [AlphaController::class, 'commerceDeclineOffer'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.offers.decline');
 Route::post('/marketplace/offers/{id}/withdraw', [AlphaController::class, 'commerceWithdrawOffer'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.offers.withdraw');

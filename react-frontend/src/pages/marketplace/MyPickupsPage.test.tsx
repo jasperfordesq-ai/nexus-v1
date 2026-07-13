@@ -35,6 +35,7 @@ vi.mock('@/contexts', () =>
 );
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 import { MyPickupsPage } from './MyPickupsPage';
 

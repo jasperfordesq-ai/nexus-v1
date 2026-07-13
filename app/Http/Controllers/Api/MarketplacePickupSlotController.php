@@ -35,7 +35,7 @@ class MarketplacePickupSlotController extends BaseApiController
     {
         if (!TenantContext::hasFeature('marketplace')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                $this->respondWithError('FEATURE_DISABLED', 'The marketplace feature is not enabled for this community.', null, 403)
+                $this->respondWithError('FEATURE_DISABLED', __('api.marketplace_feature_disabled'), null, 403)
             );
         }
     }
@@ -104,7 +104,7 @@ class MarketplacePickupSlotController extends BaseApiController
             ->first();
 
         if (!$slot) {
-            return $this->respondWithError('NOT_FOUND', 'Pickup slot not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_pickup_slot_not_found'), null, 404);
         }
 
         $data = request()->validate([
@@ -116,7 +116,16 @@ class MarketplacePickupSlotController extends BaseApiController
             'is_active' => 'sometimes|boolean',
         ]);
 
-        $updated = MarketplacePickupSlotService::update($slot, $data);
+        try {
+            $updated = MarketplacePickupSlotService::update($slot, $data);
+        } catch (\DomainException $exception) {
+            return $this->respondWithError(
+                $exception->getMessage(),
+                $this->pickupDomainMessage($exception->getMessage()),
+                null,
+                422,
+            );
+        }
 
         return $this->respondWithData([
             'id' => $updated->id,
@@ -142,10 +151,19 @@ class MarketplacePickupSlotController extends BaseApiController
             ->first();
 
         if (!$slot) {
-            return $this->respondWithError('NOT_FOUND', 'Pickup slot not found.', null, 404);
+            return $this->respondWithError('NOT_FOUND', __('api.marketplace_pickup_slot_not_found'), null, 404);
         }
 
-        MarketplacePickupSlotService::delete($slot);
+        try {
+            MarketplacePickupSlotService::delete($slot);
+        } catch (\DomainException $exception) {
+            return $this->respondWithError(
+                $exception->getMessage(),
+                $this->pickupDomainMessage($exception->getMessage()),
+                null,
+                409,
+            );
+        }
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -167,7 +185,12 @@ class MarketplacePickupSlotController extends BaseApiController
         try {
             $reservation = MarketplacePickupSlotService::scanQr($data['qr_code'], $userId);
         } catch (\DomainException $e) {
-            return $this->respondWithError($e->getMessage(), $e->getMessage(), null, 422);
+            return $this->respondWithError(
+                $e->getMessage(),
+                $this->pickupDomainMessage($e->getMessage()),
+                null,
+                422
+            );
         }
 
         return $this->respondWithData([
@@ -186,10 +209,16 @@ class MarketplacePickupSlotController extends BaseApiController
     public function listForListing(int $listingId): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_pickup_slots_public', 60, 60);
+        $offerId = $this->queryInt('offer_id', null, 1);
 
         return $this->respondWithData(
-            MarketplacePickupSlotService::listAvailableForListing($listingId)
+            MarketplacePickupSlotService::listAvailableForListing(
+                $listingId,
+                viewerUserId: $userId,
+                offerId: $offerId,
+            )
         );
     }
 
@@ -210,7 +239,12 @@ class MarketplacePickupSlotController extends BaseApiController
                 $userId
             );
         } catch (\DomainException $e) {
-            return $this->respondWithError($e->getMessage(), $e->getMessage(), null, 422);
+            return $this->respondWithError(
+                $e->getMessage(),
+                $this->pickupDomainMessage($e->getMessage()),
+                null,
+                422
+            );
         }
 
         return $this->respondWithData([
@@ -232,5 +266,31 @@ class MarketplacePickupSlotController extends BaseApiController
         return $this->respondWithData(
             MarketplacePickupSlotService::listForBuyer($userId)
         );
+    }
+
+    private function pickupDomainMessage(string $code): string
+    {
+        $key = match ($code) {
+            'SELLER_PROFILE_NOT_FOUND' => 'api.marketplace_pickup_seller_profile_not_found',
+            'SLOT_END_BEFORE_START' => 'api.marketplace_pickup_slot_end_before_start',
+            'CAPACITY_BELOW_BOOKINGS' => 'api.marketplace_pickup_capacity_below_bookings',
+            'SLOT_HAS_RESERVATIONS' => 'api.marketplace_pickup_slot_has_reservations',
+            'SLOT_NOT_FOUND' => 'api.marketplace_pickup_slot_not_found',
+            'QR_NOT_FOUND' => 'api.marketplace_pickup_qr_not_found',
+            'NOT_FOR_SELLER' => 'api.marketplace_pickup_not_for_seller',
+            'ORDER_NOT_PAID' => 'api.marketplace_pickup_order_not_paid',
+            'ALREADY_PICKED_UP' => 'api.marketplace_pickup_already_picked_up',
+            'RESERVATION_CANCELLED' => 'api.marketplace_pickup_reservation_cancelled',
+            'ORDER_NOT_FOUND' => 'api.marketplace_pickup_order_not_found',
+            'ORDER_NOT_PICKUP_ELIGIBLE' => 'api.marketplace_pickup_order_not_eligible',
+            'SLOT_INACTIVE' => 'api.marketplace_pickup_slot_inactive',
+            'SLOT_PAST' => 'api.marketplace_pickup_slot_past',
+            'SLOT_FULL' => 'api.marketplace_pickup_slot_full',
+            'SLOT_SELLER_MISMATCH' => 'api.marketplace_pickup_slot_seller_mismatch',
+            'DUPLICATE_RESERVATION' => 'api.marketplace_pickup_duplicate_reservation',
+            default => 'api.marketplace_pickup_operation_failed',
+        };
+
+        return __($key);
     }
 }

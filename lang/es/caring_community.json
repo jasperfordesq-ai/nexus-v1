@@ -19,7 +19,9 @@
       "invalid_listing": "El listado no pertenece a este comerciante.",
       "listing_unavailable": "Este listado no está disponible para canjear por fidelidad.",
       "invalid_exchange_rate": "CHF per hour must be between 0 and 9999.",
-      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100."
+      "invalid_max_discount_pct": "Max discount percent must be between 0 and 100.",
+      "redemption_unavailable": "Este canje del programa de fidelidad ya no está disponible.",
+      "redemption_mismatch": "Este canje del programa de fidelidad no coincide con el pedido del marketplace seleccionado."
     }
   },
   "survey": {

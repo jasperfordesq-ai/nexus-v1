@@ -55,17 +55,20 @@ final class LocaleContext
         }
 
         $previous = App::getLocale();
+        $previousJsonLocale = Translator::getLocale();
 
         // No-op fast path: already in the target locale.
-        if ($resolved === $previous) {
+        if ($resolved === $previous && $resolved === $previousJsonLocale) {
             return $fn();
         }
 
         App::setLocale($resolved);
+        Translator::setLocale($resolved);
         try {
             return $fn();
         } finally {
             App::setLocale($previous);
+            Translator::setLocale($previousJsonLocale);
         }
     }
 

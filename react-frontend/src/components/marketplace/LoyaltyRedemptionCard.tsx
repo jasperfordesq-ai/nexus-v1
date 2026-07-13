@@ -12,13 +12,9 @@
  *   - The seller has opted into accepting time credits
  *   - The member has a positive wallet balance
  *
- * Lets the member preview and apply a discount funded by their hours,
- * within the merchant's policy cap. On confirm, calls
- * POST /v2/caring-community/loyalty/redeem which atomically debits the
- * member's wallet and records a row in caring_loyalty_redemptions.
- *
- * The merchant honours the discount at the point of sale; the redemption
- * row is the audit trail.
+ * Lets the member preview and reserve a discount funded by their hours,
+ * within the merchant's policy cap. The returned pending redemption is
+ * attached to checkout and settled atomically when the order is created.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -33,6 +29,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -49,10 +46,16 @@ interface LoyaltyQuote {
 }
 
 interface RedeemResponse {
-  success: boolean;
   discount_chf: number;
   redemption_id: number;
-  new_wallet_balance: number;
+  adjusted_total_chf?: number;
+  new_wallet_balance?: number;
+}
+
+export interface LoyaltyRedemptionSelection {
+  redemptionId: number;
+  discountChf: number;
+  adjustedTotalChf: number;
 }
 
 interface Props {
@@ -60,13 +63,20 @@ interface Props {
   listingId: number;
   orderTotalChf: number;
   currency: string;
+  onRedemptionChange?: (selection: LoyaltyRedemptionSelection | null) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, currency }: Props) {
+export function LoyaltyRedemptionCard({
+  sellerId,
+  listingId,
+  orderTotalChf,
+  currency,
+  onRedemptionChange,
+}: Props) {
   const { t } = useTranslation('common');
   const { user, isAuthenticated } = useAuth();
   const { hasFeature } = useTenant();
@@ -76,7 +86,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
   const [credits, setCredits] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [confirmed, setConfirmed] = useState<{ discountChf: number; newBalance: number } | null>(null);
+  const [confirmed, setConfirmed] = useState<LoyaltyRedemptionSelection | null>(null);
 
   const featureOn = hasFeature('caring_community');
   const validInputs = isAuthenticated && featureOn && sellerId > 0 && orderTotalChf > 0 && user?.id !== sellerId;
@@ -84,10 +94,14 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
   // Fetch quote
   useEffect(() => {
     if (!validInputs) {
+      setConfirmed(null);
+      onRedemptionChange?.(null);
       setLoading(false);
       return;
     }
     let cancelled = false;
+    setConfirmed(null);
+    onRedemptionChange?.(null);
     setLoading(true);
     api
       .get<LoyaltyQuote>(
@@ -111,7 +125,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
     return () => {
       cancelled = true;
     };
-  }, [sellerId, listingId, orderTotalChf, validInputs]);
+  }, [sellerId, listingId, orderTotalChf, validInputs, onRedemptionChange]);
 
   const previewDiscount = useMemo(() => {
     if (!quote || !quote.accepts) return 0;
@@ -137,11 +151,22 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
         toast.error(errMsg);
         return;
       }
-      setConfirmed({ discountChf: res.data.discount_chf, newBalance: res.data.new_wallet_balance });
+      const discountChf = Math.max(0, Number(res.data.discount_chf) || 0);
+      const adjustedTotalChf = Math.max(
+        0,
+        Number(res.data.adjusted_total_chf ?? orderTotalChf - discountChf) || 0,
+      );
+      const selection: LoyaltyRedemptionSelection = {
+        redemptionId: res.data.redemption_id,
+        discountChf,
+        adjustedTotalChf,
+      };
+      setConfirmed(selection);
+      onRedemptionChange?.(selection);
       toast.success(
         t('loyalty.applied_success', {
           credits: credits.toFixed(2),
-          discount: res.data.discount_chf.toFixed(2),
+          discount: discountChf.toFixed(2),
         }),
       );
     } catch (err) {
@@ -150,7 +175,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
     } finally {
       setSubmitting(false);
     }
-  }, [quote, credits, sellerId, listingId, orderTotalChf, t, toast]);
+  }, [quote, credits, sellerId, listingId, orderTotalChf, onRedemptionChange, t, toast]);
 
   // Hide entirely when not relevant
   if (!validInputs) return null;
@@ -172,7 +197,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
               })}
             </p>
             <p className="text-xs text-muted mt-1">
-              {t('loyalty.history.subtitle')}
+              {formatMarketplaceCurrency(confirmed.adjustedTotalChf, currency)}
             </p>
           </div>
         </div>
@@ -226,7 +251,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
 
       <div className="flex items-center justify-between pt-1 border-t border-separator">
         <Chip variant="soft" color="warning" size="sm">
-          {currency} {previewNewTotal.toFixed(2)}
+          {formatMarketplaceCurrency(previewNewTotal, currency)}
         </Chip>
         <Button
 

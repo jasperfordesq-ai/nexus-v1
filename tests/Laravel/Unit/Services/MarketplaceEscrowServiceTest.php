@@ -18,15 +18,14 @@ class MarketplaceEscrowServiceTest extends TestCase
     //  releaseFunds — guard clauses
     // -----------------------------------------------------------------
 
-    public function test_releaseFunds_throwsWhenEscrowAlreadyReleased(): void
+    public function test_releaseFunds_isIdempotentWhenEscrowAlreadyReleased(): void
     {
         $escrow = Mockery::mock(MarketplaceEscrow::class)->makePartial();
         $escrow->status = 'released';
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Escrow is not in 'held' status. Current: released");
-
         MarketplaceEscrowService::releaseFunds($escrow, 'buyer_confirmed');
+
+        $this->assertSame('released', $escrow->status);
     }
 
     public function test_releaseFunds_throwsWhenEscrowIsRefunded(): void
@@ -35,7 +34,9 @@ class MarketplaceEscrowServiceTest extends TestCase
         $escrow->status = 'refunded';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Escrow is not in 'held' status. Current: refunded");
+        $this->expectExceptionMessage(
+            __('api.marketplace_escrow_not_held', ['status' => 'refunded']),
+        );
 
         MarketplaceEscrowService::releaseFunds($escrow, 'admin_override');
     }
@@ -46,7 +47,9 @@ class MarketplaceEscrowServiceTest extends TestCase
         $escrow->status = 'held';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid release trigger: hacker_exploit');
+        $this->expectExceptionMessage(
+            __('api.marketplace_escrow_invalid_release_trigger', ['trigger' => 'hacker_exploit']),
+        );
 
         MarketplaceEscrowService::releaseFunds($escrow, 'hacker_exploit');
     }
@@ -57,7 +60,9 @@ class MarketplaceEscrowServiceTest extends TestCase
         $escrow->status = 'held';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid release trigger');
+        $this->expectExceptionMessage(
+            __('api.marketplace_escrow_invalid_release_trigger', ['trigger' => '']),
+        );
 
         MarketplaceEscrowService::releaseFunds($escrow, '');
     }
@@ -72,7 +77,9 @@ class MarketplaceEscrowServiceTest extends TestCase
         $escrow->status = 'released';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Escrow cannot be refunded from status: released');
+        $this->expectExceptionMessage(
+            __('api.marketplace_escrow_refund_status_invalid', ['status' => 'released']),
+        );
 
         MarketplaceEscrowService::refundEscrow($escrow);
     }

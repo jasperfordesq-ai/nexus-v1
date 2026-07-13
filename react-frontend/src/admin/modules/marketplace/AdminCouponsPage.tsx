@@ -1,9 +1,9 @@
-import { getFormattingLocale } from '@/lib/helpers';
-import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 
 /**
  * AdminCouponsPage — AG63 admin oversight: list / suspend / delete merchant coupons.
@@ -15,8 +15,10 @@ import { useTranslation } from 'react-i18next';
 import Pause from 'lucide-react/icons/pause';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { getFormattingLocale } from '@/lib/helpers';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 import { PageHeader } from '../../components/PageHeader';
 
 interface AdminCoupon {
@@ -37,6 +39,7 @@ export default function AdminCouponsPage() {
   const confirm = useConfirm();
   usePageTitle(t('marketplace.coupons.page_title'));
   const toast = useToast();
+  const { tenant } = useTenant();
   const [items, setItems] = useState<AdminCoupon[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -98,7 +101,9 @@ export default function AdminCouponsPage() {
 
   const formatDiscount = (c: AdminCoupon): string => {
     if (c.discount_type === 'percent') return t('marketplace.coupons.discount_percent', { value: c.discount_value });
-    if (c.discount_type === 'fixed') return t('marketplace.coupons.discount_fixed', { value: (c.discount_value / 100).toFixed(2) });
+    if (c.discount_type === 'fixed') {
+      return formatMarketplaceCurrency(c.discount_value / 100, tenant?.currency || '');
+    }
     return t('marketplace.coupons.discount_bogo');
   };
 

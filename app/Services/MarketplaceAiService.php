@@ -39,7 +39,7 @@ class MarketplaceAiService
         $listing = MarketplaceListing::query()->find($listingId);
 
         if (!$listing) {
-            throw new \RuntimeException('Listing not found');
+            throw new \RuntimeException(__('api.marketplace_listing_not_found'));
         }
 
         $listingContext = $this->buildListingContext($listing);
@@ -72,7 +72,7 @@ PROMPT;
                 'listing_id' => $listingId,
                 'error' => $result['reply'],
             ]);
-            throw new \RuntimeException('Failed to generate auto-reply');
+            throw new \RuntimeException(__('api.marketplace_ai_auto_reply_failed'));
         }
 
         return $result['reply'];
@@ -124,7 +124,7 @@ PROMPT;
         ]);
 
         if ($result['error'] ?? false) {
-            throw new \RuntimeException('Failed to generate description');
+            throw new \RuntimeException(__('api.marketplace_ai_description_failed'));
         }
 
         return $result['reply'];

@@ -31,7 +31,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'JPY'];
+const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'JPY'] as const;
 
 interface ShippingFormState {
   courierName: string;
@@ -41,13 +41,28 @@ interface ShippingFormState {
   isDefault: boolean;
 }
 
-const EMPTY_FORM: ShippingFormState = {
-  courierName: '',
-  price: '',
-  currency: 'EUR',
-  estimatedDays: '',
-  isDefault: false,
-};
+function normalizeSupportedCurrency(value?: string | null): string {
+  const candidate = value?.trim().toUpperCase() ?? '';
+  return CURRENCIES.includes(candidate as (typeof CURRENCIES)[number]) ? candidate : '';
+}
+
+function createEmptyForm(currency: string): ShippingFormState {
+  return {
+    courierName: '',
+    price: '',
+    currency,
+    estimatedDays: '',
+    isDefault: false,
+  };
+}
+
+function formatCurrencyAmount(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(amount);
+  } catch {
+    return `${currency} ${amount}`;
+  }
+}
 
 export default function MarketplaceShippingOptionsRoute() {
   return (
@@ -59,7 +74,7 @@ export default function MarketplaceShippingOptionsRoute() {
 
 function MarketplaceShippingOptionsScreen() {
   const { t } = useTranslation(['marketplace', 'common', 'auth']);
-  const { hasFeature } = useTenant();
+  const { hasFeature, tenant } = useTenant();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -68,7 +83,8 @@ function MarketplaceShippingOptionsScreen() {
   const marketplaceEnabled = hasFeature('marketplace');
   const canLoadOptions = marketplaceEnabled && !isAuthLoading && isAuthenticated;
   const options = useApi(() => getMarketplaceShippingOptions(), [], { enabled: canLoadOptions });
-  const [form, setForm] = useState<ShippingFormState>(EMPTY_FORM);
+  const defaultCurrency = normalizeSupportedCurrency(tenant?.currency);
+  const [form, setForm] = useState<ShippingFormState>(() => createEmptyForm(defaultCurrency));
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -118,7 +134,7 @@ function MarketplaceShippingOptionsScreen() {
     setForm({
       courierName: option.courier_name,
       price: String(option.price),
-      currency: option.currency || 'EUR',
+      currency: option.currency || defaultCurrency,
       estimatedDays: option.estimated_days != null ? String(option.estimated_days) : '',
       isDefault: option.is_default,
     });
@@ -126,7 +142,7 @@ function MarketplaceShippingOptionsScreen() {
 
   function reset() {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm(createEmptyForm(defaultCurrency));
   }
 
   async function save() {
@@ -142,7 +158,7 @@ function MarketplaceShippingOptionsScreen() {
       const payload = {
         courier_name: form.courierName.trim(),
         price,
-        currency: form.currency,
+        ...(form.currency ? { currency: form.currency } : {}),
         estimated_days: estimatedDays && Number.isFinite(estimatedDays) ? estimatedDays : null,
         is_default: form.isDefault,
       };
@@ -236,7 +252,9 @@ function MarketplaceShippingOptionsScreen() {
                   <View className="gap-2">
                     <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('shipping.currency')}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                      {CURRENCIES.map((currency) => (
+                      {(form.currency && !CURRENCIES.includes(form.currency as (typeof CURRENCIES)[number])
+                        ? [form.currency, ...CURRENCIES]
+                        : CURRENCIES).map((currency) => (
                         <HeroButton key={currency} size="sm" variant={form.currency === currency ? 'primary' : 'secondary'} onPress={() => update('currency', currency)} style={form.currency === currency ? { backgroundColor: primary } : undefined}>
                           <HeroButton.Label>{currency}</HeroButton.Label>
                         </HeroButton>
@@ -297,7 +315,7 @@ function ShippingOptionRow({
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const price = `${option.currency || 'EUR'} ${Number(option.price).toFixed(2)}`;
+  const price = formatCurrencyAmount(Number(option.price), option.currency);
 
   return (
     <HeroCard className="mb-3 rounded-panel p-0">

@@ -1274,6 +1274,8 @@ export interface TenantConfig {
   id: number;
   name: string;
   slug: string;
+  /** Uppercase ISO 4217 payment currency resolved by the tenant bootstrap. */
+  currency?: string;
   tagline?: string;
   features: Partial<TenantFeatures>;
   modules?: Partial<TenantModules>;

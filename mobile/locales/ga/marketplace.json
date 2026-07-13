@@ -1,4 +1,9 @@
 {
+  "checkout": {
+    "paymentMethodLabel": "Roghnaigh conas íoc",
+    "payWithMoney": "Íoc {{amount}}",
+    "payWithTimeCredits": "Íoc le {{count}} creidmheas ama"
+  },
   "map": {
     "searchPanelTitle": "Choose search area",
     "searchPanelSubtitle": "Use coordinates from a map link, then adjust the distance.",

@@ -8,9 +8,9 @@
  * Filter, review, approve/reject marketplace listings with moderation notes.
  */
 
-import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getFormattingLocale } from '@/lib/helpers';
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -21,6 +21,7 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { formatMarketplaceCurrency } from '@/lib/marketplaceNumbers';
 import { adminMarketplace, type BulkActionResult } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
@@ -78,7 +79,7 @@ export function MarketplaceModerationPage() {
   const { t } = useTranslation('admin_marketplace');
   usePageTitle(t('marketplace.moderation_page_title'));
   const toast = useToast();
-  const { tenantPath } = useTenant();
+  const { tenant, tenantPath } = useTenant();
 
   const [items, setItems] = useState<MarketplaceListing[]>([]);
   const [total, setTotal] = useState(0);
@@ -233,7 +234,10 @@ export function MarketplaceModerationPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.price_currency ?? ''}{Number(item.price ?? 0).toFixed(2)}
+          {formatMarketplaceCurrency(
+            Number(item.price ?? 0),
+            item.price_currency || tenant?.currency || '',
+          )}
         </span>
       ),
     },

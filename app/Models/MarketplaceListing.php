@@ -7,6 +7,8 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use App\Core\TenantContext;
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,6 +52,7 @@ class MarketplaceListing extends Model
         'moderated_at',
         'promotion_type',
         'promoted_until',
+        'marketplace_enforcement_report_id',
         'expires_at',
         'renewed_at',
         'renewal_count',
@@ -92,7 +95,14 @@ class MarketplaceListing extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(MarketplaceCategory::class, 'category_id');
+        $tenantId = TenantContext::getId();
+
+        return $this->belongsTo(MarketplaceCategory::class, 'category_id')
+            ->withoutGlobalScope(TenantScope::class)
+            ->where(static function (Builder $query) use ($tenantId): void {
+                $query->where('marketplace_categories.tenant_id', $tenantId)
+                    ->orWhereNull('marketplace_categories.tenant_id');
+            });
     }
 
     public function images(): HasMany
@@ -129,7 +139,11 @@ class MarketplaceListing extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active')
-                     ->where('moderation_status', 'approved');
+                     ->where('moderation_status', 'approved')
+                     ->where(static function (Builder $expiryQuery): void {
+                         $expiryQuery->whereNull('expires_at')
+                             ->orWhere('expires_at', '>', now());
+                     });
     }
 
     public function scopeFree(Builder $query): Builder
@@ -142,11 +156,58 @@ class MarketplaceListing extends Model
      */
     public function scopeNearby(Builder $query, float $lat, float $lng, float $radiusKm): Builder
     {
-        $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
+        $haversine = "(6371 * acos(LEAST(1, GREATEST(-1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))))";
 
-        return $query->whereNotNull('latitude')
-                     ->whereNotNull('longitude')
+        return $query->withinRadiusBoundingBox($lat, $lng, $radiusKm)
                      ->whereRaw("{$haversine} <= ?", [$lat, $lng, $lat, $radiusKm])
                      ->orderByRaw("{$haversine} ASC", [$lat, $lng, $lat]);
+    }
+
+    /**
+     * Apply an index-friendly latitude/longitude bounding box before an exact
+     * Haversine calculation. Handles boxes that cross the antimeridian.
+     */
+    public function scopeWithinRadiusBoundingBox(
+        Builder $query,
+        float $lat,
+        float $lng,
+        float $radiusKm
+    ): Builder {
+        $latitudeDelta = $radiusKm / 111.045;
+        $minimumLatitude = max(-90.0, $lat - $latitudeDelta);
+        $maximumLatitude = min(90.0, $lat + $latitudeDelta);
+
+        $query->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->whereBetween('latitude', [$minimumLatitude, $maximumLatitude]);
+
+        $longitudeScale = abs(cos(deg2rad($lat)));
+        if ($longitudeScale < 0.000001) {
+            return $query;
+        }
+
+        $longitudeDelta = min(180.0, $radiusKm / (111.045 * $longitudeScale));
+        if ($longitudeDelta >= 180.0) {
+            return $query;
+        }
+
+        $west = $lng - $longitudeDelta;
+        $east = $lng + $longitudeDelta;
+
+        if ($west < -180.0) {
+            return $query->where(static function (Builder $longitudeQuery) use ($west, $east): void {
+                $longitudeQuery->where('longitude', '>=', $west + 360.0)
+                    ->orWhere('longitude', '<=', $east);
+            });
+        }
+
+        if ($east > 180.0) {
+            return $query->where(static function (Builder $longitudeQuery) use ($west, $east): void {
+                $longitudeQuery->where('longitude', '>=', $west)
+                    ->orWhere('longitude', '<=', $east - 360.0);
+            });
+        }
+
+        return $query->whereBetween('longitude', [$west, $east]);
     }
 }

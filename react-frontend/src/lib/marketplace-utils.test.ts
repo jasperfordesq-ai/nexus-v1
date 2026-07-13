@@ -58,8 +58,8 @@ describe('mapApiToListingItem', () => {
     });
   });
 
-  it('uses EUR when currency is empty', () => {
-    expect(mapApiToListingItem(baseRaw({ currency: '' })).price_currency).toBe('EUR');
+  it('uses an explicit tenant fallback when currency is empty', () => {
+    expect(mapApiToListingItem(baseRaw({ currency: '' }), 'JPY').price_currency).toBe('JPY');
   });
 
   it('defaults the first image to null and image_count to 0 when no images', () => {

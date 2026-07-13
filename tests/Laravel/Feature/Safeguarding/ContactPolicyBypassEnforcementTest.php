@@ -244,6 +244,7 @@ class ContactPolicyBypassEnforcementTest extends TestCase
 
         try {
             MarketplaceOrderService::createDirectPurchase($buyer->id, (int) $listingId, [
+                'idempotency_key' => 'safeguarding-direct-checkout-' . $listingId,
                 'delivery_notes' => 'This must never reach the protected seller',
             ]);
             $this->fail('Expected safeguarding denial');

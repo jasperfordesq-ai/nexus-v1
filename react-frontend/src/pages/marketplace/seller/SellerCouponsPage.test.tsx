@@ -27,12 +27,21 @@ const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi
 vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test Tenant', slug: 'test', currency: 'GBP' },
+      tenantPath: (path: string) => `/test${path}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
   })
 );
 
 vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
+
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // Mock useConfirm from @/components/ui so we can control confirm dialog outcomes
 // without needing a real DOM dialog.
@@ -44,6 +53,10 @@ vi.mock('@/components/ui', async (importOriginal) => {
     useConfirm: () => mockConfirm,
   };
 });
+
+vi.mock('@/components/ui/ConfirmDialog', () => ({
+  useConfirm: () => mockConfirm,
+}));
 
 import SellerCouponsPage from './SellerCouponsPage';
 
@@ -86,7 +99,7 @@ describe('SellerCouponsPage', () => {
   });
 
   it('renders coupon codes and titles after load', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: COUPONS } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: COUPONS } });
 
     render(<SellerCouponsPage />);
 
@@ -97,19 +110,19 @@ describe('SellerCouponsPage', () => {
   });
 
   it('formats percent discount correctly', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: COUPONS } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: COUPONS } });
 
     render(<SellerCouponsPage />);
 
     await waitFor(() => expect(screen.getByText('10%')).toBeInTheDocument());
   });
 
-  it('formats fixed discount as €value', async () => {
+  it('formats fixed discounts in the tenant currency', async () => {
     const fixed = [
       {
         id: 3,
         code: 'FIXED5',
-        title: 'Five Euro Off',
+        title: 'Five Pounds Off',
         discount_type: 'fixed' as const,
         discount_value: 500,
         status: 'active',
@@ -117,15 +130,15 @@ describe('SellerCouponsPage', () => {
         valid_until: null,
       },
     ];
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: fixed } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: fixed } });
 
     render(<SellerCouponsPage />);
 
-    await waitFor(() => expect(screen.getByText('€5.00')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('£5.00')).toBeInTheDocument());
   });
 
   it('shows usage count in the table', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: COUPONS } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: COUPONS } });
 
     render(<SellerCouponsPage />);
 
@@ -133,7 +146,7 @@ describe('SellerCouponsPage', () => {
   });
 
   it('shows empty state when no coupons exist', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: [] } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: [] } });
 
     render(<SellerCouponsPage />);
 
@@ -146,7 +159,7 @@ describe('SellerCouponsPage', () => {
   });
 
   it('renders the Create button linking to the new coupon route', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: [] } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: [] } });
 
     render(<SellerCouponsPage />);
 
@@ -161,8 +174,8 @@ describe('SellerCouponsPage', () => {
   });
 
   it('calls DELETE endpoint when user confirms deletion', async () => {
-    vi.mocked(api.get).mockResolvedValue({ data: { items: COUPONS } });
-    vi.mocked(api.delete).mockResolvedValueOnce({});
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: { items: COUPONS } });
+    vi.mocked(api.delete).mockResolvedValueOnce({ success: true });
     mockConfirm.mockResolvedValueOnce(true);
 
     render(<SellerCouponsPage />);
@@ -181,8 +194,8 @@ describe('SellerCouponsPage', () => {
   });
 
   it('shows success toast after successful delete', async () => {
-    vi.mocked(api.get).mockResolvedValue({ data: { items: COUPONS } });
-    vi.mocked(api.delete).mockResolvedValueOnce({});
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: { items: COUPONS } });
+    vi.mocked(api.delete).mockResolvedValueOnce({ success: true });
     mockConfirm.mockResolvedValueOnce(true);
 
     render(<SellerCouponsPage />);
@@ -195,8 +208,22 @@ describe('SellerCouponsPage', () => {
     await waitFor(() => expect(mockToast.success).toHaveBeenCalled());
   });
 
+  it('does not reload or report success when delete resolves with success false', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: { items: COUPONS } });
+    vi.mocked(api.delete).mockResolvedValueOnce({ success: false, error: 'Coupon in use' });
+    mockConfirm.mockResolvedValueOnce(true);
+
+    render(<SellerCouponsPage />);
+    await waitFor(() => expect(screen.getByText('SAVE10')).toBeInTheDocument());
+    fireEvent.click(screen.getAllByRole('button', { name: /delete/i })[0]);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalledWith('Coupon in use'));
+    expect(mockToast.success).not.toHaveBeenCalled();
+    expect(api.get).toHaveBeenCalledTimes(1);
+  });
+
   it('does NOT call DELETE when user cancels the confirm dialog', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: COUPONS } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: COUPONS } });
     mockConfirm.mockResolvedValueOnce(false); // user cancelled
 
     render(<SellerCouponsPage />);
@@ -211,7 +238,7 @@ describe('SellerCouponsPage', () => {
   });
 
   it('calls GET /v2/marketplace/seller/coupons on mount', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: [] } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: [] } });
 
     render(<SellerCouponsPage />);
 
@@ -221,7 +248,7 @@ describe('SellerCouponsPage', () => {
   });
 
   it('renders valid_until date when set', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ data: { items: COUPONS } });
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { items: COUPONS } });
 
     render(<SellerCouponsPage />);
 

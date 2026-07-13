@@ -99,6 +99,55 @@ class ImageUploadServiceTest extends TestCase
         $this->assertTrue(Storage::disk('public')->exists($result['path']));
     }
 
+    public function test_upload_uses_detected_mime_extension_instead_of_client_extension(): void
+    {
+        Storage::fake('public');
+        $image = UploadedFile::fake()->image('source.jpg', 320, 180);
+        $file = new UploadedFile(
+            $image->getPathname(),
+            'embedded-script.php',
+            'image/jpeg',
+            null,
+            true
+        );
+
+        $result = $this->service->upload($file);
+
+        $this->assertStringEndsWith('.jpg', $result['filename']);
+        $this->assertStringNotContainsString('.php', $result['filename']);
+        $this->assertTrue(Storage::disk('public')->exists($result['path']));
+    }
+
+    public function test_upload_reencodes_original_and_removes_embedded_metadata_bytes(): void
+    {
+        Storage::fake('public');
+        $image = UploadedFile::fake()->image('with-metadata.jpg', 320, 180);
+        $marker = 'NEXUS_PRIVATE_GPS_METADATA_53.349805_-6.26031';
+        file_put_contents($image->getPathname(), $marker, FILE_APPEND);
+        $file = new UploadedFile(
+            $image->getPathname(),
+            'with-metadata.jpg',
+            'image/jpeg',
+            null,
+            true,
+        );
+
+        $result = $this->service->upload($file);
+        $stored = Storage::disk('public')->get($result['path']);
+
+        $this->assertStringNotContainsString($marker, $stored);
+        $this->assertSame('image/jpeg', (string) mime_content_type(Storage::disk('public')->path($result['path'])));
+    }
+
+    public function test_apache_blocks_script_extensions_beneath_public_storage(): void
+    {
+        $rules = file_get_contents(base_path('httpdocs/.htaccess'));
+
+        $this->assertIsString($rules);
+        $this->assertStringContainsString('RewriteRule ^storage/.*\\.', $rules);
+        $this->assertStringContainsString('phtml|pht|phar', $rules);
+    }
+
     // ─── delete ──────────────────────────────────────────────────
 
     public function test_delete_empty_path_returns_false(): void

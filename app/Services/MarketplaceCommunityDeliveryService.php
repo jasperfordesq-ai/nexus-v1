@@ -7,6 +7,9 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Events\TransactionCompleted;
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,8 +24,8 @@ use Illuminate\Support\Facades\Log;
  * Flow:
  * 1. Listing has delivery_method = 'community_delivery'
  * 2. Community members browse deliverable orders and offer to deliver
- * 3. Seller/buyer accepts a delivery offer
- * 4. Deliverer completes delivery, gets confirmed, earns time credits
+ * 3. The buyer accepts a delivery offer and its time-credit price
+ * 4. The buyer confirms completion and pays the deliverer atomically
  *
  * Uses the `marketplace_delivery_offers` table (created by migration).
  */
@@ -47,11 +50,11 @@ class MarketplaceCommunityDeliveryService
         $notes = trim($data['notes'] ?? '');
 
         if ($timeCredits <= 0) {
-            throw new \InvalidArgumentException('Time credit amount must be greater than 0');
+            throw new \InvalidArgumentException(__('api.marketplace_delivery_time_credit_positive'));
         }
 
         if ($timeCredits > 100) {
-            throw new \InvalidArgumentException('Time credit amount cannot exceed 100 hours');
+            throw new \InvalidArgumentException(__('api.marketplace_delivery_time_credit_max'));
         }
 
         // Verify the order exists and belongs to this tenant
@@ -61,17 +64,20 @@ class MarketplaceCommunityDeliveryService
             ->first();
 
         if (!$order) {
-            throw new \RuntimeException('Order not found');
+            throw new \RuntimeException(__('api.marketplace_delivery_order_not_found'));
         }
 
         // Cannot deliver your own order
         if ((int) $order->buyer_id === $delivererId || (int) $order->seller_id === $delivererId) {
-            throw new \RuntimeException('Cannot offer to deliver your own order');
+            throw new \RuntimeException(__('api.marketplace_delivery_own_order_forbidden'));
         }
 
         // Check order status allows delivery offers
-        if (!in_array($order->status, ['confirmed', 'paid', 'processing'], true)) {
-            throw new \RuntimeException('This order is not available for delivery offers');
+        if (!in_array($order->status, ['paid', 'shipped'], true)) {
+            throw new \RuntimeException(__('api.marketplace_delivery_order_unavailable'));
+        }
+        if (($order->shipping_method ?? null) !== 'community_delivery') {
+            throw new \RuntimeException(__('api.marketplace_delivery_order_method_required'));
         }
 
         // Check if delivery method is community_delivery
@@ -81,7 +87,7 @@ class MarketplaceCommunityDeliveryService
             ->first();
 
         if (!$listing || $listing->delivery_method !== 'community_delivery') {
-            throw new \RuntimeException('This listing does not use community delivery');
+            throw new \RuntimeException(__('api.marketplace_delivery_listing_method_required'));
         }
 
         // Check for duplicate offer from same deliverer
@@ -93,7 +99,7 @@ class MarketplaceCommunityDeliveryService
             ->first();
 
         if ($existingOffer) {
-            throw new \RuntimeException('You already have an active delivery offer for this order');
+            throw new \RuntimeException(__('api.marketplace_delivery_offer_duplicate'));
         }
 
         // A delivery offer starts a new working relationship and may carry a
@@ -106,17 +112,46 @@ class MarketplaceCommunityDeliveryService
             'marketplace_community_delivery_offer',
         );
 
-        $offerId = DB::table('marketplace_delivery_offers')->insertGetId([
-            'tenant_id' => $tenantId,
-            'order_id' => $orderId,
-            'deliverer_id' => $delivererId,
-            'time_credits' => $timeCredits,
-            'estimated_minutes' => $estimatedMinutes > 0 ? $estimatedMinutes : null,
-            'notes' => $notes ?: null,
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $offerId = DB::transaction(function () use (
+            $tenantId,
+            $orderId,
+            $delivererId,
+            $timeCredits,
+            $estimatedMinutes,
+            $notes,
+        ): int {
+            $lockedOrder = DB::table('marketplace_orders')
+                ->where('id', $orderId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedOrder
+                || ! in_array($lockedOrder->status, ['paid', 'shipped'], true)
+                || ($lockedOrder->shipping_method ?? null) !== 'community_delivery') {
+                throw new \RuntimeException(__('api.marketplace_delivery_order_unavailable'));
+            }
+            $duplicate = DB::table('marketplace_delivery_offers')
+                ->where('order_id', $orderId)
+                ->where('deliverer_id', $delivererId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['pending', 'accepted'])
+                ->exists();
+            if ($duplicate) {
+                throw new \RuntimeException(__('api.marketplace_delivery_offer_duplicate'));
+            }
+
+            return (int) DB::table('marketplace_delivery_offers')->insertGetId([
+                'tenant_id' => $tenantId,
+                'order_id' => $orderId,
+                'deliverer_id' => $delivererId,
+                'time_credits' => $timeCredits,
+                'estimated_minutes' => $estimatedMinutes > 0 ? $estimatedMinutes : null,
+                'notes' => $notes ?: null,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
 
         return self::formatOffer(
             DB::table('marketplace_delivery_offers')->where('id', $offerId)->where('tenant_id', TenantContext::getId())->first()
@@ -139,7 +174,7 @@ class MarketplaceCommunityDeliveryService
     public static function acceptDeliveryOffer(int $orderId, int $delivererId, int $actorId): void
     {
         $tenantId = TenantContext::getId();
-        $order = self::requireOrderParticipant($orderId, $tenantId, $actorId);
+        $order = self::requireOrderBuyer($orderId, $tenantId, $actorId);
 
         $offer = DB::table('marketplace_delivery_offers')
             ->where('order_id', $orderId)
@@ -149,7 +184,7 @@ class MarketplaceCommunityDeliveryService
             ->first();
 
         if (!$offer) {
-            throw new \RuntimeException('Delivery offer not found or already processed');
+            throw new \RuntimeException(__('api.marketplace_delivery_offer_unavailable'));
         }
 
         // Re-check at acceptance rather than trusting the earlier offer-time
@@ -162,16 +197,30 @@ class MarketplaceCommunityDeliveryService
             'marketplace_community_delivery_acceptance',
         );
 
-        DB::transaction(function () use ($orderId, $offer, $tenantId) {
-            // Accept this offer
-            DB::table('marketplace_delivery_offers')
+        DB::transaction(function () use ($orderId, $offer, $tenantId): void {
+            // Lock the order to serialize competing acceptance requests.
+            $lockedOrder = DB::table('marketplace_orders')
+                ->where('id', $orderId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (! $lockedOrder || ! in_array($lockedOrder->status, ['paid', 'shipped'], true)
+                || $lockedOrder->shipping_method !== 'community_delivery') {
+                throw new \RuntimeException(__('api.marketplace_delivery_order_unavailable'));
+            }
+
+            $accepted = DB::table('marketplace_delivery_offers')
                 ->where('id', $offer->id)
                 ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
                 ->update([
                     'status' => 'accepted',
                     'accepted_at' => now(),
                     'updated_at' => now(),
                 ]);
+            if ($accepted !== 1) {
+                throw new \RuntimeException(__('api.marketplace_delivery_offer_unavailable'));
+            }
 
             // Decline all other pending offers for this order
             DB::table('marketplace_delivery_offers')
@@ -209,17 +258,20 @@ class MarketplaceCommunityDeliveryService
     public static function confirmDelivery(int $orderId, int $delivererId, int $actorId): void
     {
         $tenantId = TenantContext::getId();
-        $order = self::requireOrderParticipant($orderId, $tenantId, $actorId);
+        $order = self::requireOrderBuyer($orderId, $tenantId, $actorId);
 
         $offer = DB::table('marketplace_delivery_offers')
             ->where('order_id', $orderId)
             ->where('deliverer_id', $delivererId)
             ->where('tenant_id', $tenantId)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'completed'])
             ->first();
 
         if (!$offer) {
-            throw new \RuntimeException('No accepted delivery offer found');
+            throw new \RuntimeException(__('api.marketplace_delivery_accepted_offer_not_found'));
+        }
+        if ($offer->status === 'completed' && $offer->wallet_transaction_id !== null) {
+            return;
         }
 
         // Completion moves credits as well as closing the delivery
@@ -233,58 +285,111 @@ class MarketplaceCommunityDeliveryService
             'marketplace_community_delivery_confirmation',
         );
 
-        DB::transaction(function () use ($offer, $order, $tenantId) {
-            // Award time credits: buyer pays deliverer
-            $buyerId = $order->buyer_id;
-            $delivererId = $offer->deliverer_id;
-            $amount = (float) $offer->time_credits;
-
-            // Check buyer balance before completing the offer.
-            $buyer = DB::table('users')
-                ->where('id', $buyerId)
+        $settlement = DB::transaction(function () use ($offer, $order, $tenantId): array {
+            $lockedOrder = DB::table('marketplace_orders')
+                ->where('id', $order->id)
                 ->where('tenant_id', $tenantId)
                 ->lockForUpdate()
                 ->first();
-
-            if (!$buyer || (float) $buyer->balance < $amount) {
-                Log::warning('Community delivery: buyer has insufficient balance for time credit payment', [
-                    'order_id' => $order->id,
-                    'buyer_id' => $buyerId,
-                    'deliverer_id' => $delivererId,
-                    'amount' => $amount,
-                    'balance' => $buyer->balance ?? 0,
-                ]);
-                throw new \RuntimeException(__('api.organizer_insufficient_balance'));
+            if (! $lockedOrder || ! in_array($lockedOrder->status, ['paid', 'shipped', 'delivered'], true)
+                || $lockedOrder->shipping_method !== 'community_delivery') {
+                throw new \RuntimeException(__('api.marketplace_delivery_order_unavailable'));
             }
 
-            DB::table('marketplace_delivery_offers')
+            $lockedOffer = DB::table('marketplace_delivery_offers')
                 ->where('id', $offer->id)
                 ->where('tenant_id', $tenantId)
+                ->where('order_id', $order->id)
+                ->where('deliverer_id', $offer->deliverer_id)
+                ->lockForUpdate()
+                ->first();
+            if ($lockedOffer
+                && $lockedOffer->status === 'completed'
+                && $lockedOffer->wallet_transaction_id !== null) {
+                return [null, null, null];
+            }
+            if (! $lockedOffer || $lockedOffer->status !== 'accepted') {
+                throw new \RuntimeException(__('api.marketplace_delivery_offer_unavailable'));
+            }
+            if ($lockedOffer->wallet_transaction_id !== null) {
+                return [null, null, null];
+            }
+
+            $buyerId = (int) $lockedOrder->buyer_id;
+            $lockedDelivererId = (int) $lockedOffer->deliverer_id;
+            $amount = round((float) $lockedOffer->time_credits, 2);
+            foreach ([min($buyerId, $lockedDelivererId), max($buyerId, $lockedDelivererId)] as $userId) {
+                User::withoutGlobalScopes()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($userId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            }
+
+            $buyer = User::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($buyerId)
+                ->firstOrFail();
+            $deliverer = User::withoutGlobalScopes()
+                ->where('tenant_id', $tenantId)
+                ->whereKey($lockedDelivererId)
+                ->firstOrFail();
+            if ((float) $buyer->balance < $amount) {
+                throw new \RuntimeException(__('api.wallet_transfer_insufficient_balance'));
+            }
+            if (in_array((string) $deliverer->status, ['banned', 'suspended', 'inactive', 'deactivated'], true)) {
+                throw new \RuntimeException(__('api.wallet_transfer_recipient_inactive'));
+            }
+
+            $transaction = new Transaction();
+            $transaction->tenant_id = $tenantId;
+            $transaction->sender_id = $buyerId;
+            $transaction->receiver_id = $lockedDelivererId;
+            $transaction->amount = $amount;
+            $transaction->description = __('api.marketplace_delivery_transaction_description', [
+                'order' => $lockedOrder->order_number,
+            ]);
+            $transaction->transaction_type = 'community_delivery';
+            $transaction->status = 'completed';
+            $transaction->save();
+
+            $buyer->decrement('balance', $amount);
+            $deliverer->increment('balance', $amount);
+            DB::table('marketplace_delivery_offers')
+                ->where('id', $lockedOffer->id)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'accepted')
                 ->update([
                     'status' => 'completed',
                     'completed_at' => now(),
+                    'wallet_transaction_id' => $transaction->id,
                     'updated_at' => now(),
                 ]);
 
-            // Create transaction record
-            DB::table('transactions')->insert([
-                'tenant_id' => $tenantId,
-                'sender_id' => $buyerId,
-                'receiver_id' => $delivererId,
-                'amount' => $amount,
-                'description' => 'Community delivery payment for order #' . $order->id,
-                'transaction_type' => 'community_delivery',
-                'status' => 'completed',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            // Update balances
-            DB::table('users')->where('id', $buyerId)->where('tenant_id', $tenantId)
-                ->decrement('balance', $amount);
-            DB::table('users')->where('id', $delivererId)->where('tenant_id', $tenantId)
-                ->increment('balance', $amount);
+            return [
+                $transaction->fresh(['sender', 'receiver']),
+                $buyer->fresh(),
+                $deliverer->fresh(),
+            ];
         });
+
+        [$transaction, $buyer, $deliverer] = $settlement;
+        if ($transaction instanceof Transaction && $buyer instanceof User && $deliverer instanceof User) {
+            try {
+                WalletAlertService::checkAndSendLowBalanceAlert(
+                    $tenantId,
+                    (int) $buyer->id,
+                    (float) $buyer->balance,
+                );
+                event(new TransactionCompleted($transaction, $buyer, $deliverer, $tenantId));
+            } catch (\Throwable $exception) {
+                Log::warning('Community delivery post-commit notification failed', [
+                    'order_id' => $orderId,
+                    'transaction_id' => $transaction->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
 
         Log::info('Community delivery confirmed and time credits awarded', [
             'order_id' => $orderId,
@@ -385,6 +490,17 @@ class MarketplaceCommunityDeliveryService
 
         if ((int) $order->buyer_id !== $actorId && (int) $order->seller_id !== $actorId) {
             throw new AuthorizationException(__('api.marketplace_delivery_participant_required'));
+        }
+
+        return $order;
+    }
+
+    /** Only the buyer may consent to a debit from the buyer's wallet. */
+    private static function requireOrderBuyer(int $orderId, int $tenantId, int $actorId): object
+    {
+        $order = self::requireOrderParticipant($orderId, $tenantId, $actorId);
+        if ((int) $order->buyer_id !== $actorId) {
+            throw new AuthorizationException(__('api.marketplace_delivery_buyer_required'));
         }
 
         return $order;

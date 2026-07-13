@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Services\AuthenticationConfigurationService;
 use App\Services\RedisCache;
 use App\Services\TenantHierarchyService;
+use App\Services\TenantSettingsService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -39,12 +40,32 @@ class TenantBootstrapControllerTest extends TestCase
                 'id',
                 'name',
                 'slug',
+                'currency',
                 'features',
                 'modules',
                 'settings',
                 'compliance',
             ],
         ]);
+    }
+
+    public function test_bootstrap_exposes_the_tenant_payment_currency_in_uppercase(): void
+    {
+        app(TenantSettingsService::class)->set(
+            $this->testTenantId,
+            'general.default_currency',
+            'jpy'
+        );
+        app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+
+        try {
+            $this->apiGet('/v2/tenant/bootstrap?slug=' . $this->testTenantSlug)
+                ->assertOk()
+                ->assertJsonPath('data.currency', 'JPY');
+        } finally {
+            app(TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+            app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+        }
     }
 
     public function test_bootstrap_exposes_typed_authentication_configuration(): void

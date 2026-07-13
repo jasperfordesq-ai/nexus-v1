@@ -23,10 +23,10 @@ class MerchantCouponSellerController extends BaseApiController
     private function ensureFeature(): void
     {
         if (!TenantContext::hasFeature('marketplace')) {
-            abort(403, 'Marketplace feature is not enabled for this tenant.');
+            abort(403, __('api.marketplace_feature_disabled'));
         }
         if (!TenantContext::hasFeature('merchant_coupons')) {
-            abort(403, 'Merchant coupons are not enabled for this tenant.');
+            abort(403, __('api.marketplace_merchant_coupons_disabled'));
         }
     }
 
@@ -37,7 +37,7 @@ class MerchantCouponSellerController extends BaseApiController
             ->where('user_id', $userId)
             ->first();
         if (!$profile) {
-            abort(403, 'You must have an active seller profile to manage coupons.');
+            abort(403, __('api.marketplace_coupon_seller_profile_required'));
         }
         return $profile;
     }
@@ -50,7 +50,7 @@ class MerchantCouponSellerController extends BaseApiController
             ->where('seller_id', $sellerId)
             ->first();
         if (!$coupon) {
-            abort(404, 'Coupon not found.');
+            abort(404, __('api.marketplace_coupon_not_found'));
         }
         return $coupon;
     }
@@ -93,7 +93,8 @@ class MerchantCouponSellerController extends BaseApiController
             'valid_until' => 'nullable|date',
             'status' => 'nullable|in:draft,active,paused,expired',
             'applies_to' => 'nullable|in:all_listings,listing_ids,category_ids',
-            'applies_to_ids' => 'nullable|array',
+            'applies_to_ids' => 'nullable|array|max:100',
+            'applies_to_ids.*' => 'integer|min:1|distinct',
         ]);
 
         try {
@@ -127,7 +128,8 @@ class MerchantCouponSellerController extends BaseApiController
             'valid_until' => 'nullable|date',
             'status' => 'nullable|in:draft,active,paused,expired',
             'applies_to' => 'nullable|in:all_listings,listing_ids,category_ids',
-            'applies_to_ids' => 'nullable|array',
+            'applies_to_ids' => 'nullable|array|max:100',
+            'applies_to_ids.*' => 'integer|min:1|distinct',
         ]);
 
         try {
