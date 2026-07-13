@@ -189,6 +189,23 @@ class AuthenticateTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
+    public function test_handle_rejects_retired_sanctum_bearer_login_token(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+        TenantContext::setById($this->testTenantId);
+        $plainTextToken = $user->createToken('retired-login-token')->plainTextToken;
+
+        $request = Request::create('/api/v2/feed', 'GET');
+        $request->headers->set('Authorization', 'Bearer ' . $plainTextToken);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertSame('auth_required', $response->getData(true)['errors'][0]['code']);
+    }
+
     public function test_legacy_jwt_authentication_does_not_create_a_parallel_raw_php_session(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([

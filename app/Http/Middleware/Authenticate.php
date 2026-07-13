@@ -14,22 +14,24 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Hybrid authentication middleware — supports both Sanctum and legacy JWT tokens.
+ * Authentication middleware for short-lived JWTs and stateful test/session
+ * guards.
  *
- * During the Laravel migration, clients may send either:
- *   1. A Sanctum token (new login sessions)
- *   2. A legacy JWT token (existing sessions from before migration)
- *
- * This middleware tries Sanctum first, then falls back to legacy JWT validation.
+ * User-login personal access tokens were retired when rotating refresh-token
+ * families shipped. Bearer credentials must therefore validate as the current
+ * short-lived JWT protocol; otherwise an old seven-day Sanctum token could
+ * bypass the access-token lifetime and revocation guarantees.
  */
 class Authenticate
 {
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        // 1. Try Sanctum guard first (preferred)
+        // Keep guard-based authentication for Laravel stateful requests and
+        // Sanctum::actingAs() test fixtures, but never let a bearer personal
+        // access token bypass the current JWT policy.
         $guards = empty($guards) ? ['sanctum'] : $guards;
 
-        foreach ($guards as $guard) {
+        foreach ($request->bearerToken() === null ? $guards : [] as $guard) {
             try {
                 $guardInstance = auth()->guard($guard);
                 $guardAuthenticated = $guardInstance->check();
@@ -123,7 +125,7 @@ class Authenticate
             }
         }
 
-        // 2. Fall back to legacy JWT token validation
+        // Bearer authentication uses the versioned, short-lived JWT contract.
         $token = $this->extractBearerToken($request);
         if ($token) {
             $validated = $this->validateLegacyToken($token);

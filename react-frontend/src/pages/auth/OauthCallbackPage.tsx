@@ -19,9 +19,64 @@ import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { tokenManager } from '@/lib/api';
+import { API_BASE, tokenManager } from '@/lib/api';
+import {
+  clearOAuthBrowserVerifier,
+  getOAuthBrowserVerifier,
+} from '@/lib/oauth-browser-binding';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
+
+interface OAuthExchangeResponse {
+  success?: boolean;
+  token?: string;
+  access_token?: string;
+  refresh_token?: string;
+  tenant_id?: number | string;
+  message?: string;
+}
+
+// React StrictMode deliberately restarts effects during development. OAuth
+// callback codes are single-use, so every mounted instance in this tab/module
+// must share the same in-flight exchange for an exact code + browser flow.
+// Settled failures are removed so an explicit remount/retry remains possible.
+const inFlightOAuthExchanges = new Map<string, Promise<OAuthExchangeResponse>>();
+
+function exchangeOAuthCode(code: string, flow: string | null): Promise<OAuthExchangeResponse> {
+  const key = JSON.stringify([code, flow]);
+  const existing = inFlightOAuthExchanges.get(key);
+  if (existing) return existing;
+
+  const exchange = (async () => {
+    const browserVerifier = getOAuthBrowserVerifier(flow);
+    const response = await fetch(`${API_BASE}/v2/auth/oauth/exchange`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code, browser_verifier: browserVerifier }),
+    });
+    const data = await response.json() as OAuthExchangeResponse;
+
+    if (!response.ok || !data.success || !data.token) {
+      throw new Error(data.message || 'oauth_exchange_failed');
+    }
+
+    return data;
+  })();
+
+  inFlightOAuthExchanges.set(key, exchange);
+  const removeSettledExchange = () => {
+    if (inFlightOAuthExchanges.get(key) === exchange) {
+      inFlightOAuthExchanges.delete(key);
+    }
+  };
+  void exchange.then(removeSettledExchange, removeSettledExchange);
+
+  return exchange;
+}
 
 export function OauthCallbackPage() {
   const { t } = useTranslation('common');
@@ -33,6 +88,7 @@ export function OauthCallbackPage() {
   useEffect(() => {
     let cancelled = false;
     const code = params.get('code');
+    const flow = params.get('flow');
     const errCode = params.get('error');
     const errMsg = params.get('message');
 
@@ -46,38 +102,29 @@ export function OauthCallbackPage() {
       return;
     }
 
-    async function exchangeCode() {
-      try {
-        const response = await fetch('/api/v2/auth/oauth/exchange', {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        });
-        const data = await response.json();
-
-        if (!response.ok || !data?.success || !data?.token) {
-          throw new Error(data?.message || 'oauth_exchange_failed');
-        }
-
+    void exchangeOAuthCode(code, flow).then(
+      (data) => {
         if (cancelled) return;
 
         if (data.tenant_id) {
           tokenManager.setTenantId(String(data.tenant_id));
         }
-        tokenManager.setAccessToken(String(data.token));
+        if (data.refresh_token) {
+          tokenManager.setRefreshToken(String(data.refresh_token));
+        }
+        // Persist the rotating credential before the access token. Other tabs
+        // wake on the access-token storage event and must observe a complete
+        // token generation rather than new access paired with stale refresh.
+        tokenManager.setAccessToken(String(data.access_token || data.token));
+        clearOAuthBrowserVerifier(flow);
         window.location.href = tenantPath('/dashboard');
-      } catch {
+      },
+      () => {
         if (!cancelled) {
           setError(t('oauth.callback_failed'));
         }
-      }
-    }
-
-    void exchangeCode();
+      },
+    );
 
     return () => {
       cancelled = true;

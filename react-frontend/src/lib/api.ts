@@ -219,16 +219,39 @@ export interface ApiError {
   fieldErrors?: Record<string, string[]>;
 }
 
-type TokenRefreshOutcome = 'refreshed' | 'invalid' | 'transient';
+export type TokenRefreshOutcome = 'refreshed' | 'invalid' | 'transient';
+
+interface TokenGenerationSnapshot {
+  accessToken: string | null;
+  refreshToken: string | null;
+  refreshAttempt: string | null;
+  logoutGeneration: string | null;
+  tenantId: string | null;
+}
 
 interface PendingRefreshWaiter {
   accessTokenAtWait: string | null;
+  tenantIdAtWait: string | null;
   resolve: (outcome: TokenRefreshOutcome) => void;
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
 function isAbortError(error: unknown): boolean {
   return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
+}
+
+function hasApiErrorCode(payload: unknown, expectedCode: string): boolean {
+  if (typeof payload !== 'object' || payload === null || !('errors' in payload)) {
+    return false;
+  }
+
+  const errors = payload.errors;
+  return Array.isArray(errors) && errors.some((error) => (
+    typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && error.code === expectedCode
+  ));
 }
 
 export interface PaginationMeta {
@@ -408,7 +431,7 @@ export const tokenManager = {
 // API Client Class
 // ─────────────────────────────────────────────────────────────────────────────
 
-class ApiClient {
+export class ApiClient {
   private baseUrl: string;
   private isRefreshing = false;
   private refreshPromise: Promise<TokenRefreshOutcome> | null = null;
@@ -418,9 +441,21 @@ class ApiClient {
   private inflightRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
   private responseCache: Map<string, { expiresAt: number; response: ApiResponse<unknown> }> = new Map();
 
-  // Cross-tab token refresh coordination
+  // Cross-tab token refresh coordination. Web Locks are origin-scoped and
+  // remain exclusively held until their callback settles, so a slow refresh
+  // cannot outlive its ownership as it could with a time-based lease.
+  private static readonly REFRESH_WEB_LOCK_NAME = 'nexus-token-refresh';
+  private static readonly REFRESH_COORDINATION_TIMEOUT = 60_000;
+  private static readonly REFRESH_ATTEMPT_KEY = 'nexus_token_refresh_attempt';
+  private static readonly LOGOUT_GENERATION_KEY = 'nexus_logout_generation';
+  private static readonly LOGOUT_IN_PROGRESS_KEY = 'nexus_logout_in_progress';
+  private static readonly LOGOUT_IN_PROGRESS_TTL = 120_000;
+
+  // Compatibility fallback only: localStorage has no atomic compare-and-set,
+  // so this lease reduces duplicate refreshes but cannot guarantee exclusion
+  // in browsers that do not implement the Web Locks API.
   private static readonly REFRESH_LOCK_KEY = 'nexus_token_refresh_lock';
-  private static readonly REFRESH_LOCK_TTL = 15_000; // 15 seconds max
+  private static readonly REFRESH_FALLBACK_LEASE_TTL = 15_000;
 
   constructor(baseUrl: string = API_BASE) {
     this.baseUrl = baseUrl;
@@ -431,11 +466,16 @@ class ApiClient {
         if (e.key === TOKEN_KEY && this.pendingRefreshWaiters.size > 0) {
           // A value means the other tab refreshed successfully. Removal means
           // it proved that the shared session is invalid.
-          if (e.newValue) {
-            this.inflightRequests.clear();
-            this.resolvePendingRefreshWaiters('refreshed');
-          } else {
-            this.resolvePendingRefreshWaiters('invalid');
+          const currentTenantId = tokenManager.getTenantId();
+          for (const waiter of [...this.pendingRefreshWaiters]) {
+            if (currentTenantId !== waiter.tenantIdAtWait) {
+              this.resolvePendingRefreshWaiter(waiter, 'transient');
+            } else if (e.newValue) {
+              this.inflightRequests.clear();
+              this.resolvePendingRefreshWaiter(waiter, 'refreshed');
+            } else {
+              this.resolvePendingRefreshWaiter(waiter, 'invalid');
+            }
           }
           return;
         }
@@ -449,8 +489,11 @@ class ApiClient {
           // temporarily unavailable. Compare token generations so lock release
           // never masquerades as a successful refresh.
           const currentToken = tokenManager.getAccessToken();
+          const currentTenantId = tokenManager.getTenantId();
           for (const waiter of [...this.pendingRefreshWaiters]) {
-            const outcome = currentToken && currentToken !== waiter.accessTokenAtWait
+            const outcome = currentTenantId !== waiter.tenantIdAtWait
+              ? 'transient'
+              : currentToken && currentToken !== waiter.accessTokenAtWait
               ? 'refreshed'
               : 'transient';
             this.resolvePendingRefreshWaiter(waiter, outcome);
@@ -469,27 +512,27 @@ class ApiClient {
     waiter.resolve(outcome);
   }
 
-  private resolvePendingRefreshWaiters(outcome: TokenRefreshOutcome): void {
-    for (const waiter of [...this.pendingRefreshWaiters]) {
-      this.resolvePendingRefreshWaiter(waiter, outcome);
-    }
-  }
-
-  private waitForExternalTokenRefresh(accessTokenAtWait: string | null): Promise<TokenRefreshOutcome> {
+  private waitForExternalTokenRefresh(
+    generationAtWait: TokenGenerationSnapshot,
+  ): Promise<TokenRefreshOutcome> {
     return new Promise<TokenRefreshOutcome>((resolve) => {
       const waiter = {} as PendingRefreshWaiter;
-      waiter.accessTokenAtWait = accessTokenAtWait;
+      waiter.accessTokenAtWait = generationAtWait.accessToken;
+      waiter.tenantIdAtWait = generationAtWait.tenantId;
       waiter.resolve = resolve;
       waiter.timeoutId = setTimeout(() => {
         this.resolvePendingRefreshWaiter(waiter, 'transient');
-      }, ApiClient.REFRESH_LOCK_TTL);
+      }, ApiClient.REFRESH_FALLBACK_LEASE_TTL);
       this.pendingRefreshWaiters.add(waiter);
 
       // Close the gap between observing a held lock and registering this
       // waiter. The other tab may already have written its token and released
       // the lock before our storage listener was ready.
       const currentToken = tokenManager.getAccessToken();
-      if (currentToken !== accessTokenAtWait) {
+      const currentTenantId = tokenManager.getTenantId();
+      if (currentTenantId !== generationAtWait.tenantId) {
+        this.resolvePendingRefreshWaiter(waiter, 'transient');
+      } else if (currentToken !== generationAtWait.accessToken) {
         this.resolvePendingRefreshWaiter(waiter, currentToken ? 'refreshed' : 'invalid');
       } else if (localStorage.getItem(ApiClient.REFRESH_LOCK_KEY) === null) {
         this.resolvePendingRefreshWaiter(waiter, 'transient');
@@ -502,6 +545,23 @@ class ApiClient {
     this.dispatchSessionExpired();
   }
 
+  private isLogoutInProgress(): boolean {
+    const marker = localStorage.getItem(ApiClient.LOGOUT_IN_PROGRESS_KEY);
+    if (!marker) return false;
+
+    const startedAt = Number.parseInt(marker.split(':', 1)[0] ?? '', 10);
+    if (!Number.isFinite(startedAt) || Date.now() - startedAt > ApiClient.LOGOUT_IN_PROGRESS_TTL) {
+      // A tab can disappear mid-logout. Expire its marker so that a later,
+      // independent login is never permanently prevented from refreshing.
+      if (localStorage.getItem(ApiClient.LOGOUT_IN_PROGRESS_KEY) === marker) {
+        localStorage.removeItem(ApiClient.LOGOUT_IN_PROGRESS_KEY);
+      }
+      return false;
+    }
+
+    return true;
+  }
+
   private sessionExpiredResponse<T>(): ApiResponse<T> {
     return {
       success: false,
@@ -512,6 +572,10 @@ class ApiClient {
 
   private refreshUnavailableResponse<T>(): ApiResponse<T> {
     return { success: false, code: 'AUTH_REFRESH_UNAVAILABLE' };
+  }
+
+  private tenantContextChangedResponse<T>(): ApiResponse<T> {
+    return { success: false, code: 'TENANT_CONTEXT_CHANGED' };
   }
 
   /**
@@ -629,7 +693,12 @@ class ApiClient {
   /**
    * Attempt to refresh the access token
    */
-  private async refreshAccessToken(): Promise<TokenRefreshOutcome> {
+  private async refreshAccessToken(signal?: AbortSignal): Promise<TokenRefreshOutcome> {
+    const logoutGenerationAtStart = localStorage.getItem(ApiClient.LOGOUT_GENERATION_KEY);
+    if (this.isLogoutInProgress()) {
+      return 'invalid';
+    }
+
     const refreshToken = tokenManager.getRefreshToken();
     if (!refreshToken) {
       return 'invalid';
@@ -650,12 +719,22 @@ class ApiClient {
         headers: refreshHeaders,
         body: JSON.stringify({ refresh_token: refreshToken }),
         credentials: 'include',
+        signal,
       });
 
       if (!response.ok) {
         // Credential and account-policy rejections are authoritative. Server,
         // rate-limit, and transport failures are temporary and must not delete
         // an otherwise valid refresh token.
+        if (response.status === 409) {
+          const conflict = await response.json().catch(() => null);
+          if (hasApiErrorCode(conflict, 'AUTH_REFRESH_SUPERSEDED')) {
+            // Another request already consumed and rotated this token. Preserve
+            // the locally stored credentials; cross-tab generation checks stop
+            // queued Web Lock owners from presenting the old token again.
+            return 'transient';
+          }
+        }
         if (response.status >= 400 && response.status < 500 && response.status !== 408 && response.status !== 429) {
           return 'invalid';
         }
@@ -664,13 +743,22 @@ class ApiClient {
 
       const data = await response.json();
 
-      if (data.success && data.access_token) {
-        tokenManager.setAccessToken(data.access_token);
+      if (
+        signal?.aborted
+        || this.isLogoutInProgress()
+        || localStorage.getItem(ApiClient.LOGOUT_GENERATION_KEY) !== logoutGenerationAtStart
+      ) {
+        return 'transient';
+      }
 
-        // Update refresh token if provided (token rotation)
+      if (data.success && data.access_token) {
+        // Persist the rotated single-use credential before access-token storage
+        // events wake another tab. A woken tab must observe the complete token
+        // generation, never the new access token paired with the old refresh.
         if (data.refresh_token) {
           tokenManager.setRefreshToken(data.refresh_token);
         }
+        tokenManager.setAccessToken(data.access_token);
 
         return 'refreshed';
       }
@@ -681,16 +769,138 @@ class ApiClient {
     }
   }
 
+  private captureTokenGeneration(): TokenGenerationSnapshot {
+    return {
+      accessToken: tokenManager.getAccessToken(),
+      refreshToken: tokenManager.getRefreshToken(),
+      refreshAttempt: localStorage.getItem(ApiClient.REFRESH_ATTEMPT_KEY),
+      logoutGeneration: localStorage.getItem(ApiClient.LOGOUT_GENERATION_KEY),
+      tenantId: tokenManager.getTenantId(),
+    };
+  }
+
   /**
-   * Acquire a cross-tab lock via localStorage to prevent concurrent refreshes.
-   * Returns true if this tab acquired the lock.
+   * Return the shared outcome when another tab changed the token generation
+   * while this request was queued, or null when this tab still needs to refresh.
+   */
+  private outcomeAfterGenerationChange(
+    generationAtQueueTime: TokenGenerationSnapshot,
+  ): TokenRefreshOutcome | null {
+    const current = this.captureTokenGeneration();
+    if (current.logoutGeneration !== generationAtQueueTime.logoutGeneration) {
+      return 'invalid';
+    }
+    if (current.tenantId !== generationAtQueueTime.tenantId) {
+      // Never refresh or retry work from one tenant with another tenant's
+      // credentials. The caller receives a non-authoritative transient result.
+      return 'transient';
+    }
+    const tokensChanged = current.accessToken !== generationAtQueueTime.accessToken
+      || current.refreshToken !== generationAtQueueTime.refreshToken;
+    if (tokensChanged) {
+      return current.accessToken && current.refreshToken ? 'refreshed' : 'invalid';
+    }
+
+    // A prior lock owner may have received a transient response (notably the
+    // server's AUTH_REFRESH_SUPERSEDED conflict) without receiving replacement
+    // credentials. Queued owners must inherit that outcome rather than retrying
+    // the same single-use token immediately.
+    if (current.refreshAttempt !== generationAtQueueTime.refreshAttempt) {
+      return 'transient';
+    }
+
+    return null;
+  }
+
+  private publishTransientRefreshAttempt(): void {
+    safeLocalStorageSet(
+      ApiClient.REFRESH_ATTEMPT_KEY,
+      `${Date.now()}:${Math.random().toString(36).slice(2)}`,
+    );
+  }
+
+  private tokenGenerationIsUnchanged(
+    generationAtQueueTime: TokenGenerationSnapshot,
+  ): boolean {
+    const current = this.captureTokenGeneration();
+    if (
+      current.accessToken === generationAtQueueTime.accessToken
+      && current.refreshToken === generationAtQueueTime.refreshToken
+      && current.refreshAttempt === generationAtQueueTime.refreshAttempt
+      && current.logoutGeneration === generationAtQueueTime.logoutGeneration
+      && current.tenantId === generationAtQueueTime.tenantId
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private supportsWebLocks(): boolean {
+    return typeof navigator !== 'undefined'
+      && typeof navigator.locks?.request === 'function';
+  }
+
+  /**
+   * Atomically coordinate refresh across tabs with the browser Web Locks API.
+   * The abort signal bounds both time spent queued and the owned refresh. The
+   * exclusive lock remains held for the full refresh callback, regardless of
+   * whether it exceeds the compatibility fallback's historical 15-second lease.
+   */
+  private async refreshWithWebLock(
+    generationAtQueueTime: TokenGenerationSnapshot,
+  ): Promise<TokenRefreshOutcome> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      ApiClient.REFRESH_COORDINATION_TIMEOUT,
+    );
+
+    try {
+      return await navigator.locks.request(
+        ApiClient.REFRESH_WEB_LOCK_NAME,
+        { mode: 'exclusive', signal: controller.signal },
+        async () => {
+          // A queued request must re-read shared storage only after acquiring
+          // the lock. If the prior owner rotated, presenting the old single-use
+          // refresh token would be treated as replay by the server.
+          const queuedOutcome = this.outcomeAfterGenerationChange(generationAtQueueTime);
+          if (queuedOutcome !== null) {
+            return queuedOutcome;
+          }
+
+          const outcome = await this.refreshAccessToken(controller.signal);
+          if (outcome === 'transient' && this.tokenGenerationIsUnchanged(generationAtQueueTime)) {
+            this.publishTransientRefreshAttempt();
+          } else if (outcome === 'invalid') {
+            // Publish the invalid generation before releasing the Web Lock so
+            // the next queued owner cannot submit the same rejected token.
+            tokenManager.clearTokens();
+          }
+
+          return outcome;
+        },
+      );
+    } catch {
+      // Lock-wait timeouts and Web Locks failures are transient. Keep the
+      // credentials so a later request can retry safely.
+      return 'transient';
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
+   * Compatibility fallback for browsers without Web Locks. localStorage does
+   * not provide atomic lock acquisition, so this is best-effort coordination
+   * only and must not be treated as equivalent to an exclusive Web Lock.
    */
   private acquireRefreshLock(): boolean {
     const now = Date.now();
     const existing = localStorage.getItem(ApiClient.REFRESH_LOCK_KEY);
     if (existing) {
       const lockTime = parseInt(existing, 10);
-      if (now - lockTime < ApiClient.REFRESH_LOCK_TTL) {
+      if (now - lockTime < ApiClient.REFRESH_FALLBACK_LEASE_TTL) {
         return false; // Another tab holds a valid lock
       }
     }
@@ -702,31 +912,47 @@ class ApiClient {
     localStorage.removeItem(ApiClient.REFRESH_LOCK_KEY);
   }
 
+  private async refreshWithCompatibilityFallback(
+    generationAtQueueTime: TokenGenerationSnapshot,
+  ): Promise<TokenRefreshOutcome> {
+    if (!this.acquireRefreshLock()) {
+      return this.waitForExternalTokenRefresh(generationAtQueueTime);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      ApiClient.REFRESH_COORDINATION_TIMEOUT,
+    );
+
+    try {
+      const queuedOutcome = this.outcomeAfterGenerationChange(generationAtQueueTime);
+      return queuedOutcome ?? await this.refreshAccessToken(controller.signal);
+    } finally {
+      clearTimeout(timeoutId);
+      this.releaseRefreshLock();
+    }
+  }
+
   /**
    * Handle token refresh with request queuing and cross-tab coordination
    */
   private async handleTokenRefresh(): Promise<TokenRefreshOutcome> {
+    if (this.isLogoutInProgress()) {
+      this.expireSession();
+      return 'invalid';
+    }
+
     // If this tab is already refreshing, wait for the result
     if (this.isRefreshing && this.refreshPromise) {
       return this.refreshPromise;
     }
 
-    // Capture the token generation before checking the lock. If the other tab
-    // completes between these operations and waiter registration, the waiter
-    // performs an immediate generation/lock re-check.
-    const accessTokenBeforeLock = tokenManager.getAccessToken();
-
-    // Check if another tab is currently refreshing
-    if (!this.acquireRefreshLock()) {
-      // Another tab is refreshing. Wait for its token or lock storage event;
-      // lock ownership is deliberately independent from waiter state.
-      const outcome = await this.waitForExternalTokenRefresh(accessTokenBeforeLock);
-      if (outcome === 'invalid') this.expireSession();
-      return outcome;
-    }
-
+    const generationAtQueueTime = this.captureTokenGeneration();
     this.isRefreshing = true;
-    this.refreshPromise = this.refreshAccessToken();
+    this.refreshPromise = this.supportsWebLocks()
+      ? this.refreshWithWebLock(generationAtQueueTime)
+      : this.refreshWithCompatibilityFallback(generationAtQueueTime);
 
     try {
       const outcome = await this.refreshPromise;
@@ -743,7 +969,79 @@ class ApiClient {
     } finally {
       this.isRefreshing = false;
       this.refreshPromise = null;
-      this.releaseRefreshLock();
+    }
+  }
+
+  /**
+   * Refresh the shared login session through the same single-flight and
+   * cross-tab coordinator used by automatic 401 recovery.
+   *
+   * Interactive callers must use this entrypoint instead of posting a refresh
+   * token directly. Rotating refresh tokens are single-use, so parallel
+   * refresh requests are correctly treated by the server as credential replay.
+   */
+  async refreshSession(): Promise<TokenRefreshOutcome> {
+    return this.handleTokenRefresh();
+  }
+
+  /**
+   * Revoke and clear a session without allowing a delayed refresh response to
+   * resurrect it. The origin-wide marker stops writes immediately; Web Locks
+   * then orders the logout request with every modern-browser refresh owner.
+   * The server accepts any tracked generation from the family for revocation,
+   * so the compatibility path remains safe when Web Locks are unavailable.
+   */
+  async logoutSession(
+    refreshToken: string | null = tokenManager.getRefreshToken(),
+  ): Promise<ApiResponse<unknown>> {
+    const marker = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+    safeLocalStorageSet(ApiClient.LOGOUT_IN_PROGRESS_KEY, marker);
+    safeLocalStorageSet(ApiClient.LOGOUT_GENERATION_KEY, marker);
+
+    const performLogout = async (): Promise<ApiResponse<unknown>> => {
+      let response: ApiResponse<unknown>;
+      try {
+        response = await this.request<unknown>(
+          '/auth/logout',
+          {
+            method: 'POST',
+            body: { refresh_token: refreshToken },
+          },
+          false,
+        );
+      } catch {
+        response = { success: false, code: 'AUTH_LOGOUT_UNAVAILABLE' };
+      } finally {
+        // Clear while the logout marker is still active. An already-running
+        // refresh compares the persistent generation before any token write.
+        tokenManager.clearTokens();
+        this.inflightRequests.clear();
+        this.responseCache.clear();
+        for (const waiter of [...this.pendingRefreshWaiters]) {
+          this.resolvePendingRefreshWaiter(waiter, 'invalid');
+        }
+      }
+
+      return response;
+    };
+
+    try {
+      if (this.supportsWebLocks()) {
+        return await navigator.locks.request(
+          ApiClient.REFRESH_WEB_LOCK_NAME,
+          { mode: 'exclusive' },
+          performLogout,
+        );
+      }
+      return await performLogout();
+    } catch {
+      // A browser lock implementation failure must not prevent local logout or
+      // the best-effort family-revocation request.
+      return await performLogout();
+    } finally {
+      if (localStorage.getItem(ApiClient.LOGOUT_IN_PROGRESS_KEY) === marker) {
+        localStorage.removeItem(ApiClient.LOGOUT_IN_PROGRESS_KEY);
+      }
     }
   }
 
@@ -753,9 +1051,17 @@ class ApiClient {
   async request<T>(
     endpoint: string,
     options: RequestOptions = {},
-    retryOnUnauthorized = true
+    retryOnUnauthorized = true,
+    expectedTenantId?: string | null,
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
+    const currentTenantId = tokenManager.getTenantId();
+    const tenantIdAtRequestStart = expectedTenantId === undefined
+      ? currentTenantId
+      : expectedTenantId;
+    if (currentTenantId !== tenantIdAtRequestStart) {
+      return this.tenantContextChangedResponse<T>();
+    }
     const headers = this.buildHeaders(options);
     const body = options.body ? JSON.stringify(options.body) : undefined;
     const method = options.method?.toUpperCase() || 'GET';
@@ -814,10 +1120,20 @@ class ApiClient {
       // Handle 401 Unauthorized with exactly one token refresh and retry.
       if (response.status === 401 && !options.skipAuth) {
         if (retryOnUnauthorized) {
+          // A response from tenant A must never be retried after the user has
+          // switched to tenant B; that could replay a state-changing body in
+          // the wrong community with B's newly stored credentials.
+          if (tokenManager.getTenantId() !== tenantIdAtRequestStart) {
+            return this.tenantContextChangedResponse<T>();
+          }
+
           const outcome = await this.handleTokenRefresh();
 
           if (outcome === 'refreshed') {
-            return this.request<T>(endpoint, options, false);
+            if (tokenManager.getTenantId() !== tenantIdAtRequestStart) {
+              return this.tenantContextChangedResponse<T>();
+            }
+            return this.request<T>(endpoint, options, false, tenantIdAtRequestStart);
           }
           if (outcome === 'transient') {
             return this.refreshUnavailableResponse<T>();

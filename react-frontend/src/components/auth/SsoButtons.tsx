@@ -8,6 +8,11 @@ import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';
 import KeyRound from 'lucide-react/icons/key-round';
 import { Button } from '@/components/ui/Button';
+import { API_BASE } from '@/lib/api';
+import {
+  clearOAuthBrowserVerifier,
+  createOAuthBrowserBinding,
+} from '@/lib/oauth-browser-binding';
 
 interface SsoProvider {
   key: string;
@@ -40,7 +45,10 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
     const params = new URLSearchParams();
     if (tenantId) params.set('tenant_id', String(tenantId));
     const qs = params.toString();
-    fetch(`/api/v2/auth/sso/providers${qs ? `?${qs}` : ''}`, { credentials: 'include', headers })
+    fetch(`${API_BASE}/v2/auth/sso/providers${qs ? `?${qs}` : ''}`, {
+      credentials: 'include',
+      headers,
+    })
       .then((r) => r.json())
       .then((data: { success?: boolean; providers?: SsoProvider[] }) => {
         setProviders(Array.isArray(data?.providers) ? data.providers : []);
@@ -53,26 +61,36 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
     return null;
   }
 
-  function startFlow(key: string) {
+  async function startFlow(key: string) {
     setFlowError(null);
-    const params = new URLSearchParams();
-    if (tenantId) params.set('tenant_id', String(tenantId));
-    const qs = params.toString();
-    // The redirect endpoint returns JSON `{ redirect_url }` — fetch it then navigate.
-    fetch(`/api/v2/auth/sso/${encodeURIComponent(key)}/redirect${qs ? `?${qs}` : ''}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: tenantId ? { 'X-Tenant-Id': String(tenantId) } : {},
-    })
-      .then((r) => r.json())
-      .then((data: { success?: boolean; redirect_url?: string; message?: string }) => {
-        if (data?.success && data.redirect_url) {
-          window.location.href = data.redirect_url;
-        } else {
-          setFlowError(t('oauth.callback_failed'));
-        }
-      })
-      .catch(() => setFlowError(t('oauth.callback_failed')));
+    let challenge: string | null = null;
+
+    try {
+      ({ challenge } = await createOAuthBrowserBinding());
+      const params = new URLSearchParams({ browser_challenge: challenge });
+      if (tenantId) params.set('tenant_id', String(tenantId));
+      const response = await fetch(
+        `${API_BASE}/v2/auth/sso/${encodeURIComponent(key)}/redirect?${params.toString()}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: tenantId ? { 'X-Tenant-Id': String(tenantId) } : {},
+        },
+      );
+      const data = await response.json() as {
+        success?: boolean;
+        redirect_url?: string;
+      };
+      if (data?.success && data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
+      }
+    } catch {
+      // Fail closed when secure browser storage/crypto or initiation is unavailable.
+    }
+
+    clearOAuthBrowserVerifier(challenge);
+    setFlowError(t('oauth.callback_failed'));
   }
 
   return (
@@ -92,7 +110,7 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
             fullWidth
             size="lg"
             startContent={<Icon className="w-5 h-5" aria-hidden="true" />}
-            onPress={() => startFlow(provider.key)}
+            onPress={() => void startFlow(provider.key)}
             className="border-[var(--border-default)] text-theme-primary hover:bg-theme-hover"
           >
             {t('oauth.sign_in_with_provider', { name: provider.display_name })}

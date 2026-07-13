@@ -74,16 +74,15 @@ class VoiceMessageController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __('api.no_audio_data_provided'), 'audio', 400);
             }
 
-            // Create voice message via MessageService::send() (consistent with MessagesController)
+            // Persist only the tenant-scoped pointer returned by AudioUploader.
             $tenant = TenantContext::get();
             $tenantId = $tenant['id'];
-            $messageData = \App\Services\MessageService::send($senderId, [
-                'recipient_id'   => $receiverId,
-                'body'           => '',
-                'is_voice'       => true,
-                'audio_url'      => $audioResult['url'],
-                'audio_duration' => $audioResult['duration'],
-            ]);
+            $messageData = MessageService::sendVoice(
+                $senderId,
+                $receiverId,
+                (string) $audioResult['url'],
+                (int) $audioResult['duration'],
+            );
 
             if (empty($messageData)) {
                 AudioUploader::delete((string) $audioResult['url']);

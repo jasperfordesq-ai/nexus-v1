@@ -21,6 +21,7 @@ vi.mock('@/lib/api', async () => {
     api: {
       get: vi.fn(),
       post: vi.fn(),
+      logoutSession: vi.fn(),
     },
     tokenManager: {
       getAccessToken: vi.fn(),
@@ -410,7 +411,7 @@ describe('AuthContext', () => {
         success: true,
         data: { id: 1, first_name: 'John', last_name: 'Doe', tenant_id: 1 },
       });
-      vi.mocked(api.post).mockResolvedValueOnce({ success: true });
+      vi.mocked(api.logoutSession).mockResolvedValueOnce({ success: true });
 
       render(
         <AuthProvider>
@@ -433,7 +434,7 @@ describe('AuthContext', () => {
       // harmless because TenantShell and TenantProvider only use them when
       // auth tokens exist.
       expect(tokenManager.clearTokens).toHaveBeenCalled();
-      expect(api.post).toHaveBeenCalledWith('/auth/logout', expect.any(Object));
+      expect(api.logoutSession).toHaveBeenCalledTimes(1);
     });
 
     it('proceeds with local logout even if server logout fails', async () => {
@@ -444,7 +445,7 @@ describe('AuthContext', () => {
         success: true,
         data: { id: 1, first_name: 'John', last_name: 'Doe', tenant_id: 1 },
       });
-      vi.mocked(api.post).mockRejectedValueOnce(new Error('Network error'));
+      vi.mocked(api.logoutSession).mockRejectedValueOnce(new Error('Network error'));
 
       render(
         <AuthProvider>

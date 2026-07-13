@@ -186,9 +186,19 @@ class WebAuthnController extends BaseApiController
             return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
         }
         $input = $this->getAllInput();
-        $confirmationError = $this->requireSecurityConfirmation($userId, TenantContext::getId(), $input);
-        if ($confirmationError !== null) {
-            return $confirmationError;
+        $tenantId = TenantContext::getId();
+        $securityConfirmationToken = $input['security_confirmation_token']
+            ?? request()->headers->get('X-Security-Confirmation');
+        if (
+            !is_string($securityConfirmationToken)
+            || $securityConfirmationToken === ''
+            || $this->tokenService->validateSecurityConfirmationToken(
+                $securityConfirmationToken,
+                $userId,
+                $tenantId
+            ) === null
+        ) {
+            return $this->securityConfirmationFailed();
         }
 
         try {
@@ -301,13 +311,13 @@ class WebAuthnController extends BaseApiController
             $authenticatorType = null;
         }
 
-        $tenantId = TenantContext::getId();
         $maxCredentials = $this->maxCredentialsPerUser();
         try {
-            DB::transaction(function () use (
+            $registrationPersisted = DB::transaction(function () use (
                 $userId,
                 $tenantId,
                 $maxCredentials,
+                $securityConfirmationToken,
                 $credentialIdB64,
                 $verified,
                 $transports,
@@ -315,7 +325,7 @@ class WebAuthnController extends BaseApiController
                 $authenticatorType,
                 $context,
                 $challengeData
-            ): void {
+            ): bool {
                 // Routing mutations lock this tenant boundary before they
                 // re-check RP impact. Taking the same lock first prevents a
                 // registration from committing in the gap between a mutation's
@@ -357,6 +367,19 @@ class WebAuthnController extends BaseApiController
                     throw new \OverflowException('WebAuthn credential limit reached.');
                 }
 
+                // Revalidate the exact proof accepted at request entry while
+                // holding the same tenant-scoped user lock as password changes,
+                // password resets, and logout-all. A revocation that committed
+                // first advances the global cutoff and invalidates this token;
+                // a revocation that starts later must wait for enrollment.
+                if ($this->tokenService->validateSecurityConfirmationTokenUnderUserLock(
+                    $securityConfirmationToken,
+                    $userId,
+                    $tenantId
+                ) === null) {
+                    return false;
+                }
+
                 DB::insert(
                     "INSERT INTO webauthn_credentials
                         (user_id, tenant_id, credential_id, public_key, sign_count, transports,
@@ -384,7 +407,18 @@ class WebAuthnController extends BaseApiController
                         1,
                     ]
                 );
+
+                return true;
             });
+
+            if (!$registrationPersisted) {
+                Log::notice('[WebAuthn] Registration confirmation invalidated before persistence', [
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                ]);
+
+                return $this->securityConfirmationFailed();
+            }
         } catch (\OverflowException) {
             return $this->noStore($this->respondWithError(
                 'WEBAUTHN_CREDENTIAL_LIMIT',
@@ -558,6 +592,10 @@ class WebAuthnController extends BaseApiController
             $authUserId ? $allowCredentials : []
         );
 
+        // Bind the authentication window to the server-side challenge. A
+        // logout-all or password change at or after this point invalidates the
+        // ceremony even when the authenticator assertion is otherwise valid.
+        $authenticationStartedAt = time();
         $challengeB64 = $this->base64UrlEncode(random_bytes(32));
         try {
             $challengeId = $this->webAuthnChallengeStore->create(
@@ -568,6 +606,7 @@ class WebAuthnController extends BaseApiController
                     'origin' => $context['origin'],
                     'rp_id' => $context['rp_id'],
                     'allowed_credential_ids' => $realAllowedIds,
+                    'authentication_started_at' => $authenticationStartedAt,
                     // Signed-out login always uses resident/discoverable
                     // credentials. Looking up descriptor IDs by email creates
                     // an unavoidable timing distinction between real IDs and
@@ -668,6 +707,19 @@ class WebAuthnController extends BaseApiController
 
         $credentialId = $this->base64UrlEncode($credentialIdBytes);
         $metadata = is_array($challengeData['metadata'] ?? null) ? $challengeData['metadata'] : [];
+        // The top-level creation time keeps in-flight challenges from an older
+        // release compatible during a rolling deployment. New challenges bind
+        // the same timestamp explicitly in their authentication metadata.
+        $authenticationStartedAt = $metadata['authentication_started_at']
+            ?? $challengeData['created_at']
+            ?? null;
+        if (
+            !is_int($authenticationStartedAt)
+            || $authenticationStartedAt < 1
+            || $authenticationStartedAt > time()
+        ) {
+            return $this->authVerificationFailed();
+        }
         $allowedIds = is_array($metadata['allowed_credential_ids'] ?? null)
             ? array_values(array_filter($metadata['allowed_credential_ids'], 'is_string'))
             : [];
@@ -678,6 +730,10 @@ class WebAuthnController extends BaseApiController
 
         $tenantId = TenantContext::getId();
         $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
+        // Native passkeys are not implemented in the mobile client yet. Do not
+        // let spoofable public headers upgrade this browser ceremony to a
+        // longer-lived mobile credential.
+        $isMobile = false;
 
         try {
             $result = DB::transaction(function () use (
@@ -691,14 +747,51 @@ class WebAuthnController extends BaseApiController
                 $clientDataJson,
                 $authenticatorData,
                 $signature,
-                $challengeBytes
+                $challengeBytes,
+                $authenticationStartedAt,
+                $isMobile
             ): array {
-                $row = DB::table('webauthn_credentials as wc')
-                    ->join('users as u', function ($join): void {
-                        $join->on('u.id', '=', 'wc.user_id')
-                            ->on('u.tenant_id', '=', 'wc.tenant_id');
+                // Resolve the owner first, then take the exact users-row lock
+                // used by TokenService::revokeAllTokensForUser(). This totally
+                // orders token issuance with logout-all and password changes.
+                $credentialOwner = DB::table('webauthn_credentials')
+                    ->where('credential_id', $credentialId)
+                    ->where('tenant_id', $tenantId)
+                    ->where(function ($query) use ($context): void {
+                        $query->where('rp_id', $context['rp_id'])
+                            ->orWhereNull('rp_id');
                     })
+                    ->first(['user_id']);
+                if ($credentialOwner === null) {
+                    return ['failed' => true];
+                }
+
+                $lockedUser = DB::table('users')
+                    ->where('id', (int) $credentialOwner->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first([
+                        'id',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'role',
+                        'tenant_id',
+                        'is_super_admin',
+                        'is_tenant_super_admin',
+                        'is_god',
+                        'status',
+                        'verification_status',
+                        'email_verified_at',
+                        'is_approved',
+                    ]);
+                if ($lockedUser === null) {
+                    return ['failed' => true];
+                }
+
+                $row = DB::table('webauthn_credentials as wc')
                     ->where('wc.credential_id', $credentialId)
+                    ->where('wc.user_id', (int) $lockedUser->id)
                     ->where('wc.tenant_id', $tenantId)
                     ->where(function ($query) use ($context): void {
                         $query->where('wc.rp_id', $context['rp_id'])
@@ -715,20 +808,6 @@ class WebAuthnController extends BaseApiController
                         'wc.user_handle',
                         'wc.backup_eligible',
                         'wc.user_verified',
-                        'u.id as user_id',
-                        'u.first_name',
-                        'u.last_name',
-                        'u.email',
-                        'u.role',
-                        'u.tenant_id as tenant_id',
-                        'u.tenant_id as user_tenant_id',
-                        'u.is_super_admin',
-                        'u.is_tenant_super_admin',
-                        'u.is_god',
-                        'u.status',
-                        'u.verification_status',
-                        'u.email_verified_at',
-                        'u.is_approved',
                     ])
                     ->lockForUpdate()
                     ->first();
@@ -737,7 +816,14 @@ class WebAuthnController extends BaseApiController
                     return ['failed' => true];
                 }
 
-                $credential = (array) $row;
+                $credential = array_merge(
+                    (array) $row,
+                    (array) $lockedUser,
+                    [
+                        'user_id' => (int) $lockedUser->id,
+                        'user_tenant_id' => (int) $lockedUser->tenant_id,
+                    ]
+                );
                 $boundUserId = $challengeData['user_id'] ?? null;
                 if ($boundUserId !== null && (int) $boundUserId !== (int) $credential['user_id']) {
                     return ['failed' => true];
@@ -788,6 +874,16 @@ class WebAuthnController extends BaseApiController
                     return ['failed' => true];
                 }
 
+                // Possession has now been established. While the issuance lock
+                // is still held, fail closed if logout-all or a password change
+                // committed at any point since this challenge began.
+                if (!$this->tokenService->isAuthenticationStartValid(
+                    (int) $credential['user_id'],
+                    $authenticationStartedAt
+                )) {
+                    return ['failed' => true];
+                }
+
                 // Verify possession before evaluating account policy. Email-bound
                 // challenges intentionally contain padded credential IDs; returning
                 // a gate-specific response for the real ID before signature
@@ -817,7 +913,38 @@ class WebAuthnController extends BaseApiController
                     ->where('tenant_id', $tenantId)
                     ->update(['last_login_at' => now()]);
 
-                return ['credential' => $credential];
+                $accessToken = $this->tokenService->generateToken(
+                    (int) $credential['user_id'],
+                    (int) $credential['user_tenant_id'],
+                    [
+                        'role' => $credential['role'],
+                        'email' => $credential['email'],
+                        'is_super_admin' => !empty($credential['is_super_admin']),
+                        'is_tenant_super_admin' => !empty($credential['is_tenant_super_admin']),
+                        'is_god' => !empty($credential['is_god']),
+                        'amr' => ['passkey', 'user_verification'],
+                        'acr' => 'urn:nexus:aal2',
+                        'credential_ref' => $this->credentialReference($credentialId),
+                    ],
+                    $isMobile
+                );
+                $refreshToken = $this->tokenService->generateRefreshToken(
+                    (int) $credential['user_id'],
+                    (int) $credential['user_tenant_id'],
+                    $isMobile
+                );
+                $securityConfirmationToken = $this->tokenService->generateSecurityConfirmationToken(
+                    (int) $credential['user_id'],
+                    (int) $credential['user_tenant_id'],
+                    'passkey_uv'
+                );
+
+                return [
+                    'credential' => $credential,
+                    'access_token' => $accessToken,
+                    'refresh_token' => $refreshToken,
+                    'security_confirmation_token' => $securityConfirmationToken,
+                ];
             });
         } catch (\Throwable $e) {
             Log::warning('[WebAuthn] Authentication verification failed', [
@@ -837,42 +964,25 @@ class WebAuthnController extends BaseApiController
                 403
             ));
         }
-        if (!isset($result['credential']) || !is_array($result['credential'])) {
+        if (
+            !isset(
+                $result['credential'],
+                $result['access_token'],
+                $result['refresh_token'],
+                $result['security_confirmation_token']
+            )
+            || !is_array($result['credential'])
+            || !is_string($result['access_token'])
+            || !is_string($result['refresh_token'])
+            || !is_string($result['security_confirmation_token'])
+        ) {
             return $this->authVerificationFailed();
         }
 
         $credential = $result['credential'];
-
-        // Generate auth tokens
-        // Native passkeys are not implemented in the mobile client yet. Do not
-        // let spoofable public headers upgrade this browser ceremony to a
-        // 30-day access token / five-year refresh token.
-        $isMobile = false;
-        $accessToken = $this->tokenService->generateToken(
-            (int)$credential['user_id'],
-            (int)$credential['user_tenant_id'],
-            [
-                'role' => $credential['role'],
-                'email' => $credential['email'],
-                'is_super_admin' => !empty($credential['is_super_admin']),
-                'is_tenant_super_admin' => !empty($credential['is_tenant_super_admin']),
-                'is_god' => !empty($credential['is_god']),
-                'amr' => ['passkey', 'user_verification'],
-                'acr' => 'urn:nexus:aal2',
-                'credential_ref' => $this->credentialReference($credentialId),
-            ],
-            $isMobile
-        );
-        $refreshToken = $this->tokenService->generateRefreshToken(
-            (int)$credential['user_id'],
-            (int)$credential['user_tenant_id'],
-            $isMobile
-        );
-        $securityConfirmationToken = $this->tokenService->generateSecurityConfirmationToken(
-            (int) $credential['user_id'],
-            (int) $credential['user_tenant_id'],
-            'passkey_uv'
-        );
+        $accessToken = $result['access_token'];
+        $refreshToken = $result['refresh_token'];
+        $securityConfirmationToken = $result['security_confirmation_token'];
 
         // Keep passkey authentication on the frontend's established JWT token
         // family. Issuing a second Sanctum bearer plus a raw PHP session would
@@ -920,93 +1030,109 @@ class WebAuthnController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
-        $method = null;
 
-        $user = DB::table('users')
-            ->where('id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->select(['password_hash', 'status'])
-            ->first();
-        if ($user === null || strtolower((string) $user->status) !== 'active') {
-            return $this->noStore($this->respondWithError(
-                ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
-                __('api.account_suspended'),
-                null,
-                403
-            ));
-        }
-
-        $password = $input['current_password'] ?? null;
-        $totpCode = $input['totp_code'] ?? null;
-        $backupCode = $input['backup_code'] ?? null;
-
-        if (is_string($password) && $password !== '') {
-            $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$V1Jna0owWXBLNC55ajFQRQ$h0+cXUsJzOi6TzES3RPuquTJpwPbpYmVHS4A3ArHHXo';
-            if (!password_verify($password, $user->password_hash ?: $dummyHash)) {
-                return $this->securityConfirmationFailed();
-            }
-            $method = 'password';
-        } elseif (is_string($totpCode) && $totpCode !== '') {
-            $verified = TotpService::verifyLogin($userId, preg_replace('/\s+/', '', $totpCode));
-            if (($verified['success'] ?? false) !== true) {
-                return $this->securityConfirmationFailed();
-            }
-            $method = 'totp';
-        } elseif (is_string($backupCode) && $backupCode !== '') {
-            $verified = TotpService::verifyBackupCode($userId, $backupCode);
-            if (($verified['success'] ?? false) !== true) {
-                return $this->securityConfirmationFailed();
-            }
-            $method = 'backup_code';
-        } else {
-            // A UV passkey sign-in already proved possession plus local user
-            // verification. Honour that proof for its original five-minute
-            // security-confirmation window without prompting for a password
-            // the member may not have.
-            $bearerToken = request()->bearerToken();
-            $jwtPayload = is_string($bearerToken) && $bearerToken !== ''
-                ? $this->tokenService->validateToken($bearerToken)
-                : null;
-            $amr = is_array($jwtPayload['amr'] ?? null) ? $jwtPayload['amr'] : [];
-            $issuedAt = (int) ($jwtPayload['iat'] ?? 0);
-            $isRecentPasskey = is_array($jwtPayload)
-                && (int) ($jwtPayload['user_id'] ?? 0) === $userId
-                && (int) ($jwtPayload['tenant_id'] ?? 0) === $tenantId
-                && in_array('passkey', $amr, true)
-                && in_array('user_verification', $amr, true)
-                && $issuedAt >= time() - 300
-                && $issuedAt <= time() + 30;
-
-            if ($isRecentPasskey) {
-                $method = 'passkey_uv';
+        return DB::transaction(function () use ($userId, $tenantId, $input): JsonResponse {
+            // Password changes, reset completion, and logout-all take this same
+            // tenant-user lock before advancing the global revocation cutoff.
+            // Keep factor verification and confirmation issuance under it so a
+            // credential proven before revocation cannot mint a fresh token
+            // after the revocation transaction commits.
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['password_hash', 'status']);
+            if ($user === null || strtolower((string) $user->status) !== 'active') {
+                return $this->noStore($this->respondWithError(
+                    ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
+                    __('api.account_suspended'),
+                    null,
+                    403
+                ));
             }
 
-            $accessToken = request()->user()?->currentAccessToken();
-            $tokenName = strtolower((string) ($accessToken->name ?? ''));
-            $createdAt = $accessToken->created_at ?? null;
-            $isRecentFederated = $createdAt !== null
-                && $createdAt->greaterThanOrEqualTo(now()->subMinutes(5))
-                && (str_starts_with($tokenName, 'oauth-')
-                    || str_starts_with($tokenName, 'sso-')
-                    || str_starts_with($tokenName, 'oidc-'));
-            if ($method === null && !$isRecentFederated) {
-                return $this->securityConfirmationFailed();
+            $method = null;
+            $password = $input['current_password'] ?? null;
+            $totpCode = $input['totp_code'] ?? null;
+            $backupCode = $input['backup_code'] ?? null;
+
+            if (is_string($password) && $password !== '') {
+                $dummyHash = '$argon2id$v=19$m=65536,t=4,p=1$V1Jna0owWXBLNC55ajFQRQ$h0+cXUsJzOi6TzES3RPuquTJpwPbpYmVHS4A3ArHHXo';
+                if (!password_verify($password, $user->password_hash ?: $dummyHash)) {
+                    return $this->securityConfirmationFailed();
+                }
+                $method = 'password';
+            } elseif (is_string($totpCode) && $totpCode !== '') {
+                $verified = TotpService::verifyLogin(
+                    $userId,
+                    preg_replace('/\s+/', '', $totpCode),
+                    $tenantId
+                );
+                if (($verified['success'] ?? false) !== true) {
+                    return $this->securityConfirmationFailed();
+                }
+                $method = 'totp';
+            } elseif (is_string($backupCode) && $backupCode !== '') {
+                $verified = TotpService::verifyBackupCode($userId, $backupCode, $tenantId);
+                if (($verified['success'] ?? false) !== true) {
+                    return $this->securityConfirmationFailed();
+                }
+                $method = 'backup_code';
+            } else {
+                // A UV passkey sign-in already proved possession plus local user
+                // verification. Honour that proof for its original five-minute
+                // security-confirmation window without prompting for a password
+                // the member may not have. Revalidation occurs only after the
+                // issuance lock is held, so a concurrent global revocation wins.
+                $bearerToken = request()->bearerToken();
+                $jwtPayload = is_string($bearerToken) && $bearerToken !== ''
+                    ? $this->tokenService->validateToken($bearerToken)
+                    : null;
+                $amr = is_array($jwtPayload['amr'] ?? null) ? $jwtPayload['amr'] : [];
+                $issuedAt = (int) ($jwtPayload['iat'] ?? 0);
+                $isRecentPasskey = is_array($jwtPayload)
+                    && (int) ($jwtPayload['user_id'] ?? 0) === $userId
+                    && (int) ($jwtPayload['tenant_id'] ?? 0) === $tenantId
+                    && in_array('passkey', $amr, true)
+                    && in_array('user_verification', $amr, true)
+                    && $issuedAt >= time() - 300
+                    && $issuedAt <= time() + 30;
+
+                if ($isRecentPasskey) {
+                    $method = 'passkey_uv';
+                }
+
+                $accessToken = request()->user()?->currentAccessToken();
+                $tokenName = strtolower((string) ($accessToken->name ?? ''));
+                $createdAt = $accessToken->created_at ?? null;
+                $isRecentFederated = $createdAt !== null
+                    && $createdAt->greaterThanOrEqualTo(now()->subMinutes(5))
+                    && (str_starts_with($tokenName, 'oauth-')
+                        || str_starts_with($tokenName, 'sso-')
+                        || str_starts_with($tokenName, 'oidc-'));
+                if ($method === null && !$isRecentFederated) {
+                    return $this->securityConfirmationFailed();
+                }
+                $method ??= 'federated_login';
             }
-            $method ??= 'federated_login';
-        }
 
-        $token = $this->tokenService->generateSecurityConfirmationToken($userId, $tenantId, $method);
+            $token = $this->tokenService->generateSecurityConfirmationToken(
+                $userId,
+                $tenantId,
+                $method
+            );
 
-        Log::info('[WebAuthn] Security action confirmed', [
-            'tenant_id' => $tenantId,
-            'user_id' => $userId,
-            'method' => $method,
-        ]);
+            Log::info('[WebAuthn] Security action confirmed', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'method' => $method,
+            ]);
 
-        return $this->noStore($this->respondWithData([
-            'security_confirmation_token' => $token,
-            'expires_in' => 300,
-        ]));
+            return $this->noStore($this->respondWithData([
+                'security_confirmation_token' => $token,
+                'expires_in' => 300,
+            ]));
+        }, 3);
     }
 
     /** POST /api/webauthn/remove */

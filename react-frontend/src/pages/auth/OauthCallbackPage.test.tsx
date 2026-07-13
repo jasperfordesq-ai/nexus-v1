@@ -21,6 +21,7 @@
  *  - react-i18next: identity translator so assertions match on key strings.
  */
 
+import { StrictMode } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 
@@ -28,10 +29,20 @@ import { render, screen, waitFor } from '@/test/test-utils';
 // Vitest hoists vi.mock() to the top of the file; any variable referenced
 // inside the factory must itself be hoisted via vi.hoisted().
 
-const { mockSearchParams, mockSetAccessToken, mockSetTenantId } = vi.hoisted(() => ({
+const {
+  mockSearchParams,
+  mockSetAccessToken,
+  mockSetRefreshToken,
+  mockSetTenantId,
+  mockGetOAuthBrowserVerifier,
+  mockClearOAuthBrowserVerifier,
+} = vi.hoisted(() => ({
   mockSearchParams: vi.fn(),
   mockSetAccessToken: vi.fn(),
+  mockSetRefreshToken: vi.fn(),
   mockSetTenantId: vi.fn(),
+  mockGetOAuthBrowserVerifier: vi.fn(() => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'),
+  mockClearOAuthBrowserVerifier: vi.fn(),
 }));
 
 // ─── react-router-dom ────────────────────────────────────────────────────────
@@ -120,11 +131,12 @@ vi.mock('@/contexts/TenantContext', () => ({
 
 // ─── @/lib/api — tokenManager ─────────────────────────────────────────────────
 vi.mock('@/lib/api', () => ({
+  API_BASE: 'https://api.example.test/api',
   tokenManager: {
     getAccessToken: vi.fn(() => null),
     setAccessToken: mockSetAccessToken,
     getRefreshToken: vi.fn(() => null),
-    setRefreshToken: vi.fn(),
+    setRefreshToken: mockSetRefreshToken,
     getTenantId: vi.fn(() => null),
     setTenantId: mockSetTenantId,
     clearTokens: vi.fn(),
@@ -136,6 +148,11 @@ vi.mock('@/lib/api', () => ({
     patch: vi.fn(),
     delete: vi.fn(),
   },
+}));
+
+vi.mock('@/lib/oauth-browser-binding', () => ({
+  getOAuthBrowserVerifier: mockGetOAuthBrowserVerifier,
+  clearOAuthBrowserVerifier: mockClearOAuthBrowserVerifier,
 }));
 
 // ─── @/hooks ──────────────────────────────────────────────────────────────────
@@ -177,6 +194,12 @@ import { OauthCallbackPage } from './OauthCallbackPage';
 
 function makeParams(query: string) {
   return [new URLSearchParams(query), vi.fn()] as [URLSearchParams, ReturnType<typeof vi.fn>];
+}
+
+const BROWSER_CHALLENGE = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM';
+
+function makeBoundCodeParams(code: string) {
+  return makeParams(`code=${encodeURIComponent(code)}&flow=${BROWSER_CHALLENGE}`);
 }
 
 function makeResponse(body: object, ok = true): Response {
@@ -230,7 +253,7 @@ describe('OauthCallbackPage', () => {
   it('renders the signing-in text while the exchange is in flight', async () => {
     // Stall fetch indefinitely so the component stays in the loading state.
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})));
-    mockSearchParams.mockReturnValue(makeParams('code=abc123'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('abc123'));
 
     render(<OauthCallbackPage />);
 
@@ -246,13 +269,73 @@ describe('OauthCallbackPage', () => {
         makeResponse({ success: true, token: 'jwt-abc', tenant_id: 99 }),
       ),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=valid-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('valid-code'));
 
     render(<OauthCallbackPage />);
 
     await waitFor(() => {
       expect(mockSetAccessToken).toHaveBeenCalledWith('jwt-abc');
     });
+    expect(mockGetOAuthBrowserVerifier).toHaveBeenCalledWith(BROWSER_CHALLENGE);
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledWith(BROWSER_CHALLENGE);
+  });
+
+  it('stores the rotating refresh token returned by the exchange', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce(
+        makeResponse({
+          success: true,
+          access_token: 'jwt-abc',
+          token: 'jwt-abc',
+          refresh_token: 'refresh-xyz',
+          tenant_id: 99,
+        }),
+      ),
+    );
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('valid-code'));
+
+    render(<OauthCallbackPage />);
+
+    await waitFor(() => {
+      expect(mockSetRefreshToken).toHaveBeenCalledWith('refresh-xyz');
+    });
+    expect(mockSetRefreshToken.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSetAccessToken.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('exchanges once and completes when StrictMode restarts the effect', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      makeResponse({
+        success: true,
+        access_token: 'strict-access',
+        token: 'strict-access',
+        refresh_token: 'strict-refresh',
+        tenant_id: 99,
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('strict-mode-code'));
+
+    render(
+      <StrictMode>
+        <OauthCallbackPage />
+      </StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(capturedHref).toBe('/test/dashboard');
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(mockSetRefreshToken).toHaveBeenCalledWith('strict-refresh');
+    expect(mockSetAccessToken).toHaveBeenCalledWith('strict-access');
+    expect(mockSetRefreshToken.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSetAccessToken.mock.invocationCallOrder[0],
+    );
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledTimes(1);
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledWith(BROWSER_CHALLENGE);
   });
 
   it('stores the tenant_id when the exchange response includes one', async () => {
@@ -262,7 +345,7 @@ describe('OauthCallbackPage', () => {
         makeResponse({ success: true, token: 'tok', tenant_id: 99 }),
       ),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=valid-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('valid-code'));
 
     render(<OauthCallbackPage />);
 
@@ -278,7 +361,7 @@ describe('OauthCallbackPage', () => {
         makeResponse({ success: true, token: 'tok', tenant_id: 2 }),
       ),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=valid-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('valid-code'));
 
     render(<OauthCallbackPage />);
 
@@ -292,16 +375,19 @@ describe('OauthCallbackPage', () => {
       makeResponse({ success: true, token: 'tok', tenant_id: 2 }),
     );
     vi.stubGlobal('fetch', fetchMock);
-    mockSearchParams.mockReturnValue(makeParams('code=my-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('my-code'));
 
     render(<OauthCallbackPage />);
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/v2/auth/oauth/exchange',
+        'https://api.example.test/api/v2/auth/oauth/exchange',
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ code: 'my-code' }),
+          body: JSON.stringify({
+            code: 'my-code',
+            browser_verifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+          }),
           credentials: 'include',
         }),
       );
@@ -315,7 +401,7 @@ describe('OauthCallbackPage', () => {
         makeResponse({ success: true, token: 'tok' }),
       ),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=no-tenant-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('no-tenant-code'));
 
     render(<OauthCallbackPage />);
 
@@ -412,7 +498,7 @@ describe('OauthCallbackPage', () => {
         makeResponse({ success: false, message: 'Token expired' }, false),
       ),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=expired-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('expired-code'));
 
     render(<OauthCallbackPage />);
 
@@ -423,6 +509,7 @@ describe('OauthCallbackPage', () => {
     });
 
     expect(mockSetAccessToken).not.toHaveBeenCalled();
+    expect(mockClearOAuthBrowserVerifier).not.toHaveBeenCalled();
     expect(capturedHref).toBe('');
   });
 
@@ -431,7 +518,7 @@ describe('OauthCallbackPage', () => {
       'fetch',
       vi.fn().mockResolvedValueOnce(makeResponse({ success: false })),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=bad-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('bad-code'));
 
     render(<OauthCallbackPage />);
 
@@ -447,7 +534,7 @@ describe('OauthCallbackPage', () => {
       'fetch',
       vi.fn().mockResolvedValueOnce(makeResponse({ success: true })),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=no-token-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('no-token-code'));
 
     render(<OauthCallbackPage />);
 
@@ -463,7 +550,7 @@ describe('OauthCallbackPage', () => {
       'fetch',
       vi.fn().mockRejectedValueOnce(new TypeError('Failed to fetch')),
     );
-    mockSearchParams.mockReturnValue(makeParams('code=some-code'));
+    mockSearchParams.mockReturnValue(makeBoundCodeParams('some-code'));
 
     render(<OauthCallbackPage />);
 

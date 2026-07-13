@@ -7,11 +7,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\SafeguardingPolicyException;
+use App\Services\TokenService;
 use App\Support\Authorization\AdminTier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Laravel\Sanctum\PersonalAccessToken;
 use App\Core\TenantContext;
 use App\Helpers\UrlHelper;
 
@@ -40,6 +42,9 @@ abstract class BaseApiController extends Controller
 
     /** API version for legacy endpoints */
     protected const API_VERSION_LEGACY = '1.0';
+
+    /** Versioned metadata contract for the deprecated raw PHP API-session bridge. */
+    private const API_SESSION_BRIDGE_VERSION = 1;
 
     /**
      * Map the shared protected-contact exception consistently at every API edge.
@@ -587,7 +592,16 @@ abstract class BaseApiController extends Controller
      */
     protected function getOptionalUserId(): ?int
     {
-        return $this->resolveSanctumUserOptionally() ?? $this->resolveUserId();
+        $optionalBearerUserId = $this->resolveSanctumUserOptionally();
+
+        // An explicit bearer credential is authoritative. A retired Sanctum
+        // token (or any invalid bearer) must not silently fall through to a
+        // raw compatibility session or stale stateful guard identity.
+        if (request()->bearerToken()) {
+            return $optionalBearerUserId;
+        }
+
+        return $optionalBearerUserId ?? $this->resolveUserId();
     }
 
     /**
@@ -864,10 +878,10 @@ abstract class BaseApiController extends Controller
      *
      * Public routes (outside auth:sanctum middleware) don't run the Authenticate
      * middleware, so Auth::user() is null even when a valid token is sent. This
-     * method replicates the same hybrid auth logic as Authenticate middleware:
-     *   1. Try Sanctum guard (native Sanctum tokens)
-     *   2. Try Sanctum PersonalAccessToken lookup
-     *   3. Try legacy JWT validation (most users still have JWT tokens)
+     * method replicates the same hybrid auth logic as Authenticate middleware.
+     * Legacy Sanctum personal-access bearer tokens are deliberately rejected;
+     * public optional-auth routes must follow the same JWT-only bearer policy
+     * as protected API routes.
      *
      * @return int|null User ID or null if no valid token
      */
@@ -880,9 +894,8 @@ abstract class BaseApiController extends Controller
         // stale guard state across multiple requests in the same test process.
         if ($bearer) {
             try {
-                $token = \Laravel\Sanctum\PersonalAccessToken::findToken($bearer);
-                if ($token && $token->tokenable) {
-                    return (int) $token->tokenable->id;
+                if (PersonalAccessToken::findToken($bearer) !== null) {
+                    return null;
                 }
             } catch (\Throwable $e) {
                 // Not a Sanctum token — try legacy JWT
@@ -908,6 +921,9 @@ abstract class BaseApiController extends Controller
         try {
             $user = Auth::guard('sanctum')->user();
             if ($user) {
+                if ($this->isRetiredSanctumBearerUser($user)) {
+                    return null;
+                }
                 return (int) $user->id;
             }
         } catch (\Throwable $e) {
@@ -918,6 +934,9 @@ abstract class BaseApiController extends Controller
         try {
             $user = Auth::guard('api')->user();
             if ($user) {
+                if ($this->isRetiredSanctumBearerUser($user)) {
+                    return null;
+                }
                 return (int) $user->id;
             }
         } catch (\Throwable $e) {
@@ -1128,7 +1147,112 @@ abstract class BaseApiController extends Controller
     }
 
     /**
-     * Resolve the current user ID from Laravel Auth or legacy session
+     * Stamp a raw PHP API session with the fixed lifetime of its source JWT.
+     *
+     * @param array<string, mixed> $payload Validated access-token payload
+     */
+    protected function stampApiSessionAccessWindow(array $payload): bool
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+
+        $userId = (int) ($payload['user_id'] ?? 0);
+        $tenantId = (int) ($payload['tenant_id'] ?? 0);
+        $issuedAt = (int) ($payload['iat'] ?? 0);
+        $expiresAt = (int) ($payload['exp'] ?? 0);
+        if (!app(TokenService::class)->validateApiSessionWindow(
+            $userId,
+            $tenantId,
+            $issuedAt,
+            $expiresAt
+        )) {
+            return false;
+        }
+
+        $_SESSION['_api_session_bridge_version'] = self::API_SESSION_BRIDGE_VERSION;
+        $_SESSION['_api_access_user_id'] = $userId;
+        $_SESSION['_api_access_tenant_id'] = $tenantId;
+        $_SESSION['_api_access_issued_at'] = $issuedAt;
+        $_SESSION['_api_access_expires_at'] = $expiresAt;
+
+        return true;
+    }
+
+    /**
+     * Resolve a raw PHP API-session identity only while its source JWT remains valid.
+     *
+     * @return array{user_id: int, tenant_id: int, issued_at: int, expires_at: int}|null
+     */
+    protected function resolveValidApiSessionIdentity(): ?array
+    {
+        if (
+            session_status() !== PHP_SESSION_ACTIVE
+            || empty($_SESSION['user_id'])
+            || (int) ($_SESSION['_api_session_bridge_version'] ?? 0) !== self::API_SESSION_BRIDGE_VERSION
+        ) {
+            if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
+                $this->clearApiSessionAuthentication();
+            }
+            return null;
+        }
+
+        $userId = (int) $_SESSION['user_id'];
+        $tenantId = (int) ($_SESSION['tenant_id'] ?? 0);
+        $issuedAt = (int) ($_SESSION['_api_access_issued_at'] ?? 0);
+        $expiresAt = (int) ($_SESSION['_api_access_expires_at'] ?? 0);
+        $metadataMatches = $userId === (int) ($_SESSION['_api_access_user_id'] ?? 0)
+            && $tenantId === (int) ($_SESSION['_api_access_tenant_id'] ?? 0);
+
+        if (
+            !$metadataMatches
+            || !app(TokenService::class)->validateApiSessionWindow(
+                $userId,
+                $tenantId,
+                $issuedAt,
+                $expiresAt
+            )
+        ) {
+            $this->clearApiSessionAuthentication();
+            return null;
+        }
+
+        return [
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'issued_at' => $issuedAt,
+            'expires_at' => $expiresAt,
+        ];
+    }
+
+    /** Remove authentication state while preserving unrelated layout/locale data. */
+    protected function clearApiSessionAuthentication(): void
+    {
+        foreach ([
+            'user_id',
+            'user_name',
+            'user_email',
+            'user_role',
+            'role',
+            'is_super_admin',
+            'is_tenant_super_admin',
+            'is_god',
+            'tenant_id',
+            'user_avatar',
+            'is_admin',
+            'is_logged_in',
+            '_api_session_bridge_version',
+            '_api_access_user_id',
+            '_api_access_tenant_id',
+            '_api_access_issued_at',
+            '_api_access_expires_at',
+        ] as $key) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+    /**
+     * Resolve the current user ID from Laravel Auth or a bounded legacy session.
      *
      * @return int|null
      */
@@ -1138,6 +1262,9 @@ abstract class BaseApiController extends Controller
         try {
             $user = Auth::user();
             if ($user) {
+                if ($this->isRetiredSanctumBearerUser($user)) {
+                    return null;
+                }
                 return (int) $user->id;
             }
         } catch (\Throwable $e) {
@@ -1146,9 +1273,11 @@ abstract class BaseApiController extends Controller
             ]);
         }
 
-        // Legacy session fallback
-        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
-            return (int) $_SESSION['user_id'];
+        // Deprecated raw-session fallback. Missing/expired/revoked metadata
+        // fails closed and clears only the authentication fields.
+        $sessionIdentity = $this->resolveValidApiSessionIdentity();
+        if ($sessionIdentity !== null) {
+            return $sessionIdentity['user_id'];
         }
 
         return null;
@@ -1166,12 +1295,18 @@ abstract class BaseApiController extends Controller
         $user = Auth::user();
 
         if ($user) {
+            if ($this->isRetiredSanctumBearerUser($user)) {
+                throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                    $this->error(__('api.auth_required'), 401, 'AUTH_REQUIRED')
+                );
+            }
             return $user;
         }
 
-        // Legacy fallback: build a minimal user object from session + DB
-        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
-            $userId = (int) $_SESSION['user_id'];
+        // Legacy fallback: build a minimal user object from a bounded session + DB
+        $sessionIdentity = $this->resolveValidApiSessionIdentity();
+        if ($sessionIdentity !== null) {
+            $userId = $sessionIdentity['user_id'];
             $row = \Illuminate\Support\Facades\DB::selectOne(
                 "SELECT id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, TenantContext::getId()]
@@ -1185,5 +1320,25 @@ abstract class BaseApiController extends Controller
         throw new \Illuminate\Http\Exceptions\HttpResponseException(
             $this->error(__('api.auth_required'), 401, 'AUTH_REQUIRED')
         );
+    }
+
+    /**
+     * Detect a user resolved from a retired Sanctum bearer credential.
+     *
+     * Sanctum::actingAs() uses a transient token without a bearer header, so
+     * test authentication and stateful SPA sessions remain supported. JWT
+     * users also remain supported because they have no Sanctum access token.
+     */
+    private function isRetiredSanctumBearerUser(mixed $user): bool
+    {
+        if (!request()->bearerToken() || !is_object($user) || !method_exists($user, 'currentAccessToken')) {
+            return false;
+        }
+
+        try {
+            return $user->currentAccessToken() instanceof PersonalAccessToken;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

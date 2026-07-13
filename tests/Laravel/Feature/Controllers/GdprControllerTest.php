@@ -11,6 +11,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use App\Services\TokenService;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Feature tests for GdprController — GDPR consent, data requests, account deletion.
@@ -107,5 +109,38 @@ class GdprControllerTest extends TestCase
         $response = $this->apiPost('/gdpr/delete-account');
 
         $response->assertStatus(401);
+    }
+
+    public function test_delete_account_revokes_every_refresh_session_immediately(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'password_hash' => Hash::make('CorrectPassword123!'),
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($user, ['*']);
+        $tokens = app(TokenService::class);
+        $tokens->generateRefreshToken((int) $user->id, $this->testTenantId);
+        $tokens->generateRefreshToken((int) $user->id, $this->testTenantId);
+
+        $this->apiPost('/gdpr/delete-account', [
+            'password' => 'CorrectPassword123!',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.logout_required', true);
+
+        $this->assertDatabaseMissing('refresh_token_sessions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'revoked_at' => null,
+        ]);
+        $this->assertSame(
+            2,
+            DB::table('refresh_token_sessions')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('user_id', $user->id)
+                ->where('revocation_reason', 'account_deletion_request')
+                ->count(),
+        );
     }
 }

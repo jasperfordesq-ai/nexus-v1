@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\Enterprise\GdprService;
+use App\Services\TokenService;
 
 /**
  * GdprController — Eloquent-powered GDPR consent and data request endpoints.
@@ -23,6 +24,7 @@ class GdprController extends BaseApiController
 
     public function __construct(
         private readonly GdprService $gdprService,
+        private readonly TokenService $tokenService,
     ) {}
 
     /**
@@ -174,6 +176,17 @@ class GdprController extends BaseApiController
                     'requested_via' => 'api',
                 ],
             ]);
+
+            // A confirmed erasure request ends every active session
+            // immediately. Leaving another device or copied refresh token
+            // usable until the asynchronous erasure worker runs would defeat
+            // the sign-out guarantee returned below.
+            if ($this->tokenService->revokeAllTokensForUser(
+                $userId,
+                'account_deletion_request'
+            ) < 1) {
+                throw new \RuntimeException('Unable to revoke sessions for an account deletion request.');
+            }
 
             return $this->respondWithData([
                 'request_id' => $result['id'],

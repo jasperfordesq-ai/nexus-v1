@@ -45,6 +45,14 @@ class ApiErrorCodesTest extends TestCase
         $this->assertSame(409, ApiErrorCodes::getHttpStatus(ApiErrorCodes::VALIDATION_DUPLICATE));
     }
 
+    public function test_getHttpStatus_refresh_superseded_returns_409(): void
+    {
+        $this->assertSame(
+            409,
+            ApiErrorCodes::getHttpStatus(ApiErrorCodes::AUTH_REFRESH_SUPERSEDED)
+        );
+    }
+
     public function test_getHttpStatus_resource_not_found_returns_404(): void
     {
         $this->assertSame(404, ApiErrorCodes::getHttpStatus(ApiErrorCodes::RESOURCE_NOT_FOUND));
@@ -158,6 +166,7 @@ class ApiErrorCodesTest extends TestCase
 
     public function test_isRetryable_with_non_retryable_codes_returns_false(): void
     {
+        $this->assertFalse(ApiErrorCodes::isRetryable(ApiErrorCodes::AUTH_REFRESH_SUPERSEDED));
         $this->assertFalse(ApiErrorCodes::isRetryable(ApiErrorCodes::AUTH_INVALID_CREDENTIALS));
         $this->assertFalse(ApiErrorCodes::isRetryable(ApiErrorCodes::VALIDATION_ERROR));
         $this->assertFalse(ApiErrorCodes::isRetryable(ApiErrorCodes::RESOURCE_NOT_FOUND));

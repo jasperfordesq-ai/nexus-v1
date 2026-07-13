@@ -27,7 +27,13 @@ class NewUserCallbackTest extends TestCase
         $providerUserId = 'g_' . uniqid();
 
         $providerUser = new StubSocialiteUser($providerUserId, $email, 'Ada Lovelace');
-        $result = $service->findOrCreateFromOauth('google', $providerUser, $this->testTenantId);
+        $result = $service->findOrCreateFromOauth(
+            'google',
+            $providerUser,
+            $this->testTenantId,
+            time(),
+            true
+        );
 
         $this->assertTrue($result['is_new']);
         $this->assertNotNull($result['user']);
@@ -51,5 +57,13 @@ class StubSocialiteUser
     public function getEmail(): ?string { return $this->email; }
     public function getName(): ?string { return $this->name; }
     public function getAvatar(): ?string { return null; }
-    public function getRaw(): array { return ['sub' => $this->id, 'email' => $this->email]; }
+    public function getRaw(): array
+    {
+        return [
+            'sub' => $this->id,
+            'email' => $this->email,
+            'email_verified' => true,
+            'hd' => 'example.com',
+        ];
+    }
 }

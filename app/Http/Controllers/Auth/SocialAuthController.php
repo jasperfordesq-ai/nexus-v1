@@ -36,7 +36,7 @@ class SocialAuthController extends Controller
      * Public endpoint — returns the list of OAuth providers enabled for the
      * current tenant. Empty array when OAUTH_ENABLED env flag is off, or when
      * the tenant has explicitly disabled all providers. Frontend uses this to
-     * decide whether to render Google/Apple/Facebook buttons.
+     * decide whether to render vetted Google/Facebook buttons.
      */
     public function enabledProviders(Request $request): JsonResponse
     {
@@ -66,7 +66,14 @@ class SocialAuthController extends Controller
                 $intent = 'login';
             }
 
-            $result = $this->social->redirectUrl($provider, $tenantId, $intent);
+            $requestedBrowserChallenge = $request->input('browser_challenge');
+            $result = $this->social->redirectUrl(
+                $provider,
+                $tenantId,
+                $intent,
+                null,
+                is_string($requestedBrowserChallenge) ? $requestedBrowserChallenge : null
+            );
 
             if (! empty($result['error']) && $result['error'] === 'socialite_not_installed') {
                 return response()->json([
@@ -102,36 +109,65 @@ class SocialAuthController extends Controller
                 throw new \RuntimeException('OAuth state missing.');
             }
 
-            $result = $this->social->handleCallback(
-                $provider,
-                $state,
-                $request->cookie(SocialAuthService::LINK_NONCE_COOKIE)
-            );
-            /** @var \App\Models\User $user */
-            $user = $result['user'];
-
-            // Issue Sanctum token.
-            $tokenResult = $user->createToken('oauth-' . $provider, ['*']);
-            $accessToken = $tokenResult->plainTextToken;
-            try {
-                $tokenResult->accessToken->forceFill(['tenant_id' => (int) $user->tenant_id])->save();
-            } catch (\Throwable $e) {
-                // tenant_id column may be absent on personal_access_tokens in older envs
+            $stateContext = $this->social->stateContext($state);
+            if ($stateContext === null) {
+                throw new \RuntimeException('OAuth state is invalid or expired.');
             }
 
-            $code = $this->social->issueCallbackCode(
-                $accessToken,
-                $provider,
-                (bool) $result['is_new'],
-                (int) $result['tenant_id']
-            );
+            // The provider round-trip may land on the tenant-less API host.
+            // Restore the tenant only from the verified, signed state before
+            // resolving the redirect target or issuing tenant-bound credentials.
+            TenantContext::setById($stateContext['tenant_id']);
+            $frontend = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
-            $params = http_build_query([
+            $result = $this->social->handleCallback($provider, $state);
+            /** @var \App\Models\User $user */
+            $user = $result['user'];
+            if ((int) $user->tenant_id !== $stateContext['tenant_id']) {
+                throw new \RuntimeException('OAuth callback tenant mismatch.');
+            }
+
+            $browserChallenge = $stateContext['browser_challenge'];
+            $identityLink = isset($result['identity_link']) && is_array($result['identity_link'])
+                ? $result['identity_link']
+                : null;
+            if ($stateContext['intent'] === 'link') {
+                if ($identityLink === null) {
+                    throw new \RuntimeException('OAuth link callback identity is missing.');
+                }
+                $issuance = $this->social->issuePendingLinkCallbackCode(
+                    (int) $user->id,
+                    (int) $user->tenant_id,
+                    $provider,
+                    $stateContext['authentication_started_at'],
+                    $browserChallenge,
+                    $identityLink
+                );
+            } else {
+                $issuance = $this->social->issueLoginCallbackCode(
+                    (int) $user->id,
+                    (int) $user->tenant_id,
+                    $provider,
+                    (bool) $result['is_new'],
+                    $stateContext['authentication_started_at'],
+                    $browserChallenge,
+                    $identityLink
+                );
+            }
+            if (($issuance['status'] ?? null) !== 'issued' || empty($issuance['callback_code'])) {
+                throw new \RuntimeException(
+                    'OAuth credential issuance rejected: ' . (string) ($issuance['status'] ?? 'unknown')
+                );
+            }
+            $code = (string) $issuance['callback_code'];
+
+            $callbackParams = [
                 'code' => $code,
                 'provider' => $provider,
-            ]);
-            return redirect($frontend . '/auth/oauth/callback?' . $params)
-                ->withoutCookie(SocialAuthService::LINK_NONCE_COOKIE);
+            ];
+            $callbackParams['flow'] = $browserChallenge;
+            $params = http_build_query($callbackParams);
+            return redirect($frontend . '/auth/oauth/callback?' . $params);
         } catch (\Throwable $e) {
             Log::warning('[SocialAuth] callback failed: ' . $e->getMessage());
             $params = http_build_query([
@@ -139,19 +175,27 @@ class SocialAuthController extends Controller
                 'message' => __('api.social_oauth_link_failed'),
                 'provider' => $provider,
             ]);
-            return redirect($frontend . '/auth/oauth/callback?' . $params)
-                ->withoutCookie(SocialAuthService::LINK_NONCE_COOKIE);
+            return redirect($frontend . '/auth/oauth/callback?' . $params);
         }
     }
 
     public function exchange(Request $request): JsonResponse
     {
         try {
-            $payload = $this->social->consumeCallbackCode((string) $request->input('code', ''));
+            $browserVerifier = $request->input('browser_verifier');
+            $payload = $this->social->consumeCallbackCode(
+                (string) $request->input('code', ''),
+                is_string($browserVerifier) ? $browserVerifier : null
+            );
 
             return response()->json([
                 'success' => true,
                 'token' => $payload['token'],
+                'access_token' => $payload['token'],
+                'refresh_token' => $payload['refresh_token'],
+                'expires_in' => $payload['expires_in'],
+                'refresh_expires_in' => $payload['refresh_expires_in'],
+                'token_type' => 'Bearer',
                 'provider' => $payload['provider'],
                 'is_new' => $payload['is_new'],
                 'tenant_id' => $payload['tenant_id'],
@@ -173,34 +217,25 @@ class SocialAuthController extends Controller
         }
         try {
             $tenantId = (int) $user->tenant_id;
-            $redirect = $this->social->redirectUrl($provider, $tenantId, 'link', (int) $user->id);
+            $browserChallenge = $request->input('browser_challenge');
+            $redirect = $this->social->redirectUrl(
+                $provider,
+                $tenantId,
+                'link',
+                (int) $user->id,
+                is_string($browserChallenge) ? $browserChallenge : null
+            );
             if (! empty($redirect['error']) && $redirect['error'] === 'socialite_not_installed') {
                 return response()->json([
                     'success' => false,
                     'error' => 'socialite_not_installed',
                 ], 503);
             }
-            $response = response()->json([
+            return response()->json([
                 'success' => true,
                 'redirect_url' => $redirect['url'],
                 'state' => $redirect['state'],
             ]);
-
-            if (!empty($redirect['link_nonce'])) {
-                $response->withCookie(cookie(
-                    SocialAuthService::LINK_NONCE_COOKIE,
-                    (string) $redirect['link_nonce'],
-                    60,
-                    '/',
-                    null,
-                    $request->isSecure(),
-                    true,
-                    false,
-                    'Lax'
-                ));
-            }
-
-            return $response;
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,

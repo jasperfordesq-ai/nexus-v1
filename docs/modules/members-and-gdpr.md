@@ -126,7 +126,10 @@ so it nests safely under test transactions). The steps, as implemented:
 4. **Messages** — not hard-deleted (that would orphan the counterparty's half
    of the thread). The erased user's authored body is replaced with a
    tombstone, transcript nulled, and voice-message audio files are deleted from
-   disk (`uploads/{tenant}/voice_messages`) *before* `audio_url` is nulled.
+   disk (`uploads/{tenant}/voice_messages`) *before* `audio_url` is nulled. File
+   deletion requires canonical containment in the current tenant's voice root;
+   invalid, traversal, remote, and cross-tenant legacy pointers are scrubbed
+   from the row without being followed.
 5. **Hard-deleted personal content / credentials** include: notifications,
    `user_consents`, push subscriptions, FCM tokens, AI conversations and
    messages, WebAuthn credentials/passkeys, Sanctum `personal_access_tokens`,

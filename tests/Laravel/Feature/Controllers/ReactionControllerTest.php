@@ -6,8 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\User;
+use App\Services\TokenService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -252,6 +255,39 @@ class ReactionControllerTest extends TestCase
 
         // Should succeed (200) even without auth, user_reaction will be null
         $this->assertContains($response->getStatusCode(), [200, 401]);
+    }
+
+    public function test_public_optional_auth_rejects_retired_sanctum_bearer_but_accepts_jwt(): void
+    {
+        $viewer = User::factory()->forTenant($this->testTenantId)->create();
+        $probe = new BaseApiControllerOptionalAuthProbe();
+
+        $retiredSanctumBearer = $viewer->createToken('retired-public-route-token')->plainTextToken;
+        $patRequest = Request::create('/public-auth-probe', 'GET');
+        $patRequest->headers->set('Authorization', 'Bearer ' . $retiredSanctumBearer);
+        $this->app->instance('request', $patRequest);
+        $this->assertNull($probe->optionalUserId());
+
+        $jwt = app(TokenService::class)->generateToken(
+            (int) $viewer->id,
+            $this->testTenantId
+        );
+        $jwtRequest = Request::create('/public-auth-probe', 'GET');
+        $jwtRequest->headers->set('Authorization', 'Bearer ' . $jwt);
+        $this->app->instance('request', $jwtRequest);
+        $this->assertSame((int) $viewer->id, $probe->optionalUserId());
+
+        Sanctum::actingAs($viewer, ['*']);
+        $this->app->instance('request', Request::create('/public-auth-probe', 'GET'));
+        $this->assertSame((int) $viewer->id, $probe->optionalUserId());
+
+        $statefulRequestWithRetiredBearer = Request::create('/public-auth-probe', 'GET');
+        $statefulRequestWithRetiredBearer->headers->set(
+            'Authorization',
+            'Bearer ' . $retiredSanctumBearer
+        );
+        $this->app->instance('request', $statefulRequestWithRetiredBearer);
+        $this->assertNull($probe->optionalUserId());
     }
 
     public function test_get_post_reactions_includes_top_reactors(): void
@@ -688,5 +724,13 @@ class ReactionControllerTest extends TestCase
         $data = $response->json('data');
         $this->assertCount(1, $data);
         $this->assertEquals($user->id, $data[0]['id']);
+    }
+}
+
+class BaseApiControllerOptionalAuthProbe extends BaseApiController
+{
+    public function optionalUserId(): ?int
+    {
+        return $this->getOptionalUserId();
     }
 }

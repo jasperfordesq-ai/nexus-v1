@@ -9,11 +9,65 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
+  ApiClient,
   tokenManager,
   SESSION_EXPIRED_EVENT,
   API_ERROR_EVENT,
   buildQueryString,
 } from './api';
+
+/**
+ * Minimal origin-wide exclusive Web Locks queue for deterministic unit tests.
+ * Each callback owns the lock until its returned promise settles.
+ */
+function installQueuedWebLocks() {
+  const originalDescriptor = Object.getOwnPropertyDescriptor(navigator, 'locks');
+  let previousTurn = Promise.resolve();
+
+  const request = vi.fn((
+    name: string,
+    options: LockOptions,
+    callback: (lock: Lock) => unknown | PromiseLike<unknown>,
+  ): Promise<unknown> => {
+    const waitForPreviousTurn = previousTurn;
+    let releaseTurn = (): void => undefined;
+    previousTurn = new Promise<void>((resolve) => {
+      releaseTurn = resolve;
+    });
+
+    return waitForPreviousTurn
+      .then(() => {
+        if (options.signal?.aborted) {
+          throw new DOMException('Lock request aborted', 'AbortError');
+        }
+
+        return callback({
+          name,
+          mode: options.mode ?? 'exclusive',
+        });
+      })
+      .finally(releaseTurn);
+  });
+
+  Object.defineProperty(navigator, 'locks', {
+    configurable: true,
+    value: {
+      request,
+      query: vi.fn().mockResolvedValue({ held: [], pending: [] }),
+    } as unknown as LockManager,
+  });
+
+  return {
+    request,
+    restore: (): void => {
+      if (originalDescriptor) {
+        Object.defineProperty(navigator, 'locks', originalDescriptor);
+      } else {
+        Reflect.deleteProperty(navigator, 'locks');
+      }
+    },
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Token Manager Tests
@@ -619,6 +673,346 @@ describe('API Client', () => {
 
       expect(response.success).toBe(true);
       expect(fetch).toHaveBeenCalledTimes(3); // Original + refresh + retry
+    });
+
+    it('uses one Web Locks refresh for two separate ApiClient requests', async () => {
+      const webLocks = installQueuedWebLocks();
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      const tokenWriteSpy = vi.spyOn(Storage.prototype, 'setItem');
+      let refreshCalls = 0;
+
+      try {
+        vi.mocked(fetch).mockImplementation(async (input, init) => {
+          const url = String(input);
+          if (url.endsWith('/auth/refresh-token')) {
+            refreshCalls += 1;
+            return {
+              ok: true,
+              status: 200,
+              headers: new Headers(),
+              json: () => Promise.resolve({
+                success: true,
+                access_token: 'rotated-access-token',
+                refresh_token: 'rotated-refresh-token',
+              }),
+            } as Response;
+          }
+
+          const authorization = new Headers(init?.headers).get('Authorization');
+          if (authorization === 'Bearer old-token') {
+            return {
+              ok: false,
+              status: 401,
+              headers: new Headers(),
+              json: () => Promise.resolve({ error: 'Unauthorized' }),
+            } as Response;
+          }
+
+          return {
+            ok: true,
+            status: 200,
+            headers: new Headers(),
+            json: () => Promise.resolve({ data: { id: 1 } }),
+          } as Response;
+        });
+
+        const firstClient = new ApiClient('/api');
+        const secondClient = new ApiClient('/api');
+        const [firstResponse, secondResponse] = await Promise.all([
+          firstClient.get('/v2/users/me'),
+          secondClient.get('/v2/users/me'),
+        ]);
+
+        expect(firstResponse.success).toBe(true);
+        expect(secondResponse.success).toBe(true);
+        expect(refreshCalls).toBe(1);
+        expect(webLocks.request).toHaveBeenCalledTimes(2);
+
+        const tokenWrites = tokenWriteSpy.mock.calls.map(([key]) => key);
+        const refreshWrite = tokenWrites.indexOf('nexus_refresh_token');
+        const accessWrite = tokenWrites.indexOf('nexus_access_token');
+        expect(refreshWrite).toBeGreaterThanOrEqual(0);
+        expect(accessWrite).toBeGreaterThan(refreshWrite);
+      } finally {
+        tokenWriteSpy.mockRestore();
+        webLocks.restore();
+      }
+    });
+
+    it('never retries an in-flight tenant A request with tenant B credentials', async () => {
+      tokenManager.setTenantId('tenant-a');
+      tokenManager.setAccessToken('tenant-a-access');
+      tokenManager.setRefreshToken('tenant-a-refresh');
+      let resolveOriginalRequest: ((response: Response) => void) | undefined;
+
+      vi.mocked(fetch).mockImplementationOnce(() => new Promise<Response>((resolve) => {
+        resolveOriginalRequest = resolve;
+      }));
+
+      const client = new ApiClient('/api');
+      const inFlight = client.post('/v2/wallet/transfer', { amount: 1 });
+      await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+
+      tokenManager.setTenantId('tenant-b');
+      tokenManager.setRefreshToken('tenant-b-refresh');
+      tokenManager.setAccessToken('tenant-b-access');
+      resolveOriginalRequest?.({
+        ok: false,
+        status: 401,
+        headers: new Headers(),
+        json: () => Promise.resolve({ error: 'Unauthorized' }),
+      } as Response);
+
+      await expect(inFlight).resolves.toEqual({
+        success: false,
+        code: 'TENANT_CONTEXT_CHANGED',
+      });
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(tokenManager.getTenantId()).toBe('tenant-b');
+      expect(tokenManager.getAccessToken()).toBe('tenant-b-access');
+      expect(tokenManager.getRefreshToken()).toBe('tenant-b-refresh');
+    });
+
+    it('keeps a Web Lock held when refresh exceeds the old 15-second lease', async () => {
+      const webLocks = installQueuedWebLocks();
+      vi.useFakeTimers();
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      let refreshCalls = 0;
+      let completeRefresh: ((response: Response) => void) | undefined;
+
+      try {
+        vi.mocked(fetch).mockImplementation(() => {
+          refreshCalls += 1;
+          return new Promise<Response>((resolve) => {
+            completeRefresh = resolve;
+          });
+        });
+
+        const firstClient = new ApiClient('/api');
+        const secondClient = new ApiClient('/api');
+        const firstRefresh = firstClient.refreshSession();
+        const secondRefresh = secondClient.refreshSession();
+        let secondSettled = false;
+        void secondRefresh.then(() => {
+          secondSettled = true;
+        });
+
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(refreshCalls).toBe(1);
+
+        await vi.advanceTimersByTimeAsync(15_001);
+        expect(refreshCalls).toBe(1);
+        expect(secondSettled).toBe(false);
+
+        expect(completeRefresh).toBeTypeOf('function');
+        completeRefresh?.({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({
+            success: true,
+            access_token: 'rotated-access-token',
+            refresh_token: 'rotated-refresh-token',
+          }),
+        } as Response);
+
+        await expect(Promise.all([firstRefresh, secondRefresh])).resolves.toEqual([
+          'refreshed',
+          'refreshed',
+        ]);
+        expect(refreshCalls).toBe(1);
+        expect(webLocks.request).toHaveBeenCalledTimes(2);
+      } finally {
+        vi.useRealTimers();
+        webLocks.restore();
+      }
+    });
+
+    it('does not let a delayed refresh response resurrect a logged-out session', async () => {
+      const webLocks = installQueuedWebLocks();
+      tokenManager.setAccessToken('old-access-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      let completeRefresh: ((response: Response) => void) | undefined;
+      let logoutBody: string | undefined;
+
+      try {
+        vi.mocked(fetch).mockImplementation((input, init) => {
+          const url = String(input);
+          if (url.endsWith('/auth/refresh-token')) {
+            return new Promise<Response>((resolve) => {
+              completeRefresh = resolve;
+            });
+          }
+          if (url.endsWith('/auth/logout')) {
+            logoutBody = typeof init?.body === 'string' ? init.body : undefined;
+            return Promise.resolve({
+              ok: true,
+              status: 200,
+              headers: new Headers(),
+              json: () => Promise.resolve({ success: true }),
+            } as Response);
+          }
+          throw new Error(`Unexpected request: ${url}`);
+        });
+
+        const client = new ApiClient('/api');
+        const refresh = client.refreshSession();
+        await vi.waitFor(() => expect(completeRefresh).toBeTypeOf('function'));
+
+        const logout = client.logoutSession('old-refresh-token');
+        await vi.waitFor(() => expect(webLocks.request).toHaveBeenCalledTimes(2));
+
+        completeRefresh?.({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({
+            success: true,
+            access_token: 'delayed-access-token',
+            refresh_token: 'delayed-refresh-token',
+          }),
+        } as Response);
+
+        await expect(refresh).resolves.toBe('transient');
+        await expect(logout).resolves.toMatchObject({ success: true });
+        expect(JSON.parse(logoutBody ?? '{}')).toEqual({ refresh_token: 'old-refresh-token' });
+        expect(tokenManager.getAccessToken()).toBeNull();
+        expect(tokenManager.getRefreshToken()).toBeNull();
+        expect(localStorage.getItem('nexus_logout_in_progress')).toBeNull();
+        expect(localStorage.getItem('nexus_logout_generation')).not.toBeNull();
+      } finally {
+        webLocks.restore();
+      }
+    });
+
+    it('cancels a queued refresh when its tenant context changes', async () => {
+      const webLocks = installQueuedWebLocks();
+      tokenManager.setTenantId('tenant-a');
+      tokenManager.setAccessToken('tenant-a-access');
+      tokenManager.setRefreshToken('tenant-a-refresh');
+      let releaseHeldLock = (): void => undefined;
+
+      try {
+        const heldLock = navigator.locks.request(
+          'nexus-token-refresh',
+          { mode: 'exclusive' },
+          () => new Promise<void>((resolve) => {
+            releaseHeldLock = resolve;
+          }),
+        );
+        await Promise.resolve();
+
+        const client = new ApiClient('/api');
+        const queuedRefresh = client.refreshSession();
+        await vi.waitFor(() => expect(webLocks.request).toHaveBeenCalledTimes(2));
+
+        tokenManager.setTenantId('tenant-b');
+        tokenManager.setRefreshToken('tenant-b-refresh');
+        tokenManager.setAccessToken('tenant-b-access');
+        releaseHeldLock();
+
+        await heldLock;
+        await expect(queuedRefresh).resolves.toBe('transient');
+        expect(fetch).not.toHaveBeenCalled();
+        expect(tokenManager.getAccessToken()).toBe('tenant-b-access');
+        expect(tokenManager.getRefreshToken()).toBe('tenant-b-refresh');
+      } finally {
+        releaseHeldLock();
+        webLocks.restore();
+      }
+    });
+
+    it('preserves credentials for an explicitly superseded refresh conflict', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 409,
+          headers: new Headers(),
+          json: () => Promise.resolve({
+            errors: [{ code: 'AUTH_REFRESH_SUPERSEDED' }],
+          }),
+        } as Response);
+
+      const response = await api.get('/v2/users/me');
+
+      expect(response).toEqual({ success: false, code: 'AUTH_REFRESH_UNAVAILABLE' });
+      expect(tokenManager.getAccessToken()).toBe('old-token');
+      expect(tokenManager.getRefreshToken()).toBe('old-refresh-token');
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not let a queued Web Lock owner retry a superseded refresh token', async () => {
+      const webLocks = installQueuedWebLocks();
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      let refreshCalls = 0;
+
+      try {
+        vi.mocked(fetch).mockImplementation(async () => {
+          refreshCalls += 1;
+          return {
+            ok: false,
+            status: 409,
+            headers: new Headers(),
+            json: () => Promise.resolve({
+              errors: [{ code: 'AUTH_REFRESH_SUPERSEDED' }],
+            }),
+          } as Response;
+        });
+
+        const firstClient = new ApiClient('/api');
+        const secondClient = new ApiClient('/api');
+        const outcomes = await Promise.all([
+          firstClient.refreshSession(),
+          secondClient.refreshSession(),
+        ]);
+
+        expect(outcomes).toEqual(['transient', 'transient']);
+        expect(refreshCalls).toBe(1);
+        expect(tokenManager.getAccessToken()).toBe('old-token');
+        expect(tokenManager.getRefreshToken()).toBe('old-refresh-token');
+        expect(webLocks.request).toHaveBeenCalledTimes(2);
+      } finally {
+        webLocks.restore();
+      }
+    });
+
+    it('treats an unrelated refresh conflict as an invalid credential', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('old-refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 409,
+          headers: new Headers(),
+          json: () => Promise.resolve({
+            errors: [{ code: 'SOME_OTHER_CONFLICT' }],
+          }),
+        } as Response);
+
+      const response = await api.get('/v2/users/me');
+
+      expect(response.code).toBe('SESSION_EXPIRED');
+      expect(tokenManager.getAccessToken()).toBeNull();
+      expect(tokenManager.getRefreshToken()).toBeNull();
+      expect(fetch).toHaveBeenCalledTimes(2);
     });
 
     it('dispatches session expired event when refresh fails', async () => {

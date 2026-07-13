@@ -22,7 +22,7 @@ import Clock from 'lucide-react/icons/clock';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import LogOut from 'lucide-react/icons/log-out';
 
-import { SESSION_EXPIRING_EVENT, tokenManager } from '@/lib/api';
+import { api, SESSION_EXPIRING_EVENT, tokenManager } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { Button, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui';
@@ -30,7 +30,6 @@ import { Button, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, Moda
 // How long to count down in the warning (seconds shown to user)
 const COUNTDOWN_SECONDS = 30;
 const TOKEN_CHECK_INTERVAL_MS = 5000;
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 function getTokenSecondsUntilExpiry(token: string | null): number | null {
   if (!token) return null;
@@ -90,55 +89,40 @@ export function SessionTimeoutWarning() {
   }, [stopCountdown]);
 
   const handleExtend = useCallback(async () => {
+    // Do not let the countdown's auto-logout race a refresh that the user has
+    // already requested. Success closes the dialog; transient failure starts
+    // a fresh retry window; authoritative rejection logs out below.
+    stopCountdown();
     setIsExtending(true);
     try {
-      const refreshToken = tokenManager.getRefreshToken();
-      if (!refreshToken) {
+      const outcome = await api.refreshSession();
+      if (outcome === 'refreshed') {
+        const accessToken = tokenManager.getAccessToken();
+        observedAccessTokenRef.current = accessToken;
+        const secondsUntilExpiry = getTokenSecondsUntilExpiry(accessToken);
+        if (secondsUntilExpiry !== null && secondsUntilExpiry > 0) {
+          scheduleSessionWarning(secondsUntilExpiry);
+        }
         handleClose();
-        await logout();
-        navigate(tenantPath('/login'));
         return;
       }
 
-      const refreshHeaders: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      const tenantId = tokenManager.getTenantId();
-      if (tenantId) refreshHeaders['X-Tenant-ID'] = tenantId;
-
-      const response = await fetch(`${API_BASE}/auth/refresh-token`, {
-        method: 'POST',
-        headers: refreshHeaders,
-        body: JSON.stringify({ refresh_token: refreshToken }),
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.access_token) {
-          observedAccessTokenRef.current = data.access_token;
-          tokenManager.setAccessToken(data.access_token);
-          if (data.refresh_token) {
-            tokenManager.setRefreshToken(data.refresh_token);
-          }
-          // Reschedule the warning for the new token lifetime
-          if (data.expires_in) {
-            scheduleSessionWarning(data.expires_in);
-          }
-          handleClose();
-          return;
-        }
+      if (outcome === 'transient') {
+        // A network failure or AUTH_REFRESH_SUPERSEDED response does not prove
+        // that the shared session is invalid. Keep the credentials and give
+        // the user another full window to retry instead of revoking a winner.
+        startCountdown(COUNTDOWN_SECONDS);
+        return;
       }
 
-      // Refresh failed — session is gone, log out gracefully
+      // Only an authoritative credential rejection ends the session.
       handleClose();
       await logout();
       navigate(tenantPath('/login'));
     } finally {
       setIsExtending(false);
     }
-  }, [handleClose, logout, navigate, tenantPath, scheduleSessionWarning]);
+  }, [handleClose, logout, navigate, tenantPath, scheduleSessionWarning, startCountdown, stopCountdown]);
 
   const handleLogout = useCallback(async () => {
     handleClose();

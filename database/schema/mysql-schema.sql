@@ -16206,6 +16206,36 @@ CREATE TABLE `referral_tracking` (
   KEY `idx_tenant` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `refresh_token_sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `refresh_token_sessions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `family_hash` char(64) NOT NULL,
+  `jti_hash` char(64) NOT NULL,
+  `parent_jti_hash` char(64) DEFAULT NULL,
+  `issued_at` timestamp NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `family_expires_at` timestamp NOT NULL,
+  `consumed_at` timestamp NULL DEFAULT NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revocation_reason` varchar(40) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_refresh_sessions_jti` (`jti_hash`),
+  UNIQUE KEY `uq_refresh_sessions_parent` (`parent_jti_hash`),
+  KEY `idx_refresh_sessions_tenant_user` (`tenant_id`,`user_id`,`revoked_at`),
+  KEY `idx_refresh_sessions_user_tenant` (`user_id`,`tenant_id`),
+  KEY `idx_refresh_sessions_family` (`family_hash`,`revoked_at`),
+  KEY `idx_refresh_sessions_expiry` (`expires_at`),
+  KEY `idx_refresh_sessions_family_expiry` (`family_expires_at`),
+  CONSTRAINT `fk_refresh_sessions_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_refresh_sessions_user_tenant` FOREIGN KEY (`user_id`, `tenant_id`) REFERENCES `users` (`id`, `tenant_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `regional_analytics_access_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -20489,7 +20519,8 @@ INSERT INTO `laravel_migrations` VALUES
 (386,'2026_07_12_000073_optimize_marketplace_browse_queries',114),
 (387,'2026_07_12_000074_complete_marketplace_dispute_appeal_workflows',115),
 (388,'2026_07_13_000076_bind_marketplace_checkout_sessions',116),
-(389,'2026_07_13_000077_bind_marketplace_stripe_checkout_mode',117);
+(389,'2026_07_13_000077_bind_marketplace_stripe_checkout_mode',117),
+(390,'2026_07_13_000078_create_refresh_token_sessions',118);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

@@ -295,8 +295,28 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
-
         $input = $this->getAllInput();
+
+        // Profile edits may be delegated, but changing an account's identity,
+        // role, or lifecycle state is a security mutation. A tenant admin must
+        // never be able to redirect password recovery for a peer/higher-tier
+        // administrator by replacing that account's email address.
+        $requiresSecurityAuthorization = false;
+        foreach (['email', 'role', 'status'] as $securityField) {
+            if (
+                array_key_exists($securityField, $input)
+                && !$this->canManageSecurityTarget($adminId, $user)
+            ) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    __('api.insufficient_permissions'),
+                    $securityField,
+                    403
+                );
+            }
+            $requiresSecurityAuthorization = $requiresSecurityAuthorization
+                || array_key_exists($securityField, $input);
+        }
 
         // SECURITY: brokers/coordinators may edit only non-privileged profile
         // fields. Role, status, email, profile type and organisation identity
@@ -379,7 +399,29 @@ class AdminUsersController extends BaseApiController
         $params[] = $id;
         $params[] = $tenantId;
 
-        DB::update("UPDATE users SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        if ($requiresSecurityAuthorization) {
+            $updated = DB::transaction(function () use ($adminId, $id, $tenantId, $updates, $params): bool {
+                if ($this->lockManageableSecurityTarget($adminId, $id, $tenantId) === null) {
+                    return false;
+                }
+
+                DB::update(
+                    "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
+                    $params
+                );
+                return true;
+            }, 3);
+            if (!$updated) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    __('api.insufficient_permissions'),
+                    null,
+                    403
+                );
+            }
+        } else {
+            DB::update("UPDATE users SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        }
 
         ActivityLog::log($adminId, 'admin_update_user', "Updated user #{$id}");
         $this->auditLogService->logUserUpdated($adminId, $id, array_keys($input));
@@ -605,21 +647,38 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
-
-        // Idempotency: prevent double-approval (and double welcome credits).
-        // Still lift a leftover pending status — accounts approved by the
-        // pre-fix path have is_approved=1 with status stuck on 'pending'.
-        if (!empty($user['is_approved'])) {
-            $this->activatePendingStatus($id, (int) $tenantId);
-            return $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
         }
 
-        User::updateAdminFields($id, [
-            'role' => $user['role'] ?? 'member',
-            'is_approved' => 1,
-            'tenant_id' => (int) $user['tenant_id'],
-        ]);
-        $this->activatePendingStatus($id, (int) $tenantId);
+        $approval = DB::transaction(function () use ($adminId, $id, $tenantId): array {
+            $target = $this->lockManageableSecurityTarget($adminId, $id, $tenantId);
+            if ($target === null) {
+                return ['status' => 'denied'];
+            }
+
+            // Idempotency: prevent double-approval (and double welcome credits).
+            // Still lift a leftover pending status from the pre-fix path.
+            if (!empty($target['is_approved'])) {
+                $this->activatePendingStatus($id, $tenantId);
+                return ['status' => 'already_approved', 'user' => $target];
+            }
+
+            User::updateAdminFields($id, [
+                'role' => $target['role'] ?? 'member',
+                'is_approved' => 1,
+                'tenant_id' => $tenantId,
+            ]);
+            $this->activatePendingStatus($id, $tenantId);
+            return ['status' => 'approved', 'user' => $target];
+        }, 3);
+        if (($approval['status'] ?? null) === 'denied') {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
+        if (($approval['status'] ?? null) === 'already_approved') {
+            return $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
+        }
+        $user = $approval['user'];
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
         $this->auditLogService->logUserApproved($adminId, $id, $user['email']);
@@ -671,13 +730,24 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_suspend_super_admin'), null, 403);
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
         }
 
         $reason = $this->input('reason', __('svc_notifications.suspended_by_admin'));
 
-        DB::update("UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $lockedUser = DB::transaction(function () use ($adminId, $id, $tenantId): ?array {
+            $target = $this->lockManageableSecurityTarget($adminId, $id, $tenantId);
+            if ($target === null) {
+                return null;
+            }
+            DB::update("UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            return $target;
+        }, 3);
+        if ($lockedUser === null) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
+        $user = $lockedUser;
 
         ActivityLog::log($adminId, 'admin_suspend_user', "Suspended user #{$id}: {$reason}");
         $this->auditLogService->logUserSuspended($adminId, $id, $reason);
@@ -703,13 +773,24 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_ban_super_admin'), null, 403);
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
         }
 
         $reason = $this->input('reason', __('svc_notifications.banned_by_admin'));
 
-        DB::update("UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $lockedUser = DB::transaction(function () use ($adminId, $id, $tenantId): ?array {
+            $target = $this->lockManageableSecurityTarget($adminId, $id, $tenantId);
+            if ($target === null) {
+                return null;
+            }
+            DB::update("UPDATE users SET status = 'banned' WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            return $target;
+        }, 3);
+        if ($lockedUser === null) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
+        $user = $lockedUser;
 
         ActivityLog::log($adminId, 'admin_ban_user', "Banned user #{$id}: {$reason}");
         $this->auditLogService->logUserBanned($adminId, $id, $reason);
@@ -759,8 +840,22 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
 
-        DB::update("UPDATE users SET status = 'active', is_approved = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $lockedUser = DB::transaction(function () use ($adminId, $id, $tenantId): ?array {
+            $target = $this->lockManageableSecurityTarget($adminId, $id, $tenantId);
+            if ($target === null) {
+                return null;
+            }
+            DB::update("UPDATE users SET status = 'active', is_approved = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            return $target;
+        }, 3);
+        if ($lockedUser === null) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
+        $user = $lockedUser;
 
         ActivityLog::log($adminId, 'admin_reactivate_user', "Reactivated user #{$id} ({$user['email']})");
         $this->auditLogService->logUserReactivated($adminId, $id, $user['status'] ?? 'unknown');
@@ -792,8 +887,8 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_delete_super_admin'), null, 403);
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
         }
 
         // Send deletion email BEFORE the actual deletion (user record must still exist)
@@ -837,7 +932,21 @@ class AdminUsersController extends BaseApiController
         // now leaves no orphaned personal data behind.
         $adminEmail = $user['email'];
         try {
-            (new \App\Services\Enterprise\GdprService($tenantId))->executeAccountDeletion($id, $adminId);
+            $erased = DB::transaction(function () use ($adminId, $id, $tenantId): bool {
+                if ($this->lockManageableSecurityTarget($adminId, $id, $tenantId) === null) {
+                    return false;
+                }
+                (new \App\Services\Enterprise\GdprService($tenantId))->executeAccountDeletion($id, $adminId);
+                return true;
+            }, 3);
+            if (!$erased) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    __('api.insufficient_permissions'),
+                    null,
+                    403
+                );
+            }
         } catch (\Throwable $e) {
             Log::error("[AdminUsers] GDPR erasure failed for user #{$id}: " . $e->getMessage());
             return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'User']), null, 500);
@@ -1102,25 +1211,70 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
 
         $password = $this->input('password', '');
         if (strlen($password) < 8) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.password_min_length'), 'password', 422);
         }
 
-        $currentHash = DB::table('users')
-            ->where('id', $id)
-            ->where('tenant_id', $tenantId)
-            ->value('password_hash');
-        $currentHash = is_string($currentHash) ? $currentHash : null;
+        $hashed = password_hash($password, PASSWORD_ARGON2ID);
+        try {
+            $passwordUpdated = DB::transaction(function () use (
+                $adminId,
+                $id,
+                $tenantId,
+                $password,
+                $hashed
+            ): bool {
+                $lockedUser = $this->lockManageableSecurityTarget($adminId, $id, $tenantId);
+                if ($lockedUser === null) {
+                    throw new \RuntimeException('Password target is no longer manageable.');
+                }
 
-        if (PasswordHistoryService::isReused($id, $tenantId, $password, $currentHash)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.password_reused'), 'password', 422);
+                $currentHash = is_string($lockedUser['password_hash'] ?? null)
+                    ? $lockedUser['password_hash']
+                    : null;
+                if (PasswordHistoryService::isReused($id, $tenantId, $password, $currentHash)) {
+                    return false;
+                }
+
+                DB::update(
+                    "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
+                    [$hashed, $id, $tenantId]
+                );
+                PasswordHistoryService::record($id, $tenantId, $currentHash);
+
+                // A previously issued reset link must never remain a second
+                // route back into an account after an administrator replaces
+                // its password. Keep this invalidation inside the same locked
+                // transaction as the hash change and session revocation.
+                DB::table('password_resets')
+                    ->where('tenant_id', $tenantId)
+                    ->whereRaw('LOWER(email) = ?', [strtolower(trim((string) ($lockedUser['email'] ?? '')))])
+                    ->delete();
+
+                if ($this->tokenService->revokeAllTokensForUser($id, 'admin_password_change') < 1) {
+                    throw new \RuntimeException('Could not revoke sessions after admin password change.');
+                }
+
+                return true;
+            });
+        } catch (\Throwable $e) {
+            Log::error('[AdminUsers] Password transaction failed', [
+                'admin_id' => $adminId,
+                'user_id' => $id,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
 
-        $hashed = password_hash($password, PASSWORD_ARGON2ID);
-        DB::update("UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?", [$hashed, $id, $tenantId]);
-        PasswordHistoryService::record($id, $tenantId, $currentHash);
+        if (!$passwordUpdated) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.password_reused'), 'password', 422);
+        }
 
         ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
         $this->auditLogService->logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
@@ -1179,14 +1333,12 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        // Prevent impersonating super admins (security measure)
-        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.cannot_impersonate_super_admin'), null, 403);
-        }
-
         // Prevent self-impersonation
         if ($id === $adminId) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.cannot_impersonate_self'), null, 422);
+        }
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
         }
 
         // Check if target user is blocked by registration policy gates
@@ -1194,8 +1346,23 @@ class AdminUsersController extends BaseApiController
         $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
 
         try {
-            // Generate a short-lived, single-use impersonation token (5 min TTL)
-            $token = $this->tokenService->generateImpersonationToken($id, $userTenantId, $adminId);
+            // Generate the proof while the actor and target tiers are locked so
+            // a concurrent promotion cannot turn a permitted member
+            // impersonation into a peer/higher-tier administrator session.
+            $token = DB::transaction(function () use ($adminId, $id, $tenantId, $userTenantId): ?string {
+                if ($this->lockManageableSecurityTarget($adminId, $id, $tenantId) === null) {
+                    return null;
+                }
+                return $this->tokenService->generateImpersonationToken($id, $userTenantId, $adminId);
+            }, 3);
+            if ($token === null) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    __('api.insufficient_permissions'),
+                    null,
+                    403
+                );
+            }
 
             // Resolve the target user's tenant slug so the frontend can open the
             // new tab on that tenant's URL — without it, the new tab inherits
@@ -1405,7 +1572,7 @@ class AdminUsersController extends BaseApiController
 
         try {
             $token = bin2hex(random_bytes(32));
-            // Must use SHA-256 (not bcrypt) — PasswordResetController::findValidResetToken()
+            // Must use SHA-256 (not bcrypt) — PasswordResetController::findResetTokenCandidate()
             // looks up by hashed token column using hash('sha256', $token).
             $hashedToken = hash('sha256', $token);
             $userTenantId = (int) $user['tenant_id'];
@@ -1787,6 +1954,48 @@ class AdminUsersController extends BaseApiController
             return false;
         }
 
+        return $this->securityActorCanManageTarget($actor, $targetUser);
+    }
+
+    /**
+     * Lock the actor and target in deterministic ID order, then re-evaluate the
+     * hierarchy at the mutation boundary. Call only inside a DB transaction.
+     *
+     * @return array<string,mixed>|null Locked target row when authorised.
+     */
+    private function lockManageableSecurityTarget(int $adminId, int $targetId, int $tenantId): ?array
+    {
+        $ids = array_values(array_unique([$adminId, $targetId]));
+        sort($ids, SORT_NUMERIC);
+
+        $rows = DB::table('users')
+            ->whereIn('id', $ids)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get()
+            ->mapWithKeys(static fn ($row): array => [(int) $row->id => (array) $row])
+            ->all();
+
+        $actor = $rows[$adminId] ?? null;
+        $target = $rows[$targetId] ?? null;
+        if (
+            !is_array($actor)
+            || !is_array($target)
+            || (int) ($target['tenant_id'] ?? 0) !== $tenantId
+            || !$this->securityActorCanManageTarget($actor, $target)
+        ) {
+            return null;
+        }
+
+        return $target;
+    }
+
+    /**
+     * @param array<string,mixed> $actor
+     * @param array<string,mixed> $targetUser
+     */
+    private function securityActorCanManageTarget(array $actor, array $targetUser): bool
+    {
         $actorTier = $this->securityTier($actor);
         $targetTier = $this->securityTier($targetUser);
 
@@ -1809,7 +2018,11 @@ class AdminUsersController extends BaseApiController
         if ($role === 'super_admin' || !empty($user['is_super_admin'])) {
             return 3;
         }
-        if (in_array($role, ['admin', 'tenant_admin'], true) || !empty($user['is_tenant_super_admin'])) {
+        if (
+            in_array($role, ['admin', 'tenant_admin'], true)
+            || !empty($user['is_admin'])
+            || !empty($user['is_tenant_super_admin'])
+        ) {
             return 2;
         }
         // Brokers/coordinators outrank ordinary members (so they can reset a
@@ -2248,7 +2461,8 @@ class AdminUsersController extends BaseApiController
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $eligible = DB::select(
-            "SELECT id, email, first_name, preferred_language, tenant_id, is_approved, is_super_admin, is_tenant_super_admin
+            "SELECT id, email, first_name, preferred_language, tenant_id, role, is_approved,
+                    is_admin, is_super_admin, is_tenant_super_admin, is_god
              FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
             array_merge([$tenantId], $ids)
         );
@@ -2270,6 +2484,11 @@ class AdminUsersController extends BaseApiController
                 continue;
             }
             $row = $eligibleById[$id];
+            if (!$this->canManageSecurityTarget($adminId, (array) $row)) {
+                $skippedIds[] = $id;
+                $failed++;
+                continue;
+            }
             if (!empty($row->is_approved)) {
                 // Repair pre-fix approvals that left status='pending'.
                 $this->activatePendingStatus((int) $id, (int) $tenantId);
@@ -2277,12 +2496,23 @@ class AdminUsersController extends BaseApiController
                 continue;
             }
             try {
-                User::updateAdminFields($id, [
-                    'role' => 'member',
-                    'is_approved' => 1,
-                    'tenant_id' => $tenantId,
-                ]);
-                $this->activatePendingStatus((int) $id, (int) $tenantId);
+                $updated = DB::transaction(function () use ($adminId, $id, $tenantId): bool {
+                    if ($this->lockManageableSecurityTarget($adminId, $id, $tenantId) === null) {
+                        return false;
+                    }
+                    User::updateAdminFields($id, [
+                        'role' => 'member',
+                        'is_approved' => 1,
+                        'tenant_id' => $tenantId,
+                    ]);
+                    $this->activatePendingStatus((int) $id, (int) $tenantId);
+                    return true;
+                }, 3);
+                if (!$updated) {
+                    $failed++;
+                    $skippedIds[] = $id;
+                    continue;
+                }
                 $userArr = (array) $row;
                 $creditsAwarded = $this->grantWelcomeCredits($userArr, $adminId);
                 $this->sendApprovalWelcomeEmail($userArr, $creditsAwarded);
@@ -2330,7 +2560,8 @@ class AdminUsersController extends BaseApiController
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $eligible = DB::select(
-            "SELECT id, tenant_id, email, first_name, preferred_language, is_super_admin, is_tenant_super_admin
+            "SELECT id, tenant_id, email, first_name, preferred_language, role,
+                    is_admin, is_super_admin, is_tenant_super_admin, is_god
              FROM users WHERE tenant_id = ? AND id IN ({$placeholders})",
             array_merge([$tenantId], $ids)
         );
@@ -2357,16 +2588,27 @@ class AdminUsersController extends BaseApiController
                 continue;
             }
             $row = $eligibleById[$id];
-            if (!empty($row->is_super_admin) || !empty($row->is_tenant_super_admin)) {
+            if (!$this->canManageSecurityTarget($adminId, (array) $row)) {
                 $skippedIds[] = $id;
                 $failed++;
                 continue;
             }
             try {
-                DB::update(
-                    "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
-                    [$id, $tenantId]
-                );
+                $updated = DB::transaction(function () use ($adminId, $id, $tenantId): bool {
+                    if ($this->lockManageableSecurityTarget($adminId, $id, $tenantId) === null) {
+                        return false;
+                    }
+                    DB::update(
+                        "UPDATE users SET status = 'suspended' WHERE id = ? AND tenant_id = ?",
+                        [$id, $tenantId]
+                    );
+                    return true;
+                }, 3);
+                if (!$updated) {
+                    $failed++;
+                    $skippedIds[] = $id;
+                    continue;
+                }
                 $this->notifySuspendedUser([
                     'id' => (int) $row->id,
                     'tenant_id' => (int) $row->tenant_id,

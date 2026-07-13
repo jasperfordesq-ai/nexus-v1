@@ -55,9 +55,10 @@ vi.mock('@/lib/webauthn', () => ({
 }));
 
 // Mock the api module — use vi.hoisted so these are available in the hoisted vi.mock factory
-const { mockApiGet, mockApiPost, mockTokenManager } = vi.hoisted(() => {
+const { mockApiGet, mockApiPost, mockApiLogoutSession, mockTokenManager } = vi.hoisted(() => {
   const mockApiGet = vi.fn();
   const mockApiPost = vi.fn();
+  const mockApiLogoutSession = vi.fn();
   const mockTokenManager = {
     getAccessToken: vi.fn(),
     setAccessToken: vi.fn(),
@@ -70,13 +71,14 @@ const { mockApiGet, mockApiPost, mockTokenManager } = vi.hoisted(() => {
     hasAccessToken: vi.fn(),
     hasRefreshToken: vi.fn(),
   };
-  return { mockApiGet, mockApiPost, mockTokenManager };
+  return { mockApiGet, mockApiPost, mockApiLogoutSession, mockTokenManager };
 });
 
 vi.mock('@/lib/api', () => ({
   api: {
     get: (...args: unknown[]) => mockApiGet(...args),
     post: (...args: unknown[]) => mockApiPost(...args),
+    logoutSession: (...args: unknown[]) => mockApiLogoutSession(...args),
   },
   tokenManager: mockTokenManager,
   SESSION_EXPIRED_EVENT: 'nexus:session_expired',
@@ -127,6 +129,7 @@ describe('AuthContext', () => {
     // Default API responses
     mockApiGet.mockResolvedValue({ success: false, error: 'Not authenticated' });
     mockApiPost.mockResolvedValue({ success: true });
+    mockApiLogoutSession.mockResolvedValue({ success: true });
   });
 
   afterEach(() => {
@@ -469,7 +472,7 @@ describe('AuthContext', () => {
       mockTokenManager.hasAccessToken.mockReturnValue(true);
       mockApiGet.mockResolvedValue({ success: true, data: mockUser });
       // Logout endpoint fails
-      mockApiPost.mockResolvedValue({ success: false, error: 'Server error' });
+      mockApiLogoutSession.mockResolvedValue({ success: false, error: 'Server error' });
 
       const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
       await waitFor(() => expect(result.current.isAuthenticated).toBe(true));

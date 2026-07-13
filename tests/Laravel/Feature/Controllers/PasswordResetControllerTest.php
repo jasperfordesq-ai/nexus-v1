@@ -8,11 +8,13 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\TokenService;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**
@@ -148,6 +150,51 @@ class PasswordResetControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [400, 404, 422]);
+    }
+
+    public function test_reset_password_rolls_back_when_session_revocation_fails(): void
+    {
+        $email = 'reset-revocation-failure-' . uniqid('', true) . '@example.test';
+        $oldPassword = 'old-password-value-123';
+        $newPassword = 'new-password-value-' . uniqid();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => $email,
+            'status' => 'active',
+            'is_approved' => true,
+            'password_hash' => Hash::make($oldPassword),
+        ]);
+        $plainToken = bin2hex(random_bytes(32));
+        $storedToken = hash('sha256', $plainToken);
+        DB::table('password_resets')->insert([
+            'email' => $email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $storedToken,
+            'created_at' => now(),
+        ]);
+        Http::fake(['api.pwnedpasswords.com/*' => Http::response('', 200)]);
+
+        $tokens = \Mockery::mock(TokenService::class);
+        $tokens->shouldReceive('revokeAllTokensForUser')
+            ->once()
+            ->with((int) $user->id, 'password_reset')
+            ->andReturn(0);
+        app()->instance(TokenService::class, $tokens);
+
+        $this->apiPost('/auth/reset-password', [
+            'token' => $plainToken,
+            'password' => $newPassword,
+            'password_confirmation' => $newPassword,
+        ])->assertStatus(500);
+
+        $this->assertTrue(Hash::check(
+            $oldPassword,
+            (string) DB::table('users')->where('id', $user->id)->value('password_hash')
+        ));
+        $this->assertDatabaseHas('password_resets', [
+            'email' => $email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $storedToken,
+        ]);
     }
 }
 

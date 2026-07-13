@@ -76,6 +76,7 @@ vi.mock('@/lib/api', () => ({
     put: vi.fn(),
     patch: vi.fn(),
     delete: vi.fn(),
+    refreshSession: vi.fn(),
   },
 }));
 
@@ -87,7 +88,7 @@ vi.mock('@/lib/logger', () => ({
 // ─── Import AFTER mocks ───────────────────────────────────────────────────────
 
 import { SessionTimeoutWarning } from './SessionTimeoutWarning';
-import { tokenManager } from '@/lib/api';
+import { api, tokenManager } from '@/lib/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -203,6 +204,54 @@ describe('SessionTimeoutWarning — opens on event (real timers)', () => {
       // If i18n resolves to a non-default key, just assert buttons are present
       expect(allButtons.length).toBeGreaterThanOrEqual(2);
     }
+  });
+
+  it('extends through the shared refresh coordinator', async () => {
+    const rotatedAccessToken = jwtExpiringIn(240);
+    vi.mocked(api.refreshSession).mockResolvedValue('refreshed');
+    vi.mocked(tokenManager.getAccessToken).mockReturnValue(rotatedAccessToken);
+
+    render(<SessionTimeoutWarning />);
+    await act(async () => {
+      dispatchExpiringEvent();
+    });
+    await waitForText('30');
+
+    const extendButton = Array.from(document.querySelectorAll('button')).find((button) =>
+      button.textContent?.toLowerCase().includes('extend'),
+    );
+    expect(extendButton).toBeDefined();
+
+    await act(async () => {
+      fireEvent.click(extendButton!);
+    });
+
+    await waitFor(() => expect(api.refreshSession).toHaveBeenCalledOnce());
+    expect(scheduleSessionWarningSpy).toHaveBeenCalled();
+    expect(logoutSpy).not.toHaveBeenCalled();
+  });
+
+  it('keeps the session available when extension is temporarily unavailable', async () => {
+    vi.mocked(api.refreshSession).mockResolvedValue('transient');
+
+    render(<SessionTimeoutWarning />);
+    await act(async () => {
+      dispatchExpiringEvent();
+    });
+    await waitForText('30');
+
+    const extendButton = Array.from(document.querySelectorAll('button')).find((button) =>
+      button.textContent?.toLowerCase().includes('extend'),
+    );
+    expect(extendButton).toBeDefined();
+
+    await act(async () => {
+      fireEvent.click(extendButton!);
+    });
+
+    await waitFor(() => expect(api.refreshSession).toHaveBeenCalledOnce());
+    expect(logoutSpy).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain('30');
   });
 
   it('closes the modal when the unauthenticated state is detected', async () => {

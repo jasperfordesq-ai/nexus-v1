@@ -320,6 +320,11 @@ class WebAuthnControllerTest extends TestCase
         $this->assertFalse($stored['metadata']['account_bound']);
         $this->assertTrue($stored['metadata']['discoverable']);
         $this->assertSame([], $stored['metadata']['allowed_credential_ids']);
+        $this->assertIsInt($stored['metadata']['authentication_started_at']);
+        $this->assertLessThanOrEqual(
+            (int) $stored['created_at'],
+            $stored['metadata']['authentication_started_at']
+        );
     }
 
     public function test_challenges_require_uv_and_registration_requires_a_resident_key(): void
@@ -614,6 +619,48 @@ class WebAuthnControllerTest extends TestCase
         ]);
     }
 
+    public function test_registration_revalidates_confirmation_after_revocation_during_ceremony(): void
+    {
+        $user = $this->authenticatedUser();
+        $challenge = $this->issueRegistrationChallenge($user);
+        $rawCredentialId = random_bytes(32);
+        $tokenService = $this->app->make(TokenService::class);
+        $revokedSessions = 0;
+        $verifier = $this->verifierMock();
+        $verifier->shouldReceive('verifyRegistration')
+            ->once()
+            ->andReturnUsing(function () use (
+                $tokenService,
+                $user,
+                $rawCredentialId,
+                &$revokedSessions
+            ): array {
+                // Deterministically exercise the race window after the request's
+                // first confirmation check but before its persistence lock.
+                $revokedSessions = $tokenService->revokeAllTokensForUser(
+                    (int) $user->id,
+                    'password_change'
+                );
+
+                return $this->verifiedRegistration($rawCredentialId);
+            });
+
+        $this->apiPost(
+            '/webauthn/register-verify',
+            $this->registrationPayload($challenge, $rawCredentialId),
+            ['Origin' => 'http://localhost']
+        )
+            ->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'SECURITY_CONFIRMATION_REQUIRED');
+
+        $this->assertGreaterThan(0, $revokedSessions);
+        $this->assertDatabaseMissing('webauthn_credentials', [
+            'user_id' => (int) $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => $this->base64UrlEncode($rawCredentialId),
+        ]);
+    }
+
     public function test_registration_rejects_a_challenge_after_tenant_routing_changes(): void
     {
         $user = $this->authenticatedUser();
@@ -815,6 +862,49 @@ class WebAuthnControllerTest extends TestCase
         $this->apiPost('/webauthn/auth-verify', $payload, ['Origin' => 'http://localhost'])
             ->assertStatus(401)
             ->assertJsonPath('errors.0.code', 'AUTH_WEBAUTHN_CHALLENGE_EXPIRED');
+    }
+
+    public function test_global_revocation_after_challenge_prevents_valid_passkey_token_issuance(): void
+    {
+        $user = $this->eligibleUser();
+        $credential = $this->credentialFor($user);
+        $verifier = $this->verifierMock();
+        $verifier->shouldReceive('verifyAuthentication')->once()->andReturn(2);
+
+        $challenge = $this->issueAuthenticationChallenge();
+        $tokenService = $this->app->make(TokenService::class);
+        $this->assertGreaterThan(
+            0,
+            $tokenService->revokeAllTokensForUser((int) $user->id, 'password_change')
+        );
+
+        $issuanceGuard = Mockery::mock(TokenService::class)->makePartial();
+        $issuanceGuard->shouldNotReceive('generateToken');
+        $issuanceGuard->shouldNotReceive('generateRefreshToken');
+        $issuanceGuard->shouldNotReceive('generateSecurityConfirmationToken');
+        $this->app->instance(TokenService::class, $issuanceGuard);
+
+        $payload = $this->assertionPayload(
+            $credential,
+            $challenge['challenge'],
+            $challenge['challenge_id'],
+            'http://localhost',
+            (string) $credential['user_handle']
+        );
+
+        $this->apiPost('/webauthn/auth-verify', $payload, ['Origin' => 'http://localhost'])
+            ->assertStatus(401)
+            ->assertJsonPath('errors.0.code', 'AUTH_WEBAUTHN_FAILED')
+            ->assertJsonMissingPath('access_token')
+            ->assertJsonMissingPath('refresh_token');
+
+        $this->assertDatabaseMissing('refresh_token_sessions', [
+            'user_id' => (int) $user->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+        $this->assertSame(1, (int) DB::table('webauthn_credentials')
+            ->where('credential_id', $credential['credential_id'])
+            ->value('sign_count'));
     }
 
     /**
@@ -1160,6 +1250,45 @@ class WebAuthnControllerTest extends TestCase
             $this->testTenantId
         );
         $this->assertSame('passkey_uv', $payload['method'] ?? null);
+    }
+
+    public function test_password_security_confirmation_holds_the_tenant_user_issuance_lock(): void
+    {
+        $password = 'CurrentSecurityPassword123!';
+        $user = $this->authenticatedUser([
+            'password_hash' => password_hash($password, PASSWORD_ARGON2ID),
+        ]);
+        $queries = [];
+        DB::listen(static function ($query) use (&$queries): void {
+            $queries[] = strtolower((string) $query->sql);
+        });
+
+        $response = $this->apiPost('/webauthn/security-confirm', [
+            'current_password' => $password,
+        ])->assertOk()
+            ->assertJsonStructure(['data' => ['security_confirmation_token']]);
+
+        $this->assertTrue(
+            collect($queries)->contains(static fn (string $sql): bool =>
+                str_contains($sql, 'from `users`')
+                && str_contains($sql, 'for update')
+            ),
+            'Security confirmation must lock the tenant user through factor verification and token issuance.'
+        );
+
+        $tokenService = $this->app->make(TokenService::class);
+        $confirmation = (string) $response->json('data.security_confirmation_token');
+        $this->assertNotNull($tokenService->validateSecurityConfirmationToken(
+            $confirmation,
+            (int) $user->id,
+            $this->testTenantId
+        ));
+        $this->assertGreaterThan(0, $tokenService->revokeAllTokensForUser((int) $user->id, 'test_password_change'));
+        $this->assertNull($tokenService->validateSecurityConfirmationToken(
+            $confirmation,
+            (int) $user->id,
+            $this->testTenantId
+        ));
     }
 
     public function test_passkey_login_without_user_verification_does_not_satisfy_security_confirmation(): void

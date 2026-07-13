@@ -69,11 +69,11 @@ class AudioUploader
         $extension = self::getExtensionFromMime($detectedMime);
 
         // Generate secure filename
-        $filename = uniqid('voice_', true) . '.' . $extension;
+        $filename = 'voice_' . bin2hex(random_bytes(16)) . '.' . $extension;
 
         // Tenant-scoped directory
         $tenantId = TenantContext::getId();
-        // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
+        // nosemgrep: tainted-filename — tenant is an int and filename is generated from 128 random bits
         $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
@@ -146,11 +146,11 @@ class AudioUploader
 
         // Generate filename
         $extension = self::getExtensionFromMime($mimeType);
-        $filename = uniqid('voice_', true) . '.' . $extension;
+        $filename = 'voice_' . bin2hex(random_bytes(16)) . '.' . $extension;
 
         // Tenant-scoped directory
         $tenantId = TenantContext::getId();
-        // nosemgrep: tainted-filename — $tenantId is int from TenantContext, $filename is uniqid-generated
+        // nosemgrep: tainted-filename — tenant is an int and filename is generated from 128 random bits
         $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . (int)$tenantId . '/voice_messages';
 
         if (!is_dir($targetDir)) { // nosemgrep: tainted-filename
@@ -176,28 +176,115 @@ class AudioUploader
      */
     public static function delete(string $url): bool
     {
-        if (empty($url) || strpos($url, '/uploads/') !== 0) {
+        if (trim($url) === '') {
             return false;
         }
 
-        // Prevent path traversal attacks
-        $uploadsDir = realpath(__DIR__ . '/../../httpdocs/uploads');
-        if (!$uploadsDir) {
+        // File deletion must never resolve a fallback/default tenant. Upload
+        // cleanup only runs inside an already-resolved request context.
+        $tenantId = TenantContext::currentId();
+        if ($tenantId === null) {
             return false;
         }
 
-        $path = realpath(__DIR__ . '/../../httpdocs' . $url);
+        return self::deleteForTenant($url, $tenantId);
+    }
 
-        // Ensure the resolved path is within the uploads directory
-        if (!$path || strpos($path, $uploadsDir) !== 0) {
-            return false;
+    /**
+     * Delete a local voice recording only when it belongs to the specified
+     * tenant's canonical voice-message directory.
+     *
+     * This explicit-tenant variant is used by background/GDPR work where the
+     * ambient request tenant may not be available. Invalid, remote, missing,
+     * traversal, symlink-escape, and cross-tenant pointers all fail closed.
+     */
+    public static function deleteForTenant(string $url, int $tenantId): bool
+    {
+        $path = self::resolveTenantVoiceFilePath($url, $tenantId);
+
+        return $path !== null && @unlink($path);
+    }
+
+    /**
+     * Confirm that a server-issued voice URL resolves to an existing recording
+     * inside the specified tenant's canonical voice-message directory.
+     */
+    public static function isTenantVoiceFile(string $url, int $tenantId): bool
+    {
+        return self::resolveTenantVoiceFilePath($url, $tenantId) !== null;
+    }
+
+    /**
+     * Resolve a voice URL to its canonical local path for safe identity
+     * comparisons. No path is returned unless the existing file is contained
+     * by the specified tenant's voice-message directory.
+     */
+    public static function resolveTenantVoiceFilePath(string $url, int $tenantId): ?string
+    {
+        $url = trim($url);
+        if ($url === '' || $tenantId <= 0 || str_contains($url, "\0") || str_contains($url, '\\')) {
+            return null;
         }
 
-        if (is_file($path)) {
-            return unlink($path);
+        $parts = parse_url($url);
+        if ($parts === false
+            || isset($parts['scheme'])
+            || isset($parts['host'])
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || isset($parts['port'])
+            || isset($parts['query'])
+            || isset($parts['fragment'])) {
+            return null;
         }
 
-        return false;
+        $path = rawurldecode((string) ($parts['path'] ?? ''));
+        if (str_contains($path, "\0") || str_contains($path, '\\')) {
+            return null;
+        }
+        $prefix = "/uploads/{$tenantId}/voice_messages/";
+        if (!str_starts_with($path, $prefix)) {
+            return null;
+        }
+
+        $filename = substr($path, strlen($prefix));
+        if ($filename === ''
+            || $filename === '.'
+            || $filename === '..'
+            || str_contains($filename, '/')
+            || str_contains($filename, '\\')) {
+            return null;
+        }
+
+        $documentRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
+        if ($documentRoot === '' || !is_dir($documentRoot)) {
+            $documentRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
+        }
+        if ($documentRoot === '') {
+            return null;
+        }
+
+        $voiceRoot = $documentRoot
+            . DIRECTORY_SEPARATOR . 'uploads'
+            . DIRECTORY_SEPARATOR . $tenantId
+            . DIRECTORY_SEPARATOR . 'voice_messages';
+        $resolvedRoot = realpath($voiceRoot);
+        if ($resolvedRoot === false) {
+            return null;
+        }
+
+        $candidate = $voiceRoot . DIRECTORY_SEPARATOR . $filename;
+        if (!is_file($candidate)) {
+            return null;
+        }
+
+        $resolved = realpath($candidate);
+        $rootPrefix = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if ($resolved === false || !str_starts_with($resolved, $rootPrefix)) {
+            return null;
+        }
+
+        return $resolved;
     }
 
     /**

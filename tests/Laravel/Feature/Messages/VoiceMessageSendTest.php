@@ -7,13 +7,14 @@
 namespace Tests\Laravel\Feature\Messages;
 
 use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\MessageService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
- * Regression: MessageService::send sets is_voice on every voice-message send
+ * Regression: MessageService::sendVoice sets is_voice on every voice-message send
  * (fillable + cast on the Message model) but the messages table had no
  * is_voice column — the INSERT threw "unknown column" and EVERY voice
  * message send returned 400 UPLOAD_FAILED from 2026-03-28 until the
@@ -26,39 +27,68 @@ class VoiceMessageSendTest extends TestCase
 
     public function test_voice_message_send_persists_with_voice_fields(): void
     {
-        $tenantId = (int) DB::table('tenants')->where('is_active', 1)->orderBy('id')->value('id');
-        $users = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->orderBy('id')
-            ->limit(2)
-            ->pluck('id')
-            ->all();
-        if (count($users) < 2) {
-            $this->markTestSkipped('Test DB lacks two active users');
-        }
+        $tenantId = $this->testTenantId;
+        $sender = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $recipient = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
         TenantContext::setById($tenantId);
         $this->app->instance('tenant.id', $tenantId);
 
+        $voiceDirectory = public_path("uploads/{$tenantId}/voice_messages");
+        if (!is_dir($voiceDirectory)) {
+            mkdir($voiceDirectory, 0775, true);
+        }
+        $voiceUrl = "/uploads/{$tenantId}/voice_messages/voice_test_" . uniqid() . '.webm';
+        $voicePath = public_path(ltrim($voiceUrl, '/'));
+        file_put_contents($voicePath, 'test voice bytes');
+
         try {
-            $result = MessageService::send((int) $users[0], (int) $users[1], [
-                'body' => '',
-                'is_voice' => true,
-                'audio_url' => '/uploads/voice/test-clip.webm',
-                'audio_duration' => 7,
-            ]);
+            $result = MessageService::sendVoice(
+                (int) $sender->id,
+                (int) $recipient->id,
+                $voiceUrl,
+                7,
+            );
 
             $this->assertNotEmpty($result, 'Voice message send failed: ' . json_encode(MessageService::getErrors()));
 
             $row = DB::table('messages')
                 ->where('tenant_id', $tenantId)
-                ->where('sender_id', $users[0])
-                ->where('audio_url', '/uploads/voice/test-clip.webm')
+                ->where('sender_id', $sender->id)
+                ->where('audio_url', $voiceUrl)
                 ->first();
 
             $this->assertNotNull($row, 'Voice message row not persisted');
             $this->assertSame(1, (int) $row->is_voice);
             $this->assertSame(7, (int) $row->audio_duration);
+        } finally {
+            @unlink($voicePath);
+            TenantContext::reset();
+        }
+    }
+
+    public function test_generic_service_send_rejects_raw_audio_url(): void
+    {
+        $tenantId = $this->testTenantId;
+        $sender = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $recipient = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        TenantContext::setById($tenantId);
+        $this->app->instance('tenant.id', $tenantId);
+
+        $craftedUrl = "/uploads/{$tenantId}/voice_messages/../../../../.env";
+        try {
+            $result = MessageService::send((int) $sender->id, (int) $recipient->id, [
+                'body' => 'ordinary message body',
+                'audio_url' => $craftedUrl,
+            ]);
+
+            $this->assertSame([], $result);
+            $this->assertSame('VALIDATION_ERROR', MessageService::getErrors()[0]['code'] ?? null);
+            $this->assertDatabaseMissing('messages', [
+                'tenant_id' => $tenantId,
+                'sender_id' => $sender->id,
+                'receiver_id' => $recipient->id,
+                'audio_url' => $craftedUrl,
+            ]);
         } finally {
             TenantContext::reset();
         }

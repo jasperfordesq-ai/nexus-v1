@@ -209,7 +209,9 @@ final class AuthenticationMethodGuardTest extends TestCase
         ));
 
         $this->insertOauthIdentity($userId, $this->testTenantId, 'apple');
-        $this->assertTrue(AuthenticationMethodGuard::hasAlternativeToOauthProvider(
+        // Apple is deliberately excluded until a vetted Socialite driver is
+        // installed, so a dormant historical identity is not a usable method.
+        $this->assertFalse(AuthenticationMethodGuard::hasAlternativeToOauthProvider(
             $userId,
             $this->testTenantId,
             'google'

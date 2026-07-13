@@ -6,24 +6,28 @@
 /**
  * Connected Accounts Tab (SOC13)
  *
- * Lists Google / Apple / Facebook identities currently linked to the user.
+ * Lists vetted Google / Facebook identities currently linked to the user.
  * Allows connecting new providers (initiates OAuth link flow) and disconnecting
  * existing ones (refuses if it would remove the user's only auth method —
  * backend returns 422 in that case).
  */
 
 import { getFormattingLocale } from '@/lib/helpers';
-import { useCallback, useEffect, useState } from 'react';import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
-import { AppleIcon } from '@/components/icons/AppleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
+import {
+  clearOAuthBrowserVerifier,
+  createOAuthBrowserBinding,
+} from '@/lib/oauth-browser-binding';
 
-type Provider = 'google' | 'apple' | 'facebook';
+type Provider = 'google' | 'facebook';
 
 interface OauthIdentity {
   provider: Provider;
@@ -41,7 +45,6 @@ interface IdentitiesResponse {
 
 const PROVIDER_META: Record<Provider, { Icon: typeof GoogleIcon; providerLabelKey: string }> = {
   google: { Icon: GoogleIcon, providerLabelKey: 'oauth.provider_google' },
-  apple: { Icon: AppleIcon, providerLabelKey: 'oauth.provider_apple' },
   facebook: { Icon: FacebookIcon, providerLabelKey: 'oauth.provider_facebook' },
 };
 
@@ -72,15 +75,22 @@ export function ConnectedAccountsTab() {
 
   async function handleConnect(provider: Provider) {
     setBusyProvider(provider);
+    let challenge: string | null = null;
     try {
-      const res = await api.post<{ redirect_url: string }>(`/v2/auth/oauth/${provider}/link`, {});
+      ({ challenge } = await createOAuthBrowserBinding());
+      const res = await api.post<{ redirect_url: string }>(
+        `/v2/auth/oauth/${provider}/link`,
+        { browser_challenge: challenge },
+      );
       if (res.success && res.data?.redirect_url) {
         window.location.href = res.data.redirect_url;
       } else {
+        clearOAuthBrowserVerifier(challenge);
         toast.error(res.error || t('oauth.callback_failed'));
         setBusyProvider(null);
       }
     } catch (err) {
+      clearOAuthBrowserVerifier(challenge);
       logError('[ConnectedAccountsTab] connect failed', err);
       toast.error(t('oauth.callback_failed'));
       setBusyProvider(null);
@@ -105,7 +115,7 @@ export function ConnectedAccountsTab() {
     }
   }
 
-  const supported: Provider[] = data?.supported_providers ?? ['google', 'apple', 'facebook'];
+  const supported: Provider[] = data?.supported_providers ?? ['google', 'facebook'];
   const enabled = new Set(data?.enabled_providers ?? []);
   const linkedMap = new Map((data?.identities ?? []).map((i) => [i.provider, i] as const));
 

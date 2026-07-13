@@ -508,15 +508,18 @@ class UserService
     public static function updatePassword(int $userId, string $currentPassword, string $newPassword): bool
     {
         self::$errors = [];
-        $user = User::query()->find($userId);
+        $tenantId = (int) TenantContext::getId();
+        $user = User::query()
+            ->where('tenant_id', $tenantId)
+            ->find($userId);
 
         if (! $user) {
-            self::setError('NOT_FOUND', 'User not found');
+            self::setError('NOT_FOUND', __('api.user_not_found'));
             return false;
         }
 
         if (! Hash::check($currentPassword, $user->password_hash)) {
-            self::setError('INVALID_PASSWORD', 'Current password is incorrect');
+            self::setError('INVALID_PASSWORD', __('api.user_invalid_password'));
             return false;
         }
 
@@ -533,11 +536,99 @@ class UserService
             return false;
         }
 
-        $previousHash = $user->password_hash;
-        $user->password_hash = Hash::make($newPassword);
-        $user->save();
+        try {
+            $passwordOutcome = DB::transaction(function () use (
+                $userId,
+                $tenantId,
+                $currentPassword,
+                $newPassword
+            ): array {
+                // This is the authoritative validation. The fast checks above
+                // improve the common error path, but a competing password
+                // mutation may have committed since they ran. Serialise on the
+                // tenant user row and repeat both credential and history checks.
+                $user = User::query()
+                    ->where('tenant_id', $tenantId)
+                    ->whereKey($userId)
+                    ->lockForUpdate()
+                    ->first();
+                if ($user === null) {
+                    return ['status' => 'user_missing'];
+                }
 
-        PasswordHistoryService::record((int) $user->id, (int) $user->tenant_id, $previousHash);
+                if (!Hash::check($currentPassword, $user->password_hash)) {
+                    return ['status' => 'invalid_password'];
+                }
+
+                if (PasswordHistoryService::isReused(
+                    (int) $user->id,
+                    (int) $user->tenant_id,
+                    $newPassword,
+                    $user->password_hash
+                )) {
+                    return ['status' => 'password_reused'];
+                }
+
+                $previousHash = $user->password_hash;
+                $user->password_hash = Hash::make($newPassword);
+                if (!$user->save()) {
+                    throw new \RuntimeException('Unable to update password.');
+                }
+
+                PasswordHistoryService::record(
+                    (int) $user->id,
+                    (int) $user->tenant_id,
+                    $previousHash
+                );
+
+                // Any reset link issued before this authenticated password
+                // change must stop working. Keep this tenant/email-scoped
+                // invalidation in the same user-locked transaction so it
+                // cannot commit independently of the password and sessions.
+                DB::table('password_resets')
+                    ->where('tenant_id', (int) $user->tenant_id)
+                    ->where('email', strtolower(trim((string) $user->email)))
+                    ->delete();
+
+                // Password changes are a security boundary: the hash update
+                // and revocation of JWT, refresh-family, and Sanctum sessions
+                // succeed or roll back together.
+                if (app(TokenService::class)->revokeAllTokensForUser(
+                    (int) $user->id,
+                    'password_change'
+                ) < 1) {
+                    throw new \RuntimeException('Unable to revoke sessions after password change.');
+                }
+
+                return ['status' => 'updated', 'user' => $user];
+            }, 3);
+        } catch (\Throwable $e) {
+            Log::error('UserService::updatePassword transaction failed', [
+                'user_id' => $user->id,
+                'tenant_id' => $user->tenant_id,
+                'error' => $e->getMessage(),
+            ]);
+            self::setError('UPDATE_FAILED', __('api.server_error'));
+            return false;
+        }
+
+        $status = $passwordOutcome['status'] ?? null;
+        if ($status !== 'updated' || !(($passwordOutcome['user'] ?? null) instanceof User)) {
+            if ($status === 'user_missing') {
+                self::setError('NOT_FOUND', __('api.user_not_found'));
+            } elseif ($status === 'invalid_password') {
+                self::setError('INVALID_PASSWORD', __('api.user_invalid_password'));
+            } elseif ($status === 'password_reused') {
+                self::setError('PASSWORD_REUSED', __('api.password_reused'));
+            } else {
+                self::setError('UPDATE_FAILED', __('api.server_error'));
+            }
+
+            return false;
+        }
+
+        /** @var User $user */
+        $user = $passwordOutcome['user'];
 
         self::notifyPasswordChanged($user);
 

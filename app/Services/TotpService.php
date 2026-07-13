@@ -82,9 +82,9 @@ class TotpService
      *
      * @return array{limited: bool, retry_after: int|null, message: string|null}
      */
-    public static function checkRateLimit(int $userId): array
+    public static function checkRateLimit(int $userId, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
         $cutoff = date('Y-m-d H:i:s', time() - self::LOCKOUT_SECONDS);
 
         $result = DB::selectOne(
@@ -116,9 +116,9 @@ class TotpService
     /**
      * Check if user has 2FA enabled.
      */
-    public static function isEnabled(int $userId): bool
+    public static function isEnabled(int $userId, ?int $tenantId = null): bool
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
 
         $result = DB::selectOne(
             "SELECT is_enabled FROM user_totp_settings
@@ -135,9 +135,9 @@ class TotpService
      * Checks the X-Trusted-Device header first (sent by the React SPA from
      * localStorage), then falls back to the cookie for legacy/session clients.
      */
-    public static function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
+    public static function isTrustedDevice(int $userId, ?string $deviceHash = null, ?int $tenantId = null): bool
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
         $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
         if (empty($config['two_factor.allow_trusted_devices'])) {
             return false;
@@ -179,9 +179,9 @@ class TotpService
      * header on subsequent login requests — cookies don't work cross-origin
      * (SameSite=Lax blocks cross-origin POST from app.* to api.*).
      */
-    public static function trustDevice(int $userId, ?string $deviceHash = null): ?string
+    public static function trustDevice(int $userId, ?string $deviceHash = null, ?int $tenantId = null): ?string
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
         $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
         if (empty($config['two_factor.allow_trusted_devices'])) {
             return null;
@@ -216,11 +216,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string}
      */
-    public static function verifyLogin(int $userId, string $code): array
+    public static function verifyLogin(int $userId, string $code, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
 
-        $rateLimit = self::checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId, $tenantId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -243,7 +243,7 @@ class TotpService
         }
 
         if (!self::verifyCode($secret, $code)) {
-            self::recordAttempt($userId, false, 'totp', 'invalid_code');
+            self::recordAttempt($userId, false, 'totp', 'invalid_code', $tenantId);
             return ['success' => false, 'error' => 'Invalid code. Please try again.'];
         }
 
@@ -255,7 +255,7 @@ class TotpService
             [$userId, $tenantId]
         );
 
-        self::recordAttempt($userId, true, 'totp');
+        self::recordAttempt($userId, true, 'totp', null, $tenantId);
 
         return ['success' => true];
     }
@@ -265,11 +265,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string, codes_remaining?: int}
      */
-    public static function verifyBackupCode(int $userId, string $code): array
+    public static function verifyBackupCode(int $userId, string $code, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
 
-        $rateLimit = self::checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId, $tenantId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -291,22 +291,33 @@ class TotpService
         }
 
         if (!$matchedCodeId) {
-            self::recordAttempt($userId, false, 'backup_code', 'invalid_backup_code');
+            self::recordAttempt($userId, false, 'backup_code', 'invalid_backup_code', $tenantId);
             return ['success' => false, 'error' => 'Invalid backup code.'];
         }
 
         $ip = request()->ip();
         $userAgent = request()->userAgent();
 
-        DB::update(
+        $consumed = DB::update(
             "UPDATE user_backup_codes SET
                 is_used = 1,
                 used_at = NOW(),
                 used_ip = ?,
                 used_user_agent = ?
-             WHERE id = ?",
-            [$ip, $userAgent, $matchedCodeId]
+             WHERE id = ?
+               AND user_id = ?
+               AND tenant_id = ?
+               AND is_used = 0",
+            [$ip, $userAgent, $matchedCodeId, $userId, $tenantId]
         );
+
+        // Another verifier may have matched the same unused snapshot. The
+        // conditional update is the single-use boundary: only its winner may
+        // authenticate with this code.
+        if ($consumed !== 1) {
+            self::recordAttempt($userId, false, 'backup_code', 'backup_code_already_used', $tenantId);
+            return ['success' => false, 'error' => 'Invalid backup code.'];
+        }
 
         $remaining = DB::selectOne(
             "SELECT COUNT(*) as remaining FROM user_backup_codes
@@ -314,7 +325,7 @@ class TotpService
             [$userId, $tenantId]
         );
 
-        self::recordAttempt($userId, true, 'backup_code');
+        self::recordAttempt($userId, true, 'backup_code', null, $tenantId);
 
         return ['success' => true, 'codes_remaining' => (int) ($remaining->remaining ?? 0)];
     }
@@ -369,9 +380,9 @@ class TotpService
      *
      * @return array{secret: string, provisioning_uri: string, qr_code: string}
      */
-    public static function initializeSetup(int $userId): array
+    public static function initializeSetup(int $userId, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
 
         $user = DB::selectOne("SELECT email FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
 
@@ -416,11 +427,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string, backup_codes?: array}
      */
-    public static function completeSetup(int $userId, string $code): array
+    public static function completeSetup(int $userId, string $code, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
 
-        $rateLimit = self::checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId, $tenantId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -443,7 +454,7 @@ class TotpService
         }
 
         if (!self::verifyCode($secret, $code)) {
-            self::recordAttempt($userId, false, 'totp', 'invalid_code_during_setup');
+            self::recordAttempt($userId, false, 'totp', 'invalid_code_during_setup', $tenantId);
             return ['success' => false, 'error' => 'Invalid code. Please check the code and try again.'];
         }
 
@@ -465,9 +476,9 @@ class TotpService
                 [$userId, $tenantId]
             );
 
-            $backupCodes = self::generateBackupCodes($userId);
+            $backupCodes = self::generateBackupCodes($userId, $tenantId);
 
-            self::recordAttempt($userId, true, 'totp');
+            self::recordAttempt($userId, true, 'totp', null, $tenantId);
 
             DB::commit();
 
@@ -486,32 +497,61 @@ class TotpService
      */
     public static function disable(int $userId, string $password = ''): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) TenantContext::getId();
 
-        $user = DB::selectOne("SELECT password_hash FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
-        if (!$user || !password_verify($password, $user->password_hash)) {
-            return ['success' => false, 'error' => 'Invalid password.'];
-        }
-
-        DB::beginTransaction();
         try {
-            DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
-            DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
-            DB::update(
-                "UPDATE user_trusted_devices
-                 SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'two_factor_disabled'
-                 WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0",
-                [$userId, $tenantId]
-            );
-            DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            $disableOutcome = DB::transaction(function () use ($userId, $tenantId, $password): string {
+                // Match every other credential mutation's lock order: acquire
+                // the tenant user row first, then authoritatively re-check the
+                // password before touching factor or session state.
+                $user = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first(['id', 'password_hash']);
+                if ($user === null || !is_string($user->password_hash)) {
+                    return 'invalid_password';
+                }
+                if (!password_verify($password, $user->password_hash)) {
+                    return 'invalid_password';
+                }
 
-            DB::commit();
-            return ['success' => true];
-        } catch (\Exception $e) {
-            DB::rollBack();
+                DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
+                DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
+                DB::update(
+                    "UPDATE user_trusted_devices
+                     SET is_revoked = 1, revoked_at = NOW(), revoked_reason = 'two_factor_disabled'
+                     WHERE user_id = ? AND tenant_id = ? AND is_revoked = 0",
+                    [$userId, $tenantId]
+                );
+                DB::update(
+                    "UPDATE users SET totp_enabled = 0, totp_setup_required = 1
+                     WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
+                );
+
+                // Removing an authentication factor is a session boundary.
+                // A failed durable revocation aborts and rolls the factor
+                // removal back rather than reporting an unsafe success.
+                if (app(TokenService::class)->revokeAllTokensForUser(
+                    $userId,
+                    'two_factor_disabled'
+                ) < 1) {
+                    throw new \RuntimeException('Unable to revoke sessions after disabling two-factor authentication.');
+                }
+
+                return 'disabled';
+            }, 3);
+        } catch (\Throwable $e) {
             Log::error("TOTP disable error for user $userId: " . $e->getMessage());
             return ['success' => false, 'error' => 'Failed to disable 2FA.'];
         }
+
+        if ($disableOutcome !== 'disabled') {
+            return ['success' => false, 'error' => 'Invalid password.'];
+        }
+
+        return ['success' => true];
     }
 
     /**
@@ -519,9 +559,9 @@ class TotpService
      *
      * @return array  List of plain-text backup codes
      */
-    public static function generateBackupCodes(int $userId): array
+    public static function generateBackupCodes(int $userId, ?int $tenantId = null): array
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
         $config = app(AuthenticationConfigurationService::class)->getAll($tenantId);
         $backupCodeCount = (int) ($config['two_factor.backup_code_count'] ?? 10);
 
@@ -641,9 +681,15 @@ class TotpService
     /**
      * Record a 2FA verification attempt.
      */
-    public static function recordAttempt(int $userId, bool $successful, string $type = 'totp', ?string $failureReason = null): void
+    public static function recordAttempt(
+        int $userId,
+        bool $successful,
+        string $type = 'totp',
+        ?string $failureReason = null,
+        ?int $tenantId = null
+    ): void
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = self::resolveTenantId($tenantId);
         $ip = request()->ip();
         $userAgent = request()->userAgent();
 
@@ -664,6 +710,20 @@ class TotpService
     }
 
     // ─── Private helpers ────────────────────────────────────────────
+
+    /**
+     * Resolve an explicit tenant binding, falling back to the active request
+     * tenant for authenticated settings flows.
+     */
+    private static function resolveTenantId(?int $tenantId): int
+    {
+        $resolved = $tenantId ?? (int) TenantContext::getId();
+        if (!$resolved || $resolved < 1) {
+            throw new \RuntimeException('A tenant context is required for two-factor authentication.');
+        }
+
+        return (int) $resolved;
+    }
 
     /**
      * Generate a random backup code (format: XXXX-XXXX).

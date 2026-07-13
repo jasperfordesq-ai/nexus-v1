@@ -502,6 +502,32 @@ class MessagesControllerTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_generic_send_rejects_client_supplied_voice_pointers(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+
+        foreach (['voice_url', 'audio_url'] as $field) {
+            $body = 'Raw voice pointer attempt ' . $field;
+            $response = $this->apiPost('/v2/messages', [
+                'recipient_id' => $recipient->id,
+                'body' => $body,
+                $field => '/uploads/' . $this->testTenantId . '/voice_messages/../../../../.env',
+            ]);
+
+            $response
+                ->assertStatus(422)
+                ->assertJsonPath('errors.0.code', 'VALIDATION_ERROR')
+                ->assertJsonPath('errors.0.field', 'voice_message');
+            $this->assertDatabaseMissing('messages', [
+                'tenant_id' => $this->testTenantId,
+                'sender_id' => $sender->id,
+                'receiver_id' => $recipient->id,
+                'body' => $body,
+            ]);
+        }
+    }
+
     // ================================================================
     // SHOW CONVERSATION — Authentication required
     // ================================================================

@@ -42,6 +42,9 @@ class ApiErrorCodes
     /** Access token expired, use refresh token to get new one */
     public const AUTH_REFRESH_REQUIRED = 'AUTH_REFRESH_REQUIRED';
 
+    /** A concurrent request already consumed this refresh token */
+    public const AUTH_REFRESH_SUPERSEDED = 'AUTH_REFRESH_SUPERSEDED';
+
     /** User doesn't have required role/permissions */
     public const AUTH_INSUFFICIENT_PERMISSIONS = 'AUTH_INSUFFICIENT_PERMISSIONS';
 
@@ -266,6 +269,7 @@ class ApiErrorCodes
 
             // 409 Conflict
             self::VALIDATION_DUPLICATE,
+            self::AUTH_REFRESH_SUPERSEDED,
             self::RESOURCE_ALREADY_EXISTS,
             self::RESOURCE_CONFLICT,
             self::USER_MOVE_PASSKEY_RECOVERY_REQUIRED => 409,

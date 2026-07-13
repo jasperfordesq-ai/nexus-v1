@@ -165,10 +165,12 @@ class PasswordResetController extends BaseApiController
             );
         }
 
-        // Find and validate the reset token
-        $resetRecord = $this->findValidResetToken($token);
+        // Resolve only the token's immutable locator here. The authoritative
+        // expiry/user/reuse checks and consumption happen under row locks in
+        // the transaction below.
+        $resetRecord = $this->findResetTokenCandidate($token);
 
-        if (!$resetRecord) {
+        if (!$resetRecord || !isset($resetRecord['tenant_id'])) {
             return $this->respondWithError(
                 ApiErrorCodes::AUTH_TOKEN_INVALID,
                 __('api.invalid_reset_token'),
@@ -178,8 +180,9 @@ class PasswordResetController extends BaseApiController
         }
 
         // Update the password — scope by user ID to prevent cross-tenant updates
-        $email = $resetRecord['email'];
-        $tokenTenantId = isset($resetRecord['tenant_id']) ? (int) $resetRecord['tenant_id'] : null;
+        $email = (string) $resetRecord['email'];
+        $tokenTenantId = (int) $resetRecord['tenant_id'];
+        $hashedResetToken = hash('sha256', $token);
         $hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
 
         // Find the user globally — the reset token validates identity, and the user
@@ -222,32 +225,126 @@ class PasswordResetController extends BaseApiController
             );
         }
 
-        // Atomically update password, delete reset tokens, and revoke session tokens
-        DB::transaction(function () use ($hashedPassword, $user, $email, $tokenTenantId) {
-            // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
-            DB::update(
-                "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
-                [$hashedPassword, $user['id'], $user['tenant_id']]
+        // Atomically update password, delete reset tokens, and revoke sessions.
+        // A revocation failure rolls the password and reset-token changes back.
+        try {
+            $resetOutcome = DB::transaction(function () use (
+                $hashedPassword,
+                $hashedResetToken,
+                $password,
+                $user,
+                $email,
+                $tokenTenantId
+            ): array {
+                // Every password mutation locks the tenant user first. The
+                // reset-token lock follows, matching session revocation's
+                // user-first ordering and serialising competing reset/change
+                // requests for this account.
+                $lockedUserRow = DB::table('users')
+                    ->where('id', (int) $user['id'])
+                    ->where('tenant_id', $tokenTenantId)
+                    ->whereNull('deleted_at')
+                    ->lockForUpdate()
+                    ->first();
+                if ($lockedUserRow === null) {
+                    return ['status' => 'user_missing'];
+                }
+                $user = (array) $lockedUserRow;
+
+                $lockedResetToken = DB::table('password_resets')
+                    ->where('email', $email)
+                    ->where('tenant_id', $tokenTenantId)
+                    ->where('token', $hashedResetToken)
+                    ->whereRaw(
+                        'created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)',
+                        [self::TOKEN_EXPIRY_SECONDS]
+                    )
+                    ->lockForUpdate()
+                    ->first();
+                if (
+                    $lockedResetToken === null
+                    || !is_string($lockedResetToken->token ?? null)
+                    || !hash_equals($lockedResetToken->token, $hashedResetToken)
+                ) {
+                    return ['status' => 'token_invalid'];
+                }
+
+                // Repeat reuse validation against the locked, current hash.
+                if (PasswordHistoryService::isReused(
+                    (int) $user['id'],
+                    $tokenTenantId,
+                    $password,
+                    isset($user['password_hash']) ? (string) $user['password_hash'] : null
+                )) {
+                    return ['status' => 'password_reused'];
+                }
+
+                // Consume every reset token for this tenant account before
+                // changing its password. A rollback restores both together.
+                $consumed = DB::table('password_resets')
+                    ->where('email', $email)
+                    ->where('tenant_id', $tokenTenantId)
+                    ->delete();
+                if ($consumed < 1) {
+                    throw new \RuntimeException('Could not consume password reset token.');
+                }
+                // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
+                $updated = DB::table('users')
+                    ->where('id', (int) $user['id'])
+                    ->where('tenant_id', $tokenTenantId)
+                    ->update(['password_hash' => $hashedPassword]);
+                if ($updated !== 1) {
+                    throw new \RuntimeException('Could not update password during reset.');
+                }
+
+                PasswordHistoryService::record(
+                    (int) $user['id'],
+                    $tokenTenantId,
+                    isset($user['password_hash']) ? (string) $user['password_hash'] : null
+                );
+
+                $this->invalidateUserTokens((int) $user['id'], $tokenTenantId);
+
+                return ['status' => 'updated', 'user' => $user];
+            }, 3);
+        } catch (\Throwable $e) {
+            Log::error('[PasswordReset] Password transaction failed', [
+                'user_id' => (int) $user['id'],
+                'tenant_id' => (int) $user['tenant_id'],
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError(
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                __('api.server_error'),
+                null,
+                500
             );
+        }
 
-            PasswordHistoryService::record((int) $user['id'], (int) $user['tenant_id'], $user['password_hash'] ?? null);
+        if (($resetOutcome['status'] ?? null) === 'password_reused') {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.password_reused'),
+                'password',
+                422
+            );
+        }
 
-            // Delete reset tokens for this (email, tenant) pair only.
-            if ($tokenTenantId !== null) {
-                DB::delete(
-                    "DELETE FROM password_resets WHERE email = ? AND tenant_id <=> ?",
-                    [$email, $tokenTenantId]
-                );
-            } else {
-                DB::delete(
-                    "DELETE FROM password_resets WHERE email = ? AND tenant_id IS NULL",
-                    [$email]
-                );
-            }
+        if (($resetOutcome['status'] ?? null) !== 'updated' || !is_array($resetOutcome['user'] ?? null)) {
+            $message = ($resetOutcome['status'] ?? null) === 'user_missing'
+                ? __('api.unable_to_reset_password')
+                : __('api.invalid_reset_token');
 
-            // Invalidate all existing refresh tokens for security.
-            $this->invalidateUserTokens((int) $user['id'], (int) $tokenTenantId);
-        });
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                $message,
+                'token',
+                400
+            );
+        }
+
+        /** @var array<string, mixed> $user */
+        $user = $resetOutcome['user'];
 
         // Log the password change
         try {
@@ -467,25 +564,25 @@ class PasswordResetController extends BaseApiController
     }
 
     /**
-     * Find a valid (non-expired) reset token
+     * Resolve the reset token's tenant/email locator without authorising it.
+     * Expiry and continued existence are rechecked under row locks before use.
+     *
+     * @return array<string, mixed>|null
      */
-    private function findValidResetToken(string $token): ?array
+    private function findResetTokenCandidate(string $token): ?array
     {
-        // Clean up expired tokens
-        DB::delete(
-            "DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
-            [self::TOKEN_EXPIRY_SECONDS]
-        );
-
         // Hash the supplied token with SHA-256 and look it up directly by
         // the indexed token column. This eliminates the linear-scan timing
         // signal from the previous bcrypt-per-row approach.
         $hashedToken = hash('sha256', $token);
 
-        $record = DB::selectOne(
-            "SELECT * FROM password_resets WHERE token = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) LIMIT 1",
-            [$hashedToken, self::TOKEN_EXPIRY_SECONDS]
-        );
+        $record = DB::table('password_resets')
+            ->where('token', $hashedToken)
+            ->whereRaw(
+                'created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)',
+                [self::TOKEN_EXPIRY_SECONDS]
+            )
+            ->first();
 
         if (!$record) {
             return null;
@@ -495,7 +592,7 @@ class PasswordResetController extends BaseApiController
 
         // Constant-time confirmation (defence in depth — DB equality already
         // matched, but hash_equals avoids any future-proofing surprises).
-        if (!hash_equals($recordArr['token'], $hashedToken)) {
+        if (!is_string($recordArr['token'] ?? null) || !hash_equals($recordArr['token'], $hashedToken)) {
             return null;
         }
 
@@ -528,10 +625,8 @@ class PasswordResetController extends BaseApiController
      */
     private function invalidateUserTokens(int $userId, int $tenantId): void
     {
-        try {
-            $this->tokenService->revokeAllTokensForUser($userId);
-        } catch (\Throwable $e) {
-            Log::warning('[PasswordReset] Could not revoke tokens for user: ' . $e->getMessage(), ['user_id' => $userId]);
+        if ($this->tokenService->revokeAllTokensForUser($userId, 'password_reset') < 1) {
+            throw new \RuntimeException('Could not revoke sessions after password reset.');
         }
 
         try {

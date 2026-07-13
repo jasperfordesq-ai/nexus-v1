@@ -994,6 +994,7 @@ return [
     'bearer_token_required' => 'Bearer token required',
     'invalid_or_expired_token' => 'Invalid or expired token',
     'invalid_or_expired_refresh_token' => 'Invalid or expired refresh token',
+    'refresh_token_superseded' => 'Inne żądanie już odświeżyło tę sesję. Poczekaj na nowe dane uwierzytelniające i nie używaj ponownie starego tokenu odświeżania.',
     'invalid_token_type' => 'Invalid token type',
     'invalid_token_payload' => 'Invalid token payload',
     'invalid_refresh_token_or_revoked' => 'Invalid refresh token or already revoked',

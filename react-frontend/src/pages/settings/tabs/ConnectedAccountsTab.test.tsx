@@ -7,6 +7,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
+const {
+  mockCreateOAuthBrowserBinding,
+  mockClearOAuthBrowserVerifier,
+} = vi.hoisted(() => ({
+  mockCreateOAuthBrowserBinding: vi.fn().mockResolvedValue({
+    challenge: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+  }),
+  mockClearOAuthBrowserVerifier: vi.fn(),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -19,6 +29,11 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
+}));
+
+vi.mock('@/lib/oauth-browser-binding', () => ({
+  createOAuthBrowserBinding: mockCreateOAuthBrowserBinding,
+  clearOAuthBrowserVerifier: mockClearOAuthBrowserVerifier,
 }));
 
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
@@ -38,8 +53,8 @@ const makeIdentitiesResponse = (overrides: Partial<{
   supported_providers: string[];
 }> = {}) => ({
   identities: [],
-  enabled_providers: ['google', 'apple', 'facebook'],
-  supported_providers: ['google', 'apple', 'facebook'],
+  enabled_providers: ['google', 'facebook'],
+  supported_providers: ['google', 'facebook'],
   ...overrides,
 });
 
@@ -62,12 +77,12 @@ describe('ConnectedAccountsTab', () => {
     // the UI skeleton with the supported providers from defaults
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<ConnectedAccountsTab />);
-    // Before data loads, providers fall back to default list ['google','apple','facebook']
+    // Before data loads, providers fall back to default list ['google','facebook']
     // so list items are rendered immediately
     expect(screen.getAllByRole('listitem').length).toBeGreaterThan(0);
   });
 
-  it('renders all three supported providers when data loads', async () => {
+  it('renders both supported providers when data loads', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       success: true,
       data: makeIdentitiesResponse(),
@@ -76,9 +91,9 @@ describe('ConnectedAccountsTab', () => {
     render(<ConnectedAccountsTab />);
 
     await waitFor(() => {
-      // Google / Apple / Facebook labels are rendered via t('oauth.provider_google') etc.
+      // Google / Facebook labels are rendered via t('oauth.provider_google') etc.
       // In test environment i18n returns the key itself or falls back — check list items
-      expect(screen.getAllByRole('listitem').length).toBe(3);
+      expect(screen.getAllByRole('listitem').length).toBe(2);
     });
   });
 
@@ -138,7 +153,7 @@ describe('ConnectedAccountsTab', () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       success: true,
       data: makeIdentitiesResponse({
-        identities: [makeIdentity('google'), makeIdentity('apple')],
+        identities: [makeIdentity('google'), makeIdentity('facebook')],
       }),
     });
 
@@ -157,13 +172,13 @@ describe('ConnectedAccountsTab', () => {
       .mockResolvedValueOnce({
         success: true,
         data: makeIdentitiesResponse({
-          identities: [makeIdentity('google'), makeIdentity('apple')],
+          identities: [makeIdentity('google'), makeIdentity('facebook')],
         }),
       })
       .mockResolvedValueOnce({
         success: true,
         data: makeIdentitiesResponse({
-          identities: [makeIdentity('apple')],
+          identities: [makeIdentity('facebook')],
         }),
       });
 
@@ -219,7 +234,7 @@ describe('ConnectedAccountsTab', () => {
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining('/v2/auth/oauth/'),
-        {},
+        { browser_challenge: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM' },
       );
     });
 
@@ -246,13 +261,16 @@ describe('ConnectedAccountsTab', () => {
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
     });
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledWith(
+      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+    );
   });
 
   it('shows error toast when disconnect API call fails', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       success: true,
       data: makeIdentitiesResponse({
-        identities: [makeIdentity('google'), makeIdentity('apple')],
+        identities: [makeIdentity('google'), makeIdentity('facebook')],
       }),
     });
     vi.mocked(api.delete).mockRejectedValueOnce(new Error('Network error'));
@@ -276,7 +294,7 @@ describe('ConnectedAccountsTab', () => {
       success: true,
       data: makeIdentitiesResponse({
         identities: [makeIdentity('google')], // only one identity → only auth method
-        enabled_providers: ['google', 'apple', 'facebook'],
+        enabled_providers: ['google', 'facebook'],
       }),
     });
 

@@ -7,10 +7,13 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\TokenService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -99,6 +102,135 @@ class MemberSelfServiceTest extends TestCase
         $newHash = DB::table('users')->where('id', $user->id)->value('password_hash');
         $this->assertNotSame($oldHash, $newHash, 'password_hash must change');
         $this->assertTrue(Hash::check('BrandNewPassw0rd!', $newHash), 'new password must verify against the stored hash');
+    }
+
+    public function test_update_password_invalidates_only_this_tenants_reset_links(): void
+    {
+        $user = $this->makeMember('OldPassword123!');
+        $email = strtolower((string) $user->email);
+        DB::table('password_resets')->insert([
+            [
+                'email' => $email,
+                'tenant_id' => $this->testTenantId,
+                'token' => hash('sha256', 'current-tenant-reset-one'),
+                'created_at' => now(),
+            ],
+            [
+                'email' => $email,
+                'tenant_id' => $this->testTenantId,
+                'token' => hash('sha256', 'current-tenant-reset-two'),
+                'created_at' => now(),
+            ],
+            [
+                'email' => $email,
+                'tenant_id' => 999,
+                'token' => hash('sha256', 'other-tenant-reset'),
+                'created_at' => now(),
+            ],
+        ]);
+
+        $this->apiPost('/v2/users/me/password', [
+            'current_password' => 'OldPassword123!',
+            'new_password' => 'BrandNewPassw0rd!',
+        ])->assertOk();
+
+        $this->assertSame(0, DB::table('password_resets')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('email', $email)
+            ->count());
+        $this->assertSame(1, DB::table('password_resets')
+            ->where('tenant_id', 999)
+            ->where('email', $email)
+            ->count());
+    }
+
+    public function test_update_password_rolls_reset_link_invalidation_back_when_session_revocation_fails(): void
+    {
+        $user = $this->makeMember('OldPassword123!');
+        $email = strtolower((string) $user->email);
+        $oldHash = (string) $user->password_hash;
+        $resetToken = hash('sha256', 'rollback-reset-link');
+        DB::table('password_resets')->insert([
+            'email' => $email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $resetToken,
+            'created_at' => now(),
+        ]);
+
+        $tokenService = Mockery::mock(TokenService::class);
+        $tokenService->shouldReceive('revokeAllTokensForUser')
+            ->once()
+            ->with((int) $user->id, 'password_change')
+            ->andReturn(0);
+        $this->app->instance(TokenService::class, $tokenService);
+
+        $this->apiPost('/v2/users/me/password', [
+            'current_password' => 'OldPassword123!',
+            'new_password' => 'BrandNewPassw0rd!',
+        ])->assertStatus(400);
+
+        $this->assertSame($oldHash, DB::table('users')->where('id', $user->id)->value('password_hash'));
+        $this->assertDatabaseHas('password_resets', [
+            'email' => $email,
+            'tenant_id' => $this->testTenantId,
+            'token' => $resetToken,
+        ]);
+        $this->assertDatabaseMissing('user_password_history', [
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+    }
+
+    public function test_update_password_revokes_every_existing_session_type(): void
+    {
+        $user = $this->makeMember('OldPassword123!');
+        $tokens = app(TokenService::class);
+        $access = $tokens->generateToken((int) $user->id, $this->testTenantId);
+        $refresh = $tokens->generateRefreshToken((int) $user->id, $this->testTenantId);
+        $user->createToken('password-change-test');
+        DB::table('user_trusted_devices')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'device_token_hash' => hash('sha256', 'password-change-trusted-device'),
+            'device_name' => 'Password change regression device',
+            'ip_address' => '127.0.0.1',
+            'expires_at' => now()->addMonth(),
+            'is_revoked' => 0,
+        ]);
+        if (Schema::hasTable('api_tokens')) {
+            DB::table('api_tokens')->insert([
+                'user_id' => $user->id,
+                'token' => hash('sha256', 'legacy-password-change-token'),
+                'device_type' => 'web',
+                'expires_at' => now()->addMonth(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $response = $this->apiPost('/v2/users/me/password', [
+            'current_password' => 'OldPassword123!',
+            'new_password' => 'BrandNewPassw0rd!',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertNull($tokens->validateToken($access));
+        $this->assertNull($tokens->validateRefreshToken($refresh));
+        $this->assertSame(0, $user->tokens()->count());
+        if (Schema::hasTable('api_tokens')) {
+            $this->assertDatabaseMissing('api_tokens', ['user_id' => $user->id]);
+        }
+        $this->assertDatabaseHas('refresh_token_sessions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'revocation_reason' => 'password_change',
+        ]);
+        $this->assertDatabaseHas('user_trusted_devices', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'is_revoked' => 1,
+            'revoked_reason' => 'password_change',
+        ]);
     }
 
     public function test_update_password_rejects_a_wrong_current_password(): void

@@ -103,8 +103,18 @@ final class OutboundUrlGuard
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
         ];
 
-        $resolve = self::curlResolveEntries($url);
-        if ($resolve !== []) {
+        $parts = parse_url(trim($url));
+        $host = is_array($parts)
+            ? self::normalizeHost((string) ($parts['host'] ?? ''))
+            : '';
+        if ($host !== '' && !filter_var($host, FILTER_VALIDATE_IP)) {
+            // The initial validation and the cURL pin require separate DNS
+            // reads. If the second read no longer yields a public target,
+            // never fall back to cURL's live resolver (DNS-rebinding/TOCTOU).
+            $resolve = self::curlResolveEntries($url);
+            if ($resolve === []) {
+                throw new \InvalidArgumentException('Unsafe outbound URL.');
+            }
             $options[CURLOPT_RESOLVE] = $resolve;
         }
 

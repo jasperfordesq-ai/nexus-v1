@@ -10,9 +10,13 @@ namespace Tests\Laravel\Feature\Events;
 
 use App\Enums\EventStaffRole;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -219,6 +223,48 @@ final class EventPeopleOperationsApiTest extends TestCase
         self::assertStringNotContainsString('"axis":"registration"', $history->getContent());
         $this->apiGet("/v2/events/{$eventId}/people/{$waitlisted->id}/history")
             ->assertNotFound();
+    }
+
+    public function test_people_bulk_has_an_isolated_but_enforced_rate_limit(): void
+    {
+        $organizer = $this->member('People Bulk Rate Limit Organizer');
+        $eventId = $this->event($organizer);
+        Sanctum::actingAs($organizer, ['*']);
+
+        $configuredLimiter = RateLimiter::limiter('events-people-bulk');
+        self::assertNotNull($configuredLimiter);
+        $limiterRequest = Request::create("/api/v2/events/{$eventId}/people/bulk", 'POST');
+        $limiterRequest->setUserResolver(static fn (): User => $organizer);
+        $configuredLimit = $configuredLimiter($limiterRequest);
+        self::assertInstanceOf(Limit::class, $configuredLimit);
+        self::assertSame(30, $configuredLimit->maxAttempts);
+        self::assertSame(
+            "events:people-bulk:tenant:{$this->testTenantId}:user:{$organizer->id}",
+            $configuredLimit->key,
+        );
+
+        // Keep this behavioural regression fast while still exercising the real
+        // route middleware and its separation from Laravel's numeric bucket.
+        RateLimiter::for('events-people-bulk', static fn (Request $request): Limit => Limit::perMinute(2)->by(
+            'test:events-people-bulk:user:' . $request->user()?->getAuthIdentifier()
+        ));
+        Route::get('/api/_test/events/unrelated-numeric-throttle', static fn () => response()->json([
+            'ok' => true,
+        ]))->middleware(['api', 'auth:sanctum', 'throttle:2,1']);
+
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            $this->apiGet('/_test/events/unrelated-numeric-throttle')->assertOk();
+        }
+        $this->apiGet('/_test/events/unrelated-numeric-throttle')->assertTooManyRequests();
+
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            $this->apiPost("/v2/events/{$eventId}/people/bulk", [])
+                ->assertUnprocessable();
+        }
+
+        $limited = $this->apiPost("/v2/events/{$eventId}/people/bulk", [])
+            ->assertTooManyRequests();
+        self::assertGreaterThan(0, (int) $limited->json('retry_after'));
     }
 
     private function member(string $name): User

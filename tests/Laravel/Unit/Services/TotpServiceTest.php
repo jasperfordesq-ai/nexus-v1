@@ -61,6 +61,17 @@ class TotpServiceTest extends TestCase
         $this->assertTrue(TotpService::isEnabled(1));
     }
 
+    public function test_isEnabled_uses_explicit_tenant_instead_of_request_context(): void
+    {
+        DB::shouldReceive('selectOne')
+            ->once()
+            ->with(\Mockery::type('string'), [41, 999])
+            ->andReturn((object) ['is_enabled' => 1]);
+
+        $this->assertSame($this->testTenantId, TenantContext::getId());
+        $this->assertTrue(TotpService::isEnabled(41, 999));
+    }
+
     public function test_checkRateLimit_returns_not_limited_when_no_attempts(): void
     {
         DB::shouldReceive('selectOne')->andReturn((object) ['attempts' => 0]);

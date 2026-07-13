@@ -491,7 +491,7 @@ Route::middleware(['auth:sanctum', 'feature:events'])->group(function () {
     Route::post('/v2/events/{id}/people/bulk', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'bulk',
-    ])->whereNumber('id')->middleware('throttle:30,1');
+    ])->whereNumber('id')->middleware('throttle:events-people-bulk');
     Route::get('/v2/events/{id}/people/{userId}/history', [
         \App\Http\Controllers\Api\EventRegistrationController::class,
         'history',
@@ -1427,9 +1427,9 @@ Route::post('/v2/merchant-onboarding/complete', [\App\Http\Controllers\Api\Merch
 
 // SOC13 — Social login (OAuth) authenticated endpoints (link/unlink/identities)
 Route::post('/v2/auth/oauth/{provider}/link', [\App\Http\Controllers\Auth\SocialAuthController::class, 'link'])
-    ->where('provider', 'google|apple|facebook');
+    ->where('provider', 'google|facebook');
 Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\SocialAuthController::class, 'unlink'])
-    ->where('provider', 'google|apple|facebook');
+    ->where('provider', 'google|facebook');
 Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities']);
 
 // ============================================
@@ -3071,9 +3071,9 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/v2/auth/oauth/enabled-providers', [\App\Http\Controllers\Auth\SocialAuthController::class, 'enabledProviders']);
     Route::post('/v2/auth/oauth/exchange', [\App\Http\Controllers\Auth\SocialAuthController::class, 'exchange']);
     Route::get('/v2/auth/oauth/{provider}/redirect', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
-        ->where('provider', 'google|apple|facebook');
+        ->where('provider', 'google|facebook');
     Route::match(['get', 'post'], '/v2/auth/oauth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
-        ->where('provider', 'google|apple|facebook');
+        ->where('provider', 'google|facebook');
 });
 
 // SSO engine (IT-Sec-05) — tenant-configured OIDC providers (Entra ID,
@@ -3158,9 +3158,9 @@ Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalId
 Route::get('/totp/status', [\App\Http\Controllers\Api\TotpController::class, 'status']);
 // SOC13 — Social login (OAuth) authenticated routes
 Route::post('/v2/auth/oauth/{provider}/link', [\App\Http\Controllers\Auth\SocialAuthController::class, 'link'])
-    ->where('provider', 'google|apple|facebook')->middleware('throttle:10,1');
+    ->where('provider', 'google|facebook')->middleware('throttle:10,1');
 Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\SocialAuthController::class, 'unlink'])
-    ->where('provider', 'google|apple|facebook')->middleware('throttle:10,1');
+    ->where('provider', 'google|facebook')->middleware('throttle:10,1');
 Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities'])
     ->middleware('throttle:30,1');
 

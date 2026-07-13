@@ -21,7 +21,8 @@ use Illuminate\Support\Facades\Log;
  * MessagesController - Conversations, direct messaging, reactions.
  *
  * Converted from delegation to direct static service calls.
- * uploadVoice() and sendVoice() now use native Laravel request()->file().
+ * sendVoice() uses native Laravel request()->file(). uploadVoice() is retained
+ * only as an unrouted compatibility helper; generic sends reject voice URLs.
  * typing() remains delegated (uses Pusher real-time events).
  */
 class MessagesController extends BaseApiController
@@ -118,6 +119,20 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_recipient_required'), 'recipient_id', 422);
         }
 
+        // Voice pointers are never accepted from generic message input. Voice
+        // bytes must pass through the dedicated multipart upload route, which
+        // creates and validates the server-issued tenant-scoped path.
+        if (array_key_exists('voice_url', $data)
+            || array_key_exists('audio_url', $data)
+            || !empty($data['is_voice'])) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.message_voice_file_required'),
+                'voice_message',
+                422,
+            );
+        }
+
         $recipientId = (int) $data['recipient_id'];
         // This is an actual send attempt, not a read-only conversation check.
         // Record denied safeguarding contact attempts so staff can respond.
@@ -127,8 +142,6 @@ class MessagesController extends BaseApiController
         }
 
         $body = trim($data['body'] ?? '');
-        $voiceUrl = $data['voice_url'] ?? null;
-
         if (mb_strlen($body) > 10000) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_too_long'), 'body', 400);
         }
@@ -167,9 +180,9 @@ class MessagesController extends BaseApiController
             $data['attachments'] = $attachments;
         }
 
-        if (empty($body) && empty($voiceUrl) && empty($attachments)) {
+        if (empty($body) && empty($attachments)) {
             $this->deleteStagedAttachments($attachments);
-            return $this->respondWithError('VALIDATION_ERROR', __('api.message_body_or_voice_required'), 'body', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_body_required'), 'body', 422);
         }
 
         $message = $this->messageService->send($userId, $data);
@@ -532,9 +545,10 @@ class MessagesController extends BaseApiController
     /**
      * POST /api/v2/messages/upload-voice
      *
-     * Upload an audio file for voice messaging without sending.
+     * Legacy upload-only helper (not routed).
      * Accepts file upload (field: 'audio') or base64 (field: 'audio_data' + 'mime_type').
-     * Returns the voice URL and duration for later use with send().
+     * Do not expose this as a public route: generic send() deliberately rejects
+     * client-supplied voice pointers. Clients use the multipart sendVoice route.
      */
     public function uploadVoice(): JsonResponse
     {
@@ -614,13 +628,12 @@ class MessagesController extends BaseApiController
             $audioResult = AudioUploader::upload($fileArray, 0);
 
             // Send the message with voice attachment
-            $message = $this->messageService->send($userId, [
-                'recipient_id'   => $recipientId,
-                'body'           => '', // Voice messages have no text body
-                'is_voice'       => true,
-                'audio_url'      => $audioResult['url'],
-                'audio_duration' => $audioResult['duration'],
-            ]);
+            $message = $this->messageService->sendVoice(
+                $userId,
+                $recipientId,
+                (string) $audioResult['url'],
+                (int) $audioResult['duration'],
+            );
 
             if (!$message) {
                 AudioUploader::delete((string) $audioResult['url']);

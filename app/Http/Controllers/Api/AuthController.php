@@ -115,6 +115,11 @@ class AuthController extends BaseApiController
             );
         }
 
+        // Start the authentication clock before reading/verifying the password.
+        // A password change or logout-all that commits anywhere after this
+        // point must invalidate a later second-factor completion.
+        $authenticationStartedAt = time();
+
         // Scope login by tenant when tenant context is available.
         // Use a single UNION query that atomically checks both the tenant-scoped user
         // row and any super-admin cross-tenant row in one round-trip. This eliminates
@@ -125,7 +130,9 @@ class AuthController extends BaseApiController
 
         if ($tenantId) {
             // Priority 1: exact tenant match
-            // Priority 2: super-admin from any tenant (cross-tenant fallback)
+            // Priority 2: platform-level administrator from any tenant
+            // (cross-tenant fallback). Tenant administrators remain scoped to
+            // their own community.
             // UNION picks whichever row matches first; ORDER BY ensures tenant row wins.
             $userRow = DB::selectOne(
                 "SELECT u.*, t.configuration, 1 AS _match_priority
@@ -137,7 +144,6 @@ class AuthController extends BaseApiController
                  WHERE u.email = ?
                    AND (
                        u.is_super_admin = 1
-                       OR u.is_tenant_super_admin = 1
                        OR u.is_god = 1
                        OR u.role IN ('super_admin', 'god')
                    )
@@ -182,25 +188,31 @@ class AuthController extends BaseApiController
             // Detect if this is a mobile/API request
             $isMobile = $this->tokenService->isMobileRequest();
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
+            $userTenantId = (int) $user['tenant_id'];
 
             // ADMIN 2FA ENFORCEMENT — DISABLED until the dedicated setup UI
             // ships. Re-enable via the FORCE_ADMIN_2FA env flag once the
             // first-time setup page is in place. See temporary rollback at
             // commit 7fecb5b13 → unblock at <next>.
-            $has2faEnabled = $this->totpService->isEnabled((int)$user['id']);
+            $has2faEnabled = $this->totpService->isEnabled((int)$user['id'], $userTenantId);
             $isAdminAccount = in_array(($user['role'] ?? ''), ['admin', 'tenant_admin', 'org_admin', 'super_admin'], true)
                 || !empty($user['is_super_admin'])
                 || !empty($user['is_tenant_super_admin']);
 
             if (
                 filter_var(env('FORCE_ADMIN_2FA', false), FILTER_VALIDATE_BOOLEAN)
-                && TenantContext::hasFeature('two_factor_authentication')
+                && TenantContext::runForTenant(
+                    $userTenantId,
+                    static fn (): bool => TenantContext::hasFeature('two_factor_authentication')
+                )
                 && $isAdminAccount
                 && !$has2faEnabled
             ) {
                 $setupToken = $this->twoFactorChallengeManager->create(
                     (int)$user['id'],
-                    ['totp_setup']
+                    ['totp_setup'],
+                    $userTenantId,
+                    $authenticationStartedAt
                 );
                 return response()->json([
                     'success' => false,
@@ -221,15 +233,18 @@ class AuthController extends BaseApiController
             // The users.totp_enabled column can drift (e.g. initializeSetup resets
             // the settings row to is_enabled=0 but leaves users.totp_enabled=1),
             // which would gate login on 2FA the verify endpoint can't satisfy.
-            $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
+            $isTrustedDevice = $has2faEnabled
+                && $this->totpService->isTrustedDevice((int)$user['id'], null, $userTenantId);
 
             if ($has2faEnabled && !$isTrustedDevice) {
                 $authenticationConfig = app(AuthenticationConfigurationService::class)
-                    ->getAll(TenantContext::getId());
+                    ->getAll($userTenantId);
                 // 2FA required - create challenge token
                 $twoFactorToken = $this->twoFactorChallengeManager->create(
                     (int)$user['id'],
-                    ['totp', 'backup_code']
+                    ['totp', 'backup_code'],
+                    $userTenantId,
+                    $authenticationStartedAt
                 );
 
                 // For session-based clients, also store in session
@@ -238,6 +253,9 @@ class AuthController extends BaseApiController
                         session_start();
                     }
                     $_SESSION['pending_2fa_user_id'] = $user['id'];
+                    $_SESSION['pending_2fa_tenant_id'] = $userTenantId;
+                    $_SESSION['pending_2fa_started_at'] = $authenticationStartedAt;
+                    $_SESSION['pending_2fa_challenge_token'] = $twoFactorToken;
                     $_SESSION['pending_2fa_expires'] = time() + 300;
                 }
 
@@ -260,89 +278,126 @@ class AuthController extends BaseApiController
 
             // NO 2FA or TRUSTED DEVICE - Complete login normally
 
-            // START SESSION ONLY FOR WEB CLIENTS
-            if (!$wantsStateless) {
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
+            // Ordinary API login is JWT-only. Re-read and verify the password
+            // while holding the same user-row lock used by session revocation,
+            // then issue both credentials before releasing it. A concurrent
+            // password change can therefore never mint a session from the old hash.
+            $issuance = DB::transaction(function () use (
+                $user,
+                $password,
+                $isMobile,
+                $authenticationStartedAt
+            ): array {
+                $lockedRow = DB::table('users')
+                    ->where('id', (int) $user['id'])
+                    ->where('tenant_id', (int) $user['tenant_id'])
+                    ->lockForUpdate()
+                    ->first();
+                if (
+                    $lockedRow === null
+                    || !password_verify($password, (string) ($lockedRow->password_hash ?? ''))
+                ) {
+                    return ['status' => 'credentials_changed'];
                 }
-                $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-                session_regenerate_id(true);
-                if ($preservedLayout) {
-                    $_SESSION['nexus_active_layout'] = $preservedLayout;
-                    $_SESSION['nexus_layout'] = $preservedLayout;
+
+                // Logout-all uses this same row lock and advances the global
+                // revocation cutoff. If it committed after this password flow
+                // began, do not recreate a session immediately after the user
+                // explicitly revoked every session.
+                if (!$this->tokenService->isAuthenticationStartValid(
+                    (int) $user['id'],
+                    $authenticationStartedAt
+                )) {
+                    return ['status' => 'authentication_invalidated'];
                 }
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['tenant_id'] = $user['tenant_id'];
-                $_SESSION['user_role'] = $user['role'];
-                $_SESSION['is_logged_in'] = true;
+
+                $lockedUser = array_merge($user, (array) $lockedRow);
+                $lockedGateBlock = $this->tenantSettingsService->checkLoginGatesForUser($lockedUser);
+                if ($lockedGateBlock) {
+                    return ['status' => 'gate_blocked', 'gate' => $lockedGateBlock];
+                }
+
+                $accessToken = $this->tokenService->generateToken(
+                    (int) $lockedUser['id'],
+                    (int) $lockedUser['tenant_id'],
+                    [
+                        'role' => $lockedUser['role'],
+                        'email' => $lockedUser['email'],
+                        'is_super_admin' => !empty($lockedUser['is_super_admin']),
+                        'is_tenant_super_admin' => !empty($lockedUser['is_tenant_super_admin']),
+                        'is_god' => !empty($lockedUser['is_god']),
+                    ],
+                    $isMobile
+                );
+                $refreshToken = $this->tokenService->generateRefreshToken(
+                    (int) $lockedUser['id'],
+                    (int) $lockedUser['tenant_id'],
+                    $isMobile
+                );
+
+                DB::table('users')
+                    ->where('id', (int) $lockedUser['id'])
+                    ->where('tenant_id', (int) $lockedUser['tenant_id'])
+                    ->update(['last_login_at' => now()]);
+
+                return [
+                    'status' => 'issued',
+                    'user' => $lockedUser,
+                    'access_token' => $accessToken,
+                    'refresh_token' => $refreshToken,
+                ];
+            }, 3);
+
+            if (($issuance['status'] ?? null) === 'gate_blocked') {
+                $lockedGateBlock = $issuance['gate'];
+                return $this->authError(
+                    $lockedGateBlock['message'],
+                    $lockedGateBlock['code'],
+                    403,
+                    $lockedGateBlock['extra']
+                );
             }
 
-            // Generate secure tokens (legacy JWT-based)
-            $accessToken = $this->tokenService->generateToken((int)$user['id'], (int)$user['tenant_id'], [
-                'role' => $user['role'],
-                'email' => $user['email'],
-                'is_super_admin' => !empty($user['is_super_admin']),
-                'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
-                'is_god' => !empty($user['is_god']),
-            ], $isMobile);
-            $refreshToken = $this->tokenService->generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
-
-            $accessTokenExpiry = $this->tokenService->getAccessTokenExpiry($isMobile);
-            $refreshTokenExpiry = $this->tokenService->getRefreshTokenExpiry($isMobile);
-
-            // Issue Sanctum token alongside legacy JWT for gradual migration
-            $sanctumToken = null;
-            try {
-                $eloquentUser = \App\Models\User::find((int)$user['id']);
-                if ($eloquentUser) {
-                    $tokenAbilities = ['*'];
-                    $tokenResult = $eloquentUser->createToken(
-                        $isMobile ? 'mobile-api' : 'web-api',
-                        $tokenAbilities
-                    );
-                    $sanctumToken = $tokenResult->plainTextToken;
-
-                    // Stamp the tenant_id on the token record so the middleware can
-                    // validate cross-tenant token usage (tenant_id column is nullable
-                    // for backwards compatibility with tokens created before migration).
-                    $tokenResult->accessToken->forceFill(['tenant_id' => (int) $user['tenant_id']])->save();
-                }
-            } catch (\Throwable $e) {
-                // Sanctum token creation may fail if personal_access_tokens table
-                // doesn't exist yet — fall back gracefully to legacy tokens only
-                \Illuminate\Support\Facades\Log::warning('[AuthController] Sanctum token creation failed: ' . $e->getMessage());
+            if (($issuance['status'] ?? null) === 'authentication_invalidated') {
+                return $this->authError(
+                    __('api.invalid_credentials'),
+                    ApiErrorCodes::AUTH_INVALID_CREDENTIALS,
+                    401
+                );
             }
 
-            // Stamp last_login_at so member activity reports reflect real login times
-            DB::table('users')->where('id', $user['id'])->update(['last_login_at' => now()]);
+            if (($issuance['status'] ?? null) === 'issued') {
+                $user = $issuance['user'];
+                $accessToken = $issuance['access_token'];
+                $refreshToken = $issuance['refresh_token'];
 
-            return response()->json([
-                'success' => true,
-                'user' => [
-                    'id' => $user['id'],
-                    'first_name' => $user['first_name'],
-                    'last_name' => $user['last_name'],
-                    'email' => $user['email'],
-                    'avatar_url' => $user['avatar_url'],
-                    'tenant_id' => $user['tenant_id'],
-                    'role' => $user['role'] ?? 'member',
-                    'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
-                    'is_super_admin' => !empty($user['is_super_admin']),
-                    'is_god' => !empty($user['is_god']),
-                    'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
-                    'onboarding_completed' => (bool)($user['onboarding_completed'] ?? false),
-                ],
-                'access_token' => $accessToken,
-                'refresh_token' => $refreshToken,
-                'token_type' => 'Bearer',
-                'expires_in' => $accessTokenExpiry,
-                'refresh_expires_in' => $refreshTokenExpiry,
-                'is_mobile' => $isMobile,
-                'token' => $sanctumToken ?? $accessToken,
-                'sanctum_token' => $sanctumToken,
-                'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'user' => [
+                        'id' => $user['id'],
+                        'first_name' => $user['first_name'],
+                        'last_name' => $user['last_name'],
+                        'email' => $user['email'],
+                        'avatar_url' => $user['avatar_url'],
+                        'tenant_id' => $user['tenant_id'],
+                        'role' => $user['role'] ?? 'member',
+                        'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
+                        'is_super_admin' => !empty($user['is_super_admin']),
+                        'is_god' => !empty($user['is_god']),
+                        'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+                        'onboarding_completed' => (bool)($user['onboarding_completed'] ?? false),
+                    ],
+                    'access_token' => $accessToken,
+                    'refresh_token' => $refreshToken,
+                    'token_type' => 'Bearer',
+                    'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
+                    'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
+                    'is_mobile' => $isMobile,
+                    'token' => $accessToken,
+                    'sanctum_token' => null,
+                    'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
+                ]);
+            }
         }
 
         // Record failed login attempt
@@ -397,12 +452,17 @@ class AuthController extends BaseApiController
             \Illuminate\Support\Facades\Log::warning('[AuthController] Sanctum token revocation failed: ' . $e->getMessage());
         }
 
-        // If a refresh token is provided, revoke it (legacy JWT)
+        // Revoke a submitted refresh family even when the short-lived access
+        // token has already expired. TokenService validates the signed token
+        // and persisted tenant/user binding before revoking its own family.
         $data = $this->getAllInput();
         $refreshToken = $data['refresh_token'] ?? '';
+        if (!is_string($refreshToken)) {
+            $refreshToken = '';
+        }
         $tokenRevoked = false;
 
-        if (!empty($refreshToken) && $userId) {
+        if ($refreshToken !== '') {
             $tokenRevoked = $this->tokenService->revokeToken($refreshToken, $userId);
         }
 
@@ -460,6 +520,9 @@ class AuthController extends BaseApiController
 
         $data = $this->getAllInput();
         $refreshToken = $data['refresh_token'] ?? '';
+        if (!is_string($refreshToken)) {
+            $refreshToken = '';
+        }
 
         // Also check Authorization header
         if (empty($refreshToken)) {
@@ -477,8 +540,10 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Validate the refresh token with refresh-token specific revocation checks.
-        $payload = $this->tokenService->validateRefreshToken($refreshToken);
+        // Inspect tracked state without consuming it yet. This deliberately
+        // leaves consumed rows visible so the atomic rotation step can detect
+        // reuse and revoke the token family.
+        $payload = $this->tokenService->inspectRefreshTokenForRotation($refreshToken);
 
         if (!$payload) {
             return $this->authError(
@@ -499,29 +564,104 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Verify user still exists and is active
-        $userRow = DB::selectOne("SELECT id, email, role, status, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
-        $user = $userRow ? (array)$userRow : null;
+        $isMobile = $this->tokenService->isMobileRequest();
 
-        if (!$user) {
+        // Hold the user lock across policy re-check, refresh rotation, and
+        // replacement access-token issuance. Logout-all/password changes take
+        // the same lock, so revocation can only happen wholly before or after
+        // this credential pair is minted.
+        $issuance = DB::transaction(function () use (
+            $refreshToken,
+            $userId,
+            $tenantId,
+            $isMobile
+        ): array {
+            $userRow = DB::table('users')
+                ->where('id', (int) $userId)
+                ->where('tenant_id', (int) $tenantId)
+                ->lockForUpdate()
+                ->first([
+                    'id',
+                    'email',
+                    'role',
+                    'status',
+                    'is_super_admin',
+                    'is_tenant_super_admin',
+                    'tenant_id',
+                    'email_verified_at',
+                    'is_approved',
+                ]);
+            if ($userRow === null) {
+                return ['status' => 'user_not_found'];
+            }
+            $user = (array) $userRow;
+
+            if (($user['status'] ?? 'active') === 'suspended') {
+                return ['status' => 'suspended'];
+            }
+
+            $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
+            if ($gateBlock) {
+                return ['status' => 'gate_blocked', 'gate' => $gateBlock];
+            }
+
+            $rotation = $this->tokenService->rotateRefreshToken($refreshToken);
+            if ($rotation === null) {
+                return ['status' => 'rotation_failed'];
+            }
+            if (
+                ($rotation['outcome'] ?? null)
+                === TokenService::REFRESH_ROTATION_OUTCOME_RECENTLY_CONSUMED
+            ) {
+                return ['status' => 'refresh_superseded'];
+            }
+            if (
+                ($rotation['outcome'] ?? null)
+                !== TokenService::REFRESH_ROTATION_OUTCOME_ROTATED
+            ) {
+                return ['status' => 'rotation_failed'];
+            }
+            $refreshFamilyId = $rotation['payload']['family_id'] ?? null;
+            if (!is_string($refreshFamilyId) || $refreshFamilyId === '') {
+                return ['status' => 'rotation_failed'];
+            }
+
+            $accessToken = $this->tokenService->generateToken(
+                (int) $userId,
+                (int) $tenantId,
+                [
+                    'role' => $user['role'],
+                    'email' => $user['email'],
+                    'is_super_admin' => !empty($user['is_super_admin']),
+                    'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+                    'refresh_family_id' => $refreshFamilyId,
+                ],
+                $isMobile
+            );
+
+            return [
+                'status' => 'issued',
+                'access_token' => $accessToken,
+                'rotation' => $rotation,
+            ];
+        }, 3);
+
+        if (($issuance['status'] ?? null) === 'user_not_found') {
             return $this->authError(
                 __('api.user_not_found'),
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
                 401
             );
         }
-
-        if (($user['status'] ?? 'active') === 'suspended') {
+        if (($issuance['status'] ?? null) === 'suspended') {
             return $this->authError(
                 __('api.account_suspended'),
                 ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED,
                 403
             );
         }
-
-        // Enforce registration policy gates on token refresh
-        $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
-        if ($gateBlock) {
+        if (($issuance['status'] ?? null) === 'gate_blocked') {
+            $gateBlock = $issuance['gate'];
             return $this->authError(
                 $gateBlock['message'],
                 $gateBlock['code'],
@@ -529,41 +669,35 @@ class AuthController extends BaseApiController
                 $gateBlock['extra']
             );
         }
-
-        $isMobile = $this->tokenService->isMobileRequest();
-
-        // Generate new tokens
-        $newAccessToken = $this->tokenService->generateToken((int)$userId, (int)$tenantId, [
-            'role' => $user['role'],
-            'email' => $user['email'],
-            'is_super_admin' => !empty($user['is_super_admin']),
-            'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
-        ], $isMobile);
-
-        $accessTokenExpiry = $this->tokenService->getAccessTokenExpiry($isMobile);
-        $refreshTokenExpiry = $this->tokenService->getRefreshTokenExpiry($isMobile);
-
-        // Only generate new refresh token if current one is close to expiring (< 30 days)
-        $refreshTimeRemaining = $this->tokenService->getTimeRemaining($refreshToken);
-        $newRefreshToken = null;
-
-        if ($refreshTimeRemaining < 2592000) { // 30 days
-            $newRefreshToken = $this->tokenService->generateRefreshToken((int)$userId, (int)$tenantId, $isMobile);
+        if (($issuance['status'] ?? null) === 'refresh_superseded') {
+            return $this->authError(
+                __('api.refresh_token_superseded'),
+                ApiErrorCodes::AUTH_REFRESH_SUPERSEDED,
+                409,
+                ['success' => false]
+            );
         }
+        if (($issuance['status'] ?? null) !== 'issued') {
+            return $this->authError(
+                __('api.invalid_or_expired_refresh_token'),
+                ApiErrorCodes::AUTH_TOKEN_EXPIRED,
+                401
+            );
+        }
+
+        $newAccessToken = $issuance['access_token'];
+        $rotation = $issuance['rotation'];
 
         $response = [
             'success' => true,
             'access_token' => $newAccessToken,
             'token_type' => 'Bearer',
-            'expires_in' => $accessTokenExpiry,
+            'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
-            'token' => $newAccessToken
+            'token' => $newAccessToken,
+            'refresh_token' => $rotation['refresh_token'],
+            'refresh_expires_in' => $rotation['expires_in'],
         ];
-
-        if ($newRefreshToken) {
-            $response['refresh_token'] = $newRefreshToken;
-            $response['refresh_expires_in'] = $refreshTokenExpiry;
-        }
 
         return response()->json($response);
     }
@@ -577,7 +711,8 @@ class AuthController extends BaseApiController
             session_start();
         }
 
-        $isSessionAuth = !empty($_SESSION['user_id']);
+        $sessionIdentity = $this->resolveValidApiSessionIdentity();
+        $isSessionAuth = $sessionIdentity !== null;
 
         // Check Bearer token authentication
         $tokenInfo = null;
@@ -617,8 +752,8 @@ class AuthController extends BaseApiController
             );
         }
 
-        $userId = $isBearerAuth ? $bearerUserId : ($_SESSION['user_id'] ?? null);
-        $tenantId = $isBearerAuth ? $bearerTenantId : ($_SESSION['tenant_id'] ?? null);
+        $userId = $isBearerAuth ? $bearerUserId : ($sessionIdentity['user_id'] ?? null);
+        $tenantId = $isBearerAuth ? $bearerTenantId : ($sessionIdentity['tenant_id'] ?? null);
 
         // For Bearer-authenticated requests, verify user still exists
         if ($isBearerAuth && $bearerUserId) {
@@ -642,18 +777,20 @@ class AuthController extends BaseApiController
             $lastUserCheck = $_SESSION['_last_user_check'] ?? 0;
             if (time() - $lastUserCheck >= 300) {
                 try {
-                    $user = \App\Models\User::findById($_SESSION['user_id'], false);
+                    $user = \App\Models\User::findById($sessionIdentity['user_id'], false);
 
                     if (!$user) {
                         $maxRetries = 3;
                         for ($i = 0; $i < $maxRetries && !$user; $i++) {
                             usleep(200000);
-                            $user = \App\Models\User::findById($_SESSION['user_id'], false);
+                            $user = \App\Models\User::findById($sessionIdentity['user_id'], false);
                         }
                     }
 
                     if (!$user) {
-                        \Illuminate\Support\Facades\Log::warning("[Heartbeat] User ID {$_SESSION['user_id']} not found after retries - possible deleted user");
+                        \Illuminate\Support\Facades\Log::warning('[Heartbeat] Session user not found after retries', [
+                            'user_id' => $sessionIdentity['user_id'],
+                        ]);
                         return $this->authError(
                             __('api.user_not_found'),
                             ApiErrorCodes::AUTH_ACCOUNT_DELETED,
@@ -670,9 +807,14 @@ class AuthController extends BaseApiController
             $_SESSION['_last_heartbeat'] = time();
         }
 
-        // Calculate session/token expiry info
-        $sessionLifetime = (int) ini_get('session.gc_maxlifetime');
-        $expiresAt = date('c', time() + $sessionLifetime);
+        // A compatibility session inherits the source access token's fixed
+        // expiry. Heartbeats never extend this security boundary.
+        $sessionLifetime = $sessionIdentity === null
+            ? 0
+            : max(0, $sessionIdentity['expires_at'] - time());
+        $expiresAt = $sessionIdentity === null
+            ? null
+            : date('c', $sessionIdentity['expires_at']);
 
         // Update user's last_active_at in database (throttled)
         static $lastActiveUpdated = false;
@@ -735,14 +877,15 @@ class AuthController extends BaseApiController
             session_start();
         }
 
-        if (!empty($_SESSION['user_id'])) {
+        $sessionIdentity = $this->resolveValidApiSessionIdentity();
+        if ($sessionIdentity !== null) {
             return response()->json([
                 'success' => true,
                 'authenticated' => true,
                 'user' => [
-                    'id' => $_SESSION['user_id'],
+                    'id' => $sessionIdentity['user_id'],
                     'role' => $_SESSION['user_role'] ?? 'member',
-                    'tenant_id' => $_SESSION['tenant_id'] ?? TenantContext::getId()
+                    'tenant_id' => $sessionIdentity['tenant_id']
                 ]
             ]);
         }
@@ -764,7 +907,8 @@ class AuthController extends BaseApiController
             session_start();
         }
 
-        if (empty($_SESSION['user_id'])) {
+        $sessionIdentity = $this->resolveValidApiSessionIdentity();
+        if ($sessionIdentity === null) {
             return $this->authError(
                 __('api.unauthorized'),
                 ApiErrorCodes::AUTH_TOKEN_MISSING,
@@ -774,8 +918,8 @@ class AuthController extends BaseApiController
 
         $_SESSION['_session_refreshed_at'] = time();
 
-        $sessionLifetime = (int) ini_get('session.gc_maxlifetime');
-        $expiresAt = date('c', time() + $sessionLifetime);
+        $sessionLifetime = max(0, $sessionIdentity['expires_at'] - time());
+        $expiresAt = date('c', $sessionIdentity['expires_at']);
 
         return response()->json([
             'success' => true,
@@ -843,6 +987,14 @@ class AuthController extends BaseApiController
             );
         }
 
+        if ((int) ($payload['tenant_id'] ?? 0) !== (int) $user['tenant_id']) {
+            return $this->authError(
+                __('api.invalid_token_payload'),
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
+        }
+
         // Enforce registration policy gates on session restore
         $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
         if ($gateBlock) {
@@ -854,7 +1006,18 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Restore full session
+        // Restore a bounded compatibility session. It inherits the access
+        // token's issue/expiry window and remains subject to global revocation.
+        session_regenerate_id(true);
+        if (!$this->stampApiSessionAccessWindow($payload)) {
+            $this->clearApiSessionAuthentication();
+            return $this->authError(
+                __('api.invalid_or_expired_token'),
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                401
+            );
+        }
+
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
         $_SESSION['user_email'] = $user['email'];
@@ -902,6 +1065,9 @@ class AuthController extends BaseApiController
         if (!$token) {
             $data = $this->getAllInput();
             $token = $data['token'] ?? $data['access_token'] ?? '';
+            if (!is_string($token)) {
+                $token = '';
+            }
         }
 
         if (empty($token)) {
@@ -951,6 +1117,9 @@ class AuthController extends BaseApiController
 
         $data = $this->getAllInput();
         $refreshToken = $data['refresh_token'] ?? '';
+        if (!is_string($refreshToken)) {
+            $refreshToken = '';
+        }
 
         if (empty($refreshToken)) {
             return $this->authError(
@@ -991,6 +1160,17 @@ class AuthController extends BaseApiController
         }
 
         $revokedCount = $this->tokenService->revokeAllTokensForUser($userId);
+        if ($revokedCount < 1) {
+            return $this->authError(
+                __('api.server_error'),
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                500
+            );
+        }
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $this->clearApiSessionAuthentication();
+        }
 
         return response()->json([
             'success' => true,
@@ -1064,11 +1244,19 @@ class AuthController extends BaseApiController
             return $this->authError(__('api.admin_access_required'), ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 403);
         }
 
-        // Create PHP session
+        if ((int) ($payload['tenant_id'] ?? 0) !== (int) $user['tenant_id']) {
+            return $this->authError(__('api.invalid_token_payload'), ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
+        }
+
+        // Create a bounded compatibility session from the validated JWT.
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
         session_regenerate_id(true);
+        if (!$this->stampApiSessionAccessWindow($payload)) {
+            $this->clearApiSessionAuthentication();
+            return $this->authError(__('api.invalid_or_expired_token'), ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
+        }
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
         $_SESSION['user_email'] = $user['email'];

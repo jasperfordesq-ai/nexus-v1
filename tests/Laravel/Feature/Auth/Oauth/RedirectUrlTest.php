@@ -33,7 +33,13 @@ class RedirectUrlTest extends TestCase
 
         try {
             $service = app(SocialAuthService::class);
-            $result = $service->redirectUrl('google', $this->testTenantId, 'login');
+            $result = $service->redirectUrl(
+                'google',
+                $this->testTenantId,
+                'login',
+                null,
+                'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
+            );
 
             $this->assertArrayHasKey('state', $result);
             $this->assertNotEmpty($result['state']);
@@ -56,6 +62,13 @@ class RedirectUrlTest extends TestCase
     {
         $response = $this->apiGet('/v2/auth/oauth/twitter/redirect');
         // Route constraint blocks unsupported providers with 404
+        $this->assertSame(404, $response->status());
+    }
+
+    public function test_redirect_does_not_expose_unavailable_apple_provider(): void
+    {
+        $response = $this->apiGet('/v2/auth/oauth/apple/redirect');
+
         $this->assertSame(404, $response->status());
     }
 }

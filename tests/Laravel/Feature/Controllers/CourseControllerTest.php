@@ -12,6 +12,7 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\User;
 use App\Services\CourseGroupService;
+use App\Services\TokenService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -57,7 +58,12 @@ class CourseControllerTest extends TestCase
     /** @return array<string,string> */
     private function authHeaders(User $user): array
     {
-        return ['Authorization' => 'Bearer ' . $user->createToken('courses-test')->plainTextToken];
+        $token = app(TokenService::class)->generateToken(
+            (int) $user->id,
+            (int) $user->tenant_id
+        );
+
+        return ['Authorization' => 'Bearer ' . $token];
     }
 
     private function linkCourseToGroup(Course $course, Group $group): void

@@ -40,11 +40,37 @@ class ExistingEmailCallbackTest extends TestCase
         $service = app(SocialAuthService::class);
         $providerUserId = 'g_' . uniqid();
         $providerUser = new StubSocialiteUser($providerUserId, $email, 'Ada Lovelace');
+        $authenticationStartedAt = time();
 
-        $result = $service->findOrCreateFromOauth('google', $providerUser, $this->testTenantId);
+        $result = $service->findOrCreateFromOauth(
+            'google',
+            $providerUser,
+            $this->testTenantId,
+            $authenticationStartedAt
+        );
 
         $this->assertFalse($result['is_new']);
         $this->assertSame((int) $user->id, (int) $result['user']->id);
+
+        $issuance = $service->issueLoginCallbackCode(
+            (int) $user->id,
+            $this->testTenantId,
+            'google',
+            false,
+            $authenticationStartedAt,
+            'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+            $result['identity_link']
+        );
+        $this->assertSame('issued', $issuance['status']);
+
+        $this->assertNull(DB::selectOne(
+            'SELECT user_id FROM oauth_identities WHERE provider = ? AND provider_user_id = ?',
+            ['google', $providerUserId]
+        ));
+        $service->consumeCallbackCode(
+            (string) $issuance['callback_code'],
+            'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
+        );
 
         // Identity row exists pointing at the existing user
         $row = DB::selectOne(

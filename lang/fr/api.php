@@ -956,6 +956,7 @@ return [
     'bearer_token_required' => 'Bearer token required',
     'invalid_or_expired_token' => 'Invalid or expired token',
     'invalid_or_expired_refresh_token' => 'Invalid or expired refresh token',
+    'refresh_token_superseded' => 'Une autre requête a déjà actualisé cette session. Attendez les nouveaux identifiants et ne réutilisez pas l’ancien jeton d’actualisation.',
     'invalid_token_type' => 'Invalid token type',
     'invalid_token_payload' => 'Invalid token payload',
     'invalid_refresh_token_or_revoked' => 'Invalid refresh token or already revoked',

@@ -40,20 +40,25 @@ class TwoFactorController extends BaseApiController
      *     (created by AuthController::login when an admin without 2FA
      *     authenticates). The challenge must have method='totp_setup'.
      *
-     * Returns the user ID. On invalid setup token, falls through to the
-     * normal requireAuth() flow which will 401 the request.
+     * Returns the user ID, setup token, and tenant that owns the account. On
+     * an invalid setup token, falls through to the normal requireAuth() flow
+     * which will 401 the request.
      */
-    private function resolveSetupUserId(): array
+    private function resolveSetupIdentity(): array
     {
         $allInput = $this->getAllInput();
         $setupToken = $allInput['two_factor_token'] ?? null;
         if (is_string($setupToken) && $setupToken !== '') {
             $challenge = $this->challengeManager->get($setupToken);
-            if ($challenge && in_array('totp_setup', $challenge['methods'] ?? [], true)) {
-                return [(int) $challenge['user_id'], $setupToken];
+            if (
+                $challenge
+                && !empty($challenge['tenant_id'])
+                && in_array('totp_setup', $challenge['methods'] ?? [], true)
+            ) {
+                return [(int) $challenge['user_id'], $setupToken, (int) $challenge['tenant_id']];
             }
         }
-        return [$this->requireAuth(), null];
+        return [$this->requireAuth(), null, (int) TenantContext::getId()];
     }
 
     /** GET auth/2fa/status */
@@ -72,13 +77,17 @@ class TwoFactorController extends BaseApiController
     /** POST auth/2fa/setup */
     public function setup(): JsonResponse
     {
-        [$userId, $setupToken] = $this->resolveSetupUserId();
-        if (!TenantContext::hasFeature('two_factor_authentication')) {
+        [$userId, $setupToken, $tenantId] = $this->resolveSetupIdentity();
+        $enrollmentAllowed = TenantContext::runForTenant(
+            $tenantId,
+            fn (): bool => TenantContext::hasFeature('two_factor_authentication')
+        );
+        if (!$enrollmentAllowed) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
         }
         $this->rateLimit('2fa_setup', 5, 300);
 
-        if ($this->totpService->isEnabled($userId)) {
+        if ($this->totpService->isEnabled($userId, $tenantId)) {
             return $this->respondWithError(
                 'ALREADY_ENABLED',
                 '2FA is already enabled on your account',
@@ -88,7 +97,7 @@ class TwoFactorController extends BaseApiController
         }
 
         try {
-            $result = $this->totpService->initializeSetup($userId);
+            $result = $this->totpService->initializeSetup($userId, $tenantId);
 
             // Convert raw SVG to data URI for use in <img src="...">
             $svgDataUri = 'data:image/svg+xml;base64,' . base64_encode($result['qr_code']);
@@ -111,8 +120,12 @@ class TwoFactorController extends BaseApiController
     /** POST auth/2fa/verify */
     public function verify(): JsonResponse
     {
-        [$userId, $setupToken] = $this->resolveSetupUserId();
-        if (!TenantContext::hasFeature('two_factor_authentication')) {
+        [$userId, $setupToken, $tenantId] = $this->resolveSetupIdentity();
+        $enrollmentAllowed = TenantContext::runForTenant(
+            $tenantId,
+            fn (): bool => TenantContext::hasFeature('two_factor_authentication')
+        );
+        if (!$enrollmentAllowed) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.feature_disabled'), null, 403);
         }
         $this->rateLimit('2fa_verify', 10, 300);
@@ -129,7 +142,7 @@ class TwoFactorController extends BaseApiController
             );
         }
 
-        $result = $this->totpService->completeSetup($userId, $code);
+        $result = $this->totpService->completeSetup($userId, $code, $tenantId);
 
         if (!$result['success']) {
             return $this->respondWithError(
@@ -144,27 +157,37 @@ class TwoFactorController extends BaseApiController
         // so both bell text and the email match the recipient's locale, not the
         // request caller's (which can differ for impersonation/admin flows).
         try {
-            $user = User::query()->find($userId);
-            $userLocale = $user->preferred_language ?? null;
+            TenantContext::runForTenant(
+                $tenantId,
+                function () use ($userId, $tenantId): void {
+                    $user = User::query()
+                        ->whereKey($userId)
+                        ->where('tenant_id', $tenantId)
+                        ->first();
+                    $userLocale = $user?->preferred_language;
 
-            LocaleContext::withLocale($userLocale, function () use ($userId) {
-                try {
-                    Notification::createNotification(
-                        $userId,
-                        __('api_controllers_2.two_factor.enabled_notification'),
-                        null,
-                        '2fa_enabled'
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), '2fa_enabled', __('api_controllers_2.two_factor.enabled_notification'), null);
-                } catch (\Throwable $e) {
-                    Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
-                }
-            });
-
-            if ($user && $user->email) {
-                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
-                TenantContext::runForTenant($tenantId, function () use ($user, $userId, $userLocale, $tenantId): void {
                     LocaleContext::withLocale($userLocale, function () use ($user, $userId, $tenantId) {
+                        try {
+                            Notification::createNotification(
+                                $userId,
+                                __('api_controllers_2.two_factor.enabled_notification'),
+                                null,
+                                '2fa_enabled'
+                            );
+                            \App\Services\NotificationDispatcher::fanOutPush(
+                                $userId,
+                                '2fa_enabled',
+                                __('api_controllers_2.two_factor.enabled_notification'),
+                                null
+                            );
+                        } catch (\Throwable $e) {
+                            Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
+                        }
+
+                        if (!$user || !$user->email) {
+                            return;
+                        }
+
                         $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
                         $userName   = $user->first_name ?? $user->name ?? '';
 
@@ -182,46 +205,66 @@ class TwoFactorController extends BaseApiController
                             Log::warning('[2FA] Failed to send 2FA enabled email', ['user_id' => $userId]);
                         }
                     });
-                });
-            }
+                }
+            );
         } catch (\Throwable $e) {
             Log::warning('[2FA] Failed to send 2FA enabled email: ' . $e->getMessage(), ['user_id' => $userId]);
         }
 
         // If we were authenticated via a 2FA setup token (first-time admin
-        // setup flow), consume the token and issue real access + refresh
-        // tokens so the admin lands on a fully authenticated session.
+        // setup flow), issue real access + refresh tokens under the challenge
+        // tenant. Consume the challenge only after both tokens are available.
         $issuedTokens = null;
         if ($setupToken !== null) {
-            $this->challengeManager->consume($setupToken);
+            try {
+                $issuedTokens = TenantContext::runForTenant(
+                    $tenantId,
+                    function () use ($userId, $tenantId): array {
+                        $userRow = User::query()
+                            ->whereKey($userId)
+                            ->where('tenant_id', $tenantId)
+                            ->first();
+                        if (!$userRow) {
+                            throw new \RuntimeException('2FA setup user could not be resolved in the challenge tenant.');
+                        }
 
-            $userRow = User::query()->find($userId);
-            if ($userRow) {
-                $isMobile = false;
-                $accessToken = $this->tokenService->generateToken(
-                    (int) $userRow->id,
-                    (int) $userRow->tenant_id,
-                    [
-                        'role' => $userRow->role,
-                        'email' => $userRow->email,
-                        'is_super_admin' => !empty($userRow->is_super_admin),
-                        'is_tenant_super_admin' => !empty($userRow->is_tenant_super_admin),
-                    ],
-                    $isMobile
+                        $isMobile = false;
+                        $accessToken = $this->tokenService->generateToken(
+                            (int) $userRow->id,
+                            $tenantId,
+                            [
+                                'role' => $userRow->role,
+                                'email' => $userRow->email,
+                                'is_super_admin' => !empty($userRow->is_super_admin),
+                                'is_tenant_super_admin' => !empty($userRow->is_tenant_super_admin),
+                            ],
+                            $isMobile
+                        );
+                        $refreshToken = $this->tokenService->generateRefreshToken(
+                            (int) $userRow->id,
+                            $tenantId,
+                            $isMobile
+                        );
+
+                        return [
+                            'access_token' => $accessToken,
+                            'refresh_token' => $refreshToken,
+                            'token_type' => 'Bearer',
+                            'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
+                            'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
+                        ];
+                    }
                 );
-                $refreshToken = $this->tokenService->generateRefreshToken(
-                    (int) $userRow->id,
-                    (int) $userRow->tenant_id,
-                    $isMobile
-                );
-                $issuedTokens = [
-                    'access_token' => $accessToken,
-                    'refresh_token' => $refreshToken,
-                    'token_type' => 'Bearer',
-                    'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
-                    'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
-                ];
+            } catch (\Throwable $e) {
+                Log::error('[2FA] Failed to issue setup login tokens: ' . $e->getMessage(), [
+                    'user_id' => $userId,
+                    'tenant_id' => $tenantId,
+                ]);
+
+                return $this->respondWithError('SETUP_FAILED', __('api.server_error'), null, 500);
             }
+
+            $this->challengeManager->consume($setupToken);
         }
 
         $payload = ['backup_codes' => $result['backup_codes'] ?? []];

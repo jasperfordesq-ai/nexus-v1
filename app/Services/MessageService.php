@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\AudioUploader;
 use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Events\SafeguardingContactAttemptBlocked;
@@ -313,6 +314,60 @@ class MessageService
      */
     public static function send(int $senderId, int|array $receiverIdOrData, ?array $data = null): array
     {
+        $payload = is_array($receiverIdOrData) ? $receiverIdOrData : ($data ?? []);
+        if (array_key_exists('voice_url', $payload)
+            || array_key_exists('audio_url', $payload)
+            || !empty($payload['is_voice'])) {
+            self::$errors = [[
+                'code' => 'VALIDATION_ERROR',
+                'message' => __('api.message_voice_file_required'),
+            ]];
+
+            return [];
+        }
+
+        return self::sendInternal($senderId, $receiverIdOrData, $data);
+    }
+
+    /**
+     * Persist a voice message from a server-side upload flow.
+     *
+     * Generic message sends deliberately cannot supply an audio URL. The
+     * dedicated multipart controllers upload the bytes first, then call this
+     * method with the server-issued pointer. Re-resolving the pointer here
+     * prevents another internal call site from persisting a remote, traversal,
+     * missing, or cross-tenant path.
+     */
+    public static function sendVoice(
+        int $senderId,
+        int $receiverId,
+        string $audioUrl,
+        int $audioDuration = 0,
+    ): array {
+        $tenantId = (int) app('tenant.id');
+        if (!AudioUploader::isTenantVoiceFile($audioUrl, $tenantId)) {
+            self::$errors = [[
+                'code' => 'VALIDATION_ERROR',
+                'message' => __('api.message_voice_file_required'),
+            ]];
+
+            return [];
+        }
+
+        return self::sendInternal($senderId, $receiverId, [
+            'body' => '',
+            'is_voice' => true,
+            'audio_url' => $audioUrl,
+            'audio_duration' => $audioDuration,
+        ]);
+    }
+
+    /**
+     * Authoritative persistence path shared by text/attachment messages and
+     * the server-trusted voice upload flow.
+     */
+    private static function sendInternal(int $senderId, int|array $receiverIdOrData, ?array $data = null): array
+    {
         if (is_array($receiverIdOrData)) {
             // Controller-style call: send($userId, $allInput)
             $data = $receiverIdOrData;
@@ -335,12 +390,16 @@ class MessageService
 
         $tenantId = app('tenant.id');
 
-        // Check if sender is suspended/banned
+        // Fast preflight only. The same tenant-user row is locked and re-read
+        // immediately before persistence below, because account erasure may
+        // start after this read.
         $sender = User::withoutGlobalScopes()
             ->where('id', $senderId)
             ->where('tenant_id', $tenantId)
             ->first();
-        if (!$sender || in_array($sender->status ?? 'active', ['suspended', 'banned', 'deactivated'])) {
+        if (!$sender
+            || (string) ($sender->status ?? '') !== 'active'
+            || $sender->deleted_at !== null) {
             self::$errors = [['code' => 'FORBIDDEN', 'message' => __('api.message_sender_not_allowed')]];
             return [];
         }
@@ -461,6 +520,27 @@ class MessageService
 
         DB::beginTransaction();
         try {
+            // Common serialization boundary with GDPR erasure. Always lock the
+            // tenant-scoped user row before policy/message rows, then make a
+            // current-read decision while holding that lock. A send that began
+            // before erasure must wait and fail once the account is inactive.
+            $lockedSender = User::withoutGlobalScopes()
+                ->where('id', $senderId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['id', 'status', 'deleted_at']);
+            if (!$lockedSender
+                || (string) ($lockedSender->status ?? '') !== 'active'
+                || $lockedSender->deleted_at !== null) {
+                DB::rollBack();
+                self::$errors = [[
+                    'code' => 'FORBIDDEN',
+                    'message' => __('api.message_sender_not_allowed'),
+                ]];
+
+                return [];
+            }
+
             $lockedGate = self::evaluateLockedSafeguardingContactGate($senderId, $receiverId, $tenantId);
             if ($lockedGate !== null) {
                 DB::rollBack();

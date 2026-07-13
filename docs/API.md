@@ -42,7 +42,7 @@ Requests that cannot resolve a tenant receive a `400` with an error code of `ten
 
 ### Authentication
 
-The API uses **bearer-token authentication** (`Authorization: Bearer <token>`). The `Authenticate` middleware is hybrid — it accepts a current Laravel Sanctum token and falls back to legacy JWT tokens issued before the migration (see `app/Http/Middleware/Authenticate.php`). OpenAPI declares `bearerAuth` for member/admin requests and a separate `federationBearerAuth` scheme for tenant-bound partner ingest keys. Secret calendar-feed URLs explicitly opt out of both schemes and rely on their high-entropy, redacted token path.
+The API uses **short-lived JWT bearer authentication** (`Authorization: Bearer <token>`). User-login Sanctum personal-access tokens and pre-rotation legacy JWTs are not accepted. Access tokens last 15 minutes; clients continue a session through the rotating, single-use refresh token returned by login, and access tokens minted by refresh are bound to that refresh family so family logout also invalidates a delayed access response (see `app/Http/Middleware/Authenticate.php` and `app/Services/TokenService.php`). OpenAPI declares `bearerAuth` for member/admin requests and a separate `federationBearerAuth` scheme for tenant-bound partner ingest keys. Secret calendar-feed URLs explicitly opt out of both schemes and rely on their high-entropy, redacted token path.
 
 **Obtain a token** by calling the login endpoint with a tenant header:
 

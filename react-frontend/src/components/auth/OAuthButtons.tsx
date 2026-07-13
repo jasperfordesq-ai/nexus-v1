@@ -6,11 +6,15 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
-import { AppleIcon } from '@/components/icons/AppleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
 import { Button } from '@/components/ui/Button';
+import { API_BASE } from '@/lib/api';
+import {
+  clearOAuthBrowserVerifier,
+  createOAuthBrowserBinding,
+} from '@/lib/oauth-browser-binding';
 
-type Provider = 'google' | 'apple' | 'facebook';
+type Provider = 'google' | 'facebook';
 
 interface OAuthButtonsProps {
   /**
@@ -29,7 +33,6 @@ interface OAuthButtonsProps {
 
 const PROVIDERS: ReadonlyArray<{ id: Provider; Icon: typeof GoogleIcon; key: string }> = [
   { id: 'google', Icon: GoogleIcon, key: 'oauth.continue_with_google' },
-  { id: 'apple', Icon: AppleIcon, key: 'oauth.continue_with_apple' },
   { id: 'facebook', Icon: FacebookIcon, key: 'oauth.continue_with_facebook' },
 ];
 
@@ -46,7 +49,7 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
     if (enabledProviders !== undefined) return;
     const headers: Record<string, string> = {};
     if (tenantId) headers['X-Tenant-Id'] = String(tenantId);
-    fetch('/api/v2/auth/oauth/enabled-providers', { credentials: 'include', headers })
+    fetch(`${API_BASE}/v2/auth/oauth/enabled-providers`, { credentials: 'include', headers })
       .then((r) => r.json())
       .then((data: { success?: boolean; providers?: Provider[] }) => {
         setServerProviders(Array.isArray(data?.providers) ? data.providers : []);
@@ -65,25 +68,36 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
     return null;
   }
 
-  function startFlow(provider: Provider) {
+  async function startFlow(provider: Provider) {
     setFlowError(null);
-    const params = new URLSearchParams({ intent });
-    if (tenantId) params.set('tenant_id', String(tenantId));
-    // The redirect endpoint returns JSON `{ redirect_url }` — fetch it then navigate.
-    fetch(`/api/v2/auth/oauth/${provider}/redirect?${params.toString()}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: tenantId ? { 'X-Tenant-Id': String(tenantId) } : {},
-    })
-      .then((r) => r.json())
-      .then((data: { success?: boolean; redirect_url?: string; message?: string }) => {
-        if (data?.success && data.redirect_url) {
-          window.location.href = data.redirect_url;
-        } else {
-          setFlowError(t('oauth.callback_failed'));
-        }
-      })
-      .catch(() => setFlowError(t('oauth.callback_failed')));
+    let challenge: string | null = null;
+
+    try {
+      ({ challenge } = await createOAuthBrowserBinding());
+      const params = new URLSearchParams({ intent, browser_challenge: challenge });
+      if (tenantId) params.set('tenant_id', String(tenantId));
+      const response = await fetch(
+        `${API_BASE}/v2/auth/oauth/${provider}/redirect?${params.toString()}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: tenantId ? { 'X-Tenant-Id': String(tenantId) } : {},
+        },
+      );
+      const data = await response.json() as {
+        success?: boolean;
+        redirect_url?: string;
+      };
+      if (data?.success && data.redirect_url) {
+        window.location.href = data.redirect_url;
+        return;
+      }
+    } catch {
+      // Fail closed when secure browser storage/crypto or initiation is unavailable.
+    }
+
+    clearOAuthBrowserVerifier(challenge);
+    setFlowError(t('oauth.callback_failed'));
   }
 
   return (
@@ -101,7 +115,7 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
           fullWidth
           size="lg"
           startContent={<Icon className="w-5 h-5" aria-hidden="true" />}
-          onPress={() => startFlow(id)}
+          onPress={() => void startFlow(id)}
           className="border-[var(--border-default)] text-theme-primary hover:bg-theme-hover"
         >
           {t(key)}

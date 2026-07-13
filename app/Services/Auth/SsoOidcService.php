@@ -9,8 +9,10 @@ declare(strict_types=1);
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Support\OutboundUrlGuard;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -81,10 +83,18 @@ class SsoOidcService
      *
      * @return array{url:string, state:string}
      */
-    public function redirectUrl(int $tenantId, string $providerKey): array
+    public function redirectUrl(
+        int $tenantId,
+        string $providerKey,
+        ?string $browserChallenge = null
+    ): array
     {
+        $browserChallenge = OAuthBrowserBinding::requireChallenge($browserChallenge);
         $provider = $this->getEnabledProvider($tenantId, $providerKey);
         $discovery = $this->discover($provider->issuer_url);
+        // Discovery is cached; revalidate the browser destination immediately
+        // before returning it so a later DNS/config change fails closed.
+        $this->assertPublicHttpsUrl($discovery['authorization_endpoint']);
 
         $stateNonce = Str::random(32);
         $oidcNonce = Str::random(32);
@@ -93,9 +103,15 @@ class SsoOidcService
         Cache::put($this->flowCacheKey($stateNonce), [
             'code_verifier' => $codeVerifier,
             'oidc_nonce' => $oidcNonce,
+            'browser_challenge' => $browserChallenge,
         ], self::STATE_TTL_SECONDS);
 
-        $state = $this->buildState($tenantId, $providerKey, $stateNonce);
+        $state = $this->buildState(
+            $tenantId,
+            $providerKey,
+            $stateNonce,
+            $browserChallenge
+        );
 
         $params = http_build_query([
             'response_type' => 'code',
@@ -118,7 +134,14 @@ class SsoOidcService
      * Handle the OIDC callback: exchange the code, validate the ID
      * token, and resolve a NEXUS user.
      *
-     * @return array{user:User, is_new:bool, tenant_id:int, provider_key:string}
+     * @return array{
+     *   user:User,
+     *   is_new:bool,
+     *   tenant_id:int,
+     *   provider_key:string,
+     *   authentication_started_at:int,
+     *   browser_challenge:string
+     * }
      */
     /**
      * Resolve the tenant id from a signed state token without running the
@@ -146,6 +169,13 @@ class SsoOidcService
         if (! is_array($flow) || empty($flow['code_verifier']) || empty($flow['oidc_nonce'])) {
             throw new \RuntimeException('SSO flow state expired or already used.');
         }
+        $flowBrowserChallenge = $flow['browser_challenge'] ?? null;
+        if (
+            !is_string($flowBrowserChallenge)
+            || !hash_equals($payload['browser_challenge'], $flowBrowserChallenge)
+        ) {
+            throw new \RuntimeException('SSO browser challenge mismatch.');
+        }
 
         $provider = $this->getEnabledProvider($tenantId, $providerKey);
         $discovery = $this->discover($provider->issuer_url);
@@ -154,10 +184,18 @@ class SsoOidcService
 
         $email = $this->extractEmail($claims);
         $emailVerified = $this->emailIsVerified($claims);
-        $this->assertDomainAllowed($provider, $email);
+        $this->assertDomainAllowed($provider, $email, $emailVerified);
 
-        $result = $this->findOrCreateFromClaims($provider, $claims, $email, $emailVerified);
+        $result = $this->findOrCreateFromClaims(
+            $provider,
+            $claims,
+            $email,
+            $emailVerified,
+            $payload['authentication_started_at']
+        );
         $result['provider_key'] = $providerKey;
+        $result['authentication_started_at'] = $payload['authentication_started_at'];
+        $result['browser_challenge'] = $payload['browser_challenge'];
         return $result;
     }
 
@@ -269,9 +307,12 @@ class SsoOidcService
         $issuerUrl = rtrim($issuerUrl, '/');
 
         return Cache::remember($this->discoveryCacheKey($issuerUrl), self::DISCOVERY_CACHE_SECONDS, function () use ($issuerUrl) {
-            $this->assertPublicHttpsUrl($issuerUrl);
-            $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)
-                ->get($issuerUrl . '/.well-known/openid-configuration');
+            $discoveryUrl = $issuerUrl . '/.well-known/openid-configuration';
+            $response = $this->guardedHttpClient($discoveryUrl)->get($discoveryUrl);
+
+            if ($response->status() >= 300 && $response->status() < 400) {
+                throw new \RuntimeException('OIDC discovery redirects are not allowed.');
+            }
 
             if (! $response->ok()) {
                 throw new \RuntimeException("OIDC discovery failed for {$issuerUrl} (HTTP {$response->status()}).");
@@ -289,6 +330,7 @@ class SsoOidcService
             // https + public address so a misconfigured or hostile issuer
             // cannot turn discovery into an SSRF probe or redirect the
             // client-secret POST to an internal/attacker host.
+            $this->assertPublicHttpsUrl($doc['authorization_endpoint']);
             $this->assertPublicHttpsUrl($doc['token_endpoint']);
             $this->assertPublicHttpsUrl($doc['jwks_uri']);
 
@@ -322,11 +364,13 @@ class SsoOidcService
 
         // Re-assert before sending the secret — discovery is cached, so this
         // also covers a token_endpoint that became internal after caching.
-        $this->assertPublicHttpsUrl($discovery['token_endpoint']);
-
-        $response = Http::asForm()
-            ->timeout(self::HTTP_TIMEOUT_SECONDS)
+        $response = $this->guardedHttpClient($discovery['token_endpoint'])
+            ->asForm()
             ->post($discovery['token_endpoint'], $form);
+
+        if ($response->status() >= 300 && $response->status() < 400) {
+            throw new \RuntimeException('SSO token endpoint redirects are not allowed.');
+        }
 
         if (! $response->ok()) {
             Log::warning('[SSO] token exchange failed', [
@@ -405,7 +449,10 @@ class SsoOidcService
             Cache::forget($cacheKey);
         }
         return Cache::remember($cacheKey, self::JWKS_CACHE_SECONDS, function () use ($jwksUri) {
-            $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get($jwksUri);
+            $response = $this->guardedHttpClient($jwksUri)->get($jwksUri);
+            if ($response->status() >= 300 && $response->status() < 400) {
+                throw new \RuntimeException('SSO JWKS endpoint redirects are not allowed.');
+            }
             if (! $response->ok() || ! is_array($response->json('keys'))) {
                 throw new \RuntimeException('Could not fetch identity provider signing keys.');
             }
@@ -471,62 +518,40 @@ class SsoOidcService
      */
     private function assertPublicHttpsUrl(string $url): void
     {
-        $parts = parse_url($url);
-        if (($parts['scheme'] ?? '') !== 'https' || empty($parts['host'])) {
-            throw new \RuntimeException('SSO endpoint must be a valid https URL.');
-        }
-        $host = $parts['host'];
-
-        $publicIp = static function (string $ip): bool {
-            return (bool) filter_var(
-                $ip,
-                FILTER_VALIDATE_IP,
-                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+        try {
+            OutboundUrlGuard::assertSafeHttpUrl(
+                $url,
+                requireHttps: true,
+                message: 'Unsafe SSO endpoint.'
             );
-        };
+        } catch (\InvalidArgumentException $e) {
+            throw new \RuntimeException(
+                'SSO endpoint must resolve to a public https address.',
+                0,
+                $e
+            );
+        }
+    }
 
-        // Literal IP host — check directly, no DNS needed.
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            if (! $publicIp($host)) {
-                throw new \RuntimeException('SSO endpoint resolves to a non-public address.');
-            }
-            return;
+    /**
+     * Build a no-redirect HTTP client whose hostname is pinned to the public
+     * address validated for this exact request. No pin means no request.
+     */
+    private function guardedHttpClient(string $url): PendingRequest
+    {
+        try {
+            $options = OutboundUrlGuard::httpClientOptions($url, requireHttps: true);
+        } catch (\InvalidArgumentException $e) {
+            throw new \RuntimeException(
+                'SSO endpoint must resolve to a public https address.',
+                0,
+                $e
+            );
         }
 
-        // Hostname — resolve and check every A/AAAA record. Skipped under
-        // the testing env, where Http is faked and test hosts (*.example)
-        // do not resolve; the literal-IP and scheme branches above are the
-        // ones an attacker would actually use and remain enforced.
-        if (app()->environment('testing')) {
-            return;
-        }
-
-        $ips = [];
-        $records = @dns_get_record($host, DNS_A | DNS_AAAA);
-        if (is_array($records)) {
-            foreach ($records as $r) {
-                if (! empty($r['ip'])) {
-                    $ips[] = $r['ip'];
-                }
-                if (! empty($r['ipv6'])) {
-                    $ips[] = $r['ipv6'];
-                }
-            }
-        }
-        if ($ips === []) {
-            $resolved = gethostbynamel($host);
-            if (is_array($resolved)) {
-                $ips = $resolved;
-            }
-        }
-        if ($ips === []) {
-            throw new \RuntimeException('SSO endpoint host could not be resolved.');
-        }
-        foreach ($ips as $ip) {
-            if (! $publicIp($ip)) {
-                throw new \RuntimeException('SSO endpoint resolves to a non-public address.');
-            }
-        }
+        return Http::withOptions($options)
+            ->withoutRedirecting()
+            ->timeout(self::HTTP_TIMEOUT_SECONDS);
     }
 
     // ------------------------------------------------------- user resolution
@@ -538,7 +563,13 @@ class SsoOidcService
      * @param array<string, mixed> $claims
      * @return array{user:User, is_new:bool, tenant_id:int}
      */
-    private function findOrCreateFromClaims(object $provider, array $claims, ?string $email, bool $emailVerified): array
+    private function findOrCreateFromClaims(
+        object $provider,
+        array $claims,
+        ?string $email,
+        bool $emailVerified,
+        int $authenticationStartedAt
+    ): array
     {
         $tenantId = (int) $provider->tenant_id;
         $identityProvider = $this->identityProviderString($tenantId, $provider->provider_key);
@@ -548,19 +579,43 @@ class SsoOidcService
 
         // 1. Existing identity?
         $existing = DB::selectOne(
-            'SELECT user_id FROM oauth_identities WHERE provider = ? AND provider_user_id = ? LIMIT 1',
-            [$identityProvider, $subject]
+            'SELECT user_id FROM oauth_identities WHERE tenant_id = ? AND provider = ? AND provider_user_id = ? LIMIT 1',
+            [$tenantId, $identityProvider, $subject]
         );
         if ($existing) {
-            DB::update(
-                'UPDATE oauth_identities SET last_used_at = NOW(), provider_email = ?, raw_payload = ?, updated_at = NOW() WHERE provider = ? AND provider_user_id = ?',
-                [$email, json_encode($rawPayload), $identityProvider, $subject]
-            );
-            $user = User::find((int) $existing->user_id);
-            if (! $user || (int) $user->tenant_id !== $tenantId) {
+            $user = User::query()
+                ->whereKey((int) $existing->user_id)
+                ->where('tenant_id', $tenantId)
+                ->first();
+            if ($user === null) {
                 throw new \RuntimeException('Linked user not found.');
             }
+
+            if ($emailVerified && $email !== null) {
+                DB::update(
+                    'UPDATE oauth_identities SET last_used_at = NOW(), provider_email = ?, raw_payload = ?, updated_at = NOW() WHERE tenant_id = ? AND provider = ? AND provider_user_id = ?',
+                    [$email, json_encode($rawPayload), $tenantId, $identityProvider, $subject]
+                );
+            } else {
+                // The signed subject preserves an established tenant-bound
+                // identity when no domain gate applies. An unverified email
+                // must not replace trusted metadata or influence ownership.
+                DB::update(
+                    'UPDATE oauth_identities SET last_used_at = NOW(), updated_at = NOW() WHERE tenant_id = ? AND provider = ? AND provider_user_id = ?',
+                    [$tenantId, $identityProvider, $subject]
+                );
+            }
             return ['user' => $user, 'is_new' => false, 'tenant_id' => $tenantId];
+        }
+
+        // New ownership decisions (email-link or auto-provision) may use only
+        // a standards-compliant boolean assertion covered by the validated ID
+        // token signature. Missing, false, and type-confused values fail closed.
+        if (! $emailVerified) {
+            throw new \RuntimeException(__('api.sso_login_failed'));
+        }
+        if ($email === null) {
+            throw new \RuntimeException(__('api.sso_email_missing'));
         }
 
         // 2. Email match within an existing local account.
@@ -575,16 +630,29 @@ class SsoOidcService
         // binding a stranger's `sub` to an existing user.
         if ($email) {
             $emailMatch = DB::selectOne(
-                'SELECT id, email_verified_at FROM users WHERE tenant_id = ? AND email = ? LIMIT 1',
+                'SELECT * FROM users WHERE tenant_id = ? AND email = ? LIMIT 1',
                 [$tenantId, $email]
             );
             if ($emailMatch) {
-                if ($emailVerified && ! empty($emailMatch->email_verified_at)) {
-                    $this->insertIdentity((int) $emailMatch->id, $tenantId, $identityProvider, $subject, $email, $rawPayload);
-                    $user = User::find((int) $emailMatch->id);
-                    return ['user' => $user, 'is_new' => false, 'tenant_id' => $tenantId];
+                if (! empty($emailMatch->email_verified_at)) {
+                    $user = (new User())->newFromBuilder((array) $emailMatch);
+
+                    return [
+                        'user' => $user,
+                        'is_new' => false,
+                        'tenant_id' => $tenantId,
+                        'identity_link' => [
+                            'provider' => $identityProvider,
+                            'provider_user_id' => $subject,
+                            'provider_email' => $email,
+                            'avatar_url' => null,
+                            'raw_payload' => $rawPayload,
+                            'authentication_started_at' => $authenticationStartedAt,
+                            'expected_verified_email' => $email,
+                        ],
+                    ];
                 }
-                // Either the IdP did not vouch for the email, or the local
+                // The local
                 // account is unverified — refuse rather than risk takeover.
                 throw new \RuntimeException(__('api.sso_account_exists_unverified'));
             }
@@ -605,11 +673,9 @@ class SsoOidcService
             'last_name' => $names['last'],
             'email' => $email,
             'password' => password_hash(Str::random(48), PASSWORD_BCRYPT),
-            // Only inherit verified status when the IdP actually vouched for
-            // the address; otherwise leave null so the standard email
-            // verification path runs (and a squatted address can't pre-seed
-            // a "verified" record for a future takeover).
-            'email_verified_at' => $emailVerified ? now() : null,
+            // Provisioning is reachable only after a signed literal-boolean
+            // `email_verified: true` assertion for this exact address.
+            'email_verified_at' => now(),
             'preferred_language' => 'en',
             'is_approved' => 1,
             'role' => 'member',
@@ -619,7 +685,15 @@ class SsoOidcService
 
         $this->insertIdentity((int) $userId, $tenantId, $identityProvider, $subject, $email, $rawPayload);
 
-        return ['user' => User::find((int) $userId), 'is_new' => true, 'tenant_id' => $tenantId];
+        $user = User::query()
+            ->whereKey((int) $userId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if ($user === null) {
+            throw new \RuntimeException('SSO user creation failed.');
+        }
+
+        return ['user' => $user, 'is_new' => true, 'tenant_id' => $tenantId];
     }
 
     // ---------------------------------------------------------------- helpers
@@ -642,13 +716,20 @@ class SsoOidcService
         return $row;
     }
 
-    private function assertDomainAllowed(object $provider, ?string $email): void
+    private function assertDomainAllowed(
+        object $provider,
+        ?string $email,
+        bool $emailVerified
+    ): void
     {
         $domains = json_decode((string) ($provider->allowed_email_domains ?? ''), true);
         if (! is_array($domains) || $domains === []) {
             return;
         }
-        $emailDomain = $email !== null ? strtolower((string) strstr($email, '@')) : '';
+        if (! $emailVerified || $email === null) {
+            throw new \RuntimeException(__('api.sso_domain_not_allowed'));
+        }
+        $emailDomain = strtolower((string) strstr($email, '@'));
         foreach ($domains as $domain) {
             if ($emailDomain === '@' . strtolower(ltrim((string) $domain, '@'))) {
                 return;
@@ -676,12 +757,12 @@ class SsoOidcService
      * Whether the IdP asserted the email address is verified. Defaults to
      * false (fail closed) when the claim is absent — many IdPs, including
      * single-tenant Entra, omit it, in which case the email is treated as
-     * unverified and never auto-links to an existing account.
+     * unverified and never auto-links to an existing account. Only the literal
+     * JSON boolean true is accepted; strings and integers are malformed.
      */
     private function emailIsVerified(array $claims): bool
     {
-        $v = $claims['email_verified'] ?? null;
-        return $v === true || $v === 'true' || $v === 1 || $v === '1';
+        return ($claims['email_verified'] ?? null) === true;
     }
 
     /**
@@ -706,13 +787,18 @@ class SsoOidcService
         return array_values(array_unique($out));
     }
 
-    private function buildState(int $tenantId, string $providerKey, string $stateNonce): string
-    {
+    private function buildState(
+        int $tenantId,
+        string $providerKey,
+        string $stateNonce,
+        string $browserChallenge
+    ): string {
         $payload = [
             't' => $tenantId,
             'p' => $providerKey,
             'n' => $stateNonce,
             'x' => now()->timestamp,
+            'b' => OAuthBrowserBinding::requireChallenge($browserChallenge),
         ];
         $body = base64_encode((string) json_encode($payload));
         $sig = hash_hmac('sha256', $body, (string) config('app.key'));
@@ -720,7 +806,13 @@ class SsoOidcService
     }
 
     /**
-     * @return array{tenant_id:int, provider_key:string, state_nonce:string}
+     * @return array{
+     *   tenant_id:int,
+     *   provider_key:string,
+     *   state_nonce:string,
+     *   authentication_started_at:int,
+     *   browser_challenge:string
+     * }
      */
     private function verifyState(string $state): array
     {
@@ -736,13 +828,24 @@ class SsoOidcService
         if (! is_array($decoded) || empty($decoded['t']) || empty($decoded['p']) || empty($decoded['n'])) {
             throw new \RuntimeException('Malformed SSO state token.');
         }
-        if (! empty($decoded['x']) && (now()->timestamp - (int) $decoded['x']) > self::STATE_TTL_SECONDS) {
+        $browserChallenge = OAuthBrowserBinding::requireChallenge(
+            isset($decoded['b']) && is_string($decoded['b']) ? $decoded['b'] : null
+        );
+        $now = now()->timestamp;
+        $authenticationStartedAt = (int) ($decoded['x'] ?? 0);
+        if (
+            $authenticationStartedAt < 1
+            || $authenticationStartedAt > $now
+            || ($now - $authenticationStartedAt) > self::STATE_TTL_SECONDS
+        ) {
             throw new \RuntimeException('SSO state token has expired.');
         }
         return [
             'tenant_id' => (int) $decoded['t'],
             'provider_key' => (string) $decoded['p'],
             'state_nonce' => (string) $decoded['n'],
+            'authentication_started_at' => $authenticationStartedAt,
+            'browser_challenge' => $browserChallenge,
         ];
     }
 

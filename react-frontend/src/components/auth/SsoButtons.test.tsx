@@ -24,6 +24,25 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { SsoButtons } from './SsoButtons';
 
+const {
+  mockCreateOAuthBrowserBinding,
+  mockClearOAuthBrowserVerifier,
+} = vi.hoisted(() => ({
+  mockCreateOAuthBrowserBinding: vi.fn().mockResolvedValue({
+    challenge: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+  }),
+  mockClearOAuthBrowserVerifier: vi.fn(),
+}));
+
+vi.mock('@/lib/api', () => ({
+  API_BASE: 'https://api.example.test/api',
+}));
+
+vi.mock('@/lib/oauth-browser-binding', () => ({
+  createOAuthBrowserBinding: mockCreateOAuthBrowserBinding,
+  clearOAuthBrowserVerifier: mockClearOAuthBrowserVerifier,
+}));
+
 // ---------------------------------------------------------------------------
 // Stub window.location
 // ---------------------------------------------------------------------------
@@ -255,6 +274,9 @@ describe('SsoButtons — click → redirect flow', () => {
     await waitFor(() => {
       const [url] = fetchSpy.mock.calls[1] as [string, ...unknown[]];
       expect(url).toContain(`/api/v2/auth/sso/${encodeURIComponent(ENTRA_PROVIDER.key)}/redirect`);
+      expect(url).toContain(
+        'browser_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+      );
     });
   });
 
@@ -354,6 +376,9 @@ describe('SsoButtons — click → redirect flow', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
     });
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledWith(
+      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+    );
   });
 
   it('renders translated inline feedback when the redirect fetch throws', async () => {

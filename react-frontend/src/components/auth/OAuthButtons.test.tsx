@@ -21,6 +21,25 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { OAuthButtons } from './OAuthButtons';
 
+const {
+  mockCreateOAuthBrowserBinding,
+  mockClearOAuthBrowserVerifier,
+} = vi.hoisted(() => ({
+  mockCreateOAuthBrowserBinding: vi.fn().mockResolvedValue({
+    challenge: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+  }),
+  mockClearOAuthBrowserVerifier: vi.fn(),
+}));
+
+vi.mock('@/lib/api', () => ({
+  API_BASE: 'https://api.example.test/api',
+}));
+
+vi.mock('@/lib/oauth-browser-binding', () => ({
+  createOAuthBrowserBinding: mockCreateOAuthBrowserBinding,
+  clearOAuthBrowserVerifier: mockClearOAuthBrowserVerifier,
+}));
+
 // ---------------------------------------------------------------------------
 // Stub window.location so we can assert href assignments without navigation
 // ---------------------------------------------------------------------------
@@ -57,11 +76,11 @@ function mockFetch(responses: Array<{ ok?: boolean; json: () => Promise<unknown>
 
 describe('OAuthButtons — prop-driven providers (no fetch)', () => {
   it('renders buttons for each enabled provider', async () => {
-    render(<OAuthButtons enabledProviders={['google', 'apple', 'facebook']} />);
+    render(<OAuthButtons enabledProviders={['google', 'facebook']} />);
     await waitFor(() => {
       expect(screen.getByText('Continue with Google')).toBeInTheDocument();
-      expect(screen.getByText('Continue with Apple')).toBeInTheDocument();
       expect(screen.getByText('Continue with Facebook')).toBeInTheDocument();
+      expect(screen.queryByText('Continue with Apple')).not.toBeInTheDocument();
     });
   });
 
@@ -141,7 +160,7 @@ describe('OAuthButtons — server-fetched providers', () => {
     render(<OAuthButtons tenantId={42} />);
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        '/api/v2/auth/oauth/enabled-providers',
+        'https://api.example.test/api/v2/auth/oauth/enabled-providers',
         expect.objectContaining({
           headers: expect.objectContaining({ 'X-Tenant-Id': '42' }),
         })
@@ -195,6 +214,9 @@ describe('OAuthButtons — click → redirect flow', () => {
       const [url] = fetchSpy.mock.calls[1] as [string, ...unknown[]];
       expect(url).toContain('/api/v2/auth/oauth/google/redirect');
       expect(url).toContain('intent=login');
+      expect(url).toContain(
+        'browser_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+      );
     });
   });
 
@@ -262,20 +284,23 @@ describe('OAuthButtons — click → redirect flow', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
       expect(screen.queryByText('OAuth is disabled for this tenant.')).not.toBeInTheDocument();
     });
+    expect(mockClearOAuthBrowserVerifier).toHaveBeenCalledWith(
+      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+    );
   });
 
   it('renders translated inline feedback when redirect fetch fails with network error', async () => {
     const fetchSpy = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ success: true, providers: ['apple'] }),
+        json: () => Promise.resolve({ success: true, providers: ['facebook'] }),
       })
       .mockRejectedValueOnce(new Error('network failure'));
     vi.stubGlobal('fetch', fetchSpy);
 
     render(<OAuthButtons />);
-    await waitFor(() => expect(screen.getByText('Continue with Apple')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Continue with Apple'));
+    await waitFor(() => expect(screen.getByText('Continue with Facebook')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Continue with Facebook'));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');

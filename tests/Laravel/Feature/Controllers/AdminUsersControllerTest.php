@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\TokenService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -480,6 +481,103 @@ class AdminUsersControllerTest extends TestCase
         $response = $this->apiPost('/v2/admin/users/1/reset-2fa');
 
         $response->assertStatus(403);
+    }
+
+    public function test_set_password_rolls_back_when_session_revocation_fails(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $oldPassword = 'old-admin-managed-password';
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-password-failure-' . uniqid('', true) . '@example.test',
+            'password_hash' => Hash::make($oldPassword),
+        ]);
+        Sanctum::actingAs($admin);
+
+        $tokens = \Mockery::mock(TokenService::class);
+        $tokens->shouldReceive('revokeAllTokensForUser')
+            ->once()
+            ->with((int) $user->id, 'admin_password_change')
+            ->andReturn(0);
+        app()->instance(TokenService::class, $tokens);
+
+        $this->apiPost('/v2/admin/users/' . $user->id . '/password', [
+            'password' => 'new-admin-managed-password',
+        ])->assertStatus(500);
+
+        $this->assertTrue(Hash::check(
+            $oldPassword,
+            (string) DB::table('users')->where('id', $user->id)->value('password_hash')
+        ));
+    }
+
+    public function test_peer_admin_security_mutations_are_denied_for_legacy_admin_flags(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $oldPassword = 'peer-admin-old-password';
+        $peer = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'peer-admin-' . uniqid('', true) . '@example.test',
+            'password_hash' => Hash::make($oldPassword),
+            'role' => 'member',
+            'is_admin' => true,
+            'is_approved' => false,
+            'status' => 'suspended',
+        ]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/users/' . $peer->id, [
+            'email' => 'attacker-controlled@example.test',
+        ])->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/password', [
+            'password' => 'peer-admin-replacement-password',
+        ])->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/suspend')->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/ban')->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/reactivate')->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/approve')->assertStatus(403);
+        $this->apiPost('/v2/admin/users/' . $peer->id . '/impersonate')->assertStatus(403);
+        $this->apiDelete('/v2/admin/users/' . $peer->id)->assertStatus(403);
+
+        $stored = DB::table('users')->where('id', $peer->id)->first();
+        $this->assertNotNull($stored);
+        $this->assertSame($peer->email, $stored->email);
+        $this->assertSame('suspended', $stored->status);
+        $this->assertSame(0, (int) $stored->is_approved);
+        $this->assertTrue(Hash::check($oldPassword, (string) $stored->password_hash));
+    }
+
+    public function test_set_password_invalidates_only_the_targets_tenant_reset_links(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-reset-invalidate-' . uniqid('', true) . '@example.test',
+            'password_hash' => Hash::make('old-password-123'),
+        ]);
+        foreach ([$this->testTenantId, 999] as $tenantId) {
+            DB::table('password_resets')->insert([
+                'email' => $user->email,
+                'tenant_id' => $tenantId,
+                'token' => hash('sha256', 'admin-set-password-' . $tenantId),
+                'created_at' => now(),
+            ]);
+        }
+        Sanctum::actingAs($admin);
+
+        $this->apiPost('/v2/admin/users/' . $user->id . '/password', [
+            'password' => 'new-admin-managed-password',
+        ])->assertOk();
+
+        $this->assertSame(0, DB::table('password_resets')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('email', $user->email)
+            ->count());
+        $this->assertSame(1, DB::table('password_resets')
+            ->where('tenant_id', 999)
+            ->where('email', $user->email)
+            ->count());
+        $this->assertTrue(Hash::check(
+            'new-admin-managed-password',
+            (string) DB::table('users')->where('id', $user->id)->value('password_hash')
+        ));
     }
 
     public function test_send_password_reset_preserves_existing_token_when_email_send_fails(): void

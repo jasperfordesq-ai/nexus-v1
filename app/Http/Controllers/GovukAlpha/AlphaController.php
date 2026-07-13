@@ -17,6 +17,7 @@ use App\Exceptions\EventWaitlistException;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Http\Controllers\Api\CoreController;
 use App\Http\Controllers\GovukAlpha\Support\AccessibleIdentityResolver;
+use App\Http\Controllers\GovukAlpha\Support\AccessibleSessionCookies;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\ListingImage;
@@ -264,23 +265,22 @@ class AlphaController extends Controller
 
         if (($payload['success'] ?? false) === true) {
             $token = (string) ($payload['access_token'] ?? $payload['token'] ?? $payload['sanctum_token'] ?? '');
-            if ($token === '') {
+            $refreshToken = (string) ($payload['refresh_token'] ?? '');
+            $refreshExpiresIn = (int) ($payload['refresh_expires_in'] ?? 0);
+            if ($token === '' || $refreshToken === '' || $refreshExpiresIn <= 0) {
                 return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'login-failed']);
             }
 
-            return redirect()
-                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]))
-                ->withCookie(cookie(
-                    'auth_token',
-                    $token,
-                    60 * 24 * 7,
-                    '/',
-                    null,
-                    $request->isSecure(),
-                    true,
-                    false,
-                    'Lax'
-                ));
+            $redirect = redirect()
+                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]));
+
+            return app(AccessibleSessionCookies::class)->attachTo(
+                $redirect,
+                $request,
+                $token,
+                $refreshToken,
+                $refreshExpiresIn,
+            );
         }
 
         if (($payload['requires_2fa'] ?? false) === true) {
@@ -464,7 +464,9 @@ class AlphaController extends Controller
 
         if (($payload['success'] ?? false) === true) {
             $accessToken = (string) ($payload['access_token'] ?? $payload['token'] ?? $payload['sanctum_token'] ?? '');
-            if ($accessToken === '') {
+            $refreshToken = (string) ($payload['refresh_token'] ?? '');
+            $refreshExpiresIn = (int) ($payload['refresh_expires_in'] ?? 0);
+            if ($accessToken === '' || $refreshToken === '' || $refreshExpiresIn <= 0) {
                 return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-failed']);
             }
 
@@ -472,9 +474,16 @@ class AlphaController extends Controller
                 $request->session()->forget('alpha_2fa_token');
             }
 
-            return redirect()
-                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]))
-                ->withCookie(cookie('auth_token', $accessToken, 60 * 24 * 7, '/', null, $request->isSecure(), true, false, 'Lax'));
+            $redirect = redirect()
+                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]));
+
+            return app(AccessibleSessionCookies::class)->attachTo(
+                $redirect,
+                $request,
+                $accessToken,
+                $refreshToken,
+                $refreshExpiresIn,
+            );
         }
 
         // The challenge is single-use with a 5-minute TTL and a 5-attempt cap — when
@@ -601,6 +610,14 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
 
+        // Cookie expiry alone does not invalidate a copied refresh credential.
+        // Possession of a valid signed refresh token is sufficient authority to
+        // revoke its own family, even when the short access cookie has expired.
+        $refreshToken = $request->cookie(AccessibleSessionCookies::REFRESH_COOKIE);
+        if (is_string($refreshToken) && $refreshToken !== '') {
+            app(\App\Services\TokenService::class)->revokeToken($refreshToken);
+        }
+
         if (session_status() === PHP_SESSION_ACTIVE) {
             unset($_SESSION['user_id']);
         }
@@ -610,9 +627,10 @@ class AlphaController extends Controller
             $request->session()->regenerateToken();
         }
 
-        return redirect()
-            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'signed-out'])
-            ->withCookie(cookie()->forget('auth_token', '/'));
+        $redirect = redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'signed-out']);
+
+        return app(AccessibleSessionCookies::class)->expireOn($redirect);
     }
 
     public function register(Request $request, string $tenantSlug): Response
@@ -10100,13 +10118,12 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'voice-failed']);
         }
 
-        $message = MessageService::send($currentUserId, [
-            'recipient_id'   => $userId,
-            'body'           => '',
-            'is_voice'       => true,
-            'audio_url'      => $audioResult['url'] ?? '',
-            'audio_duration' => (int) ($audioResult['duration'] ?? 0),
-        ]);
+        $message = MessageService::sendVoice(
+            $currentUserId,
+            $userId,
+            (string) ($audioResult['url'] ?? ''),
+            (int) ($audioResult['duration'] ?? 0),
+        );
 
         if (empty($message)) {
             \App\Core\AudioUploader::delete((string) ($audioResult['url'] ?? ''));
@@ -11197,9 +11214,10 @@ class AlphaController extends Controller
             $request->session()->regenerateToken();
         }
 
-        return redirect()
-            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-removed'])
-            ->withCookie(cookie()->forget('auth_token', '/'));
+        $redirect = redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-removed']);
+
+        return app(AccessibleSessionCookies::class)->expireOn($redirect);
     }
 
     /**
@@ -11767,8 +11785,23 @@ class AlphaController extends Controller
                 'notes' => trim(self::asStr($request->input('reason'))) ?: null,
                 'metadata' => ['requested_via' => 'accessible-frontend', 'self_service' => true],
             ]);
+            if (app(\App\Services\TokenService::class)->revokeAllTokensForUser(
+                $userId,
+                'account_deletion_request'
+            ) < 1) {
+                throw new \RuntimeException('Unable to revoke sessions for an account deletion request.');
+            }
         } catch (\RuntimeException) {
-            // Erasure already pending — fall through to sign-out + confirmation.
+            // An existing erasure request still requires immediate revocation.
+            if (app(\App\Services\TokenService::class)->revokeAllTokensForUser(
+                $userId,
+                'account_deletion_request'
+            ) < 1) {
+                return redirect()->route('govuk-alpha.profile.delete', [
+                    'tenantSlug' => $tenantSlug,
+                    'status' => 'delete-failed',
+                ]);
+            }
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.profile.delete', ['tenantSlug' => $tenantSlug, 'status' => 'delete-failed']);
@@ -11783,9 +11816,10 @@ class AlphaController extends Controller
             $request->session()->regenerateToken();
         }
 
-        return redirect()
-            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'account-deletion-requested'])
-            ->withCookie(cookie()->forget('auth_token', '/'));
+        $redirect = redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'account-deletion-requested']);
+
+        return app(AccessibleSessionCookies::class)->expireOn($redirect);
     }
 
     private function view(string $name, array $data = [], int $status = 200): Response

@@ -42,8 +42,12 @@ class TotpController extends BaseApiController
         $this->rateLimit('totp_verify', 5, 300);
 
         $input = $this->getAllInput();
-        $twoFactorToken = $input['two_factor_token'] ?? null;
-        $code = trim($input['code'] ?? '');
+        $rawTwoFactorToken = $input['two_factor_token'] ?? null;
+        $twoFactorToken = is_string($rawTwoFactorToken) && $rawTwoFactorToken !== ''
+            ? $rawTwoFactorToken
+            : null;
+        $rawCode = $input['code'] ?? '';
+        $code = is_string($rawCode) ? trim($rawCode) : '';
         $useBackupCode = !empty($input['use_backup_code'] ?? false);
         $trustDevice = !empty($input['trust_device'] ?? false);
 
@@ -51,32 +55,35 @@ class TotpController extends BaseApiController
         $isStateless = !empty($twoFactorToken);
 
         $userId = null;
+        $tenantId = null;
+        $authenticationStartedAt = null;
+        $allowedMethods = ['totp', 'backup_code'];
 
         if ($isStateless) {
             // Stateless flow - validate two_factor_token
             $challengeData = $this->twoFactorChallengeManager->get($twoFactorToken);
 
-            if (!$challengeData) {
+            if (!$challengeData || empty($challengeData['tenant_id'])) {
                 return $this->respondWithError(
                     ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED,
-                    '2FA session expired. Please log in again.',
+                    __('api.session_expired'),
                     null,
                     401
                 );
             }
 
-            // Record attempt and check if we've exceeded max attempts
-            $attemptResult = $this->twoFactorChallengeManager->recordAttempt($twoFactorToken);
-            if (!$attemptResult['allowed']) {
+            $userId = (int) $challengeData['user_id'];
+            $tenantId = (int) $challengeData['tenant_id'];
+            $authenticationStartedAt = $this->authenticationStartFromChallenge($challengeData);
+            if ($authenticationStartedAt === null) {
                 return $this->respondWithError(
-                    ApiErrorCodes::AUTH_2FA_MAX_ATTEMPTS,
-                    'Too many failed attempts. Please log in again.',
+                    ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED,
+                    __('api.session_expired'),
                     null,
                     401
                 );
             }
-
-            $userId = $challengeData['user_id'];
+            $allowedMethods = $challengeData['methods'] ?? [];
         } else {
             // Session-based flow - check CSRF and session
             $csrfToken = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
@@ -92,17 +99,72 @@ class TotpController extends BaseApiController
             }
 
             // Check for pending 2FA session
-            if (empty($_SESSION['pending_2fa_user_id'])) {
+            if (
+                empty($_SESSION['pending_2fa_user_id'])
+                || empty($_SESSION['pending_2fa_tenant_id'])
+                || empty($_SESSION['pending_2fa_started_at'])
+                || empty($_SESSION['pending_2fa_challenge_token'])
+            ) {
                 return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, __('api.no_pending_2fa_session'), null, 401);
             }
 
             // Check session expiry
             if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
-                unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
+                unset(
+                    $_SESSION['pending_2fa_user_id'],
+                    $_SESSION['pending_2fa_tenant_id'],
+                    $_SESSION['pending_2fa_started_at'],
+                    $_SESSION['pending_2fa_challenge_token'],
+                    $_SESSION['pending_2fa_expires']
+                );
                 return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, __('api.session_expired'), null, 401);
             }
 
             $userId = (int)$_SESSION['pending_2fa_user_id'];
+            $tenantId = (int)$_SESSION['pending_2fa_tenant_id'];
+            $twoFactorToken = is_string($_SESSION['pending_2fa_challenge_token'])
+                ? $_SESSION['pending_2fa_challenge_token']
+                : null;
+            $challengeData = $twoFactorToken !== null
+                ? $this->twoFactorChallengeManager->get($twoFactorToken)
+                : null;
+            $authenticationStartedAt = is_array($challengeData)
+                ? $this->authenticationStartFromChallenge($challengeData)
+                : null;
+            if (
+                $challengeData === null
+                || $authenticationStartedAt === null
+                || (int) ($challengeData['user_id'] ?? 0) !== $userId
+                || (int) ($challengeData['tenant_id'] ?? 0) !== $tenantId
+                || $authenticationStartedAt !== (int) $_SESSION['pending_2fa_started_at']
+            ) {
+                unset(
+                    $_SESSION['pending_2fa_user_id'],
+                    $_SESSION['pending_2fa_tenant_id'],
+                    $_SESSION['pending_2fa_started_at'],
+                    $_SESSION['pending_2fa_challenge_token'],
+                    $_SESSION['pending_2fa_expires']
+                );
+                return $this->respondWithError(
+                    ApiErrorCodes::AUTH_2FA_EXPIRED,
+                    __('api.session_expired'),
+                    null,
+                    401
+                );
+            }
+            $allowedMethods = $challengeData['methods'] ?? [];
+        }
+
+        // Both API-token and legacy session completion paths consume the same
+        // cache-backed handle and share its attempt cap.
+        $attemptResult = $this->twoFactorChallengeManager->recordAttempt((string) $twoFactorToken);
+        if (!$attemptResult['allowed']) {
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_2FA_MAX_ATTEMPTS,
+                __('api.too_many_attempts'),
+                null,
+                401
+            );
         }
 
         // Validate code is provided
@@ -110,15 +172,95 @@ class TotpController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, __('api.code_required'), 'code', 400);
         }
 
+        $verificationMethod = $useBackupCode ? 'backup_code' : 'totp';
+        if (!in_array($verificationMethod, $allowedMethods, true)) {
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED,
+                __('api.session_expired'),
+                null,
+                401
+            );
+        }
+
+        DB::beginTransaction();
+        try {
+            // Password changes and logout-all take this same row lock. Keeping
+            // it through token issuance totally orders those operations with a
+            // pending 2FA login and prevents post-revocation credentials.
+            $lockedUser = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first(['id']);
+            if ($lockedUser === null) {
+                DB::rollBack();
+                return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 401);
+            }
+
+            if (!$this->tokenService->isAuthenticationStartValid($userId, (int) $authenticationStartedAt)) {
+                DB::rollBack();
+                return $this->respondWithError(
+                    $isStateless ? ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED : ApiErrorCodes::AUTH_2FA_EXPIRED,
+                    __('api.session_expired'),
+                    null,
+                    401
+                );
+            }
+
+            // Re-read the cache-backed challenge after acquiring the issuance
+            // lock so concurrent submissions cannot both mint credentials.
+            $liveChallenge = is_string($twoFactorToken)
+                ? $this->twoFactorChallengeManager->get($twoFactorToken)
+                : null;
+            if (
+                $liveChallenge === null
+                || (int) ($liveChallenge['user_id'] ?? 0) !== $userId
+                || (int) ($liveChallenge['tenant_id'] ?? 0) !== $tenantId
+                || $this->authenticationStartFromChallenge($liveChallenge) !== (int) $authenticationStartedAt
+                || !in_array($verificationMethod, $liveChallenge['methods'] ?? [], true)
+            ) {
+                DB::rollBack();
+                return $this->respondWithError(
+                    $isStateless ? ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED : ApiErrorCodes::AUTH_2FA_EXPIRED,
+                    __('api.session_expired'),
+                    null,
+                    401
+                );
+            }
+
+        // The opaque challenge binds both the user and the tenant that owns the
+        // TOTP secret. Never re-resolve this identity from the request host.
+        $userRow = DB::selectOne("
+            SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, u.tenant_id,
+                   u.is_super_admin, u.is_tenant_super_admin, u.is_god, u.email_verified_at,
+                   u.is_approved, u.status, u.onboarding_completed, t.configuration
+            FROM users u
+            LEFT JOIN tenants t ON u.tenant_id = t.id
+            WHERE u.id = ? AND u.tenant_id = ?
+        ", [$userId, $tenantId]);
+        $user = $userRow ? (array) $userRow : null;
+
+        if (!$user) {
+            DB::rollBack();
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 401);
+        }
+
         // Verify the code
         if ($useBackupCode) {
-            $result = $this->totpService->verifyBackupCode($userId, $code);
+            $result = $this->totpService->verifyBackupCode($userId, $code, $tenantId);
         } else {
-            $result = $this->totpService->verifyLogin($userId, $code);
+            $result = $this->totpService->verifyLogin($userId, $code, $tenantId);
         }
 
         if (!$result['success']) {
-            return $this->respondWithError(ApiErrorCodes::AUTH_2FA_INVALID, $result['error'] ?? 'Invalid code', null, 401);
+            // Keep the verification-attempt audit/rate-limit writes.
+            DB::commit();
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_2FA_INVALID,
+                $result['error'] ?? __('api.validation_failed'),
+                null,
+                401
+            );
         }
 
         // =========================================================
@@ -126,107 +268,86 @@ class TotpController extends BaseApiController
         // =========================================================
 
         // Consume the challenge token (single-use)
-        if ($isStateless && $twoFactorToken) {
-            $this->twoFactorChallengeManager->consume($twoFactorToken);
+        if (!is_string($twoFactorToken) || !$this->twoFactorChallengeManager->consume($twoFactorToken)) {
+            DB::rollBack();
+            return $this->respondWithError(
+                $isStateless ? ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED : ApiErrorCodes::AUTH_2FA_EXPIRED,
+                __('api.session_expired'),
+                null,
+                401
+            );
         }
 
         // Clear session-based pending state
-        unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
-
-        // Trust device if requested — returns the plain token for the frontend
-        $trustedDeviceToken = null;
-        if ($trustDevice) {
-            $trustedDeviceToken = $this->totpService->trustDevice($userId);
-        }
-
-        // Fetch user data for response
-        // Allow super admins to complete 2FA even when their tenant_id differs
-        // from the current tenant context (cross-tenant login)
-        $tenantId = TenantContext::getId();
-        $userRow = DB::selectOne("
-            SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.role, u.tenant_id,
-                   u.is_super_admin, u.is_tenant_super_admin, u.is_god, u.email_verified_at,
-                   u.is_approved, u.status, u.onboarding_completed, t.configuration
-            FROM users u
-            LEFT JOIN tenants t ON u.tenant_id = t.id
-            WHERE u.id = ? AND (u.tenant_id = ? OR u.is_super_admin = 1 OR u.is_tenant_super_admin = 1)
-        ", [$userId, $tenantId]);
-        $user = $userRow ? (array)$userRow : null;
-
-        if (!$user) {
-            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, __('api.user_not_found'), null, 401);
-        }
+        unset(
+            $_SESSION['pending_2fa_user_id'],
+            $_SESSION['pending_2fa_tenant_id'],
+            $_SESSION['pending_2fa_started_at'],
+            $_SESSION['pending_2fa_challenge_token'],
+            $_SESSION['pending_2fa_expires']
+        );
 
         // SECURITY: Block suspended/banned users from completing 2FA login
         if (($user['status'] ?? 'active') !== 'active') {
+            DB::commit();
             return $this->respondWithError(ApiErrorCodes::AUTH_ACCOUNT_SUSPENDED, __('api.account_suspended'), null, 403);
         }
 
         // SECURITY: Enforce registration policy gates after 2FA completion
         $gateBlock = $this->tenantSettingsService->checkLoginGates($user);
         if ($gateBlock) {
+            DB::commit();
             return $this->respondWithError($gateBlock['code'], $gateBlock['message'], null, 403);
         }
 
-        // Generate tokens
+        // Return the plain trusted-device token for the frontend only after
+        // every account-policy gate has passed.
+        $trustedDeviceToken = $trustDevice
+            ? $this->totpService->trustDevice($userId, null, $tenantId)
+            : null;
+
+        // Generate login tokens under the tenant bound to the challenge. This
+        // keeps tenant-aware persistence on the account's home tenant even
+        // when the request host differs.
         $isMobile = $this->tokenService->isMobileRequest();
-        $accessToken = $this->tokenService->generateToken(
-            (int)$user['id'],
-            (int)$user['tenant_id'],
-            [
-                'role' => $user['role'],
-                'email' => $user['email'],
-                'is_super_admin' => !empty($user['is_super_admin']),
-                'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
-            ],
-            $isMobile
+        [$accessToken, $refreshToken] = TenantContext::runForTenant(
+            $tenantId,
+            function () use ($user, $isMobile): array {
+                $accessToken = $this->tokenService->generateToken(
+                    (int) $user['id'],
+                    (int) $user['tenant_id'],
+                    [
+                        'role' => $user['role'],
+                        'email' => $user['email'],
+                        'is_super_admin' => !empty($user['is_super_admin']),
+                        'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+                        'is_god' => !empty($user['is_god']),
+                    ],
+                    $isMobile
+                );
+                $refreshToken = $this->tokenService->generateRefreshToken(
+                    (int) $user['id'],
+                    (int) $user['tenant_id'],
+                    $isMobile
+                );
+
+                return [$accessToken, $refreshToken];
+            }
         );
-        $refreshToken = $this->tokenService->generateRefreshToken(
-            (int)$user['id'],
-            (int)$user['tenant_id'],
-            $isMobile
-        );
 
-        // For session-based clients, set up full session
-        $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
-        if (!$wantsStateless) {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-
-            // Preserve layout preference
-            $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-
-            // Regenerate session ID for security
-            session_regenerate_id(true);
-
-            // Restore layout preference
-            if ($preservedLayout) {
-                $_SESSION['nexus_active_layout'] = $preservedLayout;
-                $_SESSION['nexus_layout'] = $preservedLayout;
-            }
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['tenant_id'] = $user['tenant_id'];
-            $_SESSION['user_role'] = $user['role'];
-            $_SESSION['is_logged_in'] = true;
-        }
-
-        // Issue Sanctum token alongside legacy JWT (matches AuthController login flow)
-        $sanctumToken = null;
-        try {
-            $eloquentUser = \App\Models\User::find((int)$user['id']);
-            if ($eloquentUser) {
-                $sanctumToken = $eloquentUser->createToken(
-                    $isMobile ? 'mobile-api' : 'web-api',
-                    ['*']
-                )->plainTextToken;
-            }
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->update(['last_login_at' => now()]);
+            DB::commit();
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('[TotpController] Sanctum token creation failed: ' . $e->getMessage());
+            DB::rollBack();
+            throw $e;
         }
 
+        // User-login Sanctum tokens are intentionally not issued because they
+        // do not share the short JWT lifetime. Keep compatibility fields while
+        // ensuring every bearer alias points at the access JWT.
         // Return success response with tokens — MUST match AuthController::login() response shape
         $response = [
             'success' => true,
@@ -250,8 +371,8 @@ class TotpController extends BaseApiController
             'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
             'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
-            'token' => $sanctumToken ?? $accessToken,
-            'sanctum_token' => $sanctumToken,
+            'token' => $accessToken,
+            'sanctum_token' => null,
             'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
         ];
 
@@ -267,6 +388,23 @@ class TotpController extends BaseApiController
         }
 
         return response()->json($response);
+    }
+
+    /**
+     * Resolve the password-authentication start bound into a challenge.
+     *
+     * `created_at` remains a rolling-upgrade fallback for challenges created
+     * by an earlier application instance before the explicit field existed.
+     */
+    private function authenticationStartFromChallenge(array $challenge): ?int
+    {
+        $startedAt = (int) ($challenge['authentication_started_at'] ?? 0);
+        if ($startedAt < 1) {
+            $parsed = strtotime((string) ($challenge['created_at'] ?? ''));
+            $startedAt = $parsed === false ? 0 : $parsed;
+        }
+
+        return $startedAt > 0 && $startedAt <= time() ? $startedAt : null;
     }
 
     /** GET totp/status */

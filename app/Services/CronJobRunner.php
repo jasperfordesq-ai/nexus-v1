@@ -2675,6 +2675,9 @@ class CronJobRunner
         } catch (\Exception $e) {
             echo "   Reset tokens: skipped.\n";
         }
+
+        $tokenRows = app(TokenService::class)->cleanupExpiredRevocations();
+        echo "   Cleaned {$tokenRows} expired token/revocation rows.\n";
     }
 
     /**

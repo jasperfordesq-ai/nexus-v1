@@ -89,7 +89,7 @@ Opening a conversation (`GET /api/v2/messages/{id}`) automatically marks it as r
 
 ### Send
 
-`POST /api/v2/messages` requires `recipient_id`. At least one of `body`, `voice_url`, or an `attachments[]` file upload must be present.
+`POST /api/v2/messages` requires `recipient_id` plus either `body` or an `attachments[]` file upload. It rejects client-supplied `voice_url` and `audio_url` pointers; voice messages must use the dedicated multipart route below.
 
 - `body` is validated server-side with `HtmlSanitizer::stripAll()` (all HTML stripped before storage).
 - Maximum body length: **10,000 characters**.
@@ -145,9 +145,9 @@ Files are stored under `httpdocs/uploads/{tenantId}/message_attachments/` with a
 
 ### Voice messages
 
-`POST /api/v2/messages/upload-voice` — upload audio and receive a `voice_url` and `duration` without sending (two-step flow).
-
 `POST /api/v2/messages/voice` — upload and send in one step (field: `voice_message`, plus `recipient_id`).
+
+The server stores the uploaded bytes under the active tenant's canonical voice-message directory and passes that server-issued path through `MessageService::sendVoice()`. Generic message input cannot choose an audio path.
 
 Accepted audio MIME types: `audio/webm`, `video/webm`, `audio/ogg`, `audio/mpeg`, `audio/mp3`, `audio/aac`, `audio/mp4`, `audio/x-m4a`, `video/mp4`. Maximum file size: **10 MB**. Maximum duration: **5 minutes** (300 seconds, enforced by `AudioUploader::$maxDuration`).
 
@@ -155,7 +155,7 @@ After upload, `TranscriptionService::transcribe()` runs non-blocking. On success
 
 ## Real-time delivery via Pusher
 
-`MessageSent` (in `app/Events/MessageSent.php`) implements `ShouldBroadcast` and is dispatched by `MessageService::send()`. It broadcasts to the Pusher private channel:
+`MessageSent` (in `app/Events/MessageSent.php`) implements `ShouldBroadcast` and is dispatched by the shared `MessageService` persistence path for text, attachment, and voice messages. It broadcasts to the Pusher private channel:
 
 ```
 private-tenant.{tenantId}.conversation.{conversationId}

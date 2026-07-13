@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\Enterprise;
 
+use App\Core\AudioUploader;
 use App\Services\LegacyVettingEvidenceManager;
 use Illuminate\Support\Facades\DB;
 use App\Services\Enterprise\LoggerService;
@@ -1101,6 +1102,17 @@ class GdprService
         return @unlink($resolved);
     }
 
+    /**
+     * Delete one canonical tenant voice recording.
+     *
+     * Kept behind an instance seam so deletion-failure handling can be tested
+     * without depending on platform-specific filesystem permission semantics.
+     */
+    protected function deleteTenantVoiceRecording(string $url): bool
+    {
+        return AudioUploader::deleteForTenant($url, $this->tenantId);
+    }
+
     // =========================================================================
     // ACCOUNT DELETION (Article 17 - Right to Erasure)
     // =========================================================================
@@ -1122,6 +1134,19 @@ class GdprService
         }
 
         try {
+            // This tenant-scoped users row is the common serialization boundary
+            // for account erasure and user-authored writes. Acquire it before
+            // generateDataExport() or any other consistent read establishes a
+            // REPEATABLE READ snapshot; otherwise an already-authenticated send
+            // can commit after the erasure scan and survive a successful delete.
+            $lockedUser = $this->query(
+                "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                [$userId, $this->tenantId]
+            )->fetch();
+            if ($lockedUser === false) {
+                throw new \RuntimeException('Cannot erase an unknown tenant user.');
+            }
+
             // Tracks whether a CRITICAL PII-erasure step failed. If so we must NOT
             // report the request as completed — PII would survive an Article 17 erasure.
             $criticalErasureFailed = false;
@@ -1189,36 +1214,114 @@ class GdprService
             //
             // Voice recordings are biometric-adjacent PII stored on disk under
             // uploads/{tenant}/voice_messages (NOT the per-user uploads dir
-            // that step 6 removes) — delete the files BEFORE audio_url is
-            // nulled below, or the paths are lost.
+            // that step 6 removes). Treat every database pointer as untrusted:
+            // compare canonical paths across the tenant so erasing one member
+            // cannot unlink a recording still referenced by another sender.
+            // Only clear a canonical pointer after successful deletion; a failed
+            // unlink must retain its retry linkage and keep the request open.
             try {
-                $audioUrls = $this->query(
-                    "SELECT audio_url FROM messages
-                      WHERE sender_id = ? AND tenant_id = ? AND audio_url IS NOT NULL",
-                    [$userId, $this->tenantId]
-                )->fetchAll(\PDO::FETCH_COLUMN);
-                $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/');
-                if ($docRoot === '' && function_exists('public_path')) {
-                    $docRoot = rtrim(public_path(), '/\\');
+                $voiceRows = $this->query(
+                    "SELECT id, sender_id, audio_url FROM messages
+                      WHERE tenant_id = ? AND audio_url IS NOT NULL",
+                    [$this->tenantId]
+                )->fetchAll();
+
+                /** @var array<string, list<array{message_id:int, sender_id:int}>> $referencesByPath */
+                $referencesByPath = [];
+                /** @var array<string, array{url:string, message_ids:list<int>}> $authoredFilesByPath */
+                $authoredFilesByPath = [];
+                /** @var list<int> $voiceMessageIdsToScrub */
+                $voiceMessageIdsToScrub = [];
+
+                foreach ($voiceRows as $voiceRow) {
+                    $messageId = (int) ($voiceRow['id'] ?? 0);
+                    $senderId = (int) ($voiceRow['sender_id'] ?? 0);
+                    $audioUrl = (string) ($voiceRow['audio_url'] ?? '');
+                    $canonicalPath = AudioUploader::resolveTenantVoiceFilePath($audioUrl, $this->tenantId);
+
+                    // Invalid, missing, remote, traversal, and cross-tenant
+                    // legacy pointers cannot identify a deletable local file.
+                    // They are safe to scrub from the erased sender's row.
+                    if ($canonicalPath === null) {
+                        if ($senderId === $userId && $messageId > 0) {
+                            $voiceMessageIdsToScrub[] = $messageId;
+                        }
+                        continue;
+                    }
+
+                    $referencesByPath[$canonicalPath][] = [
+                        'message_id' => $messageId,
+                        'sender_id' => $senderId,
+                    ];
+
+                    if ($senderId !== $userId || $messageId <= 0) {
+                        continue;
+                    }
+
+                    if (!isset($authoredFilesByPath[$canonicalPath])) {
+                        $authoredFilesByPath[$canonicalPath] = [
+                            'url' => $audioUrl,
+                            'message_ids' => [],
+                        ];
+                    }
+                    $authoredFilesByPath[$canonicalPath]['message_ids'][] = $messageId;
                 }
-                foreach ($audioUrls as $audioUrl) {
-                    $relative = parse_url((string) $audioUrl, PHP_URL_PATH);
-                    // Only ever unlink inside the uploads tree.
-                    if ($docRoot !== '' && is_string($relative) && str_starts_with($relative, '/uploads/')) {
-                        $file = $docRoot . $relative;
-                        if (is_file($file)) {
-                            @unlink($file);
+
+                foreach ($authoredFilesByPath as $canonicalPath => $authoredFile) {
+                    $referencingMessageIds = [];
+                    foreach ($referencesByPath[$canonicalPath] ?? [] as $reference) {
+                        if ($reference['sender_id'] !== $userId) {
+                            $referencingMessageIds[] = $reference['message_id'];
                         }
                     }
+
+                    if ($referencingMessageIds !== []) {
+                        // The erased sender's pointer may be poisoned or shared.
+                        // Remove that pointer, but preserve both the recording and
+                        // every other sender's still-valid message linkage.
+                        array_push($voiceMessageIdsToScrub, ...$authoredFile['message_ids']);
+                        $this->logger->warning('GDPR shared voice recording preserved', [
+                            'user_id' => $userId,
+                            'message_ids' => $authoredFile['message_ids'],
+                            'referencing_message_ids' => $referencingMessageIds,
+                        ]);
+                        continue;
+                    }
+
+                    if ($this->deleteTenantVoiceRecording($authoredFile['url'])) {
+                        array_push($voiceMessageIdsToScrub, ...$authoredFile['message_ids']);
+                        continue;
+                    }
+
+                    $criticalErasureFailed = true;
+                    $this->logger->error('GDPR CRITICAL erasure step failed (voice recording unlink)', [
+                        'user_id' => $userId,
+                        'message_ids' => $authoredFile['message_ids'],
+                    ]);
                 }
-            } catch (\Throwable $e) { $this->logger->warning('GDPR voice-file deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+                $voiceMessageIdsToScrub = array_values(array_unique($voiceMessageIdsToScrub));
+                if ($voiceMessageIdsToScrub !== []) {
+                    $voicePlaceholders = implode(',', array_fill(0, count($voiceMessageIdsToScrub), '?'));
+                    $this->query(
+                        "UPDATE messages SET audio_url = NULL
+                          WHERE sender_id = ? AND tenant_id = ? AND id IN ({$voicePlaceholders})",
+                        array_merge([$userId, $this->tenantId], $voiceMessageIdsToScrub)
+                    );
+                }
+            } catch (\Throwable $e) {
+                $criticalErasureFailed = true;
+                $this->logger->error('GDPR CRITICAL erasure step failed (voice recordings)', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
             $this->query(
                 "UPDATE messages
                     SET body = CASE WHEN sender_id = ? THEN '[message removed — account erased]' ELSE body END,
-                        transcript = CASE WHEN sender_id = ? THEN NULL ELSE transcript END,
-                        audio_url = CASE WHEN sender_id = ? THEN NULL ELSE audio_url END
+                        transcript = CASE WHEN sender_id = ? THEN NULL ELSE transcript END
                   WHERE (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
-                [$userId, $userId, $userId, $userId, $userId, $this->tenantId]
+                [$userId, $userId, $userId, $userId, $this->tenantId]
             );
             $this->query(
                 "DELETE FROM notifications WHERE user_id = ? AND tenant_id = ?",
@@ -1267,6 +1370,22 @@ class GdprService
                 );
             } catch (\Throwable $e) {
                 // Table may not exist
+            }
+
+            // 3c (continued). Delete rotating refresh-token families. Unlike
+            // the anonymized users row, these session records must not survive
+            // Article 17 erasure, and the delete must never cross tenants.
+            try {
+                $this->query(
+                    "DELETE FROM refresh_token_sessions WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                $criticalErasureFailed = true;
+                $this->logger->error('GDPR CRITICAL erasure step failed (refresh-token sessions)', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             // 3d. Delete cookie consent records

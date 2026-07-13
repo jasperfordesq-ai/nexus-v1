@@ -187,7 +187,7 @@ class User extends Authenticatable
             'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
             'created_at', 'tenant_id', 'is_approved', 'preferred_language',
             'privacy_profile', 'privacy_search',
-            'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
+            'is_admin', 'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
             DB::raw('COALESCE(xp, 0) as xp'),
             DB::raw('COALESCE(level, 1) as level'),
             'last_active_at', 'last_login_at',

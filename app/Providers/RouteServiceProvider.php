@@ -55,6 +55,19 @@ class RouteServiceProvider extends ServiceProvider
             );
         });
 
+        // Event People bulk mutations must not share Laravel's default numeric
+        // throttle bucket with unrelated API routes. Keep the existing allowance,
+        // but isolate it per tenant and authenticated actor.
+        RateLimiter::for('events-people-bulk', static function (Request $request): Limit {
+            $tenantId = (int) TenantContext::getId();
+            $userId = $request->user()?->getAuthIdentifier();
+            $actor = $userId !== null ? 'user:' . $userId : 'ip:' . $request->ip();
+
+            return Limit::perMinute(30)->by(
+                "events:people-bulk:tenant:{$tenantId}:{$actor}"
+            );
+        });
+
         // Bulk data export / import — 1 per minute keyed by authenticated user
         // (falls back to IP for unauthenticated, but all current callers are
         // behind auth:sanctum). This replaces the per-IP `throttle:1,1` that

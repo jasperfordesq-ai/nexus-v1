@@ -680,7 +680,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Call logout endpoint to invalidate tokens server-side
       // We verify the response but still proceed with local logout regardless
       try {
-        const response = await api.post('/auth/logout', { refresh_token: refreshToken });
+        const response = await api.logoutSession(refreshToken);
 
         // Log if server-side logout failed (for audit purposes)
         if (!response.success) {

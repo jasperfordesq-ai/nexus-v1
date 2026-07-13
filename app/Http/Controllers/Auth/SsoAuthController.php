@@ -62,7 +62,12 @@ class SsoAuthController extends Controller
                 ], 400);
             }
 
-            $result = $this->sso->redirectUrl($tenantId, $provider);
+            $browserChallenge = $request->input('browser_challenge');
+            $result = $this->sso->redirectUrl(
+                $tenantId,
+                $provider,
+                is_string($browserChallenge) ? $browserChallenge : null
+            );
 
             return response()->json([
                 'success' => true,
@@ -109,25 +114,36 @@ class SsoAuthController extends Controller
             $result = $this->sso->handleCallback($state, $code);
             /** @var \App\Models\User $user */
             $user = $result['user'];
-
-            $tokenResult = $user->createToken('sso-' . $result['provider_key'], ['*']);
-            $accessToken = $tokenResult->plainTextToken;
-            try {
-                $tokenResult->accessToken->forceFill(['tenant_id' => (int) $user->tenant_id])->save();
-            } catch (\Throwable $e) {
-                // tenant_id column may be absent on personal_access_tokens in older envs
+            if (
+                $stateTenantId === null
+                || (int) $result['tenant_id'] !== $stateTenantId
+                || (int) $user->tenant_id !== $stateTenantId
+            ) {
+                throw new \RuntimeException('SSO identity tenant does not match signed state.');
             }
 
-            $oneTimeCode = $this->social->issueCallbackCode(
-                $accessToken,
+            $issuance = $this->social->issueLoginCallbackCode(
+                (int) $user->id,
+                (int) $user->tenant_id,
                 'sso:' . $result['provider_key'],
                 (bool) $result['is_new'],
-                (int) $result['tenant_id']
+                (int) $result['authentication_started_at'],
+                (string) $result['browser_challenge'],
+                isset($result['identity_link']) && is_array($result['identity_link'])
+                    ? $result['identity_link']
+                    : null
             );
+            if (($issuance['status'] ?? null) !== 'issued' || empty($issuance['callback_code'])) {
+                throw new \RuntimeException(
+                    'SSO credential issuance rejected: ' . (string) ($issuance['status'] ?? 'unknown')
+                );
+            }
+            $oneTimeCode = (string) $issuance['callback_code'];
 
             $params = http_build_query([
                 'code' => $oneTimeCode,
                 'provider' => 'sso:' . $result['provider_key'],
+                'flow' => $result['browser_challenge'],
             ]);
             return redirect($frontend . '/auth/oauth/callback?' . $params);
         } catch (\Throwable $e) {
