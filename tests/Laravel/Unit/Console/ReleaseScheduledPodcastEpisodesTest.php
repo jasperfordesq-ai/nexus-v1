@@ -372,23 +372,15 @@ class ReleaseScheduledPodcastEpisodesTest extends TestCase
         $this->assertSame(3, $releasedCount, 'All 3 due episodes must be released in one run');
     }
 
-    public function test_due_release_refreshes_podcast_list_show_and_episode_snapshots(): void
+    public function test_due_release_does_not_enqueue_authenticated_podcast_routes_for_prerendering(): void
     {
         $episodeId = $this->insertEpisode([
             'slug' => 'scheduled-prerender-episode',
             'scheduled_for' => now()->subMinute(),
             'announced_at' => null,
         ]);
-        $showSlug = (string) DB::table('podcast_shows')->where('id', $this->showId)->value('slug');
-
         $invalidator = \Mockery::mock(PrerenderContentInvalidator::class);
-        $invalidator->shouldReceive('refreshRoutes')
-            ->once()
-            ->with(self::TENANT_ID, [
-                '/podcasts',
-                "/podcasts/{$showSlug}",
-                "/podcasts/{$showSlug}/scheduled-prerender-episode",
-            ]);
+        $invalidator->shouldNotReceive('refreshRoutes');
         $this->app->instance(PrerenderContentInvalidator::class, $invalidator);
 
         $this->artisan('podcasts:release-due')

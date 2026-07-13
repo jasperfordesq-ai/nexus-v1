@@ -819,6 +819,7 @@ class PodcastControllerTest extends TestCase
     public function test_hosted_audio_supports_byte_range_requests(): void
     {
         Storage::fake('local');
+        Queue::fake([ProcessPodcastEpisodeMedia::class]);
         $this->enablePodcasts(true);
         $this->actingAsMember();
 
@@ -1482,6 +1483,7 @@ class PodcastControllerTest extends TestCase
     {
         Storage::fake('local');
         Storage::fake('s3');
+        Queue::fake([ProcessPodcastEpisodeMedia::class]);
         $this->enablePodcasts(true);
         $this->actingAsAdmin();
 
@@ -1504,6 +1506,7 @@ class PodcastControllerTest extends TestCase
         ]);
         $show->assertStatus(201);
         $showId = $show->json('data.id');
+        $showSlug = $show->json('data.slug');
 
         $episode = $this->post("/api/v2/podcasts/{$showId}/episodes", [
             'title' => 'Cloud Audio',
@@ -1514,7 +1517,21 @@ class PodcastControllerTest extends TestCase
         $storagePath = DB::table('podcast_episodes')->where('id', $episodeId)->value('audio_storage_path');
         $this->assertSame('s3', DB::table('podcast_episodes')->where('id', $episodeId)->value('audio_storage_disk'));
         Storage::disk('s3')->assertExists($storagePath);
-        $this->assertStringStartsWith('https://media.example.test/podcasts/', $episode->json('data.audio_url'));
+        $this->assertStringContainsString(
+            "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
+            $episode->json('data.audio_url'),
+        );
+        $this->assertStringNotContainsString('media.example.test', $episode->json('data.audio_url'));
+
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+        ]);
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+        $publicShow = $this->apiGet("/v2/podcasts/{$showSlug}")->assertStatus(200);
+        $readyEpisode = collect($publicShow->json('data.episodes'))->firstWhere('id', $episodeId);
+        $this->assertStringStartsWith('https://media.example.test/podcasts/', (string) ($readyEpisode['audio_url'] ?? ''));
 
         $this->apiDelete("/v2/podcasts/{$showId}/episodes/{$episodeId}")->assertStatus(200);
         Storage::disk('s3')->assertMissing($storagePath);
@@ -1523,6 +1540,7 @@ class PodcastControllerTest extends TestCase
     public function test_cloud_private_audio_uses_signed_proxy_instead_of_public_cdn_url(): void
     {
         Storage::fake('s3');
+        Queue::fake([ProcessPodcastEpisodeMedia::class]);
         $this->enablePodcasts(true);
         $this->actingAsAdmin();
 
@@ -1548,9 +1566,31 @@ class PodcastControllerTest extends TestCase
             'audio' => UploadedFile::fake()->create('members-cloud.mp3', 2, 'audio/mpeg'),
         ], $this->withTenantHeader());
         $episode->assertStatus(201);
+        $episodeId = $episode->json('data.id');
 
         $audioUrl = $episode->json('data.audio_url');
-        $this->assertStringContainsString("/api/v2/podcasts/media/{$this->testTenantId}/{$episode->json('data.id')}/audio", $audioUrl);
+        $this->assertStringContainsString("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $audioUrl);
+        $this->assertStringNotContainsString('signature=', $audioUrl, 'Unready media must not receive a capability signature.');
+        $this->assertStringNotContainsString('media.example.test', $audioUrl);
+
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'audio_url' => 'https://media.example.test/podcasts/legacy-pending.mp3',
+        ]);
+        $pendingMine = $this->apiGet('/v2/podcasts/mine')->assertStatus(200);
+        $pendingEpisode = collect($pendingMine->json('data.0.episodes'))->firstWhere('id', $episodeId);
+        $pendingAudioUrl = (string) ($pendingEpisode['audio_url'] ?? '');
+        $this->assertStringContainsString("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $pendingAudioUrl);
+        $this->assertStringNotContainsString('signature=', $pendingAudioUrl);
+        $this->assertStringNotContainsString('media.example.test', $pendingAudioUrl);
+
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+        ]);
+        $mine = $this->apiGet('/v2/podcasts/mine')->assertStatus(200);
+        $readyEpisode = collect($mine->json('data.0.episodes'))->firstWhere('id', $episodeId);
+        $audioUrl = (string) ($readyEpisode['audio_url'] ?? '');
+        $this->assertStringContainsString("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $audioUrl);
         $this->assertStringContainsString('signature=', $audioUrl);
         $this->assertStringNotContainsString('media.example.test', $audioUrl);
     }

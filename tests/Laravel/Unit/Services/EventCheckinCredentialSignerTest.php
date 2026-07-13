@@ -73,8 +73,13 @@ final class EventCheckinCredentialSignerTest extends TestCase
             $issuedAt,
             $issuedAt->addMinutes(30),
         );
-        $tampered = substr($issued['token'], 0, -1)
-            . (str_ends_with($issued['token'], 'A') ? 'B' : 'A');
+        [$encodedClaims, $signature] = explode(
+            '.',
+            substr($issued['token'], strlen('nqx2_')),
+            2,
+        );
+        $signature[0] = $signature[0] === 'A' ? 'B' : 'A';
+        $tampered = 'nqx2_' . $encodedClaims . '.' . $signature;
 
         $this->assertReason(
             fn () => $signer->verify($tampered, 2, 91, 'event:91', $issuedAt),

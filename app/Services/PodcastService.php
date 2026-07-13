@@ -671,7 +671,9 @@ class PodcastService
         $episode->audio_bytes = $file->getSize();
         $episode->media_processing_status = PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_PROCESSING) ? 'pending' : 'complete';
         $episode->media_scan_status = PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_SCANNING) ? 'pending' : 'not_required';
-        $episode->audio_url = self::episodeAudioUrl($episode, false);
+        // Persist the non-capability proxy URL. Response projection may expose
+        // the CDN only after media is ready and publicly distributable.
+        $episode->audio_url = self::hostedAudioProxyUrl($episode);
         try {
             $episode->save();
         } catch (\Throwable $e) {
@@ -689,7 +691,7 @@ class PodcastService
     public static function episodeAudioUrl(PodcastEpisode $episode, bool $signed = true): string
     {
         $tenantId = (int) ($episode->tenant_id ?: TenantContext::getId());
-        $base = self::apiUrl('/api/v2/podcasts/media/' . $tenantId . '/' . $episode->id . '/audio');
+        $base = self::hostedAudioProxyUrl($episode);
         if (($episode->audio_storage_disk ?? 'local') !== 'local') {
             if ($signed) {
                 $expires = time() + self::HOSTED_AUDIO_ROUTE_TTL_SECONDS;
@@ -719,6 +721,13 @@ class PodcastService
 
         $expires = time() + self::HOSTED_AUDIO_ROUTE_TTL_SECONDS;
         return $base . '?expires=' . $expires . '&signature=' . self::mediaSignature($tenantId, $episode->id, $expires);
+    }
+
+    private static function hostedAudioProxyUrl(PodcastEpisode $episode): string
+    {
+        $tenantId = (int) ($episode->tenant_id ?: TenantContext::getId());
+
+        return self::apiUrl('/api/v2/podcasts/media/' . $tenantId . '/' . $episode->id . '/audio');
     }
 
     public static function hasValidMediaSignature(PodcastEpisode $episode, int $tenantId, ?string $expires, ?string $signature): bool
@@ -1763,6 +1772,10 @@ class PodcastService
         // its non-servable sentinel URL. Do not mint even a signed capability
         // for bytes the media endpoint must reject.
         if (!self::isMediaReadyForDistribution($episode)) {
+            // Older cloud rows may have persisted a direct CDN URL before the
+            // fail-closed proxy contract was introduced. Normalize it on every
+            // response so pending/rejected bytes cannot bypass the media gate.
+            $episode->audio_url = self::hostedAudioProxyUrl($episode);
             return;
         }
 
@@ -2061,9 +2074,9 @@ class PodcastService
         }
 
         $episode->audio_storage_disk = $targetDisk;
-        // Repoint the public URL so RSS enclosures use the CDN / proxy URL
-        // appropriate for the new disk.
-        $episode->audio_url = self::episodeAudioUrl($episode, false);
+        // Persist the neutral proxy URL; ready public response/RSS projection
+        // selects the CDN dynamically for the new disk.
+        $episode->audio_url = self::hostedAudioProxyUrl($episode);
         $episode->save();
 
         if ($deleteSource) {

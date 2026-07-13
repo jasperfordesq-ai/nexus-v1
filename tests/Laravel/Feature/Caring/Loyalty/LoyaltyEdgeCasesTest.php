@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Caring\Loyalty;
 
 use App\Core\TenantContext;
+use App\Models\MarketplaceOrder;
 use App\Services\CaringLoyaltyService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -119,6 +120,26 @@ class LoyaltyEdgeCasesTest extends TestCase
         ]);
     }
 
+    private function makeOrder(int $memberId, int $sellerId, int $listingId): MarketplaceOrder
+    {
+        $id = (int) DB::table('marketplace_orders')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'order_number' => 'LOYALTY-' . strtoupper(uniqid('', true)),
+            'buyer_id' => $memberId,
+            'seller_id' => $sellerId,
+            'marketplace_listing_id' => $listingId,
+            'quantity' => 1,
+            'unit_price' => 100.0,
+            'total_price' => 100.0,
+            'currency' => 'CHF',
+            'status' => 'pending_payment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return MarketplaceOrder::withoutGlobalScopes()->findOrFail($id);
+    }
+
     // ─── Scenario 1: Zero-balance redemption ──────────────────────────────────
 
     public function test_zero_balance_member_redeem_rejects_with_translated_error(): void
@@ -174,7 +195,11 @@ class LoyaltyEdgeCasesTest extends TestCase
         $result = $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
 
         $this->assertEqualsWithDelta(50.0, $result['discount_chf'], 0.01);
-        $this->assertEqualsWithDelta(0.0, $result['new_wallet_balance'], 0.01);
+        $this->assertEqualsWithDelta(2.0, $result['new_wallet_balance'], 0.01);
+        $order = $this->makeOrder($member, $merchant, $listing);
+        $this->service->applyPendingToOrder($result['redemption_id'], $order);
+        $this->assertEqualsWithDelta(0.0, (float) DB::table('users')->where('id', $member)->value('balance'), 0.001);
+        $this->assertEqualsWithDelta(50.0, (float) $order->fresh()->total_price, 0.01);
 
         $row = DB::table('caring_loyalty_redemptions')->where('id', $result['redemption_id'])->first();
         $this->assertNotNull($row);
@@ -220,6 +245,10 @@ class LoyaltyEdgeCasesTest extends TestCase
         $admin    = $this->makeUser('refund_admin', 0);
 
         $applied = $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
+        $this->service->applyPendingToOrder(
+            $applied['redemption_id'],
+            $this->makeOrder($member, $merchant, $listing),
+        );
         $this->assertEqualsWithDelta(3.0, (float) DB::table('users')->where('id', $member)->value('balance'), 0.001);
 
         $reversal = $this->service->reverse($applied['redemption_id'], 'Customer requested refund', $admin);
@@ -253,6 +282,10 @@ class LoyaltyEdgeCasesTest extends TestCase
         $admin    = $this->makeUser('double_admin', 0);
 
         $applied = $this->service->redeem($member, $merchant, $listing, 1.0, 100.0);
+        $this->service->applyPendingToOrder(
+            $applied['redemption_id'],
+            $this->makeOrder($member, $merchant, $listing),
+        );
         $this->service->reverse($applied['redemption_id'], 'first reversal', $admin);
 
         $expected = __('caring_community.loyalty.errors.redemption_not_reversible');
@@ -275,6 +308,10 @@ class LoyaltyEdgeCasesTest extends TestCase
         $admin    = $this->makeUser('tenant_scope_admin', 0);
 
         $applied = $this->service->redeem($member, $merchant, $listing, 1.0, 100.0);
+        $this->service->applyPendingToOrder(
+            $applied['redemption_id'],
+            $this->makeOrder($member, $merchant, $listing),
+        );
 
         // Find any other live tenant to switch to (tenant_id != TENANT_ID).
         // setById() refuses to switch to a non-existent tenant, so we must use a real one.

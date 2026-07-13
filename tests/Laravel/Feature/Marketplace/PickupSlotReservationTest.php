@@ -77,13 +77,16 @@ class PickupSlotReservationTest extends TestCase
         ]);
     }
 
-    private function createOrder(int $buyerId, int $sellerId, int $listingId): int
+    private function createOrder(
+        int $buyerId,
+        int $sellerId,
+        int $listingId,
+        string $status = 'pending_payment',
+    ): int
     {
         // marketplace_orders schema: requires unit_price/total_price (NOT
-        // subtotal/total), quantity, and a valid status enum value
-        // (pending_payment). The reservation service only reads id/tenant_id/
-        // buyer_id off the order, so the monetary columns just need to insert
-        // validly.
+        // subtotal/total), quantity, a pickup shipping method, and a valid
+        // lifecycle status. The monetary columns only need to insert validly.
         return (int) DB::table('marketplace_orders')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'buyer_id' => $buyerId,
@@ -94,7 +97,8 @@ class PickupSlotReservationTest extends TestCase
             'unit_price' => 5.00,
             'total_price' => 5.00,
             'currency' => 'EUR',
-            'status' => 'pending_payment',
+            'shipping_method' => 'pickup',
+            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -155,7 +159,7 @@ class PickupSlotReservationTest extends TestCase
         $slot = $this->createSlot($sellerProfileId, 5);
 
         $buyer = $this->createUser();
-        $orderId = $this->createOrder($buyer->id, $seller->id, $listingId);
+        $orderId = $this->createOrder($buyer->id, $seller->id, $listingId, 'paid');
 
         $reservation = MarketplacePickupSlotService::reserve($slot->id, $orderId, $buyer->id);
         $this->assertSame('reserved', $reservation->status);
