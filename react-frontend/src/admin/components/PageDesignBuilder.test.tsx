@@ -145,15 +145,24 @@ describe('PageDesignBuilder', () => {
     expect(mockEditor.AssetManager.add).toHaveBeenCalledWith('https://cdn.example.test/uploads/page.png');
     expect(mockEditor.addComponents).toHaveBeenCalledWith({
       type: 'image',
-      attributes: { src: 'https://cdn.example.test/uploads/page.png', alt: '' },
+      attributes: {
+        src: 'https://cdn.example.test/uploads/page.png',
+        alt: '',
+        class: 'nexus-page-uploaded-image',
+      },
     });
     expect(mockEditor.select).toHaveBeenCalledWith({ id: 'image-component' });
   });
 
   it('replaces the selected image when uploading from the toolbar', async () => {
     const selected = {
-      get: vi.fn((key: string) => (key === 'tagName' ? 'img' : undefined)),
+      get: vi.fn((key: string) => {
+        if (key === 'tagName') return 'img';
+        if (key === 'attributes') return { class: 'existing-class' };
+        return undefined;
+      }),
       set: vi.fn(),
+      addAttributes: vi.fn(),
     };
     mockEditor.getSelected.mockReturnValue(selected);
     mockAdminBuilderAssets.uploadImage.mockResolvedValueOnce({
@@ -170,6 +179,9 @@ describe('PageDesignBuilder', () => {
     });
 
     await waitFor(() => expect(selected.set).toHaveBeenCalledWith('src', 'https://cdn.example.test/uploads/replacement.webp'));
+    expect(selected.addAttributes).toHaveBeenCalledWith({
+      class: 'existing-class nexus-page-uploaded-image',
+    });
     expect(mockEditor.addComponents).not.toHaveBeenCalled();
   });
 
@@ -193,7 +205,11 @@ describe('PageDesignBuilder', () => {
     expect(mockEditor.AssetManager.add).toHaveBeenCalledWith('https://cdn.example.test/uploads/dropped.jpg');
     expect(mockEditor.addComponents).toHaveBeenCalledWith({
       type: 'image',
-      attributes: { src: 'https://cdn.example.test/uploads/dropped.jpg', alt: '' },
+      attributes: {
+        src: 'https://cdn.example.test/uploads/dropped.jpg',
+        alt: '',
+        class: 'nexus-page-uploaded-image',
+      },
     });
   });
 

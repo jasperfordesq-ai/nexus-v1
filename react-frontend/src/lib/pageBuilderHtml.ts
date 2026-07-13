@@ -9,6 +9,8 @@ const PAGE_BUILDER_BASELINE_CSS = `
 .nexus-custom-page-builder{background:var(--background,#ffffff);color:var(--foreground,#111827);color-scheme:inherit}
 .nexus-custom-page-builder a{color:var(--accent-color,var(--color-accent,#0891b2))}
 .nexus-custom-page-builder img{max-width:100%;height:auto}
+.nexus-custom-page-builder .nexus-page-uploaded-image,.nexus-custom-page-builder .nexus-page-section > img{display:block;max-width:100%;height:auto;border-radius:.75rem}
+.nexus-custom-page-builder .nexus-page-uploaded-image + *,.nexus-custom-page-builder .nexus-page-section > img + .nexus-page-container{margin-top:clamp(1.5rem,3vw,2.5rem)}
 `.trim();
 
 const PAGE_BUILDER_THEME_OVERRIDE_CSS = `

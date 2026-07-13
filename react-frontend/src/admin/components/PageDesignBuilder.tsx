@@ -91,6 +91,8 @@ export const DEFAULT_PAGE_CSS = `
 .nexus-page-hero h1{max-width:780px;margin:0;font-size:clamp(2.5rem,7vw,5.4rem);line-height:1.02;letter-spacing:0;color:var(--foreground,#111827)}
 .nexus-page-lede{max-width:680px;margin:1.25rem 0 0;font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.7;color:var(--foreground-muted,var(--foreground,#4b5563))}
 .nexus-page-button{display:inline-flex;margin-top:2rem;border-radius:.65rem;background:var(--accent-color,var(--color-accent,#0891b2));color:var(--accent-foreground,#fff);padding:.85rem 1.15rem;font-weight:700;text-decoration:none}
+.nexus-page-uploaded-image,.nexus-page-section > img{display:block;max-width:100%;height:auto;border-radius:.75rem}
+.nexus-page-uploaded-image + *,.nexus-page-section > img + .nexus-page-container{margin-top:clamp(1.5rem,3vw,2.5rem)}
 .nexus-page-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
 .nexus-page-card{border:1px solid var(--border-default,rgba(17,24,39,.12));border-radius:.75rem;background:var(--surface-elevated,rgba(255,255,255,.9));padding:1.5rem;box-shadow:var(--shadow-md,0 10px 30px rgba(15,23,42,.06));color:var(--foreground,#111827)}
 .nexus-page-card h2{margin:0 0 .75rem;font-size:1.35rem;color:var(--foreground,#111827)}
@@ -142,9 +144,17 @@ function insertImage(ed: Editor, url: string): void {
   const tag = ((selected?.get?.('tagName') as string) || (selected?.get?.('type') as string) || '').toLowerCase();
   if ((tag === 'img' || tag === 'image') && selected?.set) {
     selected.set('src', url);
+    const attributes = (selected.get?.('attributes') as Record<string, unknown> | undefined) ?? {};
+    const className = typeof attributes.class === 'string' ? attributes.class : '';
+    selected.addAttributes?.({
+      class: Array.from(new Set([...className.split(/\s+/).filter(Boolean), 'nexus-page-uploaded-image'])).join(' '),
+    });
     return;
   }
-  const component = ed.addComponents({ type: 'image', attributes: { src: url, alt: '' } });
+  const component = ed.addComponents({
+    type: 'image',
+    attributes: { src: url, alt: '', class: 'nexus-page-uploaded-image' },
+  });
   const first = Array.isArray(component) ? component[0] : component;
   if (first) ed.select(first);
 }
