@@ -306,6 +306,8 @@ final class AuthenticationMethodGuardTest extends TestCase
 
         $service = app(SocialAuthService::class);
         $service->unlinkProvider($userId, 'google');
+        $firstAttemptQueries = $queries;
+        $queries = [];
 
         try {
             $service->unlinkProvider($userId, 'facebook');
@@ -329,13 +331,19 @@ final class AuthenticationMethodGuardTest extends TestCase
         // MariaDB/PostgreSQL compile lockForUpdate() as FOR UPDATE. Both unlink
         // attempts must request the same user-row lock before counting methods.
         if (in_array(DB::connection()->getDriverName(), ['mysql', 'pgsql'], true)) {
-            $lockingUserQueries = array_values(array_filter(
+            $isLockingUserQuery = static fn (string $sql): bool => str_contains($sql, 'users')
+                && str_contains($sql, 'for update');
+            $firstAttemptLocks = array_values(array_filter(
+                $firstAttemptQueries,
+                $isLockingUserQuery
+            ));
+            $secondAttemptLocks = array_values(array_filter(
                 $queries,
-                static fn (string $sql): bool => str_contains($sql, 'users')
-                    && str_contains($sql, 'for update')
+                $isLockingUserQuery
             ));
 
-            $this->assertCount(2, $lockingUserQueries);
+            $this->assertNotEmpty($firstAttemptLocks);
+            $this->assertNotEmpty($secondAttemptLocks);
         }
     }
 
