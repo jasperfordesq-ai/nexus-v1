@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Auth\Oauth;
 
 use App\Services\Auth\SocialAuthService;
+use App\Services\TenantSettingsService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Laravel\TestCase;
 
@@ -27,6 +28,16 @@ class RedirectUrlTest extends TestCase
         // off, every provider is "disabled for this community" and redirectUrl()
         // throws. Enable it for this assertion so we exercise the real state-token
         // build path. env() resolves via $_ENV/$_SERVER/getenv, so set all three.
+        $previousEnvironment = getenv('OAUTH_ENABLED');
+        $previousEnvValue = $_ENV['OAUTH_ENABLED'] ?? null;
+        $previousServerValue = $_SERVER['OAUTH_ENABLED'] ?? null;
+        app(TenantSettingsService::class)->set(
+            $this->testTenantId,
+            'auth.oauth.enabled_providers',
+            json_encode(['google'], JSON_THROW_ON_ERROR),
+            'json'
+        );
+
         putenv('OAUTH_ENABLED=true');
         $_ENV['OAUTH_ENABLED'] = 'true';
         $_SERVER['OAUTH_ENABLED'] = 'true';
@@ -45,8 +56,20 @@ class RedirectUrlTest extends TestCase
             $this->assertNotEmpty($result['state']);
             $this->assertStringContainsString('.', $result['state']); // body.signature
         } finally {
-            putenv('OAUTH_ENABLED');
-            unset($_ENV['OAUTH_ENABLED'], $_SERVER['OAUTH_ENABLED']);
+            $previousEnvironment === false
+                ? putenv('OAUTH_ENABLED')
+                : putenv('OAUTH_ENABLED=' . $previousEnvironment);
+
+            if ($previousEnvValue === null) {
+                unset($_ENV['OAUTH_ENABLED']);
+            } else {
+                $_ENV['OAUTH_ENABLED'] = $previousEnvValue;
+            }
+            if ($previousServerValue === null) {
+                unset($_SERVER['OAUTH_ENABLED']);
+            } else {
+                $_SERVER['OAUTH_ENABLED'] = $previousServerValue;
+            }
         }
     }
 
