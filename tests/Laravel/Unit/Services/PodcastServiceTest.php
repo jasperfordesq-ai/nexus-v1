@@ -15,6 +15,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -125,6 +126,17 @@ class PodcastServiceTest extends TestCase
         return PodcastService::publishEpisode($episode);
     }
 
+    private function artworkPath(string $filename = 'artwork.jpg'): string
+    {
+        $tenant = TenantContext::get();
+        $slug = (string) ($tenant['slug'] ?? 'default');
+        if ((int) ($tenant['id'] ?? 0) === 1 && $slug === '') {
+            $slug = 'master';
+        }
+
+        return "/uploads/tenants/{$slug}/podcasts/{$filename}";
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Show CRUD
     // ──────────────────────────────────────────────────────────────────────────
@@ -151,6 +163,65 @@ class PodcastServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         PodcastService::createShow($this->ownerId, ['title' => '']);
+    }
+
+    public function test_createShow_rejects_external_artwork_tracking_url(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('External podcast artwork');
+
+        $this->createShow(['artwork_url' => 'https://attacker.example/tracker.png']);
+    }
+
+    public function test_legacy_external_artwork_is_suppressed_from_model_and_rss(): void
+    {
+        $show = $this->createPublishedShow();
+        DB::table('podcast_shows')->where('id', $show->id)->update([
+            'artwork_url' => 'https://attacker.example/legacy-tracker.png',
+        ]);
+        $show = PodcastShow::findOrFail($show->id);
+
+        $this->assertNull($show->artwork_url);
+        $this->assertStringNotContainsString('attacker.example', PodcastService::buildRss($show));
+    }
+
+    public function test_artwork_paths_are_restricted_to_safe_current_tenant_podcast_uploads(): void
+    {
+        $invalidPaths = [
+            '/uploads/tenants/another-tenant/podcasts/art.jpg',
+            $this->artworkPath('../art.jpg'),
+            $this->artworkPath('%2e%2e%2fart.jpg'),
+            $this->artworkPath('folder\\art.jpg'),
+            '/storage/podcasts/art.jpg',
+        ];
+
+        foreach ($invalidPaths as $path) {
+            try {
+                $this->createShow([
+                    'title' => 'Invalid Artwork ' . md5($path),
+                    'artwork_url' => $path,
+                ]);
+                $this->fail("Expected unsafe artwork path to be rejected: {$path}");
+            } catch (\InvalidArgumentException $e) {
+                $this->assertStringContainsString('External podcast artwork', $e->getMessage());
+            }
+        }
+
+        $show = $this->createShow(['artwork_url' => $this->artworkPath('safe-art.jpg')]);
+        $this->assertSame($this->artworkPath('safe-art.jpg'), $show->artwork_url);
+    }
+
+    public function test_legacy_cross_tenant_show_and_episode_artwork_is_suppressed_by_models(): void
+    {
+        $show = $this->createShow();
+        $episode = $this->createEpisode($show);
+        $foreignPath = '/uploads/tenants/foreign/podcasts/tracker.jpg';
+
+        DB::table('podcast_shows')->where('id', $show->id)->update(['artwork_url' => $foreignPath]);
+        DB::table('podcast_episodes')->where('id', $episode->id)->update(['cover_image_url' => $foreignPath]);
+
+        $this->assertNull(PodcastShow::findOrFail($show->id)->artwork_url);
+        $this->assertNull(PodcastEpisode::findOrFail($episode->id)->cover_image_url);
     }
 
     public function test_createShow_generates_unique_slug_on_duplicate_title(): void
@@ -545,7 +616,7 @@ class PodcastServiceTest extends TestCase
             'description' => 'Full description here.',
             'language'    => 'en',
             'owner_email' => 'owner@example.com',
-            'artwork_url' => 'https://example.com/art.jpg',
+            'artwork_url' => $this->artworkPath('art.jpg'),
         ]);
 
         $result = PodcastService::validateFeed($show);
@@ -561,7 +632,7 @@ class PodcastServiceTest extends TestCase
             'description' => 'Description for the show.',
             'language'    => 'en',
             'owner_email' => 'host@example.com',
-            'artwork_url' => 'https://example.com/artwork.jpg',
+            'artwork_url' => $this->artworkPath(),
         ]);
         $this->createPublishedEpisode($show, [
             'title'      => 'Valid Episode',
@@ -612,7 +683,10 @@ class PodcastServiceTest extends TestCase
         $file = UploadedFile::fake()->create('ep.mp3', 512, 'audio/mpeg');
         PodcastService::storeHostedAudio($episode, $file);
 
-        Queue::assertPushed(\App\Jobs\ProcessPodcastEpisodeMedia::class);
+        Queue::assertPushed(
+            \App\Jobs\ProcessPodcastEpisodeMedia::class,
+            fn ($job): bool => $job->afterCommit === true
+        );
     }
 
     public function test_storeHostedAudio_rejects_unsupported_mime_type(): void
@@ -629,8 +703,78 @@ class PodcastServiceTest extends TestCase
         PodcastService::storeHostedAudio($episode, $file);
     }
 
+    public function test_updateEpisode_replaces_hosted_object_without_leaving_old_file(): void
+    {
+        $show = $this->createShow();
+        $episode = $this->createEpisode($show);
+        PodcastService::storeHostedAudio($episode, UploadedFile::fake()->create('old.mp3', 8, 'audio/mpeg'));
+        $oldPath = (string) $episode->audio_storage_path;
+
+        PodcastService::updateEpisode(
+            $episode,
+            ['title' => 'Replacement Audio'],
+            UploadedFile::fake()->create('new.mp3', 8, 'audio/mpeg')
+        );
+
+        Storage::disk('local')->assertMissing($oldPath);
+        Storage::disk('local')->assertExists((string) $episode->audio_storage_path);
+    }
+
+    public function test_updateEpisode_restores_old_media_when_old_object_cannot_be_retired(): void
+    {
+        $show = $this->createShow();
+        $episode = $this->createEpisode($show);
+        PodcastService::storeHostedAudio($episode, UploadedFile::fake()->create('old.mp3', 8, 'audio/mpeg'));
+        $oldPath = (string) $episode->audio_storage_path;
+        Queue::fake();
+        $disk = Mockery::mock(Storage::disk('local'))->makePartial();
+        $disk->shouldReceive('delete')->once()->with($oldPath)->andReturn(false);
+        Storage::shouldReceive('disk')->with('local')->andReturn($disk);
+
+        try {
+            PodcastService::updateEpisode(
+                $episode,
+                ['title' => 'Replacement Audio'],
+                UploadedFile::fake()->create('new.mp3', 8, 'audio/mpeg')
+            );
+            $this->fail('Expected old media cleanup failure');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('storage deletion failed', $e->getMessage());
+        }
+
+        $episode->refresh();
+        $this->assertSame($oldPath, $episode->audio_storage_path);
+        $this->assertTrue($disk->exists($oldPath));
+        Queue::assertNotPushed(\App\Jobs\ProcessPodcastEpisodeMedia::class);
+    }
+
+    public function test_deleteEpisode_commits_durable_cleanup_pointer_with_database_deletion(): void
+    {
+        Queue::fake([\App\Jobs\CleanupPodcastMedia::class]);
+        Storage::fake('local');
+        $show = $this->createShow();
+        $episode = $this->createEpisode($show);
+        $episode->audio_storage_disk = 'local';
+        $episode->audio_storage_path = 'podcasts/cannot-delete.mp3';
+        $episode->save();
+        Storage::disk('local')->put('podcasts/cannot-delete.mp3', 'audio bytes');
+
+        PodcastService::deleteEpisode($episode);
+
+        $this->assertDatabaseMissing('podcast_episodes', ['id' => $episode->id]);
+        Storage::disk('local')->assertExists('podcasts/cannot-delete.mp3');
+        $this->assertDatabaseHas('podcast_media_cleanup_tasks', [
+            'tenant_id' => self::TENANT_ID,
+            'kind' => \App\Services\PodcastMediaCleanupService::KIND_STORAGE,
+            'disk' => 'local',
+            'path' => 'podcasts/cannot-delete.mp3',
+            'reason' => 'episode_deleted',
+            'status' => 'pending',
+        ]);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
-    // reportEpisode / resolveEpisodeReports
+    // reportEpisode / resolveEpisodeReport
     // ──────────────────────────────────────────────────────────────────────────
 
     public function test_reportEpisode_inserts_report_row(): void
@@ -650,31 +794,37 @@ class PodcastServiceTest extends TestCase
         ]);
     }
 
-    public function test_resolveEpisodeReports_closes_open_reports(): void
+    public function test_resolveEpisodeReport_closes_only_selected_report(): void
     {
         $adminId   = $this->insertUser('admin_resolver');
         $show      = $this->createPublishedShow();
         $episode   = $this->createPublishedEpisode($show);
         $reporterId = $this->insertUser('rpt2');
 
-        PodcastService::reportEpisode($episode, $reporterId, 'offensive', null);
+        $first = PodcastService::reportEpisode($episode, $reporterId, 'offensive', null);
+        $secondReporterId = $this->insertUser('rpt3');
+        $second = PodcastService::reportEpisode($episode, $secondReporterId, 'spam', null);
 
-        $result = PodcastService::resolveEpisodeReports($episode, $adminId, 'resolved');
+        $result = PodcastService::resolveEpisodeReport((int) $first['id'], $adminId, 'resolved');
 
-        $this->assertSame(0, $result['open_reports']);
+        $this->assertSame(1, $result['open_reports']);
         $this->assertDatabaseHas('podcast_episode_reports', [
-            'episode_id' => $episode->id,
+            'id' => (int) $first['id'],
             'status'     => 'resolved',
+        ]);
+        $this->assertDatabaseHas('podcast_episode_reports', [
+            'id' => (int) $second['id'],
+            'status' => 'open',
         ]);
     }
 
-    public function test_resolveEpisodeReports_throws_on_invalid_status(): void
+    public function test_resolveEpisodeReport_throws_on_invalid_status(): void
     {
         $show    = $this->createPublishedShow();
         $episode = $this->createPublishedEpisode($show);
 
         $this->expectException(\InvalidArgumentException::class);
-        PodcastService::resolveEpisodeReports($episode, $this->ownerId, 'bogus_status');
+        PodcastService::resolveEpisodeReport(999999, $this->ownerId, 'bogus_status');
     }
 
     // ──────────────────────────────────────────────────────────────────────────

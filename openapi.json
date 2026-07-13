@@ -198,6 +198,904 @@
             }
           }
         }
+      },
+      "PodcastShowInput": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 600
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "artwork_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Platform-owned upload URL only"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "author_name": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "owner_email": {
+            "type": "string",
+            "nullable": true,
+            "format": "email",
+            "maxLength": 320,
+            "description": "Private RSS owner contact exposed only to the creator studio and administrators."
+          },
+          "copyright": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300
+          },
+          "funding_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "explicit": {
+            "type": "boolean",
+            "default": false
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "members",
+              "private"
+            ]
+          }
+        }
+      },
+      "PodcastArtworkUploadResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Tenant-scoped platform upload path",
+                "pattern": "^/(uploads|storage)/"
+              }
+            }
+          }
+        }
+      },
+      "PodcastEpisodeInput": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 600
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "audio_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "description": "HTTPS URL (HTTP is accepted only for localhost in development/testing)"
+          },
+          "audio_mime": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "audio_bytes": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "episode_number": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "season_number": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "explicit": {
+            "type": "boolean",
+            "default": false
+          },
+          "episode_type": {
+            "type": "string",
+            "enum": [
+              "full",
+              "trailer",
+              "bonus"
+            ],
+            "default": "full"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "public",
+              "members",
+              "private"
+            ]
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript_language": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 20
+          },
+          "cover_image_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Platform-owned upload URL only"
+          },
+          "scheduled_for": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "chapters": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "required": [
+                "starts_at_seconds",
+                "title"
+              ],
+              "properties": {
+                "starts_at_seconds": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PodcastChapter": {
+        "type": "object",
+        "required": [
+          "starts_at_seconds",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "starts_at_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          }
+        }
+      },
+      "PodcastEpisode": {
+        "type": "object",
+        "required": [
+          "id",
+          "show_id",
+          "title",
+          "slug",
+          "status",
+          "visibility"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "show_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "audio_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "audio_mime": {
+            "type": "string",
+            "nullable": true
+          },
+          "audio_bytes": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "episode_number": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "season_number": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0
+          },
+          "explicit": {
+            "type": "boolean"
+          },
+          "episode_type": {
+            "type": "string",
+            "enum": [
+              "full",
+              "trailer",
+              "bonus"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "inherit",
+              "public",
+              "members",
+              "private"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "moderation_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "flagged"
+            ]
+          },
+          "media_processing_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "complete",
+              "failed"
+            ]
+          },
+          "media_scan_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "clean",
+              "infected",
+              "scan_unavailable",
+              "not_required"
+            ]
+          },
+          "transcript": {
+            "type": "string",
+            "nullable": true
+          },
+          "transcript_language": {
+            "type": "string",
+            "nullable": true
+          },
+          "cover_image_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduled_for": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "published_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PodcastChapter"
+            }
+          }
+        }
+      },
+      "PodcastShow": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "status",
+          "visibility"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "artwork_url": {
+            "type": "string",
+            "nullable": true
+          },
+          "language": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "nullable": true
+          },
+          "author_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "copyright": {
+            "type": "string",
+            "nullable": true
+          },
+          "funding_url": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "explicit": {
+            "type": "boolean"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "members",
+              "private"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "moderation_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "flagged"
+            ]
+          },
+          "published_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "rss_enabled": {
+            "type": "boolean"
+          },
+          "episodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PodcastEpisode"
+            }
+          }
+        }
+      },
+      "PodcastStudioShow": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PodcastShow"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "owner_email": {
+                "type": "string",
+                "nullable": true,
+                "format": "email"
+              },
+              "moderation_feedback": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "PodcastShowResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/PodcastShow"
+          }
+        }
+      },
+      "PodcastStudioShowResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/PodcastStudioShow"
+          }
+        }
+      },
+      "PodcastEpisodeResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/PodcastEpisode"
+          }
+        }
+      },
+      "PodcastShowCollectionResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PodcastShow"
+            }
+          },
+          "meta": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMeta"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "PodcastStudioCollectionResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PodcastStudioShow"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "PodcastAdminIndexResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "shows",
+              "episodes",
+              "reports",
+              "totals"
+            ],
+            "properties": {
+              "shows": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PodcastStudioShow"
+                }
+              },
+              "episodes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PodcastEpisode"
+                }
+              },
+              "reports": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "totals": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "PodcastConfigResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "PodcastOperationResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "last_page": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "parameters": {
+      "PodcastId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "PodcastShowId": {
+        "name": "showId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "PodcastEpisodeId": {
+        "name": "episodeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "PodcastTenantId": {
+        "name": "tenantId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "PodcastShowSlug": {
+        "name": "showSlug",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      },
+      "PodcastShowReference": {
+        "name": "showReference",
+        "in": "path",
+        "required": true,
+        "description": "Show slug for GET; numeric show ID for PUT and DELETE.",
+        "schema": {
+          "type": "string",
+          "pattern": "^(?:[1-9][0-9]*|[A-Za-z0-9_-]+)$"
+        }
+      },
+      "PodcastEpisodeSlug": {
+        "name": "episodeSlug",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      },
+      "PodcastReportId": {
+        "name": "reportId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "requestBodies": {
+      "PodcastShowInput": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PodcastShowInput"
+            }
+          }
+        }
+      },
+      "PodcastEpisodeInput": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PodcastEpisodeInput"
+            }
+          },
+          "multipart/form-data": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/PodcastEpisodeInput"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "audio": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "PodcastArtworkUpload": {
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "image"
+              ],
+              "properties": {
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PodcastModerationInput": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "action"
+              ],
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "approve",
+                    "reject",
+                    "flag"
+                  ]
+                },
+                "notes": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -24026,6 +24924,1262 @@
           "503": {"description": "Rollout or schema unavailable"}
         },
         "x-controller-action": "App\\Http\\Controllers\\Api\\EventRecurrenceDefinitionBlueprintController@commit"
+      }
+    },
+    "/api/v2/podcasts": {
+      "get": {
+        "summary": "Browse member-visible podcast shows",
+        "tags": [
+          "Podcasts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated podcast shows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastShowCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a podcast show",
+        "tags": [
+          "Podcasts",
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastShowInput"
+        },
+        "responses": {
+          "201": {
+            "description": "Show created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioShowResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Podcast authoring unavailable"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/mine": {
+      "get": {
+        "summary": "List shows owned by the authenticated creator",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Creator shows and capabilities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioCollectionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showReference}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TenantId"
+        },
+        {
+          "$ref": "#/components/parameters/PodcastShowReference"
+        }
+      ],
+      "get": {
+        "summary": "Get a member-visible podcast show",
+        "description": "The show reference is a slug for this read operation.",
+        "tags": [
+          "Podcasts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Podcast show with visible episodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastShowResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Show not found or not visible"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an owned podcast show",
+        "description": "The show reference is the numeric show ID for this write operation.",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastShowInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Show updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioShowResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an owned podcast show",
+        "description": "The show reference is the numeric show ID for this write operation.",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "responses": {
+          "200": {
+            "description": "Show deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{id}/artwork": {
+      "post": {
+        "summary": "Upload platform-hosted artwork for an owned podcast show",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastArtworkUpload"
+        },
+        "responses": {
+          "200": {
+            "description": "Artwork uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastArtworkUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          },
+          "422": {
+            "description": "Invalid or unsupported image"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{id}/publish": {
+      "post": {
+        "summary": "Publish or submit an owned show for moderation",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Show publication state updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioShowResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{id}/archive": {
+      "post": {
+        "summary": "Archive an owned podcast show",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Show archived",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioShowResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{id}/stats": {
+      "get": {
+        "summary": "Get privacy-preserving listen analytics for an owned show",
+        "tags": [
+          "Podcast Studio",
+          "Analytics"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Show listen statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{id}/validate-feed": {
+      "get": {
+        "summary": "Validate an owned show's RSS readiness",
+        "tags": [
+          "Podcast Studio",
+          "Podcasts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feed validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/episodes": {
+      "post": {
+        "summary": "Create an episode for an owned show",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastEpisodeInput"
+        },
+        "responses": {
+          "201": {
+            "description": "Episode created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not owned"
+          },
+          "422": {
+            "description": "Validation or media error"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/episodes/{episodeId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TenantId"
+        },
+        {
+          "$ref": "#/components/parameters/PodcastShowId"
+        },
+        {
+          "$ref": "#/components/parameters/PodcastEpisodeId"
+        }
+      ],
+      "put": {
+        "summary": "Update an owned podcast episode",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastEpisodeInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Episode updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not owned"
+          },
+          "422": {
+            "description": "Validation or media error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an owned podcast episode",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "responses": {
+          "200": {
+            "description": "Episode deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/episodes/{episodeId}/cover": {
+      "post": {
+        "summary": "Upload a platform-hosted cover image for an owned podcast episode",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastArtworkUpload"
+        },
+        "responses": {
+          "200": {
+            "description": "Episode cover uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastArtworkUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Episode not found or not owned"
+          },
+          "422": {
+            "description": "Invalid or unsupported image"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/episodes/{episodeId}/publish": {
+      "post": {
+        "summary": "Publish or submit an episode for moderation",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Episode publication state updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not owned"
+          },
+          "409": {
+            "description": "Hosted media is not ready"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/episodes/{episodeId}/archive": {
+      "post": {
+        "summary": "Archive an owned podcast episode",
+        "tags": [
+          "Podcast Studio"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Episode archived",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showId}/subscribe": {
+      "post": {
+        "summary": "Toggle subscription to a visible podcast show",
+        "tags": [
+          "Podcasts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription state updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found or not visible"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/episodes/{episodeId}/reaction": {
+      "post": {
+        "summary": "Toggle a reaction on a visible episode",
+        "tags": [
+          "Podcasts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reaction state updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not visible"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/episodes/{episodeId}/report": {
+      "post": {
+        "summary": "Report a visible podcast episode",
+        "tags": [
+          "Podcasts",
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reason"
+                ],
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "details": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not visible"
+          },
+          "409": {
+            "description": "Episode already reported by this member"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/episodes/{episodeId}/listen": {
+      "post": {
+        "summary": "Record a privacy-preserving podcast listen milestone",
+        "tags": [
+          "Podcasts",
+          "Analytics"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "maxLength": 191
+                  },
+                  "listened_seconds": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "completed": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Listen milestone accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found or not publicly listenable"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/feed/{tenantId}/{showSlug}.xml": {
+      "get": {
+        "summary": "Get a public, identity-free RSS feed for a tenant show",
+        "tags": [
+          "Podcast Distribution"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PodcastTenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowSlug"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0 podcast feed",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed unavailable or show not public"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showSlug}/feed.xml": {
+      "get": {
+        "summary": "Get a public, identity-free RSS feed in the resolved tenant",
+        "tags": [
+          "Podcast Distribution"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowSlug"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0 podcast feed",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed unavailable or show not public"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/media/{tenantId}/{episodeId}/audio": {
+      "get": {
+        "summary": "Stream public audio or capability-signed restricted audio",
+        "tags": [
+          "Podcast Distribution"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PodcastTenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "signature",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete audio response or cloud redirect"
+          },
+          "206": {
+            "description": "Partial audio response"
+          },
+          "404": {
+            "description": "Episode unavailable, media unsafe, or signature invalid"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt": {
+      "get": {
+        "summary": "Get the transcript for a public episode",
+        "tags": [
+          "Podcast Distribution"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PodcastTenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plain-text transcript",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transcript unavailable or episode not public"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/chapters/{tenantId}/{episodeId}.json": {
+      "get": {
+        "summary": "Get Podcast Namespace chapters for a public episode",
+        "tags": [
+          "Podcast Distribution"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PodcastTenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Podcast Namespace chapter document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "version",
+                    "chapters"
+                  ],
+                  "properties": {
+                    "version": {
+                      "type": "string"
+                    },
+                    "chapters": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PodcastChapter"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Chapters unavailable or episode not public"
+          }
+        }
+      }
+    },
+    "/api/v2/podcasts/{showSlug}/{episodeSlug}": {
+      "get": {
+        "summary": "Get a member-visible podcast episode",
+        "tags": [
+          "Podcasts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastShowSlug"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastEpisodeSlug"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Podcast episode",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Episode not found or not visible"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/config/podcasts": {
+      "get": {
+        "summary": "Get podcast configuration",
+        "tags": [
+          "Podcast Administration"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Podcast configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastConfigResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/config/podcasts/bulk": {
+      "put": {
+        "summary": "Update podcast configuration",
+        "tags": [
+          "Podcast Administration"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Podcast configuration updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastConfigResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          },
+          "422": {
+            "description": "Invalid configuration"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts": {
+      "get": {
+        "summary": "Get podcast moderation, reports, analytics, and readiness queues",
+        "tags": [
+          "Podcast Administration"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Podcast administration dashboard",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastAdminIndexResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts/shows/{id}/moderate": {
+      "post": {
+        "summary": "Moderate a podcast show",
+        "tags": [
+          "Podcast Administration",
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastModerationInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Show moderated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastStudioShowResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts/shows/{id}/validate-feed": {
+      "get": {
+        "summary": "Validate a show's RSS feed as an administrator",
+        "tags": [
+          "Podcast Administration"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feed validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Show not found"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts/episodes/{id}/moderate": {
+      "post": {
+        "summary": "Moderate a podcast episode",
+        "tags": [
+          "Podcast Administration",
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastId"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/PodcastModerationInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Episode moderated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastEpisodeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Episode not found"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts/reports/{reportId}/resolve": {
+      "post": {
+        "summary": "Resolve one podcast episode report",
+        "tags": [
+          "Podcast Administration",
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          },
+          {
+            "$ref": "#/components/parameters/PodcastReportId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "resolved",
+                      "dismissed",
+                      "escalated"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/api/v2/admin/podcasts/storage/verify": {
+      "post": {
+        "summary": "Verify the configured podcast media storage",
+        "tags": [
+          "Podcast Administration"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TenantId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Storage verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PodcastOperationResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          }
+        }
       }
     }
   }

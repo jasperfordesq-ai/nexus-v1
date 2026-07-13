@@ -87,12 +87,6 @@ class AnonymousMemberIdentityBoundaryTest extends TestCase
             'podcasts index' => ['/v2/podcasts'],
             'podcast show' => ['/v2/podcasts/example-show'],
             'podcast episode' => ['/v2/podcasts/example-show/example-episode'],
-            'podcast rss' => ['/v2/podcasts/example-show/feed.xml'],
-            'tenant podcast rss' => ['/v2/podcasts/feed/2/example-show.xml'],
-            'podcast audio' => ['/v2/podcasts/media/2/1/audio'],
-            'podcast transcript' => ['/v2/podcasts/transcripts/2/1.txt'],
-            'podcast chapters' => ['/v2/podcasts/chapters/2/1.json'],
-
             'marketplace listings' => ['/v2/marketplace/listings'],
             'marketplace nearby' => ['/v2/marketplace/listings/nearby'],
             'marketplace featured' => ['/v2/marketplace/listings/featured'],
@@ -112,6 +106,26 @@ class AnonymousMemberIdentityBoundaryTest extends TestCase
             'municipality surveys' => ['/v2/caring-community/surveys'],
             'municipality survey detail' => ['/v2/caring-community/surveys/1'],
         ];
+    }
+
+    public function test_identity_free_podcast_distribution_routes_reach_resource_authorization_anonymously(): void
+    {
+        $endpoints = [
+            '/v2/podcasts/example-show/feed.xml',
+            '/v2/podcasts/feed/2/example-show.xml',
+            '/v2/podcasts/media/2/999999/audio',
+            '/v2/podcasts/transcripts/2/999999.txt',
+            '/v2/podcasts/chapters/2/999999.json',
+        ];
+
+        foreach ($endpoints as $endpoint) {
+            $response = $this->apiGet($endpoint);
+
+            $this->assertNotSame(401, $response->getStatusCode(), $endpoint . ' must use visibility/signature authorization rather than member authentication.');
+            $this->assertStringNotContainsString('owner_user_id', $response->getContent());
+            $this->assertStringNotContainsString('author_user_id', $response->getContent());
+            $this->assertStringNotContainsString('owner_email', $response->getContent());
+        }
     }
 
     public function test_public_club_directory_omits_contact_email(): void

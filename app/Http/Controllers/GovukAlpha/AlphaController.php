@@ -7316,7 +7316,13 @@ class AlphaController extends Controller
         if (!in_array($podcastSort, $allowedSorts, true)) {
             $podcastSort = 'newest';
         }
-        $browseFilters = ['per_page' => 30, 'sort' => $podcastSort];
+        $podcastPage = max(1, (int) $request->query('page', 1));
+        $browseFilters = [
+            'page' => $podcastPage,
+            'per_page' => 30,
+            'sort' => $podcastSort,
+            'include_member_only' => true,
+        ];
         if ($podcastQuery !== '') {
             $browseFilters['search'] = $podcastQuery;
         }
@@ -7325,7 +7331,16 @@ class AlphaController extends Controller
         // own distinct list reaches the query.
         $podcastCategories = [];
         try {
-            $podcastCategories = \App\Services\PodcastService::getDistinctCategories();
+            $podcastCategories = \App\Models\PodcastShow::query()
+                ->published()
+                ->whereIn('visibility', ['public', 'members'])
+                ->whereNotNull('category')
+                ->where('category', '!=', '')
+                ->distinct()
+                ->orderBy('category')
+                ->pluck('category')
+                ->map(static fn ($category): string => (string) $category)
+                ->all();
         } catch (\Throwable $e) {
             report($e);
         }
@@ -7338,8 +7353,14 @@ class AlphaController extends Controller
         }
 
         $items = [];
+        $podcastTotal = 0;
+        $podcastPerPage = 30;
         try {
-            $items = \App\Services\PodcastService::browse($browseFilters)['items'] ?? [];
+            $browseResult = \App\Services\PodcastService::browse($browseFilters);
+            $items = $browseResult['items'] ?? [];
+            $podcastTotal = (int) ($browseResult['total'] ?? 0);
+            $podcastPage = (int) ($browseResult['page'] ?? $podcastPage);
+            $podcastPerPage = (int) ($browseResult['per_page'] ?? $podcastPerPage);
             $items = array_map(static fn ($s) => is_array($s) ? $s : $s->toArray(), $items);
         } catch (\Throwable $e) {
             report($e);
@@ -7354,6 +7375,10 @@ class AlphaController extends Controller
             'podcastSort' => $podcastSort,
             'podcastCategory' => $podcastCategory,
             'podcastCategories' => is_array($podcastCategories) ? $podcastCategories : [],
+            'podcastPage' => $podcastPage,
+            'podcastTotal' => $podcastTotal,
+            'podcastPerPage' => $podcastPerPage,
+            'canAccessPodcastStudio' => $this->commerceCanAuthorPodcasts(),
         ]);
     }
 
@@ -7361,33 +7386,45 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('podcasts'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
         $show = null;
+        $showData = [];
         $episodes = [];
         $isSubscribed = false;
+        $isAdmin = $this->commercePodcastViewerIsAdmin($userId);
         try {
             $show = \App\Services\PodcastService::findShowById($id);
             // Defence in depth: never surface another tenant's show by id.
             if ($show !== null && (int) $show->tenant_id !== TenantContext::getId()) {
                 $show = null;
             }
+            if ($show !== null && !\App\Services\PodcastService::canViewShow($show, $userId, $isAdmin)) {
+                $show = null;
+            }
             if ($show !== null) {
                 // Check subscription status for the current member.
                 $isSubscribed = \Illuminate\Support\Facades\DB::table('podcast_show_subscriptions')
+                    ->where('tenant_id', TenantContext::getId())
                     ->where('show_id', $show->id)
-                    ->where('user_id', $this->currentUserId())
+                    ->where('user_id', $userId)
                     ->exists();
 
                 // Only published, approved, released episodes — findShowById does not
                 // scope the episodes relation, so the raw relation would include
                 // drafts/pending uploads.
-                foreach ($show->episodes()->published()->get() as $ep) {
+                foreach ($show->episodes()->orderByDesc('published_at')->orderByDesc('id')->get() as $ep) {
+                    $ep->setRelation('show', $show);
+                    if (!\App\Services\PodcastService::canViewEpisode($ep, $show, $userId, $isAdmin)) {
+                        continue;
+                    }
                     $url = '';
                     try {
-                        $url = \App\Services\PodcastService::episodeAudioUrl($ep, true);
+                        \App\Services\PodcastService::prepareEpisodeForResponse($ep, $userId, $isAdmin);
+                        $url = (string) ($ep->audio_url ?? '');
                     } catch (\Throwable $e) {
                         $url = '';
                     }
@@ -7403,6 +7440,24 @@ class AlphaController extends Controller
                         'audio_url' => $url,
                     ];
                 }
+
+                $rssEnabled = (bool) \App\Services\PodcastConfigurationService::get(
+                    \App\Services\PodcastConfigurationService::CONFIG_ENABLE_RSS_FEED
+                ) && $show->status === 'published'
+                    && $show->moderation_status === 'approved'
+                    && $show->visibility === 'public';
+                $showData = [
+                    'id' => (int) $show->id,
+                    'title' => (string) ($show->title ?? ''),
+                    'description' => (string) ($show->description ?? ''),
+                    'artwork_url' => (string) ($show->artwork_url ?? ''),
+                    'owner' => $show->owner ? ['name' => (string) ($show->owner->name ?? '')] : null,
+                    'rss_enabled' => $rssEnabled,
+                    'rss_url' => $rssEnabled
+                        ? rtrim((string) config('app.url'), '/') . '/api/v2/podcasts/feed/'
+                            . TenantContext::getId() . '/' . rawurlencode((string) $show->slug) . '.xml'
+                        : '',
+                ];
             }
         } catch (\Throwable $e) {
             report($e);
@@ -7413,10 +7468,10 @@ class AlphaController extends Controller
             'title' => ($show->title ?? '') ?: __('govuk_alpha.podcasts.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
-            'show' => $show->toArray(),
+            'show' => $showData,
             'episodes' => $episodes,
             'isSubscribed' => $isSubscribed,
-            'currentUserId' => $this->currentUserId(),
+            'currentUserId' => $userId,
         ]);
     }
 
@@ -15610,11 +15665,18 @@ class AlphaController extends Controller
         $status = 'subscribe-failed';
         try {
             $show = \App\Services\PodcastService::findShowById($id);
-            if ($show !== null && (int) $show->tenant_id === TenantContext::getId()) {
-                $subscribed = \App\Services\PodcastService::toggleSubscription($show, $userId);
-                $status = $subscribed ? 'subscribed' : 'unsubscribed';
+            if ($show !== null && (int) $show->tenant_id !== TenantContext::getId()) {
+                $show = null;
             }
+            $isAdmin = $this->commercePodcastViewerIsAdmin($userId);
+            abort_if($show === null || !\App\Services\PodcastService::canViewShow($show, $userId, $isAdmin), 404);
+
+            $subscribed = \App\Services\PodcastService::toggleSubscription($show, $userId);
+            $status = $subscribed ? 'subscribed' : 'unsubscribed';
         } catch (\Throwable $e) {
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                throw $e;
+            }
             report($e);
         }
 
@@ -15627,23 +15689,30 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('podcasts'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
         $show = null;
         $episode = null;
+        $isAdmin = $this->commercePodcastViewerIsAdmin($userId);
         try {
             $show = \App\Services\PodcastService::findShowById($showId);
             if ($show !== null && (int) $show->tenant_id !== TenantContext::getId()) {
                 $show = null;
             }
+            if ($show !== null && !\App\Services\PodcastService::canViewShow($show, $userId, $isAdmin)) {
+                $show = null;
+            }
             if ($show !== null) {
-                $ep = $show->episodes()->published()->where('id', $id)->first();
-                if ($ep !== null) {
+                $ep = $show->episodes()->where('id', $id)->first();
+                if ($ep !== null && \App\Services\PodcastService::canViewEpisode($ep, $show, $userId, $isAdmin)) {
+                    $ep->setRelation('show', $show);
                     $url = '';
                     try {
-                        $url = \App\Services\PodcastService::episodeAudioUrl($ep, true);
+                        \App\Services\PodcastService::prepareEpisodeForResponse($ep, $userId, $isAdmin);
+                        $url = (string) ($ep->audio_url ?? '');
                     } catch (\Throwable $e) {
                         $url = '';
                     }
@@ -15652,7 +15721,9 @@ class AlphaController extends Controller
                         'title' => (string) ($ep->title ?? ''),
                         'description' => (string) ($ep->description ?? ''),
                         'audio_url' => $url,
-                        'transcript' => (string) ($ep->transcript ?? ''),
+                        'transcript' => \App\Services\PodcastConfigurationService::get(
+                            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS
+                        ) ? (string) ($ep->transcript ?? '') : '',
                     ];
                 }
             }
@@ -15665,7 +15736,10 @@ class AlphaController extends Controller
             'title' => ($episode['title'] ?: ($show->title ?? '')) ?: __('govuk_alpha.podcasts.episodes_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
-            'show' => $show->toArray(),
+            'show' => [
+                'id' => (int) $show->id,
+                'title' => (string) ($show->title ?? ''),
+            ],
             'episode' => $episode,
         ]);
     }

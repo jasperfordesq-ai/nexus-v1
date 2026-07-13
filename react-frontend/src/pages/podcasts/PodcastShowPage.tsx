@@ -10,6 +10,8 @@ import { Avatar, Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { API_BASE } from '@/lib/api';
+import { resolveThumbnailUrl } from '@/lib/helpers';
+import { safePodcastArtworkUrl } from '@/lib/podcasts/artwork';
 import { podcastsApi, type PodcastShow } from '@/lib/api/podcasts';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
@@ -26,15 +28,23 @@ export default function PodcastShowPage() {
   const [show, setShow] = useState<PodcastShow | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   usePageTitle(show?.title ?? t('title'));
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError(null);
     podcastsApi.show(showSlug)
       .then((res) => {
-        if (!cancelled) setShow(res.success && res.data ? res.data : null);
+        if (cancelled) return;
+        const data = res.success && res.data ? res.data : null;
+        setShow(data);
+        if (!data && res.code && res.code !== 'RESOURCE_NOT_FOUND' && res.code !== 'NOT_FOUND') {
+          setLoadError(res.error || t('show.load_failed'));
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -43,7 +53,7 @@ export default function PodcastShowPage() {
     return () => {
       cancelled = true;
     };
-  }, [showSlug]);
+  }, [showSlug, retryKey, t]);
 
   const isOwner = user?.id && show?.owner_user_id === user.id;
   const feedUrl = tenant?.id
@@ -80,7 +90,13 @@ export default function PodcastShowPage() {
   if (!show) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <p className="text-lg font-medium">{t('show.not_found')}</p>
+        <p className="text-lg font-medium">{loadError ? t('show.load_failed') : t('show.not_found')}</p>
+        {loadError && <p className="mt-1 text-sm text-muted" role="alert">{loadError}</p>}
+        {loadError && (
+          <Button className="mt-4" variant="secondary" onPress={() => setRetryKey((value) => value + 1)}>
+            {t('show.retry')}
+          </Button>
+        )}
         <Button as={Link} to={tenantPath('/podcasts')} className="mt-4" variant="tertiary">
           {t('actions.back_to_podcasts')}
         </Button>
@@ -90,12 +106,21 @@ export default function PodcastShowPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} aria-hidden="true" />}>
+      <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft className="rtl:rotate-180" size={16} aria-hidden="true" />}>
         {t('actions.back_to_podcasts')}
       </Button>
 
       <section className="mt-5 grid gap-6 md:grid-cols-[12rem_1fr]">
-        <Avatar src={show.artwork_url ?? undefined} name={show.title} radius="md" className="h-48 w-48" />
+        <Avatar
+          src={safePodcastArtworkUrl(show.artwork_url) ?? undefined}
+          name={show.title}
+          radius="md"
+          className="h-48 w-48"
+          imgProps={safePodcastArtworkUrl(show.artwork_url) ? {
+            src: resolveThumbnailUrl(safePodcastArtworkUrl(show.artwork_url), { width: 512, height: 512 }),
+            referrerPolicy: 'no-referrer',
+          } : undefined}
+        />
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`, { defaultValue: show.visibility })}</Chip>

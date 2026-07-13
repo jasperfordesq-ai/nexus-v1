@@ -8,6 +8,8 @@
     "close": "Dún"
   },
   "browse": {
+    "load_failed": "Níorbh fhéidir na podchraoltaí a lódáil",
+    "retry": "Bain triail eile as",
     "search_placeholder": "Léiríonn cuardaigh",
     "category_label": "Catagóir",
     "all_categories": "Gach catagóir",
@@ -24,6 +26,8 @@
     "load_more": "Luchtaigh níos mó"
   },
   "show": {
+    "load_failed": "Níorbh fhéidir an podchraoladh seo a lódáil",
+    "retry": "Bain triail eile as",
     "not_found": "Níor aimsíodh seó podchraolta",
     "no_summary": "Gan achoimre fós.",
     "byline": "Hosted by {{name}}",
@@ -48,6 +52,8 @@
     "follower_count_two": "{{count}} leantóir"
   },
   "episode": {
+    "load_failed": "Níorbh fhéidir an eipeasóid seo a lódáil",
+    "retry": "Bain triail eile as",
     "title": "Eipeasóid podchraolta",
     "not_found": "Níor aimsíodh eipeasóid podchraolta",
     "no_summary": "Gan achoimre fós.",
@@ -86,6 +92,7 @@
     "reactions_count_two": "{{count}} reactions"
   },
   "player": {
+    "volume": "Airde fuaime",
     "unsupported": "Ní thacaíonn do bhrabhsálaí leis an seinnteoir fuaime.",
     "load_error": "Níorbh fhéidir fuaim na heachtra seo a lódáil. D'fhéadfadh sé nach bhfuil sé ar fáil nó fós á phróiseáil.",
     "duration_unknown": "Fad anaithnid",
@@ -109,6 +116,18 @@
     "key_space": "Spás"
   },
   "studio": {
+    "show_updated": "Nuashonraíodh an podchraoladh.",
+    "episode_updated": "Nuashonraíodh an eipeasóid.",
+    "edit_show": "Cuir an podchraoladh in eagar",
+    "edit_episode": "Cuir an eipeasóid in eagar",
+    "save_changes": "Sábháil na hathruithe",
+    "load_failed": "Níorbh fhéidir do stiúideo podchraolta a lódáil.",
+    "retry_load": "Bain triail eile as",
+    "creation_unavailable": "Ní féidir leat podchraoladh eile a chruthú faoi shocruithe reatha an phobail seo.",
+    "moderation_feedback": "Aiseolas ón modhnóir: {{feedback}}",
+    "artwork_upload_failed": "Sábháladh an podchraoladh, ach níorbh fhéidir an íomhá a uaslódáil.",
+    "cover_upload_failed": "Sábháladh an eipeasóid, ach níorbh fhéidir an íomhá chlúdaigh a uaslódáil.",
+    "audio_https_required": "Úsáid URL fuaime HTTPS. Ní cheadaítear gnáth-HTTP ach i bhforbairt áitiúil.",
     "title": "Podcast Studio",
     "subtitle": "Cruthaigh seónna faoi cheannas na mball, cuir eipeasóidí leis, agus foilsigh iad sa leabharlann podchraoltaí pobail.",
     "create_show": "Cruthaigh seó",
@@ -214,6 +233,14 @@
     "chapter_format_warning_two": "Níl stampa ama ar línte caibidle {{count}} agus tosóidh siad ag 0:00."
   },
   "fields": {
+    "artwork_file": "Íomhá an phodchraolta",
+    "cover_image_file": "Íomhá chlúdaigh na heipeasóide",
+    "language": "Teanga",
+    "episode_number": "Uimhir na heipeasóide",
+    "season_number": "Uimhir an tséasúir",
+    "cover_image_url": "URL íomhá na heipeasóide",
+    "transcript_language": "Teanga na tras-scríbhinne",
+    "explicit_episode": "Marcáil an eipeasóid seo mar ábhar follasach",
     "show": "Show",
     "show_title": "Taispeáin teideal",
     "episode_title": "Teideal na heachtra",

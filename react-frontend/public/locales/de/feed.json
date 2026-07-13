@@ -376,6 +376,10 @@
     "read_more_about": "Lesen Sie mehr über {{title}}",
     "detail_course": "Kurs ansehen",
     "type_course": "Kurs",
+    "detail_podcast_show": "Podcast ansehen",
+    "detail_podcast_episode": "Folge anhören",
+    "type_podcast_show": "Podcast",
+    "type_podcast_episode": "Podcastfolge",
     "type_volunteer_hours": "Freiwilligenstunden",
     "volunteer_hours_title": "{{hours}} Stunden ehrenamtlich geleistet"
   },

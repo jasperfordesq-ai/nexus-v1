@@ -12,6 +12,8 @@ use App\Models\Event;
 use App\Models\Group;
 use App\Models\Listing;
 use App\Models\MarketplaceListing;
+use App\Models\PodcastEpisode;
+use App\Models\PodcastShow;
 use App\Models\User;
 use App\Support\Events\EventSearchVisibility;
 use Illuminate\Database\Eloquent\Builder;
@@ -837,9 +839,9 @@ class SearchService
      * Unified search across multiple content types.
      *
      * @param string      $term  Search query.
-     * @param string|null $type  Filter: 'users', 'listings', 'events', 'groups', or null for all.
+     * @param string|null $type  Filter: 'users', 'listings', 'events', 'groups', 'podcasts', or null for all.
      * @param int         $limit Max results per type.
-     * @return array{users?: array, listings?: array, events?: array, groups?: array}
+     * @return array{users?: array, listings?: array, events?: array, groups?: array, podcasts?: array}
      */
     public function search(string $term, ?string $type = null, int $limit = 10): array
     {
@@ -1184,6 +1186,10 @@ class SearchService
             }
         }
 
+        if (($type === 'all' || $type === 'podcasts') && TenantContext::hasFeature('podcasts')) {
+            $allItems = array_merge($allItems, $this->searchPublishedPodcasts($term, $limit, $sort));
+        }
+
         // When searching all types, each type already has its own $limit cap.
         // Do NOT globally slice — that biases toward whichever type is first
         // (listings) and silently drops users/events/groups from the response.
@@ -1299,6 +1305,10 @@ class SearchService
             }
         }
 
+        if (($type === 'all' || $type === 'podcasts') && TenantContext::hasFeature('podcasts')) {
+            $allItems = array_merge($allItems, $this->searchPublishedPodcasts($term, $limit, $sort));
+        }
+
         // Same as Meilisearch path — do NOT globally slice. Each type has its
         // own $limit cap, and the frontend handles per-tab display limits.
         return [
@@ -1308,6 +1318,92 @@ class SearchService
             'total'    => count($allItems),
             'query'    => $term,
         ];
+    }
+
+    /**
+     * Search the member-visible podcast projection without exposing creator or
+     * moderation metadata. Podcast indexes are intentionally queried through
+     * the tenant-scoped database until they have a dedicated Meilisearch index.
+     *
+     * @return list<array<string,mixed>>
+     */
+    private function searchPublishedPodcasts(string $term, int $limit, string $sort): array
+    {
+        $like = '%' . $term . '%';
+        $items = [];
+
+        $shows = PodcastShow::query()
+            ->published()
+            ->whereIn('visibility', ['public', 'members'])
+            ->where(function (Builder $query) use ($like): void {
+                $query->where('title', 'LIKE', $like)
+                    ->orWhere('summary', 'LIKE', $like)
+                    ->orWhere('description', 'LIKE', $like)
+                    ->orWhere('category', 'LIKE', $like);
+            });
+        $this->applySortOrder($shows, $sort, 'published_at');
+
+        foreach ($shows->limit($limit)->get([
+            'id', 'slug', 'title', 'summary', 'artwork_url', 'category', 'published_at', 'created_at',
+        ]) as $show) {
+            $items[] = [
+                'id' => (int) $show->id,
+                'type' => 'podcast_show',
+                'podcast_kind' => 'show',
+                'show_slug' => (string) $show->slug,
+                'title' => (string) $show->title,
+                'summary' => $show->summary,
+                'artwork_url' => $show->artwork_url,
+                'category' => $show->category,
+                'published_at' => $show->published_at,
+                'created_at' => $show->created_at,
+            ];
+        }
+
+        $episodes = PodcastEpisode::query()
+            ->published()
+            ->distributionReady()
+            ->whereIn('visibility', ['inherit', 'public', 'members'])
+            ->whereHas('show', function (Builder $query): void {
+                $query->published()->whereIn('visibility', ['public', 'members']);
+            })
+            ->with(['show:id,slug,title,artwork_url'])
+            ->where(function (Builder $query) use ($like): void {
+                $query->where('title', 'LIKE', $like)
+                    ->orWhere('summary', 'LIKE', $like)
+                    ->orWhere('description', 'LIKE', $like);
+
+                if (PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS)) {
+                    $query->orWhere('transcript', 'LIKE', $like);
+                }
+            });
+        $this->applySortOrder($episodes, $sort, 'published_at');
+
+        foreach ($episodes->limit($limit)->get([
+            'id', 'show_id', 'slug', 'title', 'summary', 'cover_image_url', 'duration_seconds',
+            'published_at', 'created_at',
+        ]) as $episode) {
+            if (!$episode->show) {
+                continue;
+            }
+
+            $items[] = [
+                'id' => (int) $episode->id,
+                'type' => 'podcast_episode',
+                'podcast_kind' => 'episode',
+                'show_slug' => (string) $episode->show->slug,
+                'show_title' => (string) $episode->show->title,
+                'episode_slug' => (string) $episode->slug,
+                'title' => (string) $episode->title,
+                'summary' => $episode->summary,
+                'artwork_url' => $episode->cover_image_url ?: $episode->show->artwork_url,
+                'duration_seconds' => $episode->duration_seconds,
+                'published_at' => $episode->published_at,
+                'created_at' => $episode->created_at,
+            ];
+        }
+
+        return $items;
     }
 
     // =========================================================================

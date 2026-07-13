@@ -73,6 +73,25 @@
     "total_count": "{{count}}合計"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "ポッドキャストのモデレーションを検索",
+      "placeholder": "ポッドキャスト、エピソード、作成者、報告を検索"
+    },
+    "review": {
+      "show_title": "ポッドキャストを審査",
+      "episode_title": "エピソードを審査",
+      "visibility": "公開範囲",
+      "language": "言語",
+      "category": "カテゴリー",
+      "media_scan": "メディアスキャン",
+      "media_processing": "メディア処理",
+      "transcript": "文字起こし",
+      "chapters": "チャプター",
+      "report_history": "報告履歴",
+      "notes": "モデレーターのメモ",
+      "notes_hint": "作成者が必要な修正を行えるよう、判断理由を説明してください。",
+      "audio_unsupported": "このブラウザーでは音声を再生できません。"
+    },
     "title": "Podcasts",
     "description": "テナントのモデレーションのために保持されているコンテンツを含む、コミュニティの番組やエピソードを確認します。",
     "load_failed": "ポッドキャスト モデレーションを読み込めませんでした。",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "確認してモデレート",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "クライアントの内訳",
       "retention": "Retention",
       "reports": "レポートを開く"
+    },
+    "review_values": {
+      "visibility": { "public": "公開", "members": "メンバー", "private": "非公開", "inherit": "番組から継承" },
+      "media_scan": { "pending": "スキャン待ち", "clean": "問題なし", "infected": "感染", "scan_unavailable": "スキャナーを利用できません", "not_required": "不要" },
+      "media_processing": { "pending": "保留中", "ready_for_processing": "処理準備完了", "complete": "完了", "failed": "失敗" },
+      "report_status": { "open": "未対応", "resolved": "解決済み", "dismissed": "却下", "escalated": "エスカレーション済み" }
     },
     "readiness": {
       "moderation": "Moderation",
@@ -212,7 +238,8 @@
       "report_escalated": "報告はエスカレートしました。",
       "feed_valid": "RSSフィードの準備ができました。",
       "feed_invalid": "RSS フィードに {{count}} の問題があります。",
-      "feed_invalid_other": "RSS フィードに {{count}} の問題があります。"
+      "feed_invalid_other": "RSS フィードに {{count}} の問題があります。",
+      "feed_invalid_one": "RSS フィードに {{count}} の問題があります。"
     },
     "bulk": {
       "approve_selected": "選択した項目を承認",
@@ -222,8 +249,11 @@
       "confirm_reject_title": "選択した項目を却下",
       "confirm_reject_message": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。",
       "done_other": "{{count}}件をモデレートしました。",
-      "confirm_reject_message_other": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
+      "done_one": "{{count}}件をモデレートしました。",
+      "confirm_reject_message_other": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。",
+      "confirm_reject_message_one": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
     },
-    "count_other": "{{count}} アイテム"
+    "count_other": "{{count}} アイテム",
+    "count_one": "{{count}} アイテム"
   }
 }

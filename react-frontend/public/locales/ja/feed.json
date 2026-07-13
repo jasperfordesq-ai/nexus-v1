@@ -253,7 +253,9 @@
     "type_tabs_aria": "コンテンツタイプを作成する",
     "compose_post": "投稿を作成する",
     "media_rejected_other": "{{count}}ファイルがスキップされました（タイプが間違っているか、サイズが大きすぎます）",
+    "media_rejected_one": "{{count}}ファイルがスキップされました（種類が正しくないか、サイズが大きすぎます）",
     "media_compression_failed_other": "{{count}}画像の処理に失敗しました",
+    "media_compression_failed_one": "{{count}}画像の処理に失敗しました",
     "group_members_other": "{{count}}人のメンバー"
   },
   "moderation": {
@@ -371,6 +373,10 @@
     "read_more_about": "{{title}} について詳しく読む",
     "detail_course": "コースを見る",
     "type_course": "コース",
+    "detail_podcast_show": "ポッドキャストを見る",
+    "detail_podcast_episode": "エピソードを聴く",
+    "type_podcast_show": "ポッドキャスト",
+    "type_podcast_episode": "ポッドキャストエピソード",
     "type_volunteer_hours": "ボランティア時間",
     "volunteer_hours_title": "{{hours}} 時間のボランティア"
   },

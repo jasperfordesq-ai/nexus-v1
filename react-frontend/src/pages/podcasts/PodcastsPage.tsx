@@ -6,10 +6,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AlphaBadge, Avatar, Button, Card, CardBody, Chip, SearchField, Select, SelectItem, Spinner } from '@/components/ui';
+import { Avatar, Button, Card, CardBody, Chip, SearchField, Select, SelectItem, Spinner } from '@/components/ui';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { podcastsApi, type PodcastShow } from '@/lib/api/podcasts';
+import { resolveThumbnailUrl } from '@/lib/helpers';
+import { safePodcastArtworkUrl } from '@/lib/podcasts/artwork';
 import PodcastIcon from 'lucide-react/icons/podcast';
 import Plus from 'lucide-react/icons/plus';
 import Search from 'lucide-react/icons/search';
@@ -19,7 +21,7 @@ type PodcastSort = 'newest' | 'title' | 'episodes' | 'followers';
 const SORT_OPTIONS: PodcastSort[] = ['newest', 'title', 'episodes', 'followers'];
 
 function showArtwork(show: PodcastShow): string | undefined {
-  return show.artwork_url ?? undefined;
+  return safePodcastArtworkUrl(show.artwork_url) ?? undefined;
 }
 
 export default function PodcastsPage() {
@@ -37,6 +39,14 @@ export default function PodcastsPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 350);
+    return () => window.clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     if (tenantLoading) {
@@ -53,12 +63,14 @@ export default function PodcastsPage() {
     }
 
     let cancelled = false;
+    const controller = new AbortController();
     const isFirstPage = page === 1;
     if (isFirstPage) setLoading(true);
     else setLoadingMore(true);
 
+    setLoadError(null);
     podcastsApi
-      .browse({ q: searchTerm || undefined, category: category || undefined, sort, page })
+      .browse({ q: debouncedSearch || undefined, category: category || undefined, sort, page }, { signal: controller.signal })
       .then((res) => {
         if (cancelled) return;
         if (res.success && res.data) {
@@ -76,7 +88,10 @@ export default function PodcastsPage() {
           // When a category filter is active the results are already narrowed,
           // so leave the dropdown intact. Reset on the first page so stale
           // categories from a previous search/sort don't linger.
-          if (!category) {
+          const metaCategories = (res.meta as { categories?: string[] } | undefined)?.categories;
+          if (metaCategories?.length) {
+            setCategoryOptions(Array.from(new Set(metaCategories.filter(Boolean))).sort((a, b) => a.localeCompare(b)));
+          } else if (!category && !debouncedSearch) {
             setCategoryOptions((prev) => {
               const next = new Set(isFirstPage ? [] : prev);
               items.forEach((show) => {
@@ -85,9 +100,18 @@ export default function PodcastsPage() {
               return Array.from(next).sort((a, b) => a.localeCompare(b));
             });
           }
-        } else if (isFirstPage) {
-          setShows([]);
-          setHasMore(false);
+        } else if (res.code !== 'REQUEST_ABORTED' && res.code !== 'ABORTED') {
+          if (isFirstPage) {
+            setShows([]);
+            setHasMore(false);
+          }
+          setLoadError(res.error || t('browse.load_failed'));
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled && !(error instanceof DOMException && error.name === 'AbortError')) {
+          if (isFirstPage) setShows([]);
+          setLoadError(t('browse.load_failed'));
         }
       })
       .finally(() => {
@@ -99,12 +123,13 @@ export default function PodcastsPage() {
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, [tenant?.id, tenantLoading, category, searchTerm, sort, page]);
+  }, [tenant?.id, tenantLoading, category, debouncedSearch, sort, page, retryKey, t]);
 
   useEffect(() => {
     setPage(1);
-  }, [tenant?.id, category, searchTerm, sort]);
+  }, [tenant?.id, category, debouncedSearch, sort]);
 
   const activeFilterCount = useMemo(
     () => [searchTerm.trim(), category].filter(Boolean).length,
@@ -121,10 +146,7 @@ export default function PodcastsPage() {
     <div className="mx-auto max-w-7xl px-4 py-6">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold leading-tight">{t('title')}</h1>
-            <AlphaBadge />
-          </div>
+          <h1 className="text-2xl font-bold leading-tight">{t('title')}</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted">{t('subtitle')}</p>
         </div>
 
@@ -189,6 +211,15 @@ export default function PodcastsPage() {
         <div className="flex justify-center py-16" role="status" aria-busy="true">
           <Spinner size="lg" />
         </div>
+      ) : loadError ? (
+        <div className="py-16 text-center" role="alert">
+          <PodcastIcon size={42} className="mx-auto mb-3 text-danger" aria-hidden="true" />
+          <p className="text-lg font-medium text-foreground">{t('browse.load_failed')}</p>
+          <p className="mt-1 text-sm text-muted">{loadError}</p>
+          <Button className="mt-4" variant="secondary" onPress={() => setRetryKey((value) => value + 1)}>
+            {t('browse.retry')}
+          </Button>
+        </div>
       ) : shows.length === 0 ? (
         <div className="py-16 text-center text-muted">
           <PodcastIcon size={42} className="mx-auto mb-3" aria-hidden="true" />
@@ -207,6 +238,10 @@ export default function PodcastsPage() {
                       name={show.title}
                       radius="md"
                       className="h-16 w-16 shrink-0"
+                      imgProps={showArtwork(show) ? {
+                        src: resolveThumbnailUrl(showArtwork(show), { width: 192, height: 192 }),
+                        referrerPolicy: 'no-referrer',
+                      } : undefined}
                     />
                     <div className="min-w-0">
                       <Link className="text-base font-semibold hover:text-accent" to={tenantPath(`/podcasts/${show.slug}`)}>

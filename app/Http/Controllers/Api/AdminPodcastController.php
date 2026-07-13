@@ -26,8 +26,18 @@ class AdminPodcastController extends BaseApiController
         $episodesPage = $this->queryInt('episodes_page', 1, 1) ?? 1;
         // Default 200 preserves the pre-pagination response shape exactly.
         $perPage = $this->queryInt('per_page', 200, 1, 200) ?? 200;
+        $rawModerationStatus = $this->query('moderation_status');
+        $moderationStatus = is_string($rawModerationStatus) ? trim($rawModerationStatus) : null;
+        $rawSearch = $this->query('q');
+        $search = is_string($rawSearch) ? trim($rawSearch) : null;
 
-        $payload = PodcastService::adminIndex($this->query('moderation_status'), $showsPage, $episodesPage, $perPage);
+        $payload = PodcastService::adminIndex(
+            $moderationStatus,
+            $showsPage,
+            $episodesPage,
+            $perPage,
+            $search
+        );
 
         return $this->respondWithData($payload, [
             'shows_page' => $showsPage,
@@ -55,7 +65,7 @@ class AdminPodcastController extends BaseApiController
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.invalid_moderation_action'), 'action', 422);
         }
 
-        return $this->respondWithData($show);
+        return $this->respondWithData($show->makeVisible(['owner_email', 'moderation_notes', 'moderated_by', 'moderated_at']));
     }
 
     public function moderateEpisode(int $id): JsonResponse
@@ -71,11 +81,16 @@ class AdminPodcastController extends BaseApiController
                 (string) $this->input('action', ''),
                 $this->input('notes')
             );
-        } catch (\InvalidArgumentException) {
+        } catch (\InvalidArgumentException $e) {
+            if (str_contains($e->getMessage(), 'not ready for publishing')) {
+                return $this->respondWithError('MEDIA_NOT_READY', __('api_controllers_2.podcasts.media_not_ready'), null, 409);
+            }
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.invalid_moderation_action'), 'action', 422);
         }
 
-        return $this->respondWithData($episode);
+        PodcastService::prepareEpisodeForResponse($episode, $adminId, true);
+
+        return $this->respondWithData($episode->makeVisible(['moderation_notes', 'moderated_by', 'moderated_at']));
     }
 
     public function validateFeed(int $id): JsonResponse
@@ -108,18 +123,22 @@ class AdminPodcastController extends BaseApiController
         return $this->respondWithData(PodcastService::verifyMediaDisk($disk));
     }
 
-    public function resolveReport(int $episodeId): JsonResponse
+    public function resolveReport(int $reportId): JsonResponse
     {
         $this->ensurePodcastsFeature();
         $adminId = $this->requireAdmin();
-        $episode = $this->findPodcastEpisodeOrFail($episodeId);
 
         try {
-            return $this->respondWithData(PodcastService::resolveEpisodeReports(
-                $episode,
+            $result = PodcastService::resolveEpisodeReport(
+                $reportId,
                 $adminId,
                 (string) $this->input('status', 'resolved')
-            ));
+            );
+            if ($result === null) {
+                return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
+            }
+
+            return $this->respondWithData($result);
         } catch (\InvalidArgumentException) {
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.invalid_report_status'), 'status', 422);
         }

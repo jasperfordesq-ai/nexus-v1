@@ -6,10 +6,13 @@
 
 namespace Tests\Laravel\Unit\Jobs;
 
-use App\Jobs\ProcessPodcastEpisodeMedia;
 use App\Core\TenantContext;
+use App\Jobs\CleanupPodcastMedia;
+use App\Jobs\ProcessPodcastEpisodeMedia;
+use App\Models\PodcastEpisode;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\Laravel\TestCase;
 
@@ -154,7 +157,9 @@ class ProcessPodcastEpisodeMediaTest extends TestCase
     /** Bytes that are not audio (e.g. a renamed binary that fooled the MIME check) → failed/not_audio. */
     public function test_handle_fails_non_audio_content_with_reason(): void
     {
+        Queue::fake([CleanupPodcastMedia::class]);
         $episodeId = $this->insertEpisodeWithStoredAudio(str_repeat("\0", 4096));
+        $path = (string) $this->fetchEpisode($episodeId)->audio_storage_path;
 
         (new ProcessPodcastEpisodeMedia(self::TENANT_ID, $episodeId))->handle();
 
@@ -162,6 +167,42 @@ class ProcessPodcastEpisodeMediaTest extends TestCase
         $this->assertSame('failed', $row->media_processing_status);
         $this->assertSame('not_audio', $row->media_failure_reason);
         $this->assertSame('scan_unavailable', $row->media_scan_status);
+        $this->assertSame('draft', $row->status);
+        $this->assertSame($path, $row->audio_storage_path);
+        $this->assertSame('podcast-hosted://quarantined', $row->audio_url);
+        $this->assertDatabaseHas('podcast_media_cleanup_tasks', [
+            'tenant_id' => self::TENANT_ID,
+            'source_episode_id' => $episodeId,
+            'path' => $path,
+            'reason' => 'content_rejected',
+            'status' => 'pending',
+        ]);
+    }
+
+    /** Malware quarantine is private immediately but retains its deletion pointer. */
+    public function test_malware_quarantine_retains_pointer_until_durable_cleanup_succeeds(): void
+    {
+        Queue::fake([CleanupPodcastMedia::class]);
+        $episodeId = $this->insertEpisodeWithStoredAudio(self::tinyWavBytes());
+        $episode = PodcastEpisode::findOrFail($episodeId);
+        $path = (string) $episode->audio_storage_path;
+
+        $method = new \ReflectionMethod(ProcessPodcastEpisodeMedia::class, 'quarantineRejectedEpisode');
+        $method->invoke(new ProcessPodcastEpisodeMedia(self::TENANT_ID, $episodeId), $episode, 'infected');
+
+        $row = $this->fetchEpisode($episodeId);
+        $this->assertSame('infected', $row->media_scan_status);
+        $this->assertSame('failed', $row->media_processing_status);
+        $this->assertSame('draft', $row->status);
+        $this->assertSame('podcast-hosted://quarantined', $row->audio_url);
+        $this->assertSame($path, $row->audio_storage_path);
+        $this->assertDatabaseHas('podcast_media_cleanup_tasks', [
+            'tenant_id' => self::TENANT_ID,
+            'source_episode_id' => $episodeId,
+            'path' => $path,
+            'reason' => 'malware_rejected',
+            'status' => 'pending',
+        ]);
     }
 
     /** Legacy 'ready_for_processing' interim rows are picked up and completed on the next run. */

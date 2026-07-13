@@ -73,6 +73,25 @@
     "total_count": "{{count}}total"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Pesquisar moderação de podcasts",
+      "placeholder": "Pesquisar podcasts, episódios, criadores ou denúncias"
+    },
+    "review": {
+      "show_title": "Rever podcast",
+      "episode_title": "Rever episódio",
+      "visibility": "Visibilidade",
+      "language": "Idioma",
+      "category": "Categoria",
+      "media_scan": "Análise do ficheiro",
+      "media_processing": "Processamento do ficheiro",
+      "transcript": "Transcrição",
+      "chapters": "Capítulos",
+      "report_history": "Histórico de denúncias",
+      "notes": "Notas da moderação",
+      "notes_hint": "Explique a decisão para que o criador possa efetuar as alterações necessárias.",
+      "audio_unsupported": "O seu navegador não consegue reproduzir este áudio."
+    },
     "title": "Podcasts",
     "description": "Revise programas e episódios da comunidade, incluindo conteúdo mantido para moderação de locatários.",
     "load_failed": "Não foi possível carregar a moderação do podcast.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Rever e moderar",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Detalhamento do cliente",
       "retention": "Retention",
       "reports": "Abrir relatórios"
+    },
+    "review_values": {
+      "visibility": { "public": "Público", "members": "Membros", "private": "Privado", "inherit": "Herdar do programa" },
+      "media_scan": { "pending": "Análise pendente", "clean": "Limpo", "infected": "Infetado", "scan_unavailable": "Analisador indisponível", "not_required": "Não necessário" },
+      "media_processing": { "pending": "Pendente", "ready_for_processing": "Pronto para processamento", "complete": "Concluído", "failed": "Falhou" },
+      "report_status": { "open": "Aberto", "resolved": "Resolvido", "dismissed": "Ignorado", "escalated": "Escalado" }
     },
     "readiness": {
       "moderation": "Moderation",

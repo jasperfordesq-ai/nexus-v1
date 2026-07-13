@@ -11,6 +11,7 @@ import type { PodcastPlayerContextValue } from '@/contexts/PodcastPlayerContext'
 
 const mockToggle = vi.fn();
 const mockClose = vi.fn();
+const mockRetry = vi.fn();
 let mockPlayer: Partial<PodcastPlayerContextValue> | null = null;
 let mockHasFeature = true;
 
@@ -49,6 +50,7 @@ function playingState(): Partial<PodcastPlayerContextValue> {
     hasError: false,
     toggle: mockToggle,
     close: mockClose,
+    retry: mockRetry,
     seekTo: vi.fn(),
   };
 }
@@ -107,5 +109,13 @@ describe('PodcastMiniPlayer', () => {
     mockPlayer = { ...playingState(), status: 'paused' };
     renderBar();
     expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
+  });
+
+  it('offers recovery when the active track fails', () => {
+    mockPlayer = { ...playingState(), status: 'error', hasError: true };
+    renderBar();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(mockRetry).toHaveBeenCalledTimes(1);
   });
 });

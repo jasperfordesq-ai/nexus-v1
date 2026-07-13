@@ -212,7 +212,7 @@
   "podcasts.episode_title_required": "Tá teideal don eipeasóid podchraolta ag teastáil.",
   "podcasts.audio_url_required": "Tá URL fuaime ag teastáil.",
   "podcasts.invalid_scheduled_for": "Úsáid dáta agus am bailí don fhoilsiú sceidealta.",
-  "podcasts.invalid_media_url": "Úsáid URL meán bailí HTTP nó HTTPS.",
+  "podcasts.invalid_media_url": "Úsáid URL meán HTTPS bailí.",
   "podcasts.invalid_media_type": "Ní thacaítear leis an gcineál comhaid sin. Uaslódáil comhad fuaime MP3, M4A, AAC, WAV, OGG nó WebM.",
   "podcasts.media_upload_failed": "Níorbh fhéidir an uaslódáil fuaime a shábháil. Bain triail eile as.",
   "podcasts.audio_too_large": "Tá comhad fuaime an phodchraolta níos mó ná mar a cheadaíonn an pobal seo.",
@@ -234,5 +234,7 @@
   "podcasts.storage_driver_unavailable": "Níl tiománaí na stórála néil suiteáilte ar an bhfreastalaí seo.",
   "podcasts.invalid_cdn_url": "Úsáid URL bailí HTTP nó HTTPS mar bhun-URL an CDN.",
   "podcasts.too_many_chapters": "Ní féidir níos mó ná 200 caibidil a bheith ag eipeasóid.",
-  "podcasts.private_shows_disabled": "Tá seónna podchraolta príobháideacha agus do bhaill amháin díchumasaithe don phobal seo."
+  "podcasts.private_shows_disabled": "Tá seónna podchraolta príobháideacha agus do bhaill amháin díchumasaithe don phobal seo.",
+  "podcasts.media_not_ready": "Tá fuaim óstáilte na heipeasóide seo fós á seiceáil nó níor éirigh léi sa bhailíochtú meán.",
+  "podcasts.external_artwork_not_allowed": "Ní mór saothar ealaíne an phodchraolta a uaslódáil chuig an ardán seo sular féidir é a úsáid."
 }

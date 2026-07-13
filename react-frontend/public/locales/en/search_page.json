@@ -120,5 +120,17 @@
   "view_all_groups_one": "View all {{count}} groups",
   "view_all_groups_other": "View all {{count}} groups",
   "saved_searches_one": "Saved Searches ({{count}})",
-  "saved_searches_other": "Saved Searches ({{count}})"
+  "saved_searches_other": "Saved Searches ({{count}})",
+  "tab_podcasts": "Podcasts ({{count}})",
+  "tab_podcasts_one": "Podcasts ({{count}})",
+  "tab_podcasts_other": "Podcasts ({{count}})",
+  "section_podcasts": "Podcasts ({{count}})",
+  "section_podcasts_one": "Podcasts ({{count}})",
+  "section_podcasts_other": "Podcasts ({{count}})",
+  "view_all_podcasts": "View all {{count}} podcasts",
+  "view_all_podcasts_one": "View {{count}} podcast",
+  "view_all_podcasts_other": "View all {{count}} podcasts",
+  "podcast_show_label": "Podcast show",
+  "podcast_episode_label": "Episode from {{show}}",
+  "filter_podcasts": "Podcasts"
 }

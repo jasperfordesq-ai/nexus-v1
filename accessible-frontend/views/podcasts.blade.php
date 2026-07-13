@@ -15,7 +15,7 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.podcasts.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.podcasts.description') }}</p>
 
-    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.podcasts.studio') && \App\Services\PodcastConfigurationService::get(\App\Services\PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION))
+    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.podcasts.studio') && !empty($canAccessPodcastStudio))
         <p class="govuk-body"><a class="govuk-link" href="{{ route('govuk-alpha.podcasts.studio', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_commerce.podcast_studio.title') }}</a></p>
     @endif
 
@@ -69,7 +69,7 @@
                 @endphp
                 <article class="nexus-alpha-card">
                     @if ($artwork !== '')
-                        <img class="nexus-alpha-avatar" src="{{ $artwork }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        <img class="nexus-alpha-avatar" src="{{ $artwork }}" alt="" aria-hidden="true" loading="lazy" decoding="async" referrerpolicy="no-referrer">
                     @endif
                     <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.podcasts.show', ['tenantSlug' => $tenantSlug, 'id' => $s['id']]) }}">{{ $sTitle }}</a></h2>
                     @if (trim((string) ($s['description'] ?? '')) !== '')
@@ -81,5 +81,22 @@
                 </article>
             @endforeach
         </div>
+    @endif
+
+    @php
+        $podcastPage = max(1, (int) ($podcastPage ?? 1));
+        $podcastPerPage = max(1, (int) ($podcastPerPage ?? 30));
+        $podcastPageCount = max(1, (int) ceil(((int) ($podcastTotal ?? 0)) / $podcastPerPage));
+    @endphp
+    @if ($podcastPageCount > 1)
+        <nav class="govuk-pagination govuk-!-margin-top-6" aria-label="{{ __('govuk_alpha.podcasts.title') }}">
+            <ul class="govuk-pagination__list">
+                @for ($pageNumber = 1; $pageNumber <= $podcastPageCount; $pageNumber++)
+                    <li class="govuk-pagination__item {{ $pageNumber === $podcastPage ? 'govuk-pagination__item--current' : '' }}">
+                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.podcasts.index', array_merge(request()->except('page'), ['tenantSlug' => $tenantSlug, 'page' => $pageNumber])) }}" @if ($pageNumber === $podcastPage) aria-current="page" @endif>{{ $pageNumber }}</a>
+                    </li>
+                @endfor
+            </ul>
+        </nav>
     @endif
 @endsection

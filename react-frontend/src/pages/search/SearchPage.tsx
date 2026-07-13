@@ -23,6 +23,7 @@ import ListTodo from 'lucide-react/icons/list-todo';
 import User from 'lucide-react/icons/user';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
+import Podcast from 'lucide-react/icons/podcast';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -46,6 +47,18 @@ interface SearchResults {
   users: UserType[];
   events: Event[];
   groups: Group[];
+  podcasts: PodcastSearchResult[];
+}
+
+interface PodcastSearchResult {
+  id: number;
+  podcast_kind: 'show' | 'episode';
+  show_slug: string;
+  episode_slug?: string;
+  title: string;
+  summary?: string | null;
+  show_title?: string;
+  duration_seconds?: number | null;
 }
 
 /**
@@ -53,7 +66,7 @@ interface SearchResults {
  * Each item carries a `type` discriminator plus type-specific fields.
  */
 interface RawSearchItem {
-  type: 'listing' | 'user' | 'event' | 'group';
+  type: 'listing' | 'user' | 'event' | 'group' | 'podcast_show' | 'podcast_episode';
   id: number;
   // listing fields
   listing_type?: string;
@@ -72,7 +85,7 @@ interface RawSearchItem {
  * normalising any field-name differences along the way.
  */
 function groupSearchItems(items: RawSearchItem[]): SearchResults {
-  const result: SearchResults = { listings: [], users: [], events: [], groups: [] };
+  const result: SearchResults = { listings: [], users: [], events: [], groups: [], podcasts: [] };
 
   for (const item of items) {
     if (item.type === 'listing') {
@@ -97,13 +110,15 @@ function groupSearchItems(items: RawSearchItem[]): SearchResults {
         // PHP returns `member_count`; React renders `group.members_count`
         members_count: item.member_count,
       } as unknown as Group);
+    } else if (item.type === 'podcast_show' || item.type === 'podcast_episode') {
+      result.podcasts.push(item as unknown as PodcastSearchResult);
     }
   }
 
   return result;
 }
 
-type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
+type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups' | 'podcasts';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -122,7 +137,8 @@ export function SearchPage() {
   const { t } = useTranslation('search_page');
   usePageTitle(t('page_title'));
   const toast = useToast();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
+  const podcastsEnabled = hasFeature('podcasts');
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [activeTab, setActiveTab] = useState<SearchTab>('all');
@@ -131,6 +147,7 @@ export function SearchPage() {
     users: [],
     events: [],
     groups: [],
+    podcasts: [],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -148,7 +165,7 @@ export function SearchPage() {
 
   const performSearch = useCallback(async (searchQuery: string, filters?: AdvancedFilters) => {
     if (!searchQuery.trim()) {
-      setResults({ listings: [], users: [], events: [], groups: [] });
+      setResults({ listings: [], users: [], events: [], groups: [], podcasts: [] });
       setHasSearched(false);
       setSearchError(null);
       return;
@@ -234,7 +251,8 @@ export function SearchPage() {
     results.listings.length +
     results.users.length +
     results.events.length +
-    results.groups.length;
+    results.groups.length +
+    results.podcasts.length;
 
   // Result count for the currently-selected category tab (null for the "all" tab).
   // Used to show an empty state when a single category has no matches even though
@@ -244,6 +262,7 @@ export function SearchPage() {
     : activeTab === 'users' ? results.users.length
     : activeTab === 'events' ? results.events.length
     : activeTab === 'groups' ? results.groups.length
+    : activeTab === 'podcasts' ? results.podcasts.length
     : null;
 
   return (
@@ -335,6 +354,7 @@ export function SearchPage() {
             <Tab key="users" title={t('tab_members', { count: results.users.length })} />
             <Tab key="events" title={t('tab_events', { count: results.events.length })} />
             <Tab key="groups" title={t('tab_groups', { count: results.groups.length })} />
+            {podcastsEnabled && <Tab key="podcasts" title={t('tab_podcasts', { count: results.podcasts.length })} />}
           </Tabs>
 
           {/* Results Content */}
@@ -590,6 +610,56 @@ export function SearchPage() {
                       onPress={() => setActiveTab('groups')}
                     >
                       {t('view_all_groups', { count: results.groups.length })}
+                    </Button>
+                  )}
+                </section>
+              )}
+
+              {/* Podcasts */}
+              {podcastsEnabled && (activeTab === 'all' || activeTab === 'podcasts') && results.podcasts.length > 0 && (
+                <section>
+                  {activeTab === 'all' && (
+                    <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-theme-primary">
+                      <Podcast className="h-5 w-5 text-accent" aria-hidden="true" />
+                      {t('section_podcasts', { count: results.podcasts.length })}
+                    </h2>
+                  )}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {results.podcasts.slice(0, activeTab === 'all' ? 4 : undefined).map((podcast) => {
+                      const path = podcast.podcast_kind === 'episode' && podcast.episode_slug
+                        ? `/podcasts/${podcast.show_slug}/${podcast.episode_slug}`
+                        : `/podcasts/${podcast.show_slug}`;
+                      return (
+                        <motion.div key={`${podcast.podcast_kind}-${podcast.id}`} variants={itemVariants}>
+                          <Link to={tenantPath(path)}>
+                            <GlassCard className="h-full p-5 transition-transform hover:scale-[1.02]">
+                              <div className="flex items-start gap-3">
+                                <span className="rounded-full bg-accent/15 p-2 text-accent" aria-hidden="true">
+                                  <Podcast className="h-5 w-5" />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-theme-subtle">
+                                    {podcast.podcast_kind === 'episode'
+                                      ? t('podcast_episode_label', { show: podcast.show_title ?? '' })
+                                      : t('podcast_show_label')}
+                                  </p>
+                                  <h3 className="break-words font-semibold text-theme-primary [overflow-wrap:anywhere]">
+                                    {podcast.title}
+                                  </h3>
+                                  {podcast.summary && (
+                                    <p className="mt-1 line-clamp-2 text-sm text-theme-subtle">{podcast.summary}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </GlassCard>
+                          </Link>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                  {activeTab === 'all' && results.podcasts.length > 4 && (
+                    <Button variant="light" color="primary" size="sm" className="mt-2" onPress={() => setActiveTab('podcasts')}>
+                      {t('view_all_podcasts', { count: results.podcasts.length })}
                     </Button>
                   )}
                 </section>

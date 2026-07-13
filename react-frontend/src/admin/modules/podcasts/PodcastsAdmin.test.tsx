@@ -138,6 +138,7 @@ const makeAdminData = (overrides = {}) => ({
 // ─────────────────────────────────────────────────────────────────────────────
 describe('PodcastsAdmin', () => {
   beforeEach(() => {
+    vi.useRealTimers();
     vi.resetAllMocks();
     mockApi.get.mockResolvedValue({ success: true, data: makeAdminData() });
   });
@@ -223,6 +224,65 @@ describe('PodcastsAdmin', () => {
     });
   });
 
+  it('shows audio, transcript, chapters, report history, and notes in episode inspection', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: makeAdminData({
+        episodes: [makeEpisode({
+          audio_url: '/api/v2/podcasts/media/2/10/audio?signature=test',
+          media_scan_status: 'clean',
+          media_processing_status: 'complete',
+          transcript: 'Full episode transcript',
+          chapters: [{ title: 'Introduction', starts_at_seconds: 0 }],
+          moderation_notes: 'Needs a rights check',
+          report_history: [{ id: 88, episode_id: 10, reporter_name: 'Charlie', reason: 'rights', details: 'Check the music licence', status: 'resolved', created_at: '2026-07-01T00:00:00Z' }],
+        })],
+      }),
+    });
+    const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
+    render(<PodcastsAdmin />);
+    await waitFor(() => expect(screen.getAllByText('Episode 1').length).toBeGreaterThan(0));
+
+    const inspectButtons = screen.getAllByRole('button', { name: /inspect and moderate/i });
+    fireEvent.click(inspectButtons[inspectButtons.length - 1]!);
+
+    expect(await screen.findByText('Full episode transcript')).toBeInTheDocument();
+    expect(screen.getByText('Introduction')).toBeInTheDocument();
+    expect(screen.getByText('Check the music licence')).toBeInTheDocument();
+    expect(screen.getByText('Clean')).toBeInTheDocument();
+    expect(screen.getByText('Complete')).toBeInTheDocument();
+    expect(screen.getByText('Resolved')).toBeInTheDocument();
+    expect(screen.queryByText('clean')).not.toBeInTheDocument();
+    expect(screen.queryByText('resolved')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/moderator notes/i)).toHaveValue('Needs a rights check');
+    expect(document.querySelector('audio')).toHaveAttribute('src', expect.stringContaining('/podcasts/media/'));
+  });
+
+  it('localizes show visibility in the review dialog', async () => {
+    const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
+    render(<PodcastsAdmin />);
+    await waitFor(() => expect(screen.getAllByText('Tech Talks').length).toBeGreaterThan(0));
+
+    const inspectButtons = screen.getAllByRole('button', { name: /inspect and moderate/i });
+    fireEvent.click(inspectButtons[0]!);
+
+    expect(await screen.findByText('Public')).toBeInTheDocument();
+    expect(screen.queryByText('public')).not.toBeInTheDocument();
+  });
+
+  it('debounces admin search and sends the query to the server', async () => {
+    vi.useFakeTimers();
+    const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
+    render(<PodcastsAdmin />);
+    await vi.advanceTimersByTimeAsync(1);
+    fireEvent.change(screen.getByRole('searchbox', { name: /search podcast moderation/i }), { target: { value: 'community voices' } });
+    await vi.advanceTimersByTimeAsync(350);
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(mockApi.get.mock.calls.some(([url]) => String(url).includes('q=community+voices'))).toBe(true);
+    vi.useRealTimers();
+  });
+
   it('calls moderate endpoint when approve button is clicked on a show', async () => {
     mockApi.post.mockResolvedValue({ success: true });
     const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
@@ -239,6 +299,8 @@ describe('PodcastsAdmin', () => {
     );
     expect(approveBtn).toBeDefined();
     fireEvent.click(approveBtn!);
+    const confirmApprove = await screen.findByRole('button', { name: /^Approve$/i });
+    fireEvent.click(confirmApprove);
 
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith(
@@ -264,6 +326,8 @@ describe('PodcastsAdmin', () => {
     // There are reject buttons for the show and episode rows
     expect(rejectBtns.length).toBeGreaterThan(0);
     fireEvent.click(rejectBtns[rejectBtns.length - 1]!);
+    const confirmReject = await screen.findByRole('button', { name: /^Reject$/i });
+    fireEvent.click(confirmReject);
 
     await waitFor(() => {
       expect(mockApi.post).toHaveBeenCalledWith(
@@ -358,7 +422,7 @@ describe('PodcastsAdmin', () => {
     fireEvent.click(resolveBtn!);
 
     await waitFor(() => {
-      expect(mockPodcastsApi.resolveReport).toHaveBeenCalledWith(10, 'resolved');
+      expect(mockPodcastsApi.resolveReport).toHaveBeenCalledWith(99, 'resolved');
     });
   });
 

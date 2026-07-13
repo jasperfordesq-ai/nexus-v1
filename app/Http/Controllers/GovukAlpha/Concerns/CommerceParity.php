@@ -2407,6 +2407,7 @@ trait CommerceParity
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'shows' => $shows,
+            'canCreateShow' => $this->commerceCanCreatePodcasts(),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -2420,7 +2421,7 @@ trait CommerceParity
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
-        abort_unless($this->commerceCanAuthorPodcasts(), 403);
+        abort_unless($this->commerceCanCreatePodcasts(), 403);
 
         return $this->view('accessible-frontend::commerce-podcast-form', $this->commercePodcastFormData(
             $tenantSlug,
@@ -2439,7 +2440,16 @@ trait CommerceParity
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
-        abort_unless($this->commerceCanAuthorPodcasts(), 403);
+        abort_unless($this->commerceCanCreatePodcasts(), 403);
+
+        $maxShows = (int) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_MAX_SHOWS_PER_USER
+        );
+        if ($maxShows > 0 && PodcastService::ownedShowCount($userId) >= $maxShows) {
+            return redirect()->route('govuk-alpha.podcasts.studio.create', ['tenantSlug' => $tenantSlug])
+                ->withInput()
+                ->with('commercePodcastErrors', [__('api_controllers_2.podcasts.max_shows_reached', ['max' => $maxShows])]);
+        }
 
         [$data, $errors] = $this->commercePodcastShowInput($request);
         if (!empty($errors)) {
@@ -2448,10 +2458,18 @@ trait CommerceParity
         }
 
         $newId = 0;
+        $artworkUrl = null;
         try {
+            $artworkUrl = $this->commerceStorePodcastImage($request, 'artwork');
+            if ($artworkUrl !== null) {
+                $data['artwork_url'] = $artworkUrl;
+            }
             $show = PodcastService::createShow($userId, $data);
             $newId = (int) $show->id;
         } catch (\Throwable $e) {
+            if ($artworkUrl !== null) {
+                \App\Core\ImageUploader::deleteTenantUpload($artworkUrl, 'podcasts');
+            }
             report($e);
         }
 
@@ -2482,9 +2500,27 @@ trait CommerceParity
                 $episodes[] = [
                     'id' => (int) $ep->id,
                     'title' => (string) ($ep->title ?? ''),
+                    'summary' => (string) ($ep->summary ?? ''),
+                    'description' => (string) ($ep->description ?? ''),
                     'status' => (string) ($ep->status ?? 'draft'),
                     'episode_number' => $ep->episode_number,
                     'season_number' => $ep->season_number,
+                    'duration_seconds' => $ep->duration_seconds,
+                    'audio_mime' => (string) ($ep->audio_mime ?? ''),
+                    'audio_bytes' => $ep->audio_bytes,
+                    'explicit' => (bool) $ep->explicit,
+                    'episode_type' => (string) ($ep->episode_type ?? 'full'),
+                    'visibility' => (string) ($ep->visibility ?? 'inherit'),
+                    'transcript' => (string) ($ep->transcript ?? ''),
+                    'transcript_language' => (string) ($ep->transcript_language ?? ''),
+                    'cover_image_url' => (string) ($ep->cover_image_url ?? ''),
+                    'scheduled_for' => $ep->scheduled_for?->format('Y-m-d\TH:i'),
+                    'chapters_json' => $ep->chapters->map(static fn ($chapter): array => [
+                        'title' => (string) $chapter->title,
+                        'starts_at_seconds' => (int) $chapter->starts_at_seconds,
+                        'url' => $chapter->url !== null ? (string) $chapter->url : null,
+                    ])->values()->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                    'audio_url' => empty($ep->audio_storage_path) ? (string) ($ep->audio_url ?? '') : '',
                 ];
             }
         } catch (\Throwable $e) {
@@ -2500,6 +2536,13 @@ trait CommerceParity
         );
         $data['episodes'] = $episodes;
         $data['episodeStoreAction'] = route('govuk-alpha.podcasts.studio.episodes.store', ['tenantSlug' => $tenantSlug, 'id' => $id]);
+        $data['episodeVisibilities'] = $this->commercePodcastEpisodeVisibilities();
+        $data['transcriptsEnabled'] = (bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS
+        );
+        $data['chaptersEnabled'] = (bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_CHAPTERS
+        );
 
         return $this->view('accessible-frontend::commerce-podcast-manage', $data);
     }
@@ -2517,17 +2560,72 @@ trait CommerceParity
 
         $show = $this->commerceOwnedShowOr404($id, $userId);
 
-        [$data, $errors] = $this->commercePodcastShowInput($request);
+        $episodeId = max(0, (int) self::asStr($request->input('episode_id')));
+        if ($episodeId > 0) {
+            $episode = $this->commerceEpisodeInShowOr404($episodeId, (int) $show->id);
+            [$episodeData, $episodeErrors] = $this->commercePodcastEpisodeInput($request, $episode);
+            if ($episodeErrors !== []) {
+                return redirect()->route('govuk-alpha.podcasts.studio.manage', [
+                    'tenantSlug' => $tenantSlug,
+                    'id' => $id,
+                ])->withInput()->with('commercePodcastErrors', $episodeErrors);
+            }
+
+            $status = 'episode-save-failed';
+            $newCoverUrl = null;
+            $oldCoverUrl = (string) ($episode->cover_image_url ?? '');
+            try {
+                $newCoverUrl = $this->commerceStorePodcastImage($request, 'cover');
+                if ($newCoverUrl !== null) {
+                    $episodeData['cover_image_url'] = $newCoverUrl;
+                }
+                $audioFile = $request->file('audio');
+                PodcastService::updateEpisode(
+                    $episode,
+                    $episodeData,
+                    $audioFile instanceof \Illuminate\Http\UploadedFile ? $audioFile : null
+                );
+                if ($newCoverUrl !== null && $oldCoverUrl !== '' && $oldCoverUrl !== $newCoverUrl) {
+                    \App\Core\ImageUploader::deleteTenantUpload($oldCoverUrl, 'podcasts');
+                }
+                $status = 'episode-saved';
+            } catch (\Throwable $e) {
+                if ($newCoverUrl !== null) {
+                    \App\Core\ImageUploader::deleteTenantUpload($newCoverUrl, 'podcasts');
+                }
+                report($e);
+            }
+
+            return redirect()->route('govuk-alpha.podcasts.studio.manage', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => $status,
+            ]);
+        }
+
+        [$data, $errors] = $this->commercePodcastShowInput($request, $show);
         if (!empty($errors)) {
             return redirect()->route('govuk-alpha.podcasts.studio.manage', ['tenantSlug' => $tenantSlug, 'id' => $id])
                 ->withInput()->with('commercePodcastErrors', $errors);
         }
 
         $status = 'show-save-failed';
+        $newArtworkUrl = null;
+        $oldArtworkUrl = (string) ($show->artwork_url ?? '');
         try {
+            $newArtworkUrl = $this->commerceStorePodcastImage($request, 'artwork');
+            if ($newArtworkUrl !== null) {
+                $data['artwork_url'] = $newArtworkUrl;
+            }
             PodcastService::updateShow($show, $data);
+            if ($newArtworkUrl !== null && $oldArtworkUrl !== '' && $oldArtworkUrl !== $newArtworkUrl) {
+                \App\Core\ImageUploader::deleteTenantUpload($oldArtworkUrl, 'podcasts');
+            }
             $status = 'show-saved';
         } catch (\Throwable $e) {
+            if ($newArtworkUrl !== null) {
+                \App\Core\ImageUploader::deleteTenantUpload($newArtworkUrl, 'podcasts');
+            }
             report($e);
         }
 
@@ -2595,36 +2693,36 @@ trait CommerceParity
 
         $show = $this->commerceOwnedShowOr404($id, $userId);
 
-        $title = trim(self::asStr($request->input('episode_title')));
-        $audioUrl = trim(self::asStr($request->input('audio_url')));
-        $audioFile = $request->file('audio');
-        if ($title === '') {
-            return redirect()->route('govuk-alpha.podcasts.studio.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'episode-title-missing']);
-        }
-        if ($audioUrl === '' && $audioFile === null) {
-            return redirect()->route('govuk-alpha.podcasts.studio.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'episode-audio-missing']);
-        }
-
-        $data = [
-            'title' => mb_substr($title, 0, 200),
-            'summary' => mb_substr(trim(self::asStr($request->input('episode_summary'))), 0, 600),
-            'description' => mb_substr(trim(self::asStr($request->input('episode_description'))), 0, 20000),
-        ];
-        if ($audioUrl !== '') {
-            $data['audio_url'] = $audioUrl;
-        }
-        $episodeNumber = self::asStr($request->input('episode_number'));
-        if ($episodeNumber !== '' && is_numeric($episodeNumber)) {
-            $data['episode_number'] = max(0, (int) $episodeNumber);
+        [$data, $errors] = $this->commercePodcastEpisodeInput($request);
+        if ($errors !== []) {
+            return redirect()->route('govuk-alpha.podcasts.studio.manage', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commercePodcastErrors', $errors);
         }
 
         $status = 'episode-failed';
+        $coverUrl = null;
         try {
-            PodcastService::createEpisode($show, $userId, $data, $audioFile);
+            $coverUrl = $this->commerceStorePodcastImage($request, 'cover');
+            if ($coverUrl !== null) {
+                $data['cover_image_url'] = $coverUrl;
+            }
+            $audioFile = $request->file('audio');
+            PodcastService::createEpisode(
+                $show,
+                $userId,
+                $data,
+                $audioFile instanceof \Illuminate\Http\UploadedFile ? $audioFile : null
+            );
             $status = 'episode-added';
         } catch (\InvalidArgumentException $e) {
+            if ($coverUrl !== null) {
+                \App\Core\ImageUploader::deleteTenantUpload($coverUrl, 'podcasts');
+            }
             $status = 'episode-invalid-audio';
         } catch (\Throwable $e) {
+            if ($coverUrl !== null) {
+                \App\Core\ImageUploader::deleteTenantUpload($coverUrl, 'podcasts');
+            }
             report($e);
         }
 
@@ -2951,9 +3049,46 @@ trait CommerceParity
         ];
     }
 
-    /** Respect the tenant's podcast member-show-creation policy. */
+    /** Whether the current member may open/manage their existing studio. */
     private function commerceCanAuthorPodcasts(): bool
     {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return false;
+        }
+
+        if ($this->commercePodcastViewerIsAdmin($userId)) {
+            return true;
+        }
+
+        try {
+            if ((bool) \App\Services\PodcastConfigurationService::get(
+                \App\Services\PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION
+            )) {
+                return true;
+            }
+
+            // Turning off new creation must not strand existing authors: they
+            // retain access to manage, publish, and delete their current shows.
+            return PodcastService::ownedShowCount($userId) > 0;
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    /** Whether the current member may create an additional show. */
+    private function commerceCanCreatePodcasts(): bool
+    {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return false;
+        }
+
+        if ($this->commercePodcastViewerIsAdmin($userId)) {
+            return true;
+        }
+
         try {
             return (bool) \App\Services\PodcastConfigurationService::get(
                 \App\Services\PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION
@@ -2962,6 +3097,17 @@ trait CommerceParity
             report($e);
             return false;
         }
+    }
+
+    /** Tenant-scoped equivalent of the API controller's administrator guard. */
+    private function commercePodcastViewerIsAdmin(int $userId): bool
+    {
+        $user = \App\Models\User::query()
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first();
+
+        return $user !== null && \App\Support\Authorization\AdminTier::allows($user);
     }
 
     /**
@@ -2981,7 +3127,10 @@ trait CommerceParity
             report($e);
         }
         abort_if($show === null, 404);
-        abort_unless((int) $show->owner_user_id === $userId, 403);
+        abort_unless(
+            (int) $show->owner_user_id === $userId || $this->commercePodcastViewerIsAdmin($userId),
+            403
+        );
         return $show;
     }
 
@@ -3000,7 +3149,7 @@ trait CommerceParity
      *
      * @return array{0: array<string,mixed>, 1: array<int,string>} [data, errors]
      */
-    private function commercePodcastShowInput(Request $request): array
+    private function commercePodcastShowInput(Request $request, ?\App\Models\PodcastShow $existingShow = null): array
     {
         $errors = [];
         $title = trim(self::asStr($request->input('title')));
@@ -3008,13 +3157,51 @@ trait CommerceParity
             $errors[] = __('govuk_alpha_commerce.podcast_studio.error_title');
         }
 
+        $requestedVisibility = trim(self::asStr($request->input('visibility')));
+        if ($requestedVisibility === '' && $existingShow === null) {
+            $requestedVisibility = 'public';
+        }
+        $privateShowsEnabled = (bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS
+        );
+        $allowedVisibilities = $privateShowsEnabled ? ['public', 'members', 'private'] : ['public'];
+        $preservingGrandfatheredVisibility = $existingShow !== null
+            && !$privateShowsEnabled
+            && in_array((string) $existingShow->visibility, ['members', 'private'], true)
+            && $requestedVisibility === (string) $existingShow->visibility;
+        if ($requestedVisibility !== ''
+            && !in_array($requestedVisibility, $allowedVisibilities, true)
+            && !$preservingGrandfatheredVisibility) {
+            $errors[] = $privateShowsEnabled
+                ? __('govuk_alpha_commerce.podcast_studio.error_create')
+                : __('api_controllers_2.podcasts.private_shows_disabled');
+        }
+
         $data = [
             'title' => mb_substr($title, 0, 200),
             'summary' => mb_substr(trim(self::asStr($request->input('summary'))), 0, 600),
             'description' => mb_substr(trim(self::asStr($request->input('description'))), 0, 20000),
+            'language' => mb_substr(
+                trim(self::asStr($request->input('language'))) ?: (
+                    $existingShow?->language ?: $this->commercePodcastDefaultLanguage()
+                ),
+                0,
+                20
+            ),
             'category' => mb_substr(trim(self::asStr($request->input('category'))), 0, 120),
-            'visibility' => $this->allowed(self::asStr($request->input('visibility')), ['public', 'members', 'private'], 'public'),
+            'author_name' => mb_substr(trim(self::asStr($request->input('author_name'))), 0, 200),
+            'owner_email' => mb_substr(trim(self::asStr($request->input('owner_email'))), 0, 320),
+            'copyright' => mb_substr(trim(self::asStr($request->input('copyright'))), 0, 300),
+            'funding_url' => trim(self::asStr($request->input('funding_url'))),
+            'explicit' => $request->boolean('explicit'),
         ];
+        $slug = trim(self::asStr($request->input('slug')));
+        if ($existingShow === null && $slug !== '') {
+            $data['slug'] = mb_substr($slug, 0, 200);
+        }
+        if ($requestedVisibility !== '' && !$preservingGrandfatheredVisibility) {
+            $data['visibility'] = $requestedVisibility;
+        }
 
         return [$data, $errors];
     }
@@ -3022,6 +3209,15 @@ trait CommerceParity
     /** Shared view-data for the create/edit podcast show form. */
     private function commercePodcastFormData(string $tenantSlug, string $mode, ?\App\Models\PodcastShow $show, string $action, ?string $status = null): array
     {
+        $privateShowsEnabled = (bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS
+        );
+
+        $user = \App\Models\User::query()
+            ->where('id', $this->currentUserId())
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['name', 'email', 'preferred_language']);
+
         return [
             'title' => $mode === 'edit'
                 ? __('govuk_alpha_commerce.podcast_studio.title_edit')
@@ -3030,20 +3226,194 @@ trait CommerceParity
             'activeNav' => 'explore',
             'mode' => $mode,
             'formAction' => $action,
-            'visibilities' => ['public', 'members', 'private'],
+            'visibilities' => $privateShowsEnabled
+                ? ['public', 'members', 'private']
+                : array_values(array_unique(array_filter([
+                    'public',
+                    $show !== null && in_array((string) $show->visibility, ['members', 'private'], true)
+                        ? (string) $show->visibility
+                        : null,
+                ]))),
             'show' => $show !== null ? [
                 'id' => (int) $show->id,
                 'title' => (string) ($show->title ?? ''),
+                'slug' => (string) ($show->slug ?? ''),
                 'summary' => (string) ($show->summary ?? ''),
                 'description' => (string) ($show->description ?? ''),
+                'artwork_url' => (string) ($show->artwork_url ?? ''),
+                'language' => (string) ($show->language ?? $this->commercePodcastDefaultLanguage()),
                 'category' => (string) ($show->category ?? ''),
+                'author_name' => (string) ($show->author_name ?? ''),
+                'owner_email' => (string) ($show->owner_email ?? ''),
+                'copyright' => (string) ($show->copyright ?? ''),
+                'funding_url' => (string) ($show->funding_url ?? ''),
+                'explicit' => (bool) $show->explicit,
                 'visibility' => (string) ($show->visibility ?? 'public'),
                 'status' => (string) ($show->status ?? 'draft'),
                 'moderation_status' => (string) ($show->moderation_status ?? 'approved'),
-            ] : null,
+            ] : [
+                'language' => $this->commercePodcastDefaultLanguage(),
+                'author_name' => (string) ($user?->name ?? ''),
+                'owner_email' => (string) ($user?->email ?? ''),
+            ],
             'episodes' => [],
             'status' => $status,
         ];
+    }
+
+    /** Resolve a new show's RSS language from the author, then tenant configuration. */
+    private function commercePodcastDefaultLanguage(): string
+    {
+        $preferred = \App\Models\User::query()
+            ->where('id', $this->currentUserId())
+            ->where('tenant_id', TenantContext::getId())
+            ->value('preferred_language');
+        $locale = trim((string) ($preferred ?: TenantContext::getSetting(
+            'default_language',
+            (string) config('app.locale')
+        )));
+
+        return preg_match('/^[a-z]{2,3}(?:[-_][A-Z0-9]{2,8})*$/i', $locale) === 1
+            ? str_replace('_', '-', $locale)
+            : (string) config('app.locale');
+    }
+
+    /** @return array<int,string> */
+    private function commercePodcastEpisodeVisibilities(?\App\Models\PodcastEpisode $episode = null): array
+    {
+        $privateEnabled = (bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS
+        );
+        $values = $privateEnabled ? ['inherit', 'public', 'members', 'private'] : ['inherit', 'public'];
+        if (!$privateEnabled && $episode !== null && in_array((string) $episode->visibility, ['members', 'private'], true)) {
+            $values[] = (string) $episode->visibility;
+        }
+
+        return array_values(array_unique($values));
+    }
+
+    /**
+     * Parse the complete creator-facing episode metadata contract shared with
+     * PodcastController. Hosted-file MIME/size stay server-derived.
+     *
+     * @return array{0:array<string,mixed>,1:array<int,string>}
+     */
+    private function commercePodcastEpisodeInput(Request $request, ?\App\Models\PodcastEpisode $episode = null): array
+    {
+        $errors = [];
+        $title = trim(self::asStr($request->input('episode_title')));
+        if ($title === '') {
+            $errors[] = __('govuk_alpha_commerce.podcast_studio.status_episode_title_missing');
+        }
+
+        $audioUrl = trim(self::asStr($request->input('audio_url')));
+        $audioFile = $request->file('audio');
+        $hasAudioFile = $audioFile instanceof \Illuminate\Http\UploadedFile;
+        if ($episode === null && $audioUrl === '' && !$hasAudioFile) {
+            $errors[] = __('govuk_alpha_commerce.podcast_studio.status_episode_audio_missing');
+        }
+
+        $visibility = trim(self::asStr($request->input('episode_visibility'))) ?: ($episode?->visibility ?: 'inherit');
+        if (!in_array($visibility, $this->commercePodcastEpisodeVisibilities($episode), true)) {
+            $errors[] = __('api_controllers_2.podcasts.private_shows_disabled');
+        }
+        $episodeType = $this->allowed(
+            trim(self::asStr($request->input('episode_type'))),
+            ['full', 'trailer', 'bonus'],
+            (string) ($episode?->episode_type ?: 'full')
+        );
+
+        $data = [
+            'title' => mb_substr($title, 0, 200),
+            'summary' => mb_substr(trim(self::asStr($request->input('episode_summary'))), 0, 600),
+            'description' => mb_substr(trim(self::asStr($request->input('episode_description'))), 0, 20000),
+            'explicit' => $request->boolean('episode_explicit'),
+            'episode_type' => $episodeType,
+            'visibility' => $visibility,
+        ];
+        $slug = trim(self::asStr($request->input('episode_slug')));
+        if ($episode === null && $slug !== '') {
+            $data['slug'] = mb_substr($slug, 0, 200);
+        }
+        if ($audioUrl !== '' && ($episode === null || empty($episode->audio_storage_path))) {
+            $data['audio_url'] = $audioUrl;
+        }
+
+        foreach (['episode_number', 'season_number', 'duration_seconds', 'audio_bytes'] as $field) {
+            $raw = trim(self::asStr($request->input($field)));
+            if ($raw !== '') {
+                if (!is_numeric($raw) || (int) $raw < 0) {
+                    $errors[] = __('govuk_alpha_commerce.podcast_studio.error_non_negative_number');
+                } else {
+                    $data[$field] = (int) $raw;
+                }
+            } elseif ($episode !== null) {
+                $data[$field] = null;
+            }
+        }
+        $audioMime = trim(self::asStr($request->input('audio_mime')));
+        if ($audioMime !== '') {
+            $data['audio_mime'] = mb_substr($audioMime, 0, 120);
+        }
+
+        $scheduled = trim(self::asStr($request->input('scheduled_for')));
+        if ($scheduled !== '') {
+            try {
+                $data['scheduled_for'] = \Carbon\Carbon::parse($scheduled)->utc()->toIso8601String();
+            } catch (\Throwable) {
+                $errors[] = __('govuk_alpha_commerce.podcast_studio.error_schedule');
+            }
+        } elseif ($episode !== null) {
+            $data['scheduled_for'] = null;
+        }
+
+        if ((bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS
+        )) {
+            $data['transcript'] = mb_substr(trim(self::asStr($request->input('transcript'))), 0, 200000);
+            $data['transcript_language'] = mb_substr(trim(self::asStr($request->input('transcript_language'))), 0, 20);
+        }
+        if ((bool) \App\Services\PodcastConfigurationService::get(
+            \App\Services\PodcastConfigurationService::CONFIG_ENABLE_CHAPTERS
+        )) {
+            $chaptersJson = trim(self::asStr($request->input('chapters_json')));
+            if ($chaptersJson !== '') {
+                $chapters = json_decode($chaptersJson, true);
+                if (!is_array($chapters) || !array_is_list($chapters)) {
+                    $errors[] = __('govuk_alpha_commerce.podcast_studio.error_chapters');
+                } else {
+                    $data['chapters'] = $chapters;
+                }
+            } elseif ($episode !== null) {
+                $data['chapters'] = [];
+            }
+        }
+
+        return [$data, array_values(array_unique($errors))];
+    }
+
+    /** Store an accessible-studio artwork/cover upload using the API's tenant path. */
+    private function commerceStorePodcastImage(Request $request, string $field): ?string
+    {
+        $file = $request->file($field);
+        if ($file === null) {
+            return null;
+        }
+        if (is_array($file) || !$file->isValid()) {
+            throw new \InvalidArgumentException('Invalid podcast image upload');
+        }
+
+        return \App\Core\ImageUploader::upload([
+            'name' => $file->getClientOriginalName(),
+            'type' => $file->getMimeType(),
+            'tmp_name' => $file->getRealPath(),
+            'error' => UPLOAD_ERR_OK,
+            'size' => $file->getSize(),
+        ], 'podcasts', [
+            'crop' => true,
+            'width' => 1400,
+            'height' => 1400,
+        ]);
     }
 
     /** Marketplace report reasons — mirrors the API validation `in:` list. */

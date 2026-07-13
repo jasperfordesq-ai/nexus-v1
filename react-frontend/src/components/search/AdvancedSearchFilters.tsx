@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { Category } from '@/types/api';
+import { useTenant } from '@/contexts';
 
 export interface SearchFilters {
   type: string;
@@ -63,6 +64,7 @@ export function AdvancedSearchFilters({
   onReset,
 }: AdvancedSearchFiltersProps) {
   const { t } = useTranslation('search_page');
+  const { hasFeature } = useTenant();
   const [isExpanded, setIsExpanded] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularTags, setPopularTags] = useState<string[]>([]);
@@ -182,6 +184,9 @@ export function AdvancedSearchFilters({
               <SelectItem key="users" id="users">{t('filter_members')}</SelectItem>
               <SelectItem key="events" id="events">{t('filter_events')}</SelectItem>
               <SelectItem key="groups" id="groups">{t('filter_groups')}</SelectItem>
+              {hasFeature('podcasts') && (
+                <SelectItem key="podcasts" id="podcasts">{t('filter_podcasts')}</SelectItem>
+              )}
             </Select>
 
             {/* Category */}

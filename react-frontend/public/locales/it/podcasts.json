@@ -8,6 +8,8 @@
     "close": "Chiudi"
   },
   "browse": {
+    "load_failed": "Impossibile caricare i podcast",
+    "retry": "Riprova",
     "search_placeholder": "Cerca spettacoli",
     "category_label": "Categoria",
     "all_categories": "Tutte le categorie",
@@ -24,6 +26,8 @@
     "load_more": "Carica di più"
   },
   "show": {
+    "load_failed": "Impossibile caricare questo podcast",
+    "retry": "Riprova",
     "not_found": "Programma podcast non trovato",
     "no_summary": "Nessun riepilogo ancora.",
     "byline": "Hosted by {{name}}",
@@ -44,6 +48,8 @@
     "follower_count_many": "{{count}} follower"
   },
   "episode": {
+    "load_failed": "Impossibile caricare questo episodio",
+    "retry": "Riprova",
     "title": "Episodio podcast",
     "not_found": "Episodio del podcast non trovato",
     "no_summary": "Nessun riepilogo ancora.",
@@ -80,6 +86,7 @@
     "reactions_count_many": "{{count}} reactions"
   },
   "player": {
+    "volume": "Volume",
     "unsupported": "Il tuo browser non supporta il lettore audio.",
     "load_error": "Impossibile caricare l'audio di questo episodio. Potrebbe non essere disponibile o essere ancora in elaborazione.",
     "duration_unknown": "Durata sconosciuta",
@@ -103,6 +110,18 @@
     "key_space": "Spazio"
   },
   "studio": {
+    "show_updated": "Podcast aggiornato.",
+    "episode_updated": "Episodio aggiornato.",
+    "edit_show": "Modifica podcast",
+    "edit_episode": "Modifica episodio",
+    "save_changes": "Salva modifiche",
+    "load_failed": "Impossibile caricare il tuo studio podcast.",
+    "retry_load": "Riprova",
+    "creation_unavailable": "Non puoi creare un altro podcast con le impostazioni attuali di questa comunità.",
+    "moderation_feedback": "Commento della moderazione: {{feedback}}",
+    "artwork_upload_failed": "Il podcast è stato salvato, ma non è stato possibile caricare l’immagine.",
+    "cover_upload_failed": "L’episodio è stato salvato, ma non è stato possibile caricare la copertina.",
+    "audio_https_required": "Usa un URL audio HTTPS. HTTP semplice è consentito solo nello sviluppo locale.",
     "title": "Podcast Studio",
     "subtitle": "Crea programmi guidati dai membri, aggiungi episodi e pubblicali nella libreria di podcast della community.",
     "create_show": "Crea spettacolo",
@@ -202,6 +221,14 @@
     "chapter_format_warning_many": "Le righe dei capitoli {{count}} non hanno timestamp e inizieranno alle 0:00."
   },
   "fields": {
+    "artwork_file": "Immagine del podcast",
+    "cover_image_file": "Copertina dell’episodio",
+    "language": "Lingua",
+    "episode_number": "Numero episodio",
+    "season_number": "Numero stagione",
+    "cover_image_url": "URL copertina episodio",
+    "transcript_language": "Lingua della trascrizione",
+    "explicit_episode": "Contrassegna questo episodio come esplicito",
     "show": "Show",
     "show_title": "Mostra titolo",
     "episode_title": "Titolo dell'episodio",

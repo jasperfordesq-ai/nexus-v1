@@ -397,6 +397,10 @@
     "read_more_about": "Léigh tuilleadh faoi {{title}}",
     "detail_course": "Féach ar an gcúrsa",
     "type_course": "Cúrsa",
+    "detail_podcast_show": "Féach ar an bpodchraoladh",
+    "detail_podcast_episode": "Éist leis an eipeasóid",
+    "type_podcast_show": "Podchraoladh",
+    "type_podcast_episode": "Eipeasóid phodchraolta",
     "type_volunteer_hours": "Uaireanta oibre deonaí",
     "volunteer_hours_title": "{{hours}} uair an chloig oibre deonaí déanta"
   },

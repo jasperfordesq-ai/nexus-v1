@@ -120,5 +120,17 @@
   "view_all_groups_one": "Bekijk alle {{count}} groepen",
   "view_all_groups_other": "Bekijk alle {{count}} groepen",
   "saved_searches_one": "Opgeslagen Zoekopdrachten ({{count}})",
-  "saved_searches_other": "Opgeslagen Zoekopdrachten ({{count}})"
+  "saved_searches_other": "Opgeslagen Zoekopdrachten ({{count}})",
+  "tab_podcasts": "Podcastprogramma's ({{count}})",
+  "tab_podcasts_one": "Podcastprogramma ({{count}})",
+  "tab_podcasts_other": "Podcastprogramma's ({{count}})",
+  "section_podcasts": "Podcastprogramma's ({{count}})",
+  "section_podcasts_one": "Podcastprogramma ({{count}})",
+  "section_podcasts_other": "Podcastprogramma's ({{count}})",
+  "view_all_podcasts": "Bekijk alle {{count}} podcasts",
+  "view_all_podcasts_one": "Bekijk {{count}} podcast",
+  "view_all_podcasts_other": "Bekijk alle {{count}} podcasts",
+  "podcast_show_label": "Podcastprogramma",
+  "podcast_episode_label": "Aflevering van {{show}}",
+  "filter_podcasts": "Podcastprogramma's"
 }

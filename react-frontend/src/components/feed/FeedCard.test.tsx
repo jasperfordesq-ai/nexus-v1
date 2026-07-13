@@ -50,6 +50,7 @@ vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   formatDate: vi.fn(() => '21 Feb 2026'),
   formatTime: vi.fn(() => '12:00'),
+  getFormattingLocale: vi.fn(() => 'en'),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
@@ -135,6 +136,37 @@ describe('FeedCard', () => {
     const item = { ...baseFeedItem, type: 'event' as const };
     render(<FeedCard {...defaultProps} item={item} />);
     expect(screen.getByText('Event')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['podcast_show', 'Podcast show'],
+    ['podcast_episode', 'Podcast episode'],
+  ] as const)('renders %s activity without crashing', (type, label) => {
+    const item: FeedItem = {
+      ...baseFeedItem,
+      type,
+      slug: type === 'podcast_show' ? 'community-voices' : 'welcome',
+      show_slug: type === 'podcast_episode' ? 'community-voices' : undefined,
+    };
+
+    render(<FeedCard {...defaultProps} item={item} />);
+
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it('does not render historical remote artwork from cached podcast activity', () => {
+    const item: FeedItem = {
+      ...baseFeedItem,
+      type: 'podcast_episode',
+      slug: 'welcome',
+      show_slug: 'community-voices',
+      image_url: 'https://tracking.example.test/pixel.png',
+    };
+
+    render(<FeedCard {...defaultProps} item={item} />);
+
+    expect(screen.queryByRole('img', { name: /podcast episode image/i })).not.toBeInTheDocument();
+    expect(document.querySelector('img[src*="tracking.example.test"]')).not.toBeInTheDocument();
   });
 
   it('does not show type chip for posts', () => {

@@ -8,6 +8,8 @@
     "close": "Zamknij"
   },
   "browse": {
+    "load_failed": "Nie udało się wczytać podcastów",
+    "retry": "Spróbuj ponownie",
     "search_placeholder": "Wyszukaj programy",
     "category_label": "Kategoria",
     "all_categories": "Wszystkie kategorie",
@@ -24,6 +26,8 @@
     "load_more": "Załaduj więcej"
   },
   "show": {
+    "load_failed": "Nie udało się wczytać tego podcastu",
+    "retry": "Spróbuj ponownie",
     "not_found": "Nie znaleziono programu podcastu",
     "no_summary": "Nie ma jeszcze podsumowania.",
     "byline": "Hosted by {{name}}",
@@ -46,6 +50,8 @@
     "follower_count_many": "{{count}} obserwujących"
   },
   "episode": {
+    "load_failed": "Nie udało się wczytać tego odcinka",
+    "retry": "Spróbuj ponownie",
     "title": "Odcinek podcastu",
     "not_found": "Nie znaleziono odcinka podcastu",
     "no_summary": "Nie ma jeszcze podsumowania.",
@@ -83,6 +89,7 @@
     "reactions_count_many": "{{count}} reactions"
   },
   "player": {
+    "volume": "Głośność",
     "unsupported": "Twoja przeglądarka nie obsługuje odtwarzacza audio.",
     "load_error": "Nie udało się załadować dźwięku tego odcinka. Może być niedostępny lub nadal przetwarzany.",
     "duration_unknown": "Czas trwania nieznany",
@@ -106,6 +113,18 @@
     "key_space": "Spacja"
   },
   "studio": {
+    "show_updated": "Podcast zaktualizowany.",
+    "episode_updated": "Odcinek zaktualizowany.",
+    "edit_show": "Edytuj podcast",
+    "edit_episode": "Edytuj odcinek",
+    "save_changes": "Zapisz zmiany",
+    "load_failed": "Nie udało się wczytać studia podcastów.",
+    "retry_load": "Spróbuj ponownie",
+    "creation_unavailable": "Przy obecnych ustawieniach podcastów tej społeczności nie możesz utworzyć kolejnego podcastu.",
+    "moderation_feedback": "Informacja od moderatora: {{feedback}}",
+    "artwork_upload_failed": "Podcast zapisano, ale nie udało się przesłać jego obrazu.",
+    "cover_upload_failed": "Odcinek zapisano, ale nie udało się przesłać okładki.",
+    "audio_https_required": "Użyj adresu audio HTTPS. Zwykłe HTTP jest dozwolone tylko podczas pracy lokalnej.",
     "title": "Podcast Studio",
     "subtitle": "Twórz programy prowadzone przez członków, dodawaj odcinki i publikuj je w bibliotece podcastów społeczności.",
     "create_show": "Utwórz przedstawienie",
@@ -208,6 +227,14 @@
     "chapter_format_warning_many": "Linie rozdziałów {{count}} nie mają sygnatury czasowej i rozpoczynają się o 0:00."
   },
   "fields": {
+    "artwork_file": "Obraz podcastu",
+    "cover_image_file": "Okładka odcinka",
+    "language": "Język",
+    "episode_number": "Numer odcinka",
+    "season_number": "Numer sezonu",
+    "cover_image_url": "Adres okładki odcinka",
+    "transcript_language": "Język transkrypcji",
+    "explicit_episode": "Oznacz ten odcinek jako treść dla dorosłych",
     "show": "Show",
     "show_title": "Pokaż tytuł",
     "episode_title": "Tytuł odcinka",

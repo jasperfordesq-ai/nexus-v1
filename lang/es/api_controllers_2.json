@@ -212,7 +212,7 @@
   "podcasts.episode_title_required": "Se requiere un título para el episodio de pódcast.",
   "podcasts.audio_url_required": "Se requiere una URL de audio.",
   "podcasts.invalid_scheduled_for": "Utilice una fecha y hora válidas para la publicación programada.",
-  "podcasts.invalid_media_url": "Utilice una URL de medios HTTP o HTTPS válida.",
+  "podcasts.invalid_media_url": "Utilice una URL de medios HTTPS válida.",
   "podcasts.invalid_media_type": "Ese tipo de archivo no es compatible. Suba un archivo de audio MP3, M4A, AAC, WAV, OGG o WebM.",
   "podcasts.media_upload_failed": "No se pudo guardar la subida de audio. Inténtelo de nuevo.",
   "podcasts.audio_too_large": "El archivo de audio del pódcast supera el tamaño permitido por esta comunidad.",
@@ -234,5 +234,7 @@
   "podcasts.storage_driver_unavailable": "El controlador de almacenamiento en la nube no está instalado en este servidor.",
   "podcasts.invalid_cdn_url": "Utilice una URL HTTP o HTTPS válida como URL base del CDN.",
   "podcasts.too_many_chapters": "Los episodios pueden tener como máximo 200 capítulos.",
-  "podcasts.private_shows_disabled": "Los programas de pódcast privados y solo para miembros están desactivados en esta comunidad."
+  "podcasts.private_shows_disabled": "Los programas de pódcast privados y solo para miembros están desactivados en esta comunidad.",
+  "podcasts.media_not_ready": "El audio alojado de este episodio todavía se está comprobando o no superó la validación.",
+  "podcasts.external_artwork_not_allowed": "La imagen del pódcast debe subirse a esta plataforma antes de poder utilizarse."
 }

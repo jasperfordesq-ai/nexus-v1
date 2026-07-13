@@ -181,6 +181,98 @@ class MemberDataExportTest extends TestCase
         @unlink($tmp);
     }
 
+    public function test_export_includes_only_the_members_podcast_data(): void
+    {
+        $userId = $this->makeUser(self::PRIMARY_TENANT_ID);
+        $otherId = $this->makeUser(self::PRIMARY_TENANT_ID);
+        $showId = (int) DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'owner_user_id' => $userId,
+            'title' => 'My portable podcast',
+            'slug' => 'portable-podcast-' . uniqid(),
+            'owner_email' => 'podcaster@example.test',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $episodeId = (int) DB::table('podcast_episodes')->insertGetId([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'show_id' => $showId,
+            'author_user_id' => $userId,
+            'title' => 'My portable episode',
+            'slug' => 'portable-episode-' . uniqid(),
+            'audio_url' => 'https://media.example.test/portable.mp3',
+            'transcript' => 'The member authored this transcript.',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('podcast_episode_chapters')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'episode_id' => $episodeId,
+            'title' => 'Opening chapter',
+            'starts_at_seconds' => 0,
+            'position' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('podcast_episode_listens')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'episode_id' => $episodeId,
+            'user_id' => $userId,
+            'listened_seconds' => 42,
+            'completed' => false,
+            'created_at' => now(),
+        ]);
+        DB::table('podcast_episode_reactions')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'episode_id' => $episodeId,
+            'user_id' => $userId,
+            'reaction' => 'like',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('podcast_show_subscriptions')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'show_id' => $showId,
+            'user_id' => $userId,
+            'notify_new_episodes' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('podcast_episode_reports')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'episode_id' => $episodeId,
+            'reporter_user_id' => $userId,
+            'reason' => 'other',
+            'details' => 'My report details',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('podcast_episode_listens')->insert([
+            'tenant_id' => self::PRIMARY_TENANT_ID,
+            'episode_id' => $episodeId,
+            'user_id' => $otherId,
+            'listened_seconds' => 99,
+            'completed' => true,
+            'created_at' => now(),
+        ]);
+
+        $archive = app(MemberDataExportService::class)->buildArchive($userId);
+
+        $this->assertSame('My portable podcast', $archive['podcasts']['shows_owned'][0]['title']);
+        $this->assertSame('The member authored this transcript.', $archive['podcasts']['episodes_authored'][0]['transcript']);
+        $this->assertSame('Opening chapter', $archive['podcasts']['chapters_authored'][0]['title']);
+        $this->assertCount(1, $archive['podcasts']['listens']);
+        $this->assertSame($userId, (int) $archive['podcasts']['listens'][0]['user_id']);
+        $this->assertCount(1, $archive['podcasts']['reactions']);
+        $this->assertCount(1, $archive['podcasts']['subscriptions']);
+        $this->assertSame('My report details', $archive['podcasts']['reports_filed'][0]['details']);
+    }
+
     public function test_unauthenticated_request_returns_401(): void
     {
         // No Sanctum::actingAs — must be rejected

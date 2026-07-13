@@ -73,6 +73,25 @@
     "total_count": "{{count}}total"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Rechercher dans la modération des podcasts",
+      "placeholder": "Rechercher des podcasts, épisodes, créateurs ou signalements"
+    },
+    "review": {
+      "show_title": "Examiner le podcast",
+      "episode_title": "Examiner l’épisode",
+      "visibility": "Visibilité",
+      "language": "Langue",
+      "category": "Catégorie",
+      "media_scan": "Analyse du média",
+      "media_processing": "Traitement du média",
+      "transcript": "Transcription",
+      "chapters": "Chapitres",
+      "report_history": "Historique des signalements",
+      "notes": "Notes de modération",
+      "notes_hint": "Expliquez la décision afin que le créateur puisse effectuer les modifications nécessaires.",
+      "audio_unsupported": "Votre navigateur ne peut pas lire cet audio."
+    },
     "title": "Podcasts",
     "description": "Passez en revue les émissions et les épisodes de la communauté, y compris le contenu réservé à la modération des locataires.",
     "load_failed": "Impossible de charger la modération du podcast.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Examiner et modérer",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Répartition des clients",
       "retention": "Retention",
       "reports": "Ouvrir des rapports"
+    },
+    "review_values": {
+      "visibility": { "public": "Public", "members": "Membres", "private": "Privé", "inherit": "Hériter de l’émission" },
+      "media_scan": { "pending": "Analyse en attente", "clean": "Sain", "infected": "Infecté", "scan_unavailable": "Analyseur indisponible", "not_required": "Non requis" },
+      "media_processing": { "pending": "En attente", "ready_for_processing": "Prêt pour le traitement", "complete": "Terminé", "failed": "Échec" },
+      "report_status": { "open": "Ouvert", "resolved": "Résolu", "dismissed": "Rejeté", "escalated": "Transmis" }
     },
     "readiness": {
       "moderation": "Moderation",

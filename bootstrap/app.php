@@ -154,6 +154,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('events-process-federation');
 
+        // Retry durable podcast storage deletions. Domain rows never lose the
+        // last object pointer before this ledger confirms cleanup succeeded.
+        $schedule->command('podcasts:dispatch-media-cleanup --limit=100')
+            ->everyMinute()
+            ->withoutOverlapping(10)
+            ->onOneServer()
+            ->name('podcasts-dispatch-media-cleanup');
+
         $schedule->command('events:materialize-recurrences')
             ->hourly()
             ->withoutOverlapping(55)

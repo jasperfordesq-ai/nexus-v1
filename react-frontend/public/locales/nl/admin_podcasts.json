@@ -73,6 +73,25 @@
     "total_count": "{{count}}totaal"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Podcastmoderatie doorzoeken",
+      "placeholder": "Zoek podcasts, afleveringen, makers of meldingen"
+    },
+    "review": {
+      "show_title": "Podcast beoordelen",
+      "episode_title": "Aflevering beoordelen",
+      "visibility": "Zichtbaarheid",
+      "language": "Taal",
+      "category": "Categorie",
+      "media_scan": "Mediascan",
+      "media_processing": "Mediaverwerking",
+      "transcript": "Transcript",
+      "chapters": "Hoofdstukken",
+      "report_history": "Meldingsgeschiedenis",
+      "notes": "Notities van moderator",
+      "notes_hint": "Leg de beslissing uit zodat de maker de nodige wijzigingen kan aanbrengen.",
+      "audio_unsupported": "Je browser kan deze audio niet afspelen."
+    },
     "title": "Podcasts",
     "description": "Beoordeel communityshows en afleveringen, inclusief inhoud die wordt bewaard voor moderatie door huurders.",
     "load_failed": "Kan podcast-moderatie niet laden.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Beoordelen en modereren",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Uitsplitsing van de klant",
       "retention": "Retention",
       "reports": "Rapporten openen"
+    },
+    "review_values": {
+      "visibility": { "public": "Openbaar", "members": "Leden", "private": "Privé", "inherit": "Overnemen van de show" },
+      "media_scan": { "pending": "Scan in afwachting", "clean": "Schoon", "infected": "Geïnfecteerd", "scan_unavailable": "Scanner niet beschikbaar", "not_required": "Niet vereist" },
+      "media_processing": { "pending": "In afwachting", "ready_for_processing": "Klaar voor verwerking", "complete": "Voltooid", "failed": "Mislukt" },
+      "report_status": { "open": "Open", "resolved": "Opgelost", "dismissed": "Afgewezen", "escalated": "Geëscaleerd" }
     },
     "readiness": {
       "moderation": "Moderation",

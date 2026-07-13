@@ -1010,6 +1010,15 @@ export interface SearchResults {
       name: string;
       members_count: number;
     }>;
+    podcasts?: Array<{
+      id: number;
+      type: 'podcast_show' | 'podcast_episode';
+      podcast_kind: 'show' | 'episode';
+      show_slug: string;
+      episode_slug?: string;
+      title: string;
+      summary?: string | null;
+    }>;
   };
 }
 
@@ -1019,7 +1028,7 @@ export interface SearchSuggestions {
 
 export interface SearchFilters {
   q: string;
-  types?: string;  // Comma-separated: 'listings,users,events,groups'
+  types?: string;  // Comma-separated: 'listings,users,events,groups,podcasts'
   limit?: number;
   limit_per_type?: number;
 }

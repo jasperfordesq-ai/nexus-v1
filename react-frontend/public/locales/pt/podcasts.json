@@ -8,6 +8,8 @@
     "close": "Fechar"
   },
   "browse": {
+    "load_failed": "Não foi possível carregar os podcasts",
+    "retry": "Tentar novamente",
     "search_placeholder": "Programas de pesquisa",
     "category_label": "Categoria",
     "all_categories": "Todas as categorias",
@@ -24,6 +26,8 @@
     "load_more": "Carregar mais"
   },
   "show": {
+    "load_failed": "Não foi possível carregar este podcast",
+    "retry": "Tentar novamente",
     "not_found": "Programa de podcast não encontrado",
     "no_summary": "Ainda não há resumo.",
     "byline": "Hosted by {{name}}",
@@ -44,6 +48,8 @@
     "follower_count_many": "{{count}} seguidores"
   },
   "episode": {
+    "load_failed": "Não foi possível carregar este episódio",
+    "retry": "Tentar novamente",
     "title": "Episódio de podcast",
     "not_found": "Episódio de podcast não encontrado",
     "no_summary": "Ainda não há resumo.",
@@ -80,6 +86,7 @@
     "reactions_count_many": "{{count}} reactions"
   },
   "player": {
+    "volume": "Volume",
     "unsupported": "Seu navegador não suporta o reprodutor de áudio.",
     "load_error": "Não foi possível carregar o áudio deste episódio. Ele pode estar indisponível ou ainda em processamento.",
     "duration_unknown": "Duração desconhecida",
@@ -103,6 +110,18 @@
     "key_space": "Espaço"
   },
   "studio": {
+    "show_updated": "Podcast atualizado.",
+    "episode_updated": "Episódio atualizado.",
+    "edit_show": "Editar podcast",
+    "edit_episode": "Editar episódio",
+    "save_changes": "Guardar alterações",
+    "load_failed": "Não foi possível carregar o seu estúdio de podcasts.",
+    "retry_load": "Tentar novamente",
+    "creation_unavailable": "Não pode criar outro podcast com as definições atuais desta comunidade.",
+    "moderation_feedback": "Comentário da moderação: {{feedback}}",
+    "artwork_upload_failed": "O podcast foi guardado, mas não foi possível enviar a imagem.",
+    "cover_upload_failed": "O episódio foi guardado, mas não foi possível enviar a capa.",
+    "audio_https_required": "Utilize um URL de áudio HTTPS. HTTP simples só é permitido no desenvolvimento local.",
     "title": "Podcast Studio",
     "subtitle": "Crie programas liderados por membros, adicione episódios e publique-os na biblioteca de podcasts da comunidade.",
     "create_show": "Criar programa",
@@ -202,6 +221,14 @@
     "chapter_format_warning_many": "As linhas do capítulo {{count}} não têm carimbo de data/hora e começarão às 0:00."
   },
   "fields": {
+    "artwork_file": "Imagem do podcast",
+    "cover_image_file": "Capa do episódio",
+    "language": "Idioma",
+    "episode_number": "Número do episódio",
+    "season_number": "Número da temporada",
+    "cover_image_url": "URL da capa do episódio",
+    "transcript_language": "Idioma da transcrição",
+    "explicit_episode": "Marcar este episódio como explícito",
     "show": "Show",
     "show_title": "Mostrar título",
     "episode_title": "Título do episódio",

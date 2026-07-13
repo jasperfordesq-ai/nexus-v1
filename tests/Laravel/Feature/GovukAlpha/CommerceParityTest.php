@@ -1415,6 +1415,14 @@ class CommerceParityTest extends TestCase
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
         $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}")->assertStatus(403);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'role' => 'admin',
+        ]);
+        Sanctum::actingAs($admin, ['*']);
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}")->assertOk();
     }
 
     public function test_commerce_store_podcast_episode_persists(): void
@@ -1468,6 +1476,277 @@ class CommerceParityTest extends TestCase
         // Episode belongs to Show B, but we ask via Show A → 404.
         $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}/episodes/{$foreignEpisodeId}/delete")
             ->assertStatus(404);
+    }
+
+    public function test_commerce_podcast_manage_can_edit_an_existing_episode(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Episode Editor']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Editable Show');
+        $episodeId = $this->seedPodcastEpisode($showId, $owner->id);
+        $form = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}");
+        $form->assertOk()->assertSee('name="episode_id"', false);
+        preg_match('/name="_token" value="([^"]+)"/', (string) $form->getContent(), $csrfMatches);
+
+        $response = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}/update", [
+            '_token' => $csrfMatches[1] ?? '',
+            'episode_id' => $episodeId,
+            'episode_title' => 'Edited accessible episode',
+            'episode_summary' => 'Edited summary',
+            'episode_description' => 'Edited description',
+            'episode_number' => '7',
+            'audio_url' => 'https://example.com/edited-audio.mp3',
+        ]);
+
+        $response->assertRedirectContains("/podcasts/studio/{$showId}");
+        $this->assertDatabaseHas('podcast_episodes', [
+            'id' => $episodeId,
+            'tenant_id' => $this->testTenantId,
+            'title' => 'Edited accessible episode',
+            'summary' => 'Edited summary',
+            'episode_number' => 7,
+            'audio_url' => 'https://example.com/edited-audio.mp3',
+        ]);
+    }
+
+    public function test_commerce_podcast_authoring_supports_rss_and_episode_metadata(): void
+    {
+        $user = $this->authenticatedUser([
+            'name' => 'Metadata Author',
+            'email' => 'metadata-author@example.test',
+            'preferred_language' => 'ga',
+        ]);
+        $this->enableAlphaFeatures(['podcasts']);
+        foreach ([
+            'podcasts.enable_transcripts' => 'true',
+            'podcasts.enable_chapters' => 'true',
+        ] as $key => $value) {
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $this->testTenantId, 'setting_key' => $key],
+                [
+                    'setting_value' => $value,
+                    'setting_type' => 'boolean',
+                    'category' => 'podcasts',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+
+        $createForm = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/new");
+        $createForm->assertOk()
+            ->assertSee('name="artwork"', false)
+            ->assertSee('name="language"', false)
+            ->assertSee('value="ga"', false)
+            ->assertSee('name="owner_email"', false);
+
+        $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/new", [
+            'title' => 'Accessible Metadata Show',
+            'slug' => 'accessible-metadata-show',
+            'summary' => 'Metadata summary',
+            'description' => 'Metadata description',
+            'category' => 'Community',
+            'author_name' => 'Community Media Team',
+            'owner_email' => 'rss-admin@example.test',
+            'copyright' => 'Copyright Community Media Team',
+            'funding_url' => 'https://example.test/support',
+            'explicit' => '1',
+            'visibility' => 'public',
+        ])->assertRedirect();
+
+        $show = DB::table('podcast_shows')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('owner_user_id', $user->id)
+            ->where('slug', 'accessible-metadata-show')
+            ->first();
+        $this->assertNotNull($show);
+        $this->assertSame('ga', $show->language);
+        $this->assertSame('Community Media Team', $show->author_name);
+        $this->assertSame('rss-admin@example.test', $show->owner_email);
+        $this->assertSame('https://example.test/support', $show->funding_url);
+        $this->assertSame(1, (int) $show->explicit);
+
+        $manage = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$show->id}");
+        $manage->assertOk()
+            ->assertSee('name="episode_slug"', false)
+            ->assertSee('name="audio"', false)
+            ->assertSee('name="season_number"', false)
+            ->assertSee('name="scheduled_for"', false)
+            ->assertSee('name="transcript"', false)
+            ->assertSee('name="chapters_json"', false)
+            ->assertSee('name="cover"', false);
+
+        $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$show->id}/episodes", [
+            'episode_title' => 'Accessible Metadata Episode',
+            'episode_slug' => 'accessible-metadata-episode',
+            'episode_summary' => 'Episode summary',
+            'episode_description' => 'Episode description',
+            'audio_url' => 'https://cdn.example.test/accessible-metadata.mp3',
+            'audio_mime' => 'audio/mpeg',
+            'audio_bytes' => '654321',
+            'duration_seconds' => '1800',
+            'episode_number' => '2',
+            'season_number' => '3',
+            'episode_explicit' => '1',
+            'episode_type' => 'bonus',
+            'episode_visibility' => 'public',
+            'scheduled_for' => '2030-06-15T12:30',
+            'transcript_language' => 'ga',
+            'transcript' => 'Accessible episode transcript.',
+            'chapters_json' => json_encode([
+                ['title' => 'Opening', 'starts_at_seconds' => 0],
+                ['title' => 'Discussion', 'starts_at_seconds' => 120, 'url' => 'https://example.test/discussion'],
+            ]),
+        ])->assertRedirect();
+
+        $episode = DB::table('podcast_episodes')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('show_id', $show->id)
+            ->where('slug', 'accessible-metadata-episode')
+            ->first();
+        $this->assertNotNull($episode);
+        $this->assertSame('audio/mpeg', $episode->audio_mime);
+        $this->assertSame(654321, (int) $episode->audio_bytes);
+        $this->assertSame(1800, (int) $episode->duration_seconds);
+        $this->assertSame(2, (int) $episode->episode_number);
+        $this->assertSame(3, (int) $episode->season_number);
+        $this->assertSame('bonus', $episode->episode_type);
+        $this->assertSame('ga', $episode->transcript_language);
+        $this->assertSame('Accessible episode transcript.', $episode->transcript);
+        $this->assertNotNull($episode->scheduled_for);
+        $this->assertDatabaseHas('podcast_episode_chapters', [
+            'episode_id' => $episode->id,
+            'title' => 'Discussion',
+            'starts_at_seconds' => 120,
+            'url' => 'https://example.test/discussion',
+        ]);
+    }
+
+    public function test_commerce_disabled_creation_does_not_strand_existing_podcast_authors(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Existing Podcast Owner']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Existing Managed Show');
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'podcasts.allow_member_show_creation'],
+            [
+                'setting_value' => 'false',
+                'setting_type' => 'boolean',
+                'category' => 'podcasts',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio")
+            ->assertOk()
+            ->assertDontSee(__('govuk_alpha_commerce.podcast_studio.create_button'));
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/new")->assertForbidden();
+    }
+
+    public function test_commerce_admin_can_create_podcast_when_member_creation_is_disabled(): void
+    {
+        $this->authenticatedUser(['name' => 'Podcast Administrator', 'role' => 'admin']);
+        $this->enableAlphaFeatures(['podcasts']);
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'podcasts.allow_member_show_creation'],
+            [
+                'setting_value' => 'false',
+                'setting_type' => 'boolean',
+                'category' => 'podcasts',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/new")->assertOk();
+    }
+
+    public function test_commerce_podcast_creation_enforces_maximum_shows_and_private_show_configuration(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Limited Podcast Owner']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $this->seedPodcastShow($owner->id, 'Only Allowed Show');
+        foreach ([
+            'podcasts.max_shows_per_user' => ['1', 'integer'],
+            'podcasts.enable_private_shows' => ['false', 'boolean'],
+        ] as $key => [$value, $type]) {
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $this->testTenantId, 'setting_key' => $key],
+                [
+                    'setting_value' => $value,
+                    'setting_type' => $type,
+                    'category' => 'podcasts',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+
+        $form = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/new");
+        $form->assertOk();
+        preg_match('/name="_token" value="([^"]+)"/', (string) $form->getContent(), $csrfMatches);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/new", [
+            '_token' => $csrfMatches[1] ?? '',
+            'title' => 'Disallowed extra show',
+            'visibility' => 'private',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('commercePodcastErrors');
+        $this->assertSame(
+            1,
+            DB::table('podcast_shows')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('owner_user_id', $owner->id)
+                ->count()
+        );
+
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'podcasts.max_shows_per_user')
+            ->update(['setting_value' => '0', 'updated_at' => now()]);
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+        $privateForm = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/new");
+        preg_match('/name="_token" value="([^"]+)"/', (string) $privateForm->getContent(), $privateCsrf);
+        $privateResponse = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/new", [
+            '_token' => $privateCsrf[1] ?? '',
+            'title' => 'Configuration-blocked private show',
+            'visibility' => 'private',
+        ]);
+        $privateResponse->assertRedirect();
+        $privateResponse->assertSessionHas('commercePodcastErrors');
+        $this->assertDatabaseMissing('podcast_shows', [
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $owner->id,
+            'title' => 'Configuration-blocked private show',
+        ]);
+
+        $existingShowId = (int) DB::table('podcast_shows')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('owner_user_id', $owner->id)
+            ->value('id');
+        DB::table('podcast_shows')->where('id', $existingShowId)->update(['visibility' => 'private']);
+        $manageForm = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$existingShowId}");
+        preg_match('/name="_token" value="([^"]+)"/', (string) $manageForm->getContent(), $manageCsrf);
+        $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$existingShowId}/update", [
+            '_token' => $manageCsrf[1] ?? '',
+            'title' => 'Safely edited grandfathered private show',
+            'summary' => '',
+            'description' => '',
+            'category' => '',
+            'visibility' => 'private',
+        ])->assertRedirect();
+        $this->assertDatabaseHas('podcast_shows', [
+            'id' => $existingShowId,
+            'title' => 'Safely edited grandfathered private show',
+            'visibility' => 'private',
+        ]);
     }
 
     // ==================================================================

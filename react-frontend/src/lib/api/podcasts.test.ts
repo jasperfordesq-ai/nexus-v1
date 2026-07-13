@@ -264,6 +264,26 @@ describe('podcastsApi.updateShow', () => {
   });
 });
 
+describe('podcastsApi artwork uploads', () => {
+  it('uploads show artwork to the owner-bound endpoint', async () => {
+    const image = new File(['image'], 'cover.png', { type: 'image/png' });
+    vi.mocked(api.upload).mockResolvedValueOnce({ success: true, data: { url: '/uploads/podcasts/cover.png' } });
+
+    await podcastsApi.uploadShowArtwork(4, image);
+
+    expect(api.upload).toHaveBeenCalledWith('/v2/podcasts/4/artwork', image, 'image');
+  });
+
+  it('uploads an episode cover to the owner-bound endpoint', async () => {
+    const image = new File(['image'], 'episode.png', { type: 'image/png' });
+    vi.mocked(api.upload).mockResolvedValueOnce({ success: true, data: { url: '/uploads/podcasts/episode.png' } });
+
+    await podcastsApi.uploadEpisodeCover(4, 9, image);
+
+    expect(api.upload).toHaveBeenCalledWith('/v2/podcasts/4/episodes/9/cover', image, 'image');
+  });
+});
+
 // ---------------------------------------------------------------------------
 // podcastsApi.publishShow
 // ---------------------------------------------------------------------------

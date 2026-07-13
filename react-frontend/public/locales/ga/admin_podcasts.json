@@ -73,6 +73,25 @@
     "total_count": "{{count}}iomlán"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Cuardaigh modhnóireacht podchraolta",
+      "placeholder": "Cuardaigh podchraoltaí, eipeasóidí, cruthaitheoirí nó tuairiscí"
+    },
+    "review": {
+      "show_title": "Athbhreithnigh podchraoladh",
+      "episode_title": "Athbhreithnigh eipeasóid",
+      "visibility": "Infheictheacht",
+      "language": "Teanga",
+      "category": "Catagóir",
+      "media_scan": "Scanadh meán",
+      "media_processing": "Próiseáil meán",
+      "transcript": "Tras-scríbhinn",
+      "chapters": "Caibidlí",
+      "report_history": "Stair na dtuairiscí",
+      "notes": "Nótaí an mhodhnóra",
+      "notes_hint": "Mínigh an cinneadh ionas gur féidir leis an gcruthaitheoir na hathruithe riachtanacha a dhéanamh.",
+      "audio_unsupported": "Ní féidir le do bhrabhsálaí an fhuaim seo a sheinm."
+    },
     "title": "Podcasts",
     "description": "Déan athbhreithniú ar sheónna agus eipeasóidí pobail, lena n-áirítear ábhar a choinnítear le haghaidh modhnóireachta tionóntaí.",
     "load_failed": "Níorbh fhéidir modhnóireacht podchraoltaí a lódáil.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Athbhreithnigh agus modhnaigh",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Miondealú cliant",
       "retention": "Retention",
       "reports": "Tuarascálacha oscailte"
+    },
+    "review_values": {
+      "visibility": { "public": "Poiblí", "members": "Baill", "private": "Príobháideach", "inherit": "Faigh ón gclár" },
+      "media_scan": { "pending": "Scanadh ar feitheamh", "clean": "Glan", "infected": "Ionfhabhtaithe", "scan_unavailable": "Níl an scanóir ar fáil", "not_required": "Níl gá leis" },
+      "media_processing": { "pending": "Ar feitheamh", "ready_for_processing": "Réidh le próiseáil", "complete": "Críochnaithe", "failed": "Theip" },
+      "report_status": { "open": "Oscailte", "resolved": "Réitithe", "dismissed": "Díbháilte", "escalated": "Ardaithe" }
     },
     "readiness": {
       "moderation": "Moderation",

@@ -65,6 +65,7 @@ class FeedActivityService
                 content    = VALUES(content),
                 image_url  = VALUES(image_url),
                 metadata   = VALUES(metadata),
+                is_visible = 1,
                 created_at = VALUES(created_at)",
             [
                 $tenantId,

@@ -153,4 +153,15 @@ describe('PodcastAudioPlayer', () => {
     fireEvent.loadedMetadata(audio);
     expect(audio.currentTime).toBe(45);
   });
+
+  it('exposes accessible progress and visible volume controls while active', () => {
+    renderPlayer(episode());
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+
+    const progress = screen.getByRole('slider', { name: 'Playback progress' });
+    const volume = screen.getByRole('slider', { name: 'Volume' });
+    expect(progress).toHaveAttribute('aria-valuetext');
+    expect(volume).toHaveAttribute('aria-valuetext');
+    expect(screen.getByText('100%')).toBeInTheDocument();
+  });
 });

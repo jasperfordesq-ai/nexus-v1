@@ -8,6 +8,8 @@
     "close": "Fermer"
   },
   "browse": {
+    "load_failed": "Impossible de charger les podcasts",
+    "retry": "Réessayer",
     "search_placeholder": "Rechercher des émissions",
     "category_label": "Catégorie",
     "all_categories": "Toutes les catégories",
@@ -24,6 +26,8 @@
     "load_more": "Charger plus"
   },
   "show": {
+    "load_failed": "Impossible de charger ce podcast",
+    "retry": "Réessayer",
     "not_found": "Émission de podcast introuvable",
     "no_summary": "Pas encore de résumé.",
     "byline": "Hosted by {{name}}",
@@ -44,6 +48,8 @@
     "follower_count_many": "{{count}} abonnés"
   },
   "episode": {
+    "load_failed": "Impossible de charger cet épisode de podcast",
+    "retry": "Réessayer",
     "title": "Épisode de podcast",
     "not_found": "Épisode de podcast introuvable",
     "no_summary": "Pas encore de résumé.",
@@ -80,6 +86,7 @@
     "reactions_count_many": "{{count}} reactions"
   },
   "player": {
+    "volume": "Volume",
     "unsupported": "Votre navigateur ne prend pas en charge le lecteur audio.",
     "load_error": "L'audio de cet épisode n'a pas pu être chargé. Il est peut-être indisponible ou en cours de traitement.",
     "duration_unknown": "Durée inconnue",
@@ -103,6 +110,18 @@
     "key_space": "Espace"
   },
   "studio": {
+    "show_updated": "Podcast mis à jour.",
+    "episode_updated": "Épisode mis à jour.",
+    "edit_show": "Modifier le podcast",
+    "edit_episode": "Modifier l’épisode",
+    "save_changes": "Enregistrer les modifications",
+    "load_failed": "Impossible de charger votre studio de podcast.",
+    "retry_load": "Réessayer",
+    "creation_unavailable": "Vous ne pouvez pas créer un autre podcast avec les paramètres actuels de cette communauté.",
+    "moderation_feedback": "Commentaire de modération : {{feedback}}",
+    "artwork_upload_failed": "Le podcast a été enregistré, mais son image n’a pas pu être importée.",
+    "cover_upload_failed": "L’épisode a été enregistré, mais son image n’a pas pu être importée.",
+    "audio_https_required": "Utilisez une URL audio HTTPS. Le protocole HTTP simple est réservé au développement local.",
     "title": "Podcast Studio",
     "subtitle": "Créez des émissions dirigées par les membres, ajoutez des épisodes et publiez-les dans la bibliothèque de podcasts de la communauté.",
     "create_show": "Créer un spectacle",
@@ -202,6 +221,14 @@
     "chapter_format_warning_many": "Les lignes de chapitre {{count}} n'ont pas d'horodatage et commenceront à 0h00."
   },
   "fields": {
+    "artwork_file": "Image du podcast",
+    "cover_image_file": "Image de l’épisode",
+    "language": "Langue",
+    "episode_number": "Numéro d’épisode",
+    "season_number": "Numéro de saison",
+    "cover_image_url": "URL de l’image de l’épisode",
+    "transcript_language": "Langue de la transcription",
+    "explicit_episode": "Marquer cet épisode comme explicite",
     "show": "Show",
     "show_title": "Afficher le titre",
     "episode_title": "Titre de l'épisode",

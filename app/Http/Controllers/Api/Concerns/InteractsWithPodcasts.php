@@ -25,6 +25,13 @@ trait InteractsWithPodcasts
 
     protected function requirePodcastAuthor(): int
     {
+        // Turning off new member-created shows must not lock existing creators
+        // out of their studio, episodes, analytics, or deletion controls.
+        return $this->requireAuth();
+    }
+
+    protected function requirePodcastShowCreator(): int
+    {
         $userId = $this->requireAuth();
 
         if (PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION)) {

@@ -8682,6 +8682,12 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee(__('govuk_alpha.polish_commerce.podcast_subscribe'));
         // Subscribe form action targets the correct route.
         $res->assertSee("/podcasts/{$showId}/subscribe", false);
+        // RSS links use the identity-free route with an explicit tenant id; the
+        // legacy ambient-tenant slug route is unsuitable for feed readers.
+        $res->assertSee(
+            "/api/v2/podcasts/feed/{$this->testTenantId}/tech-talks-{$user->id}.xml",
+            false
+        );
     }
 
     /**
@@ -8716,6 +8722,138 @@ class GovukAlphaFrontendTest extends TestCase
                 ->where('user_id', $user->id)
                 ->exists()
         );
+    }
+
+    public function test_accessible_podcast_routes_hide_unviewable_shows_and_block_subscription(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Hidden Show Owner']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = (int) DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $owner->id,
+            'title' => 'Unapproved hidden show',
+            'slug' => 'hidden-show-' . uniqid(),
+            'visibility' => 'private',
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $listener = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($listener, ['*']);
+
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/{$showId}")->assertNotFound();
+        $this->post("/{$this->testTenantSlug}/accessible/podcasts/{$showId}/subscribe")->assertNotFound();
+        $this->assertDatabaseMissing('podcast_show_subscriptions', [
+            'tenant_id' => $this->testTenantId,
+            'show_id' => $showId,
+            'user_id' => $listener->id,
+        ]);
+    }
+
+    public function test_accessible_podcast_directory_includes_members_only_shows(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser(['name' => 'Directory Listener']);
+        $this->enableAlphaFeatures(['podcasts']);
+        DB::table('podcast_shows')->insert([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $owner->id,
+            'title' => 'Members-only community stories',
+            'slug' => 'members-stories-' . uniqid(),
+            'visibility' => 'members',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'published_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts")
+            ->assertOk()
+            ->assertSee('Members-only community stories');
+    }
+
+    public function test_accessible_podcast_episode_enforces_visibility_and_transcript_configuration(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listener = $this->authenticatedUser(['name' => 'Episode Listener']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showSlug = 'visible-show-' . uniqid();
+        $showId = (int) DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $owner->id,
+            'title' => 'Visible show',
+            'slug' => $showSlug,
+            'visibility' => 'public',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'published_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $privateEpisodeId = (int) DB::table('podcast_episodes')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'show_id' => $showId,
+            'author_user_id' => $owner->id,
+            'title' => 'Private episode',
+            'slug' => 'private-episode-' . uniqid(),
+            'audio_url' => 'https://media.example.test/private.mp3',
+            'visibility' => 'private',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'published_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $publicEpisodeId = (int) DB::table('podcast_episodes')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'show_id' => $showId,
+            'author_user_id' => $owner->id,
+            'title' => 'Public episode',
+            'slug' => 'public-episode-' . uniqid(),
+            'audio_url' => 'https://media.example.test/public.mp3',
+            'transcript' => 'Transcript must respect tenant configuration.',
+            'visibility' => 'public',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'published_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'podcasts.enable_transcripts'],
+            [
+                'setting_value' => 'false',
+                'setting_type' => 'boolean',
+                'category' => 'podcasts',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        \Illuminate\Support\Facades\Cache::forget("podcast_config:{$this->testTenantId}");
+        Sanctum::actingAs($listener, ['*']);
+
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/{$showId}")
+            ->assertOk()
+            ->assertSee('Public episode')
+            ->assertDontSee('Private episode')
+            ->assertSee("/api/v2/podcasts/feed/{$this->testTenantId}/{$showSlug}.xml", false);
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/{$showId}/episodes/{$privateEpisodeId}")
+            ->assertNotFound();
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/{$showId}/episodes/{$publicEpisodeId}")
+            ->assertOk()
+            ->assertDontSee('Transcript must respect tenant configuration.');
     }
 
     /**

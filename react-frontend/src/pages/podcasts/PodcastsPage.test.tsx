@@ -224,6 +224,7 @@ describe('PodcastsPage', () => {
     // The page renders a SearchField — just confirm browse was called on load
     expect(mockBrowse).toHaveBeenCalledWith(
       expect.objectContaining({ page: 1 }),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 
@@ -244,6 +245,7 @@ describe('PodcastsPage', () => {
 
     expect(mockBrowse).toHaveBeenCalledWith(
       expect.objectContaining({ sort: 'newest', page: 1 }),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 });

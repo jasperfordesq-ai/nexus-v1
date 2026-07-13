@@ -23,6 +23,8 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import RotateCw from 'lucide-react/icons/rotate-cw';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
+import Volume2 from 'lucide-react/icons/volume-2';
+import { safePodcastArtworkUrl } from '@/lib/podcasts/artwork';
 
 interface PodcastAudioPlayerProps {
   episode: PodcastEpisode;
@@ -54,7 +56,7 @@ export function trackFromEpisode(episode: PodcastEpisode, showSlug?: string): Pl
     episodeSlug: episode.slug,
     title: episode.title,
     showTitle: episode.show?.title ?? null,
-    artworkUrl: episode.cover_image_url ?? episode.show?.artwork_url ?? null,
+    artworkUrl: safePodcastArtworkUrl(episode.cover_image_url ?? episode.show?.artwork_url),
     audioUrl: episode.audio_url,
     durationSeconds: episode.duration_seconds ?? null,
     chapters: episode.chapters ?? [],
@@ -76,7 +78,9 @@ export function PodcastAudioPlayer({ episode, showSlug }: PodcastAudioPlayerProp
   const duration = isActive && player.duration > 0 ? player.duration : normalizeDuration(episode.duration_seconds);
   const playbackRate = isActive ? player.playbackRate : 1;
 
-  const chapters = (episode.chapters ?? []).filter((chapter): chapter is PodcastChapter => Boolean(chapter.title));
+  const chapters = episode.chapters_enabled === false
+    ? []
+    : (episode.chapters ?? []).filter((chapter): chapter is PodcastChapter => Boolean(chapter.title));
   const canSeek = isActive && !hasError && duration > 0;
   const sliderMax = Math.max(1, duration);
   const sliderValue = Math.min(Math.max(scrubValue ?? currentTime, 0), sliderMax);
@@ -198,6 +202,7 @@ export function PodcastAudioPlayer({ episode, showSlug }: PodcastAudioPlayerProp
       <div className="space-y-1">
         <Slider
           aria-label={t('player.progress')}
+          formatOptions={{ style: 'unit', unit: 'second', unitDisplay: 'long' }}
           size="sm"
           hideValue
           minValue={0}
@@ -217,6 +222,28 @@ export function PodcastAudioPlayer({ episode, showSlug }: PodcastAudioPlayerProp
           <span className="tabular-nums">{duration > 0 ? formatTime(duration) : t('player.duration_unknown')}</span>
         </div>
       </div>
+
+      {isActive && (
+        <div className="flex items-center gap-3">
+          <Volume2 size={16} className="shrink-0 text-muted" aria-hidden="true" />
+          <Slider
+            aria-label={t('player.volume')}
+            formatOptions={{ style: 'percent' }}
+            className="max-w-48 flex-1"
+            size="sm"
+            hideValue
+            minValue={0}
+            maxValue={1}
+            step={0.05}
+            value={player.volume}
+            isDisabled={hasError}
+            onChange={(value) => player.setVolume(typeof value === 'number' ? value : (value[0] ?? 1))}
+          />
+          <span className="w-10 text-right text-xs tabular-nums text-muted">
+            {Math.round(player.volume * 100)}%
+          </span>
+        </div>
+      )}
 
       {chapters.length > 0 && (
         <div className="space-y-2">

@@ -26,7 +26,10 @@ import Pause from 'lucide-react/icons/pause';
 import Play from 'lucide-react/icons/play';
 import Podcast from 'lucide-react/icons/podcast';
 import X from 'lucide-react/icons/x';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TriangleAlert from 'lucide-react/icons/triangle-alert';
 import { resolveThumbnailUrl } from '@/lib/helpers';
+import { safePodcastArtworkUrl } from '@/lib/podcasts/artwork';
 
 interface PodcastMiniPlayerProps {
   /** Whether the layout renders the mobile tab bar at all (Layout's showNavbar). */
@@ -61,8 +64,9 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
     ? tenantPath(`/podcasts/${track.showSlug}/${track.episodeSlug}`)
     : tenantPath('/podcasts');
   const progressPercent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
-  const artworkSrc = track.artworkUrl
-    ? resolveThumbnailUrl(track.artworkUrl, { width: 96, height: 96 })
+  const safeArtworkUrl = safePodcastArtworkUrl(track.artworkUrl);
+  const artworkSrc = safeArtworkUrl
+    ? resolveThumbnailUrl(safeArtworkUrl, { width: 160, height: 160 })
     : '';
 
   return (
@@ -88,7 +92,7 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
 
           <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-3 sm:px-4">
             {artworkSrc ? (
-              <img src={artworkSrc} alt="" className="size-10 shrink-0 rounded-md object-cover" loading="lazy" decoding="async" />
+              <img src={artworkSrc} alt="" className="size-10 shrink-0 rounded-md object-cover" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
             ) : (
               <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-secondary text-muted">
                 <Podcast size={20} aria-hidden="true" />
@@ -108,6 +112,7 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
               <span className="shrink-0 text-xs tabular-nums text-muted">{formatTime(currentTime)}</span>
               <Slider
                 aria-label={t('player.progress')}
+                formatOptions={{ style: 'unit', unit: 'second', unitDisplay: 'long' }}
                 size="sm"
                 hideValue
                 className="flex-1"
@@ -123,16 +128,31 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
               </span>
             </div>
 
-            <Button
-              isIconOnly
-              size="sm"
-              color="primary"
-              onPress={toggle}
-              aria-label={isPlaying ? t('player.pause') : t('player.play')}
-              aria-pressed={isPlaying}
-            >
-              {isPlaying ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
-            </Button>
+            {player.hasError ? (
+              <>
+                <TriangleAlert className="text-danger" size={16} aria-hidden="true" />
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="tertiary"
+                  onPress={player.retry}
+                  aria-label={t('player.retry')}
+                >
+                  <RefreshCw size={16} aria-hidden="true" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                isIconOnly
+                size="sm"
+                color="primary"
+                onPress={toggle}
+                aria-label={isPlaying ? t('player.pause') : t('player.play')}
+                aria-pressed={isPlaying}
+              >
+                {isPlaying ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
+              </Button>
+            )}
             <Button
               isIconOnly
               size="sm"

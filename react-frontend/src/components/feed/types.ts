@@ -26,6 +26,8 @@ export interface FeedItem {
   content_truncated?: boolean;
   title?: string;
   slug?: string;
+  /** Podcast episode activity: owning show slug used to build its canonical route. */
+  show_slug?: string;
   author_name?: string;
   author_avatar?: string;
   author_id?: number;
@@ -36,7 +38,7 @@ export interface FeedItem {
   };
   created_at: string;
   updated_at?: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'volunteer_hours' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up' | 'course';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'volunteer_hours' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up' | 'course' | 'podcast_show' | 'podcast_episode';
   likes_count: number;
   comments_count: number;
   views_count?: number;
@@ -220,6 +222,12 @@ export function getItemDetailPath(item: FeedItem): string | null {
       return item.slug ? `/blog/${item.slug}` : `/feed/item/blog/${item.id}`;
     case 'course':
       return item.slug ? `/courses/${item.slug}` : `/courses/${item.id}`;
+    case 'podcast_show':
+      return item.slug ? `/podcasts/${item.slug}` : '/podcasts';
+    case 'podcast_episode':
+      return item.slug && item.show_slug
+        ? `/podcasts/${item.show_slug}/${item.slug}`
+        : '/podcasts';
     case 'discussion':
     case 'resource':
     case 'badge_earned':
@@ -257,6 +265,10 @@ export function getItemDetailLabel(item: FeedItem): string | null {
       return 'card.detail_blog';
     case 'course':
       return 'card.detail_course';
+    case 'podcast_show':
+      return 'card.detail_podcast_show';
+    case 'podcast_episode':
+      return 'card.detail_podcast_episode';
     default:
       return null;
   }

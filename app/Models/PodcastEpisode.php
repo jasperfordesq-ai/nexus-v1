@@ -7,6 +7,8 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use App\Services\PodcastConfigurationService;
+use App\Services\PodcastService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,7 +48,14 @@ class PodcastEpisode extends Model
         'scheduled_for',
     ];
 
-    protected $hidden = ['tenant_id', 'audio_storage_path', 'audio_storage_disk'];
+    protected $hidden = [
+        'tenant_id',
+        'audio_storage_path',
+        'audio_storage_disk',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
+    ];
 
     protected $casts = [
         'show_id' => 'integer',
@@ -64,6 +73,42 @@ class PodcastEpisode extends Model
         'announced_at' => 'datetime',
         'media_waveform_json' => 'array',
     ];
+
+    /** Unsafe or cross-tenant legacy cover art is never emitted to a browser or RSS. */
+    public function getCoverImageUrlAttribute(mixed $value): ?string
+    {
+        return PodcastService::safePodcastArtworkPath($value);
+    }
+
+    /** Response-only tenant capability; never persisted as a database column. */
+    public function getTranscriptsEnabledAttribute(): bool
+    {
+        return (bool) PodcastConfigurationService::get(
+            PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS
+        );
+    }
+
+    /** Response-only tenant capability; never persisted as a database column. */
+    public function getChaptersEnabledAttribute(): bool
+    {
+        return (bool) PodcastConfigurationService::get(
+            PodcastConfigurationService::CONFIG_ENABLE_CHAPTERS
+        );
+    }
+
+    /** Response-only tenant capability; never persisted as a database column. */
+    public function getReactionsEnabledAttribute(): bool
+    {
+        return (bool) PodcastConfigurationService::get(
+            PodcastConfigurationService::CONFIG_ENABLE_EPISODE_REACTIONS
+        );
+    }
+
+    /** Response-only media mode; never persisted as a database column. */
+    public function getHostedAudioAttribute(): bool
+    {
+        return ! empty($this->attributes['audio_storage_path']);
+    }
 
     public function show(): BelongsTo
     {
@@ -88,5 +133,21 @@ class PodcastEpisode extends Model
                 $q->whereNull('scheduled_for')
                     ->orWhere('scheduled_for', '<=', now());
             });
+    }
+
+    /** SQL projection matching the fail-closed hosted-media distribution gate. */
+    public function scopeDistributionReady(Builder $query): Builder
+    {
+        return $query->where(function (Builder $media): void {
+            $media->where(function (Builder $external): void {
+                $external->whereNull('audio_storage_path')
+                    ->where('audio_url', 'like', 'https://%')
+                    ->where('audio_url', 'not like', '%/api/v2/podcasts/media/%');
+            })->orWhere(function (Builder $hosted): void {
+                $hosted->whereNotNull('audio_storage_path')
+                    ->where('media_processing_status', 'complete')
+                    ->whereIn('media_scan_status', ['clean', 'not_required']);
+            });
+        });
     }
 }

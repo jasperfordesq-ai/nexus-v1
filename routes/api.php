@@ -1496,11 +1496,13 @@ Route::get('/v2/podcasts/{id}/validate-feed', [\App\Http\Controllers\Api\Podcast
 Route::get('/v2/podcasts/{id}/stats', [\App\Http\Controllers\Api\PodcastController::class, 'stats'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'store']);
 Route::put('/v2/podcasts/{id}', [\App\Http\Controllers\Api\PodcastController::class, 'update'])->where('id', '[0-9]+');
+Route::post('/v2/podcasts/{id}/artwork', [\App\Http\Controllers\Api\PodcastController::class, 'uploadArtwork'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts/{id}/publish', [\App\Http\Controllers\Api\PodcastController::class, 'publish'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts/{id}/archive', [\App\Http\Controllers\Api\PodcastController::class, 'archive'])->where('id', '[0-9]+');
 Route::delete('/v2/podcasts/{id}', [\App\Http\Controllers\Api\PodcastController::class, 'destroy'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts/{showId}/episodes', [\App\Http\Controllers\Api\PodcastController::class, 'storeEpisode'])->where('showId', '[0-9]+');
 Route::put('/v2/podcasts/{showId}/episodes/{episodeId}', [\App\Http\Controllers\Api\PodcastController::class, 'updateEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
+Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/cover', [\App\Http\Controllers\Api\PodcastController::class, 'uploadEpisodeCover'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/publish', [\App\Http\Controllers\Api\PodcastController::class, 'publishEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/archive', [\App\Http\Controllers\Api\PodcastController::class, 'archiveEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::delete('/v2/podcasts/{showId}/episodes/{episodeId}', [\App\Http\Controllers\Api\PodcastController::class, 'destroyEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
@@ -1510,12 +1512,30 @@ Route::post('/v2/podcasts/episodes/{episodeId}/report', [\App\Http\Controllers\A
 
 }); // End Route::middleware('auth:sanctum')
 
-// Identity-free analytics acknowledgement. Public episode/show payloads and
-// media remain authenticated below; this endpoint returns only {recorded:true}
-// and preserves anonymous listening metrics for an already-known episode ID.
+// Identity-free analytics acknowledgement. This endpoint returns only
+// {recorded:true} and preserves anonymous listening metrics for an already-known
+// public episode ID.
 Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])
     ->where('episodeId', '[0-9]+')
     ->withoutMiddleware('auth:sanctum');
+
+// Identity-free podcast distribution. Native media elements and podcast
+// clients cannot attach SPA bearer tokens. Controllers expose only approved
+// public resources; restricted hosted media requires a capability signature.
+Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])
+    ->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])
+    ->middleware('throttle:podcast-media');
+Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])
+    ->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])
+    ->middleware('throttle:60,1');
+Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])
+    ->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])
+    ->middleware('throttle:60,1');
+Route::get('/v2/podcasts/feed/{tenantId}/{showSlug}.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rssForTenant'])
+    ->where(['tenantId' => '[0-9]+', 'showSlug' => '[A-Za-z0-9_-]+'])
+    ->middleware('throttle:30,1');
+Route::get('/v2/podcasts/{showSlug}/feed.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rss'])
+    ->middleware('throttle:30,1');
 
 // ============================================
 // Courses, podcasts, and marketplace contain member identity and require auth.
@@ -1530,11 +1550,6 @@ Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController
 // Podcasts Module — authenticated content routes
 // ============================================
 Route::get('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'index']);
-Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:podcast-media');
-Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
-Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
-Route::get('/v2/podcasts/feed/{tenantId}/{showSlug}.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rssForTenant'])->where(['tenantId' => '[0-9]+', 'showSlug' => '[A-Za-z0-9_-]+'])->middleware('throttle:30,1');
-Route::get('/v2/podcasts/{showSlug}/feed.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rss'])->middleware('throttle:30,1');
 Route::get('/v2/podcasts/{showSlug}', [\App\Http\Controllers\Api\PodcastController::class, 'show']);
 Route::get('/v2/podcasts/{showSlug}/{episodeSlug}', [\App\Http\Controllers\Api\PodcastController::class, 'episode']);
 
@@ -2648,7 +2663,7 @@ Route::get('/v2/admin/podcasts', [\App\Http\Controllers\Api\AdminPodcastControll
 Route::post('/v2/admin/podcasts/shows/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateShow'])->where('id', '[0-9]+');
 Route::get('/v2/admin/podcasts/shows/{id}/validate-feed', [\App\Http\Controllers\Api\AdminPodcastController::class, 'validateFeed'])->where('id', '[0-9]+');
 Route::post('/v2/admin/podcasts/episodes/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateEpisode'])->where('id', '[0-9]+');
-Route::post('/v2/admin/podcasts/reports/{episodeId}/resolve', [\App\Http\Controllers\Api\AdminPodcastController::class, 'resolveReport'])->where('episodeId', '[0-9]+');
+Route::post('/v2/admin/podcasts/reports/{reportId}/resolve', [\App\Http\Controllers\Api\AdminPodcastController::class, 'resolveReport'])->where('reportId', '[0-9]+');
 Route::post('/v2/admin/podcasts/storage/verify', [\App\Http\Controllers\Api\AdminPodcastController::class, 'verifyStorage']);
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);

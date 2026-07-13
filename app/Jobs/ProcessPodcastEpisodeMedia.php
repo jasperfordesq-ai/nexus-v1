@@ -9,12 +9,15 @@ namespace App\Jobs;
 use App\Core\TenantContext;
 use App\Models\PodcastEpisode;
 use App\Services\PodcastMediaAnalyzer;
+use App\Services\PodcastMediaCleanupService;
 use App\Services\PodcastMediaScanner;
+use App\Services\PodcastService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,8 +25,8 @@ use Illuminate\Support\Facades\Storage;
  * Post-upload pipeline for hosted podcast audio:
  *
  *  1. Malware scan via ClamAV when CLAMAV_ADDRESS is configured. Infected
- *     uploads are quarantined (object deleted, storage columns cleared) and
- *     never served. Without a scanner the status stays honest:
+ *     uploads are quarantined (made private immediately, with deletion tracked
+ *     in a durable retry ledger) and never served. Without a scanner the status stays honest:
  *     'scan_unavailable', never 'clean'.
  *  2. Content analysis via getID3: verifies the bytes really are audio
  *     (the upload path only checks the client-supplied MIME type) and
@@ -74,6 +77,7 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
                         $episode->media_scan_status = 'scan_unavailable';
                     }
                     $episode->save();
+                    PodcastService::reconcileMediaLifecycle($episode);
 
                     return;
                 }
@@ -96,8 +100,8 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
                     if ($needsProcessing) {
                         $analysis = PodcastMediaAnalyzer::analyze($localPath);
                         if (!$analysis['is_audio']) {
-                            $episode->media_processing_status = 'failed';
-                            $episode->media_failure_reason = 'not_audio';
+                            $this->quarantineRejectedEpisode($episode, 'not_audio');
+                            return;
                         } else {
                             if (!$episode->duration_seconds && $analysis['duration_seconds']) {
                                 $episode->duration_seconds = $analysis['duration_seconds'];
@@ -111,6 +115,7 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
                     }
 
                     $episode->save();
+                    PodcastService::reconcileMediaLifecycle($episode);
                 } finally {
                     if ($isTempCopy && is_file($localPath)) {
                         @unlink($localPath);
@@ -186,37 +191,51 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
     }
 
     /**
-     * A positive malware verdict deletes the stored object and clears the
-     * storage columns — known malware must never be servable. The row keeps
-     * status 'infected'/'failed' so moderation can see what happened.
+     * A positive malware verdict makes the episode non-servable and records a
+     * durable deletion task. The row keeps status 'infected'/'failed' so
+     * moderation can see what happened.
      */
     private function quarantineInfectedEpisode(PodcastEpisode $episode): void
     {
-        $disk = (string) ($episode->audio_storage_disk ?: 'local');
-        $path = (string) $episode->audio_storage_path;
-
-        try {
-            Storage::disk($disk)->delete($path);
-        } catch (\Throwable $e) {
-            Log::warning('ProcessPodcastEpisodeMedia could not delete infected object', [
-                'episode_id' => $this->episodeId,
-                'disk' => $disk,
-                'path' => $path,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        $episode->media_scan_status = 'infected';
-        $episode->media_processing_status = 'failed';
-        $episode->media_failure_reason = 'infected';
-        $episode->audio_storage_path = null;
-        $episode->audio_storage_disk = null;
-        $episode->save();
+        $this->quarantineRejectedEpisode($episode, 'infected');
 
         Log::warning('Podcast episode audio failed malware scan; stored object quarantined', [
             'tenant_id' => $this->tenantId,
             'episode_id' => $this->episodeId,
         ]);
+    }
+
+    /**
+     * Put rejected media in a private, non-servable state and durably enqueue
+     * deletion. The hidden pointer remains until deletion is confirmed, so a
+     * false/exception from storage can always be retried.
+     */
+    private function quarantineRejectedEpisode(PodcastEpisode $episode, string $reason): void
+    {
+        $disk = (string) ($episode->audio_storage_disk ?: 'local');
+        $path = (string) $episode->audio_storage_path;
+
+        DB::transaction(function () use ($episode, $reason, $disk, $path): void {
+            if ($reason === 'infected') {
+                $episode->media_scan_status = 'infected';
+            }
+            $episode->media_processing_status = 'failed';
+            $episode->media_failure_reason = $reason;
+            $episode->status = 'draft';
+            $episode->audio_url = 'podcast-hosted://quarantined';
+            // audio_storage_* are deliberately retained until the cleanup
+            // worker proves the bytes are absent. They are hidden by the model.
+            $episode->save();
+
+            app(PodcastMediaCleanupService::class)->enqueueStorageObject(
+                $disk,
+                $path,
+                $reason === 'infected' ? 'malware_rejected' : 'content_rejected',
+                (int) $episode->id,
+            );
+
+            PodcastService::reconcileMediaLifecycle($episode);
+        });
     }
 
     /**
@@ -232,6 +251,7 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
                     $episode->media_processing_status = 'failed';
                     $episode->media_failure_reason = $episode->media_failure_reason ?: 'processing_error';
                     $episode->save();
+                    PodcastService::reconcileMediaLifecycle($episode);
                 }
             });
         } catch (\Throwable) {

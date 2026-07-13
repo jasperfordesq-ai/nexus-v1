@@ -726,7 +726,9 @@ const FEATURE_MODULES: ModuleDefinition[] = [
   },
   {
     id: 'podcasts',
-    name: 'Podcasts',
+    // ModuleCard resolves config.module_name_podcasts; this internal fallback
+    // deliberately avoids shipping an English user-facing label.
+    name: 'podcasts',
     description: 'Community audio — member-created shows, episodes, transcripts, chapters, RSS, and moderation.',
     icon: Podcast,
     type: 'feature',

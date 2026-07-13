@@ -12448,7 +12448,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=384 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=385 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -15601,6 +15601,31 @@ CREATE TABLE `podcast_episodes` (
   KEY `pod_eps_release_due_idx` (`status`,`moderation_status`,`announced_at`,`scheduled_for`),
   FULLTEXT KEY `pod_eps_title_desc_ft` (`title`,`summary`,`description`,`transcript`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `podcast_media_cleanup_tasks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `podcast_media_cleanup_tasks` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `asset_key` varchar(64) NOT NULL,
+  `kind` varchar(32) NOT NULL,
+  `disk` varchar(50) DEFAULT NULL,
+  `path` varchar(1000) NOT NULL,
+  `source_episode_id` bigint(20) unsigned DEFAULT NULL,
+  `reason` varchar(50) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending',
+  `attempts` int(10) unsigned NOT NULL DEFAULT 0,
+  `available_at` timestamp NULL DEFAULT NULL,
+  `last_error` text DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `pod_cleanup_tenant_asset_unique` (`tenant_id`,`asset_key`),
+  KEY `pod_cleanup_dispatch_idx` (`status`,`available_at`,`updated_at`,`id`),
+  KEY `pod_cleanup_episode_idx` (`tenant_id`,`source_episode_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `podcast_show_subscriptions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -20397,7 +20422,8 @@ INSERT INTO `laravel_migrations` VALUES
 (380,'2026_07_12_000068_add_event_recurrence_override_fields',110),
 (381,'2026_07_12_000069_add_event_recurrence_materialization_state',111),
 (382,'2026_07_12_000070_add_event_recurrence_revision_ledger',111),
-(383,'2026_07_12_000071_add_event_recurrence_definition_blueprints',111);
+(383,'2026_07_12_000071_add_event_recurrence_definition_blueprints',111),
+(384,'2026_07_12_000075_create_podcast_media_cleanup_tasks',112);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

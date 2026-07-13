@@ -8,6 +8,8 @@
     "close": "Sluiten"
   },
   "browse": {
+    "load_failed": "Podcasts konden niet worden geladen",
+    "retry": "Opnieuw proberen",
     "search_placeholder": "Zoekprogramma's",
     "category_label": "Categorie",
     "all_categories": "Alle categorieën",
@@ -24,6 +26,8 @@
     "load_more": "Laad meer"
   },
   "show": {
+    "load_failed": "Deze podcast kon niet worden geladen",
+    "retry": "Opnieuw proberen",
     "not_found": "Podcastshow niet gevonden",
     "no_summary": "Nog geen samenvatting.",
     "byline": "Hosted by {{name}}",
@@ -42,6 +46,8 @@
     "no_episodes": "Nog geen gepubliceerde afleveringen."
   },
   "episode": {
+    "load_failed": "Deze podcastaflevering kon niet worden geladen",
+    "retry": "Opnieuw proberen",
     "title": "Podcast-aflevering",
     "not_found": "Podcast-aflevering niet gevonden",
     "no_summary": "Nog geen samenvatting.",
@@ -77,6 +83,7 @@
     }
   },
   "player": {
+    "volume": "Volume",
     "unsupported": "Uw browser ondersteunt de audiospeler niet.",
     "load_error": "De audio van deze aflevering kan niet worden geladen. Mogelijk is het niet beschikbaar of wordt het nog verwerkt.",
     "duration_unknown": "Duur onbekend",
@@ -100,6 +107,18 @@
     "key_space": "Spatie"
   },
   "studio": {
+    "show_updated": "Podcast bijgewerkt.",
+    "episode_updated": "Aflevering bijgewerkt.",
+    "edit_show": "Podcast bewerken",
+    "edit_episode": "Aflevering bewerken",
+    "save_changes": "Wijzigingen opslaan",
+    "load_failed": "Je podcaststudio kon niet worden geladen.",
+    "retry_load": "Opnieuw proberen",
+    "creation_unavailable": "Je kunt met de huidige podcastinstellingen van deze community geen nieuwe podcast maken.",
+    "moderation_feedback": "Feedback van moderator: {{feedback}}",
+    "artwork_upload_failed": "De podcast is opgeslagen, maar de afbeelding kon niet worden geüpload.",
+    "cover_upload_failed": "De aflevering is opgeslagen, maar de omslag kon niet worden geüpload.",
+    "audio_https_required": "Gebruik een HTTPS-audio-URL. Gewone HTTP is alleen toegestaan bij lokale ontwikkeling.",
     "title": "Podcast Studio",
     "subtitle": "Creëer door leden geleide shows, voeg afleveringen toe en publiceer ze in de podcastbibliotheek van de community.",
     "create_show": "Toon maken",
@@ -196,6 +215,14 @@
     }
   },
   "fields": {
+    "artwork_file": "Podcastafbeelding",
+    "cover_image_file": "Afbeelding van aflevering",
+    "language": "Taal",
+    "episode_number": "Afleveringsnummer",
+    "season_number": "Seizoensnummer",
+    "cover_image_url": "URL van afleveringsafbeelding",
+    "transcript_language": "Taal van transcript",
+    "explicit_episode": "Deze aflevering als expliciet markeren",
     "show": "Show",
     "show_title": "Titel tonen",
     "episode_title": "Titel van de aflevering",

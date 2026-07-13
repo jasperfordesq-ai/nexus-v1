@@ -73,6 +73,25 @@
     "total_count": "{{count}}totale"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Cerca nella moderazione podcast",
+      "placeholder": "Cerca podcast, episodi, autori o segnalazioni"
+    },
+    "review": {
+      "show_title": "Esamina podcast",
+      "episode_title": "Esamina episodio",
+      "visibility": "Visibilità",
+      "language": "Lingua",
+      "category": "Categoria",
+      "media_scan": "Scansione media",
+      "media_processing": "Elaborazione media",
+      "transcript": "Trascrizione",
+      "chapters": "Capitoli",
+      "report_history": "Cronologia segnalazioni",
+      "notes": "Note del moderatore",
+      "notes_hint": "Spiega la decisione affinché l’autore possa apportare le modifiche necessarie.",
+      "audio_unsupported": "Il browser non può riprodurre questo audio."
+    },
     "title": "Podcasts",
     "description": "Esaminare i programmi e gli episodi della community, inclusi i contenuti conservati per la moderazione degli inquilini.",
     "load_failed": "Impossibile caricare la moderazione del podcast.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Esamina e modera",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Ripartizione del cliente",
       "retention": "Retention",
       "reports": "Apri rapporti"
+    },
+    "review_values": {
+      "visibility": { "public": "Pubblico", "members": "Membri", "private": "Privato", "inherit": "Eredita dal programma" },
+      "media_scan": { "pending": "Scansione in attesa", "clean": "Pulito", "infected": "Infetto", "scan_unavailable": "Scanner non disponibile", "not_required": "Non richiesto" },
+      "media_processing": { "pending": "In attesa", "ready_for_processing": "Pronto per l’elaborazione", "complete": "Completato", "failed": "Non riuscito" },
+      "report_status": { "open": "Aperto", "resolved": "Risolto", "dismissed": "Ignorato", "escalated": "Inoltrato" }
     },
     "readiness": {
       "moderation": "Moderation",

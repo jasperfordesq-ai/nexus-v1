@@ -14,6 +14,7 @@ use App\Jobs\ProcessPodcastEpisodeMedia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
@@ -230,6 +231,208 @@ class PodcastControllerTest extends TestCase
         $this->assertSame(false, $defaults['podcasts.moderation_enabled']);
     }
 
+    public function test_disabling_member_creation_does_not_lock_existing_creator_studio(): void
+    {
+        $this->enablePodcasts(true);
+        $member = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Existing Creator Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.allow_member_show_creation' => false],
+        ])->assertStatus(200);
+
+        Sanctum::actingAs($member, ['*']);
+        $this->apiGet('/v2/podcasts/mine')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.can_create_show', false)
+            ->assertJsonPath('meta.can_manage_existing_shows', true);
+        $this->apiPut("/v2/podcasts/{$showId}", ['title' => 'Still Manageable'])
+            ->assertStatus(200);
+        $this->apiPost('/v2/podcasts', ['title' => 'Blocked New Show'])
+            ->assertStatus(403);
+    }
+
+    public function test_external_podcast_artwork_is_rejected(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $this->apiPost('/v2/podcasts', [
+            'title' => 'No Tracking Pixels',
+            'artwork_url' => 'https://attacker.example/tracker.png',
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.code', 'VALIDATION_FAILED');
+    }
+
+    public function test_cross_tenant_and_traversal_podcast_artwork_paths_are_rejected(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        $tenant = TenantContext::get();
+        $slug = (string) ($tenant['slug'] ?? 'default');
+        $prefix = "/uploads/tenants/{$slug}/podcasts/";
+        $paths = [
+            '/uploads/tenants/another-tenant/podcasts/art.jpg',
+            $prefix . '../art.jpg',
+            $prefix . '%2e%2e%2fart.jpg',
+            $prefix . 'folder\\art.jpg',
+            '/storage/podcasts/art.jpg',
+        ];
+
+        foreach ($paths as $index => $path) {
+            $this->apiPost('/v2/podcasts', [
+                'title' => 'Unsafe Artwork ' . $index,
+                'artwork_url' => $path,
+            ])->assertStatus(422)
+                ->assertJsonPath('errors.0.code', 'VALIDATION_FAILED');
+        }
+    }
+
+    public function test_owner_uploads_high_resolution_local_artwork_and_delete_cleans_file(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Uploaded Artwork Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $upload = $this->post("/api/v2/podcasts/{$showId}/artwork", [
+            'image' => UploadedFile::fake()->image('artwork.jpg', 1800, 1800),
+        ], $this->withTenantHeader())->assertStatus(200);
+        $url = (string) $upload->json('data.url');
+        $this->assertStringStartsWith('/uploads/tenants/', $url);
+        $this->assertStringContainsString('/podcasts/', $url);
+        $path = base_path('httpdocs' . $url);
+        $this->assertFileExists($path);
+        $dimensions = getimagesize($path);
+        $this->assertSame(1400, $dimensions[0]);
+        $this->assertSame(1400, $dimensions[1]);
+
+        $this->delete("/api/v2/podcasts/{$showId}", [], $this->withTenantHeader())
+            ->assertStatus(200);
+        $this->assertFileDoesNotExist($path);
+    }
+
+    public function test_owner_uploads_episode_cover_and_episode_delete_cleans_file(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Episode Cover Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Covered Episode',
+            'audio_url' => 'https://cdn.example.test/covered.mp3',
+        ])->assertStatus(201)->json('data.id');
+
+        $upload = $this->post("/api/v2/podcasts/{$showId}/episodes/{$episodeId}/cover", [
+            'image' => UploadedFile::fake()->image('cover.png', 1600, 1600),
+        ], $this->withTenantHeader())->assertStatus(200);
+        $path = base_path('httpdocs' . (string) $upload->json('data.url'));
+        $this->assertFileExists($path);
+
+        $this->delete("/api/v2/podcasts/{$showId}/episodes/{$episodeId}", [], $this->withTenantHeader())
+            ->assertStatus(200);
+        $this->assertFileDoesNotExist($path);
+    }
+
+    public function test_approved_show_edit_returns_to_moderation_and_hides_feed_activity(): void
+    {
+        $this->enablePodcasts(true);
+        $admin = $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.moderation_enabled' => true],
+        ])->assertStatus(200);
+
+        $member = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Moderated Original',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        Sanctum::actingAs($admin, ['*']);
+        $this->apiPost("/v2/admin/podcasts/shows/{$showId}/moderate", [
+            'action' => 'approve',
+            'notes' => 'Initial review complete.',
+        ])->assertStatus(200);
+
+        Sanctum::actingAs($member, ['*']);
+        $this->apiGet('/v2/podcasts/mine')
+            ->assertJsonPath('data.0.moderation_feedback', 'Initial review complete.')
+            ->assertJsonMissingPath('data.0.moderation_notes')
+            ->assertJsonMissingPath('data.0.moderated_by');
+        $this->apiPut("/v2/podcasts/{$showId}", ['title' => 'Unreviewed Replacement'])
+            ->assertStatus(200)
+            ->assertJsonPath('data.moderation_status', 'pending');
+
+        $this->assertSame(0, (int) DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'podcast_show')
+            ->where('source_id', $showId)
+            ->value('is_visible'));
+
+        Sanctum::actingAs($admin, ['*']);
+        $this->apiPost("/v2/admin/podcasts/shows/{$showId}/moderate", ['action' => 'approve'])
+            ->assertStatus(200);
+        $activity = DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'podcast_show')
+            ->where('source_id', $showId)
+            ->first();
+        $this->assertSame(1, (int) $activity->is_visible);
+        $this->assertSame('Unreviewed Replacement', $activity->title);
+    }
+
+    public function test_approved_episode_material_edit_returns_to_moderation(): void
+    {
+        $this->enablePodcasts(true);
+        $admin = $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.moderation_enabled' => true],
+        ])->assertStatus(200);
+
+        $member = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Moderated Episode Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Approved Audio',
+            'audio_url' => 'https://cdn.example.test/approved.mp3',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        Sanctum::actingAs($admin, ['*']);
+        $this->apiPost("/v2/admin/podcasts/shows/{$showId}/moderate", ['action' => 'approve'])
+            ->assertStatus(200);
+        $this->apiPost("/v2/admin/podcasts/episodes/{$episodeId}/moderate", [
+            'action' => 'approve',
+            'notes' => 'Audio reviewed.',
+        ])->assertStatus(200);
+
+        Sanctum::actingAs($member, ['*']);
+        $this->apiPut("/v2/podcasts/{$showId}/episodes/{$episodeId}", [
+            'audio_url' => 'https://cdn.example.test/unreviewed-replacement.mp3',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.moderation_status', 'pending')
+            ->assertJsonMissingPath('data.moderation_notes');
+
+        $this->assertSame(0, (int) DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'podcast_episode')
+            ->where('source_id', $episodeId)
+            ->value('is_visible'));
+    }
+
     public function test_browse_can_filter_by_category_and_sort_shows(): void
     {
         $this->enablePodcasts(true);
@@ -259,6 +462,7 @@ class PodcastControllerTest extends TestCase
         $browse->assertStatus(200);
         $browse->assertJsonPath('data.0.title', 'Wellbeing Weekly');
         $this->assertNotContains('Arts Archive', array_column($browse->json('data'), 'title'));
+        $this->assertEqualsCanonicalizing(['Arts', 'Health'], $browse->json('meta.categories'));
     }
 
     public function test_private_episode_is_not_exposed_on_public_show_or_rss(): void
@@ -325,6 +529,11 @@ class PodcastControllerTest extends TestCase
         ]);
 
         $episode->assertStatus(422);
+
+        $this->apiPost('/v2/podcasts/' . $show->json('data.id') . '/episodes', [
+            'title' => 'Mixed Content URL',
+            'audio_url' => 'http://cdn.example.test/insecure.mp3',
+        ])->assertStatus(422);
     }
 
     public function test_transcripts_can_be_disabled_in_configuration(): void
@@ -399,6 +608,7 @@ class PodcastControllerTest extends TestCase
     public function test_hosted_private_audio_is_served_only_with_signed_url(): void
     {
         Storage::fake('local');
+        Queue::fake([ProcessPodcastEpisodeMedia::class]);
         $this->enablePodcasts(true);
         $this->actingAsMember();
 
@@ -421,11 +631,20 @@ class PodcastControllerTest extends TestCase
         $audioUrl = $episode->json('data.audio_url');
 
         $this->assertStringContainsString("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $audioUrl);
-        $this->assertStringContainsString('signature=', $audioUrl);
+        $this->assertStringNotContainsString('signature=', $audioUrl, 'Unready media must not receive a capability signature.');
 
         $row = DB::table('podcast_episodes')->where('id', $episodeId)->first();
         $this->assertNotNull($row->audio_storage_path);
         Storage::disk('local')->assertExists($row->audio_storage_path);
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+        ]);
+
+        $mine = $this->apiGet('/v2/podcasts/mine')->assertStatus(200);
+        $readyEpisode = collect($mine->json('data.0.episodes'))->firstWhere('id', $episodeId);
+        $audioUrl = (string) ($readyEpisode['audio_url'] ?? '');
+        $this->assertStringContainsString('signature=', $audioUrl, 'Ready restricted media must receive a capability signature.');
 
         $this->actingAsMember();
         TenantContext::setById($this->testTenantId);
@@ -436,9 +655,71 @@ class PodcastControllerTest extends TestCase
         );
         $unsigned->assertStatus(404);
 
+        $foreignAdmin = User::factory()->forTenant(1)->admin()->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($foreignAdmin, ['*']);
+        $this->get(
+            "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
+            $this->withTenantHeader(),
+        )->assertStatus(404);
+
+        $foreignMember = User::factory()->forTenant(1)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'role' => 'member',
+        ]);
+        Sanctum::actingAs($foreignMember, ['*']);
+        $this->get(
+            "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
+            $this->withTenantHeader(),
+        )->assertStatus(404);
+
         $signedPath = parse_url($audioUrl, PHP_URL_PATH) . '?' . parse_url($audioUrl, PHP_URL_QUERY);
         $signed = $this->get($signedPath, $this->withTenantHeader());
         $signed->assertStatus(200);
+    }
+
+    public function test_owner_email_is_private_in_catalogue_but_visible_to_creator_and_admin(): void
+    {
+        $this->enablePodcasts(true);
+        $creator = $this->actingAsMember();
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Private Feed Contact',
+            'summary' => 'A published show with a private administration contact.',
+            'owner_email' => 'feed-owner@example.test',
+            'visibility' => 'public',
+        ])->assertStatus(201);
+        $showId = (int) $show->json('data.id');
+        $showSlug = (string) $show->json('data.slug');
+        $show->assertJsonPath('data.owner_email', 'feed-owner@example.test');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $viewer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'role' => 'member',
+        ]);
+        Sanctum::actingAs($viewer, ['*']);
+        $this->apiGet("/v2/podcasts/{$showSlug}")
+            ->assertStatus(200)
+            ->assertJsonMissingPath('data.owner_email');
+        $catalogue = $this->apiGet('/v2/podcasts')->assertStatus(200);
+        $this->assertArrayNotHasKey('owner_email', $catalogue->json('data.0'));
+
+        Sanctum::actingAs($creator, ['*']);
+        $authored = $this->apiGet('/v2/podcasts/mine')->assertStatus(200);
+        $this->assertSame('feed-owner@example.test', $authored->json('data.0.owner_email'));
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($admin, ['*']);
+        $adminIndex = $this->apiGet('/v2/admin/podcasts')->assertStatus(200);
+        $adminShow = collect($adminIndex->json('data.shows'))->firstWhere('id', $showId);
+        $this->assertSame('feed-owner@example.test', $adminShow['owner_email'] ?? null);
     }
 
     public function test_member_rss_feed_can_be_fetched_with_tenant_in_url(): void
@@ -464,7 +745,7 @@ class PodcastControllerTest extends TestCase
         $episode->assertStatus(201);
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episode->json('data.id')}/publish")->assertStatus(200);
 
-        $this->actingAsMember();
+        $this->app['auth']->forgetGuards();
         TenantContext::reset();
 
         $rss = $this->get(
@@ -556,10 +837,14 @@ class PodcastControllerTest extends TestCase
         ], $this->withTenantHeader());
         $episode->assertStatus(201);
         $episodeId = $episode->json('data.id');
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+        ]);
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
 
-        $this->actingAsMember();
-        TenantContext::setById($this->testTenantId);
+        $this->app['auth']->forgetGuards();
+        TenantContext::reset();
 
         $range = $this->get(
             "/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio",
@@ -724,9 +1009,10 @@ class PodcastControllerTest extends TestCase
 
         $rss = $this->get("/api/v2/podcasts/{$showSlug}/feed.xml", $this->withTenantHeader());
         $rss->assertStatus(200);
-        $rss->assertSee('<itunes:author>NEXUS Producers</itunes:author>', false);
-        $rss->assertSee('<itunes:owner>', false);
-        $rss->assertSee('<itunes:email>producer@example.test</itunes:email>', false);
+        $rss->assertSee('<itunes:author>', false);
+        $rss->assertDontSee('NEXUS Producers</itunes:author>', false);
+        $rss->assertDontSee('<itunes:owner>', false);
+        $rss->assertDontSee('producer@example.test', false);
         $rss->assertSee('<itunes:category text="Society &amp; Culture" />', false);
         $rss->assertSee('<copyright>Copyright 2026 NEXUS Producers</copyright>', false);
         $rss->assertSee('<itunes:explicit>true</itunes:explicit>', false);
@@ -770,6 +1056,70 @@ class PodcastControllerTest extends TestCase
         ]);
     }
 
+    public function test_podcast_feed_activity_tracks_visibility_moderation_archive_and_delete_lifecycle(): void
+    {
+        $this->enablePodcasts(true);
+        $owner = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Lifecycle Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Lifecycle Episode',
+            'audio_url' => 'https://cdn.example.test/lifecycle.mp3',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $visibility = fn (string $type, int $id) => DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', $type)
+            ->where('source_id', $id)
+            ->value('is_visible');
+        $this->assertSame(1, (int) $visibility('podcast_show', $showId));
+        $this->assertSame(1, (int) $visibility('podcast_episode', $episodeId));
+
+        $this->apiPut("/v2/podcasts/{$showId}", ['visibility' => 'private'])
+            ->assertStatus(200);
+        $this->assertSame(0, (int) $visibility('podcast_show', $showId));
+        $this->assertSame(0, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPut("/v2/podcasts/{$showId}", [
+            'visibility' => 'public',
+            'title' => 'Lifecycle Show Current',
+        ])->assertStatus(200);
+        $this->assertSame(1, (int) $visibility('podcast_show', $showId));
+        $this->assertSame('Lifecycle Show Current', DB::table('feed_activity')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('source_type', 'podcast_show')
+            ->where('source_id', $showId)
+            ->value('title'));
+
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/archive")->assertStatus(200);
+        $this->assertSame(0, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+        $this->assertSame(1, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPost("/v2/podcasts/{$showId}/archive")->assertStatus(200);
+        $this->assertSame(0, (int) $visibility('podcast_show', $showId));
+        $this->assertSame(0, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $admin = $this->actingAsAdmin();
+        $this->apiPost("/v2/admin/podcasts/shows/{$showId}/moderate", ['action' => 'flag'])->assertStatus(200);
+        $this->assertSame(0, (int) $visibility('podcast_show', $showId));
+        $this->assertSame(0, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPost("/v2/admin/podcasts/shows/{$showId}/moderate", ['action' => 'approve'])->assertStatus(200);
+        $this->apiPost("/v2/admin/podcasts/episodes/{$episodeId}/moderate", ['action' => 'flag'])->assertStatus(200);
+        $this->assertSame(0, (int) $visibility('podcast_episode', $episodeId));
+        $this->apiPost("/v2/admin/podcasts/episodes/{$episodeId}/moderate", ['action' => 'approve'])->assertStatus(200);
+        $this->assertSame(1, (int) $visibility('podcast_episode', $episodeId));
+
+        Sanctum::actingAs($owner, ['*']);
+        $this->delete("/api/v2/podcasts/{$showId}", [], $this->withTenantHeader())->assertStatus(200);
+        $this->assertDatabaseMissing('feed_activity', ['tenant_id' => $this->testTenantId, 'source_type' => 'podcast_show', 'source_id' => $showId]);
+        $this->assertDatabaseMissing('feed_activity', ['tenant_id' => $this->testTenantId, 'source_type' => 'podcast_episode', 'source_id' => $episodeId]);
+    }
+
     public function test_admin_index_includes_listen_completion_analytics(): void
     {
         $this->enablePodcasts(true);
@@ -788,6 +1138,7 @@ class PodcastControllerTest extends TestCase
             'title' => 'Analytics Episode',
             'audio_url' => 'https://cdn.example.test/analytics.mp3',
             'visibility' => 'public',
+            'duration_seconds' => 120,
         ]);
         $episode->assertStatus(201);
         $episodeId = $episode->json('data.id');
@@ -799,6 +1150,8 @@ class PodcastControllerTest extends TestCase
             'completed' => false,
             'session_id' => 'analytics-a',
         ])->assertStatus(200);
+        $secondMember = $this->actingAsMember();
+        Sanctum::actingAs($secondMember, ['*']);
         $this->apiPost("/v2/podcasts/episodes/{$episodeId}/listen", [
             'listened_seconds' => 120,
             'completed' => true,
@@ -831,6 +1184,7 @@ class PodcastControllerTest extends TestCase
             'title' => 'Deduped Analytics Episode',
             'audio_url' => 'https://cdn.example.test/deduped.mp3',
             'visibility' => 'public',
+            'duration_seconds' => 45,
         ]);
         $episodeId = $episode->json('data.id');
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
@@ -1072,7 +1426,10 @@ class PodcastControllerTest extends TestCase
         ]);
 
         // Its scheduled time arrives.
-        DB::table('podcast_episodes')->where('id', $episodeId)->update(['scheduled_for' => now()->subMinute()]);
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'scheduled_for' => now()->subMinute(),
+            'published_at' => now()->subMinute(),
+        ]);
 
         TenantContext::setById($this->testTenantId);
         PodcastService::releaseDueEpisodes();
@@ -1372,24 +1729,32 @@ class PodcastControllerTest extends TestCase
             'title' => 'Reported Episode',
             'audio_url' => 'https://cdn.example.test/reported.mp3',
             'visibility' => 'public',
+            'chapters' => [['title' => 'Review context', 'starts_at_seconds' => 0]],
         ]);
         $episode->assertStatus(201);
         $episodeId = $episode->json('data.id');
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
 
-        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/report", [
+        $report = $this->apiPost("/v2/podcasts/episodes/{$episodeId}/report", [
             'reason' => 'safety',
             'details' => 'Needs review.',
         ])->assertStatus(201);
+        $reportId = (int) $report->json('data.id');
 
         $admin = $this->actingAsAdmin();
         Sanctum::actingAs($admin, ['*']);
-        $resolve = $this->apiPost("/v2/admin/podcasts/reports/{$episodeId}/resolve", [
+        $adminIndex = $this->apiGet('/v2/admin/podcasts')->assertStatus(200);
+        $adminEpisode = collect($adminIndex->json('data.episodes'))->firstWhere('id', $episodeId);
+        $this->assertSame('Review context', $adminEpisode['chapters'][0]['title']);
+        $this->assertSame($reportId, $adminEpisode['report_history'][0]['id']);
+        $this->assertSame('open', $adminEpisode['report_history'][0]['status']);
+        $resolve = $this->apiPost("/v2/admin/podcasts/reports/{$reportId}/resolve", [
             'status' => 'resolved',
             'notes' => 'Reviewed and closed.',
         ]);
 
         $resolve->assertStatus(200);
+        $resolve->assertJsonPath('data.report_id', $reportId);
         $resolve->assertJsonPath('data.open_reports', 0);
         $this->assertDatabaseHas('podcast_episode_reports', [
             'tenant_id' => $this->testTenantId,
@@ -1538,6 +1903,7 @@ class PodcastControllerTest extends TestCase
             'title' => 'Breakdown Episode',
             'audio_url' => 'https://cdn.example.test/breakdown.mp3',
             'visibility' => 'public',
+            'duration_seconds' => 100,
         ]);
         $episodeId = $episode->json('data.id');
         $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
@@ -1558,7 +1924,7 @@ class PodcastControllerTest extends TestCase
         $adminIndex->assertStatus(200);
         $adminIndex->assertJsonPath('data.stats.unique_listeners', 1);
         $adminIndex->assertJsonPath('data.client_breakdown.0.client', 'apple');
-        $adminIndex->assertJsonPath('data.retention.0.bucket', '0-25');
+        $adminIndex->assertJsonPath('data.retention.0.bucket', '75-100');
     }
 
     public function test_admin_can_validate_public_podcast_feed(): void
@@ -1719,6 +2085,15 @@ class PodcastControllerTest extends TestCase
         $this->assertContains('throttle:60,1', $middleware['api/v2/podcasts/chapters/{tenantId}/{episodeId}.json'] ?? []);
         $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/feed/{tenantId}/{showSlug}.xml'] ?? []);
         $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/{showSlug}/feed.xml'] ?? []);
+        foreach ([
+            'api/v2/podcasts/media/{tenantId}/{episodeId}/audio',
+            'api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt',
+            'api/v2/podcasts/chapters/{tenantId}/{episodeId}.json',
+            'api/v2/podcasts/feed/{tenantId}/{showSlug}.xml',
+            'api/v2/podcasts/{showSlug}/feed.xml',
+        ] as $publicDistributionRoute) {
+            $this->assertNotContains('auth:sanctum', $middleware[$publicDistributionRoute] ?? []);
+        }
     }
 
     public function test_store_episode_rejects_more_than_200_chapters(): void
@@ -1772,6 +2147,37 @@ class PodcastControllerTest extends TestCase
         $this->assertSame(['Early Chapter', 'Middle Chapter', 'Late Chapter'], $rows->pluck('title')->all());
         $this->assertSame([5, 60, 120], $rows->pluck('starts_at_seconds')->map(fn ($s) => (int) $s)->all());
         $this->assertSame([0, 1, 2], $rows->pluck('position')->map(fn ($p) => (int) $p)->all());
+    }
+
+    public function test_disabling_chapters_hides_but_does_not_delete_existing_chapters(): void
+    {
+        $this->enablePodcasts(true);
+        $member = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Preserved Chapters Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Chaptered Episode',
+            'audio_url' => 'https://cdn.example.test/chaptered.mp3',
+            'chapters' => [['title' => 'Opening', 'starts_at_seconds' => 0]],
+        ])->assertStatus(201)->json('data.id');
+
+        $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.enable_chapters' => false],
+        ])->assertStatus(200);
+
+        Sanctum::actingAs($member, ['*']);
+        $this->apiPut("/v2/podcasts/{$showId}/episodes/{$episodeId}", [
+            'title' => 'Edited While Chapters Hidden',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.chapters_enabled', false);
+
+        $this->assertSame(1, (int) DB::table('podcast_episode_chapters')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('episode_id', $episodeId)
+            ->count());
     }
 
     public function test_private_show_creation_rejected_when_private_shows_disabled(): void
@@ -1988,6 +2394,146 @@ class PodcastControllerTest extends TestCase
         $this->assertIsArray($default->json('data.top_episodes'));
     }
 
+    public function test_admin_index_search_filters_shows_and_episodes_on_the_server(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $matchingShowId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Needle Community Audio',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $otherShowId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Unrelated Community Audio',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->apiPost("/v2/podcasts/{$matchingShowId}/episodes", [
+            'title' => 'Episode found through its show',
+            'audio_url' => 'https://cdn.example.test/needle.mp3',
+        ])->assertStatus(201);
+        $this->apiPost("/v2/podcasts/{$otherShowId}/episodes", [
+            'title' => 'Unrelated episode',
+            'audio_url' => 'https://cdn.example.test/other.mp3',
+        ])->assertStatus(201);
+
+        $this->actingAsAdmin();
+        $response = $this->apiGet('/v2/admin/podcasts?q=Needle');
+        $response->assertStatus(200);
+        $response->assertJsonPath('meta.shows_total', 1);
+        $response->assertJsonPath('meta.episodes_total', 1);
+        $response->assertJsonPath('data.shows.0.id', $matchingShowId);
+        $response->assertJsonPath('data.episodes.0.show_id', $matchingShowId);
+    }
+
+    public function test_admin_rss_readiness_counts_only_feed_eligible_shows(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        $emptyShowId = $this->apiPost('/v2/podcasts', [
+            'title' => 'No Eligible Episodes',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$emptyShowId}/publish")->assertStatus(200);
+
+        $readyShowId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Ready Feed',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$readyShowId}/publish")->assertStatus(200);
+        $episodeId = $this->apiPost("/v2/podcasts/{$readyShowId}/episodes", [
+            'title' => 'Feed Eligible',
+            'audio_url' => 'https://cdn.example.test/eligible.mp3',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$readyShowId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $this->actingAsAdmin();
+        $this->apiGet('/v2/admin/podcasts')
+            ->assertStatus(200)
+            ->assertJsonPath('data.stats.published_shows', 2)
+            ->assertJsonPath('data.stats.rss_ready_shows', 1);
+    }
+
+    public function test_unready_hosted_media_statuses_cannot_be_published_or_streamed(): void
+    {
+        Storage::fake('local');
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Pending Safety Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $episode = $this->post("/api/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Still Processing',
+            'audio' => UploadedFile::fake()->createWithContent('pending.wav', self::tinyWavBytes()),
+        ], $this->withTenantHeader())->assertStatus(201);
+
+        $audioUrl = (string) $episode->json('data.audio_url');
+        $signedPath = parse_url($audioUrl, PHP_URL_PATH) . '?' . parse_url($audioUrl, PHP_URL_QUERY);
+        $episodeId = (int) $episode->json('data.id');
+        foreach ([
+            ['pending', 'not_required', null],
+            ['complete', 'scan_unavailable', null],
+            ['failed', 'not_required', 'not_audio'],
+            ['failed', 'clean', 'processing_error'],
+        ] as [$processing, $scan, $reason]) {
+            DB::table('podcast_episodes')->where('id', $episodeId)->update([
+                'media_processing_status' => $processing,
+                'media_scan_status' => $scan,
+                'media_failure_reason' => $reason,
+            ]);
+            $this->get($signedPath, $this->withTenantHeader())->assertStatus(404);
+            $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")
+                ->assertStatus(409)
+                ->assertJsonPath('errors.0.code', 'MEDIA_NOT_READY');
+        }
+    }
+
+    public function test_unready_hosted_episode_is_hidden_from_members_listen_transcript_and_chapters(): void
+    {
+        Storage::fake('local');
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Fail Closed Projection',
+            'visibility' => 'public',
+        ])->assertStatus(201);
+        $showId = (int) $show->json('data.id');
+        $showSlug = (string) $show->json('data.slug');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+        $episode = $this->post("/api/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Unsafe Legacy Episode',
+            'audio' => UploadedFile::fake()->createWithContent('unsafe.wav', self::tinyWavBytes()),
+            'transcript' => 'This must remain hidden.',
+            'chapters' => json_encode([['title' => 'Hidden chapter', 'starts_at_seconds' => 0]]),
+        ], $this->withTenantHeader())->assertStatus(201);
+        $episodeId = (int) $episode->json('data.id');
+        $episodeSlug = (string) $episode->json('data.slug');
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'published_at' => now(),
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'scan_unavailable',
+        ]);
+
+        $this->actingAsMember();
+        $this->apiGet("/v2/podcasts/{$showSlug}")
+            ->assertStatus(200)
+            ->assertJsonCount(0, 'data.episodes');
+        $this->apiGet("/v2/podcasts/{$showSlug}/{$episodeSlug}")->assertStatus(404);
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/listen", ['listened_seconds' => 10])
+            ->assertStatus(404);
+
+        $this->app['auth']->forgetGuards();
+        $this->get("/api/v2/podcasts/transcripts/{$this->testTenantId}/{$episodeId}.txt", $this->withTenantHeader())
+            ->assertStatus(404);
+        $this->get("/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json", $this->withTenantHeader())
+            ->assertStatus(404);
+    }
+
     public function test_infected_media_is_never_served(): void
     {
         Storage::fake('local');
@@ -2005,6 +2551,12 @@ class PodcastControllerTest extends TestCase
         ], $this->withTenantHeader());
         $episode->assertStatus(201);
         $episodeId = $episode->json('data.id');
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+        ]);
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
 
         // Media is streamable before quarantine…
         $this->get("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $this->withTenantHeader())

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Core\ImageUploader;
 use App\Exceptions\SafeguardingPolicyException;
 use App\Http\Controllers\Api\Concerns\InteractsWithPodcasts;
 use App\Models\PodcastEpisode;
@@ -42,12 +43,17 @@ class PodcastController extends BaseApiController
             'include_member_only' => $userId !== null,
         ]);
 
-        return $this->respondWithPaginatedCollection(
+        $response = $this->respondWithPaginatedCollection(
             $result['items'],
             $result['total'],
             $result['page'],
             $result['per_page'],
         );
+        $payload = $response->getData(true);
+        $payload['meta']['categories'] = PodcastService::getDistinctCategories($userId !== null);
+        $response->setData($payload);
+
+        return $response;
     }
 
     public function show(string $showSlug): JsonResponse
@@ -138,12 +144,26 @@ class PodcastController extends BaseApiController
     {
         $this->ensurePodcastsFeature();
         $userId = $this->requirePodcastAuthor();
+        $allowMemberCreation = (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION);
+        $currentShowCount = PodcastService::ownedShowCount($userId);
+        $isAdmin = $this->callerIsAdmin();
+        $maxShowsPerUser = (int) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MAX_SHOWS_PER_USER);
+        $withinShowLimit = $maxShowsPerUser <= 0 || $currentShowCount < $maxShowsPerUser;
 
         // Upload constraints ride along so the studio can validate files
         // client-side before starting a multi-hundred-MB upload.
         return $this->respondWithData(PodcastService::authoredBy($userId), [
             'max_audio_size_mb' => (int) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MAX_AUDIO_SIZE_MB),
             'allowed_audio_mimes' => PodcastService::allowedAudioMimes(),
+            'allow_member_show_creation' => $allowMemberCreation,
+            'can_create_show' => ($allowMemberCreation || $isAdmin) && $withinShowLimit,
+            'can_manage_existing_shows' => true,
+            'current_show_count' => $currentShowCount,
+            'enable_private_shows' => (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS),
+            'enable_transcripts' => (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS),
+            'enable_chapters' => (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_CHAPTERS),
+            'enable_episode_reactions' => (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_EPISODE_REACTIONS),
+            'max_shows_per_user' => $maxShowsPerUser,
         ]);
     }
 
@@ -188,7 +208,7 @@ class PodcastController extends BaseApiController
     {
         $this->ensurePodcastsFeature();
         $this->rateLimit('podcasts_write', 30, 60);
-        $userId = $this->requirePodcastAuthor();
+        $userId = $this->requirePodcastShowCreator();
         $input = $this->getAllInput();
 
         $titleError = $this->validatePodcastTitle($input['title'] ?? null, 'api_controllers_2.podcasts.title_required');
@@ -207,7 +227,7 @@ class PodcastController extends BaseApiController
             return $this->podcastValidationError($e);
         }
 
-        return $this->respondWithData($show, null, 201);
+        return $this->respondWithData($show->makeVisible('owner_email'), null, 201);
     }
 
     public function update(int $id): JsonResponse
@@ -228,7 +248,7 @@ class PodcastController extends BaseApiController
         }
 
         try {
-            return $this->respondWithData(PodcastService::updateShow($show, $input));
+            return $this->respondWithData(PodcastService::updateShow($show, $input)->makeVisible('owner_email'));
         } catch (\InvalidArgumentException $e) {
             return $this->podcastValidationError($e);
         }
@@ -243,7 +263,50 @@ class PodcastController extends BaseApiController
         $show = $this->findPodcastShowOrFail($id);
         $this->ensurePodcastOwnerOrAdmin($show, $userId);
 
-        return $this->respondWithData(PodcastService::publishShow($show));
+        return $this->respondWithData(PodcastService::publishShow($show)->makeVisible('owner_email'));
+    }
+
+    public function uploadArtwork(int $id): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->rateLimit('podcasts_image_upload', 10, 60);
+        $userId = $this->requirePodcastAuthor();
+        $show = $this->findPodcastShowOrFail($id);
+        $this->ensurePodcastOwnerOrAdmin($show, $userId);
+        $oldUrl = $show->artwork_url;
+        $oldModeration = [
+            'status' => $show->moderation_status,
+            'notes' => $show->moderation_notes,
+            'by' => $show->moderated_by,
+            'at' => $show->moderated_at,
+        ];
+
+        $url = $this->storePodcastImage();
+        if ($url instanceof JsonResponse) {
+            return $url;
+        }
+
+        try {
+            PodcastService::updateShow($show, ['artwork_url' => $url]);
+        } catch (\Throwable $e) {
+            ImageUploader::deleteTenantUpload($url, 'podcasts');
+            throw $e;
+        }
+        $oldPhysicalPath = $oldUrl ? base_path('httpdocs' . $oldUrl) : null;
+        if ($oldUrl && $oldUrl !== $url && is_string($oldPhysicalPath) && is_file($oldPhysicalPath)
+            && !ImageUploader::deleteTenantUpload($oldUrl, 'podcasts')) {
+            ImageUploader::deleteTenantUpload($url, 'podcasts');
+            $show->artwork_url = $oldUrl;
+            $show->moderation_status = $oldModeration['status'];
+            $show->moderation_notes = $oldModeration['notes'];
+            $show->moderated_by = $oldModeration['by'];
+            $show->moderated_at = $oldModeration['at'];
+            $show->save();
+            PodcastService::updateShow($show, []);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 500);
+        }
+
+        return $this->respondWithData(['url' => $url]);
     }
 
     public function archive(int $id): JsonResponse
@@ -255,7 +318,7 @@ class PodcastController extends BaseApiController
         $show = $this->findPodcastShowOrFail($id);
         $this->ensurePodcastOwnerOrAdmin($show, $userId);
 
-        return $this->respondWithData(PodcastService::archiveShow($show));
+        return $this->respondWithData(PodcastService::archiveShow($show)->makeVisible('owner_email'));
     }
 
     public function destroy(int $id): JsonResponse
@@ -350,7 +413,58 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
-        return $this->respondWithData(PodcastService::publishEpisode($episode));
+        try {
+            return $this->respondWithData(PodcastService::publishEpisode($episode));
+        } catch (\InvalidArgumentException $e) {
+            return $this->podcastValidationError($e);
+        }
+    }
+
+    public function uploadEpisodeCover(int $showId, int $episodeId): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->rateLimit('podcasts_image_upload', 10, 60);
+        $userId = $this->requirePodcastAuthor();
+        $show = $this->findPodcastShowOrFail($showId);
+        $this->ensurePodcastOwnerOrAdmin($show, $userId);
+        $episode = $this->findPodcastEpisodeOrFail($episodeId);
+        if ((int) $episode->show_id !== $show->id) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
+        }
+        $oldUrl = $episode->cover_image_url;
+        $oldModeration = [
+            'status' => $episode->moderation_status,
+            'notes' => $episode->moderation_notes,
+            'by' => $episode->moderated_by,
+            'at' => $episode->moderated_at,
+        ];
+
+        $url = $this->storePodcastImage();
+        if ($url instanceof JsonResponse) {
+            return $url;
+        }
+
+        try {
+            PodcastService::updateEpisode($episode, ['cover_image_url' => $url]);
+        } catch (\Throwable $e) {
+            ImageUploader::deleteTenantUpload($url, 'podcasts');
+            throw $e;
+        }
+        $oldPhysicalPath = $oldUrl ? base_path('httpdocs' . $oldUrl) : null;
+        if ($oldUrl && $oldUrl !== $url && is_string($oldPhysicalPath) && is_file($oldPhysicalPath)
+            && !ImageUploader::deleteTenantUpload($oldUrl, 'podcasts')) {
+            ImageUploader::deleteTenantUpload($url, 'podcasts');
+            $episode->cover_image_url = $oldUrl;
+            $episode->moderation_status = $oldModeration['status'];
+            $episode->moderation_notes = $oldModeration['notes'];
+            $episode->moderated_by = $oldModeration['by'];
+            $episode->moderated_at = $oldModeration['at'];
+            $episode->save();
+            PodcastService::updateEpisode($episode, []);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 500);
+        }
+
+        return $this->respondWithData(['url' => $url]);
     }
 
     public function archiveEpisode(int $showId, int $episodeId): JsonResponse
@@ -483,13 +597,11 @@ class PodcastController extends BaseApiController
 
         // Quarantined media is never servable — belt-and-braces alongside the
         // object deletion performed by ProcessPodcastEpisodeMedia.
-        if ($episode->media_scan_status === 'infected') {
+        if (!PodcastService::isMediaReadyForDistribution($episode)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
-        $isAdmin = $this->callerIsAdmin();
-        $canView = PodcastService::canViewEpisode($episode, $show, $userId, $isAdmin)
+        $canView = PodcastService::canViewEpisode($episode, $show, null, false)
             || PodcastService::hasValidMediaSignature(
                 $episode,
                 $tenantId,
@@ -521,7 +633,9 @@ class PodcastController extends BaseApiController
         return response()->file($path, [
             'Content-Type' => $episode->audio_mime ?: 'audio/mpeg',
             'Accept-Ranges' => 'bytes',
-            'Cache-Control' => 'private, max-age=300',
+            'Cache-Control' => PodcastService::canViewEpisode($episode, $show, null, false)
+                ? 'public, max-age=300'
+                : 'private, max-age=300',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
@@ -583,12 +697,42 @@ class PodcastController extends BaseApiController
             str_contains($message, 'too large') => ['VALIDATION_FAILED', 'audio_too_large', 422],
             str_contains($message, 'Unsupported') => ['VALIDATION_FAILED', 'invalid_media_type', 422],
             str_contains($message, 'storage failed') => ['MEDIA_UPLOAD_FAILED', 'media_upload_failed', 500],
+            str_contains($message, 'not ready for publishing') => ['MEDIA_NOT_READY', 'media_not_ready', 409],
+            str_contains($message, 'External podcast artwork') => ['VALIDATION_FAILED', 'external_artwork_not_allowed', 422],
             str_contains($message, 'Private podcast shows') => ['VALIDATION_FAILED', 'private_shows_disabled', 422],
             str_contains($message, 'Too many podcast chapters') => ['VALIDATION_FAILED', 'too_many_chapters', 422],
             default => ['VALIDATION_FAILED', 'invalid_media_url', 422],
         };
 
         return $this->respondWithError($code, __("api_controllers_2.podcasts.{$key}"), null, $status);
+    }
+
+    private function storePodcastImage(): string|JsonResponse
+    {
+        $file = request()->file('image');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_FAILED', __('api.no_image_uploaded'), 'image', 422);
+        }
+
+        try {
+            return (string) ImageUploader::upload([
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ], 'podcasts', [
+                'crop' => true,
+                'width' => 1400,
+                'height' => 1400,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Podcast image upload failed', [
+                'tenant_id' => TenantContext::getId(),
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('UPLOAD_FAILED', __('api.failed_upload_image'), 'image', 422);
+        }
     }
 
     private function podcastInput(): array

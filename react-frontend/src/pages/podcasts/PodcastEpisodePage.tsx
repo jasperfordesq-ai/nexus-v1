@@ -33,17 +33,23 @@ export default function PodcastEpisodePage() {
   const [reportReason, setReportReason] = useState('safety');
   const [reportDetails, setReportDetails] = useState('');
   const [reporting, setReporting] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   usePageTitle(episode?.title ?? t('episode.title'));
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError(null);
     podcastsApi.episode(showSlug, episodeSlug)
       .then((res) => {
         if (cancelled) return;
         const data = res.success && res.data ? res.data : null;
         setEpisode(data);
+        if (!data && res.code && res.code !== 'RESOURCE_NOT_FOUND' && res.code !== 'NOT_FOUND') {
+          setLoadError(res.error || t('episode.load_failed'));
+        }
         setReactionActive(Boolean(data?.viewer_has_reacted));
         setReactionCount(data?.reaction_count ?? 0);
       })
@@ -54,7 +60,7 @@ export default function PodcastEpisodePage() {
     return () => {
       cancelled = true;
     };
-  }, [showSlug, episodeSlug]);
+  }, [showSlug, episodeSlug, retryKey, t]);
 
   // Keyboard shortcuts: space play/pause, arrows seek, up/down volume.
   // Guarded so typing in the report form (or any focusable control) is
@@ -149,7 +155,13 @@ export default function PodcastEpisodePage() {
   if (!episode) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <p className="text-lg font-medium">{t('episode.not_found')}</p>
+        <p className="text-lg font-medium">{loadError ? t('episode.load_failed') : t('episode.not_found')}</p>
+        {loadError && <p className="mt-1 text-sm text-muted" role="alert">{loadError}</p>}
+        {loadError && (
+          <Button className="mt-4" variant="secondary" onPress={() => setRetryKey((value) => value + 1)}>
+            {t('episode.retry')}
+          </Button>
+        )}
         <Button as={Link} to={tenantPath('/podcasts')} className="mt-4" variant="tertiary">
           {t('actions.back_to_podcasts')}
         </Button>
@@ -176,7 +188,7 @@ export default function PodcastEpisodePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
-      <Button as={Link} to={tenantPath(`/podcasts/${showPath}`)} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} aria-hidden="true" />}>
+      <Button as={Link} to={tenantPath(`/podcasts/${showPath}`)} variant="tertiary" size="sm" startContent={<ArrowLeft className="rtl:rotate-180" size={16} aria-hidden="true" />}>
         {t('actions.back_to_show')}
       </Button>
 
@@ -214,7 +226,7 @@ export default function PodcastEpisodePage() {
         </Card>
 
         <div className="flex flex-wrap items-center gap-2">
-          {isAuthenticated && (
+          {isAuthenticated && episode.reactions_enabled !== false && (
             <Button
               variant={reactionActive ? 'secondary' : 'tertiary'}
               size="sm"
@@ -226,7 +238,7 @@ export default function PodcastEpisodePage() {
               {reactionActive ? t('episode.reacted') : t('episode.react')}
             </Button>
           )}
-          {reactionCount > 0 && (
+          {episode.reactions_enabled !== false && reactionCount > 0 && (
             <span className="text-sm text-muted">{t('episode.reactions_count', { count: reactionCount })}</span>
           )}
           {isAuthenticated && (
@@ -243,7 +255,7 @@ export default function PodcastEpisodePage() {
           </section>
         )}
 
-        {episode.transcript && (
+        {episode.transcripts_enabled !== false && episode.transcript && (
           <section>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold">{t('episode.transcript')}</h2>

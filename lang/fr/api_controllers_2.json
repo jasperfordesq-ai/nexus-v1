@@ -212,7 +212,7 @@
   "podcasts.episode_title_required": "Un titre d'épisode de podcast est requis.",
   "podcasts.audio_url_required": "Une URL audio est requise.",
   "podcasts.invalid_scheduled_for": "Utilisez une date et une heure valides pour la publication programmée.",
-  "podcasts.invalid_media_url": "Utilisez une URL de média HTTP ou HTTPS valide.",
+  "podcasts.invalid_media_url": "Utilisez une URL de média HTTPS valide.",
   "podcasts.invalid_media_type": "Ce type de fichier n'est pas pris en charge. Téléversez un fichier audio MP3, M4A, AAC, WAV, OGG ou WebM.",
   "podcasts.media_upload_failed": "Le téléversement audio n'a pas pu être enregistré. Veuillez réessayer.",
   "podcasts.audio_too_large": "Le fichier audio du podcast dépasse la taille autorisée par cette communauté.",
@@ -234,5 +234,7 @@
   "podcasts.storage_driver_unavailable": "Le pilote de stockage cloud n'est pas installé sur ce serveur.",
   "podcasts.invalid_cdn_url": "Utilisez une URL HTTP ou HTTPS valide comme URL de base du CDN.",
   "podcasts.too_many_chapters": "Les épisodes peuvent contenir au maximum 200 chapitres.",
-  "podcasts.private_shows_disabled": "Les émissions de podcast privées et réservées aux membres sont désactivées pour cette communauté."
+  "podcasts.private_shows_disabled": "Les émissions de podcast privées et réservées aux membres sont désactivées pour cette communauté.",
+  "podcasts.media_not_ready": "L'audio hébergé de cet épisode est encore en cours de vérification ou n'a pas réussi la validation.",
+  "podcasts.external_artwork_not_allowed": "L'illustration du podcast doit être téléversée sur cette plateforme avant utilisation."
 }

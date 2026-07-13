@@ -212,7 +212,7 @@
   "podcasts.episode_title_required": "Tytuł odcinka podcastu jest wymagany.",
   "podcasts.audio_url_required": "Adres URL audio jest wymagany.",
   "podcasts.invalid_scheduled_for": "Użyj prawidłowej daty i godziny zaplanowanej publikacji.",
-  "podcasts.invalid_media_url": "Użyj prawidłowego adresu URL multimediów HTTP lub HTTPS.",
+  "podcasts.invalid_media_url": "Użyj prawidłowego adresu URL multimediów HTTPS.",
   "podcasts.invalid_media_type": "Ten typ pliku nie jest obsługiwany. Prześlij plik audio MP3, M4A, AAC, WAV, OGG lub WebM.",
   "podcasts.media_upload_failed": "Nie udało się zapisać przesłanego audio. Spróbuj ponownie.",
   "podcasts.audio_too_large": "Plik audio podcastu jest większy, niż pozwala ta społeczność.",
@@ -234,5 +234,7 @@
   "podcasts.storage_driver_unavailable": "Sterownik pamięci masowej w chmurze nie jest zainstalowany na tym serwerze.",
   "podcasts.invalid_cdn_url": "Użyj prawidłowego adresu URL HTTP lub HTTPS jako bazowego adresu URL CDN.",
   "podcasts.too_many_chapters": "Odcinki mogą mieć najwyżej 200 rozdziałów.",
-  "podcasts.private_shows_disabled": "Prywatne i dostępne tylko dla członków programy podcastowe są wyłączone dla tej społeczności."
+  "podcasts.private_shows_disabled": "Prywatne i dostępne tylko dla członków programy podcastowe są wyłączone dla tej społeczności.",
+  "podcasts.media_not_ready": "Hostowany dźwięk tego odcinka jest nadal sprawdzany lub nie przeszedł walidacji multimediów.",
+  "podcasts.external_artwork_not_allowed": "Grafika podcastu musi zostać przesłana na tę platformę przed użyciem."
 }

@@ -48,6 +48,8 @@ export interface PodcastShow {
   updated_at?: string | null;
   owner?: PodcastOwner | null;
   episodes?: PodcastEpisode[];
+  moderation_notes?: string | null;
+  moderation_feedback?: string | null;
 }
 
 export interface PodcastChapter {
@@ -93,6 +95,39 @@ export interface PodcastEpisode {
   show?: PodcastShow | null;
   author?: PodcastOwner | null;
   chapters?: PodcastChapter[];
+  moderation_notes?: string | null;
+  moderation_feedback?: string | null;
+  hosted_audio?: boolean;
+  reactions_enabled?: boolean;
+  transcripts_enabled?: boolean;
+  chapters_enabled?: boolean;
+  /** Admin-only moderation history; absent from member-facing projections. */
+  report_history?: Array<{
+    id: number;
+    episode_id: number;
+    reporter_user_id?: number | null;
+    reporter_name?: string | null;
+    reason: string;
+    details?: string | null;
+    status: string;
+    reviewed_by?: number | null;
+    reviewed_at?: string | null;
+    created_at?: string | null;
+  }>;
+}
+
+export interface PodcastStudioCapabilities {
+  max_audio_size_mb?: number;
+  allowed_audio_mimes?: string[];
+  allow_member_show_creation?: boolean;
+  can_create_show?: boolean;
+  can_manage_existing_shows?: boolean;
+  current_show_count?: number;
+  max_shows_per_user?: number;
+  enable_private_shows?: boolean;
+  enable_transcripts?: boolean;
+  enable_chapters?: boolean;
+  enable_episode_reactions?: boolean;
 }
 
 export interface PodcastFeedValidation {
@@ -133,6 +168,7 @@ interface PodcastPaginationMeta {
   current_page?: number;
   per_page?: number;
   has_more?: boolean;
+  categories?: string[];
 }
 
 export interface CreatePodcastShowPayload {
@@ -184,8 +220,14 @@ function query(params: Record<string, string | number | undefined>): string {
 }
 
 export const podcastsApi = {
-  browse: async (params: { q?: string; category?: string; sort?: string; page?: number; per_page?: number } = {}): Promise<ApiResponse<PodcastPage<PodcastShow>>> => {
-    const res = await api.get<PodcastShow[] | PodcastPage<PodcastShow>>(`/v2/podcasts${query(params)}`);
+  browse: async (
+    params: { q?: string; category?: string; sort?: string; page?: number; per_page?: number } = {},
+    options?: { signal?: AbortSignal },
+  ): Promise<ApiResponse<PodcastPage<PodcastShow>>> => {
+    const endpoint = `/v2/podcasts${query(params)}`;
+    const res = await (options
+      ? api.get<PodcastShow[] | PodcastPage<PodcastShow>>(endpoint, options)
+      : api.get<PodcastShow[] | PodcastPage<PodcastShow>>(endpoint));
     if (!res.success || !res.data) {
       return { ...res, data: undefined };
     }
@@ -221,6 +263,9 @@ export const podcastsApi = {
 
   updateShow: (id: number, data: Partial<CreatePodcastShowPayload>) =>
     api.put<PodcastShow>(`/v2/podcasts/${id}`, data),
+
+  uploadShowArtwork: (showId: number, image: File) =>
+    api.upload<{ url: string }>(`/v2/podcasts/${showId}/artwork`, image, 'image'),
 
   publishShow: (id: number) =>
     api.post<PodcastShow>(`/v2/podcasts/${id}/publish`, {}),
@@ -263,6 +308,9 @@ export const podcastsApi = {
   updateEpisode: (showId: number, episodeId: number, data: Partial<CreatePodcastEpisodePayload>) =>
     api.put<PodcastEpisode>(`/v2/podcasts/${showId}/episodes/${episodeId}`, data),
 
+  uploadEpisodeCover: (showId: number, episodeId: number, image: File) =>
+    api.upload<{ url: string }>(`/v2/podcasts/${showId}/episodes/${episodeId}/cover`, image, 'image'),
+
   publishEpisode: (showId: number, episodeId: number) =>
     api.post<PodcastEpisode>(`/v2/podcasts/${showId}/episodes/${episodeId}/publish`, {}),
 
@@ -281,8 +329,8 @@ export const podcastsApi = {
   reportEpisode: (episodeId: number, data: { reason: string; details?: string }) =>
     api.post(`/v2/podcasts/episodes/${episodeId}/report`, data),
 
-  resolveReport: (episodeId: number, status: 'resolved' | 'dismissed' | 'escalated' = 'resolved') =>
-    api.post<{ episode_id: number; open_reports: number }>(`/v2/admin/podcasts/reports/${episodeId}/resolve`, { status }),
+  resolveReport: (reportId: number, status: 'resolved' | 'dismissed' | 'escalated' = 'resolved') =>
+    api.post<{ report_id: number; episode_id: number; open_reports: number }>(`/v2/admin/podcasts/reports/${reportId}/resolve`, { status }),
 
   validateFeed: (showId: number) =>
     api.get<PodcastFeedValidation>(`/v2/admin/podcasts/shows/${showId}/validate-feed`),

@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use App\Services\PodcastService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +37,13 @@ class PodcastShow extends Model
         'visibility',
     ];
 
-    protected $hidden = ['tenant_id'];
+    protected $hidden = [
+        'tenant_id',
+        'owner_email',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
+    ];
 
     protected $casts = [
         'owner_user_id' => 'integer',
@@ -47,6 +54,12 @@ class PodcastShow extends Model
         'moderated_at' => 'datetime',
         'published_at' => 'datetime',
     ];
+
+    /** Unsafe or cross-tenant legacy artwork is never emitted to a browser or RSS. */
+    public function getArtworkUrlAttribute(mixed $value): ?string
+    {
+        return PodcastService::safePodcastArtworkPath($value);
+    }
 
     public function owner(): BelongsTo
     {

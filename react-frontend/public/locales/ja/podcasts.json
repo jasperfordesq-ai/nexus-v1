@@ -8,6 +8,8 @@
     "close": "閉じる"
   },
   "browse": {
+    "load_failed": "ポッドキャストを読み込めませんでした",
+    "retry": "もう一度試す",
     "search_placeholder": "番組を検索する",
     "category_label": "カテゴリ",
     "all_categories": "すべてのカテゴリー",
@@ -24,6 +26,8 @@
     "load_more": "さらにロードする"
   },
   "show": {
+    "load_failed": "このポッドキャストを読み込めませんでした",
+    "retry": "もう一度試す",
     "not_found": "ポッドキャスト番組が見つかりません",
     "no_summary": "まだ概要はありません。",
     "byline": "Hosted by {{name}}",
@@ -42,6 +46,8 @@
     "no_episodes": "公開されたエピソードはまだありません。"
   },
   "episode": {
+    "load_failed": "このエピソードを読み込めませんでした",
+    "retry": "もう一度試す",
     "title": "ポッドキャストのエピソード",
     "not_found": "ポッドキャストのエピソードが見つかりません",
     "no_summary": "まだ概要はありません。",
@@ -77,6 +83,7 @@
     }
   },
   "player": {
+    "volume": "音量",
     "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
     "load_error": "このエピソードの音声をロードできませんでした。利用できないか、まだ処理中の可能性があります。",
     "duration_unknown": "期間不明",
@@ -100,6 +107,18 @@
     "key_space": "スペース"
   },
   "studio": {
+    "show_updated": "ポッドキャストを更新しました。",
+    "episode_updated": "エピソードを更新しました。",
+    "edit_show": "ポッドキャストを編集",
+    "edit_episode": "エピソードを編集",
+    "save_changes": "変更を保存",
+    "load_failed": "ポッドキャストスタジオを読み込めませんでした。",
+    "retry_load": "もう一度試す",
+    "creation_unavailable": "このコミュニティの現在の設定では、別のポッドキャストを作成できません。",
+    "moderation_feedback": "モデレーターからのフィードバック：{{feedback}}",
+    "artwork_upload_failed": "ポッドキャストは保存されましたが、画像をアップロードできませんでした。",
+    "cover_upload_failed": "エピソードは保存されましたが、カバー画像をアップロードできませんでした。",
+    "audio_https_required": "HTTPSの音声URLを使用してください。通常のHTTPはローカル開発時のみ利用できます。",
     "title": "Podcast Studio",
     "subtitle": "メンバー主導の番組を作成し、エピソードを追加して、コミュニティ ポッドキャスト ライブラリに公開します。",
     "create_show": "番組の作成",
@@ -179,7 +198,8 @@
         "episode_missing_audio_length": "音声のファイルサイズがないエピソードがあります。",
         "episode_missing_audio_mime": "音声のMIMEタイプがないエピソードがあります。"
       },
-      "skipped_episodes_other": "音声が修正されるまで、{{count}}件のエピソードがフィードから除外されます。"
+      "skipped_episodes_other": "音声が修正されるまで、{{count}}件のエピソードがフィードから除外されます。",
+      "skipped_episodes_one": "音声が修正されるまで、{{count}}件のエピソードがフィードから除外されます。"
     },
     "stats": {
       "title": "リスナー統計",
@@ -190,10 +210,19 @@
       "top_episodes": "人気エピソード",
       "listen_count": "{{count}}回再生",
       "last_days": "再生アクティビティは過去{{days}}日間が対象です。",
-      "listen_count_other": "{{count}}回再生"
+      "listen_count_other": "{{count}}回再生",
+      "listen_count_one": "{{count}}回再生"
     }
   },
   "fields": {
+    "artwork_file": "ポッドキャスト画像",
+    "cover_image_file": "エピソードのカバー画像",
+    "language": "言語",
+    "episode_number": "エピソード番号",
+    "season_number": "シーズン番号",
+    "cover_image_url": "エピソード画像のURL",
+    "transcript_language": "文字起こしの言語",
+    "explicit_episode": "このエピソードを成人向けとしてマーク",
     "show": "Show",
     "show_title": "番組タイトル",
     "episode_title": "エピソードのタイトル",

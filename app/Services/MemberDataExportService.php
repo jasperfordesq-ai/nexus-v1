@@ -67,6 +67,7 @@ class MemberDataExportService
             'login_history'              => $this->loginHistory($userId),
             'notifications'              => $this->notifications($userId, $tenantId),
             'consents'                   => $this->consents($userId, $tenantId),
+            'podcasts'                   => $this->podcasts($userId, $tenantId),
         ];
     }
 
@@ -861,6 +862,117 @@ class MemberDataExportService
             ->all();
     }
 
+    /**
+     * Podcast content and engagement directly attributable to the member.
+     * Other listeners/subscribers are deliberately excluded from an owner's
+     * archive because those records belong to those other data subjects.
+     *
+     * @return array<string,mixed>
+     */
+    private function podcasts(int $userId, int $tenantId): array
+    {
+        $empty = [
+            'shows_owned' => [],
+            'episodes_authored' => [],
+            'chapters_authored' => [],
+            'listens' => [],
+            'reactions' => [],
+            'subscriptions' => [],
+            'reports_filed' => [],
+            'moderation_activity' => [
+                'shows' => [],
+                'episodes' => [],
+                'reports_reviewed' => [],
+            ],
+        ];
+
+        if (!Schema::hasTable('podcast_shows')) {
+            return $empty;
+        }
+
+        $rows = static fn ($query): array => $query->get()
+            ->map(static fn ($row): array => (array) $row)
+            ->all();
+
+        $empty['shows_owned'] = $rows(
+            DB::table('podcast_shows')
+                ->where('tenant_id', $tenantId)
+                ->where('owner_user_id', $userId)
+                ->orderByDesc('created_at')
+        );
+
+        if (Schema::hasTable('podcast_episodes')) {
+            $empty['episodes_authored'] = $rows(
+                DB::table('podcast_episodes')
+                    ->where('tenant_id', $tenantId)
+                    ->where('author_user_id', $userId)
+                    ->orderByDesc('created_at')
+            );
+
+            $episodeIds = array_map(
+                static fn (array $episode): int => (int) $episode['id'],
+                $empty['episodes_authored']
+            );
+            if ($episodeIds !== [] && Schema::hasTable('podcast_episode_chapters')) {
+                $empty['chapters_authored'] = $rows(
+                    DB::table('podcast_episode_chapters')
+                        ->where('tenant_id', $tenantId)
+                        ->whereIn('episode_id', $episodeIds)
+                        ->orderBy('episode_id')
+                        ->orderBy('position')
+                );
+            }
+
+            if (Schema::hasColumn('podcast_episodes', 'moderated_by')) {
+                $empty['moderation_activity']['episodes'] = $rows(
+                    DB::table('podcast_episodes')
+                        ->where('tenant_id', $tenantId)
+                        ->where('moderated_by', $userId)
+                        ->select(['id', 'show_id', 'moderation_status', 'moderated_at'])
+                        ->orderByDesc('moderated_at')
+                );
+            }
+        }
+
+        foreach ([
+            'podcast_episode_listens' => ['key' => 'listens', 'column' => 'user_id'],
+            'podcast_episode_reactions' => ['key' => 'reactions', 'column' => 'user_id'],
+            'podcast_show_subscriptions' => ['key' => 'subscriptions', 'column' => 'user_id'],
+            'podcast_episode_reports' => ['key' => 'reports_filed', 'column' => 'reporter_user_id'],
+        ] as $table => $mapping) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+            $empty[$mapping['key']] = $rows(
+                DB::table($table)
+                    ->where('tenant_id', $tenantId)
+                    ->where($mapping['column'], $userId)
+                    ->orderByDesc('id')
+            );
+        }
+
+        if (Schema::hasColumn('podcast_shows', 'moderated_by')) {
+            $empty['moderation_activity']['shows'] = $rows(
+                DB::table('podcast_shows')
+                    ->where('tenant_id', $tenantId)
+                    ->where('moderated_by', $userId)
+                    ->select(['id', 'moderation_status', 'moderated_at'])
+                    ->orderByDesc('moderated_at')
+            );
+        }
+        if (Schema::hasTable('podcast_episode_reports') && Schema::hasColumn('podcast_episode_reports', 'reviewed_by')) {
+            $empty['moderation_activity']['reports_reviewed'] = $rows(
+                DB::table('podcast_episode_reports')
+                    ->where('tenant_id', $tenantId)
+                    ->where('reviewed_by', $userId)
+                    ->select(['id', 'episode_id', 'status', 'reviewed_at'])
+                    ->orderByDesc('reviewed_at')
+            );
+        }
+
+        return $empty;
+    }
+
     // ─────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────
@@ -880,6 +992,8 @@ class MemberDataExportService
     private function buildReadme(int $userId, string $tenantName): string
     {
         $generated = now()->toDayDateTimeString();
+        $podcastsTitle = __('govuk_alpha.podcasts.title');
+        $podcastsDescription = __('govuk_alpha.podcasts.description');
         return <<<MD
 # Personal Data Archive
 
@@ -982,6 +1096,9 @@ status, and timestamp.
 ### consents
 Every consent record we hold for you — what you agreed to, which version of
 the document, when, and whether you've since withdrawn it.
+
+### {$podcastsTitle}
+{$podcastsDescription}
 
 ## Your rights
 

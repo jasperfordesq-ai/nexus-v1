@@ -8,6 +8,8 @@
     "close": "إغلاق"
   },
   "browse": {
+    "load_failed": "تعذر تحميل ملفات البودكاست",
+    "retry": "حاول مرة أخرى",
     "search_placeholder": "يظهر البحث",
     "category_label": "فئة",
     "all_categories": "جميع الفئات",
@@ -24,6 +26,8 @@
     "load_more": "تحميل المزيد"
   },
   "show": {
+    "load_failed": "تعذر تحميل برنامج البودكاست هذا",
+    "retry": "حاول مرة أخرى",
     "not_found": "لم يتم العثور على عرض البودكاست",
     "no_summary": "لا يوجد ملخص بعد.",
     "byline": "Hosted by {{name}}",
@@ -50,6 +54,8 @@
     "follower_count_zero": "{{count}} متابعين"
   },
   "episode": {
+    "load_failed": "تعذر تحميل حلقة البودكاست هذه",
+    "retry": "حاول مرة أخرى",
     "title": "حلقة بودكاست",
     "not_found": "لم يتم العثور على حلقة البودكاست",
     "no_summary": "لا يوجد ملخص بعد.",
@@ -89,6 +95,7 @@
     "reactions_count_zero": "{{count}} reactions"
   },
   "player": {
+    "volume": "مستوى الصوت",
     "unsupported": "متصفحك لا يدعم مشغل الصوت.",
     "load_error": "تعذر تحميل الصوت لهذه الحلقة. قد يكون غير متوفر أو لا يزال قيد المعالجة.",
     "duration_unknown": "المدة غير معروفة",
@@ -112,6 +119,18 @@
     "key_space": "مسافة"
   },
   "studio": {
+    "show_updated": "تم تحديث برنامج البودكاست.",
+    "episode_updated": "تم تحديث الحلقة.",
+    "edit_show": "تعديل برنامج البودكاست",
+    "edit_episode": "تعديل الحلقة",
+    "save_changes": "حفظ التغييرات",
+    "load_failed": "تعذر تحميل استوديو البودكاست الخاص بك.",
+    "retry_load": "حاول مرة أخرى",
+    "creation_unavailable": "لا يمكنك إنشاء برنامج بودكاست آخر وفق الإعدادات الحالية لهذا المجتمع.",
+    "moderation_feedback": "ملاحظات الإشراف: {{feedback}}",
+    "artwork_upload_failed": "تم حفظ برنامج البودكاست، لكن تعذر تحميل صورته.",
+    "cover_upload_failed": "تم حفظ الحلقة، لكن تعذر تحميل صورة الغلاف.",
+    "audio_https_required": "استخدم رابط صوت HTTPS. يُسمح بـ HTTP العادي أثناء التطوير المحلي فقط.",
     "title": "Podcast Studio",
     "subtitle": "أنشئ عروضًا يقودها الأعضاء وأضف الحلقات وانشرها في مكتبة البودكاست المجتمعية.",
     "create_show": "إنشاء عرض",
@@ -220,6 +239,14 @@
     "chapter_format_warning_zero": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00."
   },
   "fields": {
+    "artwork_file": "صورة برنامج البودكاست",
+    "cover_image_file": "صورة غلاف الحلقة",
+    "language": "اللغة",
+    "episode_number": "رقم الحلقة",
+    "season_number": "رقم الموسم",
+    "cover_image_url": "رابط صورة غلاف الحلقة",
+    "transcript_language": "لغة النص المكتوب",
+    "explicit_episode": "وضع علامة محتوى صريح على هذه الحلقة",
     "show": "Show",
     "show_title": "إظهار العنوان",
     "episode_title": "عنوان الحلقة",

@@ -20,6 +20,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTenant } from './TenantContext';
+import { API_BASE, tokenManager } from '@/lib/api';
 import { podcastsApi, type PodcastChapter } from '@/lib/api/podcasts';
 import { listenSessionId } from '@/lib/podcasts/listenSession';
 import {
@@ -74,6 +75,8 @@ const RESUME_MIN_SECONDS = 10;
 const RESUME_END_BUFFER_SECONDS = 10;
 /** Minimum gap between throttled resume-position writes during playback. */
 const RESUME_WRITE_INTERVAL_MS = 5000;
+/** Avoid a request for every media timeupdate while retaining useful partial listens. */
+const LISTEN_REPORT_INTERVAL_MS = 15000;
 
 export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
   const { tenant } = useTenant();
@@ -85,6 +88,8 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
   const completedRef = useRef(false);
   const pendingSeekRef = useRef<number | null>(null);
   const lastResumeWriteRef = useRef(0);
+  const lastListenReportRef = useRef(0);
+  const lastReportedSecondsRef = useRef(-1);
   const rateRef = useRef(1);
 
   const [track, setTrack] = useState<PlayerTrack | null>(null);
@@ -114,6 +119,53 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
     }
     if (pos < RESUME_MIN_SECONDS) return;
     saveResumePosition(tenantIdRef.current, current.episodeId, pos);
+  }, []);
+
+  const reportListen = useCallback((force = false, completed = false, secondsOverride?: number) => {
+    const audio = audioRef.current;
+    const current = trackRef.current;
+    if (!audio || !current) return;
+
+    const listenedSeconds = Math.max(0, Math.round(secondsOverride ?? audio.currentTime));
+    const now = Date.now();
+    if (!force && now - lastListenReportRef.current < LISTEN_REPORT_INTERVAL_MS) return;
+    if (!completed && listenedSeconds === lastReportedSecondsRef.current) return;
+
+    lastListenReportRef.current = now;
+    lastReportedSecondsRef.current = listenedSeconds;
+    void podcastsApi.recordListen(current.episodeId, {
+      listened_seconds: listenedSeconds,
+      completed,
+      session_id: listenSessionId(current.episodeId),
+    });
+  }, []);
+
+  const reportListenKeepalive = useCallback(() => {
+    const audio = audioRef.current;
+    const current = trackRef.current;
+    if (!audio || !current || audio.currentTime <= 0) return;
+
+    const headers = new Headers({ 'Content-Type': 'application/json', Accept: 'application/json' });
+    const token = tokenManager.getAccessToken();
+    const tenantId = tokenManager.getTenantId();
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    if (tenantId) headers.set('X-Tenant-ID', String(tenantId));
+
+    try {
+      void fetch(`${API_BASE}/v2/podcasts/episodes/${current.episodeId}/listen`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          listened_seconds: Math.max(0, Math.round(audio.currentTime)),
+          completed: false,
+          session_id: listenSessionId(current.episodeId),
+        }),
+        credentials: 'include',
+        keepalive: true,
+      }).catch(() => undefined);
+    } catch {
+      // Navigation must never be blocked by best-effort analytics delivery.
+    }
   }, []);
 
   // Create the single audio element once per provider mount. It lives in the
@@ -151,13 +203,18 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
     const onTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
       persistPosition();
+      reportListen();
     };
-    const onPlay = () => setStatus('playing');
+    const onPlay = () => {
+      setStatus('playing');
+      reportListen(true);
+    };
     const onPlaying = () => setStatus('playing');
     const onWaiting = () => setStatus('loading');
     const onPause = () => {
       setStatus((prev) => (prev === 'ended' || prev === 'error' ? prev : 'paused'));
       persistPosition(true);
+      reportListen(true);
     };
     const onEnded = () => {
       setStatus('ended');
@@ -168,11 +225,9 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
       const dur = Number.isFinite(audio.duration) && audio.duration > 0
         ? audio.duration
         : (current.durationSeconds ?? 0);
-      void podcastsApi.recordListen(current.episodeId, {
-        listened_seconds: Math.round(dur || audio.currentTime),
-        completed: true,
-        session_id: listenSessionId(current.episodeId),
-      });
+      // Use the media duration for a completed listen. The server independently
+      // derives completion against its trusted duration and ignores this hint.
+      reportListen(true, true, dur || audio.currentTime);
     };
     const onError = () => {
       // close() clears src, which fires a spurious error — only real tracks count.
@@ -200,12 +255,22 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
     document.body.appendChild(audio);
     audioRef.current = audio;
 
-    const onBeforeUnload = () => persistPosition(true);
+    const onBeforeUnload = () => {
+      persistPosition(true);
+      reportListenKeepalive();
+    };
+    const onPageHide = () => {
+      persistPosition(true);
+      reportListenKeepalive();
+    };
     window.addEventListener('beforeunload', onBeforeUnload);
+    window.addEventListener('pagehide', onPageHide);
 
     return () => {
       window.removeEventListener('beforeunload', onBeforeUnload);
+      window.removeEventListener('pagehide', onPageHide);
       persistPosition(true);
+      reportListen(true);
       try {
         audio.pause();
         audio.removeAttribute('src');
@@ -215,7 +280,7 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
       audio.remove();
       audioRef.current = null;
     };
-  }, [persistPosition]);
+  }, [persistPosition, reportListen, reportListenKeepalive]);
 
   const load = useCallback((next: PlayerTrack, opts?: { autoplay?: boolean }) => {
     const audio = audioRef.current;
@@ -229,9 +294,14 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (current) persistPosition(true);
+    if (current) {
+      persistPosition(true);
+      reportListen(true);
+    }
 
     completedRef.current = false;
+    lastListenReportRef.current = 0;
+    lastReportedSecondsRef.current = -1;
     pendingSeekRef.current = null;
     trackRef.current = next;
     setTrack(next);
@@ -253,7 +323,7 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
     audio.playbackRate = savedRate;
     audio.load();
     if (opts?.autoplay) void audio.play().catch(() => undefined);
-  }, [persistPosition]);
+  }, [persistPosition, reportListen]);
 
   const play = useCallback(() => {
     void audioRef.current?.play().catch(() => undefined);
@@ -337,6 +407,7 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
   const close = useCallback(() => {
     const audio = audioRef.current;
     persistPosition(true);
+    reportListen(true);
     // Clear the track BEFORE touching src so the spurious error event fired
     // by clearing src is ignored by onError.
     trackRef.current = null;
@@ -355,7 +426,7 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
         /* nothing to reset */
       }
     }
-  }, [persistPosition]);
+  }, [persistPosition, reportListen]);
 
   const getResumePosition = useCallback(
     (episodeId: number) => readResumePosition(tenantIdRef.current, episodeId),

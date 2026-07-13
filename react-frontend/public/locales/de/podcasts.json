@@ -8,6 +8,8 @@
     "close": "Schließen"
   },
   "browse": {
+    "load_failed": "Podcasts konnten nicht geladen werden",
+    "retry": "Erneut versuchen",
     "search_placeholder": "Suche zeigt",
     "category_label": "Kategorie",
     "all_categories": "Alle Kategorien",
@@ -24,6 +26,8 @@
     "load_more": "Mehr laden"
   },
   "show": {
+    "load_failed": "Dieser Podcast konnte nicht geladen werden",
+    "retry": "Erneut versuchen",
     "not_found": "Podcast-Show nicht gefunden",
     "no_summary": "Noch keine Zusammenfassung.",
     "byline": "Hosted by {{name}}",
@@ -42,6 +46,8 @@
     "no_episodes": "Noch keine veröffentlichten Episoden."
   },
   "episode": {
+    "load_failed": "Diese Podcastfolge konnte nicht geladen werden",
+    "retry": "Erneut versuchen",
     "title": "Podcast-Folge",
     "not_found": "Podcastfolge nicht gefunden",
     "no_summary": "Noch keine Zusammenfassung.",
@@ -77,6 +83,7 @@
     }
   },
   "player": {
+    "volume": "Lautstärke",
     "unsupported": "Ihr Browser unterstützt den Audioplayer nicht.",
     "load_error": "Der Ton dieser Episode konnte nicht geladen werden. Möglicherweise ist es nicht verfügbar oder wird noch verarbeitet.",
     "duration_unknown": "Dauer unbekannt",
@@ -100,6 +107,18 @@
     "key_space": "Leertaste"
   },
   "studio": {
+    "show_updated": "Podcast aktualisiert.",
+    "episode_updated": "Folge aktualisiert.",
+    "edit_show": "Podcast bearbeiten",
+    "edit_episode": "Folge bearbeiten",
+    "save_changes": "Änderungen speichern",
+    "load_failed": "Dein Podcast-Studio konnte nicht geladen werden.",
+    "retry_load": "Erneut versuchen",
+    "creation_unavailable": "Mit den aktuellen Podcast-Einstellungen dieser Community kannst du keinen weiteren Podcast erstellen.",
+    "moderation_feedback": "Moderationshinweis: {{feedback}}",
+    "artwork_upload_failed": "Der Podcast wurde gespeichert, aber das Bild konnte nicht hochgeladen werden.",
+    "cover_upload_failed": "Die Folge wurde gespeichert, aber das Titelbild konnte nicht hochgeladen werden.",
+    "audio_https_required": "Verwenden Sie eine HTTPS-Audio-URL. Einfaches HTTP ist nur lokal in der Entwicklung zulässig.",
     "title": "Podcast Studio",
     "subtitle": "Erstellen Sie von Mitgliedern geleitete Sendungen, fügen Sie Episoden hinzu und veröffentlichen Sie sie in der Community-Podcast-Bibliothek.",
     "create_show": "Show erstellen",
@@ -196,6 +215,14 @@
     }
   },
   "fields": {
+    "artwork_file": "Podcastbild",
+    "cover_image_file": "Titelbild der Folge",
+    "language": "Sprache",
+    "episode_number": "Folgennummer",
+    "season_number": "Staffelnummer",
+    "cover_image_url": "URL des Folgenbilds",
+    "transcript_language": "Sprache des Transkripts",
+    "explicit_episode": "Diese Folge als explizit kennzeichnen",
     "show": "Show",
     "show_title": "Titel anzeigen",
     "episode_title": "Episodentitel",

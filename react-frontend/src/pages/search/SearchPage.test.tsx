@@ -60,8 +60,22 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  getFormattingLocale: vi.fn(() => 'en'),
+  responsiveThumbnailProps: vi.fn((url) => ({ src: url })),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
+}));
+
+vi.mock('@/components/search/SavedSearches', () => ({
+  SavedSearches: () => null,
+}));
+
+vi.mock('@/components/search/AdvancedSearchFilters', () => ({
+  defaultFilters: {
+    type: 'all', category_id: '', date_from: '', date_to: '', sort: 'relevance', skills: '', location: '',
+  },
+  AdvancedSearchFilters: () => null,
 }));
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
@@ -199,6 +213,51 @@ describe('SearchPage', () => {
     expect(screen.getByText('Need help in garden')).toBeInTheDocument();
     expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     expect(screen.getByText('Gardener')).toBeInTheDocument();
+  });
+
+  it('groups podcast shows and episodes into the podcasts results section', async () => {
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/search?')) {
+        return Promise.resolve({
+          success: true,
+          data: [
+            {
+              type: 'podcast_show',
+              id: 31,
+              podcast_kind: 'show',
+              show_slug: 'community-voices',
+              title: 'Community Voices',
+              summary: 'Stories from local members',
+            },
+            {
+              type: 'podcast_episode',
+              id: 32,
+              podcast_kind: 'episode',
+              show_slug: 'community-voices',
+              episode_slug: 'garden-stories',
+              show_title: 'Community Voices',
+              title: 'Garden Stories',
+              summary: 'Growing together',
+            },
+          ],
+        });
+      }
+      return Promise.resolve({ success: true, data: [], meta: {} });
+    });
+
+    render(<SearchPage />);
+    const input = screen.getByPlaceholderText('Search for anything...');
+    const form = input.closest('form')!;
+    const { fireEvent } = await import('@testing-library/react');
+    fireEvent.change(input, { target: { value: 'community' } });
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(screen.getByText('Community Voices')).toBeInTheDocument());
+    expect(screen.getByText('Garden Stories')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Garden Stories/ })).toHaveAttribute(
+      'href',
+      '/test/podcasts/community-voices/garden-stories'
+    );
   });
 
   it('shows error state when search API fails', async () => {

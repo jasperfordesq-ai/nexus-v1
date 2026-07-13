@@ -9,7 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Podcasts module (alpha) — shows, episodes, chapters, and lightweight
+ * Podcasts module — shows, episodes, chapters, and lightweight
  * engagement analytics. Tenant-scoped and idempotent; no DB-level FKs, matching
  * the course/marketplace convention for weakly coupled multi-tenant modules.
  */

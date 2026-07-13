@@ -87,7 +87,8 @@
       "resolve_report": "Resolve report",
       "dismiss_report": "Dismiss report",
       "escalate_report": "Escalate report",
-      "validate_feed": "Validate RSS feed"
+      "validate_feed": "Validate RSS feed",
+      "inspect": "Inspect and moderate"
     },
     "filters": {
       "label": "Podcast moderation filter",
@@ -104,6 +105,31 @@
       "client_breakdown": "Client breakdown",
       "retention": "Retention",
       "reports": "Open reports"
+    },
+    "search": {
+      "label": "Search podcast moderation",
+      "placeholder": "Search shows, episodes, creators, or reports"
+    },
+    "review": {
+      "show_title": "Review podcast show",
+      "episode_title": "Review podcast episode",
+      "visibility": "Visibility",
+      "language": "Language",
+      "category": "Category",
+      "media_scan": "Media scan",
+      "media_processing": "Media processing",
+      "transcript": "Transcript",
+      "chapters": "Chapters",
+      "report_history": "Report history",
+      "notes": "Moderator notes",
+      "notes_hint": "Explain the decision so the creator can make the necessary changes.",
+      "audio_unsupported": "Your browser cannot play this audio."
+    },
+    "review_values": {
+      "visibility": { "public": "Public", "members": "Members", "private": "Private", "inherit": "Inherit from show" },
+      "media_scan": { "pending": "Scan pending", "clean": "Clean", "infected": "Infected", "scan_unavailable": "Scanner unavailable", "not_required": "Not required" },
+      "media_processing": { "pending": "Pending", "ready_for_processing": "Ready for processing", "complete": "Complete", "failed": "Failed" },
+      "report_status": { "open": "Open", "resolved": "Resolved", "dismissed": "Dismissed", "escalated": "Escalated" }
     },
     "readiness": {
       "moderation": "Moderation",

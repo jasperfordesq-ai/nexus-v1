@@ -8,8 +8,9 @@
  */
 
 import { getFormattingLocale } from '@/lib/helpers';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import ArrowUp from 'lucide-react/icons/arrow-up';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -20,9 +21,11 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Rss from 'lucide-react/icons/rss';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import XCircle from 'lucide-react/icons/circle-x';
+import Eye from 'lucide-react/icons/eye';
+import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { feedIssueKey } from '@/lib/podcasts/feedIssues';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { podcastsApi, type PodcastEpisode, type PodcastModerationStatus, type PodcastShow, type PodcastStatus } from '@/lib/api/podcasts';
 import {
@@ -31,6 +34,13 @@ import {
   CardBody,
   Chip,
   Spinner,
+  SearchField,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Textarea,
   Tab,
   Table,
   TableBody,
@@ -66,6 +76,9 @@ interface PodcastAdminStats {
   pending_media_scans: number;
   media_scan_unavailable: number;
   pending_media_processing: number;
+  failed_media_processing?: number;
+  infected_media?: number;
+  rss_ready_shows?: number;
 }
 
 interface PodcastReport {
@@ -131,11 +144,17 @@ function formatDate(value?: string | null): string {
   return new Date(value).toLocaleDateString(getFormattingLocale());
 }
 
+function formatDuration(seconds: number): string {
+  const safe = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, '0')}`;
+}
+
 
 export default function PodcastsAdmin() {
   const { t } = useTranslation('admin_podcasts');
   usePageTitle(t('podcasts_admin.title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
 
   const [data, setData] = useState<PodcastAdminIndex | null>(null);
   const [filter, setFilter] = useState<ModerationFilter>('all');
@@ -148,8 +167,23 @@ export default function PodcastsAdmin() {
   const [selectedShowIds, setSelectedShowIds] = useState<Set<string>>(new Set());
   const [selectedEpisodeIds, setSelectedEpisodeIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const requestIdRef = useRef(0);
+  const requestAbortRef = useRef<AbortController | null>(null);
+  const [reviewItem, setReviewItem] = useState<{ type: 'show'; item: PodcastShow } | { type: 'episode'; item: PodcastEpisode } | null>(null);
+  const [moderationNotes, setModerationNotes] = useState('');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 350);
+    return () => window.clearTimeout(timer);
+  }, [searchTerm]);
 
   const load = useCallback(async () => {
+    requestAbortRef.current?.abort();
+    const controller = new AbortController();
+    requestAbortRef.current = controller;
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -157,7 +191,9 @@ export default function PodcastsAdmin() {
       params.set('shows_page', String(showsPage));
       params.set('episodes_page', String(episodesPage));
       params.set('per_page', String(PAGE_SIZE));
-      const res = await api.get<PodcastAdminIndex>(`/v2/admin/podcasts?${params.toString()}`);
+      if (debouncedSearch) params.set('q', debouncedSearch);
+      const res = await api.get<PodcastAdminIndex>(`/v2/admin/podcasts?${params.toString()}`, { signal: controller.signal });
+      if (requestId !== requestIdRef.current) return;
       if (res.success && res.data) {
         setData(res.data);
         // Server-side pagination totals; fall back to row counts when the
@@ -171,15 +207,22 @@ export default function PodcastsAdmin() {
         toast.error(t('podcasts_admin.load_failed'));
       }
     } catch {
+      if (controller.signal.aborted) return;
       toast.error(t('podcasts_admin.load_failed'));
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [filter, showsPage, episodesPage, t, toast]);
+  }, [filter, showsPage, episodesPage, debouncedSearch, t, toast]);
 
   useEffect(() => {
-    load();
+    void load();
+    return () => requestAbortRef.current?.abort();
   }, [load]);
+
+  useEffect(() => {
+    setShowsPage(1);
+    setEpisodesPage(1);
+  }, [debouncedSearch]);
 
   const stats = useMemo(() => {
     if (!data) return [];
@@ -228,31 +271,32 @@ export default function PodcastsAdmin() {
         key: 'media',
         icon: HardDrive,
         label: t('podcasts_admin.readiness.media'),
-        value: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing,
+        value: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing + (data.stats.failed_media_processing ?? 0) + (data.stats.infected_media ?? 0),
         detail: t('podcasts_admin.readiness.media_jobs', {
-          count: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing,
+          count: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing + (data.stats.failed_media_processing ?? 0) + (data.stats.infected_media ?? 0),
         }),
-        color: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing > 0 ? 'warning' : 'success',
+        color: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing + (data.stats.failed_media_processing ?? 0) + (data.stats.infected_media ?? 0) > 0 ? 'warning' : 'success',
       },
       {
         key: 'rss',
         icon: Rss,
         label: t('podcasts_admin.readiness.rss'),
-        value: data.stats.published_shows,
-        detail: t('podcasts_admin.readiness.rss_ready', { count: data.stats.published_shows }),
-        color: data.stats.published_shows > 0 ? 'success' : 'default',
+        value: data.stats.rss_ready_shows ?? 0,
+        detail: t('podcasts_admin.readiness.rss_ready', { count: data.stats.rss_ready_shows ?? 0 }),
+        color: (data.stats.rss_ready_shows ?? 0) > 0 ? 'success' : 'default',
       },
     ] as const;
   }, [data, t]);
 
-  const moderate = async (type: 'show' | 'episode', id: number, action: ModerationAction) => {
+  const moderate = async (type: 'show' | 'episode', id: number, action: ModerationAction, notes?: string) => {
     const key = `${type}:${id}:${action}`;
     setActionKey(key);
     try {
       const endpoint = type === 'show'
         ? `/v2/admin/podcasts/shows/${id}/moderate`
         : `/v2/admin/podcasts/episodes/${id}/moderate`;
-      const res = await api.post(endpoint, { action });
+      const trimmedNotes = notes?.trim();
+      const res = await api.post(endpoint, trimmedNotes ? { action, notes: trimmedNotes } : { action });
       if (res.success) {
         toast.success(t(`podcasts_admin.toasts.${type}_${action}`));
         load();
@@ -266,11 +310,25 @@ export default function PodcastsAdmin() {
     }
   };
 
-  const resolveReport = async (episodeId: number, status: 'resolved' | 'dismissed' | 'escalated') => {
-    const key = `report:${episodeId}:${status}`;
+  const openReview = (type: 'show' | 'episode', item: PodcastShow | PodcastEpisode): void => {
+    setModerationNotes(item.moderation_notes ?? '');
+    setReviewItem(type === 'show'
+      ? { type, item: item as PodcastShow }
+      : { type, item: item as PodcastEpisode });
+  };
+
+  const submitReview = (action: ModerationAction): void => {
+    if (!reviewItem) return;
+    void moderate(reviewItem.type, reviewItem.item.id, action, moderationNotes);
+    setReviewItem(null);
+    setModerationNotes('');
+  };
+
+  const resolveReport = async (reportId: number, status: 'resolved' | 'dismissed' | 'escalated') => {
+    const key = `report:${reportId}:${status}`;
     setActionKey(key);
     try {
-      const res = await podcastsApi.resolveReport(episodeId, status);
+      const res = await podcastsApi.resolveReport(reportId, status);
       if (res.success) {
         toast.success(t(`podcasts_admin.toasts.report_${status}`));
         load();
@@ -380,8 +438,27 @@ export default function PodcastsAdmin() {
     </Chip>
   );
 
-  const actionButtons = (type: 'show' | 'episode', id: number) => (
+  const reviewState = (group: 'visibility' | 'media_scan' | 'media_processing' | 'report_status', value?: string | null) => {
+    if (!value) return t('podcasts_admin.empty_value');
+    return t(`podcasts_admin.review_values.${group}.${value}`, {
+      defaultValue: t('common.unknown'),
+    });
+  };
+
+  const actionButtons = (type: 'show' | 'episode', item: PodcastShow | PodcastEpisode) => (
     <div className="flex min-w-[7.5rem] items-center justify-end gap-1">
+      <Tooltip content={t('podcasts_admin.actions.inspect')}>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="tertiary"
+          aria-label={t('podcasts_admin.actions.inspect')}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => openReview(type, item)}
+        >
+          <Eye size={16} aria-hidden="true" />
+        </Button>
+      </Tooltip>
       <Tooltip content={t('podcasts_admin.actions.approve')}>
         <Button
           isIconOnly
@@ -389,8 +466,9 @@ export default function PodcastsAdmin() {
           variant="tertiary"
           color="success"
           aria-label={t('podcasts_admin.actions.approve')}
-          isLoading={actionKey === `${type}:${id}:approve`}
-          onPress={() => moderate(type, id, 'approve')}
+          isLoading={actionKey === `${type}:${item.id}:approve`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => openReview(type, item)}
         >
           <CheckCircle size={16} aria-hidden="true" />
         </Button>
@@ -402,8 +480,9 @@ export default function PodcastsAdmin() {
           variant="tertiary"
           color="danger"
           aria-label={t('podcasts_admin.actions.reject')}
-          isLoading={actionKey === `${type}:${id}:reject`}
-          onPress={() => moderate(type, id, 'reject')}
+          isLoading={actionKey === `${type}:${item.id}:reject`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => openReview(type, item)}
         >
           <XCircle size={16} aria-hidden="true" />
         </Button>
@@ -414,8 +493,9 @@ export default function PodcastsAdmin() {
           size="sm"
           variant="tertiary"
           aria-label={t('podcasts_admin.actions.flag')}
-          isLoading={actionKey === `${type}:${id}:flag`}
-          onPress={() => moderate(type, id, 'flag')}
+          isLoading={actionKey === `${type}:${item.id}:flag`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => openReview(type, item)}
         >
           <Flag size={16} aria-hidden="true" />
         </Button>
@@ -423,7 +503,7 @@ export default function PodcastsAdmin() {
     </div>
   );
 
-  const reportButtons = (episodeId: number) => (
+  const reportButtons = (reportId: number) => (
     <div className="flex min-w-[7.5rem] items-center justify-end gap-1">
       <Tooltip content={t('podcasts_admin.actions.resolve_report')}>
         <Button
@@ -432,8 +512,9 @@ export default function PodcastsAdmin() {
           variant="tertiary"
           color="success"
           aria-label={t('podcasts_admin.actions.resolve_report')}
-          isLoading={actionKey === `report:${episodeId}:resolved`}
-          onPress={() => resolveReport(episodeId, 'resolved')}
+          isLoading={actionKey === `report:${reportId}:resolved`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => resolveReport(reportId, 'resolved')}
         >
           <CheckCircle size={16} aria-hidden="true" />
         </Button>
@@ -444,8 +525,9 @@ export default function PodcastsAdmin() {
           size="sm"
           variant="tertiary"
           aria-label={t('podcasts_admin.actions.dismiss_report')}
-          isLoading={actionKey === `report:${episodeId}:dismissed`}
-          onPress={() => resolveReport(episodeId, 'dismissed')}
+          isLoading={actionKey === `report:${reportId}:dismissed`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => resolveReport(reportId, 'dismissed')}
         >
           <XCircle size={16} aria-hidden="true" />
         </Button>
@@ -457,8 +539,9 @@ export default function PodcastsAdmin() {
           variant="tertiary"
           color="warning"
           aria-label={t('podcasts_admin.actions.escalate_report')}
-          isLoading={actionKey === `report:${episodeId}:escalated`}
-          onPress={() => resolveReport(episodeId, 'escalated')}
+          isLoading={actionKey === `report:${reportId}:escalated`}
+          isDisabled={actionKey !== null || bulkLoading}
+          onPress={() => resolveReport(reportId, 'escalated')}
         >
           <ArrowUp size={16} aria-hidden="true" />
         </Button>
@@ -494,12 +577,13 @@ export default function PodcastsAdmin() {
               variant="tertiary"
               aria-label={t('podcasts_admin.actions.validate_feed')}
               isLoading={actionKey === `feed:${show.id}`}
+              isDisabled={actionKey !== null || bulkLoading}
               onPress={() => validateFeed(show)}
             >
               <Rss size={16} aria-hidden="true" />
             </Button>
           </Tooltip>
-          {actionButtons('show', show.id)}
+          {actionButtons('show', show)}
         </div>
       ),
     },
@@ -521,7 +605,7 @@ export default function PodcastsAdmin() {
     { key: 'author', label: t('podcasts_admin.columns.author'), render: (episode) => <div className="max-w-[16rem] truncate">{episode.author?.name ?? t('podcasts_admin.empty_value')}</div> },
     { key: 'status', label: t('podcasts_admin.columns.status'), render: (episode) => statusChip(episode.status) },
     { key: 'moderation', label: t('podcasts_admin.columns.moderation'), render: (episode) => moderationChip(episode.moderation_status) },
-    { key: 'actions', label: t('podcasts_admin.columns.actions'), render: (episode) => actionButtons('episode', episode.id) },
+    { key: 'actions', label: t('podcasts_admin.columns.actions'), render: (episode) => actionButtons('episode', episode) },
   ];
 
   return (
@@ -542,6 +626,18 @@ export default function PodcastsAdmin() {
           </Button>
         }
       />
+
+      <div className="mb-5 max-w-xl">
+        <SearchField
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+          onClear={() => setSearchTerm('')}
+          isClearable
+          aria-label={t('podcasts_admin.search.label')}
+          placeholder={t('podcasts_admin.search.placeholder')}
+          startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
+        />
+      </div>
 
       {loading && !data ? (
         <div className="flex justify-center py-16" role="status" aria-busy="true">
@@ -723,7 +819,11 @@ export default function PodcastsAdmin() {
                       <TableCell>
                         <div className="min-w-0">
                           <div className="truncate font-medium text-foreground">
-                            {report.episode_title ?? t('podcasts_admin.report_unknown_episode', { id: report.episode_id })}
+                            {report.show_slug && report.episode_slug ? (
+                              <Link className="hover:text-accent" to={tenantPath(`/podcasts/${report.show_slug}/${report.episode_slug}`)}>
+                                {report.episode_title ?? t('podcasts_admin.report_unknown_episode', { id: report.episode_id })}
+                              </Link>
+                            ) : report.episode_title ?? t('podcasts_admin.report_unknown_episode', { id: report.episode_id })}
                           </div>
                           <div className="truncate text-xs text-muted">
                             {report.reporter_name
@@ -738,7 +838,7 @@ export default function PodcastsAdmin() {
                       <TableCell>{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</TableCell>
                       <TableCell className="max-w-md whitespace-normal text-sm text-muted">{report.details || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell className="text-right">{reportButtons(report.episode_id)}</TableCell>
+                      <TableCell className="text-right">{reportButtons(report.id)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -817,6 +917,104 @@ export default function PodcastsAdmin() {
           </section>
         </div>
       )}
+
+      <Modal isOpen={reviewItem !== null} onClose={() => setReviewItem(null)} size="2xl">
+        <ModalContent>
+          <ModalHeader>{t(`podcasts_admin.review.${reviewItem?.type ?? 'episode'}_title`)}</ModalHeader>
+          <ModalBody className="gap-4">
+            {reviewItem && (
+              <>
+                <div className="space-y-2 rounded-lg border border-border bg-surface-secondary/50 p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground">{reviewItem.item.title}</h3>
+                    {statusChip(reviewItem.item.status)}
+                    {moderationChip(reviewItem.item.moderation_status)}
+                  </div>
+                  <p className="whitespace-pre-line text-sm text-muted">
+                    {reviewItem.item.description || reviewItem.item.summary || t('podcasts_admin.empty_value')}
+                  </p>
+                  {reviewItem.type === 'show' ? (
+                    <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                      <div><dt className="font-medium">{t('podcasts_admin.columns.owner')}</dt><dd className="text-muted">{reviewItem.item.owner?.name ?? t('podcasts_admin.empty_value')}</dd></div>
+                      <div><dt className="font-medium">{t('podcasts_admin.review.visibility')}</dt><dd className="text-muted">{reviewState('visibility', reviewItem.item.visibility)}</dd></div>
+                      <div><dt className="font-medium">{t('podcasts_admin.review.language')}</dt><dd className="text-muted">{reviewItem.item.language}</dd></div>
+                      <div><dt className="font-medium">{t('podcasts_admin.review.category')}</dt><dd className="text-muted">{reviewItem.item.category || t('podcasts_admin.empty_value')}</dd></div>
+                    </dl>
+                  ) : (
+                    <div className="space-y-4">
+                      <audio
+                        className="w-full"
+                        controls
+                        controlsList="nodownload"
+                        preload="metadata"
+                        src={reviewItem.item.audio_url}
+                      >
+                        {t('podcasts_admin.review.audio_unsupported')}
+                      </audio>
+                      <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                        <div><dt className="font-medium">{t('podcasts_admin.columns.show')}</dt><dd className="text-muted">{reviewItem.item.show?.title ?? t('podcasts_admin.empty_value')}</dd></div>
+                        <div><dt className="font-medium">{t('podcasts_admin.columns.author')}</dt><dd className="text-muted">{reviewItem.item.author?.name ?? t('podcasts_admin.empty_value')}</dd></div>
+                        <div><dt className="font-medium">{t('podcasts_admin.review.media_scan')}</dt><dd className="text-muted">{reviewState('media_scan', reviewItem.item.media_scan_status)}</dd></div>
+                        <div><dt className="font-medium">{t('podcasts_admin.review.media_processing')}</dt><dd className="text-muted">{reviewState('media_processing', reviewItem.item.media_processing_status)}</dd></div>
+                      </dl>
+                      {reviewItem.item.transcript && (
+                        <div>
+                          <h4 className="mb-1 text-sm font-semibold">{t('podcasts_admin.review.transcript')}</h4>
+                          <p className="max-h-64 overflow-auto whitespace-pre-line rounded-md bg-surface p-3 text-sm text-muted">{reviewItem.item.transcript}</p>
+                        </div>
+                      )}
+                      {reviewItem.item.chapters && reviewItem.item.chapters.length > 0 && (
+                        <div>
+                          <h4 className="mb-1 text-sm font-semibold">{t('podcasts_admin.review.chapters')}</h4>
+                          <ol className="max-h-48 space-y-1 overflow-auto rounded-md bg-surface p-3 text-sm text-muted">
+                            {reviewItem.item.chapters.map((chapter, index) => (
+                              <li key={`${chapter.starts_at_seconds}-${index}`} className="flex gap-3">
+                                <span className="tabular-nums">{formatDuration(chapter.starts_at_seconds)}</span>
+                                <span>{chapter.title}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                      {reviewItem.item.report_history && reviewItem.item.report_history.length > 0 && (
+                        <div>
+                          <h4 className="mb-1 text-sm font-semibold">{t('podcasts_admin.review.report_history')}</h4>
+                          <ul className="max-h-64 space-y-2 overflow-auto rounded-md bg-surface p-3 text-sm">
+                            {reviewItem.item.report_history.map((report) => (
+                              <li key={report.id} className="border-b border-border pb-2 last:border-0 last:pb-0">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="font-medium">{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</span>
+                                  <Chip size="sm" variant="soft">{reviewState('report_status', report.status)}</Chip>
+                                </div>
+                                {report.reporter_name && <p className="text-xs text-muted">{t('podcasts_admin.reporter', { name: report.reporter_name })}</p>}
+                                {report.details && <p className="mt-1 whitespace-pre-line text-muted">{report.details}</p>}
+                                <p className="mt-1 text-xs text-muted">{formatDate(report.reviewed_at ?? report.created_at) || t('podcasts_admin.empty_value')}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <Textarea
+                  label={t('podcasts_admin.review.notes')}
+                  description={t('podcasts_admin.review.notes_hint')}
+                  value={moderationNotes}
+                  onValueChange={setModerationNotes}
+                  maxLength={2000}
+                />
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter className="flex-wrap">
+            <Button variant="tertiary" onPress={() => setReviewItem(null)}>{t('common.close')}</Button>
+            <Button color="warning" variant="secondary" isDisabled={actionKey !== null} onPress={() => submitReview('flag')}>{t('podcasts_admin.actions.flag')}</Button>
+            <Button color="danger" variant="secondary" isDisabled={actionKey !== null} onPress={() => submitReview('reject')}>{t('podcasts_admin.actions.reject')}</Button>
+            <Button color="success" isDisabled={actionKey !== null} onPress={() => submitReview('approve')}>{t('podcasts_admin.actions.approve')}</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

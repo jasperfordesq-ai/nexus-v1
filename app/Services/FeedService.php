@@ -475,6 +475,14 @@ class FeedService
         foreach ($rows as $row) {
             $meta = is_array($row->metadata) ? $row->metadata : ($row->metadata ? json_decode($row->metadata, true) : []);
             $likeKey = $row->source_type . ':' . $row->source_id;
+            $imageUrl = $row->image_url;
+
+            // Historical podcast feed rows may predate the tenant-bound artwork
+            // policy. Never return an arbitrary remote creator URL from cache:
+            // doing so would disclose the viewer's network metadata on render.
+            if (in_array($row->source_type, ['podcast_show', 'podcast_episode'], true)) {
+                $imageUrl = PodcastService::safePodcastArtworkPath($imageUrl);
+            }
 
             $contentResult = $this->truncateWithFlag($row->content ?? '', 500);
 
@@ -485,7 +493,7 @@ class FeedService
                 'title' => $row->title,
                 'content' => $contentResult['text'],
                 'content_truncated' => $contentResult['truncated'],
-                'image_url' => $row->image_url,
+                'image_url' => $imageUrl,
                 'author' => [
                     'id' => (int) $row->user_id,
                     'name' => $row->author_name,
@@ -517,6 +525,10 @@ class FeedService
                 // Volunteer metadata
                 'credits_offered' => isset($meta['credits_offered']) ? (int) $meta['credits_offered'] : null,
                 'organization' => $meta['organization'] ?? null,
+                // Podcast routing metadata
+                'slug' => $meta['slug'] ?? null,
+                'show_slug' => $meta['show_slug'] ?? null,
+                'detail_path' => $meta['detail_path'] ?? null,
                 // Volunteer-hours metadata (approved hour logs)
                 'hours' => isset($meta['hours']) ? (float) $meta['hours'] : null,
                 // Internal cursor fields

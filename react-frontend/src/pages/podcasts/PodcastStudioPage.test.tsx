@@ -13,6 +13,8 @@ const { mockPodcastsApi, mockToast } = vi.hoisted(() => ({
   mockPodcastsApi: {
     authored: vi.fn(),
     createShow: vi.fn(),
+    updateShow: vi.fn(),
+    uploadShowArtwork: vi.fn(),
     publishShow: vi.fn(),
     archiveShow: vi.fn(),
     deleteShow: vi.fn(),
@@ -20,6 +22,8 @@ const { mockPodcastsApi, mockToast } = vi.hoisted(() => ({
     archiveEpisode: vi.fn(),
     deleteEpisode: vi.fn(),
     createEpisode: vi.fn(),
+    updateEpisode: vi.fn(),
+    uploadEpisodeCover: vi.fn(),
     validateShowFeed: vi.fn(),
     showStats: vi.fn(),
   },
@@ -110,6 +114,8 @@ describe('PodcastStudioPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [] });
+    mockPodcastsApi.uploadShowArtwork.mockResolvedValue({ success: true, data: {} });
+    mockPodcastsApi.uploadEpisodeCover.mockResolvedValue({ success: true, data: {} });
     // The stats panel loads whenever a show is selected; disabled = renders null.
     mockPodcastsApi.showStats.mockResolvedValue({ success: true, data: { enabled: false } });
   });
@@ -397,6 +403,184 @@ describe('PodcastStudioPage', () => {
     render(<PodcastStudioPage />);
 
     await waitFor(() => expect(screen.getByText(/Scheduled for/i)).toBeInTheDocument());
+  });
+
+  it('serializes a creator local schedule as an absolute UTC timestamp', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.createEpisode.mockResolvedValue({ success: true, data: makeEpisode() });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    fireEvent.change(screen.getByLabelText(/episode title/i), { target: { value: 'Scheduled episode' } });
+    fireEvent.change(screen.getByLabelText(/audio url/i), { target: { value: 'https://cdn.example.test/scheduled.mp3' } });
+    const localValue = '2027-02-03T09:45';
+    fireEvent.change(screen.getByLabelText(/schedule publication/i), { target: { value: localValue } });
+    fireEvent.click(screen.getByRole('button', { name: /add episode/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.createEpisode).toHaveBeenCalled());
+    expect(mockPodcastsApi.createEpisode.mock.calls[0][1]).toEqual(expect.objectContaining({
+      scheduled_for: new Date(localValue).toISOString(),
+    }));
+  });
+
+  it('hides new show creation at the viewer-resolved limit while keeping existing management available', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow()],
+      meta: { can_create_show: false, max_shows_per_user: 1, current_show_count: 1 },
+    });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(mockPodcastsApi.authored).toHaveBeenCalled());
+
+    expect(screen.getByText(/cannot create another show/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create show/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /edit show/i })).toBeInTheDocument();
+  });
+
+  it('omits disabled transcript, chapter, restricted visibility, and reaction capabilities from episode creation', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow()],
+      meta: {
+        enable_private_shows: false,
+        enable_transcripts: false,
+        enable_chapters: false,
+        enable_episode_reactions: false,
+      },
+    });
+    mockPodcastsApi.createEpisode.mockResolvedValue({ success: true, data: makeEpisode() });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    expect(screen.queryByLabelText(/^transcript$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^chapters$/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /^members$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /^private$/i })).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/episode title/i), { target: { value: 'Capability-safe episode' } });
+    fireEvent.change(screen.getByLabelText(/audio url/i), { target: { value: 'https://cdn.example.test/capability.mp3' } });
+    fireEvent.click(screen.getByRole('button', { name: /add episode/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.createEpisode).toHaveBeenCalled());
+    const payload = mockPodcastsApi.createEpisode.mock.calls[0][1];
+    expect(payload).toEqual(expect.objectContaining({ transcript: '', transcript_language: '' }));
+    expect(payload).not.toHaveProperty('chapters');
+    expect(payload).not.toHaveProperty('enable_episode_reactions');
+    expect(payload).not.toHaveProperty('reactions_enabled');
+  });
+
+  it('edits grandfathered restricted content without resubmitting disabled visibility', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow({
+        visibility: 'members',
+        episodes: [makeEpisode({ episode_type: 'full', visibility: 'private', explicit: false })],
+      })],
+      meta: { enable_private_shows: false },
+    });
+    mockPodcastsApi.updateShow.mockResolvedValue({ success: true, data: makeShow() });
+    mockPodcastsApi.updateEpisode.mockResolvedValue({ success: true, data: makeEpisode() });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getByText('Episode One')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /edit show/i }));
+    expect(screen.getByRole('option', { name: /^members$/i })).toBeInTheDocument();
+    const showTitleInputs = screen.getAllByLabelText(/show title/i);
+    fireEvent.change(showTitleInputs[showTitleInputs.length - 1]!, { target: { value: 'Updated grandfathered show' } });
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => expect(mockPodcastsApi.updateShow).toHaveBeenCalled());
+    expect(mockPodcastsApi.updateShow.mock.calls[0][1]).not.toHaveProperty('visibility');
+
+    fireEvent.click(screen.getByRole('button', { name: /edit episode/i }));
+    expect(screen.getByRole('option', { name: /^private$/i })).toBeInTheDocument();
+    const episodeTitleInputs = screen.getAllByLabelText(/episode title/i);
+    fireEvent.change(episodeTitleInputs[episodeTitleInputs.length - 1]!, { target: { value: 'Updated grandfathered episode' } });
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => expect(mockPodcastsApi.updateEpisode).toHaveBeenCalled());
+    expect(mockPodcastsApi.updateEpisode.mock.calls[0][2]).not.toHaveProperty('visibility');
+  });
+
+  it('sends artwork and cover files only through owner-bound upload endpoints', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [] });
+    mockPodcastsApi.createShow.mockResolvedValue({ success: true, data: { id: 22 } });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    const showView = render(<PodcastStudioPage />);
+    await waitFor(() => expect(mockPodcastsApi.authored).toHaveBeenCalled());
+
+    const artwork = new File(['art'], 'show.png', { type: 'image/png' });
+    fireEvent.change(screen.getByLabelText(/show title/i), { target: { value: 'Uploaded art show' } });
+    fireEvent.change(screen.getByLabelText(/show artwork/i), { target: { files: [artwork] } });
+    fireEvent.click(screen.getByRole('button', { name: /create show/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.uploadShowArtwork).toHaveBeenCalledWith(22, artwork));
+    const showPayload = mockPodcastsApi.createShow.mock.calls[0][0];
+    expect(showPayload).not.toHaveProperty('artwork_url');
+    showView.unmount();
+
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.createEpisode.mockResolvedValue({ success: true, data: makeEpisode({ id: 33 }) });
+    const episodeView = render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+    const cover = new File(['cover'], 'episode.webp', { type: 'image/webp' });
+    fireEvent.change(screen.getByLabelText(/episode title/i), { target: { value: 'Uploaded cover episode' } });
+    fireEvent.change(screen.getByLabelText(/audio url/i), { target: { value: 'https://cdn.example.test/uploaded.mp3' } });
+    fireEvent.change(screen.getByLabelText(/episode cover image/i), { target: { files: [cover] } });
+    fireEvent.click(screen.getByRole('button', { name: /add episode/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.uploadEpisodeCover).toHaveBeenCalledWith(1, 33, cover));
+    const episodePayload = mockPodcastsApi.createEpisode.mock.calls[0][1];
+    expect(episodePayload).not.toHaveProperty('cover_image_url');
+    episodeView.unmount();
+  });
+
+  it('preserves a failed image upload for an explicit retry without recreating metadata', async () => {
+    mockPodcastsApi.createShow.mockResolvedValue({ success: true, data: { id: 44 } });
+    mockPodcastsApi.uploadShowArtwork.mockResolvedValueOnce({ success: false, error: 'Upload failed' });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(mockPodcastsApi.authored).toHaveBeenCalled());
+
+    const artwork = new File(['art'], 'retry.png', { type: 'image/png' });
+    fireEvent.change(screen.getByLabelText(/show title/i), { target: { value: 'Retry artwork show' } });
+    fireEvent.change(screen.getByLabelText(/show artwork/i), { target: { files: [artwork] } });
+    fireEvent.click(screen.getByRole('button', { name: /create show/i }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /retry upload/i })).toBeInTheDocument());
+    mockPodcastsApi.uploadShowArtwork.mockResolvedValueOnce({ success: true, data: {} });
+    fireEvent.click(screen.getByRole('button', { name: /retry upload/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.uploadShowArtwork).toHaveBeenCalledTimes(2));
+    expect(mockPodcastsApi.uploadShowArtwork).toHaveBeenLastCalledWith(44, artwork);
+    expect(mockPodcastsApi.createShow).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByRole('button', { name: /retry upload/i })).not.toBeInTheDocument());
+  });
+
+  it('updates existing show and episode metadata from the edit dialogs', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow({ episodes: [makeEpisode({ episode_type: 'full', visibility: 'inherit', explicit: false })] })],
+    });
+    mockPodcastsApi.updateShow.mockResolvedValue({ success: true, data: makeShow() });
+    mockPodcastsApi.updateEpisode.mockResolvedValue({ success: true, data: makeEpisode() });
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getByText('Episode One')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /edit show/i }));
+    const showTitleInputs = screen.getAllByLabelText(/show title/i);
+    fireEvent.change(showTitleInputs[showTitleInputs.length - 1]!, { target: { value: 'Updated show' } });
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => expect(mockPodcastsApi.updateShow).toHaveBeenCalledWith(1, expect.objectContaining({ title: 'Updated show' })));
+
+    fireEvent.click(screen.getByRole('button', { name: /edit episode/i }));
+    const episodeTitleInputs = screen.getAllByLabelText(/episode title/i);
+    fireEvent.change(episodeTitleInputs[episodeTitleInputs.length - 1]!, { target: { value: 'Updated episode' } });
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => expect(mockPodcastsApi.updateEpisode).toHaveBeenCalledWith(1, 10, expect.objectContaining({ title: 'Updated episode' })));
   });
 
   it('validates the feed from the show card and shows the results modal', async () => {

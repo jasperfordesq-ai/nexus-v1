@@ -51,7 +51,9 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha_commerce.podcast_studio.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha_commerce.podcast_studio.description') }}</p>
 
-    <a class="govuk-button" href="{{ route('govuk-alpha.podcasts.studio.create', ['tenantSlug' => $tenantSlug]) }}" data-module="govuk-button">{{ __('govuk_alpha_commerce.podcast_studio.create_button') }}</a>
+    @if (!empty($canCreateShow))
+        <a class="govuk-button" href="{{ route('govuk-alpha.podcasts.studio.create', ['tenantSlug' => $tenantSlug]) }}" data-module="govuk-button">{{ __('govuk_alpha_commerce.podcast_studio.create_button') }}</a>
+    @endif
 
     @if (empty($shows))
         <p class="govuk-inset-text">{{ __('govuk_alpha_commerce.podcast_studio.empty') }}</p>

@@ -1396,8 +1396,6 @@ class PrerenderService
             '#^/marketplace/(?!free$|map$|category/)[^/]+$#',
             '#^/marketplace/category/[^/]+$#',
             '#^/courses/[^/]+$#',
-            '#^/podcasts/[^/]+$#',
-            '#^/podcasts/[^/]+/[^/]+$#',
         ];
 
         foreach ($patterns as $pattern) {
@@ -3251,39 +3249,6 @@ class PrerenderService
                     ->exists();
         }
 
-        if (preg_match('#^/podcasts/([^/]+)/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
-            return Schema::hasTable('podcast_shows')
-                && Schema::hasTable('podcast_episodes')
-                && DB::table('podcast_episodes as e')
-                    ->join('podcast_shows as s', function ($join) {
-                        $join->on('s.id', '=', 'e.show_id')->whereColumn('s.tenant_id', 'e.tenant_id');
-                    })
-                    ->where('e.tenant_id', $tenantId)
-                    ->where('s.slug', $m[1])
-                    ->where('e.slug', $m[2])
-                    ->where('s.status', 'published')
-                    ->where('s.moderation_status', 'approved')
-                    ->where('s.visibility', 'public')
-                    ->where('e.status', 'published')
-                    ->where('e.moderation_status', 'approved')
-                    ->whereIn('e.visibility', ['inherit', 'public'])
-                    ->where(function ($query) {
-                        $query->whereNull('e.scheduled_for')->orWhere('e.scheduled_for', '<=', now());
-                    })
-                    ->exists();
-        }
-
-        if (preg_match('#^/podcasts/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
-            return Schema::hasTable('podcast_shows')
-                && DB::table('podcast_shows')
-                    ->where('tenant_id', $tenantId)
-                    ->where('slug', $m[1])
-                    ->where('status', 'published')
-                    ->where('moderation_status', 'approved')
-                    ->where('visibility', 'public')
-                    ->exists();
-        }
-
         return false;
     }
 
@@ -3352,7 +3317,6 @@ class PrerenderService
             'resources' => ['/kb/'],
             'marketplace' => ['/marketplace/'],
             'courses' => ['/courses/'],
-            'podcasts' => ['/podcasts/'],
         ];
         $features = TenantFeatureConfig::mergeFeatures(
             $this->decodeJsonColumn($tenantTarget['features'] ?? null)
@@ -3754,9 +3718,6 @@ class PrerenderService
             ['route' => '/courses',       'table' => 'course_sections',          'col' => 'updated_at'],
             ['route' => '/courses',       'table' => 'course_lessons',           'col' => 'updated_at'],
             ['route' => '/courses',       'table' => 'course_reviews',           'col' => 'updated_at'],
-            ['route' => '/podcasts',      'table' => 'podcast_shows',            'col' => 'updated_at'],
-            ['route' => '/podcasts',      'table' => 'podcast_episodes',         'col' => 'updated_at'],
-            ['route' => '/podcasts',      'table' => 'podcast_episode_chapters', 'col' => 'updated_at'],
         ];
 
         foreach ($queries as $q) {

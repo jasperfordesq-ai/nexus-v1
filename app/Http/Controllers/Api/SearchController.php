@@ -32,9 +32,9 @@ class SearchController extends BaseApiController
     // -----------------------------------------------------------------
 
     /**
-     * Unified search across listings, users, events, and groups.
+     * Unified search across listings, users, events, groups, and podcasts.
      *
-     * Query params: q (required, min 2), type (all|listings|users|events|groups),
+     * Query params: q (required, min 2), type (all|listings|users|events|groups|podcasts),
      *               cursor, per_page (default 20, max 50), category_id,
      *               sort (relevance|newest|oldest), skills.
      */
@@ -55,7 +55,7 @@ class SearchController extends BaseApiController
         // Validate type param
         $type = $this->query('type');
         if ($type !== null) {
-            $validTypes = ['all', 'listings', 'users', 'events', 'groups'];
+            $validTypes = ['all', 'listings', 'users', 'events', 'groups', 'podcasts'];
             if (! in_array($type, $validTypes, true)) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',

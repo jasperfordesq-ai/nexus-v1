@@ -294,7 +294,7 @@ function TenantSlugGate({ slug, children }: { slug: string; children: ReactNode 
  * This is rendered identically at both / and /:tenantSlug/ prefixes.
  */
 export function AppRoutes() {
-  const { t } = useTranslation('utility');
+  const { t } = useTranslation(['utility', 'podcasts']);
   return (
     <>
       {/* Main Routes (with navbar/footer) */}
@@ -747,28 +747,28 @@ export function AppRoutes() {
           } />
           <Route path="podcasts" element={
             <FeatureGate feature="podcasts" redirect="/">
-              <FeatureErrorBoundary featureName="Podcasts">
+              <FeatureErrorBoundary featureName={t('podcasts:title')}>
                 <PodcastsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="podcasts/studio" element={
             <FeatureGate feature="podcasts" redirect="/">
-              <FeatureErrorBoundary featureName="Podcasts">
+              <FeatureErrorBoundary featureName={t('podcasts:title')}>
                 <PodcastStudioPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="podcasts/:showSlug" element={
             <FeatureGate feature="podcasts" redirect="/">
-              <FeatureErrorBoundary featureName="Podcasts">
+              <FeatureErrorBoundary featureName={t('podcasts:title')}>
                 <PodcastShowPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="podcasts/:showSlug/:episodeSlug" element={
             <FeatureGate feature="podcasts" redirect="/">
-              <FeatureErrorBoundary featureName="Podcasts">
+              <FeatureErrorBoundary featureName={t('podcasts:title')}>
                 <PodcastEpisodePage />
               </FeatureErrorBoundary>
             </FeatureGate>

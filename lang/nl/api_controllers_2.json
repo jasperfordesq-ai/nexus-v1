@@ -212,7 +212,7 @@
   "podcasts.episode_title_required": "Een titel voor de podcastaflevering is verplicht.",
   "podcasts.audio_url_required": "Een audio-URL is verplicht.",
   "podcasts.invalid_scheduled_for": "Gebruik een geldige datum en tijd voor de geplande publicatie.",
-  "podcasts.invalid_media_url": "Gebruik een geldige HTTP- of HTTPS-media-URL.",
+  "podcasts.invalid_media_url": "Gebruik een geldige HTTPS-media-URL.",
   "podcasts.invalid_media_type": "Dit bestandstype wordt niet ondersteund. Upload een MP3-, M4A-, AAC-, WAV-, OGG- of WebM-audiobestand.",
   "podcasts.media_upload_failed": "De audio-upload kon niet worden opgeslagen. Probeer het opnieuw.",
   "podcasts.audio_too_large": "Het audiobestand van de podcast is groter dan deze community toestaat.",
@@ -234,5 +234,7 @@
   "podcasts.storage_driver_unavailable": "De cloudopslagdriver is niet geïnstalleerd op deze server.",
   "podcasts.invalid_cdn_url": "Gebruik een geldige HTTP- of HTTPS-URL als CDN-basis-URL.",
   "podcasts.too_many_chapters": "Afleveringen kunnen maximaal 200 hoofdstukken hebben.",
-  "podcasts.private_shows_disabled": "Privé- en alleen-voor-leden-podcastshows zijn uitgeschakeld voor deze community."
+  "podcasts.private_shows_disabled": "Privé- en alleen-voor-leden-podcastshows zijn uitgeschakeld voor deze community.",
+  "podcasts.media_not_ready": "De gehoste audio van deze aflevering wordt nog gecontroleerd of heeft de mediavalidatie niet doorstaan.",
+  "podcasts.external_artwork_not_allowed": "Podcastafbeeldingen moeten eerst naar dit platform worden geüpload."
 }

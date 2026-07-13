@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { getFormattingLocale } from '@/lib/helpers';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, Checkbox, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Select, SelectItem, Spinner, Textarea, useConfirm } from '@/components/ui';
@@ -18,6 +18,7 @@ import {
   type PodcastEpisode,
   type PodcastFeedValidation,
   type PodcastShow,
+  type PodcastStudioCapabilities,
   type PodcastVisibility,
 } from '@/lib/api/podcasts';
 import { feedIssueKey } from '@/lib/podcasts/feedIssues';
@@ -33,6 +34,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Rss from 'lucide-react/icons/rss';
 import Trash2 from 'lucide-react/icons/trash-2';
 import XCircle from 'lucide-react/icons/circle-x';
+import Pencil from 'lucide-react/icons/pencil';
 
 /** Client-side fallback when /v2/podcasts/mine meta is unavailable. */
 const DEFAULT_MAX_AUDIO_MB = 250;
@@ -109,10 +111,54 @@ const emptyEpisode: CreatePodcastEpisodePayload = {
   transcript: '',
 };
 
+function toApiDateTime(value?: string): string | undefined {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}
+
+function formatChapterTime(totalSeconds: number): string {
+  const safe = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  const seconds = safe % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function toLocalDateTimeInput(value?: string | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const local = new Date(date.getTime() - (date.getTimezoneOffset() * 60_000));
+  return local.toISOString().slice(0, 16);
+}
+
+function isAllowedExternalAudioUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    if (url.protocol === 'https:') return true;
+    return url.protocol === 'http:' && ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isRestrictedVisibility(value: unknown): value is 'members' | 'private' {
+  return value === 'members' || value === 'private';
+}
+
+type PendingImageUpload =
+  | { kind: 'show'; showId: number; file: File }
+  | { kind: 'episode'; showId: number; episodeId: number; file: File };
+
 export default function PodcastStudioPage() {
   const { t } = useTranslation('podcasts');
   usePageTitle(t('studio.title'));
-  const { tenantPath } = useTenant();
+  const { tenantPath, supportedLanguages, defaultLanguage } = useTenant();
+  const studioDefaultLanguage = defaultLanguage || 'en';
+  const studioLanguages = supportedLanguages?.length ? supportedLanguages : [studioDefaultLanguage];
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -121,9 +167,11 @@ export default function PodcastStudioPage() {
   const [savingShow, setSavingShow] = useState(false);
   const [savingEpisode, setSavingEpisode] = useState(false);
   const [selectedShowId, setSelectedShowId] = useState<string>('');
-  const [showForm, setShowForm] = useState<CreatePodcastShowPayload>(emptyShow);
-  const [episodeForm, setEpisodeForm] = useState<CreatePodcastEpisodePayload>(emptyEpisode);
+  const [showForm, setShowForm] = useState<CreatePodcastShowPayload>({ ...emptyShow, language: studioDefaultLanguage });
+  const [episodeForm, setEpisodeForm] = useState<CreatePodcastEpisodePayload>({ ...emptyEpisode, transcript_language: studioDefaultLanguage });
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [showArtworkFile, setShowArtworkFile] = useState<File | null>(null);
+  const [episodeCoverFile, setEpisodeCoverFile] = useState<File | null>(null);
   const [chaptersText, setChaptersText] = useState('');
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [episodeError, setEpisodeError] = useState<string | null>(null);
@@ -131,10 +179,32 @@ export default function PodcastStudioPage() {
   const [uploadLimits, setUploadLimits] = useState<{ maxMb: number; mimes: string[] }>({ maxMb: DEFAULT_MAX_AUDIO_MB, mimes: DEFAULT_AUDIO_MIMES });
   const [feedValidation, setFeedValidation] = useState<{ show: PodcastShow; result: PodcastFeedValidation } | null>(null);
   const [validatingShowId, setValidatingShowId] = useState<number | null>(null);
+  const [capabilities, setCapabilities] = useState<PodcastStudioCapabilities>({
+    allow_member_show_creation: true,
+    can_create_show: true,
+    enable_private_shows: true,
+    enable_transcripts: true,
+    enable_chapters: true,
+    enable_episode_reactions: true,
+  });
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [editingShow, setEditingShow] = useState<PodcastShow | null>(null);
+  const [editingShowForm, setEditingShowForm] = useState<CreatePodcastShowPayload>({ ...emptyShow });
+  const [editingEpisode, setEditingEpisode] = useState<{ showId: number; episode: PodcastEpisode } | null>(null);
+  const [editingEpisodeForm, setEditingEpisodeForm] = useState<Partial<CreatePodcastEpisodePayload>>({});
+  const [editingChaptersText, setEditingChaptersText] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editingShowArtworkFile, setEditingShowArtworkFile] = useState<File | null>(null);
+  const [editingEpisodeCoverFile, setEditingEpisodeCoverFile] = useState<File | null>(null);
+  const [pendingImageUpload, setPendingImageUpload] = useState<PendingImageUpload | null>(null);
+  const [retryingImageUpload, setRetryingImageUpload] = useState(false);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
 
   const chapterIssues = useMemo(() => countInvalidChapterLines(chaptersText), [chaptersText]);
+  const canCreateShow = capabilities.can_create_show
+    ?? (capabilities.allow_member_show_creation !== false
+      && (!capabilities.max_shows_per_user || shows.length < capabilities.max_shows_per_user));
 
   const selectedShow = useMemo(
     () => shows.find((show) => String(show.id) === selectedShowId) ?? null,
@@ -155,24 +225,28 @@ export default function PodcastStudioPage() {
     ];
   }, [selectedShow]);
 
-  async function loadShows(): Promise<void> {
+  const loadShows = useCallback(async (): Promise<void> => {
     setLoading(true);
+    setLoadError(null);
     const res = await podcastsApi.authored();
     if (res.success && res.data) {
       setShows(res.data);
       setSelectedShowId((current) => current || (res.data?.[0] ? String(res.data[0].id) : ''));
       // Upload constraints ride along in meta so files can be validated
       // before a multi-hundred-MB upload starts.
-      const meta = res.meta as { max_audio_size_mb?: number; allowed_audio_mimes?: string[] } | undefined;
+      const meta = res.meta as PodcastStudioCapabilities | undefined;
+      if (meta) setCapabilities((current) => ({ ...current, ...meta }));
       if (meta?.max_audio_size_mb || meta?.allowed_audio_mimes) {
         setUploadLimits({
           maxMb: meta.max_audio_size_mb && meta.max_audio_size_mb > 0 ? meta.max_audio_size_mb : DEFAULT_MAX_AUDIO_MB,
           mimes: meta.allowed_audio_mimes?.length ? meta.allowed_audio_mimes : DEFAULT_AUDIO_MIMES,
         });
       }
+    } else {
+      setLoadError(res.error || t('studio.load_failed'));
     }
     setLoading(false);
-  }
+  }, [t]);
 
   function handleAudioFileSelected(file: File | null): void {
     setFileError(null);
@@ -201,22 +275,33 @@ export default function PodcastStudioPage() {
   }
 
   useEffect(() => {
-    loadShows();
-  }, []);
+    void loadShows();
+    return () => uploadAbortRef.current?.abort();
+  }, [loadShows]);
 
   async function handleCreateShow(): Promise<void> {
     if (!showForm.title.trim()) return;
     setSavingShow(true);
+    const payload = { ...showForm };
+    delete payload.artwork_url;
     const res = await podcastsApi.createShow({
-      ...showForm,
+      ...payload,
       title: showForm.title.trim(),
       visibility: (showForm.visibility ?? 'public') as PodcastVisibility,
     });
     setSavingShow(false);
 
     if (res.success && res.data) {
+      if (showArtworkFile) {
+        const upload = await podcastsApi.uploadShowArtwork(res.data.id, showArtworkFile);
+        if (!upload.success) {
+          setPendingImageUpload({ kind: 'show', showId: res.data.id, file: showArtworkFile });
+          toast.warning(t('studio.artwork_upload_failed'));
+        }
+      }
       toast.success(t('studio.show_created'));
-      setShowForm(emptyShow);
+      setShowForm({ ...emptyShow, language: studioDefaultLanguage });
+      setShowArtworkFile(null);
       await loadShows();
       setSelectedShowId(String(res.data.id));
     } else {
@@ -315,20 +400,28 @@ export default function PodcastStudioPage() {
 
   async function handleCreateEpisode(): Promise<void> {
     if (!selectedShow || !episodeForm.title.trim() || (!episodeForm.audio_url.trim() && !audioFile)) return;
+    if (!audioFile && !isAllowedExternalAudioUrl(episodeForm.audio_url.trim())) {
+      setEpisodeError(t('studio.audio_https_required'));
+      return;
+    }
     setSavingEpisode(true);
     setEpisodeError(null);
     const abortController = audioFile ? new AbortController() : null;
     uploadAbortRef.current = abortController;
     if (audioFile) setUploadProgress(0);
+    const createPayload = { ...episodeForm };
+    delete createPayload.cover_image_url;
     const res = await podcastsApi.createEpisode(
       selectedShow.id,
       {
-        ...episodeForm,
+        ...createPayload,
         title: episodeForm.title.trim(),
         // When a hosted file is present, omit audio_url so the upload path drives it.
         audio_url: audioFile ? '' : episodeForm.audio_url.trim(),
         audio_file: audioFile,
-        chapters: parseChapters(chaptersText),
+        scheduled_for: toApiDateTime(episodeForm.scheduled_for),
+        ...(capabilities.enable_chapters !== false ? { chapters: parseChapters(chaptersText) } : {}),
+        ...(capabilities.enable_transcripts === false ? { transcript: '', transcript_language: '' } : {}),
       },
       audioFile ? (percent) => setUploadProgress(percent) : undefined,
       abortController?.signal,
@@ -338,10 +431,19 @@ export default function PodcastStudioPage() {
     setUploadProgress(null);
 
     if (res.success) {
+      if (episodeCoverFile && res.data) {
+        const upload = await podcastsApi.uploadEpisodeCover(selectedShow.id, res.data.id, episodeCoverFile);
+        if (!upload.success) {
+          setPendingImageUpload({ kind: 'episode', showId: selectedShow.id, episodeId: res.data.id, file: episodeCoverFile });
+          toast.warning(t('studio.cover_upload_failed'));
+        }
+      }
       toast.success(t('studio.episode_created'));
-      setEpisodeForm(emptyEpisode);
+      setEpisodeForm({ ...emptyEpisode, transcript_language: studioDefaultLanguage });
       setAudioFile(null);
+      setEpisodeCoverFile(null);
       setChaptersText('');
+      if (audioInputRef.current) audioInputRef.current.value = '';
       await loadShows();
     } else if (res.code === 'UPLOAD_ABORTED') {
       // User-initiated cancel: keep the form and file intact for a retry.
@@ -382,9 +484,148 @@ export default function PodcastStudioPage() {
     }
   }
 
+  function beginEditShow(show: PodcastShow): void {
+    setEditingShowArtworkFile(null);
+    setEditingShow(show);
+    setEditingShowForm({
+      title: show.title,
+      summary: show.summary ?? '',
+      description: show.description ?? '',
+      artwork_url: show.artwork_url ?? '',
+      language: show.language || studioDefaultLanguage,
+      category: show.category ?? '',
+      author_name: show.author_name ?? '',
+      owner_email: show.owner_email ?? '',
+      copyright: show.copyright ?? '',
+      funding_url: show.funding_url ?? '',
+      explicit: show.explicit ?? false,
+      visibility: show.visibility,
+    });
+  }
+
+  async function handleUpdateShow(): Promise<void> {
+    if (!editingShow || !editingShowForm.title.trim()) return;
+    setSavingEdit(true);
+    const payload = { ...editingShowForm };
+    delete payload.artwork_url;
+    if (capabilities.enable_private_shows === false
+      && isRestrictedVisibility(editingShow.visibility)
+      && payload.visibility === editingShow.visibility) {
+      delete payload.visibility;
+    }
+    const res = await podcastsApi.updateShow(editingShow.id, {
+      ...payload,
+      title: editingShowForm.title.trim(),
+    });
+    setSavingEdit(false);
+    if (res.success) {
+      if (editingShowArtworkFile) {
+        const upload = await podcastsApi.uploadShowArtwork(editingShow.id, editingShowArtworkFile);
+        if (!upload.success) {
+          setPendingImageUpload({ kind: 'show', showId: editingShow.id, file: editingShowArtworkFile });
+          toast.warning(t('studio.artwork_upload_failed'));
+        }
+      }
+      toast.success(t('studio.show_updated'));
+      setEditingShow(null);
+      await loadShows();
+    } else {
+      toast.error(res.error || t('studio.save_failed'));
+    }
+  }
+
+  function beginEditEpisode(showId: number, episode: PodcastEpisode): void {
+    setEditingEpisodeCoverFile(null);
+    setEditingEpisode({ showId, episode });
+    setEditingEpisodeForm({
+      title: episode.title,
+      summary: episode.summary ?? '',
+      description: episode.description ?? '',
+      duration_seconds: episode.duration_seconds ?? undefined,
+      episode_number: episode.episode_number ?? undefined,
+      season_number: episode.season_number ?? undefined,
+      explicit: episode.explicit,
+      episode_type: episode.episode_type,
+      visibility: episode.visibility,
+      transcript: episode.transcript ?? '',
+      transcript_language: episode.transcript_language ?? '',
+      cover_image_url: episode.cover_image_url ?? '',
+      scheduled_for: toLocalDateTimeInput(episode.scheduled_for),
+      ...(!episode.hosted_audio ? { audio_url: episode.audio_url } : {}),
+    });
+    setEditingChaptersText((episode.chapters ?? [])
+      .map((chapter) => `${formatChapterTime(chapter.starts_at_seconds)} ${chapter.title}`)
+      .join('\n'));
+  }
+
+  async function handleUpdateEpisode(): Promise<void> {
+    if (!editingEpisode || !editingEpisodeForm.title?.trim()) return;
+    if (editingEpisodeForm.audio_url && !isAllowedExternalAudioUrl(editingEpisodeForm.audio_url.trim())) {
+      toast.error(t('studio.audio_https_required'));
+      return;
+    }
+    setSavingEdit(true);
+    const payload: Partial<CreatePodcastEpisodePayload> = {
+      ...editingEpisodeForm,
+      title: editingEpisodeForm.title.trim(),
+      scheduled_for: toApiDateTime(editingEpisodeForm.scheduled_for),
+      ...(capabilities.enable_chapters !== false ? { chapters: parseChapters(editingChaptersText) } : {}),
+    };
+    if (editingEpisode.episode.hosted_audio) delete payload.audio_url;
+    delete payload.cover_image_url;
+    if (capabilities.enable_private_shows === false
+      && isRestrictedVisibility(editingEpisode.episode.visibility)
+      && payload.visibility === editingEpisode.episode.visibility) {
+      delete payload.visibility;
+    }
+    const res = await podcastsApi.updateEpisode(editingEpisode.showId, editingEpisode.episode.id, payload);
+    setSavingEdit(false);
+    if (res.success) {
+      if (editingEpisodeCoverFile) {
+        const upload = await podcastsApi.uploadEpisodeCover(editingEpisode.showId, editingEpisode.episode.id, editingEpisodeCoverFile);
+        if (!upload.success) {
+          setPendingImageUpload({
+            kind: 'episode',
+            showId: editingEpisode.showId,
+            episodeId: editingEpisode.episode.id,
+            file: editingEpisodeCoverFile,
+          });
+          toast.warning(t('studio.cover_upload_failed'));
+        }
+      }
+      toast.success(t('studio.episode_updated'));
+      setEditingEpisode(null);
+      await loadShows();
+    } else {
+      toast.error(res.error || t('studio.save_failed'));
+    }
+  }
+
+  async function handleRetryImageUpload(): Promise<void> {
+    if (!pendingImageUpload) return;
+    setRetryingImageUpload(true);
+    const res = pendingImageUpload.kind === 'show'
+      ? await podcastsApi.uploadShowArtwork(pendingImageUpload.showId, pendingImageUpload.file)
+      : await podcastsApi.uploadEpisodeCover(
+        pendingImageUpload.showId,
+        pendingImageUpload.episodeId,
+        pendingImageUpload.file,
+      );
+    setRetryingImageUpload(false);
+    if (res.success) {
+      setPendingImageUpload(null);
+      toast.success(pendingImageUpload.kind === 'show' ? t('studio.show_updated') : t('studio.episode_updated'));
+      await loadShows();
+    } else {
+      toast.warning(pendingImageUpload.kind === 'show'
+        ? t('studio.artwork_upload_failed')
+        : t('studio.cover_upload_failed'));
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
-      <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} aria-hidden="true" />}>
+      <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft className="rtl:rotate-180" size={16} aria-hidden="true" />}>
         {t('actions.back_to_podcasts')}
       </Button>
 
@@ -397,31 +638,67 @@ export default function PodcastStudioPage() {
         <div className="flex justify-center py-16" role="status" aria-busy="true">
           <Spinner size="lg" />
         </div>
+      ) : loadError ? (
+        <div className="rounded-xl border border-danger/30 bg-danger/10 px-4 py-8 text-center" role="alert">
+          <XCircle className="mx-auto mb-3 text-danger" size={32} aria-hidden="true" />
+          <p className="font-semibold text-foreground">{t('studio.load_failed')}</p>
+          <p className="mt-1 text-sm text-muted">{loadError}</p>
+          <Button className="mt-4" variant="secondary" startContent={<RefreshCw size={14} aria-hidden="true" />} onPress={loadShows}>
+            {t('studio.retry_load')}
+          </Button>
+        </div>
       ) : (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]">
           <section className="space-y-4">
-            <Card>
-              <CardBody className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Plus size={18} className="text-accent" aria-hidden="true" />
-                  <h2 className="text-lg font-semibold">{t('studio.create_show')}</h2>
-                </div>
+            {pendingImageUpload && (
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning" role="alert">
+                <span className="min-w-0 flex-1">
+                  {pendingImageUpload.kind === 'show'
+                    ? t('studio.artwork_upload_failed')
+                    : t('studio.cover_upload_failed')}
+                </span>
+                <Button size="sm" variant="secondary" isLoading={retryingImageUpload} onPress={handleRetryImageUpload}>
+                  {t('studio.retry_upload')}
+                </Button>
+              </div>
+            )}
+
+            {canCreateShow ? (
+              <Card>
+                <CardBody className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Plus size={18} className="text-accent" aria-hidden="true" />
+                    <h2 className="text-lg font-semibold">{t('studio.create_show')}</h2>
+                  </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Input label={t('fields.show_title')} maxLength={200} value={showForm.title} onValueChange={(title) => setShowForm((prev) => ({ ...prev, title }))} />
                   <Input label={t('fields.category')} value={showForm.category ?? ''} onValueChange={(category) => setShowForm((prev) => ({ ...prev, category }))} />
-                  <Input label={t('fields.artwork_url')} value={showForm.artwork_url ?? ''} onValueChange={(artwork_url) => setShowForm((prev) => ({ ...prev, artwork_url }))} />
+                  <label className="block text-sm font-medium text-foreground">
+                    {t('fields.artwork_file')}
+                    <input className="mt-1 block w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setShowArtworkFile(event.currentTarget.files?.[0] ?? null)} />
+                    {showArtworkFile && <span className="mt-1 block text-xs text-muted">{showArtworkFile.name}</span>}
+                  </label>
                   <Input label={t('fields.author_name')} value={showForm.author_name ?? ''} onValueChange={(author_name) => setShowForm((prev) => ({ ...prev, author_name }))} />
                   <Input label={t('fields.owner_email')} type="email" value={showForm.owner_email ?? ''} onValueChange={(owner_email) => setShowForm((prev) => ({ ...prev, owner_email }))} />
                   <Input label={t('fields.copyright')} value={showForm.copyright ?? ''} onValueChange={(copyright) => setShowForm((prev) => ({ ...prev, copyright }))} />
                   <Input label={t('fields.funding_url')} value={showForm.funding_url ?? ''} onValueChange={(funding_url) => setShowForm((prev) => ({ ...prev, funding_url }))} />
+                  <Select
+                    label={t('fields.language')}
+                    selectedKeys={[showForm.language || studioDefaultLanguage]}
+                    onSelectionChange={(keys) => setShowForm((prev) => ({ ...prev, language: String(Array.from(keys)[0] ?? studioDefaultLanguage) }))}
+                  >
+                    {studioLanguages.map((language) => (
+                      <SelectItem key={language} id={language}>{language.toUpperCase()}</SelectItem>
+                    ))}
+                  </Select>
                   <Select
                     label={t('fields.visibility')}
                     selectedKeys={[showForm.visibility ?? 'public']}
                     onSelectionChange={(keys) => setShowForm((prev) => ({ ...prev, visibility: (Array.from(keys)[0] as PodcastVisibility) ?? 'public' }))}
                   >
                     <SelectItem id="public">{t('visibility.public')}</SelectItem>
-                    <SelectItem id="members">{t('visibility.members')}</SelectItem>
-                    <SelectItem id="private">{t('visibility.private')}</SelectItem>
+                    {capabilities.enable_private_shows !== false && <SelectItem id="members">{t('visibility.members')}</SelectItem>}
+                    {capabilities.enable_private_shows !== false && <SelectItem id="private">{t('visibility.private')}</SelectItem>}
                   </Select>
                 </div>
                 <Checkbox isSelected={Boolean(showForm.explicit)} onValueChange={(explicit) => setShowForm((prev) => ({ ...prev, explicit }))}>
@@ -435,7 +712,12 @@ export default function PodcastStudioPage() {
                   </Button>
                 </div>
               </CardBody>
-            </Card>
+              </Card>
+            ) : (
+              <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning" role="status">
+                {t('studio.creation_unavailable')}
+              </p>
+            )}
 
             <Card>
               <CardBody className="space-y-4">
@@ -456,11 +738,41 @@ export default function PodcastStudioPage() {
                   <Input label={t('fields.episode_title')} maxLength={200} value={episodeForm.title} onValueChange={(title) => setEpisodeForm((prev) => ({ ...prev, title }))} />
                   <Input
                     label={t('fields.audio_url')}
+                    type="url"
                     value={episodeForm.audio_url}
                     onValueChange={(audio_url) => setEpisodeForm((prev) => ({ ...prev, audio_url }))}
                     isDisabled={Boolean(audioFile) || savingEpisode}
                     description={audioFile ? t('fields.audio_url_disabled_file_selected') : undefined}
                   />
+                  <Input
+                    label={t('fields.episode_number')}
+                    type="number"
+                    min="0"
+                    value={episodeForm.episode_number != null ? String(episodeForm.episode_number) : ''}
+                    onValueChange={(value) => setEpisodeForm((prev) => ({ ...prev, episode_number: value ? Math.max(0, Number(value)) : undefined }))}
+                  />
+                  <Input
+                    label={t('fields.season_number')}
+                    type="number"
+                    min="0"
+                    value={episodeForm.season_number != null ? String(episodeForm.season_number) : ''}
+                    onValueChange={(value) => setEpisodeForm((prev) => ({ ...prev, season_number: value ? Math.max(0, Number(value)) : undefined }))}
+                  />
+                  <label className="block text-sm font-medium text-foreground">
+                    {t('fields.cover_image_file')}
+                    <input className="mt-1 block w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setEpisodeCoverFile(event.currentTarget.files?.[0] ?? null)} />
+                    {episodeCoverFile && <span className="mt-1 block text-xs text-muted">{episodeCoverFile.name}</span>}
+                  </label>
+                  <Select
+                    label={t('fields.visibility')}
+                    selectedKeys={[episodeForm.visibility ?? 'inherit']}
+                    onSelectionChange={(keys) => setEpisodeForm((prev) => ({ ...prev, visibility: (Array.from(keys)[0] as CreatePodcastEpisodePayload['visibility']) ?? 'inherit' }))}
+                  >
+                    <SelectItem id="inherit">{t('visibility.inherit')}</SelectItem>
+                    <SelectItem id="public">{t('visibility.public')}</SelectItem>
+                    {capabilities.enable_private_shows !== false && <SelectItem id="members">{t('visibility.members')}</SelectItem>}
+                    {capabilities.enable_private_shows !== false && <SelectItem id="private">{t('visibility.private')}</SelectItem>}
+                  </Select>
                   <div className="sm:col-span-2">
                     <label htmlFor="podcast-audio-file" className="block text-sm font-medium text-foreground">
                       {t('fields.audio_file')}
@@ -524,9 +836,27 @@ export default function PodcastStudioPage() {
                 </div>
                 <Textarea label={t('fields.summary')} value={episodeForm.summary ?? ''} onValueChange={(summary) => setEpisodeForm((prev) => ({ ...prev, summary }))} />
                 <Textarea label={t('fields.description')} value={episodeForm.description ?? ''} onValueChange={(description) => setEpisodeForm((prev) => ({ ...prev, description }))} />
-                <Textarea label={t('fields.transcript')} value={episodeForm.transcript ?? ''} onValueChange={(transcript) => setEpisodeForm((prev) => ({ ...prev, transcript }))} />
-                <Textarea label={t('fields.chapters')} description={t('fields.chapters_hint')} value={chaptersText} onValueChange={setChaptersText} />
-                {chapterIssues > 0 && (
+                <Checkbox isSelected={Boolean(episodeForm.explicit)} onValueChange={(explicit) => setEpisodeForm((prev) => ({ ...prev, explicit }))}>
+                  {t('fields.explicit_episode')}
+                </Checkbox>
+                {capabilities.enable_transcripts !== false && (
+                  <>
+                    <Textarea label={t('fields.transcript')} value={episodeForm.transcript ?? ''} onValueChange={(transcript) => setEpisodeForm((prev) => ({ ...prev, transcript }))} />
+                    <Select
+                      label={t('fields.transcript_language')}
+                      selectedKeys={[episodeForm.transcript_language || studioDefaultLanguage]}
+                      onSelectionChange={(keys) => setEpisodeForm((prev) => ({ ...prev, transcript_language: String(Array.from(keys)[0] ?? studioDefaultLanguage) }))}
+                    >
+                      {studioLanguages.map((language) => (
+                        <SelectItem key={language} id={language}>{language.toUpperCase()}</SelectItem>
+                      ))}
+                    </Select>
+                  </>
+                )}
+                {capabilities.enable_chapters !== false && (
+                  <Textarea label={t('fields.chapters')} description={t('fields.chapters_hint')} value={chaptersText} onValueChange={setChaptersText} />
+                )}
+                {capabilities.enable_chapters !== false && chapterIssues > 0 && (
                   <p className="text-xs text-warning">{t('studio.chapter_format_warning', { count: chapterIssues })}</p>
                 )}
                 {uploadProgress !== null && (
@@ -613,11 +943,19 @@ export default function PodcastStudioPage() {
                       <p className="mt-1 line-clamp-2 text-sm text-muted">{show.summary || t('show.no_summary')}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="tertiary" startContent={<Pencil size={14} aria-hidden="true" />} onPress={() => beginEditShow(show)}>
+                        {t('studio.edit_show')}
+                      </Button>
                       <Chip size="sm" variant="soft">{t(`status.${show.status}`)}</Chip>
                       <Chip size="sm" variant="soft" color={show.moderation_status === 'approved' ? 'success' : 'warning'}>
                         {t(`moderation.${show.moderation_status}`)}
                       </Chip>
                     </div>
+                    {show.moderation_feedback && (
+                      <p className="rounded-md bg-warning/10 px-3 py-2 text-sm text-warning">
+                        {t('studio.moderation_feedback', { feedback: show.moderation_feedback })}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       <Button size="sm" variant="tertiary" onPress={() => setSelectedShowId(String(show.id))}>
                         {t('studio.select_show')}
@@ -675,6 +1013,9 @@ export default function PodcastStudioPage() {
                               </div>
                             </div>
                             <div className="flex flex-wrap gap-2">
+                              <Button size="sm" variant="tertiary" startContent={<Pencil size={14} aria-hidden="true" />} onPress={() => beginEditEpisode(show.id, episode)}>
+                                {t('studio.edit_episode')}
+                              </Button>
                               {episode.status === 'draft' && (
                                 <Button size="sm" color="primary" onPress={() => handlePublishEpisode(show.id, episode.id)}>
                                   {t('studio.publish_episode')}
@@ -689,6 +1030,11 @@ export default function PodcastStudioPage() {
                                 {t('studio.delete_episode')}
                               </Button>
                             </div>
+                            {episode.moderation_feedback && (
+                              <p className="text-sm text-warning sm:basis-full">
+                                {t('studio.moderation_feedback', { feedback: episode.moderation_feedback })}
+                              </p>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -700,6 +1046,110 @@ export default function PodcastStudioPage() {
           </aside>
         </div>
       )}
+
+      <Modal isOpen={editingShow !== null} onClose={() => setEditingShow(null)} size="2xl">
+        <ModalContent>
+          <ModalHeader>{t('studio.edit_show')}</ModalHeader>
+          <ModalBody className="gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input label={t('fields.show_title')} maxLength={200} value={editingShowForm.title} onValueChange={(title) => setEditingShowForm((prev) => ({ ...prev, title }))} />
+              <Input label={t('fields.category')} value={editingShowForm.category ?? ''} onValueChange={(category) => setEditingShowForm((prev) => ({ ...prev, category }))} />
+              <label className="block text-sm font-medium text-foreground">
+                {t('fields.artwork_file')}
+                <input className="mt-1 block w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setEditingShowArtworkFile(event.currentTarget.files?.[0] ?? null)} />
+                {editingShowArtworkFile && <span className="mt-1 block text-xs text-muted">{editingShowArtworkFile.name}</span>}
+              </label>
+              <Input label={t('fields.author_name')} value={editingShowForm.author_name ?? ''} onValueChange={(author_name) => setEditingShowForm((prev) => ({ ...prev, author_name }))} />
+              <Input label={t('fields.owner_email')} type="email" value={editingShowForm.owner_email ?? ''} onValueChange={(owner_email) => setEditingShowForm((prev) => ({ ...prev, owner_email }))} />
+              <Input label={t('fields.copyright')} value={editingShowForm.copyright ?? ''} onValueChange={(copyright) => setEditingShowForm((prev) => ({ ...prev, copyright }))} />
+              <Input label={t('fields.funding_url')} value={editingShowForm.funding_url ?? ''} onValueChange={(funding_url) => setEditingShowForm((prev) => ({ ...prev, funding_url }))} />
+              <Select
+                label={t('fields.language')}
+                selectedKeys={[editingShowForm.language || studioDefaultLanguage]}
+                onSelectionChange={(keys) => setEditingShowForm((prev) => ({ ...prev, language: String(Array.from(keys)[0] ?? studioDefaultLanguage) }))}
+              >
+                {studioLanguages.map((language) => (
+                  <SelectItem key={language} id={language}>{language.toUpperCase()}</SelectItem>
+                ))}
+              </Select>
+              <Select
+                label={t('fields.visibility')}
+                selectedKeys={[editingShowForm.visibility ?? 'public']}
+                onSelectionChange={(keys) => setEditingShowForm((prev) => ({ ...prev, visibility: (Array.from(keys)[0] as PodcastVisibility) ?? 'public' }))}
+              >
+                <SelectItem id="public">{t('visibility.public')}</SelectItem>
+                {(capabilities.enable_private_shows !== false || editingShow?.visibility === 'members') && <SelectItem id="members">{t('visibility.members')}</SelectItem>}
+                {(capabilities.enable_private_shows !== false || editingShow?.visibility === 'private') && <SelectItem id="private">{t('visibility.private')}</SelectItem>}
+              </Select>
+            </div>
+            <Checkbox isSelected={Boolean(editingShowForm.explicit)} onValueChange={(explicit) => setEditingShowForm((prev) => ({ ...prev, explicit }))}>
+              {t('fields.explicit_show')}
+            </Checkbox>
+            <Textarea label={t('fields.summary')} value={editingShowForm.summary ?? ''} onValueChange={(summary) => setEditingShowForm((prev) => ({ ...prev, summary }))} />
+            <Textarea label={t('fields.description')} value={editingShowForm.description ?? ''} onValueChange={(description) => setEditingShowForm((prev) => ({ ...prev, description }))} />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={() => setEditingShow(null)}>{t('actions.cancel')}</Button>
+            <Button color="primary" isLoading={savingEdit} isDisabled={!editingShowForm.title.trim()} onPress={handleUpdateShow}>{t('studio.save_changes')}</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={editingEpisode !== null} onClose={() => setEditingEpisode(null)} size="2xl">
+        <ModalContent>
+          <ModalHeader>{t('studio.edit_episode')}</ModalHeader>
+          <ModalBody className="gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input label={t('fields.episode_title')} maxLength={200} value={editingEpisodeForm.title ?? ''} onValueChange={(title) => setEditingEpisodeForm((prev) => ({ ...prev, title }))} />
+              {!editingEpisode?.episode.hosted_audio && (
+                <Input label={t('fields.audio_url')} type="url" value={editingEpisodeForm.audio_url ?? ''} onValueChange={(audio_url) => setEditingEpisodeForm((prev) => ({ ...prev, audio_url }))} />
+              )}
+              <Input label={t('fields.duration_seconds')} type="number" min="0" value={editingEpisodeForm.duration_seconds != null ? String(editingEpisodeForm.duration_seconds) : ''} onValueChange={(value) => setEditingEpisodeForm((prev) => ({ ...prev, duration_seconds: value ? Math.max(0, Number(value)) : undefined }))} />
+              <Input label={t('fields.episode_number')} type="number" min="0" value={editingEpisodeForm.episode_number != null ? String(editingEpisodeForm.episode_number) : ''} onValueChange={(value) => setEditingEpisodeForm((prev) => ({ ...prev, episode_number: value ? Math.max(0, Number(value)) : undefined }))} />
+              <Input label={t('fields.season_number')} type="number" min="0" value={editingEpisodeForm.season_number != null ? String(editingEpisodeForm.season_number) : ''} onValueChange={(value) => setEditingEpisodeForm((prev) => ({ ...prev, season_number: value ? Math.max(0, Number(value)) : undefined }))} />
+              <label className="block text-sm font-medium text-foreground">
+                {t('fields.cover_image_file')}
+                <input className="mt-1 block w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setEditingEpisodeCoverFile(event.currentTarget.files?.[0] ?? null)} />
+                {editingEpisodeCoverFile && <span className="mt-1 block text-xs text-muted">{editingEpisodeCoverFile.name}</span>}
+              </label>
+              <Input label={t('fields.scheduled_for')} type="datetime-local" value={editingEpisodeForm.scheduled_for ?? ''} onValueChange={(scheduled_for) => setEditingEpisodeForm((prev) => ({ ...prev, scheduled_for: scheduled_for || undefined }))} />
+              <Select label={t('fields.episode_type')} selectedKeys={[editingEpisodeForm.episode_type ?? 'full']} onSelectionChange={(keys) => setEditingEpisodeForm((prev) => ({ ...prev, episode_type: (Array.from(keys)[0] as CreatePodcastEpisodePayload['episode_type']) ?? 'full' }))}>
+                <SelectItem id="full">{t('episode.type.full')}</SelectItem>
+                <SelectItem id="trailer">{t('episode.type.trailer')}</SelectItem>
+                <SelectItem id="bonus">{t('episode.type.bonus')}</SelectItem>
+              </Select>
+              <Select label={t('fields.visibility')} selectedKeys={[editingEpisodeForm.visibility ?? 'inherit']} onSelectionChange={(keys) => setEditingEpisodeForm((prev) => ({ ...prev, visibility: (Array.from(keys)[0] as CreatePodcastEpisodePayload['visibility']) ?? 'inherit' }))}>
+                <SelectItem id="inherit">{t('visibility.inherit')}</SelectItem>
+                <SelectItem id="public">{t('visibility.public')}</SelectItem>
+                {(capabilities.enable_private_shows !== false || editingEpisode?.episode.visibility === 'members') && <SelectItem id="members">{t('visibility.members')}</SelectItem>}
+                {(capabilities.enable_private_shows !== false || editingEpisode?.episode.visibility === 'private') && <SelectItem id="private">{t('visibility.private')}</SelectItem>}
+              </Select>
+            </div>
+            <Checkbox isSelected={Boolean(editingEpisodeForm.explicit)} onValueChange={(explicit) => setEditingEpisodeForm((prev) => ({ ...prev, explicit }))}>
+              {t('fields.explicit_episode')}
+            </Checkbox>
+            <Textarea label={t('fields.summary')} value={editingEpisodeForm.summary ?? ''} onValueChange={(summary) => setEditingEpisodeForm((prev) => ({ ...prev, summary }))} />
+            <Textarea label={t('fields.description')} value={editingEpisodeForm.description ?? ''} onValueChange={(description) => setEditingEpisodeForm((prev) => ({ ...prev, description }))} />
+            {capabilities.enable_transcripts !== false && (
+              <>
+                <Textarea label={t('fields.transcript')} value={editingEpisodeForm.transcript ?? ''} onValueChange={(transcript) => setEditingEpisodeForm((prev) => ({ ...prev, transcript }))} />
+                <Select label={t('fields.transcript_language')} selectedKeys={[editingEpisodeForm.transcript_language || studioDefaultLanguage]} onSelectionChange={(keys) => setEditingEpisodeForm((prev) => ({ ...prev, transcript_language: String(Array.from(keys)[0] ?? studioDefaultLanguage) }))}>
+                  {studioLanguages.map((language) => (
+                    <SelectItem key={language} id={language}>{language.toUpperCase()}</SelectItem>
+                  ))}
+                </Select>
+              </>
+            )}
+            {capabilities.enable_chapters !== false && (
+              <Textarea label={t('fields.chapters')} description={t('fields.chapters_hint')} value={editingChaptersText} onValueChange={setEditingChaptersText} />
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={() => setEditingEpisode(null)}>{t('actions.cancel')}</Button>
+            <Button color="primary" isLoading={savingEdit} isDisabled={!editingEpisodeForm.title?.trim()} onPress={handleUpdateEpisode}>{t('studio.save_changes')}</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <Modal isOpen={feedValidation !== null} onClose={() => setFeedValidation(null)} size="md">
         <ModalContent>

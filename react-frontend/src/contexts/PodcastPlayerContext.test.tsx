@@ -16,6 +16,14 @@ vi.mock('@/lib/api/podcasts', () => ({
   },
 }));
 
+vi.mock('@/lib/api', () => ({
+  API_BASE: '/api',
+  tokenManager: {
+    getAccessToken: () => 'test-access-token',
+    getTenantId: () => 2,
+  },
+}));
+
 vi.mock('@/contexts/TenantContext', () => ({
   useTenant: () => ({ tenant: { id: 2 }, hasFeature: () => true, tenantPath: (p: string) => p }),
 }));
@@ -123,6 +131,79 @@ describe('PodcastPlayerContext', () => {
     expect(payload.session_id).toContain('7:');
   });
 
+  it('records a partial listen when playback pauses', () => {
+    renderPlayer();
+    fireEvent.click(screen.getByText('load-one'));
+
+    const audio = playerAudio();
+    audio.currentTime = 87;
+    fireEvent.pause(audio);
+
+    expect(recordListen).toHaveBeenCalledWith(7, expect.objectContaining({
+      listened_seconds: 87,
+      completed: false,
+      session_id: expect.stringContaining('7:'),
+    }));
+  });
+
+  it('starts a stable analytics session when playback begins', () => {
+    renderPlayer();
+    fireEvent.click(screen.getByText('load-one'));
+    fireEvent.play(playerAudio());
+
+    expect(recordListen).toHaveBeenCalledWith(7, expect.objectContaining({
+      listened_seconds: 0,
+      completed: false,
+      session_id: expect.stringContaining('7:'),
+    }));
+  });
+
+  it('reports a periodic partial listen after the analytics interval', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_000);
+    renderPlayer();
+    fireEvent.click(screen.getByText('load-one'));
+    const audio = playerAudio();
+    fireEvent.play(audio);
+
+    now.mockReturnValue(16_001);
+    audio.currentTime = 43;
+    fireEvent.timeUpdate(audio);
+
+    expect(recordListen).toHaveBeenCalledTimes(2);
+    expect(recordListen).toHaveBeenLastCalledWith(7, expect.objectContaining({
+      listened_seconds: 43,
+      completed: false,
+      session_id: expect.stringContaining('7:'),
+    }));
+  });
+
+  it('flushes an authenticated keepalive listen on pagehide', () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+    renderPlayer();
+    fireEvent.click(screen.getByText('load-one'));
+    const audio = playerAudio();
+    audio.currentTime = 72;
+
+    window.dispatchEvent(new Event('pagehide'));
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/v2/podcasts/episodes/7/listen', expect.objectContaining({
+      method: 'POST',
+      credentials: 'include',
+      keepalive: true,
+    }));
+    const options = fetchMock.mock.calls[0][1] as RequestInit;
+    const headers = options.headers as Headers;
+    expect(headers.get('Authorization')).toBe('Bearer test-access-token');
+    expect(headers.get('X-Tenant-ID')).toBe('2');
+    expect(JSON.parse(String(options.body))).toEqual(expect.objectContaining({
+      listened_seconds: 72,
+      completed: false,
+      session_id: expect.stringContaining('7:'),
+    }));
+    vi.unstubAllGlobals();
+  });
+
   it('applies the saved resume position after metadata arrives and clears it on completion', () => {
     saveResumePosition(2, 7, 120);
     renderPlayer();
@@ -165,10 +246,11 @@ describe('PodcastPlayerContext', () => {
     expect(audio.getAttribute('src')).toBe('https://example.test/audio/two.mp3');
     expect(screen.getByTestId('title').textContent).toBe('Episode Two');
 
-    // Completion fires for the NEW track.
+    // The outgoing partial listen is flushed, then completion fires for the new track.
     fireEvent.ended(audio);
-    expect(recordListen).toHaveBeenCalledTimes(1);
-    expect(recordListen.mock.calls[0][0]).toBe(8);
+    expect(recordListen).toHaveBeenCalledTimes(2);
+    expect(recordListen.mock.calls[0][0]).toBe(7);
+    expect(recordListen.mock.calls[1][0]).toBe(8);
   });
 
   it('close() clears the track and ignores the spurious src-clear error', () => {

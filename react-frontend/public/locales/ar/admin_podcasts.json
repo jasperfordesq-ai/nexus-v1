@@ -73,6 +73,25 @@
     "total_count": "إجمالي{{count}}"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "البحث في مراجعة البودكاست",
+      "placeholder": "البحث في البرامج أو الحلقات أو المنشئين أو البلاغات"
+    },
+    "review": {
+      "show_title": "مراجعة برنامج البودكاست",
+      "episode_title": "مراجعة حلقة البودكاست",
+      "visibility": "الظهور",
+      "language": "اللغة",
+      "category": "الفئة",
+      "media_scan": "فحص الوسائط",
+      "media_processing": "معالجة الوسائط",
+      "transcript": "النص المكتوب",
+      "chapters": "الفصول",
+      "report_history": "سجل البلاغات",
+      "notes": "ملاحظات المشرف",
+      "notes_hint": "اشرح القرار حتى يتمكن المنشئ من إجراء التغييرات اللازمة.",
+      "audio_unsupported": "لا يمكن لمتصفحك تشغيل هذا الصوت."
+    },
     "title": "Podcasts",
     "description": "قم بمراجعة العروض والحلقات المجتمعية، بما في ذلك المحتوى المحفوظ للإشراف على المستأجر.",
     "load_failed": "تعذر تحميل الإشراف على البودكاست.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "المراجعة والإشراف",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "انهيار العميل",
       "retention": "Retention",
       "reports": "فتح التقارير"
+    },
+    "review_values": {
+      "visibility": { "public": "عام", "members": "للأعضاء", "private": "خاص", "inherit": "موروث من البرنامج" },
+      "media_scan": { "pending": "بانتظار الفحص", "clean": "سليم", "infected": "مصاب", "scan_unavailable": "الماسح غير متاح", "not_required": "غير مطلوب" },
+      "media_processing": { "pending": "قيد الانتظار", "ready_for_processing": "جاهز للمعالجة", "complete": "مكتمل", "failed": "فشل" },
+      "report_status": { "open": "مفتوح", "resolved": "تم الحل", "dismissed": "مرفوض", "escalated": "تم التصعيد" }
     },
     "readiness": {
       "moderation": "Moderation",

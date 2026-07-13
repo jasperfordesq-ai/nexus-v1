@@ -50,6 +50,7 @@ import Zap from 'lucide-react/icons/zap';
 import Pencil from 'lucide-react/icons/pencil';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Landmark from 'lucide-react/icons/landmark';
+import PodcastIcon from 'lucide-react/icons/podcast';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -70,6 +71,7 @@ import { ReactionSummary } from '@/components/social/ReactionSummary';
 import { DeferredUserHoverCard } from '@/components/social/DeferredUserHoverCard';
 import { ShareButton, SharedByAttribution } from './ShareButton';
 import { BookmarkButton } from '@/components/social/BookmarkButton';
+import { safePodcastArtworkUrl } from '@/lib/podcasts/artwork';
 
 const CommentsSection = lazy(() => import('@/components/social/CommentsSection').then((module) => ({ default: module.CommentsSection })));
 const PostAnalyticsModal = lazy(() => import('./PostAnalyticsModal').then((module) => ({ default: module.PostAnalyticsModal })));
@@ -197,6 +199,14 @@ const COMMENTABLE_TYPES = new Set<FeedItem['type']>([
  * - `softGradient` is used for the subtle body tint (e.g. view-detail CTA, milestone card backgrounds).
  * - `accentGradient` is the saturated top accent strip — matches the pattern established by the poll card redesign.
  */
+const fallbackTypeConfig = {
+  labelKey: null,
+  color: 'default' as const,
+  icon: null,
+  softGradient: '',
+  accentGradient: 'from-[var(--border-default)] via-[var(--border-subtle)] to-[var(--border-default)]',
+};
+
 const typeConfig = {
   post: {
     labelKey: null,
@@ -311,6 +321,20 @@ const typeConfig = {
     icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
     softGradient: 'from-accent/10 to-violet-500/10',
     accentGradient: 'from-accent via-violet-500 to-accent-gradient-end',
+  },
+  podcast_show: {
+    labelKey: 'card.type_podcast_show',
+    color: 'primary' as const,
+    icon: <PodcastIcon className="h-3 w-3" aria-hidden="true" />,
+    softGradient: 'from-fuchsia-500/10 to-violet-500/10',
+    accentGradient: 'from-fuchsia-500 via-violet-500 to-fuchsia-500',
+  },
+  podcast_episode: {
+    labelKey: 'card.type_podcast_episode',
+    color: 'secondary' as const,
+    icon: <PodcastIcon className="h-3 w-3" aria-hidden="true" />,
+    softGradient: 'from-violet-500/10 to-blue-500/10',
+    accentGradient: 'from-violet-500 via-blue-500 to-violet-500',
   },
 };
 
@@ -495,10 +519,16 @@ const FeedCard = React.memo(function FeedCard({
   const isOwnPost = currentUserId === author.id;
   const canViewAnalytics = isOwnPost && item.type === 'post';
   const isCommentable = COMMENTABLE_TYPES.has(item.type);
-  const config = typeConfig[item.type];
+  // Keep the route usable if an API feed type arrives before a cached client
+  // learns its presentation. Unknown items render neutrally instead of taking
+  // down the whole feed through an undefined configuration lookup.
+  const config = typeConfig[item.type] ?? fallbackTypeConfig;
   const typeLabel = config.labelKey ? t(config.labelKey) : null;
   const detailPath = getItemDetailPath(item);
   const detailLabel = getItemDetailLabel(item);
+  const imageUrl = item.type === 'podcast_show' || item.type === 'podcast_episode'
+    ? safePodcastArtworkUrl(item.image_url)
+    : item.image_url;
   // Volunteer-hours activity is system-generated, so its stored title is a
   // non-localised fallback; render a localised title from the hours instead.
   const displayTitle = item.type === 'volunteer_hours' && item.hours != null
@@ -1142,7 +1172,7 @@ const FeedCard = React.memo(function FeedCard({
               )}
             </Suspense>
           </div>
-        ) : item.image_url ? (
+        ) : imageUrl ? (
           <div
             className="mb-4 -mx-5 overflow-hidden relative"
             onClick={detailPath ? undefined : doubleTapHandler}
@@ -1155,7 +1185,7 @@ const FeedCard = React.memo(function FeedCard({
             {detailPath ? (
               <Link to={tenantPath(detailPath)} onClick={doubleTapHandler}>
                 <img
-                  src={resolveThumbnailUrl(item.image_url, { width: 960, height: 540 })}
+                  src={resolveThumbnailUrl(imageUrl, { width: 960, height: 540 })}
                   alt={t('card.image_alt', { type: typeLabel ?? t('card.type_post'), name: author.name })}
                   className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
@@ -1166,7 +1196,7 @@ const FeedCard = React.memo(function FeedCard({
               </Link>
             ) : (
               <img
-                src={resolveThumbnailUrl(item.image_url, { width: 960, height: 540 })}
+                src={resolveThumbnailUrl(imageUrl, { width: 960, height: 540 })}
                 alt={t('card.image_alt', { type: t('card.type_post'), name: author.name })}
                 className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"

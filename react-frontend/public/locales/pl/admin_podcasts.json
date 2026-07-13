@@ -73,6 +73,25 @@
     "total_count": "Łącznie{{count}}"
   },
   "podcasts_admin": {
+    "search": {
+      "label": "Przeszukaj moderację podcastów",
+      "placeholder": "Szukaj podcastów, odcinków, twórców lub zgłoszeń"
+    },
+    "review": {
+      "show_title": "Sprawdź podcast",
+      "episode_title": "Sprawdź odcinek",
+      "visibility": "Widoczność",
+      "language": "Język",
+      "category": "Kategoria",
+      "media_scan": "Skanowanie pliku",
+      "media_processing": "Przetwarzanie pliku",
+      "transcript": "Transkrypcja",
+      "chapters": "Rozdziały",
+      "report_history": "Historia zgłoszeń",
+      "notes": "Uwagi moderatora",
+      "notes_hint": "Wyjaśnij decyzję, aby twórca mógł wprowadzić niezbędne zmiany.",
+      "audio_unsupported": "Twoja przeglądarka nie może odtworzyć tego dźwięku."
+    },
     "title": "Podcasts",
     "description": "Przeglądaj programy i odcinki społeczności, w tym treści przeznaczone do moderacji dla najemców.",
     "load_failed": "Nie udało się załadować moderacji podcastu.",
@@ -80,6 +99,7 @@
     "empty_value": "-",
     "count": "{{count}} items",
     "actions": {
+      "inspect": "Sprawdź i moderuj",
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
@@ -104,6 +124,12 @@
       "client_breakdown": "Podział klienta",
       "retention": "Retention",
       "reports": "Otwórz raporty"
+    },
+    "review_values": {
+      "visibility": { "public": "Publiczny", "members": "Członkowie", "private": "Prywatny", "inherit": "Dziedzicz z audycji" },
+      "media_scan": { "pending": "Oczekuje na skanowanie", "clean": "Czysty", "infected": "Zainfekowany", "scan_unavailable": "Skaner niedostępny", "not_required": "Niewymagane" },
+      "media_processing": { "pending": "Oczekuje", "ready_for_processing": "Gotowe do przetwarzania", "complete": "Ukończone", "failed": "Niepowodzenie" },
+      "report_status": { "open": "Otwarte", "resolved": "Rozwiązane", "dismissed": "Odrzucone", "escalated": "Eskalowane" }
     },
     "readiness": {
       "moderation": "Moderation",

@@ -339,6 +339,16 @@ class GdprService
             'insurance_certificates' => $this->safeSection('insurance_certificates', fn () => $this->getInsuranceCertificatesData($userId), []),
             'identity_verification' => $this->safeSection('identity_verification', fn () => $this->getIdentityVerificationData($userId), []),
             'safeguarding_preferences' => $this->safeSection('safeguarding_preferences', fn () => $this->getSafeguardingPreferencesData($userId), []),
+            'podcasts' => $this->safeSection('podcasts', fn () => $this->getPodcastsData($userId), [
+                'shows_owned' => [],
+                'episodes_authored' => [],
+                'chapters_authored' => [],
+                'listens' => [],
+                'reactions' => [],
+                'subscriptions' => [],
+                'reports_filed' => [],
+                'moderation_activity' => ['shows' => [], 'episodes' => [], 'reports_reviewed' => []],
+            ]),
         ];
     }
 
@@ -983,6 +993,114 @@ class GdprService
         }
     }
 
+    /**
+     * Export podcast data attributable to the data subject without including
+     * other members' listening or subscription records for shows they own.
+     *
+     * @return array<string,mixed>
+     */
+    private function getPodcastsData(int $userId): array
+    {
+        return [
+            'shows_owned' => $this->query(
+                "SELECT * FROM podcast_shows
+                  WHERE owner_user_id = ? AND tenant_id = ? ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'episodes_authored' => $this->query(
+                "SELECT * FROM podcast_episodes
+                  WHERE author_user_id = ? AND tenant_id = ? ORDER BY created_at DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'chapters_authored' => $this->query(
+                "SELECT c.* FROM podcast_episode_chapters c
+                  INNER JOIN podcast_episodes e ON e.id = c.episode_id AND e.tenant_id = c.tenant_id
+                  WHERE e.author_user_id = ? AND c.tenant_id = ?
+                  ORDER BY c.episode_id, c.position",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'listens' => $this->query(
+                "SELECT * FROM podcast_episode_listens
+                  WHERE user_id = ? AND tenant_id = ? ORDER BY id DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'reactions' => $this->query(
+                "SELECT * FROM podcast_episode_reactions
+                  WHERE user_id = ? AND tenant_id = ? ORDER BY id DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'subscriptions' => $this->query(
+                "SELECT * FROM podcast_show_subscriptions
+                  WHERE user_id = ? AND tenant_id = ? ORDER BY id DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'reports_filed' => $this->query(
+                "SELECT * FROM podcast_episode_reports
+                  WHERE reporter_user_id = ? AND tenant_id = ? ORDER BY id DESC",
+                [$userId, $this->tenantId]
+            )->fetchAll(),
+            'moderation_activity' => [
+                'shows' => $this->query(
+                    "SELECT id, moderation_status, moderated_at FROM podcast_shows
+                      WHERE moderated_by = ? AND tenant_id = ? ORDER BY moderated_at DESC",
+                    [$userId, $this->tenantId]
+                )->fetchAll(),
+                'episodes' => $this->query(
+                    "SELECT id, show_id, moderation_status, moderated_at FROM podcast_episodes
+                      WHERE moderated_by = ? AND tenant_id = ? ORDER BY moderated_at DESC",
+                    [$userId, $this->tenantId]
+                )->fetchAll(),
+                'reports_reviewed' => $this->query(
+                    "SELECT id, episode_id, status, reviewed_at FROM podcast_episode_reports
+                      WHERE reviewed_by = ? AND tenant_id = ? ORDER BY reviewed_at DESC",
+                    [$userId, $this->tenantId]
+                )->fetchAll(),
+            ],
+        ];
+    }
+
+    /**
+     * Delete a podcast image pointer only when it is a local public upload in
+     * the podcasts subtree. Absolute/external URLs are intentionally never
+     * fetched; their database pointer is scrubbed by the caller.
+     */
+    private function deletePodcastPublicAssetPointer(?string $pointer): bool
+    {
+        $pointer = trim((string) $pointer);
+        if ($pointer === '') {
+            return true;
+        }
+
+        $parts = parse_url($pointer);
+        if ($parts === false || isset($parts['scheme']) || isset($parts['host'])) {
+            return true;
+        }
+
+        $path = rawurldecode((string) ($parts['path'] ?? ''));
+        $path = '/' . ltrim(str_replace('\\', '/', $path), '/');
+        $segments = array_values(array_filter(explode('/', $path), static fn (string $segment): bool => $segment !== ''));
+        if (!str_starts_with($path, '/uploads/')
+            || !in_array('podcasts', $segments, true)
+            || in_array('..', $segments, true)
+            || in_array('.', $segments, true)) {
+            return true;
+        }
+
+        $uploadsRoot = realpath(public_path('uploads'));
+        $candidate = public_path(ltrim($path, '/'));
+        if (!is_file($candidate)) {
+            return true;
+        }
+
+        $resolved = realpath($candidate);
+        if ($uploadsRoot === false || $resolved === false
+            || !str_starts_with($resolved, rtrim($uploadsRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR)) {
+            return false;
+        }
+
+        return @unlink($resolved);
+    }
+
     // =========================================================================
     // ACCOUNT DELETION (Article 17 - Right to Erasure)
     // =========================================================================
@@ -1569,7 +1687,175 @@ class GdprService
                 $this->query("DELETE FROM course_enrollments WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
             } catch (\Throwable $e) { $this->logger->warning('GDPR courses deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
-            // 3x. Identity and compliance records. Safeguarding reports remain
+            // 3x. Podcasts â€” shows/episodes are creator-owned personal
+            // content, while listens, reactions, subscriptions and reports are
+            // behavioural data. Remove both the rows and hosted audio. If a
+            // storage object cannot be removed, retain a private, archived
+            // tombstone containing only its storage pointer so the DPO can
+            // retry cleanup; never orphan the only pointer to surviving media.
+            if (\Illuminate\Support\Facades\Schema::hasTable('podcast_shows')) {
+                try {
+                    $showRows = $this->query(
+                        "SELECT id, artwork_url FROM podcast_shows WHERE owner_user_id = ? AND tenant_id = ?",
+                        [$userId, $this->tenantId]
+                    )->fetchAll();
+                    $showIds = array_map(static fn (array $row): int => (int) $row['id'], $showRows);
+                    $episodeRows = $this->query(
+                        "SELECT id, show_id, audio_storage_path, audio_storage_disk, cover_image_url
+                           FROM podcast_episodes
+                          WHERE tenant_id = ?
+                            AND (author_user_id = ? OR show_id IN
+                                (SELECT id FROM podcast_shows WHERE owner_user_id = ? AND tenant_id = ?))",
+                        [$this->tenantId, $userId, $userId, $this->tenantId]
+                    )->fetchAll();
+                    $episodeIds = array_map(static fn ($row): int => (int) $row['id'], $episodeRows);
+                    $affectedShowIds = array_values(array_unique(array_map(
+                        static fn ($row): int => (int) $row['show_id'],
+                        $episodeRows
+                    )));
+
+                    $mediaDeletionFailed = false;
+                    $failedArtworkPointers = [];
+                    $failedCoverPointers = [];
+                    foreach ($showRows as $showRow) {
+                        $artworkPointer = (string) ($showRow['artwork_url'] ?? '');
+                        if (!$this->deletePodcastPublicAssetPointer($artworkPointer)) {
+                            $mediaDeletionFailed = true;
+                            $failedArtworkPointers[(int) $showRow['id']] = $artworkPointer;
+                            $this->logger->error('GDPR podcast artwork deletion requires DPO follow-up', [
+                                'user_id' => $userId,
+                                'show_id' => (int) $showRow['id'],
+                            ]);
+                        }
+                    }
+                    foreach ($episodeRows as $episodeRow) {
+                        $coverPointer = (string) ($episodeRow['cover_image_url'] ?? '');
+                        if (!$this->deletePodcastPublicAssetPointer($coverPointer)) {
+                            $mediaDeletionFailed = true;
+                            $failedCoverPointers[(int) $episodeRow['id']] = $coverPointer;
+                            $this->logger->error('GDPR podcast cover deletion requires DPO follow-up', [
+                                'user_id' => $userId,
+                                'episode_id' => (int) $episodeRow['id'],
+                            ]);
+                        }
+
+                        $path = trim((string) ($episodeRow['audio_storage_path'] ?? ''));
+                        if ($path === '') {
+                            continue;
+                        }
+                        $disk = trim((string) ($episodeRow['audio_storage_disk'] ?? '')) ?: 'local';
+                        try {
+                            $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+                            if ($storage->exists($path) && !$storage->delete($path)) {
+                                $mediaDeletionFailed = true;
+                            }
+                        } catch (\Throwable $e) {
+                            $mediaDeletionFailed = true;
+                            $this->logger->error('GDPR podcast media deletion requires DPO follow-up', [
+                                'user_id' => $userId,
+                                'episode_id' => (int) $episodeRow['id'],
+                                'disk' => $disk,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    // Behavioural and moderation identity links are removed
+                    // regardless of the creator-content cleanup outcome.
+                    $this->query("DELETE FROM podcast_episode_listens WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("DELETE FROM podcast_episode_reactions WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("DELETE FROM podcast_show_subscriptions WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("DELETE FROM podcast_episode_reports WHERE reporter_user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("UPDATE podcast_episode_reports SET reviewed_by = NULL WHERE reviewed_by = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("UPDATE podcast_shows SET moderated_by = NULL WHERE moderated_by = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                    $this->query("UPDATE podcast_episodes SET moderated_by = NULL WHERE moderated_by = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                    if ($mediaDeletionFailed) {
+                        $criticalErasureFailed = true;
+                        $this->query(
+                            "UPDATE podcast_shows
+                                SET title = CONCAT('erased-podcast-', id), slug = CONCAT('erased-podcast-', id),
+                                    summary = NULL, description = NULL, artwork_url = NULL,
+                                    author_name = NULL, owner_email = NULL, copyright = NULL, funding_url = NULL,
+                                    visibility = 'private', status = 'archived', moderation_status = 'rejected',
+                                    moderation_notes = NULL, moderated_by = NULL, moderated_at = NULL,
+                                    updated_at = NOW()
+                              WHERE owner_user_id = ? AND tenant_id = ?",
+                            [$userId, $this->tenantId]
+                        );
+                        $this->query(
+                            "UPDATE podcast_episodes
+                                SET title = CONCAT('erased-episode-', id), slug = CONCAT('erased-episode-', id),
+                                    summary = NULL, description = NULL, audio_url = CONCAT('podcast-erasure-pending://', id),
+                                    transcript = NULL, transcript_language = NULL, cover_image_url = NULL,
+                                    visibility = 'private', status = 'archived', moderation_status = 'rejected',
+                                    moderation_notes = NULL, moderated_by = NULL, moderated_at = NULL,
+                                    updated_at = NOW()
+                              WHERE tenant_id = ?
+                                AND (author_user_id = ? OR show_id IN
+                                    (SELECT id FROM podcast_shows WHERE owner_user_id = ? AND tenant_id = ?))",
+                            [$this->tenantId, $userId, $userId, $this->tenantId]
+                        );
+                        foreach ($failedArtworkPointers as $failedShowId => $failedPointer) {
+                            $this->query(
+                                "UPDATE podcast_shows SET artwork_url = ? WHERE id = ? AND tenant_id = ?",
+                                [$failedPointer, $failedShowId, $this->tenantId]
+                            );
+                        }
+                        foreach ($failedCoverPointers as $failedEpisodeId => $failedPointer) {
+                            $this->query(
+                                "UPDATE podcast_episodes SET cover_image_url = ? WHERE id = ? AND tenant_id = ?",
+                                [$failedPointer, $failedEpisodeId, $this->tenantId]
+                            );
+                        }
+                    } else {
+                        if ($episodeIds !== []) {
+                            $episodePlaceholders = implode(',', array_fill(0, count($episodeIds), '?'));
+                            $episodeParams = array_merge([$this->tenantId], $episodeIds);
+                            foreach (['podcast_episode_chapters', 'podcast_episode_listens', 'podcast_episode_reactions', 'podcast_episode_reports'] as $table) {
+                                $this->query(
+                                    "DELETE FROM {$table} WHERE tenant_id = ? AND episode_id IN ({$episodePlaceholders})",
+                                    $episodeParams
+                                );
+                            }
+                            $this->query(
+                                "DELETE FROM podcast_episodes WHERE tenant_id = ? AND id IN ({$episodePlaceholders})",
+                                $episodeParams
+                            );
+                        }
+                        if ($showIds !== []) {
+                            $showPlaceholders = implode(',', array_fill(0, count($showIds), '?'));
+                            $showParams = array_merge([$this->tenantId], $showIds);
+                            $this->query(
+                                "DELETE FROM podcast_show_subscriptions WHERE tenant_id = ? AND show_id IN ({$showPlaceholders})",
+                                $showParams
+                            );
+                            $this->query(
+                                "DELETE FROM podcast_shows WHERE tenant_id = ? AND id IN ({$showPlaceholders})",
+                                $showParams
+                            );
+                        }
+                        if ($affectedShowIds !== []) {
+                            $affectedPlaceholders = implode(',', array_fill(0, count($affectedShowIds), '?'));
+                            $this->query(
+                                "UPDATE podcast_shows s
+                                    SET episode_count = (SELECT COUNT(*) FROM podcast_episodes e
+                                                          WHERE e.tenant_id = s.tenant_id AND e.show_id = s.id)
+                                  WHERE s.tenant_id = ? AND s.id IN ({$affectedPlaceholders})",
+                                array_merge([$this->tenantId], $affectedShowIds)
+                            );
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    $criticalErasureFailed = true;
+                    $this->logger->error('GDPR CRITICAL erasure step failed (podcasts)', [
+                        'user_id' => $userId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // 3y. Identity and compliance records. Safeguarding reports remain
             // governed by their separate legal-hold workflow.
             // Metadata-only safeguarding records do not contain certificate
             // evidence, but the anonymized users row means FK cascades do not

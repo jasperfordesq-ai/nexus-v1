@@ -390,6 +390,10 @@
     "read_more_about": "Przeczytaj więcej o {{title}}",
     "detail_course": "Zobacz kurs",
     "type_course": "Kurs",
+    "detail_podcast_show": "Zobacz podcast",
+    "detail_podcast_episode": "Posłuchaj odcinka",
+    "type_podcast_show": "Podcast",
+    "type_podcast_episode": "Odcinek podcastu",
     "type_volunteer_hours": "Godziny wolontariatu",
     "volunteer_hours_title": "Przepracowano {{hours}} godzin wolontariatu"
   },

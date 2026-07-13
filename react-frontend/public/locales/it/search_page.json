@@ -137,5 +137,20 @@
   "saved_searches_many": "Ricerche salvate ({{count}})",
   "saved_searches_one": "Ricerche salvate ({{count}})",
   "saved_searches_other": "Ricerche salvate ({{count}})",
-  "saved_result_count_many": "({{count}} risultati)"
+  "saved_result_count_many": "({{count}} risultati)",
+  "tab_podcasts": "Podcast ({{count}})",
+  "tab_podcasts_one": "Podcast ({{count}})",
+  "tab_podcasts_other": "Podcast ({{count}})",
+  "tab_podcasts_many": "Podcast ({{count}})",
+  "section_podcasts": "Podcast ({{count}})",
+  "section_podcasts_one": "Podcast ({{count}})",
+  "section_podcasts_other": "Podcast ({{count}})",
+  "section_podcasts_many": "Podcast ({{count}})",
+  "view_all_podcasts": "Vedi tutti i {{count}} podcast",
+  "view_all_podcasts_one": "Vedi {{count}} podcast",
+  "view_all_podcasts_other": "Vedi tutti i {{count}} podcast",
+  "view_all_podcasts_many": "Vedi tutti i {{count}} podcast",
+  "podcast_show_label": "Programma podcast",
+  "podcast_episode_label": "Episodio di {{show}}",
+  "filter_podcasts": "Podcast"
 }

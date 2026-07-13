@@ -906,6 +906,22 @@ class FeedServiceTest extends TestCase
         $this->assertArrayHasKey('_activity_created_at', $item);
     }
 
+    public function test_getFeed_suppresses_historical_remote_podcast_artwork(): void
+    {
+        $row = $this->makeFeedRow([
+            'source_type' => 'podcast_episode',
+            'source_id' => 701,
+            'image_url' => 'https://tracking.example.test/listener-pixel.png',
+        ]);
+
+        $service = $this->mockEloquentConnectionAndBuildService([[$row]]);
+
+        $result = $service->getFeed(10, []);
+
+        $this->assertCount(1, $result['items']);
+        $this->assertNull($result['items'][0]['image_url']);
+    }
+
     public function test_getFeed_default_avatar_when_null(): void
     {
         $row = $this->makeFeedRow([
