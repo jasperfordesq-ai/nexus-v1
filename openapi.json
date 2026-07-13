@@ -236,9 +236,7 @@
             },
             "wallet_refund_transaction_id": {
               "type": "integer",
-              "description": "Present after a time-credit refund; null for cash",
-              "free": null,
-              "and historical orders.": null,
+              "description": "Present after a time-credit refund; null for cash, free, and historical orders.",
               "nullable": true
             },
             "loyalty_redemption_id": {
@@ -620,8 +618,7 @@
               "type": "number",
               "format": "double",
               "minimum": 0,
-              "description": "Null until a buyer refund is recorded",
-              "including on historical disputes.": null,
+              "description": "Null until a buyer refund is recorded, including on historical disputes.",
               "nullable": true
             },
             "created_at": {
@@ -2022,9 +2019,7 @@
             "description": "Marketplace unavailable or purchase prohibited"
           },
           "422": {
-            "description": "Invalid",
-            "unavailable": null,
-            "or inconsistent checkout selection": null
+            "description": "Invalid, unavailable, or inconsistent checkout selection"
           }
         }
       }

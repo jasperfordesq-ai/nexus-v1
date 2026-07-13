@@ -740,7 +740,7 @@ paths:
           content: { application/json: { schema: { $ref: '#/components/schemas/MarketplaceOrderResponse' } } }
         '401': { description: Authentication required }
         '403': { description: Marketplace unavailable or purchase prohibited }
-        '422': { description: Invalid, unavailable, or inconsistent checkout selection }
+        '422': { description: 'Invalid, unavailable, or inconsistent checkout selection' }
   /v2/marketplace/reports:
     get:
       operationId: listMyMarketplaceReports
@@ -1289,7 +1289,7 @@ components:
         currency: { type: string }
         time_credits_used: { type: [number, 'null'], format: double, minimum: 0 }
         wallet_transaction_id: { type: [integer, 'null'] }
-        wallet_refund_transaction_id: { type: [integer, 'null'], description: Present after a time-credit refund; null for cash, free, and historical orders. }
+        wallet_refund_transaction_id: { type: [integer, 'null'], description: 'Present after a time-credit refund; null for cash, free, and historical orders.' }
         loyalty_redemption_id: { type: [integer, 'null'] }
         payment_method: { type: string, enum: [cash, time_credits, free] }
         requires_payment: { type: boolean }
@@ -1399,7 +1399,7 @@ components:
         status: { type: string, enum: [open, under_review, resolved_buyer, resolved_seller, escalated, closed] }
         prior_order_status: { type: [string, 'null'] }
         resolution_notes: { type: [string, 'null'] }
-        refund_amount: { type: [number, 'null'], format: double, minimum: 0, description: Null until a buyer refund is recorded, including on historical disputes. }
+        refund_amount: { type: [number, 'null'], format: double, minimum: 0, description: 'Null until a buyer refund is recorded, including on historical disputes.' }
         created_at: { type: [string, 'null'], format: date-time }
         resolved_at: { type: [string, 'null'], format: date-time }
         opened_by:

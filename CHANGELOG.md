@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Marketplace OpenAPI descriptions now remain structurally valid when they contain commas.** Flow-style YAML descriptions for checkout validation, time-credit refunds, and historical dispute refunds are quoted so the synchronized JSON contracts no longer emit sentence fragments as illegal schema properties and the Redocly documentation gate passes.
 - **Fresh schema imports no longer retain a production-only MariaDB trigger definer.** Schema refreshes strip account-specific `DEFINER` clauses so CI, tests, and new installations create triggers under their own import account instead of failing writes with error 1449 when `nexus@%` does not exist.
 
 ### Added
