@@ -235,12 +235,15 @@ class AudioUploader
         $legacyPrefix = "/uploads/{$tenantId}/voice_messages/";
         if (str_starts_with($url, $privatePrefix)) {
             $filename = substr($url, strlen($privatePrefix));
-            $rootPath = storage_path("app/private/message-media/{$tenantId}/voice");
+            $rootPaths = [storage_path("app/private/message-media/{$tenantId}/voice")];
         } elseif (str_starts_with($url, $legacyPrefix)) {
             $filename = substr(rawurldecode($url), strlen($legacyPrefix));
             $documentRoot = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
-            $rootPath = ($documentRoot !== '' ? $documentRoot : base_path('httpdocs'))
-                . "/uploads/{$tenantId}/voice_messages";
+            $rootPaths = array_values(array_unique(array_filter([
+                $documentRoot !== '' ? $documentRoot . "/uploads/{$tenantId}/voice_messages" : null,
+                base_path("httpdocs/uploads/{$tenantId}/voice_messages"),
+                public_path("uploads/{$tenantId}/voice_messages"),
+            ], static fn (?string $path): bool => $path !== null && $path !== '')));
         } else {
             return null;
         }
@@ -249,18 +252,20 @@ class AudioUploader
             return null;
         }
 
-        $resolvedRoot = realpath($rootPath);
-        if ($resolvedRoot === false) {
-            return null;
+        foreach ($rootPaths as $rootPath) {
+            $resolvedRoot = realpath($rootPath);
+            if ($resolvedRoot === false) {
+                continue;
+            }
+
+            $resolved = realpath($resolvedRoot . DIRECTORY_SEPARATOR . $filename);
+            $rootPrefix = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            if ($resolved !== false && str_starts_with($resolved, $rootPrefix) && is_file($resolved)) {
+                return $resolved;
+            }
         }
 
-        $resolved = realpath($resolvedRoot . DIRECTORY_SEPARATOR . $filename);
-        $rootPrefix = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        if ($resolved === false || !str_starts_with($resolved, $rootPrefix)) {
-            return null;
-        }
-
-        return is_file($resolved) ? $resolved : null;
+        return null;
     }
 
     /**

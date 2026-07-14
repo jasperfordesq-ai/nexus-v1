@@ -305,8 +305,8 @@ final class MessageErasureConcurrencyTest extends TestCase
     /** @return array{string, string} */
     private function createVoiceFixture(): array
     {
-        $directory = public_path("uploads/{$this->testTenantId}/voice_messages");
-        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
+        $directory = storage_path("app/private/message-media/{$this->testTenantId}/voice");
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
             throw new RuntimeException('message_erasure_voice_directory_failed');
         }
 
@@ -317,7 +317,7 @@ final class MessageErasureConcurrencyTest extends TestCase
         }
 
         return [
-            "/uploads/{$this->testTenantId}/voice_messages/{$filename}",
+            "message-media/{$this->testTenantId}/voice/{$filename}",
             $this->voicePath,
         ];
     }

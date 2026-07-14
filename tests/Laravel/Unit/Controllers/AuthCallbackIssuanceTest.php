@@ -207,7 +207,7 @@ class AuthCallbackIssuanceTest extends TestCase
         $social = Mockery::mock(SocialAuthService::class);
         $social->shouldReceive('issueLoginCallbackCode')
             ->once()
-            ->with(902, $this->testTenantId, 'sso:entra', false, $startedAt, self::BROWSER_CHALLENGE, $identityLink)
+            ->with(902, $this->testTenantId, 'sso:entra', false, $startedAt, self::BROWSER_CHALLENGE, $identityLink, false)
             ->andReturn(['status' => 'issued', 'callback_code' => 'sso-once']);
 
         TenantContext::reset();
