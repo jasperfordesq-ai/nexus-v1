@@ -2,13 +2,15 @@
 
 Audience: maintainers and contributors working on community idea management, challenge lifecycles, voting, outcomes, or campaign organisation.
 
+Last reviewed: 2026-07-14
+
 ---
 
 ## What it does
 
 The Ideation & Challenges module lets tenants run structured idea-collection campaigns:
 
-- **Admins** create *challenges* — community problem statements with a lifecycle, deadlines, optional categories, tags, and a prize description.
+- **Authenticated members** can create *challenges* — community problem statements with a lifecycle, deadlines, optional categories, tags, and a prize description. Subsequent challenge update/delete/status operations are admin-only.
 - **Members** submit ideas in response to a challenge, vote on each other's ideas, comment, and save drafts.
 - **Admins** progress challenges through a controlled lifecycle, shortlist and select winning ideas, and record outcomes (implementation status and impact).
 - **Campaigns** group related challenges into a themed collection.
@@ -32,17 +34,20 @@ Feature flag: `ideation_challenges` (default: **ON**).
 
 ## Challenge lifecycle
 
-Status transitions are validated server-side. Only admins can advance status.
+Status transitions are validated server-side. Only admins can change the status of an existing challenge.
 
 ```
-draft → open → voting → evaluating → closed → archived
-                └──────── evaluating → closed ──────────────┘
-                          closed → open   (re-open)
+draft      → open
+open       → voting | evaluating | closed
+voting     → evaluating | closed
+evaluating → closed
+closed     → open | archived
+archived   → closed
 ```
 
 Allowed transitions are enforced by `IdeationChallengeService::updateChallengeStatus()`. Attempting an invalid transition returns HTTP 409.
 
-**Idea statuses** (admin-controlled via `updateIdeaStatus()`): `submitted → shortlisted → winner → withdrawn`.
+`POST /v2/ideation-challenges` currently accepts any valid challenge status at creation (default `open`), so the transition graph only governs later status changes. **Idea statuses** are admin-controlled via `updateIdeaStatus()`, but are a set rather than a transition chain: an admin may directly assign any of `submitted`, `shortlisted`, `winner`, or `withdrawn`.
 
 ---
 
@@ -71,7 +76,7 @@ All ideation tables are prefixed with `challenge_` or `ideation_`; they carry no
 | `team_tasks` | Kanban tasks inside implementation groups |
 | `team_documents` | File uploads inside implementation groups |
 
-Tenant scoping: `ideation_challenges.tenant_id` is the root anchor. Ideas, votes, and comments are scoped transitively by joining through their parent challenge. Categories, tags, templates, and outcomes carry their own `tenant_id` via the `HasTenantScope` trait on the relevant Eloquent models.
+Tenant scoping: `ideation_challenges.tenant_id` is the root anchor. Most idea, vote, and comment operations scope transitively through their parent challenge; the known `getIdeas()` exception is called out under [Security and privacy invariants](#security-and-privacy-invariants). Categories, tags, templates, and outcomes carry their own `tenant_id` via the `HasTenantScope` trait on the relevant Eloquent models.
 
 ---
 
@@ -97,20 +102,20 @@ Tenant scoping: `ideation_challenges.tenant_id` is the root anchor. Ideas, votes
 
 | Controller | Path prefix | Notes |
 |---|---|---|
-| `app/Http/Controllers/Api/IdeationChallengesController.php` | `/api/v2/` | All public and member-facing endpoints; also hosts group chatroom, task, and document endpoints that belong to implementation teams |
+| `app/Http/Controllers/Api/IdeationChallengesController.php` | `/api/v2/` | Authenticated member-facing endpoints; also hosts group chatroom, task, and document endpoints that belong to implementation teams |
 | `app/Http/Controllers/Api/AdminIdeationController.php` | `/api/v2/admin/ideation` | Moderation view: list all challenges (offset-paginated), show, delete, advance status; requires admin middleware |
 
 ### Key API endpoints
 
-All endpoints require `auth:sanctum` unless noted. See `routes/api.php` for the full list.
+All endpoints below require `auth:sanctum`; there are no anonymous ideation reads. See `routes/api.php` for the full list.
 
 **Challenges**
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| GET | `/v2/ideation-challenges` | optional | Cursor-paginated; `?status=`, `?category_id=`, `?search=`, `?cursor=`, `?per_page=` (1–100) |
-| POST | `/v2/ideation-challenges` | required | Creates challenge; fires feed-activity record; rate-limited 10 req/min |
-| GET | `/v2/ideation-challenges/{id}` | optional | Detail with `ideas_count` and `is_favorited` |
+| GET | `/v2/ideation-challenges` | required | Cursor-paginated; non-admins see `open`, `voting`, `evaluating`, and `closed`; admins may also query `draft`/`archived` |
+| POST | `/v2/ideation-challenges` | required | Any authenticated member may create; fires feed activity; rate-limited 10 req/min |
+| GET | `/v2/ideation-challenges/{id}` | required | Detail with `ideas_count` and caller-relative `is_favorited`; draft/archived restricted to creator/admin |
 | PUT | `/v2/ideation-challenges/{id}` | admin | Update challenge fields |
 | DELETE | `/v2/ideation-challenges/{id}` | admin | Hard delete |
 | PUT | `/v2/ideation-challenges/{id}/status` | admin | Status transition (validates allowed paths) |
@@ -124,13 +129,13 @@ All endpoints require `auth:sanctum` unless noted. See `routes/api.php` for the 
 | GET | `/v2/ideation-challenges/{id}/ideas` | `?sort=votes` (default) or `newest`; cursor-paginated |
 | POST | `/v2/ideation-challenges/{id}/ideas` | Submit idea; notifies challenge creator |
 | GET | `/v2/ideation-challenges/{id}/ideas/drafts` | User's own drafts for a challenge |
-| GET | `/v2/ideation-ideas/{id}` | Single idea; includes `has_voted` when authenticated |
+| GET | `/v2/ideation-ideas/{id}` | Single idea; includes caller-relative `has_voted` |
 | PUT | `/v2/ideation-ideas/{id}` | Edit own idea while challenge is `open` |
 | PUT | `/v2/ideation-ideas/{id}/draft` | Save/publish a draft (`?publish=true` transitions `draft → submitted`) |
 | DELETE | `/v2/ideation-ideas/{id}` | Owner or admin; decrements counter atomically |
 | POST | `/v2/ideation-ideas/{id}/vote` | Toggle vote; blocked if idea is `draft`/`withdrawn` or challenge is not `open`/`voting`; users cannot vote on their own ideas |
-| PUT | `/v2/ideation-ideas/{id}/status` | Admin only; `submitted → shortlisted → winner → withdrawn`; notifies idea author |
-| POST | `/v2/ideation-ideas/{id}/convert-to-group` | Create implementation group from idea |
+| PUT | `/v2/ideation-ideas/{id}/status` | Admin only; directly assigns an allowed status and notifies the idea author |
+| POST | `/v2/ideation-ideas/{id}/convert-to-group` | Idea author, challenge creator, or admin creates an implementation group; idea status is not checked |
 
 **Comments**
 
@@ -144,7 +149,7 @@ All endpoints require `auth:sanctum` unless noted. See `routes/api.php` for the 
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/v2/ideation-categories` | Public list |
+| GET | `/v2/ideation-categories` | Authenticated list |
 | POST/PUT/DELETE | `/v2/ideation-categories/{id}` | Admin only |
 | GET | `/v2/ideation-tags` | `?type=` filter |
 | GET | `/v2/ideation-tags/popular` | Ranked by usage count |
@@ -157,7 +162,7 @@ All endpoints require `auth:sanctum` unless noted. See `routes/api.php` for the 
 
 | Method | Path |
 |---|---|
-| GET/PUT | `/v2/ideation-challenges/{id}/outcome` |
+| GET/PUT | `/v2/ideation-challenges/{id}/outcome` (read: authenticated; write: admin enforced in the service) |
 | GET | `/v2/ideation-outcomes/dashboard` |
 | GET/POST/PUT/DELETE | `/v2/ideation-campaigns`, `/v2/ideation-campaigns/{id}` |
 | POST/DELETE | `/v2/ideation-campaigns/{id}/challenges` |
@@ -200,11 +205,12 @@ Lang file: `lang/en/govuk_alpha_ideation.php` (plus 10 locale variants).
 
 ## Security and privacy invariants
 
-- Every query on `ideation_challenges` includes `WHERE tenant_id = ?` (checked in `IdeationChallengeService` via `TenantContext::getId()`). Ideas, votes, and comments are scoped transitively by joining back to the parent challenge.
+- Challenge CRUD and single-idea/comment operations scope through `ideation_challenges.tenant_id`. **Known gap:** `IdeationChallengeService::getIdeas()` currently filters only by the supplied `challenge_id` and does not join back to the tenant-scoped challenge. Do not treat authentication alone as tenant authorization; add the parent tenant check before extending or reusing that method.
 - Voting: users cannot vote on their own ideas; votes are rejected if the challenge is not in `open` or `voting` status; a duplicate vote toggles the existing vote off (idempotent toggle).
 - Challenge update and delete are admin-only. Idea edit is owner-only and blocked once the challenge leaves `open` status.
 - Draft ideas are owner-private: `getUserDrafts()` always filters by both `challenge_id` and `user_id`.
 - Outcome upsert (including selecting a winning idea) is admin-only. The winning idea's membership in the challenge is validated before the FK is written.
+- Idea submission, voting, commenting, favoriting, and cross-user team conversion apply `SafeguardingInteractionPolicy` before creating contact between members.
 - Duplicate operation creates a `draft` with zeroed counters; deadlines are intentionally cleared.
 - All notification emails are rendered inside `LocaleContext::withLocale($recipient, ...)` so they go out in the recipient's `preferred_language`, not the caller's locale.
 
@@ -243,7 +249,7 @@ vendor/bin/phpunit tests/Laravel/Unit/Services/ChallengeOutcomeServiceTest.php
 vendor/bin/phpunit tests/Laravel/Feature/GovukAlpha/IdeationParityTest.php
 
 # React — run from react-frontend/
-npm test -- --testPathPattern=ideation
+npx vitest run src/pages/ideation src/components/ideation src/admin/modules/ideation
 ```
 
 Key coverage:
@@ -261,10 +267,10 @@ Key coverage:
 | Failure | Behaviour | Recovery |
 |---|---|---|
 | Feature disabled for tenant | All API endpoints return HTTP 403 (`FEATURE_DISABLED`); React routes show a coming-soon page | Enable `ideation_challenges` in tenant settings via the admin panel |
-| Invalid status transition | `updateChallengeStatus()` returns `CONFLICT` error; HTTP 409 | Advance through the correct sequence (e.g. `open → voting` before `voting → evaluating`) |
+| Invalid status transition | `updateChallengeStatus()` returns `CONFLICT` error; HTTP 409 | Use one of the explicit transitions above; `open` may move directly to `voting`, `evaluating`, or `closed` |
 | Vote on closed/evaluating challenge | `voteIdea()` returns `CONFLICT` (`challenge_voting_not_allowed`) | No action needed; the challenge must be `open` or `voting` to accept votes |
-| Idea edit after challenge leaves `open` | `updateIdea()` returns `CONFLICT` (`challenge_closed_for_edits`) | Reopen the challenge status (admin) or use the admin idea-status endpoint to set the idea `withdrawn` |
-| Notification email failure | `EmailDispatchService::sendRaw()` returns false; logged as `Log::warning` — the primary action still succeeds | Check `email_logs` table or SendGrid Activity for delivery status |
+| Idea edit after challenge leaves `open` | `updateIdea()` returns `CONFLICT` (`challenge_closed_for_edits`) | Editing becomes available only if an admin returns the challenge to `open` through a valid lifecycle path; idea status can be changed separately by an admin |
+| Notification email failure | `EmailDispatchService::sendRaw()` returns false; logged as `Log::warning` — the primary action still succeeds | Check `email_logs` and the configured mail provider's delivery logs |
 | Outcome `winning_idea_id` FK violation | Service validates that the idea belongs to the challenge; returns `VALIDATION_INVALID_VALUE` | Pass a valid idea ID that was submitted to the same challenge |
-| Team conversion on non-shortlisted idea | `IdeaTeamConversionService` checks idea eligibility; returns `FORBIDDEN` or `CONFLICT` | Shortlist or mark the idea as winner before converting |
+| Team conversion denied or repeated | Caller is not the idea author/challenge creator/admin, or `idea_team_links` already contains the idea | Use an authorized caller; if already converted, reuse the existing implementation group rather than creating another |
 | Category deleted while challenges reference it | `ChallengeCategoryService::delete()` nulls out `category_id` on affected challenges before deleting the category row | No recovery needed; challenges retain their free-text `category` field |

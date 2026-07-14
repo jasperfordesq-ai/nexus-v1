@@ -1,11 +1,13 @@
 # Custom Domains
 
+Last reviewed: 2026-07-14
+
 Project NEXUS supports separate tenant domains for the primary React frontend and the accessibility-first frontend.
 
 | Frontend | Tenant column | Serves | Upstream family |
 | --- | --- | --- | --- |
 | React SPA | `tenants.domain` | Primary tenant UI | React blue/green frontend |
-| Accessible frontend | `tenants.accessible_domain` | HTML-first `/alpha` UI | PHP/Laravel blue/green app |
+| Accessible frontend | `tenants.accessible_domain` | HTML-first accessible UI | PHP/Laravel blue/green app |
 
 Both hostnames resolve a tenant from the HTTP `Host` header. The production web server must preserve the original host when proxying to the app containers, otherwise tenant detection and generated links can be wrong.
 
@@ -55,7 +57,7 @@ RewriteRule ^(.*)$ http://127.0.0.1:${NEXUS_API_PORT}$1 [P,L]
 ## Verification
 
 - `https://<react-domain>/` loads the React SPA for the correct tenant.
-- `https://<accessible-domain>/alpha` loads the accessible frontend for the correct tenant.
+- `https://<accessible-domain>/` loads the accessible frontend for the correct tenant.
 - The React utility link to the accessible version points to the configured accessible domain when one exists.
 - Tenant bootstrap, CORS, cookies, and generated notification links still use the expected public hostnames.
 
@@ -64,4 +66,7 @@ RewriteRule ^(.*)$ http://127.0.0.1:${NEXUS_API_PORT}$1 [P,L]
 - The React and accessible domains must be distinct.
 - Domain validation enforces global uniqueness across both tenant domain columns.
 - Tenant bootstrap responses are cached. Clear the relevant cache or wait for expiry after changing a domain.
-- Full slug-less accessible deep links are not complete; the custom accessible domain is the entry point, while many internal routes still include the tenant slug.
+- On a shared platform host, tenant-scoped pages use `/{tenantSlug}/accessible/...`.
+- On a dedicated accessible domain, the same route set is served without the tenant slug or `/accessible` prefix.
+- Legacy `/alpha/...` bookmarks redirect permanently to the corresponding public route. Do not publish new `/alpha` links.
+- `GovukAlpha`, `govuk_alpha`, and `govuk-alpha.*` remain internal code-path names until a deliberate namespace migration; they do not define the public URL.

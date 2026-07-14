@@ -1,5 +1,7 @@
 # Project NEXUS Public Collateral
 
+Last reviewed: 2026-07-14
+
 This directory contains public-facing collateral and public-safe operational artifacts for Project NEXUS. The maintained documentation starts in [../docs/README.md](../docs/README.md), and the source code remains authoritative for implementation details.
 
 ## Current Public Collateral
@@ -23,4 +25,3 @@ The earlier per-module "engine report" snapshots (events, gamification, goals/im
 - Do not include secrets, credentials, live webhook URLs, private contacts, production IP addresses, or machine-local paths.
 - Keep version labels aligned with `VERSION` and `CHANGELOG.md`.
 - Run `npm run check:docs` and `npm run check:version` before publishing or committing collateral changes.
-</content>

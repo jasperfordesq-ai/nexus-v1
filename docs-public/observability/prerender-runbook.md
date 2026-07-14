@@ -1,5 +1,7 @@
 # Prerender engine — operator runbook
 
+Last reviewed: 2026-07-14
+
 Self-service playbook for the alerts in `prerender-alerts.yml`. Each section maps 1:1 to an alert name; follow the steps in order.
 
 The engine's own health endpoint at `GET /api/v2/admin/prerender/health` is the source of truth — most alerts here are reading its individual checks. When unsure, hit it first.
@@ -38,7 +40,7 @@ The worker hit the consecutive-failure threshold (default 5 in 10 min). Walk bac
 When fixed, either wait 15 min for auto-resume or:
 
 ```bash
-curl -X POST https://app.project-nexus.ie/api/v2/admin/prerender/reset-breaker \
+curl -X POST https://api.project-nexus.ie/api/v2/admin/prerender/reset-breaker \
   -H "Authorization: Bearer <admin-token>"
 ```
 
@@ -59,7 +61,7 @@ If the volume disappeared, recreate it and let the next deploy repopulate.
 Always reproducible — hit the health endpoint and follow its `action` strings:
 
 ```bash
-curl -s https://app.project-nexus.ie/api/v2/admin/prerender/health \
+curl -s https://api.project-nexus.ie/api/v2/admin/prerender/health \
   -H "Authorization: Bearer <admin-token>" | jq .
 ```
 
@@ -74,7 +76,7 @@ The Coverage tab has a one-click **"Refresh all stale"** that targets only missi
 Snapshots reference build-hashed `/assets/*.js` URLs that no longer exist. Almost always a deploy-time issue (worker ran against the old build). Trigger an auto-recache:
 
 ```bash
-curl -X POST https://app.project-nexus.ie/api/v2/admin/prerender/auto-recache \
+curl -X POST https://api.project-nexus.ie/api/v2/admin/prerender/auto-recache \
   -H "Authorization: Bearer <admin-token>" \
   -H "Content-Type: application/json" -d '{"apply":true}'
 ```
@@ -84,7 +86,7 @@ curl -X POST https://app.project-nexus.ie/api/v2/admin/prerender/auto-recache \
 The admin UI has an **Emergency reset** button (visible on the health banner when status ≠ green). Equivalent CLI:
 
 ```bash
-curl -X POST https://app.project-nexus.ie/api/v2/admin/prerender/reset-queue \
+curl -X POST https://api.project-nexus.ie/api/v2/admin/prerender/reset-queue \
   -H "Authorization: Bearer <admin-token>"
 ```
 

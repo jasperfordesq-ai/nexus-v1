@@ -7,6 +7,8 @@ See NOTICE file for attribution and acknowledgements.
 
 # Accessible Frontend
 
+Last reviewed: 2026-07-14
+
 This is the Project NEXUS accessibility-first frontend. It is built as an HTML-first, progressively enhanced Laravel frontend using the official `govuk-frontend` package, without GOV.UK branding, crown, logotype, header identity, footer crest, or GDS Transport.
 
 Recommended public subdomain: `accessible.project-nexus.ie`.
@@ -42,4 +44,8 @@ Commit the generated files under `httpdocs/build/accessible-frontend/` with the 
 - Design System source: https://github.com/alphagov/govuk-design-system
 - Technical frontend docs: https://github.com/alphagov/govuk-frontend-docs
 
-See `COMPONENTS.md` for the local inventory of the installed shared components we can use.
+## Maintained Documentation
+
+- [COMPONENTS.md](COMPONENTS.md) inventories the installed shared components and approved local patterns.
+- [Accessible frontend research and constraints](../docs/govuk-alpha/RESEARCH.md) records the architecture decision, official sources, branding limits, and upgrade policy.
+- [GOV.UK-related attribution](../docs/govuk-alpha/ATTRIBUTION.md) records third-party attribution for this frontend.

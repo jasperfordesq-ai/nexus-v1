@@ -1,5 +1,7 @@
 # Project NEXUS Test Suite
 
+Last reviewed: 2026-07-14
+
 This directory contains the PHP test harness for the Laravel 12 backend. The older `tests/run-api-tests.php` runner still exists for legacy API smoke checks, but the canonical backend test entrypoint is PHPUnit via `phpunit.xml`.
 
 ## Canonical Commands
@@ -65,4 +67,4 @@ npm run test:e2e
 npx playwright test e2e/tests/smoke.spec.ts --grep '@smoke' --project=chromium-modern
 ```
 
-See [../e2e/README.md](../e2e/README.md) and [../docs/TESTING.md](../docs/TESTING.md) for browser-test status and remaining debt.
+See [../e2e/README.md](../e2e/README.md) and [../docs/TESTING.md](../docs/TESTING.md) for browser-test status and remaining debt. The separately runnable retained core/helper tests are documented in [Core/README.md](Core/README.md).

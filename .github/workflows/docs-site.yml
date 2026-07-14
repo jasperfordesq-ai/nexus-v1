@@ -33,18 +33,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate documentation publication hygiene
+        run: npm run check:docs
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install MkDocs Material
-        run: pip install "mkdocs-material>=9.5" "pymdown-extensions>=10"
+        run: pip install "mkdocs==1.6.1" "mkdocs-material==9.7.6" "pymdown-extensions==11.0.1"
 
       - name: Stage the OpenAPI contract for the API reference page
         run: cp openapi.json docs/openapi.json
 
       - name: Build site
-        run: mkdocs build --clean
+        run: mkdocs build --clean --strict
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

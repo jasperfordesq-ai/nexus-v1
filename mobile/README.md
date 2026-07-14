@@ -1,5 +1,7 @@
 # Timebank Global - Mobile App
 
+Last reviewed: 2026-07-14
+
 React Native (Expo) mobile client for the [Project NEXUS](https://github.com/jasperfordesq-ai/nexus-v1) timebanking platform.
 
 Release identity, package IDs, and website/Play Store distribution decisions are recorded in [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
@@ -10,7 +12,7 @@ Release identity, package IDs, and website/Play Store distribution decisions are
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - Expo CLI through `npx expo` or the local npm scripts
 - For Android: Android Studio + emulator, or a physical device with Expo Go
 - For iOS: Xcode + Simulator (macOS only), or a physical device with Expo Go
@@ -21,7 +23,7 @@ Release identity, package IDs, and website/Play Store distribution decisions are
 
 ```bash
 cd mobile
-npm install   # .npmrc sets legacy-peer-deps=true automatically
+npm ci        # .npmrc sets legacy-peer-deps=true automatically
 cp .env.example .env.local
 # Edit .env.local and set EXPO_PUBLIC_API_URL to your API endpoint
 ```
@@ -132,11 +134,11 @@ See `docs/WRAPPER_POLICY.md` for the wrapper-vs-primitive policy and locale guid
 
 ### Auth Flow
 
-1. App mounts and `AuthContext` reads the stored JWT from `expo-secure-store`.
+1. App mounts and `AuthContext` reads the stored access/refresh credentials from `expo-secure-store`.
 2. If a token exists, `GET /api/v2/users/me` validates it and redirects to `/(tabs)/home`.
 3. If no token exists or validation fails, the app redirects to `/(auth)/login`.
 4. On login, credentials are posted, the JWT is stored, and the app redirects to tabs.
-5. On 401 from any API call, credentials are cleared and the app redirects to login through `lib/api/client.ts`.
+5. On 401 from an API call, `lib/api/client.ts` attempts one rotating refresh-token exchange and retries the original request. It clears credentials and redirects to login only when refresh fails.
 
 #### WebAuthn / Passkeys
 
@@ -154,11 +156,24 @@ To switch tenant, call `setTenantSlug(slug)` from `useTenant()`.
 
 ```bash
 cd mobile
+npm run verify:release
 npm run type-check
 npm test -- --runInBand --silent
 ```
 
 Focused route/component tests are useful during migration work, but run the commands above before considering a HeroUI Native or parity pass complete. The Jest suite may emit known Uniwind/HeroUI Native test-environment warnings; document any command timeout or open-handle behavior in the parity audit.
+
+## Maintained Mobile Documentation
+
+| Guide | Purpose |
+| --- | --- |
+| [DISTRIBUTION.md](docs/DISTRIBUTION.md) | Package identity, release channels, stores, and distribution policy. |
+| [SECURITY.md](docs/SECURITY.md) | Token handling, Android certificate pins, OTA policy, and native hardening. |
+| [NATIVE_UI_CONTRACT.md](docs/NATIVE_UI_CONTRACT.md) | Supported native UI contract and parity boundaries. |
+| [WRAPPER_POLICY.md](docs/WRAPPER_POLICY.md) | HeroUI Native wrapper-versus-primitive rules and locale guidance. |
+| [HEROUI_NATIVE_PARITY_AUDIT.md](docs/HEROUI_NATIVE_PARITY_AUDIT.md) | Maintained parity matrix and verification record. |
+| [ALERT_MIGRATION_PLAYBOOK.md](docs/ALERT_MIGRATION_PLAYBOOK.md) | Migration procedure for native alert and confirmation surfaces. |
+| [.maestro/README.md](.maestro/README.md) | Maestro installation, test data, and native end-to-end flow instructions. |
 
 ---
 

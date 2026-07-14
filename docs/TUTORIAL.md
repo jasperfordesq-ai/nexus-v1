@@ -1,6 +1,6 @@
 # Your First Contribution to Project NEXUS
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This tutorial walks you through making a real, merged-quality change to Project NEXUS from scratch. By the end you will have cloned the repository, run the app locally, made a visible change, verified it, and prepared it for a pull request.
 
@@ -50,35 +50,34 @@ git remote add upstream https://github.com/jasperfordesq-ai/nexus-v1.git
 
 ## Step 3: Set up the environment file
 
-Copy the example environment file and open it in a text editor:
+Copy the Docker example environment file and open it in a text editor:
 
 ```bash
-cp .env.example .env
+cp .env.docker.example .env.docker
 ```
 
 The file contains placeholder values. For this tutorial, the defaults are enough to start the data services. The only value you may need to generate is `APP_KEY`; the comment inside the file explains how.
 
-> **Keep `.env` private.** The repository is public and `.env` is gitignored — never commit it.
+> **Keep `.env.docker` private.** The repository is public and local environment files are gitignored — never commit them.
 
 ---
 
 ## Step 4: Start the data services and frontend
 
-Start the database (MariaDB), cache (Redis), and search engine (Meilisearch) in Docker:
+Install the root and React dependencies:
 
 ```bash
-docker compose up -d
+npm ci
+npm --prefix react-frontend ci
 ```
 
-The first run downloads and builds images. This can take a few minutes — you will see progress printed to your terminal. When it completes, the three data services are running in the background.
-
-Next, start the Docker PHP app container (this serves the Laravel API):
+Start the Docker PHP app, MariaDB, Redis, and Meilisearch plus the native Vite development server:
 
 ```bash
-docker compose --profile docker-php up -d app
+npm run dev:docker
 ```
 
-Run the database migrations and first-run seed data:
+The first run downloads and builds images and then keeps Vite attached to the current terminal. In a second terminal, run the database migrations and first-run seed data:
 
 ```bash
 docker exec nexus-php-app php artisan migrate --seed
@@ -91,16 +90,10 @@ Email: admin@project-nexus.local
 Password: ChangeMe123!
 ```
 
-Finally, install the frontend dependencies and start the Vite dev server:
-
-```bash
-npm run dev:frontend
-```
-
 Vite will print a message like:
 
 ```
-  VITE v5.x.x  ready in 1234 ms
+  VITE v7.x.x  ready in 1234 ms
   ➜  Local:   http://127.0.0.1:5173/
 ```
 
@@ -108,9 +101,9 @@ Vite will print a message like:
 
 ## Step 5: Confirm the app loads
 
-Open http://localhost:5173 in your browser. You should see the Project NEXUS React frontend. If it shows a loading spinner or a login page, the app is running correctly.
+Open http://127.0.0.1:5173/hour-timebank in your browser. You should see the Project NEXUS React frontend. If it shows a loading spinner or a login page, the app is running correctly.
 
-Open http://localhost:8090 in a separate tab — if the PHP API is healthy, it returns a JSON response.
+Open http://127.0.0.1:8090/up in a separate tab — if Laravel is healthy, it returns a small successful response.
 
 > If you see an error instead, check that all four Docker containers are running:
 >
@@ -163,11 +156,11 @@ Change the `"beta"` value — for example, to `"Beta (active)"` — so you have 
 
 Save the file.
 
-Now go to your browser and navigate to http://localhost:5173/features. Because Vite watches the file system, the page reloads automatically. You should see the chip label updated.
+Now go to your browser and navigate to http://127.0.0.1:5173/hour-timebank/features. Because Vite watches the file system, the page reloads automatically. You should see the chip label updated.
 
 You have just made a real, traceable change through the translation system — the same system used for every user-facing string across all 11 supported languages.
 
-> **If you want to try something different:** you can also fix a typo in any of the `.md` files in `docs/`. Documentation-only changes do not require any commands beyond a text editor.
+> **If you want to try something different:** you can also fix a typo in any of the `.md` files in `docs/`. Public documentation is release-relevant, so still run the documentation and changelog gates below.
 
 ---
 
@@ -175,22 +168,31 @@ You have just made a real, traceable change through the translation system — t
 
 Before committing, run the checks that CI will run on your pull request.
 
-**TypeScript type check:**
+**Record the release-relevant change:**
+
+Add a concise bullet under `[Unreleased]` in the root `CHANGELOG.md`, for example:
+
+```markdown
+- **The public Features page now identifies the active Beta release stage more clearly.**
+```
+
+Refresh the ignored in-app copy from that canonical file:
+
+```bash
+npm --prefix react-frontend run copy-changelog
+```
+
+**Blocking React checks:**
 
 ```bash
 cd react-frontend
 npm run lint
+npm run test:a11y -- --run
+npm run test:ui-contracts -- --run
+npm run build
 ```
 
-This runs ESLint plus `tsc --noEmit`. A clean output means no type errors were introduced. Fix any errors before continuing.
-
-**Frontend tests:**
-
-```bash
-npm test -- --run
-```
-
-This runs the Vitest suite once (without watch mode). All tests should pass. If a test fails on a file you did not touch, note it and mention it in your pull request — these are pre-existing failures, not caused by your change.
+The lint command runs ESLint plus `tsc --noEmit`; the next commands exercise the blocking accessibility/UI contracts and production build. The broad Vitest worker pool currently has a documented systemic hang, so do not use a full `npm test -- --run` as the success criterion. CI reports its focused smoke and coverage runs as non-blocking evidence until that runner issue is resolved.
 
 **Documentation hygiene** (required when editing any file in `docs/`):
 
@@ -204,6 +206,8 @@ npm run check:docs
 ```bash
 npm run check:i18n:drift
 npm run check:i18n:baseline
+npm run check:version
+npm run check:changelog
 ```
 
 All checks should pass. If any fail because of your change, fix them before moving on.
@@ -245,10 +249,10 @@ node scripts/check-spdx.mjs
 
 ## Step 10: Commit your change
 
-Stage only the file you changed:
+Stage the source change and its canonical release note:
 
 ```bash
-git add react-frontend/public/locales/en/public.json
+git add react-frontend/public/locales/en/public.json CHANGELOG.md
 ```
 
 Write a commit message using the [conventional commit](../CONTRIBUTING.md#git-commit-convention) format:
@@ -271,13 +275,13 @@ docs(features): clarify Beta chip label in public features page
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-Husky pre-commit and pre-push hooks will run automatically. If they flag errors in files you did not touch, you may bypass the hook and explain in your pull request why the failure is pre-existing and unrelated to your change:
+Husky pre-commit and pre-push hooks will run automatically. If they flag a pre-existing lint or build error in a file you did not touch, you may bypass that unrelated hook failure and explain the reason in your pull request:
 
 ```bash
 git commit --no-verify -m "docs(features): clarify Beta chip label in public features page"
 ```
 
-Do not use `--no-verify` to hide failures in code you wrote.
+Do not use `--no-verify` to hide failures in code you wrote. In particular, never bypass a failed staged-PHP-test verify gate: fix the staged test or remove it from the commit.
 
 ---
 

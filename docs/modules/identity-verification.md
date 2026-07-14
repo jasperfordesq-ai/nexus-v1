@@ -2,6 +2,8 @@
 
 Audience: maintainers and contributors working on document/selfie identity verification, the "ID Verified" trust badge, the per-member verification fee, or tenant registration policies that gate sign-up on identity.
 
+Last reviewed: 2026-07-14
+
 > Compliance note: this module handles government ID documents and biometric (selfie) data through third-party providers. Read the [Privacy and data handling](#privacy-and-data-handling) section before changing any code that stores, logs, or exports verification data.
 
 ## Two distinct flows
@@ -21,7 +23,7 @@ The optional flow is gated by the per-tenant `identity_verification` feature fla
 
 When a tenant turns the flag **off**:
 
-- The React route is blocked — `App.tsx` wraps both `/verify-identity-optional` and `/verify-identity/callback` in `<FeatureGate feature="identity_verification" redirect="/dashboard">`.
+- The React route is blocked — `react-frontend/src/routes/AppRoutes.tsx` wraps both `/verify-identity-optional` and `/verify-identity/callback` in `<FeatureGate feature="identity_verification" redirect="/dashboard">`.
 - The nav entry points are removed — `Navbar.tsx` and `MobileDrawer.tsx` only render the "Verify identity" item when `hasFeature('identity_verification')` is true.
 - The backend rejects new/in-progress verification — `OptionalIdentityVerificationController::guardFeatureEnabled()` returns a 403 (`FEATURE_DISABLED`) from `saveDob`, `createPaymentIntent`, and `startVerification`.
 - **`GET /v2/identity/status` is deliberately left ungated** so existing "ID Verified" badges keep rendering after a tenant disables new verification. Read-only status stays available; only starting/progressing a verification is blocked.
@@ -58,7 +60,7 @@ A document that Stripe reports as "verified" is **not sufficient** to grant the 
 Handled by `IdentityVerificationPaymentService`:
 
 - **Amount** — `getFeeCents($tenantId)` reads the `identity_verification_fee_cents` tenant setting (default `500`). Super-admins can set it to `0` for free verification via `PUT /v2/admin/super/identity/fee`.
-- **Currency** — the tenant's configured currency (`TenantContext::getCurrency()`); the status/intent responses surface `eur` as the displayed default.
+- **Currency** — Stripe PaymentIntent creation uses the tenant's configured currency (`TenantContext::getCurrency()`), but the current status and create-payment response payloads hardcode `fee_currency = eur`. This is a known contract mismatch for non-EUR tenants; clients must not assume the displayed response currency matches the charge until the response is wired to the tenant currency.
 - **Pay-once rule** — once a user has any session with `payment_status = 'completed'` for the tenant, retries after a failed verification **skip payment**. Enforced by `IdentityVerificationSessionService::hasCompletedPaymentForTenant()`.
 - **Idempotency** — `createPaymentIntent()` uses a stable Stripe idempotency key (`identity-{tenantId}-{userId}`) so a client retry cannot double-charge.
 - **Webhooks** — `handlePaymentSucceeded()` / `handlePaymentFailed()` update the session's `payment_status` and email the user. They early-return unless the PaymentIntent metadata `nexus_type === 'identity_verification'`, so they never touch unrelated payments.
@@ -79,7 +81,7 @@ Stripe Identity webhooks are not fully reliable, so three independent paths conv
 | **In-app poll** | User revisits the verification page; `getStatus` polls Stripe for any active session | `OptionalIdentityVerificationController::getStatus()` |
 | **Stuck-session cron** | Hourly `nexus:identity:poll-stuck` for sessions untouched for N minutes (default 5), created within 7 days | `App\Console\Commands\PollStuckIdentityVerifications` (scheduled in `bootstrap/app.php`) |
 
-The webhook handler verifies the provider signature, is idempotent against duplicate terminal events, and always returns 200 to the provider once received.
+The webhook handler verifies the provider signature and is idempotent against duplicate terminal events. Accepted/matched events, unknown session identifiers, and payloads without a provider session id are acknowledged with 200. Rate-limit, unknown-provider, invalid-signature/payload, and provider-processing failures can instead return 429, 404, 403/400, or 500 respectively.
 
 ## Tenant scoping
 
@@ -90,7 +92,7 @@ Every session and event row carries `tenant_id`. User-facing and listing queries
 This is the compliance-sensitive part of the module.
 
 - **Data minimisation at the provider.** `StripeIdentityProvider::createSession()` does **not** pre-send the user's name/DOB to Stripe (only email is passed in `provided_details`). The document name/DOB are retrieved from `verified_outputs` **after** the check completes, solely to run the profile-match gate. This minimisation applies to the **identity-check session**; the separate **fee** path (`IdentityVerificationPaymentService::createPaymentIntent`) does create a Stripe Customer with the user's name + email.
-- **Result columns are stored as plaintext JSON — not encrypted.** On `identity_verification_sessions`, `result_summary` and `metadata` are written with a plain `json_encode()` of the provider result (decision, risk score, checks, failure reason — **not** name/DOB or document images). Despite earlier intent they are **not** currently encrypted at rest; treat encrypting them (e.g. Laravel `Crypt`) as a known follow-up. The raw ID document and selfie are held by the provider (Stripe Identity), never in the NEXUS database. (By contrast, registration-policy provider *credentials* are AES-256-GCM encrypted — see [Providers](#providers).)
+- **Normalized results are plaintext JSON — not encrypted.** Current completion paths write the provider's normalized result (decision, risk score, checks, failure reason — **not** verified name/DOB or document images) to `identity_verification_sessions.result_summary` and to event `details`. Although the sessions table also has a `metadata` column, the current create paths leave it null rather than duplicating the result there. Treat encryption at rest as a known follow-up. The raw ID document and selfie remain with the provider and are never stored in the NEXUS database. (By contrast, registration-policy provider *credentials* are AES-256-GCM encrypted — see [Providers](#providers).)
 - **Audit trail.** `identity_verification_events` records every state transition (`registration_started` … `verification_passed/failed`, `admin_approved/rejected`, `account_activated`, etc.) with actor type/id, IP, and user agent. Audit logging is best-effort and never breaks the main flow.
 - **Retention.** `IdentityVerificationSessionService::purgeOldSessions()` deletes terminal sessions (`passed`/`failed`/`expired`/`cancelled`) older than the retention period (default 180 days). `expireAbandoned()` expires created/started sessions older than a threshold (default 72h). The `identity_verification_events` audit trail is retained even when session rows are purged (the event FK is `ON DELETE SET NULL`).
 - **GDPR.** Account deletion removes the user's `identity_verification_sessions` rows (`GdprService`, scoped by `user_id` + `tenant_id`). The Article 15 data export returns only non-sensitive session metadata (id, provider slug, level, status, failure reason, timestamps) — never document images or biometric data.

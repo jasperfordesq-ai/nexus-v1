@@ -1,5 +1,7 @@
 # Blog & Resources Modules
 
+Last reviewed: 2026-07-14
+
 Audience: maintainers and contributors working on content publishing, the resource library, SEO, or the accessible (GOV.UK) frontend.
 
 Both modules ship in every tenant installation. Each is independently toggled by a feature flag (both default **ON**).
@@ -145,7 +147,7 @@ React:
 - `/blog` → `react-frontend/src/pages/blog/BlogPage.tsx` — category filter tabs, search, cursor-paginated grid.
 - `/blog/:slug` → `react-frontend/src/pages/blog/BlogPostPage.tsx` — full post with comment thread, reactions.
 
-Accessible (GOV.UK) frontend under `/{tenantSlug}/alpha/`:
+Accessible (GOV.UK) frontend under `/{tenantSlug}/accessible/`:
 
 - `GET /blog` — index (govuk-alpha.blog.index)
 - `GET /blog/feed.xml` — RSS feed (govuk-alpha.blog.feed)
@@ -276,7 +278,7 @@ React:
 
 - `/resources` → `react-frontend/src/pages/resources/ResourcesPage.tsx` — category tree sidebar, search, cursor-paginated list, upload modal (authenticated), download button.
 
-Accessible (GOV.UK) frontend under `/{tenantSlug}/alpha/`:
+Accessible (GOV.UK) frontend under `/{tenantSlug}/accessible/`:
 
 - `GET /resources` — simple browse (govuk-alpha.resources.index)
 - `GET /resources/library` — full library with category tree, filters, pagination, reorder

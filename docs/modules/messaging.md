@@ -1,6 +1,6 @@
 # Messaging Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the direct-messaging surface in Project NEXUS. It covers conversations and threads, sending/editing/deleting messages, file and voice attachments, real-time delivery via Pusher, broker safeguarding visibility, federation cross-community messaging, tenant scoping, privacy invariants, failure modes, and regression tests.
 
@@ -31,12 +31,13 @@ All queries are scoped by `tenant_id` from `App\Core\TenantContext::getId()` and
 
 ## Key code and data locations
 
-Routes are defined in [`routes/api.php`](../../routes/api.php) (lines 214–234 for direct messages, lines 441–445 for federation messages). Do not reproduce the full endpoint table here — read the route file or `docs/API.md` for the live list.
+Routes are defined in [`routes/api.php`](../../routes/api.php). Do not reproduce the full endpoint table here — read the route file or `docs/API.md` for the live list.
 
 | Concern | Route prefix | Controller |
 | --- | --- | --- |
 | Conversations and direct messages | `/v2/messages/*` | `app/Http/Controllers/Api/MessagesController.php` |
-| Voice upload/send | `/v2/messages/upload-voice`, `/v2/messages/voice` | `MessagesController` (native Laravel `request()->file()`) |
+| Voice upload/send | `/v2/messages/voice` | `MessagesController` (native Laravel `request()->file()`); `uploadVoice()` is an unrouted compatibility helper |
+| Private attachment/voice delivery | `/v2/messages/{message}/attachments/{attachment}`, `/v2/messages/{message}/voice` | `app/Http/Controllers/Api/MessageMediaController.php` |
 | Group conversations | `/v2/conversations/{id}/messages` | `app/Http/Controllers/Api/GroupConversationController.php` |
 | Federation messages | `/v2/federation/messages/*` | `app/Http/Controllers/Api/FederationV2Controller.php` |
 | Broker review queue | `/v2/admin/broker/messages/*` | `app/Http/Controllers/Api/AdminBrokerController.php` |
@@ -66,6 +67,7 @@ Models and tables:
 | Model | Table | Notes |
 | --- | --- | --- |
 | `App\Models\Message` | `messages` | `body` column is `text`. Includes `is_voice`, `audio_url`, `audio_duration`, `transcript`, `transcript_language`, `reactions` (JSON), `is_edited`, `is_deleted`, `is_deleted_sender`, `is_deleted_receiver`, `context_type`, `context_id`, `archived_by_sender`, `archived_by_receiver`. |
+| `App\Models\MessageAttachment` | `message_attachments` | Private attachment metadata. The raw `file_path` is hidden; the serialized `url`/`file_url` accessors return the authenticated media endpoint instead of a storage path. |
 | `App\Models\BrokerMessageCopy` | `broker_message_copies` | Safeguarding copy. `copy_reason` enum: `first_contact`, `high_risk_listing`, `new_member`, `flagged_user`, `manual_monitoring`, `random_sample`. `flagged`, `flag_severity`, `reviewed_by`, `reviewed_at`. Unique index on `(tenant_id, original_message_id)` prevents duplicate copies. |
 | — | `federation_messages` | Cross-tenant messages. `receiver_tenant_id`, `external_partner_id`, `external_message_id` (idempotency). |
 | — | `user_messaging_restrictions` | Per-user `messaging_disabled` and `under_monitoring` flags with optional expiry. |
@@ -137,19 +139,50 @@ Accepted types (extension verified against MIME content detected by `finfo`):
 | txt | text/plain |
 | csv | text/plain, text/csv, application/csv |
 | doc | application/msword |
-| docx | application/vnd.openxmlformats-officedocument.wordprocessingml.document |
+| docx | application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/zip |
 | xls | application/vnd.ms-excel |
-| xlsx | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet |
+| xlsx | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/zip |
 
-Files are stored under `httpdocs/uploads/{tenantId}/message_attachments/` with a random hex filename. The public path is `/uploads/{tenantId}/message_attachments/{filename}`. Executable extensions and MIME-type mismatches (e.g. a `.png` that is actually a script) are rejected.
+New files are stored outside the web root under
+`storage/app/private/message-media/{tenantId}/attachments/` with a random hex
+filename, directory mode `0700`, and file mode `0600`. The database stores the
+tenant-relative private path; it is never exposed to clients. Serialized
+attachments instead use
+`GET /api/v2/messages/{message}/attachments/{attachment}`.
+
+`MessageMediaController` requires Sanctum authentication and then authorizes
+the caller as the direct sender/receiver or a member of the message's group
+conversation. The attachment must belong to that message and tenant. Successful
+responses use `Cache-Control: private, no-store, max-age=0`, `nosniff`, a
+sandboxed CSP, and `Cross-Origin-Resource-Policy: same-site`. The React client
+therefore loads media through `useAuthenticatedMedia`, which supplies the bearer
+token and creates a short-lived object URL; do not replace this with a public
+`/uploads/...` URL.
+
+Legacy public paths remain readable only through the same authorized controller
+while migration/cleanup compatibility is needed. Migration
+`2026_07_14_000200_move_message_media_to_private_storage.php` copies recognized
+production attachment roots into private storage and rewrites their database
+pointers. Executable extensions and MIME-type mismatches (for example, a `.png`
+that is actually a script) are rejected at upload.
 
 ### Voice messages
 
 `POST /api/v2/messages/voice` — upload and send in one step (field: `voice_message`, plus `recipient_id`).
 
-The server stores the uploaded bytes under the active tenant's canonical voice-message directory and passes that server-issued path through `MessageService::sendVoice()`. Generic message input cannot choose an audio path.
+The server stores the uploaded bytes under
+`storage/app/private/message-media/{tenantId}/voice/` and passes that
+server-issued, tenant-relative path through `MessageService::sendVoice()`.
+Generic message input cannot choose an audio path. The `Message.audio_url`
+accessor exposes only `GET /api/v2/messages/{message}/voice`, which applies the
+same authentication, participant authorization, tenant containment, and
+no-store response headers as attachment delivery.
 
-Accepted audio MIME types: `audio/webm`, `video/webm`, `audio/ogg`, `audio/mpeg`, `audio/mp3`, `audio/aac`, `audio/mp4`, `audio/x-m4a`, `video/mp4`. Maximum file size: **10 MB**. Maximum duration: **5 minutes** (300 seconds, enforced by `AudioUploader::$maxDuration`).
+Accepted audio MIME types: `audio/webm`, `video/webm`, `audio/ogg`,
+`audio/mpeg`, `audio/mp3`, `audio/wav`, `audio/x-wav`, `audio/aac`,
+`audio/x-hx-aac-adts`, `audio/mp4`, `audio/x-m4a`, and `video/mp4`.
+Maximum file size: **10 MB**. Maximum duration: **5 minutes** (300
+seconds, enforced by `AudioUploader::$maxDuration`).
 
 After upload, `TranscriptionService::transcribe()` runs non-blocking. On success the `transcript` and `transcript_language` columns are updated on the message row and included in the response. Transcription failure is logged as a warning and does not fail the send.
 
@@ -252,9 +285,11 @@ For full federation operational notes, partner onboarding, and the external part
 
 - **Tenant isolation is absolute.** Every query in `MessageService`, `BrokerMessageVisibilityService`, and `FederatedMessageService` includes `tenant_id` from `TenantContext::getId()`. There is no cross-tenant query path.
 - **No participant leakage in broadcast payloads.** `MessageSent::broadcastWith()` emits only `id`, `body`, `sender_id`, `created_at`, `is_voice`, and `audio_url`. Full `User` objects (including email, phone) are never broadcast.
+- **Message media is never public.** New attachment and voice bytes live under `storage/app/private/message-media/{tenantId}/`; clients receive only authenticated API URLs. Media delivery fails closed for outsiders, cross-tenant pointers, traversal, missing files, and attachments that do not belong to the requested message.
 - **Broker copies are immutable.** A broker copy stores `message_body` at the moment of copy. Subsequent edits or deletions of the original message do not propagate to the copy.
 - **Translation is opt-in per message.** Translations are not stored; they are computed on demand and returned in the response. The source text for translation is either `transcript` (voice) or `body` (text), both already stored.
 - **Voice transcripts are stored on the server** in the `transcript` column. Tenants should include this in their privacy policy.
+- **Erasure removes authored media without breaking another sender's reference.** `GdprService::executeAccountDeletion()` deletes attachment rows and voice pointers authored by the erased member. It unlinks the underlying private file only when no other sender still references the same canonical path. An unlink failure retains the database pointer so cleanup remains retryable; when erasure is processing a `gdpr_requests` row, that request remains `processing` instead of being marked complete.
 
 ## Failure modes and recovery
 
@@ -265,7 +300,9 @@ For full federation operational notes, partner onboarding, and the external part
 | `CopyMessageForBrokerReview` listener failure | Logged to `Log::error`. The original message is unaffected. The broker copy may be missing. | Check `failed_jobs`. Re-dispatch manually. The idempotency guard (`firstOrCreate`) prevents a double-copy on re-dispatch. |
 | Voice transcription failure | Logged as `Log::warning('Voice message transcription failed')`. The voice message is sent successfully without a transcript. | No action needed. Transcription can be re-attempted manually by updating the `transcript` column directly if required. |
 | Translation failure | `TranslationConfigurationService` / `TranscriptionService::translate()` returns `null`. API returns `TRANSLATION_FAILED` (HTTP 500). | Check that `OPENAI_API_KEY` is set and the OpenAI endpoint is reachable. |
-| Attachment upload failure | Storage write fails; `MessageAttachmentUploader` throws `\RuntimeException`. API returns `UPLOAD_FAILED` (HTTP 400). | Check disk space and directory permissions under `httpdocs/uploads/{tenantId}/message_attachments/`. |
+| Attachment upload failure | Storage write fails; `MessageAttachmentUploader` throws `\RuntimeException`. API returns `UPLOAD_FAILED` (HTTP 400). | Check disk space and directory permissions under `storage/app/private/message-media/{tenantId}/attachments/`; directories should be `0700` and files `0600`. |
+| Private media returns 401/403 | The request has no valid Sanctum token, or the caller is not the sender, receiver, or a group-conversation participant. | Confirm the client uses `useAuthenticatedMedia`/an authenticated fetch and that the current user belongs to the conversation. Do not make the file public as a workaround. |
+| Private media returns 404 | The attachment is not attached to the requested message, the private file is missing, or its stored path fails tenant/canonical-path validation. | Compare the tenant-scoped database pointer with `storage/app/private/message-media/{tenantId}/`; for legacy rows, run or inspect the private-media migration rather than rewriting URLs by hand. |
 | Federation message delivery failure | `storeExternalMessage()` returns `['success' => false, 'retryable' => true]`. The row is in `federation_messages` but `notification_sent_at` or `email_sent_at` may be null. | Re-deliver from the partner side (the idempotency guard repairs missing side effects). Or update `notification_sent_at`/`email_sent_at` manually after resolving the queue issue. |
 
 ## Test commands and key regression tests
@@ -283,8 +320,9 @@ Key test files:
 | File | What it covers |
 | --- | --- |
 | `tests/Laravel/Feature/Controllers/MessagesControllerTest.php` | Send, edit, delete, reactions, pagination, rate limits. |
-| `tests/Laravel/Feature/Messages/MessageAttachmentsTest.php` | File upload allow-list, MIME verification, size limits, 5-file cap. |
+| `tests/Laravel/Feature/Messages/MessageAttachmentsTest.php` | Attachment persistence plus authenticated, participant-only private delivery and no-store headers. |
 | `tests/Laravel/Feature/Messages/VoiceMessageSendTest.php` | Voice upload, duration cap, transcription path. |
+| `tests/Laravel/Unit/Migrations/PrivateMessageMediaMigrationTest.php` | Approved production legacy roots are migrated; unapproved and traversing paths fail closed. |
 | `tests/Laravel/Feature/Listeners/CopyMessageForBrokerReviewTest.php` | Copy criteria evaluation, idempotency guard, duplicate suppression. |
 | `tests/Laravel/Unit/Listeners/NotifyMessageReceivedTest.php` | Notification dispatch, locale wrapping, idempotency. |
 | `tests/Laravel/Unit/Services/BrokerMessageVisibilityServiceTest.php` | All copy-reason branches, restriction status, expired monitoring. |

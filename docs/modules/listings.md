@@ -1,12 +1,12 @@
 # Listings / Marketplace Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 Audience: maintainers and contributors working on the listings module — the offer/request board at the heart of the timebanking workflow.
 
 ## Overview
 
-Listings are the primary way members advertise services they can offer or request from their community. Every listing is classified as either an **offer** (member can provide the service) or a **request** (member needs the service). An approved listing with `status = active` and `moderation_status = approved` is visible to all members of the same tenant; unauthenticated visitors can browse but cannot initiate an exchange.
+Listings are the primary way members advertise services they can offer or request from their community. Every listing is classified as either an **offer** (member can provide the service) or a **request** (member needs the service). An approved listing with `status = active` and `moderation_status = approved` is visible to authenticated members of the same tenant. The primary browse and detail routes are not anonymous.
 
 Separate from the time-credit listings module, a **Marketplace** subsystem (`/v2/marketplace/*`) handles physical-goods commerce with pricing, inventory, escrow, seller profiles, and delivery. The marketplace uses its own `marketplace_listings` table and service layer. This guide covers the timebanking listings module; for the Marketplace, see `app/Services/MarketplaceListingService.php` and the routes grouped under `/v2/marketplace/` in `routes/api.php`.
 
@@ -16,10 +16,10 @@ Use this guide when changing listing creation, moderation, expiry, search indexi
 
 Supported workflows:
 
-- **Browse and search** — any visitor can list, filter, and search active approved listings.
+- **Browse and search** — authenticated tenant members can list, filter, and search active approved listings.
 - **Create offer or request** — authenticated members create listings; if moderation is enabled they enter `pending_review` first.
 - **Edit / pause / delete** — the listing owner or an admin can update fields, pause a listing (`status = paused`), or soft-delete it (`status = deleted`).
-- **Renew** — owners extend the expiry date by 30 days (max 12 renewals per listing).
+- **Renew** — owners extend the expiry date by 30 days (currently a fixed maximum of 12 renewals).
 - **Favourite / save** — authenticated members can save listings to a personal list.
 - **Moderation** — admins review the pending queue, approve or reject with a reason.
 - **Featured / boosted** — admins pin listings to the top of the browse page via `is_featured`.
@@ -28,7 +28,8 @@ Supported workflows:
 
 ## Tenant and feature-gate rules
 
-- **Module gate:** `listings`. All listing routes are wrapped in `Route::middleware('module:listings')` in `routes/api.php`. The React frontend wraps the listings pages in `<FeatureGate module="listings" redirect="/" />`.
+- **Module gate:** `listings`. All listing routes are wrapped in `Route::middleware('module:listings')` in `routes/api.php`. The React frontend wraps the listings pages in `<FeatureGate module="listings" redirect="/" />` in `react-frontend/src/routes/AppRoutes.tsx`.
+- **Authentication:** browse, detail, featured, nearby, CRUD, analytics, reports, and favourites inherit `auth:sanctum`. Only the popular-tag and tag-autocomplete helper routes deliberately remove that middleware while retaining the module gate.
 - The module defaults to **enabled** (`listings: true` in the React `defaultFeatures` map and in `TenantContext::FEATURE_DEFAULTS`). A tenant admin can disable it to hide the board entirely.
 - **Tenant scoping is enforced by the `HasTenantScope` trait** on `App\Models\Listing`. Every query automatically includes `WHERE tenant_id = <current>`. Never bypass this; always use `TenantContext::getId()` in raw queries.
 - Category resolution (slug → id) is also tenant-scoped: `WHERE type = 'listing' AND tenant_id = ?`.
@@ -40,7 +41,7 @@ Routes are in [`routes/api.php`](../../routes/api.php) (search for `module:listi
 
 | Concern | Route prefix | Controller |
 | --- | --- | --- |
-| Public browse / search / nearby | `GET /v2/listings` | `App\Http\Controllers\Api\ListingsController` |
+| Member browse / search / nearby | `GET /v2/listings` | `App\Http\Controllers\Api\ListingsController` |
 | Single listing detail | `GET /v2/listings/{id}` | `App\Http\Controllers\Api\ListingsController` |
 | CRUD (create / update / delete) | `POST/PUT/DELETE /v2/listings` | `App\Http\Controllers\Api\ListingsController` |
 | Renew / analytics / tags / report | `POST /v2/listings/{id}/renew` etc. | `App\Http\Controllers\Api\ListingsController` |
@@ -51,7 +52,7 @@ Services:
 
 - `app/Services/ListingService.php` — all listing CRUD, public visibility filter, cursor pagination, Haversine proximity search, and the `canModify()` permission check.
 - `app/Services/ListingModerationService.php` — approve / reject workflow, review queue, moderation stats.
-- `app/Services/ListingExpiryService.php` — processes expired listings across tenants (scheduled), and one-click renewal (max 12 renewals, +30 days per renewal).
+- `app/Services/ListingExpiryService.php` — processes expired listings across tenants (scheduled), and one-click renewal. The service currently hardcodes max 12 renewals and +30 days.
 - `app/Services/ListingFeaturedService.php` — sets/clears `is_featured` and `featured_until`.
 - `app/Services/ListingConfigurationService.php` — typed tenant config with Redis cache (5-minute TTL). Keys live in `tenant_settings` with a `listing.` prefix.
 - `app/Services/ListingSkillTagService.php` — tag CRUD on `listing_skill_tags`; autocomplete and popular tags.
@@ -65,7 +66,7 @@ Models and tables:
 | `App\Models\Listing` / `listings` | Core listing row |
 | `listing_skill_tags` | Many-to-many skill tags on a listing |
 | `listing_images` / `App\Models\ListingImage` | Up to N images per listing (configurable, default 5) |
-| `listing_views` | Anonymous + authenticated view events (dedup by IP hash) |
+| `listing_views` | View events with IP-hash deduplication; the current listing-detail API requires authentication even though the schema can represent a nullable user |
 | `listing_reports` / `App\Models\ListingReport` | Community abuse reports awaiting admin review |
 | `user_saved_listings` | Favourites (userId × listingId × tenantId) |
 | `categories` | Tenant-scoped listing categories (`type = 'listing'`) |
@@ -95,13 +96,13 @@ Key columns on the `listings` table:
 | `is_featured` | tinyint | Set by admin; pins listing to top of browse page |
 | `featured_until` | datetime | Optional expiry for the featured window |
 | `expires_at` | datetime | Auto-expiry date set by `listing.auto_expire_days` config |
-| `renewal_count` | int unsigned | Times renewed; capped at `listing.max_renewals` (default 12) |
+| `renewal_count` | int unsigned | Times renewed; current service cap is hardcoded at 12 |
 | `sdg_goals` | JSON | Optional UN Sustainable Development Goals tags (integers 1–17) |
 | `availability` | JSON | Free-form availability schedule |
 | `direct_messaging_disabled` | tinyint | Disables direct contact; forces use of the exchange workflow |
 | `exchange_workflow_required` | tinyint | Marks listing as requiring formal exchange |
 
-**Public visibility rule** (enforced in `ListingService::applyPublicVisibility()`): a listing is visible to members only when `(status IS NULL OR status = 'active') AND (moderation_status IS NULL OR moderation_status = 'approved')`. Draft, paused, expired, deleted, pending, and rejected listings are hidden from non-owners.
+**Member visibility rule** (enforced in `ListingService::applyPublicVisibility()`): a listing is visible to members only when `(status IS NULL OR status = 'active') AND (moderation_status IS NULL OR moderation_status = 'approved')`. Draft, paused, expired, deleted, pending, and rejected listings are hidden from non-owners.
 
 ## Offer / request model
 
@@ -146,7 +147,7 @@ POST /v2/listings
 
 - `listing_skill_tags`, `user_saved_listings`, `listing_views`, `listing_contacts` rows for the listing are deleted.
 - `SearchService::removeListing()` removes the document from the Meilisearch `listings` index.
-- `FeedActivityService::removeActivity('listing', $id)` removes the feed entry.
+- `ListingObserver` marks matching feed activity as `is_visible = 0`; the feed row is retained rather than hard-deleted.
 
 ## Categories and skill tags
 
@@ -188,7 +189,7 @@ php scripts/sync_search_index.php --all-tenants --type=listing
 Moderation is **opt-in per tenant** (`listing.moderation_enabled`, default `false`). When enabled:
 
 1. New listings enter `status=pending, moderation_status=pending_review` and are invisible to non-owners.
-2. Admins see the queue via `GET /v2/admin/listings/moderation/queue` (served by `AdminListingsController`).
+2. Admins see the queue via `GET /v2/admin/listings/moderation-queue` (served by `AdminListingsController`).
 3. `ListingModerationService::approve()` sets both `status=active` and `moderation_status=approved`, writes a `feed_activity` row, and sends a bell + push notification to the owner in their `preferred_language`.
 4. `ListingModerationService::reject()` requires a non-empty reason; sends bell notification and email to the owner. The listing is not auto-deleted — the owner can edit and re-submit.
 
@@ -207,7 +208,7 @@ A listing is the entry point for an exchange. The "Request this service" button 
 - `provider_id` — the listing owner.
 - `proposed_hours` — negotiated at request time.
 
-`exchange_requests.listing_id` has an `ON DELETE CASCADE` constraint, so deleting a listing also removes its pending exchange requests. **Do not delete a listing that has in-progress exchanges** — check `exchange_requests` first or use `status=paused` instead.
+`exchange_requests.listing_id` has an `ON DELETE CASCADE` constraint for a physical listing-row deletion. The normal API `ListingService::delete()` is only a status soft delete, so it retains both the listing row and its exchange requests. Do not rely on the FK cascade for the ordinary delete endpoint; inspect in-progress exchanges before soft-deleting or hard-deleting a listing.
 
 For the full exchange state machine and credit transfer, see [docs/modules/wallet-exchanges.md](wallet-exchanges.md).
 
@@ -235,7 +236,7 @@ All keys stored in `tenant_settings` with a `listing.` prefix. Managed by `Listi
 
 ## Security and privacy invariants
 
-- **Owner-only mutations:** `ListingService::canModify()` returns `true` only for the listing owner or a user with `role IN ('admin', 'tenant_admin')` or `is_super_admin`. The controller enforces this before any write.
+- **Owner-only mutations:** `ListingService::canModify()` returns `true` only for the listing owner or a user with `role IN ('admin', 'tenant_admin')`, `is_super_admin`, or `is_tenant_super_admin`. The controller enforces this before any write.
 - **No cross-tenant data:** all queries carry `tenant_id` from `TenantContext::getId()`. The `HasTenantScope` trait is applied at the model level.
 - **Hidden listings:** a non-owner viewing a listing in `pending`, `rejected`, `deleted`, `draft`, or `paused` status receives HTTP 404 (treated as not found), not 403 — to avoid revealing that a listing exists.
 - **Image upload validation:** only JPEG, PNG, WebP, and GIF are accepted; files over 8 MB are rejected before upload to cloud storage.
@@ -250,7 +251,7 @@ All keys stored in `tenant_settings` with a `listing.` prefix. Managed by `Listi
 | Meilisearch unavailable at create/delete time | Index update silently skipped; listing is live in the database | Run `sync_search_index.php --type=listing --tenant=<id>` to re-sync |
 | Listing expiry cron fails for a tenant | Listings remain `active` past `expires_at`; owner does not receive expiry email | Re-run `ListingExpiryService::processAllTenants()` manually; it is idempotent |
 | `listing.max_per_user` cap reached | Create returns HTTP 422 with `VALIDATION_ERROR` | Admin can raise the cap in tenant settings, or the member deletes an old listing |
-| In-progress exchange when listing deleted | `exchange_requests` rows cascade-deleted | Do not delete a listing with in-progress exchanges. Check `exchange_requests WHERE listing_id = ? AND status NOT IN ('completed','cancelled')` first |
+| In-progress exchange when listing is soft-deleted | Exchange rows remain because `ListingService::delete()` retains the listing row | Check `exchange_requests WHERE listing_id = ? AND status NOT IN ('completed','cancelled')` first; pause instead when the workflow must remain visible |
 | Featured listing not expiring | `featured_until` stored but never enforced on display — `getFeaturedListings()` filters `featured_until > now()` | No action needed; featured status expires automatically on next browse request |
 | Moderation queue stuck (no admin action) | Listing stays `pending_review`; owner sees no update | Admin must process the queue; there is no automatic escalation |
 

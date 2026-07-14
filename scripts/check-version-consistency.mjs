@@ -69,7 +69,8 @@ if (composerVersion !== version) {
   addIssue(`composer.json: version is ${composerVersion}, expected ${version}`);
 }
 
-const frontendVersion = readJson('react-frontend/package.json').version;
+const frontendPackage = readJson('react-frontend/package.json');
+const frontendVersion = frontendPackage.version;
 if (frontendVersion !== version) {
   addIssue(`react-frontend/package.json: version is ${frontendVersion}, expected ${version}`);
 }
@@ -95,6 +96,21 @@ assertContains('docs/ARCHITECTURE.md', `Platform version: ${version}`, 'ARCHITEC
 assertContains('app/Services/Enterprise/LoggerService.php', `'${version}'`, 'LoggerService version fallback');
 assertContains('app/Services/Enterprise/MetricsService.php', `'${version}'`, 'MetricsService version fallback');
 assertContains('.github/ISSUE_TEMPLATE/bug_report.yml', `placeholder: "${version}"`, 'bug-report version placeholder');
+
+// The in-app changelog is a generated, ignored build artifact. Fresh checkouts
+// must not require the file to exist, but every dev/build path must regenerate
+// it from the canonical root CHANGELOG before Vite serves or bundles the app.
+const frontendScripts = frontendPackage.scripts ?? {};
+if (frontendScripts['copy-changelog'] !== 'node scripts/copy-changelog.mjs') {
+  addIssue('react-frontend/package.json: copy-changelog must run scripts/copy-changelog.mjs');
+}
+for (const hook of ['predev', 'prebuild']) {
+  const command = frontendScripts[hook];
+  if (typeof command !== 'string' || !command.includes('copy-changelog')) {
+    addIssue(`react-frontend/package.json: ${hook} must regenerate the bundled changelog`);
+  }
+}
+assertContains('react-frontend/.gitignore', /^public\/changelog\.md$/m, 'ignore rule for the generated changelog bundle');
 
 // The visible footer + changelog-chip label is driven by the per-language
 // `release_stage` translation key — enforce all installed locale files.

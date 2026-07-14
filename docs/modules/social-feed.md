@@ -1,6 +1,6 @@
 # Social Feed Module
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide covers the Social Feed module in Project NEXUS — the unified activity stream, standalone posts, polls, stories, comments, reactions, sharing, and the EdgeRank-style ranking algorithm. It is for maintainers adding features, fixing bugs, or changing ranking behaviour.
 

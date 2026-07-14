@@ -1,8 +1,10 @@
 # Project NEXUS Documentation
 
+Last reviewed: 2026-07-14
+
 This directory contains the public, maintained documentation for Project NEXUS.
 
-Historical prompts, one-off audits, dated handoff notes, generated reports, PDF exports, and stale planning documents were moved out of `docs/` during the 2026-06-23 cleanup. They remain available locally under `.local-docs-archive/2026-06-23-docs-cleanup/`, which is intentionally ignored by git.
+Historical prompts, one-off audits, dated handoff notes, generated reports, PDF exports, and stale planning documents do not belong in `docs/`. Keep any locally useful copies under `.local-docs-archive/`, which is intentionally ignored by git.
 
 ## How the documentation is organised
 

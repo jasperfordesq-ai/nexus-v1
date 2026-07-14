@@ -192,7 +192,7 @@ Open a GitHub Discussion or issue tagged `enhancement`. Describe the use case, n
 
 1. Make sure your branch is based on the latest `main`.
 2. Write or update tests for your changes.
-3. Ensure all tests pass and linting is clean (the pre-push hook will verify this automatically).
+3. Run the relevant blocking checks below and make sure they pass; CI re-runs the authoritative gates.
 4. Open a PR against `main` with a clear description of:
    - What the change does
    - Why it is needed
@@ -459,16 +459,11 @@ refactor(auth): Extract token validation to AuthHelper
 - Use the imperative mood ("Add" not "Added", "Fix" not "Fixed").
 - Reference GitHub issues in the body when relevant (`Closes #123`).
 
-### Pre-commit and pre-push hooks
+### Pre-commit verify gate
 
-Husky hooks run automatically:
+Install the repository-managed hook with `bash scripts/git-hooks/install-hooks.sh`. Its pre-commit gate runs only when PHP test files are staged: it enforces the schema-skip budget and, when PHP plus the test database are available, runs those staged test files in isolation. The repository does not install a pre-push hook; GitHub Actions remains the authoritative full gate.
 
-- **Pre-commit** (`lint-staged`): ESLint + `tsc --noEmit` on staged `.ts`/`.tsx` files.
-- **Pre-push**: Full `tsc --noEmit` + production build check.
-
-As a contributor, do not bypass these hooks with `--no-verify`. Your pull request is re-checked by CI regardless, so a local bypass only delays the failure rather than avoiding it.
-
-The one documented exception is when a commit is blocked **solely by a pre-existing** lint or type error in files your change does not touch. In that case you may bypass the hook for that commit and explain why in the pull-request description. If you can fix the pre-existing failure cleanly in its own commit, prefer that. (Project maintainers follow the same documented-exception rule when clearing pre-existing failures on `main`.)
+Never use `--no-verify` to bypass a failure from the staged-PHP-test gate: fix the test or remove it from the commit. The documented exception applies only when another locally configured lint/build hook is blocked solely by a pre-existing failure in files your change does not touch; explain that exception in the pull-request description.
 
 ---
 
@@ -478,11 +473,14 @@ The one documented exception is when a commit is blocked **solely by a pre-exist
 
 ```bash
 cd react-frontend
-npm test              # Watch mode
-npm run test -- --run # Single run (CI)
-npm run lint          # TypeScript type check
-npm run build         # Production build check
+npm test -- SearchPage                  # Targeted Vitest watch example
+npm run lint                            # ESLint + TypeScript (blocking)
+npm run test:a11y -- --run              # Accessibility contracts (blocking)
+npm run test:ui-contracts -- --run      # UI contracts (blocking)
+npm run build                           # Production build (blocking)
 ```
+
+The broad Vitest worker pool currently has a documented systemic hang. CI keeps its focused smoke and coverage runs non-blocking until that is resolved, so a full `npm test -- --run` is advisory rather than the release success criterion.
 
 ### PHP backend (PHPUnit)
 
@@ -498,7 +496,10 @@ docker exec nexus-php-app php tests/run-api-tests.php
 
 ```bash
 cd mobile
-npx expo test
+npm run verify:release
+npm run type-check
+npm test -- --runInBand --silent
+npx expo-doctor
 ```
 
 ### Static analysis (PHP)

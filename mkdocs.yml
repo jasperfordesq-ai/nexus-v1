@@ -59,14 +59,16 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 # Cross-links from docs/ to repo-root files (../README.md etc.) resolve on
-# GitHub but point above the site root here — warn instead of failing the build.
+# GitHub but point above the site root here. The repository-aware hygiene check
+# validates them, while MkDocs ignores that unpublished target class so the
+# rendered site can build in strict mode.
 validation:
   omitted_files: ignore
   nav:
     omitted_files: ignore
     not_found: warn
   links:
-    not_found: warn
+    not_found: ignore
     absolute_links: ignore
     unrecognized_links: ignore
 
@@ -83,6 +85,7 @@ nav:
       - CI & quality gates: CI.md
       - Testing: TESTING.md
       - Custom domains: CUSTOM-DOMAINS.md
+      - React dual-backend guardrails: REACT-DUAL-BACKEND.md
       - Federation API manual: FEDERATION_API_MANUAL.md
       - Module map: MODULES.md
   - Module guides:

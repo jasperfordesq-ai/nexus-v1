@@ -1,5 +1,7 @@
 # Members & GDPR / Data Protection Module
 
+Last reviewed: 2026-07-14
+
 Audience: maintainers and contributors working on the member directory, the
 data-subject-rights surface (export and erasure), consent records, and the
 compliance alarms that back them.
@@ -85,7 +87,7 @@ There are **two distinct export paths** and they are not interchangeable:
 sections (profile, listings, messages, transactions, events, groups,
 volunteering and detailed volunteer records, gamification, activity log,
 consents, notifications, connections, login history, messaging restrictions,
-AI chat history, reviews, exchanges, vetting records, insurance certificates,
+AI chat history, reviews, exchanges, vetting records, insurance metadata,
 identity verification, safeguarding preferences).
 
 Each section runs inside `safeSection()`, a fault-isolation boundary: if a
@@ -97,6 +99,24 @@ bad table never aborts the whole DSAR.
 `generateDataExport()` produces a ZIP containing `data.json`, `data.html`, a
 `README.txt`, and copied user uploads, then records `export_file_path` and a
 7-day `export_expires_at` on the request row.
+
+### Insurance records are metadata-only
+
+Insurance workflows no longer accept or retain certificate documents. The
+member endpoints `GET/POST /api/v2/users/me/insurance` expose a tenant-scoped
+record containing the insurance type, optional provider, required expiry date,
+status, and verification timestamps. A member submission containing
+`certificate_file` fails with `DOCUMENT_UPLOAD_FORBIDDEN` (HTTP 422). The
+accessible frontend enforces the same contract, and
+`InsuranceCertificateService::create()` always writes
+`certificate_file_path`, `policy_number`, and `coverage_amount` as `NULL`.
+
+Migration `2026_07_14_000100_remove_insurance_document_data.php` cleared legacy
+document/detail columns and deleted the retired
+`httpdocs/uploads/insurance/` tree. Service reads use an explicit safe-column
+allow-list, so raw document paths, policy numbers, coverage amounts, and private
+notes cannot re-enter member or broker API responses. DSARs and erasure still
+include/delete the remaining insurance metadata rows.
 
 ---
 
@@ -125,11 +145,15 @@ so it nests safely under test transactions). The steps, as implemented:
    cleaned explicitly.
 4. **Messages** — not hard-deleted (that would orphan the counterparty's half
    of the thread). The erased user's authored body is replaced with a
-   tombstone, transcript nulled, and voice-message audio files are deleted from
-   disk (`uploads/{tenant}/voice_messages`) *before* `audio_url` is nulled. File
-   deletion requires canonical containment in the current tenant's voice root;
-   invalid, traversal, remote, and cross-tenant legacy pointers are scrubbed
-   from the row without being followed.
+   tombstone and transcript nulled. Their attachment rows and private files
+   under `storage/app/private/message-media/{tenant}/attachments/` are removed,
+   and voice files under the adjacent `voice/` root are unlinked before their
+   `audio_url` pointers are cleared. Canonical tenant containment is mandatory.
+   Invalid, traversal, remote, and cross-tenant legacy pointers are scrubbed
+   without being followed; a physical file referenced by another sender is
+   preserved while only the erased member's pointer is removed. Failed unlinks
+   retain their database linkage for retry; an associated `gdpr_requests` row
+   remains `processing` rather than reporting false completion.
 5. **Hard-deleted personal content / credentials** include: notifications,
    `user_consents`, push subscriptions, FCM tokens, AI conversations and
    messages, WebAuthn credentials/passkeys, Sanctum `personal_access_tokens`,
@@ -142,12 +166,17 @@ so it nests safely under test transactions). The steps, as implemented:
    mood/wellbeing data, accessibility needs, guardian consents, safeguarding
    training, certificates, shift waitlist/swaps/check-ins, emergency-alert
    recipients, custom field values, vol reviews).
-6. **Identity & compliance copies are deleted, files included** — `vetting_records`
-   (and their `/uploads/...` documents), `insurance_certificates` (per-user
-   directory), and `identity_verification_sessions`. Decision recorded in code
-   (2026-06-12): the platform is not the vetting authority and holds no
-   post-erasure retention duty for these copies. **Safeguarding *reports* are
-   deliberately retained** under legal hold — they are not in this set.
+6. **Identity & compliance metadata is erased with a legacy-evidence safety
+   exception** — current `member_vetting_attestations`, their event/review rows,
+   `insurance_certificates` metadata, and `identity_verification_sessions` are
+   deleted. Evidence-free legacy `vetting_records` rows are deleted immediately.
+   A legacy row that still carries `document_url` is reduced to a revoked,
+   minimised cleanup tombstone until the DPO-authorised legacy-evidence command
+   (`php artisan safeguarding:legacy-vetting-evidence`) removes the referenced
+   object; dropping that pointer first could orphan the most sensitive copy. The
+   retired legacy insurance directory is also removed defensively if it still
+   exists. **Safeguarding reports are deliberately retained** under legal hold
+   — they are not in this set.
 7. **Anonymised-but-kept records** (financial / org-accounting audit value):
    `transactions` flagged `deleted_for_sender`/`deleted_for_receiver` (amounts
    kept); `reviews.reviewer_id` nulled; exchange request notes nulled; vol
@@ -155,7 +184,7 @@ so it nests safely under test transactions). The steps, as implemented:
    hours and donation amounts stay (they back org wallet ledgers).
 8. **Listings** soft-deleted (`status='deleted'`, description `[DELETED]`).
 9. **Activity logs** anonymised (IP and user-agent nulled).
-10. **Uploaded files** removed; **all sessions** deleted.
+10. **Other owned upload directories** removed; **all sessions** deleted.
 11. After commit (outside the transaction): a queued `UserFederatedOptOut` event
     retracts the profile from federation partners, the user and their listings
     are removed from the Meilisearch index, and per-user Redis cache keys are
@@ -264,9 +293,12 @@ consent also syncs the newsletter subscription
   re-verify, tenant-scoped, before any destructive work).
 - **Every GDPR query is tenant-scoped** (`WHERE … AND tenant_id = ?`) except
   the cross-tenant operator alarm, which is intentionally platform-wide.
-- **Uploaded files are erased, not just rows** — voice messages, vetting
-  documents, insurance certificates, volunteer credentials, and job CVs are
-  deleted from disk/storage as part of erasure.
+- **Uploaded files are erased, not just rows** — authored private message
+  attachments and voice recordings, volunteer credentials, and job CVs are
+  deleted from disk/storage as part of erasure. Shared canonical message-media
+  files are preserved for another sender, and failed unlinks retain retry
+  pointers. Legacy vetting evidence follows the DPO-authorised tombstone cleanup
+  path described above; current insurance records have no document file.
 - **Counterparty records are preserved** — messages, transactions, reviews, and
   two-party marketplace/exchange records are anonymised in place rather than
   deleted, so the other participant's history stays intact.
@@ -324,6 +356,12 @@ vendor/bin/phpunit tests/Laravel/Unit/Services/Enterprise/GdprServiceTest.php
 
 # Controller-level (auth gates, consent update, export request, delete auth)
 vendor/bin/phpunit tests/Laravel/Feature/Controllers/GdprControllerTest.php
+
+# Private message-media erasure, vetting erasure, and metadata-only insurance
+vendor/bin/phpunit tests/Laravel/Integration/MessageErasureConcurrencyTest.php
+vendor/bin/phpunit tests/Laravel/Feature/Gdpr/VettingAttestationGdprTest.php
+vendor/bin/phpunit tests/Laravel/Feature/Controllers/UserInsuranceControllerTest.php
+vendor/bin/phpunit tests/Laravel/Unit/Services/InsuranceCertificateServiceTest.php
 
 # Overdue-request alarm (threshold, statutory-deadline count, healthy case)
 vendor/bin/phpunit tests/Laravel/Feature/Console/OverdueGdprRequestAlertTest.php

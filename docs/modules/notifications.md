@@ -1,6 +1,6 @@
 # Notifications & Email Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the notifications and email subsystem in Project NEXUS. It covers the three delivery channels (in-app bell, email, push/FCM), the recipient-locale invariant that every notification path must honour, the dispatcher flow, the queue, tenant scoping, the frontend inbox, and the regression tests that protect this surface.
 
@@ -25,7 +25,11 @@ Supported notification workflows:
 
 ## Tenant & feature-gate rules
 
-- **Tenant scope is mandatory.** All queries against `notifications`, `notification_queue`, `notification_settings`, and `push_subscriptions` filter on `tenant_id`. The `Notification` Eloquent model uses the `HasTenantScope` trait (global scope), so `Notification::query()` is automatically tenant-scoped.
+- **Tenant scope is mandatory.** `notifications`, `notification_queue`, and
+  `push_subscriptions` carry `tenant_id`; the `Notification` model also
+  uses `HasTenantScope`. `notification_settings` intentionally has no
+  `tenant_id`: its global user/context key is safe only after the caller proves
+  ownership through the authenticated tenant-scoped `users` row.
 - The `markAllRead()` method in `NotificationService` also adds an explicit `AND tenant_id = ?` filter as defence in depth.
 - There is no feature-gate that globally disables notifications; specific channels (email, push) can be toggled per-user through notification preferences (`users.notification_preferences`).
 - Push requires a configured VAPID key (`config('services.vapid.public_key')`). When it is missing, `WebPushService` returns false silently.
@@ -43,16 +47,18 @@ The primary entry point for standard (discussion / topic / reply / mention) noti
 1. **Resolve tenant.** Calls `TenantContext::runForTenant()` using the recipient's `users.tenant_id`, so the block is always executed in the correct tenant context regardless of which worker or HTTP request triggered it.
 2. **Mute check.** If `$fromUserId` is supplied and that user appears in `user_muted_users` for the recipient, the entire dispatch is silently skipped (returns `true`).
 3. **In-app bell (deduplication).** Writes a row via `Notification::createNotification()`. A 60-second Cache key `notif_dedup:{tenant}:{user}:{type}:{md5(link)}` suppresses duplicate bells within the window.
-4. **Frequency resolution.** Calls `getFrequencySetting()` which walks the hierarchy: thread → group → global. If nothing is set, the tenant-level default in `configuration.notifications.default_frequency` applies; if that is also unset, the frequency defaults to `'off'`. Six critical types are always forced to `'instant'` regardless of the digest setting: `new_message`, `connection_request`, `connection_accepted`, `vol_application_approved`, `vol_application_declined`, `vol_hours_approved`.
-5. **Device push fan-out.** Immediately after a fresh bell is written, `fanOutPush()` fires (independent of email frequency). Push has its own 60-second dedup key per `(user, type, md5(link))`. The VAPID send is dispatched `afterResponse()` so it never delays the HTTP caller. FCM and web push run in parallel, failure-isolated. Results are recorded to `push_log` for delivery observability.
+4. **Frequency resolution.** Calls `getFrequencySetting()` which walks the hierarchy: thread → group → global. If nothing is set, the tenant-level default in `configuration.notifications.default_frequency` applies; if that is also unset, the frequency defaults to `'off'`. Seven critical types are forced to `'instant'`: `new_message`, `connection_request`, `connection_accepted`, `vol_application_approved`, `vol_application_declined`, `vol_hours_approved`, and the time-sensitive `vol_waitlist_spot`.
+5. **Device push fan-out.** Immediately after a fresh bell is written, `fanOutPush()` fires (independent of email frequency). Push has its own 60-second dedup key per `(user, type, md5(link))`. The send is dispatched `afterResponse()` for HTTP callers. Web push and FCM are attempted sequentially inside that closure and are failure-isolated, so one provider cannot suppress the other. Results are recorded to `push_log`.
 6. **Email queue insert.** For `instant`, queues an immediate email in `notification_queue`. For `daily` / `monthly`, queues for the batch digest run. For `off`, nothing is enqueued.
-7. **Rollback on queue failure.** If the `notification_queue` insert fails, the bell row is deleted and `dispatch()` returns `false`.
+7. **Rollback on queue failure.** If the `notification_queue` insert fails,
+   only the fresh, non-duplicate bell created by this dispatch is deleted;
+   `dispatch()` returns `false`.
 
 ### Dispatch flow diagram (simplified)
 
 ```
 Event fires
-  └─ Listener (ShouldQueue, runs on Redis queue)
+  └─ Listener (often ShouldQueue; some listeners run inline)
        └─ LocaleContext::withLocale($recipient, fn())
             ├─ Notification::createNotification()   → notifications table (bell)
             ├─ NotificationDispatcher::fanOutPush() → WebPushService + FCMPushService
@@ -106,7 +112,10 @@ foreach ($admins as $admin) {
 }
 ```
 
-**Queue workers** (listeners implementing `ShouldQueue`) boot once with the application default locale and never change it across jobs. The `preferred_language` field must be passed into the job payload, and `withLocale()` must wrap the entire `handle()` body. All five production listeners (`NotifyTransactionCompleted`, `NotifyMessageReceived`, `NotifyConnectionRequest`, `NotifyConnectionAccepted`, and `NotifySafeguardingStaff`) follow this pattern.
+**Queue workers** (listeners implementing `ShouldQueue`) boot once with the
+application default locale and reuse the process. Every queued listener must
+load or carry the recipient's `preferred_language` and wrap rendering and send
+work in `withLocale()`; do not rely on a fixed list of listeners.
 
 **Admin fanouts** (e.g. `notifyAdmins()`, `notifyModerationAdmins()`) wrap the send *inside* the per-recipient loop so each recipient's subject and body render in their language:
 
@@ -128,6 +137,7 @@ Routes are defined in [`routes/api.php`](../../routes/api.php). Do not maintain 
 | --- | --- | --- |
 | Notification inbox (list, grouped, counts, mark read, delete) | `/v2/notifications/*` | `App\Http\Controllers\Api\NotificationsController` |
 | Per-user notification preferences | `GET/PUT /v2/users/me/notifications` | `App\Http\Controllers\Api\UsersController` |
+| Atomic Settings form save | `PUT /v2/users/me/notification-settings` | `App\Http\Controllers\Api\NotificationSettingsController` |
 | Per-context digest frequency settings | `GET/POST /v2/notifications/settings` | `App\Http\Controllers\Api\UsersController` |
 | Email one-click unsubscribe | `GET/POST /v2/notifications/unsubscribe` | `App\Http\Controllers\Api\NotificationUnsubscribeController` |
 | Web push: subscribe / unsubscribe / status | `POST /push/subscribe`, `POST /push/unsubscribe`, `GET /push/status` | `App\Http\Controllers\Api\PushController` |
@@ -139,6 +149,7 @@ Services:
 | --- | --- | --- |
 | `NotificationService` | `app/Services/NotificationService.php` | In-app inbox reads: paginated list with cursor, grouped list, unread counts, mark-read, mark-group-read, delete. All queries are tenant-scoped via `HasTenantScope`. |
 | `NotificationDispatcher` | `app/Services/NotificationDispatcher.php` | Central dispatcher: bell creation, frequency resolution, email queue insert, push fan-out, hot/mutual match emails, exchange/broker notification helpers. |
+| `NotificationSettingsService` | `app/Services/NotificationSettingsService.php` | Atomically updates user JSON preferences, federation notifications, tenant-scoped match preferences, and global user/context digest settings after locking the tenant-owned user row. |
 | `SocialNotificationService` | `app/Services/SocialNotificationService.php` | Likes, comments, comment replies, shares — writes bell + sends email under recipient's locale. |
 | `PushNotificationService` | `app/Services/PushNotificationService.php` | Manages `push_subscriptions` rows (subscribe / unsubscribe / count). Delegates sending to `WebPushService`. |
 | `WebPushService` | `app/Services/WebPushService.php` | VAPID browser push; called by `fanOutPush()`. |
@@ -158,13 +169,14 @@ Database tables (do not query directly from new code — use the services and mo
 | --- | --- |
 | `notifications` | In-app bell rows per tenant per user. |
 | `notification_queue` | Pending email digest rows. Columns: `user_id`, `tenant_id`, `activity_type`, `content_snippet`, `link`, `frequency`, `email_body`, `status`. |
-| `notification_settings` | Per-user per-context frequency preferences (context_type: `global`, `group`, `thread`; frequency: `instant`, `daily`, `monthly`, `off`). |
+| `notification_settings` | Per-user per-context frequency preferences (context_type: `global`, `group`, `thread`; frequency: `instant`, `daily`, `monthly`, `off`). It has no `tenant_id`; access must first establish the globally unique user's tenant ownership. |
 | `push_subscriptions` | Browser VAPID and mobile (FCM) push endpoint rows, keyed on `(user_id, endpoint)`. Tenant-scoped. |
 | `push_log` | Delivery observability for push fan-outs (one row per fan-out call). |
 | `transaction_notification_deliveries` | Idempotency ledger for `NotifyTransactionCompleted` — records delivery status per `(transaction_id, user_id, event, channel)` to prevent duplicate emails on queue re-delivery. |
 | `user_muted_users` | Muted-sender list. `dispatch()` skips all channels when the acting user appears here for the recipient. |
 
-Listeners (all implement `ShouldQueue`, run on the Redis queue):
+Listeners (most implement `ShouldQueue`; `SendWelcomeNotification` and
+`NotifyAdminOfNewRegistration` currently run inline):
 
 | Listener | Event | What it sends |
 | --- | --- | --- |
@@ -172,12 +184,12 @@ Listeners (all implement `ShouldQueue`, run on the Redis queue):
 | `NotifyMessageReceived` | `MessageSent` | Bell + email to message recipient. Idempotency via Cache. |
 | `NotifyConnectionRequest` | `ConnectionRequested` | Bell + email to connection target. Idempotency via Cache. |
 | `NotifyConnectionAccepted` | `ConnectionAccepted` | Bell + email to original requester. |
-| `NotifySafeguardingStaff` | `SafeguardingFlagRaised` | Bell to all safeguarding-role users. |
+| `NotifySafeguardingStaff` | `SafeguardingFlaggedEvent` | Bell to all safeguarding-role users. |
 | `NotifyAdminOfNewRegistration` | `UserRegistered` | Bell to admins on new registration. |
 | `NotifyAdminOfNewListing` | `ListingCreated` | Bell to admins on new listing. |
 | `NotifyAdminOfNewGroup` | `GroupCreated` | Bell to admins on new group. |
 | `NotifyAdminOfNewCommunityEvent` | `CommunityEventCreated` | Bell to admins on new event. |
-| `NotifyAdminOfNewVolunteerOpportunity` | `VolOpportunityCreated` | Bell to admins on new opportunity. |
+| `NotifyAdminOfNewVolunteerOpportunity` | `VolunteerOpportunityCreated` | Bell to admins on new opportunity. |
 | `SendWelcomeNotification` | `UserRegistered` | Welcome bell to new member. |
 | `NotifyGroupChatroomMessage` | `GroupChatroomMessageSent` | Bell to group chatroom participants. |
 | `NotifyGroupMemberJoined` | `GroupMemberJoined` | Bell to group organisers. |
@@ -208,7 +220,12 @@ Types that do not match any category are counted in `other`.
 
 ## Email template builder
 
-All HTML emails are built with `App\Core\EmailTemplateBuilder`. Chain methods (`theme()`, `title()`, `previewText()`, `greeting()`, `paragraph()`, `blockquote()`, `infoCard()`, `button()`, `divider()`, `highlight()`, `render()`) produce consistent, brand-themed HTML. Use `htmlspecialchars()` on user-supplied values before passing to `paragraph()` — it is the only raw-HTML sink.
+All HTML emails are built with `App\Core\EmailTemplateBuilder`. Chain methods
+produce consistent, brand-themed HTML, but several content blocks intentionally
+accept trusted HTML. Escape every user-controlled value with
+`htmlspecialchars()` before interpolating it into paragraph, list, highlight,
+blockquote, or other HTML-bearing content; `paragraph()` is not the only
+surface to review.
 
 ---
 
@@ -238,7 +255,7 @@ vendor/bin/phpunit --filter Notification --colors=always
 vendor/bin/phpunit tests/Laravel/Feature/I18n/EmailLocaleIntegrationTest.php --colors=always
 
 # Transaction notification idempotency
-vendor/bin/phpunit tests/Laravel/Feature/Listeners/NotifyTransactionCompletedTest.php --colors=always
+vendor/bin/phpunit tests/Laravel/Unit/Listeners/NotifyTransactionCompletedTest.php --colors=always
 
 # Full Laravel test suite (includes listeners)
 vendor/bin/phpunit --testsuite=Laravel --colors=always
@@ -252,7 +269,7 @@ npm run check:i18n:baseline
 | Test file | What it guards |
 | --- | --- |
 | `tests/Laravel/Feature/I18n/EmailLocaleIntegrationTest.php` | `LocaleContext::withLocale()` causes `__()` to resolve in the recipient's locale; restores outer locale after return and on exception; nested invocations each see their own locale. |
-| `tests/Laravel/Feature/Listeners/NotifyTransactionCompletedTest.php` | Bell + email sent to receiver in receiver's locale; confirmation email sent to sender in sender's locale; idempotency guard prevents duplicate delivery on queue re-delivery. |
+| `tests/Laravel/Unit/Listeners/NotifyTransactionCompletedTest.php` | Bell + email sent to receiver in receiver's locale; confirmation email sent to sender in sender's locale; idempotency guard prevents duplicate delivery on queue re-delivery. |
 
 ---
 
@@ -266,7 +283,7 @@ npm run check:i18n:baseline
 | Push not delivered | VAPID key missing from `.env`, or `push_subscriptions` row expired / unregistered. | Check `push_log` for error details. Verify `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` are set. User may need to re-subscribe in Settings. |
 | Push double-fired | `fanOutPush()` called twice for the same event (e.g. `dispatch()` plus a direct call in the same path). | The 60-second Cache dedup key prevents double push for identical `(user, type, link)` within the window. If firing more than 60 seconds apart, the caller is responsible for suppressing the duplicate. |
 | Email appears from wrong tenant | `TenantContext` not restored after an async job. All listeners call `TenantContext::restoreAfterScopedListener()` in `finally`. If a custom job forgets this, the worker's context leaks to subsequent jobs. | Add `restoreAfterScopedListener()` in the `finally` block of the listener's `handle()` method. |
-| `notification_queue` rows stuck in `pending` | Digest cron job not running, or database connection failure during flush. | The queue is flushed by `App\Services\CronJobRunner` on the scheduler. Check `app/Console/Kernel.php` for the scheduled cron entry and verify the Laravel scheduler is running (`php artisan schedule:run`). Rows expire to `failed` automatically after 7 days. Sent / failed rows are cleaned up after 30 days. |
+| `notification_queue` rows stuck in `pending` | Digest cron job not running, or database connection failure during flush. | The queue is flushed by `App\Services\CronJobRunner` from the schedule registered in `bootstrap/app.php`. Verify the Laravel scheduler is running. Rows expire to `failed` after 7 days; sent/failed rows are cleaned after 30 days. |
 
 ---
 

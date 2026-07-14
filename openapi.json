@@ -330,6 +330,7 @@
               "nullable": true
             },
             "listing": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplaceListingSummary"
@@ -339,6 +340,7 @@
               "description": "Null when a historical order outlives its deleted listing."
             },
             "buyer": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplacePerson"
@@ -347,6 +349,7 @@
               "nullable": true
             },
             "seller": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplacePerson"
@@ -548,6 +551,7 @@
               "description": "Null when the order references a deleted historical listing."
             },
             "buyer": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplacePerson"
@@ -556,6 +560,7 @@
               "nullable": true
             },
             "seller": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplacePerson"
@@ -632,6 +637,7 @@
               "nullable": true
             },
             "opened_by": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplacePerson"
@@ -640,6 +646,7 @@
               "nullable": true
             },
             "order": {
+              "type": "object",
               "allOf": [
                 {
                   "$ref": "#/components/schemas/MarketplaceDisputeOrder"
@@ -1051,6 +1058,7 @@
                 "additionalProperties": true,
                 "properties": {
                   "recurrence": {
+                    "type": "object",
                     "allOf": [
                       {
                         "$ref": "#/components/schemas/EventRecurrenceProjection"
@@ -1780,6 +1788,129 @@
           }
         }
       },
+      "ApiErrorItem": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApiErrorResponse": {
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/ApiErrorItem"
+            }
+          }
+        }
+      },
+      "MessageVoiceResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The newly created voice-message record, including its participant-authorized media URL."
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "base_url"
+            ],
+            "properties": {
+              "base_url": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "MessageMediaBinary": {
+        "type": "string",
+        "format": "binary",
+        "description": "Private message media returned with its stored MIME type. The response is never publicly cacheable."
+      },
+      "CspViolationDetails": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "document-uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "documentURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "blocked-uri": {
+            "type": "string"
+          },
+          "blockedURL": {
+            "type": "string"
+          },
+          "violated-directive": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "effectiveDirective": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "source-file": {
+            "type": "string",
+            "format": "uri"
+          },
+          "sourceFile": {
+            "type": "string",
+            "format": "uri"
+          },
+          "line-number": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lineNumber": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "CspReportEnvelope": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "A legacy CSP report, Reporting API report body, or raw violation object. Unknown browser fields are accepted and ignored.",
+        "properties": {
+          "csp-report": {
+            "$ref": "#/components/schemas/CspViolationDetails"
+          },
+          "body": {
+            "$ref": "#/components/schemas/CspViolationDetails"
+          }
+        }
+      },
       "PaginationMeta": {
         "type": "object",
         "properties": {
@@ -1978,6 +2109,59 @@
     }
   ],
   "paths": {
+    "/api/csp-report": {
+      "post": {
+        "summary": "Collect a browser Content Security Policy violation",
+        "description": "Unauthenticated browser reporting endpoint used by the platform CSP. It accepts legacy report-uri envelopes and Reporting API batches, sanitizes logged URLs to origin and path, and returns no content. Requests declaring a body larger than 32 KiB are rejected.",
+        "operationId": "SecurityReport_collectCspViolation",
+        "tags": [
+          "Security"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/csp-report": {
+              "schema": {
+                "$ref": "#/components/schemas/CspReportEnvelope"
+              }
+            },
+            "application/reports+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CspReportEnvelope"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CspReportEnvelope"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/CspReportEnvelope"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Report accepted, ignored, or malformed without exposing processing details"
+          },
+          "413": {
+            "description": "Declared request body exceeds 32 KiB"
+          }
+        },
+        "x-controller-action": "App\\Http\\Controllers\\Api\\SecurityReportController@csp"
+      }
+    },
     "/api/v2/marketplace/orders": {
       "post": {
         "operationId": "createMarketplaceOrder",
@@ -13610,30 +13794,271 @@
         }
       }
     },
-    "/api/v2/messages/upload-voice": {
-      "post": {
-        "summary": "POST /api/v2/messages/upload-voice",
-        "tags": [
-          "Messages"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation"
-          }
-        }
-      }
-    },
     "/api/v2/messages/voice": {
       "post": {
-        "summary": "POST /api/v2/messages/voice",
+        "summary": "Upload and send a private voice message",
+        "description": "Creates a direct voice message in one multipart request. The stored recording is private and the returned media URL is participant-authorized.",
+        "operationId": "Messages_sendVoice",
         "tags": [
           "Messages"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "recipient_id",
+                  "voice_message"
+                ],
+                "properties": {
+                  "recipient_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "voice_message": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "A WebM, OGG, MP3, WAV, M4A, MP4, or AAC recording up to 10 MiB."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Voice message created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageVoiceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing, invalid, unsupported, or oversized recording",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Messaging policy, block, or safeguarding restriction denied the send"
+          },
+          "404": {
+            "description": "Recipient not found in the current tenant"
+          },
+          "422": {
+            "description": "Message could not be created in its current state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Voice-message rate limit exceeded"
+          },
+          "503": {
+            "description": "Required safeguarding policy is unavailable"
+          }
+        },
+        "x-controller-action": "App\\Http\\Controllers\\Api\\MessagesController@sendVoice"
+      }
+    },
+    "/api/v2/messages/{message}/attachments/{attachment}": {
+      "get": {
+        "summary": "Download a private message attachment",
+        "description": "Returns an attachment only to the sender, receiver, or an authorized participant in the message conversation. The response uses the stored MIME type and private no-store headers.",
+        "operationId": "Messages_getAttachment",
+        "tags": [
+          "Messages"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "attachment",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Successful operation"
+            "description": "Private attachment bytes; Content-Type is the validated stored MIME type",
+            "headers": {
+              "Cache-Control": {
+                "description": "Prevents shared or local caching of private message media.",
+                "schema": {
+                  "type": "string",
+                  "example": "private, no-store, max-age=0"
+                }
+              },
+              "Pragma": {
+                "description": "Legacy cache prevention.",
+                "schema": {
+                  "type": "string",
+                  "example": "no-cache"
+                }
+              },
+              "X-Content-Type-Options": {
+                "description": "Disables MIME sniffing.",
+                "schema": {
+                  "type": "string",
+                  "example": "nosniff"
+                }
+              },
+              "Content-Security-Policy": {
+                "description": "Sandboxes directly opened media.",
+                "schema": {
+                  "type": "string",
+                  "example": "default-src 'none'; sandbox"
+                }
+              },
+              "Cross-Origin-Resource-Policy": {
+                "description": "Restricts embedding to the same site.",
+                "schema": {
+                  "type": "string",
+                  "example": "same-site"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageMediaBinary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Authenticated member is not a conversation participant"
+          },
+          "404": {
+            "description": "Message, attachment, or private file not found"
           }
-        }
+        },
+        "x-controller-action": "App\\Http\\Controllers\\Api\\MessageMediaController@attachment"
+      }
+    },
+    "/api/v2/messages/{message}/voice": {
+      "get": {
+        "summary": "Stream a private voice-message recording",
+        "description": "Returns a voice recording only to the sender, receiver, or an authorized participant in the message conversation. The response uses the detected MIME type and private no-store headers.",
+        "operationId": "Messages_getVoice",
+        "tags": [
+          "Messages"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private recording bytes; Content-Type is detected from the stored file",
+            "headers": {
+              "Cache-Control": {
+                "description": "Prevents shared or local caching of private message media.",
+                "schema": {
+                  "type": "string",
+                  "example": "private, no-store, max-age=0"
+                }
+              },
+              "Pragma": {
+                "description": "Legacy cache prevention.",
+                "schema": {
+                  "type": "string",
+                  "example": "no-cache"
+                }
+              },
+              "X-Content-Type-Options": {
+                "description": "Disables MIME sniffing.",
+                "schema": {
+                  "type": "string",
+                  "example": "nosniff"
+                }
+              },
+              "Content-Security-Policy": {
+                "description": "Sandboxes directly opened media.",
+                "schema": {
+                  "type": "string",
+                  "example": "default-src 'none'; sandbox"
+                }
+              },
+              "Cross-Origin-Resource-Policy": {
+                "description": "Restricts embedding to the same site.",
+                "schema": {
+                  "type": "string",
+                  "example": "same-site"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageMediaBinary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Authenticated member is not a conversation participant"
+          },
+          "404": {
+            "description": "Message or private recording not found"
+          }
+        },
+        "x-controller-action": "App\\Http\\Controllers\\Api\\MessageMediaController@voice"
       }
     },
     "/api/v2/messages/conversations/{id}": {
@@ -18693,9 +19118,11 @@
         }
       }
     },
-    "/api/v2/users/me/availability/{day}": {
+    "/api/v2/users/me/availability/{reference}": {
       "put": {
-        "summary": "PUT /api/v2/users/me/availability/{day}",
+        "summary": "Set availability for one weekday",
+        "description": "For PUT, reference is the weekday identifier accepted by the member-availability controller.",
+        "operationId": "MemberAvailability_setDay",
         "tags": [
           "Users"
         ],
@@ -18706,14 +19133,40 @@
         },
         "parameters": [
           {
-            "name": "day",
+            "name": "reference",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             }
           }
-        ]
+        ],
+        "x-controller-action": "App\\Http\\Controllers\\Api\\MemberAvailabilityController@setDayAvailability"
+      },
+      "delete": {
+        "summary": "Delete one availability slot",
+        "description": "For DELETE, reference is the numeric availability-slot identifier.",
+        "operationId": "MemberAvailability_deleteSlot",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability slot deleted"
+          }
+        },
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "x-controller-action": "App\\Http\\Controllers\\Api\\MemberAvailabilityController@deleteSlot"
       }
     },
     "/api/v2/users/me/availability/date": {
@@ -18727,29 +19180,6 @@
             "description": "Successful operation"
           }
         }
-      }
-    },
-    "/api/v2/users/me/availability/{id}": {
-      "delete": {
-        "summary": "DELETE /api/v2/users/me/availability/{id}",
-        "tags": [
-          "Users"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
       }
     },
     "/api/v2/users/{id}/availability": {
@@ -18970,37 +19400,6 @@
         "parameters": [
           {
             "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/api/v2/admin/users/{id}/badges/{type}": {
-      "delete": {
-        "summary": "DELETE /api/v2/admin/users/{id}/badges/{type}",
-        "tags": [
-          "Admin Users"
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "type",
             "in": "path",
             "required": true,
             "schema": {

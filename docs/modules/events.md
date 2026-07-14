@@ -1,6 +1,6 @@
 # Events Module Guide
 
-Last reviewed: 2026-07-12
+Last reviewed: 2026-07-14
 
 Project NEXUS Events is an authenticated, tenant-scoped event-management module. It covers discovery, lifecycle and moderation, registration and waitlists, staff and people operations, agenda sessions, reminders and broadcasts, calendars, safety controls, tickets, templates, offline check-in, analytics, and federation. This guide describes maintained behaviour; [`routes/api.php`](../../routes/api.php) is the authoritative endpoint inventory.
 

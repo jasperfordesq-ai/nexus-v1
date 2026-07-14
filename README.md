@@ -117,7 +117,7 @@ The full architecture map — runtime boundaries, tenant/feature model, and cros
 |------|---------|
 | `app/`, `routes/`, `config/`, `bootstrap/` | Laravel 12 application, API routing, middleware, providers, and runtime configuration |
 | `react-frontend/` | Primary React 19 + TypeScript UI for members and current admin workflows |
-| `accessible-frontend/` | Accessibility-first, HTML-first frontend served by Laravel at `accessible.project-nexus.ie` and `/{tenantSlug}/alpha/...` |
+| `accessible-frontend/` | Accessibility-first, HTML-first frontend served by Laravel at `accessible.project-nexus.ie` and `/{tenantSlug}/accessible/...` |
 | `views/` | Live email templates (`views/emails/match_*.php`) and the module-404 page; everything else under `views/` is retired legacy code |
 | `httpdocs/` | Apache web root, public health endpoints, and compatibility entrypoints |
 | `database/`, `migrations/` | Laravel migrations, schema dump, and legacy SQL history |
@@ -151,7 +151,7 @@ docker exec nexus-php-app php artisan migrate --seed
 # React Frontend: http://localhost:5173
 # PHP API:        http://localhost:8090
 # Sales Site:     http://localhost:3001
-# Accessible UI:  http://localhost:8090/alpha
+# Accessible UI:  http://localhost:8090/hour-timebank/accessible
 #
 # First login, unless you changed NEXUS_BOOTSTRAP_ADMIN_* in your env file:
 # Email:    admin@project-nexus.local
@@ -177,7 +177,7 @@ The full current schema dump is committed at [database/schema/mysql-schema.sql](
 This is **version 1.5.5 — generally available**, in active production use. Per-module maturity (GA / Beta / Preview) is published on the in-app `/features` page and the public Changelog:
 
 - The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
-- The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel and planned for `accessible.project-nexus.ie`
+- The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel at `accessible.project-nexus.ie`
 - The **Laravel 12 backend** provides the API — all services are native Laravel implementations (zero stubs)
 - The **legacy PHP admin** (`/admin-legacy/`, `/super-admin/`) has been decommissioned — all admin workflows live in the React admin
 - **Zero-downtime blue/green deployments** — production switches between blue and green container stacks with no maintenance window

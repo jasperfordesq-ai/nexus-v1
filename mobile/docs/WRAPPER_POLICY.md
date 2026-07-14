@@ -1,10 +1,12 @@
 # Mobile Wrapper Policy
 
+Last reviewed: 2026-07-14
+
 Consolidated guide for native wrapper components, the UI contract, and locale/i18n
 for the Expo mobile app (`mobile/`).
 
-See `docs/NATIVE_UI_CONTRACT.md` for the full contract and
-`docs/HEROUI_NATIVE_PARITY_AUDIT.md` for the current parity matrix.
+See [NATIVE_UI_CONTRACT.md](NATIVE_UI_CONTRACT.md) for the full contract and
+[HEROUI_NATIVE_PARITY_AUDIT.md](HEROUI_NATIVE_PARITY_AUDIT.md) for the current parity matrix.
 
 ---
 
@@ -37,7 +39,7 @@ requiring per-screen knowledge of HeroUI Native internals.
 | `TextArea` | `components/ui/TextArea.tsx` | Long text entry, especially inside bottom sheets |
 | `SearchInput` | `components/ui/SearchInput.tsx` | Search boxes — provides clear action and search affordance natively |
 | `Card` | `components/ui/Card.tsx` | Generic framed content; pressable mode uses a HeroUI Native button wrapper |
-| `Badge` / `Badge` (via `Badge.tsx`) | `components/ui/Badge.tsx` | Status labels and counts |
+| `Badge` / HeroUI `Chip` (via `Badge.tsx`) | `components/ui/Badge.tsx` | Status labels and counts |
 | `Toggle` | `components/ui/Toggle.tsx` | Boolean settings (e.g. inventory switches) |
 | `Checkbox` | `components/ui/Checkbox.tsx` | Multi-select or terms-acceptance controls |
 | `BottomSheet` | `components/ui/BottomSheet.tsx` | Mobile drawers, sheet workflows, form/action sheets |
@@ -143,7 +145,7 @@ must be declared in the `useTranslation` hook call:
 const { t } = useTranslation('exchanges');
 ```
 
-All 26 namespaces are listed in `lib/i18n.ts` (`NAMESPACES` constant).
+The authoritative namespace list is the `NAMESPACES` constant in `lib/i18n.ts`.
 
 ### Language detection and persistence
 
@@ -203,7 +205,5 @@ For focused passes, run the affected screen test plus the wrapper test together:
 npm test -- <screen>.test.tsx components/ui/Input.test.tsx --runInBand
 ```
 
-Known: Jest logs HeroUI Native/Uniwind/colorKit/act warnings during tests; these
-are environment noise and do not indicate test failures. The full suite may hit a
-shutdown timeout — this is a known open-handle behavior in the Jest/Uniwind
-integration and does not affect test results.
+Review any HeroUI Native, Uniwind, colorKit, or React `act` warning in context;
+a non-zero exit, timeout, or open-handle failure is not a passing verification.

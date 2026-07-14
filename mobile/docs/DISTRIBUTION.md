@@ -1,5 +1,7 @@
 # Timebank Global mobile distribution
 
+Last reviewed: 2026-07-14
+
 This file records the release identity and distribution decisions for the native mobile app.
 
 ## App identity

@@ -1,6 +1,6 @@
 # Volunteering Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 How-to / reference guide for the Volunteering module: organisations, opportunities, shifts, hour logging, and the time-credit mint on approval. Verified against the live service layer (`app/Services/Volunteer*`, `app/Services/Shift*`, `app/Services/VolOrgWalletService.php`) and `routes/api.php`.
 
@@ -47,7 +47,7 @@ The two hats are enforced in code: an organisation starts at `status = 'pending'
 
 **Tables:** `vol_organizations`, `vol_opportunities`, `vol_applications`, `vol_shifts`, `vol_logs`, `vol_org_transactions`, `vol_certificates`, `vol_shift_checkins`, `vol_shift_waitlist`, `vol_shift_swap_requests`, `vol_reviews`. Membership/roles are stored in `org_members` with `org_type = 'volunteer'`. Minted credits also write the platform-wide `transactions` table and adjust `users.balance`.
 
-**Frontend entry points:** React `react-frontend/src/pages` (volunteering pages and org dashboard) and the accessible GOV.UK track under `/{tenantSlug}/alpha/...` (`app/Http/Controllers/GovukAlpha`, `VolunteeringParityTest` and friends).
+**Frontend entry points:** React `react-frontend/src/pages` (volunteering pages and org dashboard) and the accessible GOV.UK track under `/{tenantSlug}/accessible/...` (`app/Http/Controllers/GovukAlpha`, `VolunteeringParityTest` and friends).
 
 **Routes / API contract:** member routes are `/v2/volunteering/*` and admin routes `/v2/admin/volunteering/*` in `routes/api.php` (≈ lines 774–816 and 2052–2106). Refer to that file and the OpenAPI surface rather than copying the endpoint table here. Note `opportunities`, `showOpportunity`, `organisations`, and `showOrganisation` are explicitly public (`withoutMiddleware('auth:sanctum')`); everything else requires auth.
 

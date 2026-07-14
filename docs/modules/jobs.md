@@ -1,6 +1,6 @@
 # Jobs / Hiring Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 How-to / reference guide for the Jobs (Hiring) module: posting vacancies, the application and hiring pipeline, interviews and offers, job alerts, syndication feeds, the hiring **bias / fairness audit**, and GDPR handling for applicant data. Verified against the live service layer (`app/Services/Job*`), `app/Listeners/NotifyJobAlertSubscribers.php`, and `routes/api.php`.
 
@@ -52,7 +52,7 @@ Tenant/platform admins have a moderation and analytics superset via `/v2/admin/j
 
 **Tables:** `job_vacancies`, `job_vacancy_applications`, `job_application_history`, `job_interviews`, `job_offers`, `job_scorecards`, `job_alerts`, `job_referrals`, `job_saved_profiles`, `job_pipeline_rules`, `job_templates`, `job_vacancy_team`, `job_interview_slots`, `job_vacancy_views`. Notifications/emails additionally write `notifications` and `email_log`.
 
-**Frontend entry points:** React jobs pages under `react-frontend/src/pages` and `react-frontend/src/admin` (hiring surfaces), plus the accessible GOV.UK track at `/{tenantSlug}/alpha/...` (parity tests `JobsParityTest`, `JobsBiasAuditParityTest`, `JobsCvUploadParityTest`, `JobsApplicationHistoryParityTest`).
+**Frontend entry points:** React jobs pages under `react-frontend/src/pages` and `react-frontend/src/admin` (hiring surfaces), plus the accessible GOV.UK track at `/{tenantSlug}/accessible/...` (parity tests `JobsParityTest`, `JobsBiasAuditParityTest`, `JobsCvUploadParityTest`, `JobsApplicationHistoryParityTest`).
 
 **Routes / API contract:** member routes are `/v2/jobs/*`, admin routes `/v2/admin/jobs/*`, and public feeds `/v2/jobs/feed.*` in `routes/api.php` (≈ lines 55–60, 606–710, 2121–2134). Refer to that file and the OpenAPI surface rather than copying the endpoint table here. Note `index`, `show`, `employerReviews`, and the feed routes are explicitly public (`withoutMiddleware('auth:sanctum')`); everything else requires auth.
 

@@ -1,6 +1,8 @@
 # Accessible Frontend GOV.UK Attribution
 
-Last reviewed: 2026-06-23 (against `govuk-frontend` 6.1.0 installed; 6.3.0 latest verified stable).
+Last reviewed: 2026-07-14
+
+Review basis: `govuk-frontend` 6.1.0 is installed; 6.3.0 was the latest verified stable release on 2026-06-23.
 
 This accessible frontend uses the `govuk-frontend` package, which is MIT licensed.
 

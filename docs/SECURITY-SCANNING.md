@@ -1,6 +1,6 @@
 # Security Scanning
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 Project NEXUS is a public AGPL repository. Security scanning must distinguish reachable production risk from development-tooling noise.
 
@@ -31,6 +31,7 @@ The `security-scan.yml` workflow runs the following tools in order. The CI defin
 | Tool | What it covers | Blocking? |
 | --- | --- | --- |
 | `composer audit --locked` | PHP CVEs in `composer.lock` | Yes |
+| Enlightn Security Checker | A second advisory-database pass over `composer.lock` | Yes |
 | Trivy filesystem (table) | Filesystem CVEs at CRITICAL/HIGH | Yes, respects `.trivyignore` |
 | Trivy filesystem (SARIF) | Same — uploads to GitHub Security tab | No (visibility only) |
 | Semgrep (SAST) | PHP injection, secret patterns, security anti-patterns | No (SARIF upload only) |

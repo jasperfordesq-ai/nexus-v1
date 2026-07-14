@@ -1,5 +1,7 @@
 # Incident Response Runbook
 
+Last reviewed: 2026-07-14
+
 This runbook covers first response for Project NEXUS production incidents. It assumes Apache plus Docker blue/green deployment on the production host.
 
 ## First Five Minutes
@@ -15,8 +17,9 @@ This runbook covers first response for Project NEXUS production incidents. It as
 | Check | Command | Healthy result |
 | --- | --- | --- |
 | Pre-framework health | `curl -sS https://api.project-nexus.ie/health.php` | HTTP 200 and healthy JSON |
-| Laravel health | `curl -sS https://api.project-nexus.ie/v2/health` | HTTP 200 |
-| Live build | `curl -sI https://api.project-nexus.ie/ \| grep -i x-build` | Current deployed commit |
+| Laravel health | `curl -sS https://api.project-nexus.ie/api/v2/health` | HTTP 200 |
+| Live build | `curl -sS https://api.project-nexus.ie/version.php` | JSON identifies the current deployed commit |
+| API build header | `curl -sI https://api.project-nexus.ie/api/v2/health \| grep -i x-build` | `X-Build` matches the deployed commit |
 | Active color | `sudo bash scripts/deploy/bluegreen-deploy.sh status` | Active color and last deploy state |
 
 When running from a development machine, load private SSH details from `.secrets.local/deploy.env` and run the same server-side commands over SSH.
@@ -60,7 +63,7 @@ Check the application email log and provider activity before changing mailer cod
 
 ### Queues are stuck
 
-Check the active color queue and scheduler containers, then Horizon status. Restart the queue container only after confirming the active color.
+Check the active color queue and scheduler containers, then Horizon status. Restart the queue container only after confirming the active color. During blue/green cutover, the deploy engine terminates Horizon from the process-owning container user and falls back to Docker's graceful stop when Horizon cannot signal PID 1; do not manually start the old color's workers alongside the active color.
 
 ### Database or Redis is degraded
 

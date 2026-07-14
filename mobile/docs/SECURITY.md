@@ -1,6 +1,6 @@
 # Project NEXUS Mobile — Security Guide
 
-> Last updated: 2026-06-05
+Last reviewed: 2026-07-14
 
 This document describes the mobile app's security posture, identifies known gaps, and provides implementation guidance for hardening.
 
@@ -19,7 +19,7 @@ This document describes the mobile app's security posture, identifies known gaps
 | **Rate limit awareness** | Non-2xx API responses, including 429, are surfaced through typed `ApiResponseError` objects | `lib/api/client.ts` |
 | **No secrets in code** | All credentials come from `EXPO_PUBLIC_*` env vars; `.env.local` is gitignored | `.gitignore` |
 | **Auth input validation** | Zod schemas validate login, registration, forgot-password, and reset-password forms before submission | `app/(auth)/*.tsx` |
-| **Android certificate pinning** | Android release builds pin `api.project-nexus.ie` through the network security config injected by `expo-build-properties` | `android-network-security-config.xml`, `android/app/src/main/res/xml/network_security_config.xml`, `lib/security/pinning.ts` |
+| **Android certificate pinning** | A project config plugin copies the fail-closed network security policy into generated Android builds and wires it into the manifest | `plugins/with-android-network-security.js`, `android-network-security-config.xml`, `scripts/verify-release-config.mjs` |
 
 ### Known gaps / future hardening
 
@@ -35,29 +35,39 @@ Certificate pinning prevents MITM (man-in-the-middle) attacks by refusing TLS co
 
 ### Current implementation
 
-Android pinning is implemented for `api.project-nexus.ie` through the network security config injected by `expo-build-properties`. The checked-in root config is `android-network-security-config.xml`; the generated native config is `android/app/src/main/res/xml/network_security_config.xml`.
+Android pinning is implemented for `api.project-nexus.ie` by the project config
+plugin `plugins/with-android-network-security.js`. During Expo prebuild it:
+
+1. Sets `android:networkSecurityConfig="@xml/network_security_config"` and
+   `android:usesCleartextTraffic="false"` on the application manifest.
+2. Copies the canonical `android-network-security-config.xml` into the generated
+   `android/app/src/main/res/xml/network_security_config.xml`.
+
+The source policy pins the live leaf SPKI plus a rotation-safe intermediate
+SPKI, blocks cleartext traffic in both the domain and base configurations, and
+does not trust user-added certificate authorities. `lib/security/pinning.ts` is
+only a JavaScript host/configuration helper; Android enforcement is native and
+does not depend on a runtime JS interceptor. The generated `mobile/android/`
+directory is gitignored and is not the source of truth.
 
 iOS currently relies on App Transport Security (ATS) HTTPS enforcement. Strict iOS SHA-256 certificate pinning still requires TrustKit or a similar native module in a prebuild/bare workflow.
 
 ### How to maintain Android pinning
 
-**Step 1 - Keep the plugin installed:**
+Run these commands from `mobile/`.
 
-```bash
-npx expo install expo-build-properties
-```
-
-**Step 2 - Keep `app.json` wired to the root config:**
+**Step 1 - Keep the project plugin configured:**
 
 ```json
 {
   "expo": {
     "plugins": [
+      "./plugins/with-android-network-security",
       [
         "expo-build-properties",
         {
           "android": {
-            "networkSecurityConfig": "./android-network-security-config.xml"
+            "useLegacyPackaging": true
           }
         }
       ]
@@ -66,25 +76,48 @@ npx expo install expo-build-properties
 }
 ```
 
-**Step 3 - Refresh `android-network-security-config.xml` before pin expiry or certificate rotation:**
+`expo-build-properties` remains installed for packaging/framework settings, but
+it does **not** inject this network security file. Keep the custom plugin as a
+separate `app.json` entry.
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-  <domain-config cleartextTrafficPermitted="false">
-    <domain includeSubdomains="false">api.project-nexus.ie</domain>
-    <pin-set expiration="2027-01-01">
-      <!-- Primary certificate SHA-256 fingerprint (base64) -->
-      <!-- Run: openssl s_client -connect api.project-nexus.ie:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform DER | openssl dgst -sha256 -binary | base64 -->
-      <pin digest="SHA-256">REPLACE_WITH_REAL_FINGERPRINT=</pin>
-      <!-- Backup pin — a different cert you control, for rotation -->
-      <pin digest="SHA-256">REPLACE_WITH_BACKUP_FINGERPRINT=</pin>
-    </pin-set>
-  </domain-config>
-</network-security-config>
+**Step 2 - Refresh the canonical pins before certificate rotation or expiry:**
+
+```bash
+bash scripts/get-cert-pins.sh api.project-nexus.ie 443
 ```
 
-**Step 4 - iOS ATS (App Transport Security):**
+Update `android-network-security-config.xml` with the verified leaf pin and an
+independent backup/intermediate pin. Keep at least two SHA-256 pins and move the
+`pin-set` expiration far enough ahead for the release gate's 90-day minimum.
+Never add a TrustKit element: Android Network Security Configuration does not
+support it.
+
+**Step 3 - Run the source-level release gate:**
+
+```bash
+npm run verify:release
+```
+
+`scripts/verify-release-config.mjs` blocks a release when app/package versions
+drift, `versionCode` is not an integer greater than 1, OTA/runtime channels are
+unsafe, the custom network plugin is absent, fewer than two pins exist, pin
+expiry is within 90 days, an unsupported TrustKit element appears, or Android
+app links include an untrusted host.
+
+**Step 4 - Generate and inspect the native policy:**
+
+```bash
+npx expo prebuild --platform android --no-install --clean
+```
+
+Confirm that the generated manifest contains both application attributes, that
+`android/app/src/main/res/xml/network_security_config.xml` exists, and that it
+contains the exact `api.project-nexus.ie` domain plus SHA-256 pins. CI's
+**Android Native Release Gate** performs this clean prebuild and inspection in
+addition to `npm run verify:release`, mobile type-check/tests, and
+`expo-doctor`.
+
+**Step 5 - iOS ATS (App Transport Security):**
 
 iOS enforces HTTPS by default via ATS. To add certificate pinning on iOS you need a bare workflow or a custom native module. For managed workflow, ATS ensures HTTPS but cannot pin specific certificates. Options:
 
@@ -92,8 +125,10 @@ iOS enforces HTTPS by default via ATS. To add certificate pinning on iOS you nee
 - Or rely on ATS + your CA chain for managed workflow
 
 **Important — pin rotation:**
+
 - Always include at least two pins (primary + backup)
-- Set an `expiration` date and rotate before it lapses
+- Set an `expiration` date and rotate while more than 90 days remain
+- Ship a new native Android binary after changing pins; an OTA JavaScript update cannot replace the packaged network security XML
 - A failed pin with no backup = the app cannot connect to the API
 
 ---

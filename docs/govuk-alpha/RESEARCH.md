@@ -1,5 +1,7 @@
 # GOV.UK-Based Accessible Frontend Research
 
+Last reviewed: 2026-07-14
+
 ## Architecture Decision
 
 Project NEXUS Accessible Frontend is an approved exception to the React-primary UI rule. It is an isolated, HTML-first Laravel frontend that complements `react-frontend/` and does not replace it. It follows GOV.UK Frontend implementation standards for accessibility and resilience, but it is not a GOV.UK service and must not look or read like one.

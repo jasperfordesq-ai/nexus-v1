@@ -14,7 +14,9 @@ const docsDir = path.join(root, 'docs');
 const docsPublicDir = path.join(root, 'docs-public');
 const docsIndex = path.join(docsDir, 'README.md');
 const docsPublicIndex = path.join(docsPublicDir, 'README.md');
+const mkdocsConfig = path.join(root, 'mkdocs.yml');
 const maxDocBytes = 80 * 1024;
+const maxReviewAgeDays = 180;
 
 const allowedExtensions = new Set(['.md']);
 const blockedDirectories = new Set([
@@ -50,6 +52,7 @@ const blockedContentPatterns = [
   { pattern: /\bHeroUI v2\b/i, reason: 'stale HeroUI version' },
   { pattern: /\bnginx\b/i, reason: 'stale web-server claim; Project NEXUS production uses Apache' },
   { pattern: /confidential and intended for/i, reason: 'confidentiality notice in public documentation' },
+  { pattern: /^\s*<\/?content>\s*$/im, reason: 'stray content wrapper artifact' },
 ];
 
 const secretPatterns = [
@@ -74,12 +77,36 @@ const publicMarkdownFiles = [
   'accessible-frontend/COMPONENTS.md',
   'mobile/README.md',
   'mobile/.maestro/README.md',
+  'mobile/docs/ALERT_MIGRATION_PLAYBOOK.md',
   'mobile/docs/DISTRIBUTION.md',
+  'mobile/docs/HEROUI_NATIVE_PARITY_AUDIT.md',
   'mobile/docs/NATIVE_UI_CONTRACT.md',
   'mobile/docs/SECURITY.md',
+  'mobile/docs/WRAPPER_POLICY.md',
   'tests/README.md',
   'tests/Core/README.md',
   'e2e/README.md',
+  'e2e/docs/REACT_ROUTES_REFERENCE.md',
+];
+
+const scopedDocumentationIndexes = [
+  {
+    index: 'accessible-frontend/README.md',
+    prefix: 'accessible-frontend/',
+    excluded: ['accessible-frontend/CLAUDE.md'],
+  },
+  {
+    index: 'mobile/README.md',
+    prefix: 'mobile/',
+  },
+  {
+    index: 'e2e/README.md',
+    prefix: 'e2e/',
+  },
+  {
+    index: 'tests/README.md',
+    prefix: 'tests/',
+  },
 ];
 
 const issues = [];
@@ -119,6 +146,31 @@ function walk(dir) {
   return files;
 }
 
+function checkLastReviewedMarker(filePath) {
+  const text = fs.readFileSync(filePath, 'utf8');
+  const nearTop = text.split(/\r?\n/).slice(0, 10).join('\n');
+  const reviewMatch = nearTop.match(/^Last reviewed: (\d{4}-\d{2}-\d{2})$/m);
+  if (!reviewMatch) {
+    addIssue(filePath, 'missing a near-top "Last reviewed: YYYY-MM-DD" marker (must appear within the first 10 lines)');
+    return;
+  }
+
+  const reviewDate = new Date(`${reviewMatch[1]}T00:00:00Z`);
+  if (Number.isNaN(reviewDate.valueOf()) || reviewDate.toISOString().slice(0, 10) !== reviewMatch[1]) {
+    addIssue(filePath, `has an invalid Last reviewed date: ${reviewMatch[1]}`);
+    return;
+  }
+
+  const now = new Date();
+  const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const ageDays = Math.floor((todayUtc - reviewDate.valueOf()) / (24 * 60 * 60 * 1000));
+  if (ageDays < -1) {
+    addIssue(filePath, `has a future Last reviewed date: ${reviewMatch[1]}`);
+  } else if (ageDays > maxReviewAgeDays) {
+    addIssue(filePath, `Last reviewed date is ${ageDays} days old; re-check the page against source at least every ${maxReviewAgeDays} days`);
+  }
+}
+
 function checkDocsTree(files) {
   const indexText = fs.readFileSync(docsIndex, 'utf8');
 
@@ -151,6 +203,10 @@ function checkDocsTree(files) {
     }
 
     const text = fs.readFileSync(filePath, 'utf8');
+    if (extension === '.md') {
+      checkLastReviewedMarker(filePath);
+    }
+
     for (const { pattern, reason } of [...blockedContentPatterns, ...secretPatterns]) {
       if (pattern.test(text)) {
         addIssue(filePath, `contains ${reason}`);
@@ -189,6 +245,45 @@ function extractMarkdownLinks(text) {
   }
 
   return links;
+}
+
+function scopedDocuments(scope, repositoryFiles) {
+  const excluded = new Set(scope.excluded ?? []);
+  return [...repositoryFiles]
+    .filter((relativePath) => relativePath.startsWith(scope.prefix))
+    .filter((relativePath) => relativePath.endsWith('.md'))
+    .filter((relativePath) => relativePath !== scope.index)
+    .filter((relativePath) => !excluded.has(relativePath))
+    .filter((relativePath) => fs.existsSync(path.join(root, relativePath)))
+    .sort();
+}
+
+function checkScopedDocumentationIndexes(scopedDocumentsByIndex) {
+  for (const scope of scopedDocumentationIndexes) {
+    const indexPath = path.join(root, scope.index);
+    if (!fs.existsSync(indexPath)) {
+      addIssue(indexPath, 'scoped documentation index is missing');
+      continue;
+    }
+
+    const linkedTargets = new Set();
+    for (let target of extractMarkdownLinks(fs.readFileSync(indexPath, 'utf8'))) {
+      if (target.startsWith('<') && target.endsWith('>')) {
+        target = target.slice(1, -1);
+      }
+      if (isExternalOrAnchor(target)) continue;
+      const targetWithoutAnchor = target.split('#')[0];
+      if (!targetWithoutAnchor) continue;
+      linkedTargets.add(path.resolve(path.dirname(indexPath), targetWithoutAnchor));
+    }
+
+    for (const document of scopedDocumentsByIndex.get(scope.index) ?? []) {
+      const documentPath = path.join(root, document);
+      if (!linkedTargets.has(path.resolve(documentPath))) {
+        addIssue(documentPath, `not linked from its scoped index ${scope.index}`);
+      }
+    }
+  }
 }
 
 function isExternalOrAnchor(target) {
@@ -274,6 +369,58 @@ function checkTrackedRootArtifacts(tracked) {
   }
 }
 
+function checkTrackedLocalArchive(tracked) {
+  for (const relativePath of tracked) {
+    if (relativePath !== '.local-docs-archive'
+      && !relativePath.startsWith('.local-docs-archive/')) continue;
+
+    const filePath = path.join(root, relativePath);
+    if (!fs.existsSync(filePath)) continue;
+    addIssue(filePath, 'tracked local/archive material must be removed from Git; .local-docs-archive/ is intentionally gitignored');
+  }
+}
+
+function checkMkDocsNavigation(files) {
+  if (!fs.existsSync(mkdocsConfig)) {
+    addIssue(mkdocsConfig, 'MkDocs configuration is missing');
+    return;
+  }
+
+  const configText = fs.readFileSync(mkdocsConfig, 'utf8');
+  const navStart = configText.search(/^nav:\s*$/m);
+  if (navStart === -1) {
+    addIssue(mkdocsConfig, 'nav section is missing; every maintained document must be discoverable in the built site');
+    return;
+  }
+
+  const navText = configText.slice(navStart);
+  const navEntries = new Map();
+  const navPattern = /:\s*["']?([^\s"'#]+\.md)["']?\s*(?:#.*)?$/gm;
+  let match;
+  while ((match = navPattern.exec(navText)) !== null) {
+    const relativePath = toPosix(match[1]);
+    navEntries.set(relativePath, (navEntries.get(relativePath) ?? 0) + 1);
+  }
+
+  for (const filePath of files) {
+    if (path.extname(filePath).toLowerCase() !== '.md') continue;
+    const relativeToDocs = toPosix(path.relative(docsDir, filePath));
+    if (!navEntries.has(relativeToDocs)) {
+      addIssue(filePath, 'not listed in mkdocs.yml nav; every maintained document must be published and discoverable');
+    }
+  }
+
+  for (const [relativePath, count] of navEntries) {
+    const target = path.join(docsDir, relativePath);
+    if (!fs.existsSync(target)) {
+      addIssue(mkdocsConfig, `nav references missing document: ${relativePath}`);
+    }
+    if (count > 1) {
+      addIssue(mkdocsConfig, `nav lists ${relativePath} ${count} times`);
+    }
+  }
+}
+
 if (!fs.existsSync(docsDir)) {
   console.error('docs/ directory is missing.');
   process.exit(1);
@@ -289,7 +436,21 @@ const publicCollateralTextFiles = fs.existsSync(docsPublicDir)
   ? walk(docsPublicDir).filter((file) => ['.md', '.html', '.json', '.yml', '.yaml'].includes(path.extname(file).toLowerCase()))
   : [];
 const tracked = trackedFiles();
-const publicMarkdownPaths = publicMarkdownFiles
+const scopedDocumentsByIndex = new Map(scopedDocumentationIndexes.map((scope) => [
+  scope.index,
+  scopedDocuments(scope, tracked),
+]));
+const scopedReviewedRelativePaths = [...new Set(scopedDocumentationIndexes.flatMap((scope) => [
+  scope.index,
+  ...(scopedDocumentsByIndex.get(scope.index) ?? []),
+]))];
+const publicMarkdownPaths = [...new Set([
+  ...publicMarkdownFiles,
+  ...scopedReviewedRelativePaths,
+])]
+  .map((file) => path.join(root, file))
+  .filter((file) => fs.existsSync(file));
+const scopedReviewedMarkdownPaths = scopedReviewedRelativePaths
   .map((file) => path.join(root, file))
   .filter((file) => fs.existsSync(file));
 const linkCheckFiles = [
@@ -299,7 +460,15 @@ const linkCheckFiles = [
 ];
 
 checkDocsTree(docsFiles);
+checkMkDocsNavigation(docsFiles);
 checkDocsPublicIndex(publicCollateralTextFiles);
+checkScopedDocumentationIndexes(scopedDocumentsByIndex);
+for (const filePath of scopedReviewedMarkdownPaths) {
+  checkLastReviewedMarker(filePath);
+}
+for (const filePath of publicCollateralTextFiles.filter((file) => path.extname(file).toLowerCase() === '.md')) {
+  checkLastReviewedMarker(filePath);
+}
 checkTextPatterns(publicCollateralTextFiles);
 checkTextPatterns([
   path.join(root, 'NOTICE'),
@@ -309,6 +478,7 @@ checkTextPatterns([
 ]);
 checkLocalLinks(linkCheckFiles);
 checkTrackedRootArtifacts(tracked);
+checkTrackedLocalArchive(tracked);
 
 if (issues.length > 0) {
   console.error('Documentation hygiene check failed:');
@@ -320,4 +490,4 @@ if (issues.length > 0) {
   process.exit(1);
 }
 
-console.log(`Documentation hygiene OK (${docsFiles.length} docs files, ${publicCollateralTextFiles.length} public collateral files checked).`);
+console.log(`Documentation hygiene OK (${docsFiles.length} docs files, ${scopedReviewedMarkdownPaths.length} scoped guides, ${publicCollateralTextFiles.length} public collateral files checked).`);

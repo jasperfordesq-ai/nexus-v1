@@ -1,15 +1,16 @@
 # Groups Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 Audience: maintainers and contributors working on the Groups feature — membership flows, discussion threads, announcements, file sharing, chatrooms, and group moderation.
 
 ## Supported workflows
 
-- **Browse & discover** — public groups are visible to all visitors; unauthenticated listing uses optional auth.
+- **Browse & discover** — authenticated tenant members can discover active public groups. Private and secret groups appear in directory results only to their owner, active members, or a tenant/platform administrator.
 - **Create a group** — any authenticated member may create a group and automatically becomes its owner.
 - **Public groups** — immediate membership on join (`status = active`).
 - **Private groups** — join request creates a `pending` row; a group admin must accept before the user becomes active.
+- **Secret groups** — hidden from non-members and joinable only when an `invited` membership row already exists.
 - **Discussions** — threaded forums visible to active members only.
 - **Announcements** — admin-only broadcasts with optional pin, priority, and expiry.
 - **File sharing** — members upload documents/media; admins or uploaders may delete.
@@ -21,10 +22,10 @@ Audience: maintainers and contributors working on the Groups feature — members
 
 ## Tenant and feature-gate rules
 
-- **Feature gate:** `groups`. Both the React frontend (`App.tsx`, `FeatureGate feature="groups"`) and the accessible GOV.UK frontend (`AlphaController`, `abort_unless(TenantContext::hasFeature('groups'), 403)`) enforce this. When disabled, group routes redirect to the dashboard.
+- **Feature gate:** `groups`. React routes are gated in `react-frontend/src/routes/AppRoutes.tsx`; the accessible GOV.UK frontend checks the same tenant feature. The API group routes require `auth:sanctum` and `feature:groups` (some nested integrations add further feature/tab middleware).
 - **Group exchange gate:** `group_exchanges` is a separate feature flag. See [docs/modules/wallet-exchanges.md](wallet-exchanges.md).
 - **Tenant scoping:** the `Group` Eloquent model uses the `HasTenantScope` trait, which adds a `WHERE tenant_id = <current>` global scope to every query. The `Group::attachMember()` override explicitly copies `groups.tenant_id` into the pivot row to prevent scope drift.
-- **Visibility in list queries:** the `getAll()` method filters by `visibility = public` for unauthenticated requests. A signed-in user additionally sees groups they own or belong to. Platform admins (`role IN (admin, tenant_admin, super_admin, god)`) see all private groups within the tenant.
+- **Visibility in list queries:** `GroupService::getAll()` returns public groups plus private/secret groups the authenticated caller owns or actively belongs to. `GroupAccessService` also permits tenant/platform administrators to audit all groups in the tenant. There is no anonymous list route.
 
 ## Key code locations
 
@@ -113,12 +114,13 @@ Admin promotion sends a localised confirmation email to the promoted member via 
 ## Membership lifecycle
 
 ```
-[Unauthenticated visitor]
+[Authenticated tenant member]
         │
         ├─ POST /v2/groups/{id}/join
         │
         │  public group  → status = 'active'  (immediate)
         │  private group → status = 'pending' (join request)
+        │  secret group  → active only from an existing 'invited' row
         │
         ├─ GET  /v2/groups/{id}/requests       (admin only)
         ├─ POST /v2/groups/{id}/requests/{userId}  action=accept|reject
@@ -126,7 +128,7 @@ Admin promotion sends a localised confirmation email to the promoted member via 
         └─ DELETE /v2/groups/{id}/membership   (leave)
 ```
 
-A banned member (`status = 'banned'` in `group_members`) cannot rejoin. A `UniqueConstraintViolationException` on the pivot insert is treated as `ALREADY_MEMBER` (race-condition safety).
+A banned member (`status = 'banned'` in `group_members`) cannot rejoin. Join and request approval run in locked transactions, enforce capacity and safeguarding-cohort rules, and synchronise `cached_member_count`. Existing active/pending memberships are idempotent successes; a pivot insert race is resolved from the winning row's status.
 
 When a member joins or is accepted, `GroupWelcomeService::sendWelcome()` fires a welcome message and `GroupChallengeService::incrementProgress()` advances any active challenge counters.
 
@@ -157,10 +159,12 @@ Any active member may upload. Admins and the uploader may delete.
 Constraints enforced by `GroupFileService`:
 
 - Maximum file size: **25 MB**
+- Storage quotas: **500 MB per group** and **10 GB across group files/media per tenant**
+- Images are limited to **25 million decoded pixels**
 - Allowed MIME types: common images (JPEG, PNG, GIF, WebP), PDF, Word, Excel, PowerPoint, plain text, CSV, Markdown, ZIP, RAR, MP4, WebM, MP3, WAV, OGG
-- SVG is explicitly excluded because inline `<script>` tags in SVG constitute XSS when served inline.
+- MIME content and filename extension must agree; Office archives are structurally inspected. SVG is explicitly excluded because inline `<script>` tags in SVG constitute XSS when served inline.
 
-Files are stored at `groups/{tenantId}/{groupId}/{uniqueName}` on the `local` disk. The download endpoint increments `group_files.download_count` on each access.
+Files are stored at `groups/{tenantId}/{groupId}/{uniqueName}` on the private `local` disk. API serialization omits `file_path`; an authenticated, member-authorized download is streamed with `Cache-Control: private, no-store` and `X-Content-Type-Options: nosniff`. The endpoint increments `group_files.download_count`. Upload failure compensates by deleting a staged file, while deletion uses storage quarantine so the database and filesystem do not silently diverge.
 
 ## Chatrooms
 
@@ -191,11 +195,11 @@ Platform-wide bans are stored in `group_bans`. `GroupModerationService::isUserBa
 
 ## Security and privacy invariants
 
-1. **Private groups are invisible to non-members.** `GroupService::getAll()` filters private groups so only the owner, active members, and tenant admins can see them. `GroupService::canView()` is the authoritative check; controllers call it with `enforceVisibility = true`.
+1. **Overview access is distinct from member content.** Any authenticated same-tenant member may view an active public or private group's privacy-safe overview. Secret overviews require ownership, active membership, or tenant-admin access. Discussions, files, chat, and other child resources require active membership/ownership or tenant-admin authority through `GroupAccessService::canViewMemberContent()`.
 2. **Every query is tenant-scoped.** The `HasTenantScope` global scope on `Group` applies automatically. Direct DB queries in `GroupService` use a `whereIn('id', fn($q) => $q->select('id')->from('groups')->where('tenant_id', ...))` guard.
 3. **Pivot rows carry `tenant_id`.** `Group::attachMember()` copies the group's own `tenant_id` into the pivot, not the ambient `TenantContext`. This prevents cross-tenant pollution when a platform admin operates across tenants.
 4. **Only admins may write announcements.** Announcement create/update/delete call `GroupService::canModify()` which requires owner, admin, or platform admin role.
-5. **File type filtering prevents executable uploads.** `GroupFileService` validates MIME types against an allowlist and deliberately excludes SVG.
+5. **Files stay behind authorization.** `GroupFileService` validates content MIME, extension, path components, size, image dimensions, and quotas; it deliberately excludes SVG. Storage paths are not returned by list APIs and downloads are private/no-store.
 6. **XSS prevention in discussions.** All user content passes through `strip_tags()` with an allowlist before persistence.
 7. **Owner cannot be removed or demoted.** `removeMember`, `updateMemberRole`, and `leave` all reject operations that would target the owner or leave the group without any admin.
 
@@ -203,10 +207,10 @@ Platform-wide bans are stored in `group_bans`. `GroupModerationService::isUserBa
 
 | Symptom | Likely cause | Recovery |
 |---------|-------------|----------|
-| Join request accepted but member count does not increment | `cached_member_count` not updated in the `handleJoinRequest` path | Run `GroupService::recalculateMemberCount()` or update `cached_member_count` directly; the `activeMembers()` relation is always authoritative |
+| Member count looks stale after a failed membership operation | The transaction rolled back or historical data predates the current synchronisation path | Confirm the membership row and rerun the project's member-count reconciliation; current join, leave, accept, and reject paths call `syncCachedMemberCount()` |
 | Welcome email not sent after join request approval | `GroupWelcomeService::sendWelcome()` throws and is swallowed | Check `laravel.log` for `[warning]` lines from `GroupService`; the member is still active |
 | Chatroom messages not delivering in real time | Pusher broadcast failed | Messages are persisted; users can reload. Check Pusher credentials in `.env` (`PUSHER_APP_*`) |
-| Private group visible in search | `SearchService` does not apply visibility filtering in the basic `search()` path; only `unifiedSearch()` and `suggestions()` filter to public groups | Do not use the basic search endpoint to surface a private group's content |
+| Private/secret group appears in unified search during a Meilisearch outage | The Meilisearch path filters group documents to public, but the current SQL fallback in `unifiedSearchViaSQL()` does not apply a visibility filter | Treat search as discovery only, enforce `GroupAccessService` when hydrating/opening results, and fix the fallback before relying on it as a privacy boundary |
 | File upload fails with `UPLOAD_FAILED` | Disk quota or `local` disk misconfiguration | Check `storage/app` write permissions and disk quota |
 | Group deletion leaves orphaned event records | By design — events are disassociated (`group_id = NULL`), not deleted | If cleanup is needed, query `events WHERE group_id IS NULL` and act accordingly |
 

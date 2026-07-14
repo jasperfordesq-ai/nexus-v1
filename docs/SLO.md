@@ -1,5 +1,7 @@
 # Service Level Objectives
 
+Last reviewed: 2026-07-14
+
 Project NEXUS starts with a small set of SLOs that can be measured and acted on. A few watched signals are better than a large dashboard nobody trusts.
 
 ## SLO 1: Exchange Completion

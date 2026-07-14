@@ -1,5 +1,7 @@
 # Project NEXUS — Maestro E2E Mobile Tests
 
+Last reviewed: 2026-07-14
+
 Maestro is a lightweight mobile UI testing framework that drives iOS Simulators and Android Emulators (or real devices) by replaying YAML flow files against the running app. Flows tap, type, scroll, and assert exactly as a real user would.
 
 ---
@@ -76,9 +78,11 @@ On a completely fresh install (`clearState: true`) the app may show a **"Select 
 
 ---
 
-## CI integration
+## CI status
 
-EAS builds are configured in `.github/workflows/mobile-eas-build.yml`. To wire Maestro into CI after a preview build is distributed to a device farm:
+Maestro is currently an operator-run device test, not a GitHub Actions gate. The main CI workflow runs the blocking Android release-policy check, typecheck, Jest suite, Expo Doctor, and generated-native-policy inspection; it does not launch an emulator or submit an EAS build. EAS build and submission commands remain deliberate operator actions documented in [`../docs/DISTRIBUTION.md`](../docs/DISTRIBUTION.md).
+
+If a device-farm gate is added later, start from a preview APK and pass credentials only through repository secrets. For example:
 
 ```yaml
 - name: Run Maestro E2E tests

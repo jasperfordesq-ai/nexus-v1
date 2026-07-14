@@ -570,7 +570,7 @@ jobs:
           message: |
             ## Vitest Coverage Report
 
-            Focused smoke tests are blocking for this PR. Coverage is reported as a warning while unrelated full-suite frontend failures are fixed separately.
+            Focused smoke tests and coverage are currently non-blocking while the documented Vitest worker hang is resolved. TypeScript, ESLint, accessibility, UI-contract, and production-build gates remain blocking.
 
             <details>
             <summary>View full coverage output</summary>
@@ -873,6 +873,12 @@ jobs:
 
       - name: "BLOCKING: Keep docs/ curated and public-safe"
         run: npm run check:docs
+
+      - name: "BLOCKING: Keep security-sensitive routes aligned with OpenAPI"
+        run: node scripts/check-openapi-route-contract.mjs
+
+      - name: Generate the in-app changelog from its canonical source
+        run: npm --prefix react-frontend run copy-changelog
 
       - name: "BLOCKING: Keep platform version references unified"
         run: npm run check:version

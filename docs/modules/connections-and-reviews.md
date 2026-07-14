@@ -2,6 +2,8 @@
 
 Audience: maintainers and contributors working on member social graph, reputation, or skill endorsement features.
 
+Last reviewed: 2026-07-14
+
 ## Supported workflows
 
 - **Member connections** — send, accept, decline, cancel, and list connections between members of the same tenant ("friends" / network graph).
@@ -19,7 +21,7 @@ Both features default to **on** and are togglable per tenant in the admin "Modul
 | `connections` | `true` | `TenantFeatureConfig::FEATURE_DEFAULTS['connections']` |
 | `reviews` | `true` | `TenantFeatureConfig::FEATURE_DEFAULTS['reviews']` |
 
-In the React app, the Connections page and its sub-routes are wrapped in a `<FeatureGate feature="connections">` component (see `react-frontend/src/App.tsx` around the `/connections` route). When `connections` is disabled, the route renders a ComingSoon page. The Reviews page (`/reviews`, `/reviews/create`) is not wrapped in a FeatureGate in the current routing; feature enforcement for reviews is handled by tenant admin configuration. Skill and peer endorsement API endpoints are not separately gated at the route level.
+In the React app, the Connections routes and the `/reviews` and `/reviews/create` routes are gated in `react-frontend/src/routes/AppRoutes.tsx` with their respective feature flags. Disabled tenants receive the route's coming-soon/redirect fallback. The API routes themselves inherit `auth:sanctum` but are not wrapped in matching `feature:` middleware; skill and peer endorsement endpoints have no separate feature gate.
 
 ## Member connections
 
@@ -57,7 +59,7 @@ Unique constraint: `(tenant_id, requester_id, receiver_id)` — prevents duplica
 After the transaction commits, the service fires:
 
 - `ConnectionRequested` — handled by `NotifyConnectionRequest` (queued, `ShouldQueue`). Sends a bell notification and email to the target user in their `preferred_language` via `LocaleContext::withLocale()`. One-time-use idempotency guard in Redis prevents duplicate sends on queue re-delivery.
-- `ConnectionAccepted` — dispatched after `accept()` commits. Both users receive XP via `GamificationService` and badge checks run.
+- `ConnectionAccepted` — dispatched after `accept()` commits. `NotifyConnectionAccepted` sends the original requester a locale-aware, idempotency-guarded notification; `PushConnectionAcceptedToFederatedPartner` mirrors the acceptance when federation applies. This event does not award connection XP or run badge checks.
 
 Declining a request sends a `connection_declined` bell notification and email to the requester, rendered in the requester's `preferred_language`. Email sending is gated by the requester's `email_connections` notification preference.
 
@@ -109,13 +111,14 @@ Connection suggestions are ranked by: mutual connections × 5, shared groups × 
 
 ### Overview
 
-Member reviews capture a 1–5 star rating with optional text after a completed exchange. Each completed transaction generates one pending-review slot per participant. Reviews appear on the reviewed member's public profile as an aggregate reputation score.
+Member reviews capture a 1–5 star rating with optional text. The pending-review UI is generated from completed transactions, one slot per participant. The create API also accepts a transaction id after validating that the reviewer and receiver are its parties, but `ReviewService::create()` does not independently require that transaction to be completed. Reviews appear on the reviewed member's in-app profile as an aggregate reputation score.
 
 This section covers **member (peer) reviews only**. Exchange ratings stored in `exchange_ratings` are part of the exchange workflow — see `docs/modules/wallet-exchanges.md`. Course reviews (`course_reviews`) and volunteer reviews (`vol_reviews`) are separate sub-systems covered by their respective module guides.
 
 ### Review creation rules
 
 - Self-reviews are rejected (400).
+- Reviewer, receiver, and any supplied transaction are tenant-scoped. For a transaction-backed review, both users must be transaction participants.
 - One review per `(reviewer_id, transaction_id)` — enforced by a unique index `uq_reviews_reviewer_transaction` and checked in `ReviewService::create()` before insert. A concurrent race past the exists-check is caught by the unique constraint.
 - Without a `transaction_id`, at most one review per `(reviewer_id, receiver_id)` per 24-hour window to limit spam.
 - Reviews are created with `status = 'approved'`; moderation can move them to `status = 'rejected'`.
@@ -160,10 +163,10 @@ See `routes/api.php` and `app/Http/Controllers/Api/ReviewsController.php`.
 |--------|------|-------------|------|------------|
 | GET | `/api/v2/reviews/pending` | Completed transactions without a review from the caller | required | — |
 | GET | `/api/v2/reviews/given` | Reviews written by the caller | required | 60/min |
-| GET | `/api/v2/reviews/user/{userId}` | Reviews received by a user | public | 60/min |
-| GET | `/api/v2/users/{userId}/reviews` | Alias for the above | public | 60/min |
-| GET | `/api/v2/reviews/user/{userId}/stats` | Aggregate stats (total, average, distribution) | public | 120/min |
-| GET | `/api/v2/reviews/{id}` | Single review | public | 120/min |
+| GET | `/api/v2/reviews/user/{userId}` | Reviews received by a user | required | 60/min |
+| GET | `/api/v2/users/{userId}/reviews` | Alias for the above | required | 60/min |
+| GET | `/api/v2/reviews/user/{userId}/stats` | Aggregate stats (total, average, distribution) | required | 120/min |
+| GET | `/api/v2/reviews/{id}` | Single review | required | 120/min |
 | POST | `/api/v2/reviews` | Create a review | required | 10/min |
 | DELETE | `/api/v2/reviews/{id}` | Author self-delete | required | 10/min |
 
@@ -179,7 +182,7 @@ See `routes/api.php` and `app/Http/Controllers/Api/ReviewsController.php`.
 | POST | `/api/v2/admin/reviews/{id}/hide` | Hide (sets `status = 'rejected'`) and notifies reviewer |
 | DELETE | `/api/v2/admin/reviews/{id}` | Hard-delete review and notify reviewer |
 
-Served by `app/Http/Controllers/Api/AdminReviewsController.php`.
+Served by `app/Http/Controllers/Api/AdminReviewsController.php`. These routes use the `broker-or-admin` middleware rather than the stricter admin-only middleware.
 
 ### Gamification
 
@@ -254,15 +257,15 @@ See `routes/api.php` and `app/Http/Controllers/Api/EndorsementController.php`.
 |--------|------|-------------|------|------------|
 | POST | `/api/v2/members/{id}/endorse` | Endorse a skill on a member's profile | required | 20/min |
 | DELETE | `/api/v2/members/{id}/endorse` | Remove your endorsement of a skill | required | — |
-| GET | `/api/v2/members/{id}/endorsements` | List endorsements grouped by skill | public | 30/min |
-| GET | `/api/v2/members/top-endorsed` | Top endorsed members (by total count) | public | 10/min |
+| GET | `/api/v2/members/{id}/endorsements` | List endorsements grouped by skill | required | 30/min |
+| GET | `/api/v2/members/top-endorsed` | Top endorsed members (by total count) | required | 10/min |
 | POST | `/api/v2/members/{id}/peer-endorse` | Submit a peer endorsement (badge trigger) | required | 20/min |
 
 `POST /api/v2/members/{id}/endorse` body: `{ "skill_name": string, "skill_id": int|null, "comment": string|null }`.
 
 `DELETE /api/v2/members/{id}/endorse` requires `skill_name` as body or query param.
 
-`GET /api/v2/members/{id}/endorsements` with `?skill_name=<name>` returns detailed endorser list for one skill and, when the caller is authenticated, a `has_endorsed` boolean.
+`GET /api/v2/members/{id}/endorsements` with `?skill_name=<name>` returns the detailed endorser list for one skill and a caller-relative `has_endorsed` boolean.
 
 `GET /api/v2/members/top-endorsed` accepts `?limit=<int>` (default 10, max 50).
 
@@ -281,7 +284,7 @@ See `routes/api.php` and `app/Http/Controllers/Api/EndorsementController.php`.
 ## Security and privacy invariants
 
 - **Tenant isolation** — all three systems use `HasTenantScope` or explicit `tenant_id` filters. Cross-tenant data cannot be returned.
-- **Block interplay** — blocked users cannot send connection requests. Suggestion results exclude both directions of block. Endorsement and review flows do not re-check blocks at write time, but the social surface area is constrained because blocked users are hidden from member search results.
+- **Block and safeguarding interplay** — blocked users cannot send connection requests, and suggestion results exclude both directions of block. Review creation and skill-endorsement writes also call the safeguarding interaction policy. Peer endorsements enforce tenant membership, reject self-endorsement, and rely on their duplicate guard, but do not call that safeguarding policy directly.
 - **Self-action prevention** — all three systems reject self-requests at the service layer before any DB write.
 - **Duplicate guards** — connections: unique index + locked `FOR UPDATE` check. Reviews: unique index `uq_reviews_reviewer_transaction` + pre-insert exists check + 24h spam window for transaction-less reviews. Skill endorsements: unique index `unique_endorsement`. Peer endorsements: `INSERT IGNORE` + unique index.
 - **Author-delete vs moderator-reject distinction** — `deleted_by_author_at` timestamp differentiates who initiated a review removal; admin moderation cannot resurrect an author-deleted review.

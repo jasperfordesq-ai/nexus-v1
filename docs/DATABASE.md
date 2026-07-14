@@ -1,5 +1,7 @@
 # Database & Migrations
 
+Last reviewed: 2026-07-14
+
 > **Diátaxis:** explanation + how-to. How Project NEXUS structures its database, the two migration systems, and how to add schema changes safely.
 
 The platform runs on **MariaDB 10.11** (MySQL-compatible), with **Redis 7** for cache/queues and **Meilisearch** for search indexing.
@@ -20,10 +22,10 @@ Never concatenate SQL; always use prepared statements. For `IN (...)` clauses, b
 
 ## Two migration systems
 
-| System | Location | Status | Count |
-|--------|----------|--------|------:|
-| **Laravel migrations** | `database/migrations/` | **Primary — use for all new changes** | ~304 |
-| Legacy SQL migrations | `migrations/` | Historical record — **do not add new ones** | ~264 |
+| System | Location | Status |
+|--------|----------|--------|
+| **Laravel migrations** | `database/migrations/` | **Primary — use for all new changes** |
+| Legacy SQL migrations | `migrations/` | Historical record — **do not add new ones** |
 
 New schema changes use standard Laravel migrations (`php artisan make:migration`). Make them **idempotent** with `Schema::hasTable()` / `Schema::hasColumn()` guards so they are safe to re-run:
 
@@ -39,7 +41,7 @@ When adding foreign keys, check **column-type consistency** (signed vs unsigned 
 
 ## The schema dump
 
-`database/schema/mysql-schema.sql` (~830 KB) is the **full current schema** plus `laravel_migrations` table data, committed to git so a new contributor can stand up a working database:
+`database/schema/mysql-schema.sql` is the **full current schema** plus `laravel_migrations` table data, committed to git so a new contributor can stand up a working database. Its size and migration count change frequently, so verify the file itself rather than relying on copied counts:
 
 ```bash
 docker compose up -d

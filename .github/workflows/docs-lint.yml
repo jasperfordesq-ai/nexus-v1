@@ -1,28 +1,48 @@
 name: Docs Lint
 
-# Quality gates for documentation: Markdown structure (markdownlint), the
-# OpenAPI contract (Redocly), and that the MkDocs site still builds.
-# All three are verified to pass on the current tree.
+# Quality gates for documentation: Markdown structure and publication hygiene,
+# Laravel/OpenAPI parity, deterministic OpenAPI linting, companion-contract
+# alignment, and a strict MkDocs build.
 
 on:
   push:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'docs-public/**'
+      - 'accessible-frontend/*.md'
+      - 'mobile/**/*.md'
+      - 'e2e/**/*.md'
+      - 'tests/**/*.md'
       - '*.md'
       - 'openapi.json'
+      - 'resources/openapi.json'
+      - 'resources/openapi.yaml'
+      - 'routes/api.php'
       - 'mkdocs.yml'
       - '.markdownlint-cli2.jsonc'
       - 'redocly.yaml'
+      - 'scripts/check-docs-hygiene.mjs'
+      - 'scripts/check-openapi-route-contract.mjs'
       - '.github/workflows/docs-lint.yml'
   pull_request:
     paths:
       - 'docs/**'
+      - 'docs-public/**'
+      - 'accessible-frontend/*.md'
+      - 'mobile/**/*.md'
+      - 'e2e/**/*.md'
+      - 'tests/**/*.md'
       - '*.md'
       - 'openapi.json'
+      - 'resources/openapi.json'
+      - 'resources/openapi.yaml'
+      - 'routes/api.php'
       - 'mkdocs.yml'
       - '.markdownlint-cli2.jsonc'
       - 'redocly.yaml'
+      - 'scripts/check-docs-hygiene.mjs'
+      - 'scripts/check-openapi-route-contract.mjs'
       - '.github/workflows/docs-lint.yml'
 
 permissions:
@@ -43,7 +63,9 @@ jobs:
         with:
           node-version: '22'
       - name: markdownlint-cli2
-        run: npx --yes markdownlint-cli2
+        run: npx --yes markdownlint-cli2@0.23.0
+      - name: Documentation publication and navigation hygiene
+        run: npm run check:docs
 
   openapi-lint:
     name: OpenAPI contract
@@ -53,8 +75,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Redocly lint (minimal ruleset — fails on spec-validity errors)
-        run: npx --yes @redocly/cli@latest lint openapi.json
+      - name: Security-sensitive Laravel route/OpenAPI parity
+        run: node scripts/check-openapi-route-contract.mjs
+      - name: Redocly lint (pinned, maintained ruleset)
+        run: npx --yes @redocly/cli@2.39.0 lint openapi.json resources/openapi.json resources/openapi.yaml --max-problems 1000
+      - name: Focused resource JSON/YAML contracts stay aligned
+        shell: bash
+        run: |
+          BUNDLED="$RUNNER_TEMP/resources-openapi-from-yaml.json"
+          npx --yes @redocly/cli@2.39.0 bundle resources/openapi.yaml --ext json --output "$BUNDLED"
+          node - "$BUNDLED" <<'NODE'
+          const fs = require('node:fs');
+          const canonicalize = (value) => value && typeof value === 'object'
+            ? (Array.isArray(value)
+              ? value.map(canonicalize)
+              : Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])])))
+            : value;
+          const jsonContract = JSON.parse(fs.readFileSync('resources/openapi.json', 'utf8'));
+          const yamlContract = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (JSON.stringify(canonicalize(jsonContract)) !== JSON.stringify(canonicalize(yamlContract))) {
+            console.error('resources/openapi.json and resources/openapi.yaml have drifted.');
+            process.exit(1);
+          }
+          console.log('Focused resource OpenAPI JSON/YAML contracts are aligned.');
+          NODE
 
   docs-build:
     name: MkDocs site builds
@@ -65,8 +109,10 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install MkDocs Material
-        run: pip install "mkdocs-material>=9.5" "pymdown-extensions>=10"
+        run: pip install "mkdocs==1.6.1" "mkdocs-material==9.7.6" "pymdown-extensions==11.0.1"
       - name: Stage the OpenAPI contract for the API reference page
         run: cp openapi.json docs/openapi.json
+      # check:docs in the Markdown job validates repo-root links and complete
+      # nav coverage before MkDocs performs its strict site-only validation.
       - name: Build site
-        run: mkdocs build
+        run: mkdocs build --clean --strict

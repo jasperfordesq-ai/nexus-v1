@@ -1,5 +1,7 @@
 # Sentry Error Tracking
 
+Last reviewed: 2026-07-14
+
 Project NEXUS uses Sentry for backend exceptions, frontend exceptions, performance traces, and selected operational alerts.
 
 ## Backend

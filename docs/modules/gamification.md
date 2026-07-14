@@ -1,6 +1,6 @@
 # Gamification Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the **Gamification** surface in Project NEXUS: XP and levels, badges and achievements, leaderboards, challenges, and the NEXUS score. It documents the data model, tenant scoping, the XP-award idempotency / anti-abuse mechanism, failure modes, and the regression tests that protect this surface.
 
@@ -22,7 +22,7 @@ Supported workflows:
 ## Tenant & feature-gate rules
 
 - **Tenant scoping is mandatory.** XP, badges, leaderboards, challenges, and scores are all per-tenant. Eloquent models (`UserXpLog`, `UserBadge`, `Challenge`, `UserChallengeProgress`) use the `HasTenantScope` trait; raw-SQL paths (leaderboards, several badge checks) filter on `tenant_id` explicitly. `GamificationService::getLeaderboard()` defaults the tenant to `TenantContext::getId()` precisely because an unscoped XP aggregate would leak users across every tenant on the platform.
-- **Feature gate:** `gamification`. Registered in `app/Services/TenantFeatureConfig.php` (default **on**). The React frontend wraps the Leaderboard, Achievements, and NEXUS score routes in `<FeatureGate feature="gamification">` (see `react-frontend/src/App.tsx`); disabled tenants get a "coming soon" fallback.
+- **Feature gate:** `gamification`. Registered in `app/Services/TenantFeatureConfig.php` (default **on**). The React frontend wraps the Leaderboard, Achievements, and NEXUS score routes in `<FeatureGate feature="gamification">` (see `react-frontend/src/routes/AppRoutes.tsx`); disabled tenants get a "coming soon" fallback.
 - **Note:** the `/v2/gamification/*` API routes are not individually wrapped in a `feature:` route middleware — the gate is enforced in the frontend and in navigation config. Treat the feature flag as a UI/navigation gate, not a hard API authorization boundary. Side-effect awards (XP/badges) still fire from the underlying action events regardless of the flag.
 
 ## Key code & data locations
@@ -169,6 +169,6 @@ Important regression tests:
 - `tests/Laravel/Integration/GamificationFlowTest.php` — end-to-end: XP awarded for listing creation and exchange completion, badge checks after activity, level calculation from XP (including beyond the max defined level), leaderboard ranking, and that daily reward cannot be claimed twice.
 - `tests/Laravel/Unit/Models/UserXpLogTest.php` — model contract: table name, `UPDATED_AT` disabled, fillable includes `source_reference`, and the tenant scope is applied.
 - `tests/Laravel/Unit/Services/LeaderboardServiceTest.php` / `NexusScoreServiceTest.php` / `GamificationServiceTest.php` — metric/period handling, score dimensions, and XP/level constant invariants.
-- `tests/Laravel/Feature/Controllers/Gamification{,V2}ControllerTest.php`, `AdminGamificationControllerTest.php` — endpoint behaviour and admin badge/campaign management.
+- `tests/Laravel/Feature/Controllers/GamificationControllerTest.php`, `tests/Laravel/Feature/Controllers/GamificationV2ControllerTest.php`, and `AdminGamificationControllerTest.php` — endpoint behaviour and admin badge/campaign management.
 
 When adding a new XP source, prefer passing a stable `source_reference` so the `uniq_user_xp_log_ref` index makes the award idempotent, and add a test that asserts a second award for the same reference is a no-op.

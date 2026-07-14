@@ -27,7 +27,16 @@
   "globs": [
     "*.md",
     "docs/**/*.md",
-    "docs-public/**/*.md"
+    "docs-public/**/*.md",
+    "accessible-frontend/README.md",
+    "accessible-frontend/**/*.md",
+    "mobile/README.md",
+    "mobile/.maestro/README.md",
+    "mobile/**/*.md",
+    "e2e/README.md",
+    "e2e/**/*.md",
+    "tests/README.md",
+    "tests/**/*.md"
   ],
   "ignores": [
     "node_modules/**",
@@ -36,10 +45,7 @@
     ".local-docs-archive/**",
     ".heroui-docs/**",
     "react-frontend/**",
-    "accessible-frontend/**",
-    "mobile/**",
-    "e2e/**",
-    "tests/**",
+    "accessible-frontend/CLAUDE.md",
     "CHANGELOG.md"
   ]
 }

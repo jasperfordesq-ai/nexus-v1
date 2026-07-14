@@ -1,5 +1,7 @@
 # Project NEXUS Deployment
 
+Last reviewed: 2026-07-14
+
 This is the maintained production deployment guide for Project NEXUS.
 
 Deployment requires explicit owner approval. Do not deploy merely because a code or documentation task is complete.
@@ -7,6 +9,8 @@ Deployment requires explicit owner approval. Do not deploy merely because a code
 ## Production Model
 
 Production runs on Apache with Docker blue/green app stacks. The live color keeps serving traffic while the inactive color is built, migrated, smoke-tested, and switched into service by the Apache route file.
+
+Queue and scheduler containers are color-scoped alongside the app. During cutover the deploy engine starts the new color's workers, disables the old containers' restart policies, asks Horizon to terminate from the container's process-owning user, and waits for an orderly stop. If Horizon cannot signal its master process, deployment falls back to Docker's graceful stop timeout rather than leaving both colors consuming the same queues. The scheduler receives `schedule:interrupt` before its container stops.
 
 The canonical deploy engine is:
 
@@ -88,4 +92,4 @@ The maintenance script toggles both enforcement layers: the pre-framework `.main
 - Do not build React locally and upload `dist/`; production builds inside the deployed container image.
 - Do not use legacy maintenance-mode deploy paths as the normal production route.
 - Do not deploy without an explicit deployment instruction.
-- After a deploy, verify the active color, health endpoints, and `X-Build` header.
+- After a deploy, verify the active color, health endpoints, `X-Build` header, and that only the active color's queue and scheduler containers are running.

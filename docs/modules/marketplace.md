@@ -1,6 +1,6 @@
 # Marketplace Module Guide
 
-Last reviewed: 2026-07-13
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the **Marketplace** module — a standalone goods/commerce surface where members list physical items for sale, negotiate offers, or give items away. Cash-priced orders use Stripe Connect, while supported item and community-delivery flows can use time credits. It is **completely separate from the timebanking Listings module** (`ListingService` / `listings` table): different tables, service layer, and Meilisearch index.
 

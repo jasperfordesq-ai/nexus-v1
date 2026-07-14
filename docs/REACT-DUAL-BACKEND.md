@@ -1,5 +1,7 @@
 # React Dual-Backend Portability
 
+Last reviewed: 2026-07-14
+
 This document defines the guardrails for making the React frontend able to run
 against either the Laravel API or the ASP.NET API while keeping Laravel as the
 protected default.

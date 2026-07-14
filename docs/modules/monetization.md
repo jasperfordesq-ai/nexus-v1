@@ -1,6 +1,6 @@
 # Monetization Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the three optional **monetization** sub-features in Project NEXUS: **Member Premium** subscriptions, **Merchant Coupons**, and **Local Advertising**. All three are opt-in, default-OFF, and tenant-scoped. They are independent surfaces with separate feature flags, services, tables, and routes — there is no shared "monetization" service.
 

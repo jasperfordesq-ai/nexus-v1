@@ -1,5 +1,7 @@
 # Mobile Native UI Contract
 
+Last reviewed: 2026-07-14
+
 This app should feel like a native mobile application first, and a parity layer second.
 Feature parity must not override the visual and interaction system.
 
@@ -16,10 +18,10 @@ Checked against the HeroUI Native docs on 2026-05-31:
 - ListGroup: https://www.heroui.com/en/docs/native/components/list-group
 - Popover: https://www.heroui.com/en/docs/native/components/popover
 
-## Status (2026-06-03)
+## Current status
 
-- **`Alert.alert` is fully retired from product code.** All ~359 calls across 62
-  screens/components were migrated to branded HeroUI Native feedback. New code
+- **`Alert.alert` is fully retired from product code.** Product screens and
+  components use branded HeroUI Native feedback. New code
   MUST NOT introduce `Alert.alert` — use the wrappers below.
 - Transient feedback → `useAppToast()` from `components/ui/AppToast.tsx`
   (`show({ title, description, variant })`; variant `danger`/`warning`/`success`/`default`).

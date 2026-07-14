@@ -1,6 +1,6 @@
 # Wallet & Exchanges Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a how-to/reference for maintainers of the time-credit **Wallet** and the structured **Exchanges** workflow in Project NEXUS. It describes the exchange lifecycle, the ledger invariants that keep credits conserved, the idempotency guard on transfers, money-column precision, tenant scoping, feature gates, failure modes, and the regression tests that protect this surface.
 

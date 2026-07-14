@@ -1,5 +1,7 @@
 # Podcasts Module
 
+Last reviewed: 2026-07-14
+
 Audience: maintainers and contributors working on the Podcasts feature — audio hosting, RSS distribution, listen analytics, or admin moderation.
 
 > **Status: production-hardened, tenant opt-in.** The module ships behind the `podcasts` tenant feature flag (default OFF). React and accessible-frontend routes are gated, member-facing catalogue reads require a same-tenant authenticated session, and only the identity-free distribution projection is anonymous.
@@ -51,6 +53,8 @@ Migrations (in order):
 - `database/migrations/2026_06_03_000002_add_distribution_metadata_to_podcasts.php` — RSS/iTunes metadata columns
 - `database/migrations/2026_06_03_000003_harden_podcast_media_and_moderation.php` — media pipeline columns, subscriptions, reports
 - `database/migrations/2026_06_04_120500_add_announced_at_to_podcast_episodes.php` — idempotent announcement guard
+- `database/migrations/2026_07_03_000001_harden_podcast_media_pipeline.php` — fail-closed media readiness and hosted-object metadata
+- `database/migrations/2026_07_12_000075_create_podcast_media_cleanup_tasks.php` — durable hosted-media and artwork cleanup ledger
 
 ---
 
@@ -64,6 +68,7 @@ Migrations (in order):
 | Admin API controller | `app/Http/Controllers/Api/AdminPodcastController.php` |
 | Shared controller concern | `app/Http/Controllers/Api/Concerns/InteractsWithPodcasts.php` |
 | Async media job | `app/Jobs/ProcessPodcastEpisodeMedia.php` |
+| Durable cleanup service/job/command | `app/Services/PodcastMediaCleanupService.php`, `app/Jobs/DeletePodcastMedia.php`, `app/Console/Commands/DispatchPodcastMediaCleanup.php` |
 | Scheduled release command | `app/Console/Commands/ReleaseScheduledPodcastEpisodes.php` |
 | Models | `app/Models/PodcastShow.php`, `PodcastEpisode.php`, `PodcastEpisodeChapter.php`, `PodcastEpisodeListen.php`, `PodcastEpisodeReaction.php` |
 | React pages | `react-frontend/src/pages/podcasts/` |
@@ -140,7 +145,13 @@ Episodes support two audio storage modes, set at upload time:
 **Audio delivery** (`GET /v2/podcasts/media/{tenantId}/{episodeId}/audio`):
 
 - Local disk: served as a `BinaryFileResponse` with `Accept-Ranges: bytes` for Range support (seekable in browsers).
-- Cloud disk: redirected to a 10-minute temporary URL via `Storage::disk(...)->temporaryUrl()`. If the driver package is missing (e.g. `league/flysystem-aws-s3-v3` not installed), the route falls back to the in-app proxy rather than 500-ing. This fallback is regression-tested in `tests/Laravel/Feature/Services/PodcastEpisodeAudioUrlFallbackTest.php`.
+- Cloud disk: an episode projection prefers a 10-minute
+  `Storage::disk(...)->temporaryUrl()`. If URL generation is unavailable, the
+  projection returns the in-app proxy URL rather than exposing the storage path
+  or failing the detail request. The proxy then resolves its own temporary URL
+  and returns 404 if the configured disk still cannot provide one. This is
+  regression-tested in
+  `tests/Laravel/Feature/Services/PodcastEpisodeAudioUrlFallbackTest.php`.
 - Members-only or private episodes require a valid HMAC capability (`?expires=<ts>&signature=<hex>`). The media route deliberately does not treat an unrelated Bearer token as authorization, so changing the tenant ID in a media URL cannot reuse another tenant's member/admin privileges. Public episodes served through RSS get unsigned URLs so native players and aggregators can fetch without signing.
 
 **Artwork** — creator-controlled external artwork URLs are rejected and legacy external values are suppressed from API, RSS, accessible HTML, feed cards, and the React player. Show artwork and episode covers use the owner-bound upload endpoints above, are stored under the tenant's podcast upload directory, and are normalized to a high-resolution square asset. Show/episode deletion records local artwork in the durable cleanup ledger; failed deletion remains visible and retryable rather than losing the only pointer.
@@ -176,7 +187,12 @@ Episodes with hosted audio use unsigned proxy URLs in the feed so podcast aggreg
 
 Episodes can be scheduled by setting `scheduled_for` to a future RFC 3339 timestamp when creating or updating an episode. The React studio converts the creator's `datetime-local` choice to an explicit UTC ISO timestamp before sending it, so server timezone and daylight-saving changes cannot shift the intended instant. Publishing such an episode sets `published_at = scheduled_for` and does not immediately notify subscribers.
 
-The `podcasts:release-due` Artisan command (backed by `ReleaseScheduledPodcastEpisodes`) should run on a frequent schedule (every minute is appropriate). It queries all published, approved, not-yet-announced episodes whose `scheduled_for` has passed, sets `announced_at` via a conditional UPDATE (preventing duplicate announcement across concurrent runs), posts a feed activity, and notifies subscribers.
+The `podcasts:release-due` Artisan command (backed by
+`ReleaseScheduledPodcastEpisodes`) is registered in `bootstrap/app.php`
+every five minutes with overlap prevention and single-server execution. It
+queries published, approved, not-yet-announced episodes whose `scheduled_for`
+has passed, sets `announced_at` via a conditional update, posts a feed
+activity, and notifies subscribers.
 
 The `announced_at` column acts as an idempotent guard: the publish path, the moderation-approval path, and the scheduler all call `PodcastService::announceEpisode()`, which uses `UPDATE ... WHERE announced_at IS NULL` and returns early if the row was already claimed.
 
@@ -186,6 +202,12 @@ To run manually:
 php artisan podcasts:release-due
 php artisan podcasts:release-due --limit=50
 ```
+
+Durable deletion retries are scheduler-owned:
+`podcasts:dispatch-media-cleanup --limit=100` runs every minute with overlap
+prevention and single-server execution. A failed storage deletion must remain
+in `podcast_media_cleanup_tasks`; never clear the last private object pointer
+merely because a queue dispatch or filesystem delete failed.
 
 ---
 
@@ -269,7 +291,13 @@ Future-scheduled episodes are hidden from all non-owner/non-admin viewers even a
 
 The `PodcastAudioPlayer` component (`react-frontend/src/components/podcasts/PodcastAudioPlayer.tsx`) handles in-browser playback, keyboard seeking, visible volume control, accessible slider value text, resume state, retry recovery, and partial listen reporting. The Studio supports create/edit workflows, tenant capability/limit metadata, image upload, RFC 3339 UTC scheduling, RSS metadata, transcript/chapter controls, and local upload cancellation/retry.
 
-Podcast shows and episodes also appear in the authenticated main feed. `FeedCard` has explicit podcast types plus a neutral unknown-type fallback; activity is updated or retired when content is edited, made private, archived, rejected/flagged, or deleted. Unified search indexes approved public/member-visible titles and, when enabled, transcripts; private content is excluded.
+Podcast shows and episodes also appear in the authenticated main feed.
+`FeedCard` has explicit podcast types plus a neutral unknown-type fallback;
+activity is updated or retired when content is edited, made private, archived,
+rejected/flagged, or deleted. Unified search queries the tenant-scoped SQL
+projection rather than a podcast Meilisearch index. It includes eligible
+public/member-visible titles and conditionally searches transcripts; private
+content is excluded.
 
 ---
 

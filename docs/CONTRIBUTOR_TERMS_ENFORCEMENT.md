@@ -1,5 +1,7 @@
 # Contributor Terms Enforcement
 
+Last reviewed: 2026-07-14
+
 Project NEXUS uses three layers to make contributor-terms acceptance hard to miss and hard to bypass accidentally.
 
 ## Layer 1: Pull Request Template
@@ -11,6 +13,8 @@ Contributors must check the acknowledgement boxes and complete the disclosure fi
 ## Layer 2: Blocking PR Check
 
 `.github/workflows/contributor-terms.yml` contains the `Contributor Terms Acceptance` job. The job runs on pull requests to `main` when a PR is opened, edited, updated, reopened, or marked ready for review.
+
+Bot-authored pull requests and pull requests authored by the repository owner are exempt: a bot cannot accept legal terms, and the owner is already the licensor. All other contributors must satisfy the fields below.
 
 The job fails unless the PR description includes:
 

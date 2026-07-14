@@ -1,6 +1,8 @@
 # API Reference
 
-This page renders the full Project NEXUS API as an interactive, browsable reference (powered by [Redoc](https://github.com/Redocly/redoc)) directly from the canonical [`openapi.json`](API.md) contract.
+Last reviewed: 2026-07-14
+
+This page renders the full Project NEXUS API as an interactive, browsable reference (powered by [Redoc](https://github.com/Redocly/redoc)) directly from the canonical [`openapi.json`](../openapi.json) contract.
 
 > The interactive reference below renders on the **documentation site**. On GitHub, see [API.md](API.md) for the getting-started guide and the raw [`openapi.json`](../openapi.json) contract, or render it locally with `npx @redocly/cli preview-docs openapi.json`.
 

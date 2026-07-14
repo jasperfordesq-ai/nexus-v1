@@ -1,6 +1,6 @@
 # Admin Module
 
-Last reviewed: 2026-07-10
+Last reviewed: 2026-07-14
 
 This guide covers the tenant admin panel and the platform super-admin surface: who can access each tier, how server-side enforcement works, what the audit trail captures, and where the code lives.
 
@@ -157,6 +157,84 @@ The route map in `react-frontend/src/admin/routes.tsx` defines all admin pages. 
 | Prerender admin | `AdminPrerenderController` — also uses `requirePlatformSuperAdmin()` |
 
 The React super-admin panel is at `/{tenant}/super-admin` (not a sub-path of `/admin`). Routes in `routes.tsx` redirect `/admin/super/*` to `/super-admin/*`.
+
+---
+
+## Broker safeguarding vetting
+
+The broker panel at `/{tenant}/broker/vetting` records a community's
+safeguarding decision, not a criminal-record certificate. Routes under
+`/v2/admin/vetting/*` use `broker-or-admin`; brokers and admin-tier users may
+make decisions, while coordinators are rejected by
+`requireVettingDecisionMaker()`. Only admin-tier users may change or rotate the
+tenant jurisdiction policy.
+
+### UK jurisdiction package
+
+`SafeguardingJurisdictionService` requires an explicit jurisdiction because a
+country code of `GB` cannot distinguish the three vetting authorities. The
+supported UK policies are:
+
+| Policy | Scheme / attestation | Allowed certification code(s) |
+| --- | --- | --- |
+| United Kingdom | `uk_national_safeguarding` / `uk_safeguarding_clearance` | Any non-empty combination of `dbs_enhanced`, `pvg_scotland`, and `access_ni` (maximum 3) |
+| England and Wales | `dbs_england_wales` / `dbs_enhanced` | `dbs_enhanced` |
+| Scotland | `pvg_scotland` / `pvg_scotland` | `pvg_scotland` |
+| Northern Ireland | `access_ni` / `access_ni` | `access_ni` |
+
+The United Kingdom umbrella policy is for communities that operate across UK
+jurisdictions. Confirming under it requires an acknowledgement, at least one
+controlled certification code, an operational scope summary, and a community
+`review_due_at` date. Selecting PVG also requires
+`authority_expires_at`; DBS and AccessNI may carry an authority date but do not
+require one. Neither date may be in the past, and the community review cannot
+fall after an authority expiry. A single-authority policy fills its sole
+certification code automatically when the caller omits the array.
+
+`MemberVettingAttestationService` stores the controlled codes, policy identity,
+decision actors/timestamps, dates, and encrypted scope/private notes. Files,
+certificate or reference numbers, results, arbitrary statuses, and authority
+documents are prohibited; any upload or unknown/prohibited input returns
+`VETTING_EVIDENCE_PROHIBITED`. This boundary is deliberate: certificate
+evidence stays with the competent authority or arranging organisation, outside
+Project NEXUS.
+
+### Authorization, renewal, and policy changes
+
+A confirmation authorizes safeguarded contact only while it is confirmed under
+the tenant's current policy version, has not been revoked, and neither its
+review date nor authority expiry is in the past. The due date itself remains
+current; it becomes expired the following day. Reconfirmation updates the
+details and clears all prior reminder stamps.
+
+The scheduled command `safeguarding:vetting-renewals` runs daily at 06:15,
+without overlap and on one server. It uses the earlier of `review_due_at` and
+`authority_expires_at`, then sends one localized email and bell cycle to active
+brokers/admins in each 90-day, 30-day, and 7-day window, on the due date, and
+after expiry. A stamp is written only after at least one delivery succeeds, so
+a tenant with no reachable safeguarding staff remains retryable. Operators can
+preview work without sending or stamping it:
+
+```bash
+php artisan safeguarding:vetting-renewals --dry-run
+```
+
+Policy rotation is different from certificate expiry. It creates a new policy
+version, makes confirmations under the old version non-authorizing, creates
+pending review requests for affected confirmed members, and notifies those
+members. Use `POST /v2/admin/vetting/policy/rotate` with an acknowledgement and
+one of `policy_changed`, `scheduled_review`, or `incident_response`; do not edit
+attestation rows directly.
+
+Key regression coverage:
+
+- `tests/Laravel/Feature/Controllers/AdminVettingControllerTest.php` — access
+  control plus removal of legacy verify/reject/delete/upload routes.
+- `tests/Laravel/Feature/Safeguarding/MemberVettingAttestationWorkflowTest.php` —
+  UK certification/date rules, encrypted decision metadata, prohibited
+  evidence, confirmation/revocation, expiry, reviews, and policy rotation.
+- `tests/Laravel/Feature/Console/VettingRenewalRemindersCommandTest.php` —
+  seven-day staff notification delivery and its persisted reminder stamp.
 
 ---
 

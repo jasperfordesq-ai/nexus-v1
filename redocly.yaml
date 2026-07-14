@@ -1,2 +1,16 @@
 extends:
   - minimal
+
+rules:
+  # The large route inventory predates stable operation IDs. Curated and
+  # security-sensitive operations are checked by check-openapi-route-contract;
+  # new IDs must be unique there. Do not manufacture unstable IDs for ~900
+  # legacy operations merely to silence a style warning.
+  operation-operationId: off
+
+  # Laravel intentionally dispatches several literal/parameter and
+  # method-specific route pairs that a framework-agnostic linter cannot order.
+  # Exact duplicate templates remain an error below.
+  no-ambiguous-paths: off
+  no-identical-paths: error
+  nullable-type-sibling: error

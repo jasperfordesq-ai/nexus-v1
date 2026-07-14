@@ -1,6 +1,6 @@
 # Organisations Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 Reference guide for the Organisations module: public directory, registration and approval workflow, opportunities on an org page, reviews, impact stats, and the owner/admin dashboard. Verified against `app/Services/VolunteerService.php`, `app/Http/Controllers/Api/VolunteerController.php`, `app/Http/Controllers/Api/AdminVolunteerController.php`, `app/Models/VolOrganization.php`, and `routes/api.php`.
 
@@ -225,7 +225,7 @@ The directory listing (`getOrganisations`) computes these with fixed-count group
 
 ## Accessible (GOV.UK) frontend
 
-The accessible frontend has a parity implementation for the Organisations module under `/{tenantSlug}/alpha/organisations/*`. It calls the same `VolunteerService` methods as the React API controllers — no business logic is reimplemented.
+The accessible frontend has a parity implementation for the Organisations module under `/{tenantSlug}/accessible/organisations/*`. It calls the same `VolunteerService` methods as the React API controllers — no business logic is reimplemented.
 
 Routes (`routes/govuk-alpha-parity/organisations.php`):
 

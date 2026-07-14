@@ -1,5 +1,7 @@
 # Production Monitoring
 
+Last reviewed: 2026-07-14
+
 Project NEXUS uses external uptime checks plus application error tracking. Monitoring configuration should avoid committing private contact details, tokens, or webhook URLs.
 
 ## External Checks
@@ -8,7 +10,7 @@ Configure HTTPS monitors for:
 
 | URL | Type | Expected result | Suggested interval |
 | --- | --- | --- | --- |
-| `https://api.project-nexus.ie/v2/health` | HTTP keyword | Health JSON reports OK | 5 min |
+| `https://api.project-nexus.ie/api/v2/health` | HTTP keyword | Health JSON reports OK | 5 min |
 | `https://api.project-nexus.ie/health.php` | HTTP status | 200 when dependencies are healthy | 5 min |
 | `https://app.project-nexus.ie/` | HTTP keyword | Project NEXUS shell loads | 5 min |
 | `https://accessible.project-nexus.ie/` | HTTP keyword | Accessible frontend loads | 5 min |
@@ -21,7 +23,7 @@ Use at least two alert destinations for primary checks, such as an owner-control
 
 Cloudflare health checks are useful as a second vantage point:
 
-1. Check `api.project-nexus.ie` at `/v2/health`, expecting HTTP 200.
+1. Check `api.project-nexus.ie` at `/api/v2/health`, expecting HTTP 200.
 2. Check `app.project-nexus.ie` at `/`, expecting HTTP 200 plus a stable body keyword.
 3. Notify an owner-controlled alert destination on status changes.
 

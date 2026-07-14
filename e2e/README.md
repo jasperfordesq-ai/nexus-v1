@@ -1,5 +1,7 @@
 # Project NEXUS E2E Tests
 
+Last reviewed: 2026-07-14
+
 End-to-end tests use Playwright and target the React frontend plus the Laravel API. Run Playwright from the repository root dependency tree for normal work; do not create or rely on a nested `e2e/node_modules` install.
 
 ## Prerequisites
@@ -51,11 +53,11 @@ e2e/
 ├── fixtures/          # Auth state and seeded-test artifacts
 ├── page-objects/      # Page object helpers where useful
 ├── global.setup.ts    # Auth/session setup
-└── docs/              # Route and migration reference notes
+└── docs/              # Route reference notes (see REACT_ROUTES_REFERENCE.md)
 ```
 
 ## Current Status
 
-The E2E suite is being moved from broad smoke coverage toward real journey assertions. CI no longer treats a configured zero-test run as green, but some lower-priority browser specs still contain defensive presence checks and `|| true` fallbacks. See [../docs/TESTING.md](../docs/TESTING.md) before treating E2E as release evidence.
+The E2E suite combines broad smoke coverage with real journey assertions. CI does not treat a configured zero-test run as green, but some lower-priority browser specs still use defensive presence checks. See [../docs/TESTING.md](../docs/TESTING.md) before treating a lower-priority spec as release evidence, and use [docs/REACT_ROUTES_REFERENCE.md](docs/REACT_ROUTES_REFERENCE.md) when reconciling route coverage.
 
 When converting an E2E test, run it against a live local stack and assert real outcomes such as persisted state, changed balances, visible messages, route protection, or form validation. Do not replace a stale selector with another unverified fallback.

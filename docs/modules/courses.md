@@ -1,6 +1,6 @@
 # Courses Module Guide
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This guide is a reference for maintainers of the **Courses** module in Project NEXUS. The module ships a full LMS (learning-management) stack: a course catalogue, structured section/lesson content, drip scheduling, quizzes, progress tracking, completion certificates, per-course discussions, cohort management, and paid enrolment via time credits. Credit flows are routed through the battle-tested `WalletService` — see [docs/modules/wallet-exchanges.md](wallet-exchanges.md) for the ledger invariants.
 
@@ -10,7 +10,7 @@ Use this guide when changing course authoring, the enrolment lifecycle, credit c
 
 Supported workflows:
 
-- **Course discovery** — members browse, filter (by category, level, keyword), and view course details; anonymous visitors see `visibility=public` courses only.
+- **Course discovery** — authenticated tenant members browse, filter (by category, level, keyword), and view course details.
 - **Free enrolment** — a member self-enrols at no cost when `credit_cost = 0`.
 - **Paid enrolment** — a member pays the course's `credit_cost` in time credits; the charge is a direct learner→author transfer routed through `WalletService::transfer()`.
 - **Lesson progress** — a learner works through lessons in order, with optional drip gating, and the system tracks per-lesson and overall completion percentage.
@@ -38,7 +38,7 @@ Additional per-tenant settings (stored in `tenants.configuration` as JSON):
 
 ## Key code & data locations
 
-Routes are defined in [`routes/api.php`](../../routes/api.php) around line 1048. Do not copy the full endpoint table here — read the route file for the live list. Primary entry points:
+Routes are defined in [`routes/api.php`](../../routes/api.php). All catalogue, detail, authoring, learning, and admin endpoints require authentication; group-linked routes additionally require the `groups` feature. Do not copy the full endpoint table here — read the route file for the live list. Primary entry points:
 
 | Concern | Route prefix | Controller |
 | --- | --- | --- |
@@ -115,8 +115,8 @@ The `visibility` enum has three values:
 
 | Value | Who can see it |
 | --- | --- |
-| `public` | Anyone including anonymous visitors |
-| `members` | Authenticated members only |
+| `public` | Any authenticated tenant member |
+| `members` | Any authenticated tenant member (currently the same route boundary as `public`) |
 | `group` | Members of a group linked to the course via `course_group_links` |
 
 A course is only surfaced in browse results and reachable via `show` when `status = published` AND `moderation_status = approved`. Instructors and admins can see their own draft/pending courses regardless of status through `canManageCourseAsUser()`.
@@ -169,7 +169,7 @@ Special cases:
 - **Zero cost:** `credit_cost = 0` is treated as free — no transfer is made.
 - **Author self-enrolment:** a user enrolling in their own course is never charged regardless of `credit_cost`.
 - **Re-enrolment after dropping:** a dropped learner has already paid once. `enrollWithPayment()` detects the `dropped` row and calls the free `enroll()` path, preserving the "charge exactly once" contract.
-- **Double-submit:** the outer idempotency check (`isEnrolled` short-circuit in the controller) catches a concurrent second call before the transaction runs.
+- **Double-submit:** the controller's outer `isEnrolled` check handles ordinary retries. The decisive concurrent check is repeated inside the transaction after the course row is locked; the unique `(tenant_id, course_id, user_id)` index is the final backstop.
 
 The transfer uses `WalletService`'s row-locked, atomic path. See [docs/modules/wallet-exchanges.md](wallet-exchanges.md) for the full ledger invariants.
 
@@ -274,7 +274,7 @@ Per-course analytics (`GET /v2/courses/{id}/analytics`, owner or admin only) inc
 | **Gamification failure on completion** | Guarded individually; a GamificationService outage does not prevent the enrollment from reaching `completed`. |
 | **Lesson drip gate** | A learner trying to complete a locked lesson receives HTTP 403 `LESSON_LOCKED`. The unlock time is included in the `progress` response (`availability[].unlock_at`). |
 | **Section id from another course** | `CourseLessonService` validates the `section_id` belongs to the same course and silently sets it to `null` if not. |
-| **Moderation pending** | A published course stays invisible in the public catalogue (no 404, just not returned by `browse`) until `moderation_status = approved`. The instructor can still view it via `GET /v2/courses/mine`. |
+| **Moderation pending** | A published course stays invisible in the authenticated member catalogue (not returned by `browse`) until `moderation_status = approved`. The instructor can still view it via `GET /v2/courses/mine`. |
 
 ## Test commands & key regression tests
 

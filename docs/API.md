@@ -1,6 +1,6 @@
 # API Reference
 
-Last reviewed: 2026-07-12
+Last reviewed: 2026-07-14
 
 Project NEXUS exposes a large Laravel JSON API for the React frontend, mobile clients, integrations, federation, and admin surfaces. The hand-written docs do not duplicate every endpoint. **The OpenAPI contract is the source of truth.**
 
@@ -10,7 +10,7 @@ This page is a getting-started guide: base URLs, the auth model, and one worked 
 
 | Contract | Status | Notes |
 | --- | --- | --- |
-| `openapi.json` (repo root) | Main API contract | OpenAPI 3.0.3, `Project NEXUS v2 API`, version `2.0.0`. About 560 KB — render it (see below) rather than reading the raw file. |
+| `openapi.json` (repo root) | Main API contract | OpenAPI 3.0.3, `Project NEXUS v2 API`, version `2.0.0`. Render it (see below) rather than reading the large raw file. |
 | `resources/openapi.json` | Smaller resource contract | OpenAPI 3.1.0, a focused subset. |
 | `resources/openapi.yaml` | YAML companion | Keep aligned with `resources/openapi.json` when that smaller contract changes. |
 | `routes/api.php` | Runtime route source | Laravel API route registration for v2, admin, partner, federation, support, and regional analytics routes. |
@@ -131,7 +131,7 @@ npx swagger-ui-watcher openapi.json
 
 You can also import `openapi.json` into Postman, Insomnia, or an SDK generator (e.g. `openapi-generator`).
 
-> Publishing a hosted Redoc page (e.g. on GitHub Pages) is a maintainer toggle, not a default. The committed `openapi.json` is always the source of truth; a hosted page is a convenience rendering of it.
+The MkDocs site publishes a hosted Redoc rendering through `docs/api-reference.md`. The committed `openapi.json` remains the source of truth; the hosted page is a convenience view of that same file.
 
 ## How To Use The API Docs
 

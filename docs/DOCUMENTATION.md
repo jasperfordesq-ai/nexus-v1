@@ -1,6 +1,6 @@
 # Documentation Architecture
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-14
 
 This page defines how Project NEXUS documentation is organised and kept trustworthy. It is a maintainer guide, not a dump of audit notes.
 
@@ -22,7 +22,7 @@ Project NEXUS documentation follows these external standards:
 | --- | --- | --- |
 | `README.md` | Public entry point, setup overview, licence and attribution summary. | Tutorial / explanation |
 | `docs/` | Maintained public maintainer, developer, operator, architecture, API, testing, security, and governance docs. | How-to / reference / explanation |
-| `docs-public/` | Public collateral, announcements, and dated engine-report snapshots. | Explanation / dated reference |
+| `docs-public/` | Public-safe operational collateral that does not belong in the maintained guide hierarchy. | Explanation / reference |
 | `openapi.json` | Canonical generated API contract for the large v2 API surface. | Reference |
 | `resources/openapi.*` | Smaller resource contract used by tooling or runtime surfaces. | Reference |
 | `mobile/docs/` | Mobile release, native UI, and security guidance scoped to the Expo app. | How-to / reference |
@@ -36,6 +36,8 @@ Project NEXUS documentation follows these external standards:
 - Do not publish secrets, live credentials, private contact details, production IP addresses, raw prompt logs, generated audit dumps, or machine-local paths.
 - Prefer current code paths: `app/`, `routes/api.php`, `database/migrations/`, `react-frontend/`, and `accessible-frontend/`.
 - Link every maintained `docs/` page from `docs/README.md`.
+- Put `Last reviewed: YYYY-MM-DD` near the top of every maintained page under `docs/`, `docs-public/`, and the scoped guide sets; refresh it only after checking the page against current source and configuration. The hygiene gate rejects invalid, future, and more-than-180-day-old review dates.
+- Index scoped guides from their nearest maintained README (`mobile/README.md`, `accessible-frontend/README.md`, `e2e/README.md`) rather than leaving them discoverable only through repository search.
 - Mark dated snapshots clearly and keep them out of the maintained-reference path.
 - Use neutral global examples, not Ireland-only assumptions.
 - Treat `CHANGELOG.md`, `VERSION`, `NOTICE`, `CONTRIBUTOR_TERMS.md`, and `CONTRIBUTING.md` as source-of-truth documents.
@@ -47,7 +49,7 @@ Project NEXUS documentation follows these external standards:
 | Public maintained documentation | `docs/ARCHITECTURE.md`, `docs/API.md`, `docs/DEPLOYMENT.md` | Keep indexed and checked. |
 | Private/local-only documentation | `BACKUP.md`, `.local-docs-archive/`, ignored root strategy notes | Do not link from public docs. |
 | Generated artifact | raw static-analysis output, Playwright reports, coverage reports | Keep out of maintained docs. |
-| Dated snapshot | `docs-public/*_ENGINE_REPORT.md`, route migration snapshots | Label as historical and avoid treating as live reference. |
+| Dated snapshot | An explicitly retained release or verification record | Label as historical and avoid treating it as live reference. |
 | Archive candidate | completed implementation plans, stale prompt outputs | Remove from tracked public repo or move to local archive. |
 | Delete candidate | temporary paste buffers, generated text dumps | Delete when no tracked reference depends on them. |
 | Source-of-truth reference | `openapi.json`, `routes/api.php`, `database/schema/mysql-schema.sql` | Do not paraphrase into competing hand-written reference. |
@@ -59,8 +61,11 @@ Project NEXUS documentation follows these external standards:
 3. If a raw artifact is useful only for one task, place it under `.local-docs-archive/`.
 4. If API behavior changes, update or regenerate `openapi.json` and validate it.
 5. If the change is release-relevant, update `CHANGELOG.md` and refresh the app copy.
-6. Run `npm run check:docs`, `npm run check:version`, and `npm run check:changelog` before finishing.
+6. Refresh the page's `Last reviewed` date after checking its factual claims against source.
+7. Run `npm run check:docs`, `npm run check:version`, and `npm run check:changelog` before finishing.
 
-## Current Gaps
+## Coverage Status
 
-The public docs now have the right shape. The remaining work is depth: write module guides only when a module is actively changed, starting with wallet/exchanges, notifications, search, federation operations, and mobile packaging.
+The maintained public set is fully indexed. Every live product module has a curated guide under `docs/modules/`, while federation, mobile, and the accessible frontend have dedicated cross-cutting references. The machine-readable API contract remains the endpoint source of truth.
+
+Treat documentation coverage as a release invariant rather than a standing backlog: when behaviour changes, update its guide and contract in the same change. Record any newly discovered documentation gap as a specific, scoped issue instead of adding an open-ended audit dump to the repository.

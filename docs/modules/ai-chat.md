@@ -2,6 +2,8 @@
 
 Audience: maintainers and contributors working on the in-platform AI assistant, its provider abstraction, tool/function-calling layer, content generation, or the privacy boundary with external AI providers.
 
+Last reviewed: 2026-07-14
+
 ## Purpose
 
 The AI assistant is an in-platform helper that answers questions about the platform and the member's own community. It can explain features, walk through workflows, draft listings/events/messages/bios, and — through function-calling **tools** — search live, tenant-scoped data (listings, members, events, jobs, marketplace, knowledge base) and report the member's own wallet balance. A separate set of admin-only "content generation" endpoints reuse the same provider layer to draft newsletters, blog posts, and CMS page sections.
@@ -112,7 +114,7 @@ This is the sensitive boundary; treat changes here with care.
 
 - The tenant system prompt and tool-usage guidance.
 - The user's typed message and the last ~12 turns of *that user's own* conversation.
-- The **user-memory block** (`AiUserMemoryService::buildPrompt`): only fields the member has already chosen to share — first/last name or organisation name, role, profile type, preferred language, location, skills, tagline, and time-credit balance (flagged "do not mention unless asked"), plus up to 3 of the user's own recent active listing titles. **No email, phone, or date of birth.** Tenant-scoped.
+- The **user-memory block** (`AiUserMemoryService::buildPrompt`): a service-selected account/profile snapshot — first/last name or organisation name, role, profile type, preferred language, location, skills, tagline, and time-credit balance (flagged "do not mention unless asked"), plus up to 3 of the user's own recent active listing titles. These are not limited to fields independently proven public by this service. **No email, phone, or date of birth.** Tenant-scoped.
 - Matched **module-docs** grounding text (admin-authored, per-tenant, public-facing how-to content — not member PII).
 - **Tool results**, which are themselves tenant-scoped and visibility-filtered (active/approved listings, etc.). The wallet tool returns only the caller's own balance and a count.
 
@@ -120,11 +122,11 @@ This is the sensitive boundary; treat changes here with care.
 
 **What is NOT sent:** other members' private messages, other members' PII beyond what their public directory entry already exposes, payment/card data (the platform processes none), or cross-tenant data.
 
-**Conversation privacy:** chats are private to the member. Admin dashboards see aggregated metrics (cost, latency, top tools, thumbs feedback) via `AiTurnTraceService::metricsFor()` — not raw member conversations, except turns a member down-voted (surfaced for quality triage). `ai_turn_traces` stores truncated user/assistant text for that purpose; account for it in data-retention/GDPR work.
+**Conversation privacy:** conversation and message APIs are private to the member. Separately, every turn is copied into `ai_turn_traces`: user text is truncated to 4,000 characters and assistant text to 8,000. Admin metrics are aggregated, but down-voted turns expose 300-character user and 400-character assistant excerpts, plus the member's feedback note, for quality triage. Account for this operational copy in data-retention/GDPR work.
 
 ## Turn tracing & feedback
 
-`AiTurnTraceService` writes one `ai_turn_traces` row per turn: tenant/user/conversation/message ids, truncated text, provider, model, token counts, best-effort `cost_usd` (static `PRICING` map — update when model prices change), latency, compacted tool-call summary, and any error. `POST /ai/chat/feedback` records thumbs up/down (by `trace_id` or `message_id`). `metricsFor()` powers the admin AI analytics view.
+`AiTurnTraceService` writes one `ai_turn_traces` row per turn: tenant/user/conversation/message ids, text truncated to the limits above, provider, model, token counts, best-effort `cost_usd` (static `PRICING` map — update when model prices change), latency, compacted tool-call summary, and any error. Tool result bodies are not retained in this trace; only tool name, success, result count, and a 160-character summary are stored. `POST /ai/chat/feedback` records thumbs up/down (by `trace_id` or `message_id`). `metricsFor()` powers the admin AI analytics view.
 
 ## Rate limiting & quotas
 

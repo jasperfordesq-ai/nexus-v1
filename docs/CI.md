@@ -1,5 +1,7 @@
 # Continuous Integration & Quality Gates
 
+Last reviewed: 2026-07-14
+
 > **Diátaxis:** explanation. What runs on every push and pull request, which checks are blocking, and how to run the same checks locally before you push.
 
 Project NEXUS uses GitHub Actions. The pipeline is designed so that **`main` stays green** — a failing check on `main` is inherited by every later PR, so gates are kept meaningful and are fixed or reverted immediately.
@@ -8,13 +10,20 @@ Project NEXUS uses GitHub Actions. The pipeline is designed so that **`main` sta
 
 | Job | Blocking steps | What it proves |
 |-----|----------------|----------------|
-| **PHP Checks** | PHPUnit (`--testsuite=Laravel,LaravelMigrated`); schema-driven test-skip budget; **PHPStan** (larastan, level 1 + `phpstan-baseline.neon`); artisan cache fail-fast; PHP syntax check | Backend logic, static analysis, and bootability. |
-| **React Build & Tests** | `tsc --noEmit`; ESLint (`--max-warnings 30`); Vitest smoke tests; **production build** (`npm run build`) | Frontend type-safety, lint, tests, and that it actually builds. |
-| **API Contract Validation** | API contract schema tests (runs after the React build) | The API responses match the typed contract the frontend expects. |
-| **Documentation & version hygiene** | `check:docs`, `check:version`, `check:changelog` | Docs are indexed and link-clean, the version is consistent across all ~16 references, and the changelog was updated. |
-| **Docker Build Verify** | Builds the dev PHP image, the production PHP image, and the React image (`--no-cache`) | The container images build for deployment. |
+| **PHP Tests / PHP Static Analysis / PHP Checks** | Sharded PHPUnit suites; schema-driven test-skip budget; PHPStan/Larastan with the checked-in baseline; Laravel boot/cache checks; PHP syntax checks | Backend behaviour, static analysis, and bootability. `PHP Checks` is the stable aggregate status. |
+| **React Build & Tests** | TypeScript; ESLint (`--max-warnings 30`); component accessibility tests; UI-contract tests; production build | Frontend type safety, lint, accessibility contracts, UI contracts, and buildability. The focused Vitest smoke and coverage steps are currently warnings because of the documented worker-pool hang. |
+| **API Contract Validation** | Focused Zod response-shape tests | Representative Laravel responses still match the TypeScript contract consumed by React. |
+| **Docker Build Verify / Dockerfile Drift Detection** | Development and production PHP images; React image; PHP configuration parity | Deployment images build and paired Dockerfiles have not silently diverged. Image builds run after merge or by manual dispatch rather than on every pull request. |
+| **Migration Safety Gate** | Schema changes require Laravel migrations; new legacy SQL migrations are rejected | Schema evolution remains deployable and uses the supported migration system. |
+| **Translation Drift Detection** | Changed-locale parity and i18n quality gates | Locale files stay structurally aligned and new translated output passes the repository checks. |
+| **Documentation, Version, and Changelog Hygiene** | `check:docs`, `check:version`, base-aware `check:changelog` | Public docs are indexed and safe, version metadata agrees, and release-relevant changes include a release note. |
+| **SPDX License Compliance / Regression Pattern Detection** | SPDX header check; repository-specific security and regression scans | New source remains AGPL-attributed and known failure patterns do not return. |
+| **E2E Smoke Tests / Accessibility Audit** | Authenticated browser smoke matrix; Events enterprise journey; real-browser accessibility; PWA offline; editor isolation; axe scan | Cross-surface runtime journeys and accessibility contracts work in built applications. |
+| **Android Native Release Gate** | Release/OTA verifier; typecheck/tests; Expo prebuild; generated network-security policy inspection | Android release channels, certificate pins, deep links, and native release configuration are safe to publish. |
+| **Accessible Frontend Release Gate** | Production build; Laravel contract tests; browser accessibility suite | The maintained HTML-first frontend builds and preserves its Laravel/accessibility contract. |
+| **Release Gate** | Aggregates every authoritative job above | A failure or cancellation in any required release gate keeps the overall pipeline red; legitimate path-filter skips are allowed. |
 
-Steps are labelled **BLOCKING** (fail the build) or **WARNING** (reported, non-blocking — e.g. the Vitest coverage report and the env-var documentation check).
+Steps labelled **BLOCKING** fail their job. Steps labelled **WARNING**, and steps with `continue-on-error: true`, report evidence without blocking. At present the focused Vitest smoke/coverage run is explicitly non-blocking; TypeScript, ESLint, accessibility/UI contracts, and the production React build remain blocking.
 
 ## Other workflows
 
@@ -23,6 +32,8 @@ Steps are labelled **BLOCKING** (fail the build) or **WARNING** (reported, non-b
 | `pr-checks.yml` | PR description gates (Root-Cause/Prevention, Translation Status, Contributor Terms). |
 | `contributor-terms.yml` | Enforces the contributor-terms acceptance section on PRs. |
 | `dependency-review.yml` | Flags risky dependency changes on PRs. |
+| `docs-lint.yml` | Markdown structure, OpenAPI lint, documentation hygiene, and strict MkDocs build. |
+| `docs-site.yml` | Publishes the MkDocs/Redoc documentation site when maintained documentation changes. |
 | `security-scan.yml` | Security scanners (see [SECURITY-SCANNING.md](SECURITY-SCANNING.md)). |
 | `e2e-tests.yml` | Playwright end-to-end smoke tests. |
 | `lighthouse.yml` | Lighthouse performance/accessibility budget. |
@@ -48,10 +59,19 @@ vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated
 vendor/bin/phpstan analyse --no-progress --memory-limit=512M
 
 # Frontend
-cd react-frontend && npx tsc --noEmit && npm run lint && npm test && npm run build
+cd react-frontend && npm run lint && npm run test:a11y -- --run && npm run test:ui-contracts -- --run && npm run build
 
 # Docs / version / changelog
 npm run check:docs && npm run check:version && npm run check:changelog
+
+# Published documentation and API contract (same pinned tools as CI)
+npx --yes markdownlint-cli2@0.23.0
+node scripts/check-openapi-route-contract.mjs
+npx --yes @redocly/cli@2.39.0 lint openapi.json resources/openapi.json resources/openapi.yaml --max-problems 1000
+python -m pip install "mkdocs==1.6.1" "mkdocs-material==9.7.6" "pymdown-extensions==11.0.1"
+cp openapi.json docs/openapi.json
+python -m mkdocs build --clean --strict
+rm -f docs/openapi.json
 
 # i18n (after locale changes)
 npm run check:i18n:baseline && npm run check:i18n:gaps

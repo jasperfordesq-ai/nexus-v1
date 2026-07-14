@@ -7,6 +7,8 @@ See NOTICE file for attribution and acknowledgements.
 
 # Alert.alert → Branded Toast / ConfirmDialog Playbook
 
+Last reviewed: 2026-07-14
+
 `NATIVE_UI_CONTRACT.md` mandates branded HeroUI Native feedback instead of the
 OS `Alert.alert`. This is the exact, verified transformation. Reference
 implementations: `app/(modals)/wallet.tsx` (toast) and

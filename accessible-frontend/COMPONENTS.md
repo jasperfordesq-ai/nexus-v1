@@ -7,6 +7,8 @@ See NOTICE file for attribution and acknowledgements.
 
 # Accessible Frontend Components
 
+Last reviewed: 2026-07-14
+
 The complete shared component library for this frontend is the official `govuk-frontend` npm package.
 
 Verified baseline on 2026-06-23:
