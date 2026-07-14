@@ -21,6 +21,11 @@ class PublicChangelogControllerTest extends TestCase
         $response->assertJsonPath('data.source_path', 'CHANGELOG.md');
         $response->assertJsonPath('data.items.0.id', 'unreleased');
         $response->assertJsonPath('data.items.0.title', 'Unreleased');
-        $this->assertNotEmpty($response->json('data.items.0.description'));
+
+        $items = $response->json('data.items');
+
+        $this->assertIsArray($items);
+        $this->assertNotEmpty($items[1]['description'] ?? '');
+        $this->assertNotEmpty($items[1]['released_at'] ?? '');
     }
 }
