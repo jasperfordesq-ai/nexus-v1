@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Guardian Assignments",
     "tab_member_preferences": "Member Preferences",
     "to": "To",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Notify safeguarding staff",
+      "requires_broker_approval": "Require coordinator approval",
+      "requires_vetted_interaction": "Vetted members only",
+      "restricts_matching": "Restrict matching",
+      "restricts_messaging": "Monitor messaging"
+    },
     "type_checkbox": "Checkbox",
     "type_info": "Info",
     "type_select": "Select",

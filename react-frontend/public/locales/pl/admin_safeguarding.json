@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Zadania Strażników",
     "tab_member_preferences": "Preferencje członków",
     "to": "Do",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Powiadom zespół ds. ochrony",
+      "requires_broker_approval": "Wymagaj zatwierdzenia koordynatora",
+      "requires_vetted_interaction": "Tylko zweryfikowani członkowie",
+      "restricts_matching": "Ogranicz dopasowywanie",
+      "restricts_messaging": "Monitoruj wiadomości"
+    },
     "type_checkbox": "Pole wyboru",
     "type_info": "Informacje",
     "type_select": "Wybierz",

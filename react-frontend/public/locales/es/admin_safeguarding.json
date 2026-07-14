@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Asignaciones de tutores",
     "tab_member_preferences": "Preferencias de miembros",
     "to": "a",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Notificar al equipo de protección",
+      "requires_broker_approval": "Requerir aprobación del coordinador",
+      "requires_vetted_interaction": "Solo miembros verificados",
+      "restricts_matching": "Restringir las coincidencias",
+      "restricts_messaging": "Supervisar los mensajes"
+    },
     "type_checkbox": "Casilla de verificación",
     "type_info": "Información",
     "type_select": "Seleccionar",

@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Incarichi di guardiano",
     "tab_member_preferences": "Preferenze dei membri",
     "to": "A",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Notifica il team di tutela",
+      "requires_broker_approval": "Richiedi l'approvazione del coordinatore",
+      "requires_vetted_interaction": "Solo membri verificati",
+      "restricts_matching": "Limita gli abbinamenti",
+      "restricts_messaging": "Monitora i messaggi"
+    },
     "type_checkbox": "Casella di controllo",
     "type_info": "Informazioni",
     "type_select": "Seleziona",

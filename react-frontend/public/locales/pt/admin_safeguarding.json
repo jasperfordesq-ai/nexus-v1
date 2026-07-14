@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Atribuições de Guardião",
     "tab_member_preferences": "Preferências de membros",
     "to": "Para",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Notificar a equipa de salvaguarda",
+      "requires_broker_approval": "Exigir aprovação do coordenador",
+      "requires_vetted_interaction": "Apenas membros verificados",
+      "restricts_matching": "Restringir correspondências",
+      "restricts_messaging": "Monitorizar mensagens"
+    },
     "type_checkbox": "Caixa de seleção",
     "type_info": "Informações",
     "type_select": "Selecione",

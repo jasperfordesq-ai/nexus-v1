@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Sannacháin Chaomhnóra",
     "tab_member_preferences": "Roghanna Ball",
     "to": "Chuig",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Cuir an fhoireann cosanta ar an eolas",
+      "requires_broker_approval": "Faomhadh comhordaitheora de dhíth",
+      "requires_vetted_interaction": "Baill ghrinnfhiosraithe amháin",
+      "restricts_matching": "Srian a chur le meaitseáil",
+      "restricts_messaging": "Monatóireacht a dhéanamh ar theachtaireachtaí"
+    },
     "type_checkbox": "ticbhosca",
     "type_info": "Eolas",
     "type_select": "Roghnaigh",

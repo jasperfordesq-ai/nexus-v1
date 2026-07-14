@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "مهام الوصي",
     "tab_member_preferences": "تفضيلات الأعضاء",
     "to": "ل",
+    "trigger_labels": {
+      "notify_admin_on_selection": "إخطار فريق الحماية",
+      "requires_broker_approval": "طلب موافقة المنسق",
+      "requires_vetted_interaction": "الأعضاء المدققون فقط",
+      "restricts_matching": "تقييد المطابقة",
+      "restricts_messaging": "مراقبة الرسائل"
+    },
     "type_checkbox": "خانة الاختيار",
     "type_info": "معلومات",
     "type_select": "يختار",

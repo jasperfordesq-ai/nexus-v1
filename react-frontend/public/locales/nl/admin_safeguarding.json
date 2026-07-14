@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Guardian-opdrachten",
     "tab_member_preferences": "Voorkeuren van leden",
     "to": "Aan",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Safeguardingteam informeren",
+      "requires_broker_approval": "Goedkeuring van coördinator vereisen",
+      "requires_vetted_interaction": "Alleen gescreende leden",
+      "restricts_matching": "Matching beperken",
+      "restricts_messaging": "Berichten monitoren"
+    },
     "type_checkbox": "Selectievakje",
     "type_info": "Info",
     "type_select": "Selecteer",

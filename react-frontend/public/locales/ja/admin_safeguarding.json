@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "ガーディアンの割り当て",
     "tab_member_preferences": "メンバーの好み",
     "to": "に",
+    "trigger_labels": {
+      "notify_admin_on_selection": "セーフガーディング担当者に通知",
+      "requires_broker_approval": "コーディネーターの承認を必須にする",
+      "requires_vetted_interaction": "審査済みメンバーのみ",
+      "restricts_matching": "マッチングを制限",
+      "restricts_messaging": "メッセージを監視"
+    },
     "type_checkbox": "チェックボックス",
     "type_info": "情報",
     "type_select": "選択",

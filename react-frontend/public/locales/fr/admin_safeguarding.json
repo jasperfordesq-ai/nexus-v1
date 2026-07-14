@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Missions de tuteur",
     "tab_member_preferences": "Préférences des membres",
     "to": "À",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Notifier l’équipe de protection",
+      "requires_broker_approval": "Exiger l’approbation du coordinateur",
+      "requires_vetted_interaction": "Membres vérifiés uniquement",
+      "restricts_matching": "Restreindre les mises en relation",
+      "restricts_messaging": "Surveiller les messages"
+    },
     "type_checkbox": "Case à cocher",
     "type_info": "Informations",
     "type_select": "Sélectionnez",

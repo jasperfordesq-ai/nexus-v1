@@ -277,24 +277,35 @@ describe('SafeguardingOptionsAdmin', () => {
     const { SafeguardingOptionsAdmin } = await import('./SafeguardingOptionsAdmin');
     render(<SafeguardingOptionsAdmin />);
     await waitFor(() => {
-      // trigger chips appear (e.g. notify_admin_label key)
-      const chips = screen.queryAllByText(/notify_admin_label|broker_approval_label|trigger/);
-      // At least some trigger indicators should be present
-      expect(chips.length).toBeGreaterThanOrEqual(0);
-      // The option itself is rendered
-      expect(screen.getByText('Working with Vulnerable Adults')).toBeInTheDocument();
+      expect(screen.getByText('Notify safeguarding staff')).toBeInTheDocument();
+      expect(screen.getByText('Require coordinator approval')).toBeInTheDocument();
+      expect(screen.queryByText(/safeguarding\.trigger_/)).not.toBeInTheDocument();
     });
   });
 
-  it('shows preset_source chip when option has a preset source', async () => {
+  it('shows a localized preset label instead of the stored preset code', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
-      data: [makeOption({ preset_source: 'ireland' })],
+      data: [makeOption({ preset_source: 'england_wales' })],
     });
     const { SafeguardingOptionsAdmin } = await import('./SafeguardingOptionsAdmin');
     render(<SafeguardingOptionsAdmin />);
     await waitFor(() => {
-      expect(screen.getByText('ireland')).toBeInTheDocument();
+      expect(screen.getByText('England and Wales')).toBeInTheDocument();
+      expect(screen.queryByText('england_wales')).not.toBeInTheDocument();
+    });
+  });
+
+  it('does not expose an inactive option internal key', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [makeOption({ label: 'I have a current DBS check', option_key: 'has_vetting', is_active: false })],
+    });
+    const { SafeguardingOptionsAdmin } = await import('./SafeguardingOptionsAdmin');
+    render(<SafeguardingOptionsAdmin />);
+    await waitFor(() => {
+      expect(screen.getByText('I have a current DBS check')).toBeInTheDocument();
+      expect(screen.queryByText('has_vetting')).not.toBeInTheDocument();
     });
   });
 });

@@ -354,6 +354,13 @@
     "tab_guardian_assignments": "Wächteraufgaben",
     "tab_member_preferences": "Mitgliederpräferenzen",
     "to": "Zu",
+    "trigger_labels": {
+      "notify_admin_on_selection": "Safeguarding-Team benachrichtigen",
+      "requires_broker_approval": "Koordinatorfreigabe erforderlich",
+      "requires_vetted_interaction": "Nur überprüfte Mitglieder",
+      "restricts_matching": "Vermittlung einschränken",
+      "restricts_messaging": "Nachrichten überwachen"
+    },
     "type_checkbox": "Kontrollkästchen",
     "type_info": "Infos",
     "type_select": "Auswählen",

@@ -92,15 +92,6 @@ const TRIGGER_ICONS: Record<string, typeof Bell> = {
   requires_vetted_interaction: ShieldCheck,
 };
 
-// Maps trigger key → translation key suffix used in safeguarding.trigger_*_label / *_desc
-const TRIGGER_I18N_KEY: Record<string, string> = {
-  notify_admin_on_selection: 'notify_admin',
-  requires_broker_approval: 'broker_approval',
-  restricts_messaging: 'monitor_messaging',
-  restricts_matching: 'restrict_matching',
-  requires_vetted_interaction: 'vetted_interaction',
-};
-
 const TRIGGER_KEYS = [
   'notify_admin_on_selection',
   'requires_broker_approval',
@@ -108,6 +99,14 @@ const TRIGGER_KEYS = [
   'restricts_matching',
   'requires_vetted_interaction',
 ] as const;
+
+const PRESET_I18N_KEYS: Record<string, string> = {
+  custom: 'system.onboarding.preset_custom',
+  england_wales: 'system.onboarding.preset_england_wales',
+  ireland: 'system.onboarding.preset_ireland',
+  northern_ireland: 'system.onboarding.preset_northern_ireland',
+  scotland: 'system.onboarding.preset_scotland',
+};
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -336,7 +335,6 @@ export function SafeguardingOptionsAdmin() {
                   <div key={opt.id} className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated">
                     <div>
                       <p className="text-sm line-through">{opt.label}</p>
-                      <p className="text-xs text-theme-muted">{opt.option_key}</p>
                     </div>
                     <Chip size="sm" variant="soft" color="default">{t('safeguarding.inactive')}</Chip>
                   </div>
@@ -417,7 +415,6 @@ export function SafeguardingOptionsAdmin() {
               <div className="space-y-3">
                 {TRIGGER_KEYS.map((key) => {
                   const Icon = TRIGGER_ICONS[key]!;
-                  const i18nKey = TRIGGER_I18N_KEY[key]!;
                   return (
                     <Switch
                       key={key}
@@ -428,8 +425,8 @@ export function SafeguardingOptionsAdmin() {
                       <div className="flex items-start gap-2">
                         <Icon className="w-4 h-4 text-theme-muted mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-sm">{t(`safeguarding.trigger_${i18nKey}_label`)}</p>
-                          <p className="text-xs text-theme-muted">{t(`safeguarding.trigger_${i18nKey}_desc`)}</p>
+                          <p className="font-medium text-sm">{t(`safeguarding.trigger_labels.${key}`)}</p>
+                          <p className="text-xs text-theme-muted">{t(`safeguarding.help.triggers.effects.${key}`)}</p>
                         </div>
                       </div>
                     </Switch>
@@ -503,11 +500,12 @@ function OptionCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { t } = useTranslation('admin_safeguarding');
+  const { t } = useTranslation(['admin_safeguarding', 'admin_system']);
   const triggers = option.triggers || {};
   const activeTriggers = Object.entries(triggers).filter(
-    ([k, v]) => v === true && k in TRIGGER_I18N_KEY
+    ([k, v]) => v === true && TRIGGER_KEYS.includes(k as (typeof TRIGGER_KEYS)[number])
   );
+  const presetI18nKey = option.preset_source ? PRESET_I18N_KEYS[option.preset_source] : null;
 
   return (
     <div className="flex items-start justify-between p-4 rounded-lg bg-theme-elevated border border-theme-default">
@@ -518,8 +516,10 @@ function OptionCard({
           {option.is_required && (
             <Chip size="sm" variant="soft" color="danger" className="text-xs">{t('safeguarding.required')}</Chip>
           )}
-          {option.preset_source && (
-            <Chip size="sm" variant="soft" color="default" className="text-xs">{option.preset_source}</Chip>
+          {presetI18nKey && (
+            <Chip size="sm" variant="soft" color="default" className="text-xs">
+              {t(presetI18nKey, { ns: 'admin_system' })}
+            </Chip>
           )}
         </div>
         {option.description && (
@@ -529,7 +529,7 @@ function OptionCard({
           <div className="flex flex-wrap gap-1 ml-6 mt-1">
             {activeTriggers.map(([key]) => (
               <Chip key={key} size="sm" variant="soft" color="warning" className="text-xs">
-                {TRIGGER_I18N_KEY[key] ? t(`safeguarding.trigger_${TRIGGER_I18N_KEY[key]}_label`) : key}
+                {t(`safeguarding.trigger_labels.${key}`)}
               </Chip>
             ))}
           </div>
